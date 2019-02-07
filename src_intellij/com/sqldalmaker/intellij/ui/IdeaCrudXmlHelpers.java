@@ -64,7 +64,8 @@ public class IdeaCrudXmlHelpers {
         ISelectDbSchemaCallback callback = new ISelectDbSchemaCallback() {
 
             @Override
-            public void process_ok(String selectedSchema, boolean skipUsed, boolean include_views, boolean plural_to_singular, boolean crud_auto, boolean add_fk_access) {
+            public void process_ok(String selected_schema, boolean skip_used, boolean include_views,
+                                   boolean plural_to_singular, boolean crud_auto, boolean add_fk_access) {
 
                 try {
 
@@ -81,7 +82,7 @@ public class IdeaCrudXmlHelpers {
                         // !!!! after 'try'
                         Set<String> in_use;
 
-                        if (skipUsed) {
+                        if (skip_used) {
 
                             in_use = find_tables_used_in_dto_xml(root_file);
 
@@ -94,7 +95,7 @@ public class IdeaCrudXmlHelpers {
 
                         DatabaseMetaData db_info = con.getMetaData();
 
-                        ResultSet rs = DbUtils.get_tables(con, db_info, selectedSchema, include_views);
+                        ResultSet rs = DbUtils.get_tables(con, db_info, selected_schema, include_views);
 
                         try {
 
@@ -117,7 +118,8 @@ public class IdeaCrudXmlHelpers {
                                     if (!in_use.contains(table_name)) {
 
                                         DtoClass cls = object_factory.createDtoClass();
-                                        String dto_class_name = IdeaHelpers.table_name_to_dto_class_name(table_name, plural_to_singular);
+                                        String dto_class_name = IdeaHelpers.table_name_to_dto_class_name(
+                                                table_name, plural_to_singular);
                                         cls.setName(dto_class_name);
                                         cls.setRef(/*"table:" +*/ table_name);
                                         items.add(cls);
@@ -224,11 +226,13 @@ public class IdeaCrudXmlHelpers {
                 if (element instanceof Crud) {
 
                     Crud c = (Crud) element;
+
                     res.add(c.getTable());
 
                 } else if (element instanceof CrudAuto) {
 
                     CrudAuto c = (CrudAuto) element;
+
                     res.add(c.getTable());
                 }
             }
@@ -242,7 +246,8 @@ public class IdeaCrudXmlHelpers {
         ISelectDbSchemaCallback callback = new ISelectDbSchemaCallback() {
 
             @Override
-            public void process_ok(String selected_schema, boolean skip_used, boolean include_views, boolean plural_to_singular, boolean crud_auto, boolean add_fk_access) {
+            public void process_ok(String selected_schema, boolean skip_used, boolean include_views,
+                                   boolean plural_to_singular, boolean crud_auto, boolean add_fk_access) {
 
                 try {
 
@@ -294,7 +299,8 @@ public class IdeaCrudXmlHelpers {
 
                                     if (!in_use.contains(table_name)) {
 
-                                        String dto_class_name = IdeaHelpers.table_name_to_dto_class_name(table_name, plural_to_singular);
+                                        String dto_class_name = IdeaHelpers.table_name_to_dto_class_name(
+                                                table_name, plural_to_singular);
 
                                         if (crud_auto) {
 
@@ -359,7 +365,8 @@ public class IdeaCrudXmlHelpers {
 
                                         if (add_fk_access) {
 
-                                            add_fk_access(root_file, conn, selected_schema, db_info, rs, nodes, plural_to_singular);
+                                            add_fk_access(root_file, conn, selected_schema,
+                                                    db_info, rs, nodes, plural_to_singular);
                                         }
 
                                     }
@@ -404,7 +411,8 @@ public class IdeaCrudXmlHelpers {
     }
 
     private static void add_fk_access(final VirtualFile root_file, Connection conn, String selected_schema,
-                                      DatabaseMetaData db_info, ResultSet rs_tables, List<Object> nodes, boolean plural_to_singular)
+                                      DatabaseMetaData db_info, ResultSet rs_tables, List<Object> nodes,
+                                      boolean plural_to_singular)
             throws SQLException {
 
         try {
@@ -461,6 +469,7 @@ public class IdeaCrudXmlHelpers {
             List<String> fk_column_names = map.get(pk_table_name);
 
             String params = "";
+
             String columns = "";
 
             boolean first = true;
@@ -476,11 +485,13 @@ public class IdeaCrudXmlHelpers {
                 if (first) {
 
                     params += c;
+
                     columns += fk_column_name;
 
                 } else {
 
                     params += ", " + c;
+
                     columns += ", " + fk_column_name;
                 }
 
@@ -516,7 +527,8 @@ public class IdeaCrudXmlHelpers {
         ISelectDbSchemaCallback callback = new ISelectDbSchemaCallback() {
 
             @Override
-            public void process_ok(String selected_schema, boolean skip_used, boolean include_views, boolean plural_to_singular, boolean crud_auto, boolean add_fk_access) {
+            public void process_ok(String selected_schema, boolean skip_used, boolean include_views,
+                                   boolean plural_to_singular, boolean crud_auto, boolean add_fk_access) {
 
                 try {
 
@@ -576,7 +588,9 @@ public class IdeaCrudXmlHelpers {
         }
     }
 
-    private static void open_dao_xml_in_editor(Project project, com.sqldalmaker.jaxb.dao.ObjectFactory object_factory, String file_name, DaoClass root) throws Exception {
+    private static void open_dao_xml_in_editor(Project project,
+                                               com.sqldalmaker.jaxb.dao.ObjectFactory object_factory,
+                                               String file_name, DaoClass root) throws Exception {
 
         String text = XmlHelpers.get_dao_xml_text(object_factory, root, true);
 
