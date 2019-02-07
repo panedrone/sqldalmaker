@@ -52,6 +52,7 @@ public class NbpIdeConsoleUtil {
 
         // http://wiki.netbeans.org/BookNBPlatformCookbookCH0209
         // Set the second parameter to true to enable reuse previously used object if any
+        //
         io = IOProvider.getDefault().getIO(display_name, false); // === ^^ false indead!!!
 
         try {

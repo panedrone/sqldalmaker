@@ -58,6 +58,7 @@ public class NbpPathHelpers {
             }
 
             // returns null if tmp is file-system file located outside project source folder
+            //
             Project tmp_project_fo = get_project(tmp);
 
             if (tmp_project_fo != project_fo) {
@@ -150,6 +151,7 @@ public class NbpPathHelpers {
     public static String get_relative_path(FileObject folder, FileObject file) {
 
         // http://bits.netbeans.org/7.4/javadoc/org-openide-filesystems/org/openide/filesystems/FileUtil.html
+        //
         String res = FileUtil.getRelativePath(folder, file);
 
         return res;

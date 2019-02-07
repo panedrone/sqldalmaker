@@ -40,7 +40,8 @@ public class NbpCrudXmHelpers {
         ISelectDbSchemaCallback callback = new ISelectDbSchemaCallback() {
 
             @Override
-            public void process_ok(String selected_schema, boolean skip_used, boolean include_views, boolean plural_to_singular, boolean crud_auto, boolean add_fk_access) {
+            public void process_ok(String selected_schema, boolean skip_used,
+                    boolean include_views, boolean plural_to_singular, boolean crud_auto, boolean add_fk_access) {
 
                 try {
 
@@ -78,7 +79,8 @@ public class NbpCrudXmHelpers {
                                 if (!in_use.contains(table_name)) {
 
                                     DtoClass cls = object_factory.createDtoClass();
-                                    String dto_class_name = NbpHelpers.table_name_to_dto_class_name(table_name, plural_to_singular);
+                                    String dto_class_name = NbpHelpers.table_name_to_dto_class_name(table_name,
+                                            plural_to_singular);
                                     cls.setName(dto_class_name);
                                     cls.setRef(table_name);
                                     items.add(cls);
@@ -112,7 +114,7 @@ public class NbpCrudXmHelpers {
         Set<String> res = new HashSet<String>();
 
         String dto_xml_abs_path = NbpPathHelpers.get_dto_xml_abs_path(obj);
-        
+
         String dto_xsd_abs_path = NbpPathHelpers.get_dto_xsd_abs_path(obj);
 
         List<DtoClass> list = get_dto_classes(dto_xml_abs_path, dto_xsd_abs_path);
@@ -124,7 +126,7 @@ public class NbpCrudXmHelpers {
             if (ref.startsWith("table:")) {
 
                 String[] parts = ref.split(":");
-                
+
                 res.add(parts[1]);
 
             } else if (Helpers.is_table_ref(ref)) {
@@ -158,7 +160,8 @@ public class NbpCrudXmHelpers {
         ISelectDbSchemaCallback callback = new ISelectDbSchemaCallback() {
 
             @Override
-            public void process_ok(String selected_schema, boolean skip_used, boolean include_views, boolean plural_to_singular, boolean crud_auto, boolean add_fk_access) {
+            public void process_ok(String selected_schema, boolean skip_used, 
+                    boolean include_views, boolean plural_to_singular, boolean crud_auto, boolean add_fk_access) {
 
                 try {
 
@@ -195,7 +198,8 @@ public class NbpCrudXmHelpers {
 
                                 if (!in_use.contains(table_name)) {
 
-                                    String dto_class_name = NbpHelpers.table_name_to_dto_class_name(table_name, plural_to_singular);
+                                    String dto_class_name = NbpHelpers.table_name_to_dto_class_name(table_name, 
+                                            plural_to_singular);
 
                                     if (crud_auto) {
 
@@ -255,7 +259,7 @@ public class NbpCrudXmHelpers {
                                             tm.setMethod(m);
                                             crud.setDelete(tm);
                                         }
-                                        
+
                                         nodes.add(crud);
                                     }
                                 }
@@ -348,17 +352,17 @@ public class NbpCrudXmHelpers {
                 if (element instanceof Crud) {
 
                     Crud c = (Crud) element;
-                    
+
                     res.add(c.getTable());
 
                 } else if (element instanceof CrudAuto) {
 
                     CrudAuto c = (CrudAuto) element;
-                    
+
                     res.add(c.getTable());
-                    
+
                 } else {
-                    
+
                     throw new Exception("Unexpected XML element: " + element.getClass().getTypeName());
                 }
             }
@@ -388,7 +392,7 @@ public class NbpCrudXmHelpers {
                 String fk_column_name = rs.getString("FKCOLUMN_NAME");
 
                 if (!hm.containsKey(pk_table_name)) {
-                    
+
                     hm.put(pk_table_name, new ArrayList<String>());
                 }
 
@@ -411,7 +415,7 @@ public class NbpCrudXmHelpers {
             List<String> fk_column_names = hm.get(pk_table_name);
 
             String params = "";
-            
+
             String columns = "";
 
             boolean first = true;
@@ -425,7 +429,7 @@ public class NbpCrudXmHelpers {
                 if (first) {
 
                     params += c;
-                    
+
                     columns += fk_column_name;
 
                     first = false;
@@ -433,7 +437,7 @@ public class NbpCrudXmHelpers {
                 } else {
 
                     params += ", " + c;
-                    
+
                     columns += ", " + fk_column_name;
                 }
             }
@@ -467,7 +471,8 @@ public class NbpCrudXmHelpers {
         ISelectDbSchemaCallback callback = new ISelectDbSchemaCallback() {
 
             @Override
-            public void process_ok(String selected_schema, boolean skip_used, boolean include_views, boolean plural_to_singular, boolean crud_auto, boolean add_fk_access) {
+            public void process_ok(String selected_schema, boolean skip_used, 
+                    boolean include_views, boolean plural_to_singular, boolean crud_auto, boolean add_fk_access) {
 
                 try {
 
