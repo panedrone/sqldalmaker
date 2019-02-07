@@ -32,7 +32,7 @@ public class PhpCG {
 
         private final List<DtoClass> dto_classes;
 
-        private final TemplateEngine ve;
+        private final TemplateEngine te;
 
         private final DbUtils db_utils;
 
@@ -49,11 +49,11 @@ public class PhpCG {
 
             if (vm_file_system_dir == null) {
 
-                ve = new TemplateEngine(get_template_path(), false);
+                te = new TemplateEngine(get_template_path(), false);
 
             } else {
 
-                ve = new TemplateEngine(vm_file_system_dir, true);
+                te = new TemplateEngine(vm_file_system_dir, true);
             }
 
             db_utils = new DbUtils(connection, FieldNamesMode.AS_IS, null);
@@ -90,7 +90,7 @@ public class PhpCG {
             context.put("mode", "dto_class");
 
             StringWriter sw = new StringWriter();
-            ve.merge(context, sw);
+            te.merge(context, sw);
 
             String text = sw.toString();
             text = text.replace("java.lang.", "");
@@ -111,7 +111,7 @@ public class PhpCG {
 
         private final Set<String> uses = new HashSet<String>();
 
-        private final TemplateEngine ve;
+        private final TemplateEngine te;
 
         private final DbUtils db_utils;
 
@@ -132,11 +132,11 @@ public class PhpCG {
 
             if (vm_file_system_dir == null) {
 
-                ve = new TemplateEngine(get_template_path(), false);
+                te = new TemplateEngine(get_template_path(), false);
 
             } else {
 
-                ve = new TemplateEngine(vm_file_system_dir, true);
+                te = new TemplateEngine(vm_file_system_dir, true);
             }
 
             db_utils = new DbUtils(connection, FieldNamesMode.AS_IS, null);
@@ -171,7 +171,7 @@ public class PhpCG {
             context.put("dao_namespace", dao_namespace);
 
             StringWriter sw = new StringWriter();
-            ve.merge(context, sw);
+            te.merge(context, sw);
             String text = sw.toString();
             text = text.replace("java.lang.", "");
             text = text.replace("java.util.", "");
@@ -387,7 +387,7 @@ public class PhpCG {
             context.put("mode", "dao_exec_dml");
 
             StringWriter sw = new StringWriter();
-            ve.merge(context, sw);
+            te.merge(context, sw);
             buffer.append(sw.getBuffer());
         }
 
@@ -447,7 +447,7 @@ public class PhpCG {
             context.put("mode", "dao_query");
 
             StringWriter sw = new StringWriter();
-            ve.merge(context, sw);
+            te.merge(context, sw);
             buff.append(sw.getBuffer());
         }
 
@@ -622,7 +622,7 @@ public class PhpCG {
             }
 
             StringWriter sw = new StringWriter();
-            ve.merge(context, sw);
+            te.merge(context, sw);
 
             StringBuilder buffer = new StringBuilder();
 
@@ -636,7 +636,7 @@ public class PhpCG {
             context.put("table_name", table_name);
             context.put("mode", mode);
 
-            ve.merge(context, sw);
+            te.merge(context, sw);
         }
 
         @Override
@@ -710,7 +710,7 @@ public class PhpCG {
 
             StringWriter sw = new StringWriter();
 
-            ve.merge(context, sw);
+            te.merge(context, sw);
 
             buffer.append(sw.getBuffer());
 
@@ -771,7 +771,7 @@ public class PhpCG {
 
             StringWriter sw = new StringWriter();
 
-            ve.merge(context, sw);
+            te.merge(context, sw);
 
             buffer.append(sw.getBuffer());
 

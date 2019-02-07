@@ -33,7 +33,7 @@ public class CppCG {
 
         private final List<DtoClass> dto_classes;
 
-        private final TemplateEngine ve;
+        private final TemplateEngine te;
 
         private final DbUtils db_utils;
 
@@ -50,11 +50,11 @@ public class CppCG {
 
             if (vm_file_system_dir == null) {
 
-                ve = new TemplateEngine(get_template_path(), false);
+                te = new TemplateEngine(get_template_path(), false);
 
             } else {
 
-                ve = new TemplateEngine(vm_file_system_dir, true);
+                te = new TemplateEngine(vm_file_system_dir, true);
             }
 
             db_utils = new DbUtils(connection, FieldNamesMode.AS_IS, type_map);
@@ -89,7 +89,7 @@ public class CppCG {
             context.put("mode", "dto_class");
 
             StringWriter sw = new StringWriter();
-            ve.merge(context, sw);
+            te.merge(context, sw);
             String text = sw.toString();
 
             return new String[]{text};
@@ -108,7 +108,7 @@ public class CppCG {
 
         private final Set<String> imports = new HashSet<String>();
 
-        private final TemplateEngine ve;
+        private final TemplateEngine te;
 
         private final DbUtils db_utils;
 
@@ -125,11 +125,11 @@ public class CppCG {
 
             if (vm_file_system_dir == null) {
 
-                ve = new TemplateEngine(get_template_path(), false);
+                te = new TemplateEngine(get_template_path(), false);
 
             } else {
 
-                ve = new TemplateEngine(vm_file_system_dir, true);
+                te = new TemplateEngine(vm_file_system_dir, true);
             }
 
             db_utils = new DbUtils(connection, FieldNamesMode.AS_IS, type_map);
@@ -157,7 +157,7 @@ public class CppCG {
             context.put("mode", "dao_class");
 
             StringWriter sw = new StringWriter();
-            ve.merge(context, sw);
+            te.merge(context, sw);
             String text = sw.toString();
 
             return new String[]{text};
@@ -249,7 +249,7 @@ public class CppCG {
             return buff;
         }
 
-        public String get_rendered_dto_class_name(String dto_class_name) throws Exception {
+        private String get_rendered_dto_class_name(String dto_class_name) throws Exception {
 
             DtoClass dto_def = Helpers.find_dto_class(dto_class_name, dto_classes);
 
@@ -357,8 +357,8 @@ public class CppCG {
             context.put("mode", "dao_exec_dml");
 
             StringWriter sw = new StringWriter();
-            ve.merge(context, sw);
-            
+            te.merge(context, sw);
+
             buffer.append(sw.getBuffer());
         }
 
@@ -421,7 +421,7 @@ public class CppCG {
             context.put("mode", "dao_query");
 
             StringWriter sw = new StringWriter();
-            ve.merge(context, sw);
+            te.merge(context, sw);
             buff.append(sw.getBuffer());
         }
 
@@ -603,7 +603,7 @@ public class CppCG {
             }
 
             StringWriter sw = new StringWriter();
-            ve.merge(context, sw);
+            te.merge(context, sw);
 
             StringBuilder buffer = new StringBuilder();
             buffer.append(sw.getBuffer());
@@ -616,7 +616,7 @@ public class CppCG {
             context.put("table_name", table_name);
             context.put("mode", mode);
 
-            ve.merge(context, sw);
+            te.merge(context, sw);
         }
 
         @Override
@@ -689,7 +689,7 @@ public class CppCG {
             context.put("mode", "dao_exec_dml");
 
             StringWriter sw = new StringWriter();
-            ve.merge(context, sw);
+            te.merge(context, sw);
 
             buffer.append(sw.getBuffer());
 
@@ -749,7 +749,7 @@ public class CppCG {
             context.put("mode", "dao_exec_dml");
 
             StringWriter sw = new StringWriter();
-            ve.merge(context, sw);
+            te.merge(context, sw);
             buffer.append(sw.getBuffer());
 
             return buffer;

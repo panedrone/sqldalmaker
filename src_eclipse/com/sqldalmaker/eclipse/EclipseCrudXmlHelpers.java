@@ -140,6 +140,7 @@ public class EclipseCrudXmlHelpers {
 		Set<String> res = new HashSet<String>();
 
 		String dto_xml_abs_path = editor2.get_dto_xml_abs_path();
+
 		String dto_xsd_abs_path = editor2.get_dto_xsd_abs_path();
 
 		List<DtoClass> list = EclipseHelpers.get_dto_classes(dto_xml_abs_path, dto_xsd_abs_path);
@@ -190,11 +191,13 @@ public class EclipseCrudXmlHelpers {
 				if (element instanceof Crud) {
 
 					Crud c = (Crud) element;
+					
 					res.add(c.getTable());
 
 				} else if (element instanceof CrudAuto) {
 
 					CrudAuto c = (CrudAuto) element;
+					
 					res.add(c.getTable());
 				}
 			}
@@ -291,6 +294,7 @@ public class EclipseCrudXmlHelpers {
 			List<String> fk_column_names = hm.get(pk_table_name);
 
 			String params = "";
+			
 			String columns = "";
 
 			boolean first = true;
@@ -306,11 +310,13 @@ public class EclipseCrudXmlHelpers {
 				if (first) {
 
 					params += c;
+					
 					columns += fk_column_name;
 
 				} else {
 
 					params += ", " + c;
+					
 					columns += ", " + fk_column_name;
 				}
 

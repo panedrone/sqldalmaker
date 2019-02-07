@@ -32,7 +32,7 @@ public class RubyCG {
 
         private final List<DtoClass> dto_classes;
 
-        private final TemplateEngine ve;
+        private final TemplateEngine te;
 
         private final DbUtils db_utils;
 
@@ -45,11 +45,11 @@ public class RubyCG {
 
             if (vm_file_system_dir == null) {
 
-                ve = new TemplateEngine(get_template_path(), false);
+                te = new TemplateEngine(get_template_path(), false);
 
             } else {
 
-                ve = new TemplateEngine(vm_file_system_dir, true);
+                te = new TemplateEngine(vm_file_system_dir, true);
             }
 
             // http://rubylearning.com/satishtalim/ruby_names.html
@@ -91,7 +91,7 @@ public class RubyCG {
             context.put("mode", "dto_class");
 
             StringWriter sw = new StringWriter();
-            ve.merge(context, sw);
+            te.merge(context, sw);
 
             String text = sw.toString();
             text = text.replace("java.lang.", "");
@@ -112,7 +112,7 @@ public class RubyCG {
 
         private final Set<String> uses = new HashSet<String>();
 
-        private final TemplateEngine ve;
+        private final TemplateEngine te;
 
         private final DbUtils db_utils;
 
@@ -125,11 +125,11 @@ public class RubyCG {
 
             if (vm_file_system_dir == null) {
 
-                ve = new TemplateEngine(get_template_path(), false);
+                te = new TemplateEngine(get_template_path(), false);
 
             } else {
 
-                ve = new TemplateEngine(vm_file_system_dir, true);
+                te = new TemplateEngine(vm_file_system_dir, true);
             }
 
             db_utils = new DbUtils(connection, FieldNamesMode.PYTHON_RUBY, null);
@@ -164,7 +164,7 @@ public class RubyCG {
             context.put("mode", "dao_class");
 
             StringWriter sw = new StringWriter();
-            ve.merge(context, sw);
+            te.merge(context, sw);
 
             String text = sw.toString();
 
@@ -377,7 +377,7 @@ public class RubyCG {
 
             StringWriter sw = new StringWriter();
 
-            ve.merge(context, sw);
+            te.merge(context, sw);
 
             buffer.append(sw.getBuffer());
         }
@@ -442,7 +442,7 @@ public class RubyCG {
 
             StringWriter sw = new StringWriter();
 
-            ve.merge(context, sw);
+            te.merge(context, sw);
 
             buff.append(sw.getBuffer());
         }
@@ -625,7 +625,7 @@ public class RubyCG {
 
             StringWriter sw = new StringWriter();
 
-            ve.merge(context, sw);
+            te.merge(context, sw);
 
             StringBuilder buffer = new StringBuilder();
 
@@ -639,7 +639,7 @@ public class RubyCG {
             context.put("table_name", table_name);
             context.put("mode", mode);
 
-            ve.merge(context, sw);
+            te.merge(context, sw);
         }
 
         @Override
@@ -711,7 +711,7 @@ public class RubyCG {
 
             StringWriter sw = new StringWriter();
 
-            ve.merge(context, sw);
+            te.merge(context, sw);
 
             buffer.append(sw.getBuffer());
 
@@ -768,7 +768,7 @@ public class RubyCG {
 
             StringWriter sw = new StringWriter();
 
-            ve.merge(context, sw);
+            te.merge(context, sw);
 
             buffer.append(sw.getBuffer());
 
