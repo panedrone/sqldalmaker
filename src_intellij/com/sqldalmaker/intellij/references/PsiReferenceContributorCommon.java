@@ -32,7 +32,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public class PsiReferenceContributorCommon extends PsiReferenceContributor {
 
-    private class DtoDocElementFilter implements ElementFilter {
+    private class DtoXmlDocElementFilter implements ElementFilter {
 
         @Override
         public boolean isAcceptable(Object element, @Nullable PsiElement context) {
@@ -69,7 +69,7 @@ public class PsiReferenceContributorCommon extends PsiReferenceContributor {
         }
     }
 
-    private class DaoDocElementFilter implements ElementFilter {
+    private class DaoXmlDocElementFilter implements ElementFilter {
 
         @Override
         public boolean isAcceptable(Object element, @Nullable PsiElement context) {
@@ -114,14 +114,14 @@ public class PsiReferenceContributorCommon extends PsiReferenceContributor {
 
         XmlUtil.registerXmlAttributeValueReferenceProvider(registrar, new String[]{"name"}, new ScopeFilter(
                 new AndFilter(
-                        new DtoDocElementFilter(),
+                        new DtoXmlDocElementFilter(),
                         new ParentElementFilter(new TagNameFilter(IdeaReferenceCompletion.ELEMENT.DTO_CLASS), 2)
                 )
         ), true, ref_provider_dto_class);
 
         XmlUtil.registerXmlAttributeValueReferenceProvider(registrar, new String[]{"dto"}, new ScopeFilter(
                 new AndFilter(
-                        new DaoDocElementFilter(),
+                        new DaoXmlDocElementFilter(),
                         new ParentElementFilter(new TagNameFilter(IdeaReferenceCompletion.DAO_TAGS_USING_DTO), 2)
                 )
         ), true, ref_provider_dto_class);
@@ -132,14 +132,14 @@ public class PsiReferenceContributorCommon extends PsiReferenceContributor {
 
         XmlUtil.registerXmlAttributeValueReferenceProvider(registrar, new String[]{"ref"}, new ScopeFilter(
                 new AndFilter(
-                        new DtoDocElementFilter(),
+                        new DtoXmlDocElementFilter(),
                         new ParentElementFilter(new TagNameFilter(IdeaReferenceCompletion.ELEMENT.DTO_CLASS), 2)
                 )
         ), true, ref_provider_sql_file);
 
         XmlUtil.registerXmlAttributeValueReferenceProvider(registrar, new String[]{"ref"}, new ScopeFilter(
                 new AndFilter(
-                        new DaoDocElementFilter(),
+                        new DaoXmlDocElementFilter(),
                         new ParentElementFilter(new TagNameFilter(IdeaReferenceCompletion.DAO_TAGS_USING_REF), 2)
                 )
         ), true, ref_provider_sql_file);

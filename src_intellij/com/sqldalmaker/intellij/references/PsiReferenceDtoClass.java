@@ -79,15 +79,18 @@ public class PsiReferenceDtoClass extends PsiReferenceBase<PsiElement> {
     @NotNull
     @Override
     public Object[] getVariants() {
+
         // code completion is not implemented for this attribute value yet
+        //
         return ArrayUtil.EMPTY_OBJECT_ARRAY;
     }
 
     @Override
     public boolean isSoft() {
-        // defaults: if 'false' then wrong class name is highlighted in red
 
-        final PsiFile containing_file = myElement.getContainingFile();
+        // defaults: if 'false' then wrong class name is highlighted in red
+        //
+        PsiFile containing_file = myElement.getContainingFile();
 
         if (containing_file == null) {
 

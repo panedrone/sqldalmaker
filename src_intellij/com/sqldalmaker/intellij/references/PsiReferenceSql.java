@@ -117,7 +117,9 @@ public class PsiReferenceSql extends PsiReferenceBase<PsiElement> {
     @NotNull
     @Override
     public Object[] getVariants() {
+
         // code completion is implemented with CompletionProvider API
+        //
         return ArrayUtil.EMPTY_OBJECT_ARRAY;
     }
 
@@ -133,8 +135,7 @@ public class PsiReferenceSql extends PsiReferenceBase<PsiElement> {
             return false;
         }
 
-        // @NotNull
-        String canonical_text = getCanonicalText();
+        String canonical_text = getCanonicalText(); // @NotNull
 
         String name = containing_file.getName();
 
@@ -151,7 +152,7 @@ public class PsiReferenceSql extends PsiReferenceBase<PsiElement> {
         } else if (FileSearchHelpers.is_dao_xml(name)) {
 
             // Allowed in DAO: ONLY path to sql-file. So, everything must be checked
-
+            //
             if (Helpers.is_sql_shortcut_ref(canonical_text)) {
 
                 return true;

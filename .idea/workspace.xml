@@ -20,7 +20,83 @@
     <favorites_list name="com.sqldalmaker.plugins" />
   </component>
   <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300" />
+    <leaf>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/CompletionProviderSql.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="203">
+              <caret line="129" column="70" selection-start-line="129" selection-start-column="70" selection-end-line="129" selection-end-column="70" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/CompletionProviderTable.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1955">
+              <caret line="136" column="96" selection-start-line="136" selection-start-column="96" selection-end-line="136" selection-end-column="96" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/PsiReferenceContributorCommon.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-350">
+              <caret line="71" column="24" selection-start-line="71" selection-start-column="24" selection-end-line="71" selection-end-column="24" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/PsiReferenceDtoClass.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="357">
+              <caret line="92" selection-start-line="92" selection-end-line="92" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/PsiReferenceDtoClassProvider.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="249">
+              <caret line="73" column="24" selection-start-line="73" selection-start-column="24" selection-end-line="73" selection-end-column="24" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/PsiReferenceSql.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1847">
+              <caret line="121" column="10" selection-start-line="121" selection-start-column="10" selection-end-line="121" selection-end-column="10" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/SdmActionGroup.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="508">
+              <caret line="124" column="10" selection-start-line="124" selection-start-column="10" selection-end-line="124" selection-end-column="10" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -98,7 +174,6 @@
         <option value="$PROJECT_DIR$/src/com/sqldalmaker/common/XmlHelpers.java" />
         <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaEditorHelpers.java" />
         <option value="$PROJECT_DIR$/META-INF/plugin.xml" />
-        <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/SdmActionGroup.java" />
         <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/SdmPluginRegistration.java" />
         <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/RefCommon.java" />
         <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/CrudTableDtoCompletionProvider.java" />
@@ -110,7 +185,6 @@
         <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/RefReferenceContributor.java" />
         <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/CommonCompletionContributor.java" />
         <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/DtoReference.java" />
-        <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/PsiReferenceDtoClass.java" />
         <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/PsiReferenceContributorSql.java" />
         <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/DtoReferenceProvider.java" />
         <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/NameReference.java" />
@@ -122,7 +196,6 @@
         <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/PsiReferenceName.java" />
         <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/PsiReferenceDtoClassGeneratedSource.java" />
         <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/PsiReferenceDtoClassProvider.java" />
-        <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/PsiReferenceContributorCommon.java" />
         <option value="$PROJECT_DIR$/src/com/sqldalmaker/cg/cpp/cpp.vm" />
         <option value="$PROJECT_DIR$/src/com/sqldalmaker/cg/java/java.vm" />
         <option value="$PROJECT_DIR$/src/com/sqldalmaker/cg/php/php.vm" />
@@ -131,12 +204,15 @@
         <option value="$PROJECT_DIR$/src/com/sqldalmaker/cg/Helpers.java" />
         <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/CompletionProviderTable.java" />
         <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaHelpers.java" />
-        <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/PsiReferenceSql.java" />
         <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/CompletionContributorCommon.java" />
         <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/CompletionProviderSql.java" />
         <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabDAO.java" />
         <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaCrudXmlHelpers.java" />
         <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaTargetLanguageHelpers.java" />
+        <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/PsiReferenceContributorCommon.java" />
+        <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/PsiReferenceDtoClass.java" />
+        <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/PsiReferenceSql.java" />
+        <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/SdmActionGroup.java" />
       </list>
     </option>
   </component>
@@ -167,8 +243,8 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="PackagesPane" />
       <pane id="Scope" />
+      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -203,20 +279,6 @@
               <item name="src_intellij" type="462c0819:PsiDirectoryNode" />
               <item name="intellij" type="462c0819:PsiDirectoryNode" />
             </path>
-            <path>
-              <item name="com.sqldalmaker.intellij" type="b2602c69:ProjectViewProjectNode" />
-              <item name="sqldalmaker-plugins" type="462c0819:PsiDirectoryNode" />
-              <item name="src_intellij" type="462c0819:PsiDirectoryNode" />
-              <item name="intellij" type="462c0819:PsiDirectoryNode" />
-              <item name="references" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="com.sqldalmaker.intellij" type="b2602c69:ProjectViewProjectNode" />
-              <item name="sqldalmaker-plugins" type="462c0819:PsiDirectoryNode" />
-              <item name="src_intellij" type="462c0819:PsiDirectoryNode" />
-              <item name="intellij" type="462c0819:PsiDirectoryNode" />
-              <item name="ui" type="462c0819:PsiDirectoryNode" />
-            </path>
           </expand>
           <select />
         </subPane>
@@ -236,7 +298,7 @@
     <property name="UI_DESIGNER_EDITOR_MODE.UIDesignerToolWindowManager.WIDTH" value="421" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1549533456702" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1549568193435" />
     <property name="dynamic.classpath" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="options.lastSelected" value="project.propVCSSupport.Mappings" />
@@ -1006,8 +1068,9 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1066" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.29850745" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.30170575" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Image Layers" order="2" />
       <window_info id="UI Designer" order="3" />
@@ -1016,13 +1079,13 @@
       <window_info id="Palette&#9;" order="6" />
       <window_info id="Capture Tool" order="7" />
       <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" sideWeight="0.41364604" weight="0.37211856" />
+      <window_info anchor="bottom" id="Find" order="1" sideWeight="0.413113" visible="true" weight="0.2557629" />
       <window_info anchor="bottom" id="Run" order="2" sideWeight="0.4834931" weight="0.26813188" />
       <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.51492536" weight="0.25356752" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" sideWeight="0.4978701" weight="0.28411633" />
       <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="bottom" id="Event Log" order="7" sideWeight="0.6130064" side_tool="true" visible="true" weight="0.32930845" />
+      <window_info active="true" anchor="bottom" id="Event Log" order="7" sideWeight="0.586887" side_tool="true" visible="true" weight="0.2557629" />
       <window_info anchor="bottom" id="SVN Repositories" order="8" sideWeight="0.4978701" weight="0.32997763" />
       <window_info anchor="bottom" id="Application Servers" order="9" />
       <window_info anchor="bottom" id="Version Control" order="10" sideWeight="0.49361023" weight="0.25892857" />
@@ -1164,17 +1227,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UIDialogSelectDbSchema.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3253">
-          <caret line="295" lean-forward="true" selection-start-line="295" selection-end-line="295" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="method#$$$setupUI$$$#0;class#UIDialogSelectDbSchema#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/com/sqldalmaker/jaxb/dto/ObjectFactory.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="295">
@@ -1357,13 +1409,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/SdmActionGroup.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1649">
-          <caret line="114" selection-start-line="114" selection-end-line="114" />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$APPLICATION_HOME_DIR$/lib/platform-api.jar!/com/intellij/psi/PsiReferenceBase.class">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="136">
@@ -1378,27 +1423,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/PsiReferenceDtoClass.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-392">
-          <caret line="25" column="21" selection-start-line="25" selection-start-column="13" selection-end-line="25" selection-end-column="33" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/PsiReferenceDtoClassGeneratedSource.java" />
-    <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/PsiReferenceDtoClassProvider.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="734">
-          <caret line="69" column="58" lean-forward="true" selection-start-line="69" selection-start-column="58" selection-end-line="69" selection-end-column="58" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/com/sqldalmaker/cg/cpp/cpp.vm">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="217">
@@ -1451,13 +1476,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/CompletionProviderTable.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="408">
-          <caret line="136" column="96" selection-start-line="136" selection-start-column="96" selection-end-line="136" selection-end-column="96" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/CompletionProviderDtoClass.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="85">
@@ -1482,36 +1500,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/CompletionProviderSql.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="329">
-          <caret line="87" column="9" lean-forward="true" selection-start-line="87" selection-start-column="9" selection-end-line="87" selection-end-column="9" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/PsiReferenceContributorCommon.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/CompletionContributorCommon.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="748">
           <caret line="48" column="33" selection-start-line="48" selection-start-column="33" selection-end-line="48" selection-end-column="33" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/PsiReferenceSql.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="496">
-          <caret line="159" column="25" lean-forward="true" selection-start-line="159" selection-start-column="25" selection-end-line="159" selection-end-column="25" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -1549,6 +1541,74 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="118">
           <caret line="112" column="62" selection-start-line="112" selection-start-column="62" selection-end-line="112" selection-end-column="62" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$APPLICATION_HOME_DIR$/lib/platform-api.jar!/com/intellij/openapi/vfs/VirtualFileVisitor.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="544">
+          <caret line="42" column="14" selection-start-line="42" selection-start-column="14" selection-end-line="42" selection-end-column="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/CompletionProviderSql.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="203">
+          <caret line="129" column="70" selection-start-line="129" selection-start-column="70" selection-end-line="129" selection-end-column="70" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/CompletionProviderTable.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1955">
+          <caret line="136" column="96" selection-start-line="136" selection-start-column="96" selection-end-line="136" selection-end-column="96" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/PsiReferenceContributorCommon.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-350">
+          <caret line="71" column="24" selection-start-line="71" selection-start-column="24" selection-end-line="71" selection-end-column="24" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/PsiReferenceDtoClass.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="357">
+          <caret line="92" selection-start-line="92" selection-end-line="92" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/PsiReferenceDtoClassProvider.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="249">
+          <caret line="73" column="24" selection-start-line="73" selection-start-column="24" selection-end-line="73" selection-end-column="24" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/PsiReferenceSql.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1847">
+          <caret line="121" column="10" selection-start-line="121" selection-start-column="10" selection-end-line="121" selection-end-column="10" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/SdmActionGroup.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="508">
+          <caret line="124" column="10" selection-start-line="124" selection-start-column="10" selection-end-line="124" selection-end-column="10" />
         </state>
       </provider>
     </entry>
