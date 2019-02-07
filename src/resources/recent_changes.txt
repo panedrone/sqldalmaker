@@ -1,0 +1,32 @@
+Jan 11, 2019
+
+    - Fixes for DTO/DAO XML assistants + MySQL.
+
+Nov 11, 2018
+
+    - Fixes for DTO/DAO XML assistants + MySQL.
+
+Nov 07, 2018
+
+    - Added an option to exclude views in DTO/DAO assistants.
+    - Fixes of C++ formatting in VM.
+    - Added example of DataStore class implemented in Qt5 C++.
+
+Feb 12, 2018
+------------
+
+	Implemented generation of XML for reading data through FK-s.
+	
+Jan 08, 2018
+------------
+
+    Improvements of error handling and visualization.
+    
+    To use new event logging, update XSD-files from the tab 'Admin' and add <ide event-log="true"/> to 'settings.xml'.
+
+Apr 01, 2017
+------------
+
+    Shortcuts for simple reading data through FK-s:
+
+        '<query-dto-list method="findCustomers(companyName, region)" dto="Customer" ref="customers(CompanyName, Region)"/>'

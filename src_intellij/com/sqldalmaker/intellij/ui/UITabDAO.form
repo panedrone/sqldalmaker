@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="com.sqldalmaker.intellij.ui.UITabDAO">
+  <grid id="27dc6" binding="rootPanel" layout-manager="GridLayoutManager" row-count="3" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+    <margin top="0" left="0" bottom="0" right="0"/>
+    <constraints>
+      <xy x="20" y="20" width="509" height="400"/>
+    </constraints>
+    <properties/>
+    <border type="none"/>
+    <children>
+      <component id="b2e3f" class="javax.swing.JTextField" binding="textField1" default-binding="true">
+        <constraints>
+          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+            <preferred-size width="150" height="-1"/>
+          </grid>
+        </constraints>
+        <properties/>
+      </component>
+      <scrollpane id="db81b">
+        <constraints>
+          <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <component id="d827f" class="javax.swing.JTable" binding="table" custom-create="true">
+            <constraints/>
+            <properties>
+              <autoResizeMode value="0"/>
+              <fillsViewportHeight value="true"/>
+            </properties>
+          </component>
+        </children>
+      </scrollpane>
+      <grid id="a0a9b" binding="toolbar_1" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="0">
+        <constraints>
+          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <toolbar id="adcde" binding="toolbar1">
+            <constraints/>
+            <properties>
+              <borderPainted value="false"/>
+              <floatable value="false"/>
+            </properties>
+            <border type="none"/>
+            <children>
+              <component id="ca7e1" class="javax.swing.JButton" binding="btn_NewXML">
+                <constraints/>
+                <properties>
+                  <borderPainted value="false"/>
+                  <icon value="img/new_xml.gif"/>
+                  <margin top="5" left="5" bottom="5" right="5"/>
+                  <maximumSize width="32" height="32"/>
+                  <minimumSize width="32" height="32"/>
+                  <opaque value="false"/>
+                  <preferredSize width="32" height="32"/>
+                  <text value=""/>
+                  <toolTipText value="New XML file"/>
+                </properties>
+              </component>
+              <component id="9732e" class="javax.swing.JButton" binding="btn_OpenXML">
+                <constraints/>
+                <properties>
+                  <borderPainted value="false"/>
+                  <icon value="img/xmldoc.gif"/>
+                  <margin top="5" left="5" bottom="5" right="5"/>
+                  <maximumSize width="32" height="32"/>
+                  <minimumSize width="32" height="32"/>
+                  <opaque value="false"/>
+                  <preferredSize width="32" height="32"/>
+                  <text value=""/>
+                  <toolTipText value="Open XML file"/>
+                </properties>
+              </component>
+              <component id="4b090" class="javax.swing.JButton" binding="btn_OpenJava">
+                <constraints/>
+                <properties>
+                  <borderPainted value="false"/>
+                  <icon value="img/GeneratedFile.gif"/>
+                  <margin top="5" left="5" bottom="5" right="5"/>
+                  <maximumSize width="32" height="32"/>
+                  <minimumSize width="32" height="32"/>
+                  <opaque value="false"/>
+                  <preferredSize width="32" height="32"/>
+                  <text value=""/>
+                  <toolTipText value="Go to generated source"/>
+                </properties>
+              </component>
+              <component id="93bcc" class="javax.swing.JButton" binding="btn_CrudDao">
+                <constraints/>
+                <properties>
+                  <borderPainted value="false"/>
+                  <icon value="img/180.png"/>
+                  <margin top="5" left="5" bottom="5" right="5"/>
+                  <maximumSize width="32" height="32"/>
+                  <minimumSize width="32" height="32"/>
+                  <opaque value="false"/>
+                  <preferredSize width="32" height="32"/>
+                  <text value=""/>
+                  <toolTipText value="DAO CRUD assistant"/>
+                </properties>
+              </component>
+              <component id="b0d83" class="javax.swing.JButton" binding="button_fk_assistant">
+                <constraints/>
+                <properties>
+                  <borderPainted value="false"/>
+                  <icon value="img/FK.gif"/>
+                  <margin top="5" left="5" bottom="5" right="5"/>
+                  <maximumSize width="32" height="32"/>
+                  <minimumSize width="32" height="32"/>
+                  <opaque value="false"/>
+                  <preferredSize width="32" height="32"/>
+                  <text value=""/>
+                  <toolTipText value="FK access assistant"/>
+                </properties>
+              </component>
+              <component id="f2f7e" class="javax.swing.JButton" binding="btn_Refresh">
+                <constraints/>
+                <properties>
+                  <borderPainted value="false"/>
+                  <icon value="img/arrow-circle-double-135.png"/>
+                  <margin top="5" left="5" bottom="5" right="5"/>
+                  <maximumSize width="32" height="32"/>
+                  <minimumSize width="32" height="32"/>
+                  <opaque value="false"/>
+                  <preferredSize width="32" height="32"/>
+                  <text value=""/>
+                  <toolTipText value="Refresh"/>
+                </properties>
+              </component>
+              <component id="aec10" class="javax.swing.JButton" binding="btn_DeselAll">
+                <constraints/>
+                <properties>
+                  <borderPainted value="false"/>
+                  <icon value="img/none.gif"/>
+                  <margin top="5" left="5" bottom="5" right="5"/>
+                  <maximumSize width="32" height="32"/>
+                  <minimumSize width="32" height="32"/>
+                  <opaque value="false"/>
+                  <preferredSize width="32" height="32"/>
+                  <text value=""/>
+                  <toolTipText value="Deselect all"/>
+                </properties>
+              </component>
+              <component id="5a00e" class="javax.swing.JButton" binding="btn_SelAll">
+                <constraints/>
+                <properties>
+                  <borderPainted value="false"/>
+                  <icon value="img/text.gif"/>
+                  <margin top="5" left="5" bottom="5" right="5"/>
+                  <maximumSize width="32" height="32"/>
+                  <minimumSize width="32" height="32"/>
+                  <opaque value="false"/>
+                  <preferredSize width="32" height="32"/>
+                  <text value=""/>
+                  <toolTipText value="Select all"/>
+                </properties>
+              </component>
+              <component id="f321f" class="javax.swing.JButton" binding="btn_Generate">
+                <constraints/>
+                <properties>
+                  <borderPainted value="false"/>
+                  <icon value="img/compile-warning.png"/>
+                  <margin top="5" left="5" bottom="5" right="5"/>
+                  <maximumSize width="32" height="32"/>
+                  <minimumSize width="32" height="32"/>
+                  <opaque value="false"/>
+                  <preferredSize width="32" height="32"/>
+                  <text value=""/>
+                  <toolTipText value="Generate for selection"/>
+                </properties>
+              </component>
+              <component id="89a6c" class="javax.swing.JButton" binding="btn_Validate">
+                <constraints/>
+                <properties>
+                  <borderPainted value="false"/>
+                  <icon value="img/validate.gif"/>
+                  <margin top="5" left="5" bottom="5" right="5"/>
+                  <maximumSize width="32" height="32"/>
+                  <minimumSize width="32" height="32"/>
+                  <opaque value="false"/>
+                  <preferredSize width="32" height="32"/>
+                  <text value=""/>
+                  <toolTipText value="Validate all"/>
+                </properties>
+              </component>
+            </children>
+          </toolbar>
+        </children>
+      </grid>
+    </children>
+  </grid>
+</form>

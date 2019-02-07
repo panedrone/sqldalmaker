@@ -1,0 +1,448 @@
+package com.sqldalmaker;
+
+import android.content.Context;
+import android.content.ContextWrapper;
+import android.content.res.Resources;
+import android.database.Cursor;
+import android.database.SQLException;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteStatement;
+import android.util.Log;
+
+import com.sqldalmaker.thesaurus.app.dao.ThesaurusDao;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
+/*
+This is an example of how to implement and use DataStore for Android.
+Web-site: http://sqldalmaker.sourceforge.net
+Contact: sqldalmaker@gmail.com
+Copy-paste this code to your project and change it for your needs.
+*/
+public class DataStoreManager {
+
+    private static final String DB_NAME = "thesaurus.db";
+
+    private final Context myContext;
+
+    private SQLiteDatabase dataBase;
+
+    public DataStoreManager(Context context) {
+        this.myContext = context;
+    }
+
+    private String getDatabasePath() {
+        // return this.myContext.getDatabasePath(DB_NAME).getAbsolutePath();
+        return this.myContext.getDatabasePath(DB_NAME).getPath();
+    }
+
+    public void openReadableDatabase() throws SQLException, IOException {
+        deployDatabaseOnDemand();
+        String myPath = getDatabasePath();
+        dataBase = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READONLY);
+    }
+
+    public void openWritableDatabase() throws SQLException, IOException {
+        deployDatabaseOnDemand();
+        String myPath = getDatabasePath();
+        dataBase = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READWRITE);
+    }
+
+    public void beginTransaction() {
+        dataBase.beginTransaction();
+    }
+
+    public void setTransactionSuccessful() {
+        dataBase.setTransactionSuccessful();
+    }
+
+    public void endTransaction() {
+        // http://stackoverflow.com/questions/6909221/android-sqlite-rollback
+        // you do not need to explicitly rollback. If you call
+        // db.endTransaction() without .setTransactionSuccessful() it will roll
+        // back automatically.
+        dataBase.endTransaction();
+    }
+
+    public void close() {
+        if (dataBase != null) {
+            dataBase.close();
+            dataBase = null;
+        }
+    }
+
+    ///////////////////////////////////////////
+
+    private void deployDatabaseOnDemand() {
+
+        String myPath = getDatabasePath();
+        File f = new File(myPath);
+        f.delete();
+
+        if (!f.exists()) {
+
+            try {
+
+                copyDataBase();
+
+            } catch (IOException e) {
+                throw new Error("Error copying database");
+            }
+        }
+    }
+
+    private void copyDataBase() throws IOException {
+
+        Resources resources = myContext.getResources();
+
+        String myPath = getDatabasePath();
+        // it works OK without mkdirs and createNewFile:
+        OutputStream databaseOutput = new FileOutputStream(myPath);
+
+        try {
+
+            // Deploying android apps with large databases
+            // http://www.chriskopec.com/blog/2010/mar/13/deploying-android-apps-with-large-databases/
+
+            for (int i = 1; i <= 69; i++) {
+
+                String resName = String.format("thesaurus_%03d", i);
+                // http://stackoverflow.com/questions/2856407/android-how-to-get-access-to-raw-resources-that-i-put-in-res-folder
+                int id = resources.getIdentifier(resName, "raw", myContext.getPackageName());
+                // int id = R.raw.thesaurus_zip_001 | i;
+                InputStream databaseInput = resources.openRawResource(id);
+                try {
+                    byte[] buffer = new byte[2048];
+                    int length;
+
+                    while ((length = databaseInput.read(buffer)) > 0) {
+                        databaseOutput.write(buffer, 0, length);
+                        databaseOutput.flush();
+                    }
+                } finally {
+                    databaseInput.close();
+                }
+            }
+
+        } finally {
+
+            databaseOutput.flush();
+            databaseOutput.close();
+        }
+    }
+
+    /////////////////////////////////////////////////////
+
+    private MyDataStore ds = new MyDataStore();
+
+    // //////////////////////////////////////////////////
+    //
+    // MyDataStore is hidden: use factory method pattern
+
+    public ThesaurusDao createThesaurusDao() {
+        return new ThesaurusDao(ds);
+    }
+
+    private class MyDataStore extends DataStore {
+
+        public <T> T castGeneratedValue(Class<T> type, Object obj) {
+
+            return type.cast(obj);
+        }
+
+        public int insert(String sql, String[] genColNames, Object[] genValues,
+                          Object... params) throws Exception {
+
+            SQLiteStatement statement = dataBase.compileStatement(sql);
+
+            try {
+
+                bindParams(statement, params);
+
+                assert statement != null;
+                genValues[0] = statement.executeInsert();
+
+            } finally {
+
+                assert statement != null;
+                statement.close();
+            }
+
+            return 1;
+        }
+
+        public int execDML(String sql, Object... params) throws Exception {
+
+            SQLiteStatement statement = dataBase.compileStatement(sql);
+
+            try {
+
+                bindParams(statement, params);
+
+                String trimmed = sql.toUpperCase(Locale.getDefault()).trim();
+
+                if ("DELETE".equals(trimmed) || "UPDATE".equals(trimmed)) {
+
+                    // Returns
+                    // the number of rows affected by this SQL statement
+                    // execution.
+
+                    assert statement != null;
+                    return statement.executeUpdateDelete();
+
+                } else {
+
+                    assert statement != null;
+                    statement.execute();
+
+                    return 0;
+                }
+
+            } finally {
+
+                assert statement != null;
+                statement.close();
+            }
+        }
+
+        private Object getValueByColumnLabel(Cursor cursor, String columnLabel)
+                throws Exception {
+
+            // columnIndex the zero-based index of the target column.
+            int columnIndex = cursor.getColumnIndexOrThrow(columnLabel);
+
+            return getValueByColumnIndex(cursor, columnIndex);
+        }
+
+        private Object getValueByColumnIndex(Cursor cursor, int columnIndex)
+                throws Exception {
+
+            Object res;
+
+            int type = cursor.getType(columnIndex);
+
+            switch (type) {
+                case Cursor.FIELD_TYPE_NULL:
+                    res = null;
+                    break;
+                case Cursor.FIELD_TYPE_INTEGER:
+                    res = cursor.getLong(columnIndex);
+                    break;
+                case Cursor.FIELD_TYPE_FLOAT:
+                    res = cursor.getDouble(columnIndex);
+                    break;
+                case Cursor.FIELD_TYPE_STRING:
+                    res = cursor.getString(columnIndex);
+                    break;
+                case Cursor.FIELD_TYPE_BLOB:
+                    res = cursor.getBlob(columnIndex);
+                    break;
+                default:
+                    throw new Exception("Unexpected value type: " + type);
+            }
+
+            return res;
+        }
+
+        @Override
+        public <T> T query(final Class<T> type, String sql, Object... params)
+                throws Exception {
+
+            final Cursor cursor = dataBase.rawQuery(sql, getSelectionArgs(params));
+
+            try {
+
+                if (cursor.moveToFirst()) {
+
+                    T res = type.cast(getValueByColumnIndex(cursor, 0));
+
+                    if (cursor.moveToNext()) {
+
+                        throw new Exception(
+                                "Incorrect result size: expected 1 or 0. Query: "
+                                        + sql
+                        );
+                    }
+
+                    return res;
+
+                } else {
+                    return null;
+                }
+
+            } finally {
+                cursor.close();
+            }
+        }
+
+        public <T> List<T> queryList(final Class<T> type, String sql,
+                                     Object... params) throws Exception {
+
+            final ArrayList<T> res = new ArrayList<T>();
+
+            final Cursor cursor = dataBase.rawQuery(sql, getSelectionArgs(params));
+
+            try {
+
+                if (cursor.moveToFirst()) {
+
+                    do {
+
+                        T t = type.cast(getValueByColumnIndex(cursor, 0));
+                        res.add(t);
+
+                    } while (cursor.moveToNext());
+                }
+
+            } finally {
+                cursor.close();
+            }
+
+            return res;
+        }
+
+        public <T> T queryDto(String sql, final RowHandler<T> rowHandler,
+                              Object... params) throws Exception {
+
+            final Cursor cursor = dataBase.rawQuery(sql, getSelectionArgs(params));
+
+            try {
+
+                if (cursor.moveToFirst()) {
+
+                    RowData vr = new RowData() {
+
+                        public <V> V getValue(Class<V> type, String columnLabel)
+                                throws Exception {
+
+                            return type.cast(getValueByColumnLabel(cursor, columnLabel));
+                        }
+                    };
+
+                    T res = rowHandler.handleRow(vr);
+
+                    if (cursor.moveToNext()) {
+
+                        throw new Exception(
+                                "Incorrect result size: expected 1 or 0. Query: "
+                                        + sql
+                        );
+                    }
+
+                    return res;
+
+                } else {
+                    return null;
+                }
+
+            } finally {
+                cursor.close();
+            }
+        }
+
+        public <T> List<T> queryDtoList(String sql,
+                                        final RowHandler<T> rowHandler, Object... params)
+                throws Exception {
+
+            final ArrayList<T> res = new ArrayList<T>();
+
+            final Cursor cursor = dataBase.rawQuery(sql, getSelectionArgs(params));
+
+            try {
+
+                if (cursor.moveToFirst()) {
+
+                    RowData vr = new RowData() {
+
+                        public <VT> VT getValue(Class<VT> type, String columnLabel)
+                                throws Exception {
+
+                            return type.cast(getValueByColumnLabel(cursor, columnLabel));
+                        }
+                    };
+
+                    do {
+
+                        T t = rowHandler.handleRow(vr);
+                        res.add(t);
+
+                    } while (cursor.moveToNext());
+                }
+
+            } finally {
+                cursor.close();
+            }
+
+            return res;
+        }
+
+        private void bindParams(SQLiteStatement statement, Object... params)
+                throws Exception {
+
+            // index The 1-based index to the parameter to bind
+
+            for (int i = 1; i <= params.length; i++) {
+
+                Object param = params[i - 1];
+
+                if (param instanceof Integer) {
+
+                    statement.bindLong(i, (Integer) param);
+
+                } else if (param instanceof Long) {
+
+                    statement.bindLong(i, (Long) param);
+
+                } else if (param instanceof Double) {
+
+                    statement.bindDouble(i, (Double) param);
+
+                } else if (param instanceof String) {
+
+                    statement.bindString(i, (String) param);
+
+                } else if (param instanceof byte[]) {
+
+                    statement.bindBlob(i, (byte[]) param);
+
+                } else if (param == null) {
+
+                    statement.bindNull(i);
+
+                } else {
+                    throw new Exception("Unexpected param type: "
+                            + param.getClass().getName());
+                }
+            }
+        }
+
+        private String[] getSelectionArgs(Object[] params) {
+
+            if (params == null) {
+                return null;
+            }
+
+            String[] res = new String[params.length];
+
+            for (int i = 0; i < params.length; i++) {
+
+                Object param = params[i];
+
+                if (param == null) {
+                    res[i] = null;
+                } else {
+                    res[i] = param.toString();
+                }
+            }
+
+            return res;
+        }
+    }
+}

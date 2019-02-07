@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	elementFormDefault="qualified">
+
+	<xs:element name="dao-class">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:choice minOccurs="0" maxOccurs="unbounded">
+					<xs:element ref="crud" />
+					<xs:element ref="crud-auto" />
+					<xs:element ref="query" />
+					<xs:element ref="query-list" />
+					<xs:element ref="query-dto" />
+					<xs:element ref="query-dto-list" />
+					<xs:element ref="exec-dml" />
+				</xs:choice>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:attribute name="class-name" type="xs:NCName" />
+	<xs:attribute name="dto" type="xs:NCName" />
+	<xs:attribute name="method" type="xs:string" />
+	<xs:attribute name="ref" type="xs:string" />
+	<xs:attribute name="external-sql" type="xs:boolean"
+		default="false" />
+	<xs:attribute name="return-type" type="xs:string" />
+
+	<xs:complexType name="type-method">
+		<xs:attribute ref="method" use="required" />
+	</xs:complexType>
+
+	<xs:complexType name="type-crud">
+		<xs:sequence minOccurs="1">
+			<xs:element name="create" type="type-method" minOccurs="0"
+				maxOccurs="1" />
+			<xs:element name="read-all" type="type-method" minOccurs="0"
+				maxOccurs="1" />
+			<xs:element name="read" type="type-method" minOccurs="0"
+				maxOccurs="1" />
+			<xs:element name="update" type="type-method" minOccurs="0"
+				maxOccurs="1" />
+			<xs:element name="delete" type="type-method" minOccurs="0"
+				maxOccurs="1" />
+		</xs:sequence>
+		<xs:attribute ref="dto" use="required" />
+		<xs:attribute name="table" type="xs:NCName" use="required" />
+		<xs:attribute name="fetch-generated" type="xs:boolean"
+			default="true" />
+		<xs:attribute name="generated" type="xs:string" default="*" />
+	</xs:complexType>
+
+	<xs:element name="crud-auto">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="type-crud" />
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="crud">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="type-crud">
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="query">
+		<xs:complexType>
+			<xs:attribute ref="method" use="required" />
+			<xs:attribute ref="ref" use="required" />
+			<xs:attribute ref="external-sql" use="optional" />
+			<xs:attribute ref="return-type" use="optional" />
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="query-list">
+		<xs:complexType>
+			<xs:attribute ref="method" use="required" />
+			<xs:attribute ref="ref" use="required" />
+			<xs:attribute ref="external-sql" use="optional" />
+			<xs:attribute ref="return-type" use="optional" />
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="query-dto">
+		<xs:complexType>
+			<xs:attribute ref="method" use="required" />
+			<xs:attribute ref="dto" use="required" />
+			<xs:attribute ref="ref" use="required" />
+			<xs:attribute ref="external-sql" use="optional" />
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="query-dto-list">
+		<xs:complexType>
+			<xs:attribute ref="method" use="required" />
+			<xs:attribute ref="dto" use="required" />
+			<xs:attribute ref="ref" use="required" />
+			<xs:attribute ref="external-sql" use="optional" />
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="exec-dml">
+		<xs:complexType>
+			<xs:attribute ref="method" use="required" />
+			<xs:attribute ref="ref" use="required" />
+			<xs:attribute ref="external-sql" use="optional" />
+		</xs:complexType>
+	</xs:element>
+
+</xs:schema>

@@ -1,0 +1,24 @@
+Automatic-Module-Name: com.sqldalmaker.eclipse
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: com.sqldalmaker.eclipse
+Bundle-SymbolicName: com.sqldalmaker.eclipse;singleton:=true
+Bundle-Version: 1.80.0.qualifier
+Bundle-Activator: com.sqldalmaker.eclipse.Activator
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.core.resources,
+ org.eclipse.core.variables,
+ org.eclipse.ui,
+ org.eclipse.ui.ide,
+ org.eclipse.ui.forms,
+ org.eclipse.jface.text,
+ org.eclipse.wst.sse.core,
+ org.eclipse.wst.sse.ui,
+ org.eclipse.wst.xml.ui,
+ org.eclipse.ui.console
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ClassPath: .,
+ velocity-1.7-dep.jar
+Bundle-Vendor: sqldalmaker@gmail.com
+

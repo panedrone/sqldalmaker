@@ -1,0 +1,7 @@
+SQL DAL Maker is a generator of DTO and DAO classes. Target programming languages: PHP, Java, C++. 
+
+Copyright (C) 2012-2014 sqldalmaker at gmail.com
+
+This product includes software developed at
+The Apache Software Foundation (http://www.apache.org/).
+

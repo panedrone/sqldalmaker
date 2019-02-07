@@ -1,0 +1,209 @@
+## Java ===============================================================================================================
+#macro(list_item_base $index $value $separator)
+#if( $index == 1 )${value}#else${separator}${value}#end
+#end
+#macro(list_item $index $value)
+#list_item_base($index $value ", ")
+#end
+#macro(list_item_str $index $value)
+#if( $index == 1 )"${value}"#else, "${value}"#end
+#end
+#macro(param_decls $external_sql $params)
+#if ($external_sql == true)
+String sql#if(${params.size()} > 0), #end
+#end
+#foreach($param in ${params})#if(${velocityCount} == 1)${param.getType()} ${param.getName()}#else, ${param.getType()} ${param.getName()}#end#end
+#end
+#macro(param_decls_dto $external_sql)
+#if($external_sql == true)String sql, #end
+#end
+#macro(sql_var $is_external_sql $sql)
+#if ($is_external_sql==false)
+
+		String sql = "${sql}";
+#end
+#end
+## ====================================================================================================================
+#if ($mode == "crud_sql_create")
+INSERT INTO ${table_name} (#foreach ($col in ${col_names})#list_item(${velocityCount} ${col})#end)
+VALUES (#foreach ($col in ${col_names})#list_item(${velocityCount} "?")#end)
+#elseif ($mode == "crud_sql_read_all")
+SELECT * FROM ${table_name}
+#elseif ($mode == "crud_sql_read_single")
+SELECT * FROM ${table_name} WHERE #foreach ($key in ${keys})#list_item_base(${velocityCount} "${key.getColumnName()} = ?" " AND ")#end
+#elseif ($mode == "crud_sql_update")
+UPDATE ${table_name} SET
+	#foreach ($param in ${params})#list_item(${velocityCount} "${param.getColumnName()} = ?")#end
+
+WHERE #foreach ($key in ${keys})#list_item_base(${velocityCount} "${key.getColumnName()} = ?" " AND ")#end
+#elseif ($mode == "crud_sql_delete")
+DELETE FROM ${table_name} WHERE #foreach ($key in ${keys})#list_item_base(${velocityCount} "${key.getColumnName()} = ?" " AND ")#end
+## ====================================================================================================================
+#elseif($mode=="dto_class")
+package ${package};
+
+/**
+ * This class is created by SQL DAL Maker. Don't modify it manually.
+ * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
+ */
+public class ${class_name} ${implements} {
+
+#foreach($field in ${fields})
+	private ${field.getType()} ${field.getName()};
+#end
+#foreach($field in ${fields})
+
+	public ${field.getType()} ${field.getterMethod()}() {
+		return this.$field.getName();
+	}
+
+	public void ${field.setterMethod()}(${field.getType()} $field.getName()) {
+		this.$field.getName() = $field.getName();
+	}
+#end
+}## ====================================================================================================================
+#elseif($mode=="dao_class")
+package ${package};
+
+import com.sqldalmaker.DataStore;
+
+#foreach($imp in ${imports})
+import ${imp};
+#end
+
+/**
+ * This class is created by SQL DAL Maker. Don't modify it manually.
+ * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
+ */
+public class ${class_name} {
+
+	protected final DataStore ds;
+
+	public ${class_name}(DataStore ds) {
+		this.ds = ds;
+	}
+#foreach($method in ${methods})${method}#end
+}## ====================================================================================================================
+#elseif($mode=="dao_create")
+
+	/**
+	 * CRUD-Create. The table '${table_name}'.
+	 * Auto-generated values are assigned to appropriate fields of DTO.
+	 * Returns the number of affected rows or -1 on error.
+	 */
+	public int ${method_name}(${dto_param} p) throws Exception {
+#sql_var(false $sql)
+
+		String []genColNames = new String[] {#foreach ($key in ${keys})#list_item_str(${velocityCount} ${key.getColumnName()})#end};
+		Object []genValues = new Object[genColNames.length];
+
+		int res = ds.insert(sql, genColNames, genValues#foreach($param in ${params}), p.${param.getterMethod()}()#end);
+
+#foreach ($key in ${keys})
+#set($i = ${velocityCount} - 1)
+		p.${key.setterMethod()}(ds.castGeneratedValue(${key.getType()}.class, genValues[${i}]));
+#end
+
+		return res;
+	}
+## ====================================================================================================================
+#elseif($mode=="dao_query")
+
+#if($crud)
+	/**
+	 * CRUD-Read. The table '${ref}'.
+	 */
+#end
+#if($fetch_list)
+#set($tmp = $imports.add("java.util.List"))
+	public List<${returned_type_name}> ${method_name}(#if(${dto_param} != "")#param_decls_dto($is_external_sql)${dto_param} p#else#param_decls($is_external_sql $params)#end) throws Exception {
+#sql_var($is_external_sql $sql)
+
+#if($use_dto)
+		return ds.queryDtoList(sql, new DataStore.RowHandler<${returned_type_name}>() {
+
+			public ${returned_type_name} handleRow(DataStore.RowData rd) throws Exception {
+				${returned_type_name} obj = new ${returned_type_name}();
+#foreach($field in ${fields})
+#set($i = ${velocityCount} - 1)
+				obj.${field.setterMethod()}(rd.getValue(${field.getType()}.class, "${field.getColumnName()}"));
+#end
+				return obj;
+			}
+
+		}#if(${dto_param} != "")#foreach($param in ${params}), p.${param.getterMethod()}()#end);#else#foreach($param in ${params}), ${param.getName()}#end);#end
+
+#else
+#if(${dto_param} != "")	
+		return ds.queryList(${returned_type_name}.class, sql#foreach($param in ${params}), p.${param.getterMethod()}()#end);
+#else
+		return ds.queryList(${returned_type_name}.class, sql#foreach($param in ${params}), ${param.getName()}#end);
+#end
+#end
+	}
+#else
+	public ${returned_type_name} ${method_name}(#if(${dto_param} != "")#param_decls_dto($is_external_sql)${dto_param} p#else#param_decls($is_external_sql $params)#end) throws Exception {
+#sql_var($is_external_sql $sql)
+
+#if($use_dto)
+		return ds.queryDto(sql, new DataStore.RowHandler<${returned_type_name}>() {
+
+			public ${returned_type_name} handleRow(DataStore.RowData rd) throws Exception {
+				${returned_type_name} res = new ${returned_type_name}();
+#foreach($field in ${fields})
+#set($i = ${velocityCount} - 1)
+				res.${field.setterMethod()}(rd.getValue(${field.getType()}.class, "${field.getColumnName()}"));
+#end
+				return res;
+			}
+
+		}#if(${dto_param} != "")#foreach($param in ${params}), p.${param.getterMethod()}()#end);#else#foreach($param in ${params}), ${param.getName()}#end);#end
+
+#else
+#if(${dto_param} != "")	
+		return ds.query(${returned_type_name}.class, sql#foreach($param in ${params}), p.${param.getterMethod()}()#end);
+#else
+		return ds.query(${returned_type_name}.class, sql#foreach($param in ${params}), ${param.getName()}#end);
+#end	
+#end
+	}
+#end
+## ====================================================================================================================
+#elseif($mode=="dao_exec_dml")
+#if(${dto_param} != "")
+
+	/**
+#if($method_type == "CREATE")
+	 * CRUD-Create. The table '${table_name}'.
+#elseif($method_type == "UPDATE")
+	 * CRUD-Update. The table '${table_name}'.
+#elseif($method_type == "DELETE")
+	 * CRUD-Delete. The table '${table_name}'.
+#end
+	 * Returns the number of affected rows or -1 on error.
+	 */
+	public int ${method_name}(#param_decls_dto($is_external_sql)${dto_param} p) throws Exception {
+#sql_var($is_external_sql $sql)
+
+		return ds.execDML(sql#foreach($param in ${params}), p.${param.getterMethod()}()#end);
+	}
+#end
+#if($plain_params)
+
+	/**
+#if($method_type == "CREATE")
+	 * CRUD-Create. The table '${table_name}'.
+#elseif($method_type == "UPDATE")
+	 * CRUD-Update. The table '${table_name}'.
+#elseif($method_type == "DELETE")
+	 * CRUD-Delete. The table '${table_name}'.
+#end
+	 * Returns the number of affected rows or -1 on error.
+	 */
+	public int ${method_name}(#param_decls($is_external_sql $params)) throws Exception {
+#sql_var($is_external_sql $sql)
+
+		return ds.execDML(sql#foreach($param in ${params}), ${param.getName()}#end);
+	}
+#end
+#end

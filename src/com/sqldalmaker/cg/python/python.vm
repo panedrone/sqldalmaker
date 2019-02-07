@@ -1,0 +1,208 @@
+## Python =============================================================================================================
+#macro(list_item_base $index $value $separator)
+#if( $index == 1 )$value#else$separator$value#end
+#end
+#macro(list_item $index $value)
+#list_item_base($index $value ", ")
+#end
+#macro(list_item_str $index $value)
+#if( $index == 1 )"$value"#else, "$value"#end
+#end
+#macro(param_decls $external_sql $params)
+self#if($external_sql), sql#end#foreach($param in ${params}), ${param.getName()}#end
+#end
+#macro(param_decls_dto $external_sql)
+self#if($external_sql), sql#end, #end
+#macro(param_array $dto_param $params)
+#if ($dto_param != "")
+        params = [#foreach ($param in $params)#set($p="p."+$param.getName())#list_item($velocityCount $p)#end]
+#else
+        params = [#foreach ($param in $params)#set($p=$param.getName())#list_item($velocityCount $p)#end]
+#end
+#end
+#macro(sql_var $is_external_sql $sql)
+#if ($is_external_sql==false)
+        sql = """$sql"""
+
+#end
+#end
+## ====================================================================================================================
+#if ($mode == "crud_sql_create")
+INSERT INTO $table_name (#foreach ($col in $col_names)#list_item($velocityCount $col)#end)
+VALUES (#foreach ($col in $col_names)#list_item($velocityCount "?")#end)
+#elseif ($mode == "crud_sql_read_all")
+SELECT *
+FROM $table_name
+#elseif ($mode == "crud_sql_read_single")
+SELECT *
+FROM $table_name
+WHERE #foreach ($key in $keys)#list_item_base($velocityCount "$key.getColumnName() = ?" " AND ")#end
+#elseif ($mode == "crud_sql_update")
+UPDATE $table_name SET
+    #foreach ($param in $params)#list_item($velocityCount "$param.getColumnName() = ?")#end
+
+WHERE #foreach ($key in $keys)#list_item_base($velocityCount "$key.getColumnName() = ?" " AND ")#end
+#elseif ($mode == "crud_sql_delete")
+DELETE FROM $table_name
+WHERE #foreach ($key in $keys)#list_item_base($velocityCount "$key.getColumnName() = ?" " AND ")#end
+## ====================================================================================================================
+#elseif($mode=="dto_class")
+"""
+ This class is created by SQL DAL Maker. Don't modify it manually.
+ SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
+"""
+
+
+class $class_name:
+    """
+#foreach($field in $fields)
+    @type $field.getName(): $field.getType() | None
+#end
+    """
+
+    def __init__(self):
+#foreach($field in $fields)
+        self.$field.getName() = None
+#end
+## ====================================================================================================================
+#elseif($mode=="dao_class")
+"""
+ This class is created by SQL DAL Maker. Don't modify it manually.
+ SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
+"""
+
+
+#foreach($imp in $imports)
+from $imp import $imp
+#end
+
+
+class $class_name:
+
+    def __init__(self, ds):
+        self._ds = ds
+#foreach($method in $methods)$method#end
+## ====================================================================================================================
+#elseif($mode=="dao_create")
+
+    def $method_name(self, p):
+        """
+        CRUD-Create. The table '$table_name'.
+        Auto-generated values are assigned to related fields of DTO.
+        @type p: $dto_param
+        @rtype: None
+        @raise: Exception if no rows inserted.
+        """
+#sql_var(false $sql)
+        params = [#foreach ($param in $params)#set($p="p."+${param.getName()})#list_item($velocityCount $p)#end]
+        ai_values = [#foreach ($key in $keys)#set($p='["'+${key.getColumnName()} +'", None]')#list_item($velocityCount $p)#end]
+        self._ds.insert_row(sql, params, ai_values)
+#foreach ($key in $keys)
+#set($i = $velocityCount - 1)
+        p.$key.getName() = ai_values[$i][1]
+#end
+## ====================================================================================================================
+#elseif($mode=="dao_query")
+
+#if($fetch_list)
+    def $method_name(#if($dto_param != "")#param_decls_dto($is_external_sql)p#else#param_decls($is_external_sql $params)#end):
+        """
+#if($crud)
+        CRUD-Read-All. The table '$ref'.
+#end
+#if($is_external_sql)
+        @type sql: basestring
+#end
+#if($dto_param != "")
+        @type p: $dto_param
+#else
+#foreach($param in $params)
+        @type $param.getName(): $param.getType()
+#end
+#end
+        @rtype: list[$returned_type_name]
+        """
+#sql_var(false $sql)
+#param_array($dto_param $params)
+#if($use_dto)
+        res = []
+
+        def callback(row):
+            obj = ${returned_type_name}()
+#foreach($field in ${fields})
+            obj.${field.getName()} = row["${field.getColumnName()}"]
+#end
+            res.append(obj)
+
+        self._ds.query_all_rows(sql, params, callback)
+
+        return res
+#else
+
+        return self._ds.query_scalar_array(sql, params)
+#end
+#else
+    def $method_name(#if($dto_param != "")#param_decls_dto($is_external_sql)p, obj#else#param_decls($is_external_sql $params)#if($use_dto), obj#end#end):
+        """
+#if($crud)
+        CRUD-Read. The table '$ref'.
+#end
+#if($is_external_sql)
+        @type sql: basestring
+#end
+#if($dto_param != "")
+        @type p: $dto_param
+#else
+#foreach($param in $params)
+        @type $param.getName(): $param.getType()
+#end
+#end
+#if($use_dto)
+        @type obj: $returned_type_name
+        @rtype: None
+#else
+        @rtype: $returned_type_name
+#end
+        @raise: Exception if amount of returned rows != 1.
+        """
+#sql_var(false $sql)
+#param_array($dto_param $params)
+#if($use_dto)
+        row = self._ds.query_single_row(sql, params)
+#foreach($field in ${fields})
+        obj.${field.getName()} = row["${field.getColumnName()}"]
+#end
+#else
+        return self._ds.query_scalar(sql, params)
+#end
+#end
+## ====================================================================================================================
+#elseif($mode=="dao_exec_dml")
+
+    def $method_name(#if($dto_param != "")#param_decls_dto($is_external_sql)p#else#param_decls($is_external_sql $params)#end):
+        """
+#if ($crud == "create")
+        CRUD-Create. The table '$table_name'.
+#elseif ($crud == "update")
+        CRUD-Update. The table '$table_name'.
+#elseif ($crud == "delete")
+        CRUD-Delete. The table '$table_name'.
+#else
+        Returns number of affected rows.
+#end
+#if ($is_external_sql)
+        @type sql: str
+#end
+#if ($dto_param != "")
+        @type p: $dto_param
+#else
+#foreach($param in $params)
+        @type $param.getName(): $param.getType()
+#end
+#end
+        @rtype: int
+        """
+#sql_var(false $sql)
+#param_array($dto_param $params)
+        return self._ds.exec_dml(sql, params)
+#end

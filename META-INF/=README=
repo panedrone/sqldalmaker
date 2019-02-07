@@ -1,0 +1,4 @@
+common:     LICENSE
+eclipse:    MANIFEST.MF
+common:     NOTICE
+intellij:   plugin.xml

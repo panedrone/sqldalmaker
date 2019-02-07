@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+      		default="true"
+            name="SQL DAL Maker"
+            icon="icons/sqldalmaker.gif"
+            filenames="php.dal, java.dal, cpp.dal, python.dal, ruby.dal"
+            class="com.sqldalmaker.eclipse.Editor2"
+            id="com.sqldalmaker.eclipse.Editor">
+      </editor>
+   </extension>
+ 
+   <extension
+         point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectors">
+      <hyperlinkDetector
+            activate="true"
+            class="com.sqldalmaker.eclipse.ProjectFileHyperlinkDetector"
+            id="com.sqldalmaker.eclipse.projectFileHyperlinkDetector"
+            name="SQL DAL Maker SQL Resources Hyperlinks Detector"
+            targetId="org.eclipse.core.runtime.xml">
+      </hyperlinkDetector>
+   </extension>
+
+  <extension
+     id="com.sqldalmaker.xml.completionProposal"
+     point="org.eclipse.wst.sse.ui.completionProposal">        
+      
+  <proposalCategory
+           id="com.sqldalmaker.xml.completionProposal.category"
+           name="SQL DAL Maker proposals">
+  </proposalCategory>
+ 
+  <proposalComputer
+       activate="true"
+       categoryId="com.sqldalmaker.xml.completionProposal.category"
+       class="com.sqldalmaker.eclipse.XmlCompletionProposalComputer"
+       id="com.sqldalmaker.xml.completionProposal.computer">     
+    <contentType id="org.eclipse.core.runtime.xml"/>     
+  </proposalComputer>        
+ </extension>
+ 
+ 
+  <extension
+        point="org.eclipse.ui.commands">
+     <category
+           id="com.sqldalmaker.commands.category"
+           name="DAL Category">
+     </category>
+     <command
+           categoryId="com.sqldalmaker.commands.category"
+           id="com.sqldalmaker.open_dal_file.command_id"
+           name="DAL Command"
+           defaultHandler="com.sqldalmaker.eclipse.MyToolbarActionHandler">
+     </command>
+  </extension>
+  <!--extension
+        point="org.eclipse.ui.handlers">
+     <handler
+           class="com.sqldalmaker.eclipse.handlers.SampleHandler"
+           commandId="com.sqldalmaker.eclipse.commands.sampleCommand">
+     </handler>
+  </extension-->
+  
+  <extension
+        point="org.eclipse.ui.menus">
+     <menuContribution
+           locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+
+<toolbar
+      id="com.sqldalmaker.toolbar">
+      
+      <command
+                 commandId="com.sqldalmaker.open_dal_file.command_id"
+                 icon="icons/sqldalmaker.gif"
+                 id="com.sqldalmaker.toolbar.command_id"
+                 style="pulldown"
+                 tooltip="DAL Files">
+           </command>
+      
+</toolbar>
+
+     </menuContribution>
+  </extension>
+  
+  <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution 
+            locationURI="menu:com.sqldalmaker.toolbar.command_id">
+            
+	      <dynamic
+	      		id="com.sqldalmaker.dynamic_menu">
+	      		
+				<class
+				    class="com.sqldalmaker.eclipse.MyDynamicMenu">
+				</class>
+	      
+		  </dynamic>
+
+      </menuContribution>
+</extension>
+   
+</plugin>

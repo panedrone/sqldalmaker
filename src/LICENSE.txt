@@ -1,0 +1,5 @@
+SQL DAL Maker License
+
+1. SQL DAL Maker is free software. You are welcome to use it in any form.
+2. You preserve information about usage of SQL DAL Maker, including usage of its sources and ideas.
+3. Provided "AS-IS". No warranty.

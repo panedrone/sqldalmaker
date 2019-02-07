@@ -1,0 +1,49 @@
+<idea-plugin url="http://sqldalmaker.sourceforge.net/">
+    <id>dal-mpe</id>
+    <name>SQL DAL Maker</name>
+    <category>Database</category>
+    <version>1.80.20190205</version>
+    <vendor email="sqldalmaker@gmail.com"/>
+    <!-- please see http://confluence.intellij.net/display/IDEADEV/Build+Number+Ranges for description -->
+    <idea-version since-build="111.69"/>
+
+    <depends>com.intellij.modules.lang</depends>
+
+    <description><![CDATA[
+SQL DAL Maker is a generator of DTO and DAO classes. Target programming languages: PHP, Java, C++, Python, Ruby.<br/>
+<br/>
+To generate the class, you declare it in XML meta-program.<br/>
+    ]]></description>
+
+    <application-components>
+        <component>
+            <implementation-class>com.sqldalmaker.intellij.SdmPluginRegistration</implementation-class>
+        </component>
+    </application-components>
+
+    <project-components>
+    </project-components>
+
+    <module-components>
+    </module-components>
+
+    <actions>
+
+        <group class="com.sqldalmaker.intellij.SdmActionGroup" id="SdmActionGroup" text="DAL files"
+               description="DAL files" icon="/img/sqldalmaker.gif" popup="true">
+
+        </group>
+
+    </actions>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <fileTypeFactory implementation="com.sqldalmaker.intellij.ui.RootFileTypeFactory"/>
+        <fileEditorProvider implementation="com.sqldalmaker.intellij.ui.RootFileEditorProvider"/>
+        <editorTabTitleProvider implementation="com.sqldalmaker.intellij.ui.RootFileEditorTabTitleProvider"/>
+        <psi.referenceContributor
+                implementation="com.sqldalmaker.intellij.references.PsiReferenceContributorCommon"/>
+        <completion.contributor language="XML"
+                                implementationClass="com.sqldalmaker.intellij.references.CompletionContributorCommon"/>
+    </extensions>
+
+</idea-plugin>

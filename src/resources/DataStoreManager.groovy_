@@ -1,0 +1,270 @@
+import groovy.sql.Sql
+
+import com.sqldalmaker.DataStore
+
+/*
+This is an example of how to implement and use DataStore for Groovy.
+Web-site: http://sqldalmaker.sourceforge.net
+Contact: sqldalmaker@gmail.com
+Copy-paste this code to your project and change it for your needs.
+*/
+public class DataStoreManager {
+
+    private Sql groovySql;
+
+    public void connect() throws Exception {
+
+        groovySql = Sql.newInstance("jdbc:postgresql://xpvm:5432/orders",
+                "postgres", "sa", "org.postgresql.Driver")
+        groovySql.getConnection().setAutoCommit(false);
+    }
+
+    public void commit() throws Exception {
+        groovySql.getConnection().commit();
+    }
+
+    public void rollback() throws Exception {
+        groovySql.getConnection().rollback();
+    }
+
+    public void close() throws Exception {
+
+        // http://stackoverflow.com/questions/4940648/how-to-start-a-transaction-in-jdbc
+        // Changing the auto-commit mode triggers a commit of the current
+        // transaction (if one is active).
+        // ------------------------------------------------------
+        // connection.setAutoCommit(true) is required for
+        // org.apache.derby.jdbc.ClientDriver to prevent
+        // java.sql.SQLException: Cannot close a connection while a transaction
+        // is still active.
+
+        groovySql.getConnection().setAutoCommit(true);
+        groovySql.getConnection().close();
+    }
+
+    //////////////////////////
+
+    private MyDataStore ds = new MyDataStore();
+
+    ////////////////////////////////////////////////////
+    //
+    // MyDataStore is hidden: use factory method pattern
+
+    //	public OrderDao createOrderDao() {
+    //		return new OrderDao(ds);
+    //	}
+
+    public class MyDataStore extends DataStore {
+
+        private boolean isStringValue(Class<?> inValueType) {
+            // Consider any CharSequence (including StringBuffer and
+            // StringBuilder) as a String.
+            return (CharSequence.class.isAssignableFrom(inValueType) || StringWriter.class
+                    .isAssignableFrom(inValueType));
+        }
+
+        private boolean isDateValue(Class<?> inValueType) {
+            return (java.util.Date.class.isAssignableFrom(inValueType) && !(java.sql.Date.class
+                    .isAssignableFrom(inValueType)
+                    || java.sql.Time.class.isAssignableFrom(inValueType) || java.sql.Timestamp.class
+                    .isAssignableFrom(inValueType)));
+        }
+
+        protected void preprocessParams(Object... params) {
+
+            for (int i = 0; i < params.length; i++) {
+
+                if (params[i] != null) {
+
+                    if (isStringValue(params[i].getClass())) {
+                        params[i] = params[i].toString();
+                    } else if (isDateValue(params[i].getClass())) {
+                        params[i] = new java.sql.Timestamp(
+                                ((java.util.Date) params[i]).getTime());
+                    }
+                }
+            }
+        }
+
+        //////////////////////////////////////////////////////////
+
+        @Override
+        public <T> T castGeneratedValue(Class<T> type, Object obj) {
+
+            if (obj instanceof BigDecimal) {
+
+                BigDecimal bigDecimal = (BigDecimal) obj;
+
+                if (Byte.class.equals(type)) {
+
+                    obj = bigDecimal.byteValueExact();
+                } else if (Float.class.equals(type)) {
+                    // there is no 'exact' version
+                    obj = bigDecimal.floatValue();
+
+                } else if (Double.class.equals(type)) {
+                    // there is no 'exact' version
+                    obj = bigDecimal.doubleValue();
+
+                } else if (Integer.class.equals(type)) {
+
+                    obj = bigDecimal.intValueExact();
+                } else if (Long.class.equals(type)) {
+
+                    obj = bigDecimal.longValueExact();
+                } else if (BigInteger.class.equals(type)) {
+
+                    obj = bigDecimal.toBigIntegerExact();
+                } else if (BigDecimal.class.equals(type)) {
+
+                    obj = bigDecimal;
+                } else if (Object.class.equals(type)) {
+
+                    obj = bigDecimal;
+                } else {
+
+                    throw new ClassCastException("Unexpected class '"
+                            + type.getName() + "'");
+                }
+            }
+
+            // cast:
+
+            // Throws:
+            // ClassCastException - if the object is not null and is not assignable
+            // to the type T.
+
+            return type.cast(obj);
+        }
+
+        @Override
+        public int insert(String sql, String[] genColNames, Object[] genValues, Object... params) throws Exception {
+
+            preprocessParams(params)
+
+            // executeInsert(... uses getObject(... to get AUTOINC values. In Java, it may cause cast exception
+            // while working with MySQL: getObject() can return Long for column detected as Integer
+
+            List<List<Object>> autoinc = groovySql.executeInsert(sql, params)
+
+            for (int i = 0; i < autoinc.size(); i++) {
+                List<Object> objects = autoinc.get(i)
+                genValues[i] = objects.get(0)
+            }
+
+            // if skipped, GroovyCastException occurs:
+            return 1
+        }
+
+        @Override
+        public int execDML(String sql, Object... params) throws Exception {
+
+            preprocessParams(params);
+
+            int res = groovySql.executeUpdate(sql, params)
+
+            return res;
+        }
+
+        @Override
+        public <T> T query(final Class<T> type, String sql, Object... params) throws Exception {
+
+            preprocessParams(params);
+
+            List rows = groovySql.rows(sql, params);
+
+            if (!rows.isEmpty()) {
+
+                if (rows.size() > 1) {
+                    throw new Exception("More than 1 row available");
+                }
+
+                groovy.sql.GroovyRowResult res = groovySql.firstRow(sql, params)
+
+                return type.cast(res.getAt(0));
+            }
+
+            return null;
+        }
+
+        @Override
+        public <T> List<T> queryList(final Class<T> type, String sql,
+                                     Object... params) throws Exception {
+
+            preprocessParams(params);
+
+            final ArrayList<T> res = new ArrayList<T>();
+
+            List tmp = params;
+
+            groovySql.eachRow(sql, tmp) { row ->
+
+                def rs = row.toRowResult();
+
+                T r = type.cast(rs.getAt(0));
+                res.add(r);
+            }
+
+            return res;
+        }
+
+        @Override
+        public <T> T queryDto(String sql, final DataStore.RowHandler<T> rowHandler,
+                              Object... params) throws Exception {
+
+            preprocessParams(params);
+
+            List rows = groovySql.rows(sql, params);
+
+            if (!rows.isEmpty()) {
+
+                if (rows.size() > 1) {
+                    throw new Exception("More than 1 row available");
+                }
+
+                groovy.sql.GroovyRowResult res = groovySql.firstRow(sql, params)
+
+                DataStore.RowData vr = new DataStore.RowData() {
+
+                    public <T> T getValue(Class<T> type, String columnLabel) throws Exception {
+
+                        return type.cast(res.getProperty(columnLabel));
+                    }
+                };
+
+                return rowHandler.handleRow(vr);
+            }
+
+            return null;
+        }
+
+        @Override
+        public <T> List<T> queryDtoList(String sql,
+                                        final RowHandler<T> rowHandler, Object... params) throws Exception {
+
+            preprocessParams(params);
+
+            final ArrayList<T> res = new ArrayList<T>();
+
+            List tmp = params;
+
+            groovySql.eachRow(sql, tmp) { row ->
+
+                def rs = row.toRowResult();
+
+                DataStore.RowData vr = new DataStore.RowData() {
+
+                    public <T> T getValue(Class<T> type, String columnLabel) throws Exception {
+
+                        return type.cast(rs.getProperty(columnLabel));
+                    }
+                };
+
+                T r = rowHandler.handleRow(vr);
+                res.add(r);
+            }
+
+            return res;
+        }
+    }
+}

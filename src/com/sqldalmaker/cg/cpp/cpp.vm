@@ -1,0 +1,197 @@
+## CPP ================================================================================================================ 
+#macro(list_item_base $index $value $separator)
+#if( $index == 1 )${value}#else${separator}${value}#end
+#end
+#macro(list_item $index $value)
+#list_item_base($index $value ", ")
+#end
+#macro(list_item_str $index $value)
+#if( $index == 1 )"${value}"#else, "${value}"#end
+#end
+#macro(out_params $params)
+#foreach($param in ${params})#if(${velocityCount} > 1), #end${param.getType()} &${param.getName()}#end
+#end
+#macro(param_array $dto_param $params)
+#if ($dto_param != "")
+		CValue *params[] = {#foreach ($param in ${params})#set($p="&p."+$param.getName())#list_item(${velocityCount} $p)#end};
+#else
+		CValue *params[] = {#foreach ($param in ${params})#set($p="&"+$param.getName())#list_item(${velocityCount} $p)#end};
+#end
+#end
+#macro(sql_var $external_sql $sql)
+#if(${external_sql}==false)
+		DL_STR sql = DL_T(${sql});
+
+#end
+#end
+## ====================================================================================================================
+#if ($mode == "crud_sql_create")
+INSERT INTO ${table_name} (#foreach ($col in ${col_names})#list_item(${velocityCount} ${col})#end) 
+VALUES (#foreach ($col in ${col_names})#list_item(${velocityCount} "?")#end)
+#elseif ($mode == "crud_sql_read_all")
+SELECT * FROM ${table_name}
+#elseif ($mode == "crud_sql_read_single")
+SELECT * FROM ${table_name} WHERE #foreach ($key in ${keys})#list_item_base(${velocityCount} "${key.getColumnName()} = ?" " AND ")#end
+#elseif ($mode == "crud_sql_update")
+UPDATE ${table_name} SET
+	#foreach ($param in ${params})#list_item(${velocityCount} "${param.getColumnName()} = ?")#end
+	
+WHERE #foreach ($key in ${keys})#list_item_base(${velocityCount} "${key.getColumnName()} = ?" " AND ")#end
+#elseif ($mode == "crud_sql_delete")
+DELETE FROM ${table_name} WHERE #foreach ($key in ${keys})#list_item_base(${velocityCount} "${key.getColumnName()} = ?" " AND ")#end
+## ==================================================================================================================== 
+#elseif($mode=="dto_class")
+\#if !defined(_${class_name}_)
+\#define _${class_name}_
+
+// This class is created by SQL DAL Maker. Don't modify it manually.
+// SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
+
+\#include "DataStore.h"
+
+class ${class_name}
+{
+public:
+
+#foreach($field in ${fields})
+	${field.getType()} ${field.getName()};
+#end
+};
+
+#endif // !defined(_${class_name}_)## ==================================================================================================================== 
+#elseif($mode=="dao_class")
+\#if !defined(_${class_name}_)
+\#define _${class_name}_
+
+// This class is created by SQL DAL Maker. Don't modify it manually.
+// SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
+
+#foreach($imp in ${imports})
+\#include "${imp}"
+#end
+
+class ${class_name}
+{
+protected:
+
+	CDataStore &m_ds;
+
+public:
+
+	${class_name}(CDataStore &ds) : m_ds(ds)
+	{
+	}
+#foreach($method in ${methods})${method}#end
+};
+
+#endif // !defined(_${class_name}_)## ==================================================================================================================== 
+#elseif($mode=="dao_create")
+
+	/* 
+	   CRUD-Create. The table '${table_name}'.
+	   Auto-generated values are assigned to appropriate fields of DTO.
+	   Returns the number of affected rows or -1 on error.
+	*/
+	int ${method_name}(${dto_param} &p)
+	{
+#sql_var(false $sql)
+		CValue *params[] = {#foreach ($param in ${params})#set($p="&p."+${param.getName()})#list_item(${velocityCount} $p)#end};
+		CValue *ai_values[]= {#foreach ($key in ${keys})#set($p="&p."+${key.getColumnName()})#list_item(${velocityCount} $p)#end};
+
+		return m_ds.insert(sql,	${params.size()}, params, ${keys.size()}, ai_values);
+	}
+## ====================================================================================================================
+#elseif($mode=="dao_query")
+	
+	/* 
+#if($crud)
+	   CRUD-Read. The table '${ref}'.
+#end
+	   Returns the number of fetched rows or -1 on error.
+	 */
+#if($fetch_list)
+#set($reader = "CListReader<"+${returned_type_name}+"> &reader")
+#if(${dto_param} != "")
+	int ${method_name}(#if($external_sql)DL_STR sql, #end${dto_param} &p, ${reader})
+#else
+	int ${method_name}(#if($external_sql)DL_STR sql, #end#out_params($params)#if(${params.size()}>0), #end${reader})
+#end
+	{
+#sql_var(${external_sql} $sql)
+		struct : public CRowProcessor
+		{
+			${returned_type_name} buff;
+			CListReader<${returned_type_name}> *pReader;
+
+			void processRow() { pReader->read(buff); }
+
+		} rp;
+
+		rp.pReader = &reader;
+
+#if(${dto_param} != "")
+#if(${params.size()} > 0)
+		CValue *params[] = {#foreach ($param in ${params})#set($p="&p."+$param.getName())#list_item(${velocityCount} $p)#end};
+#end
+#else
+#if(${params.size()} > 0)
+		CValue *params[] = {#foreach ($param in ${params})#set($p="&"+$param.getName())#list_item(${velocityCount} $p)#end};
+#end
+#end
+#if($return_type_is_dto)
+		CValue *res_values[] = {#foreach ($field in ${fields})#set($v="&rp.buff."+$field.getName())#list_item(${velocityCount} $v)#end};
+#else
+		CValue *res_values[] = {&rp.buff};
+#end
+		DL_STR col_names[] = {#foreach ($field in ${fields})#if(${velocityCount} == 1)DL_T("${field.getName()}")#else, DL_T("${field.getName()}")#end#end};
+
+		return m_ds.queryRowList(sql, ${params.size()},#if(${params.size()} > 0) params#else 0#end, ${fields.size()}, res_values, col_names, &rp);
+	}
+#else
+#if(${dto_param} != "")
+	int ${method_name}(#if($external_sql)DL_STR sql, #end${dto_param} &p, ${returned_type_name} &res)
+#else
+	int ${method_name}(#if($external_sql)DL_STR sql, #end#out_params($params)#if(${params.size()}>0), #end${returned_type_name} &res)
+#end
+	{
+#sql_var(${external_sql} $sql)
+#if(${dto_param} != "")
+#if(${params.size()} > 0)
+		CValue *params[] = {#foreach ($param in ${params})#set($p="&p."+$param.getName())#list_item(${velocityCount} $p)#end};
+#end
+#else
+#if(${params.size()} > 0)
+		CValue *params[] = {#foreach ($param in ${params})#set($p="&"+$param.getName())#list_item(${velocityCount} $p)#end};
+#end
+#end
+#if($return_type_is_dto)
+		CValue *res_values[] = {#foreach ($field in ${fields})#set($v="&res."+$field.getName())#list_item(${velocityCount} $v)#end};
+#else
+		CValue *res_values[] = {&res};
+#end
+		DL_STR col_names[] = {#foreach ($field in ${fields})#if(${velocityCount} == 1)DL_T("${field.getName()}")#else, DL_T("${field.getName()}")#end#end};
+
+		return m_ds.queryRow(sql, ${params.size()},#if(${params.size()} > 0) params#else 0#end, ${fields.size()}, res_values, col_names);
+	}
+#end
+## ==================================================================================================================== 
+#elseif($mode=="dao_exec_dml")
+	
+	/*
+#if($method_type == "CREATE")
+	   CRUD-Create. The table '${table_name}'.
+#elseif($method_type == "UPDATE")
+	   CRUD-Update. The table '${table_name}'.
+#elseif($method_type == "DELETE")
+	   CRUD-Delete. The table '${table_name}'.
+#end
+	   Returns the number of affected rows or -1 on error.
+	*/
+	int ${method_name}(#if(${dto_param} != "")#if($external_sql)DL_STR sql, #end${dto_param} &p#else#if($external_sql)DL_STR sql#if(${params.size()}>0), #end#end#out_params($params)#end)
+	{
+#sql_var(${external_sql} $sql)
+#param_array($dto_param $params)
+
+		return m_ds.execDML(sql, ${params.size()}, params);
+	}
+#end
