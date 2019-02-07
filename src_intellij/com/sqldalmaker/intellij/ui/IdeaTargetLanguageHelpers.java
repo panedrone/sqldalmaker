@@ -194,7 +194,8 @@ public class IdeaTargetLanguageHelpers {
         list.add(gf);
     }
 
-    public static void validate_dto(Project project, VirtualFile root_file, Settings settings, String class_name, String[] file_content,
+    public static void validate_dto(Project project, VirtualFile root_file, Settings settings,
+                                    String class_name, String[] file_content,
                                     StringBuilder validation_buff) throws Exception {
 
         String source_folder = settings.getFolders().getTarget();

@@ -21,7 +21,7 @@ import javax.swing.*;
  */
 public class RootFileTypeFactory extends FileTypeFactory {
 
-    private static final FileType fileType = new MyFileType();
+    private static final FileType file_type = new MyFileType();
 
     public static final class MyFileType implements FileType {
 
@@ -68,6 +68,6 @@ public class RootFileTypeFactory extends FileTypeFactory {
 
     @Override
     public void createFileTypes(@NotNull FileTypeConsumer consumer) {
-        IdeaTargetLanguageHelpers.register(consumer, fileType);
+        IdeaTargetLanguageHelpers.register(consumer, file_type);
     }
 }

@@ -15,6 +15,7 @@ import com.intellij.openapi.vfs.VirtualFile;
  * Date: 21.06.12
  */
 public class RootFileEditorTabTitleProvider implements EditorTabTitleProvider {
+
     @Override
     public String getEditorTabTitle(Project project, VirtualFile file) {
 

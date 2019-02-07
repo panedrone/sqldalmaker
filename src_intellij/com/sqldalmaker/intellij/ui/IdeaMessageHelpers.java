@@ -29,7 +29,8 @@ public class IdeaMessageHelpers {
     public static final NotificationGroup GROUP_DISPLAY_ID_INFO =
             new NotificationGroup("sqldalmaker", NotificationDisplayType.NONE, true);
 
-    public static void add_dto_error_message(Settings settings, final Project project, final VirtualFile root_file, final String clazz, String msg) {
+    public static void add_dto_error_message(Settings settings, final Project project,
+                                             final VirtualFile root_file, final String clazz, String msg) {
 
         Ide ide = settings.getIde();
 
@@ -60,7 +61,9 @@ public class IdeaMessageHelpers {
 
                     e.printStackTrace();
 
-                    Notifications.Bus.notify(GROUP_DISPLAY_ID_INFO.createNotification("Cannot navigate to dto.xml", NotificationType.ERROR));
+                    Notifications.Bus.notify(
+                            GROUP_DISPLAY_ID_INFO.createNotification("Cannot navigate to dto.xml",
+                                    NotificationType.ERROR));
                 }
             }
         };
@@ -79,7 +82,8 @@ public class IdeaMessageHelpers {
         Notifications.Bus.notify(notification);
     }
 
-    public static void add_dao_error_message(Settings settings, final Project project, final VirtualFile root_file, final String dao_xml_rel_path, String msg) {
+    public static void add_dao_error_message(Settings settings, final Project project,
+                                             final VirtualFile root_file, final String dao_xml_rel_path, String msg) {
 
         Ide ide = settings.getIde();
 
@@ -110,7 +114,8 @@ public class IdeaMessageHelpers {
 
                     e.printStackTrace();
 
-                    Notifications.Bus.notify(GROUP_DISPLAY_ID_INFO.createNotification("Cannot navigate to " + dao_xml_rel_path,
+                    Notifications.Bus.notify(GROUP_DISPLAY_ID_INFO.createNotification(
+                            "Cannot navigate to " + dao_xml_rel_path,
                             NotificationType.ERROR));
                 }
             }
@@ -127,7 +132,8 @@ public class IdeaMessageHelpers {
 
         msg = msg.replace("<", "&lt;").replace(">", "&gt;");
 
-        Notification notification = GROUP_DISPLAY_ID_INFO.createNotification(dao_xml_rel_path, " <a href='Fix'>Fix</a> " + msg,
+        Notification notification = GROUP_DISPLAY_ID_INFO.createNotification(dao_xml_rel_path,
+                " <a href='Fix'>Fix</a> " + msg,
                 NotificationType.ERROR, listener);
 
         Notifications.Bus.notify(notification);

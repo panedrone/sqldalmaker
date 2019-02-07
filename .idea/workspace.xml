@@ -21,19 +21,38 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaCrudXmlHelpers.java">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaEditorHelpers.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="423">
-              <caret line="592" column="47" selection-start-line="592" selection-start-column="47" selection-end-line="592" selection-end-column="47" />
+            <state relative-caret-position="616">
+              <caret line="154" column="50" selection-start-line="154" selection-start-column="50" selection-end-line="154" selection-end-column="50" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#1875#4970#0" expanded="true" />
-                <element signature="e#4969#4970#0" expanded="true" />
-                <element signature="e#7644#14679#0" expanded="true" />
-                <element signature="e#14678#14679#0" expanded="true" />
-                <element signature="e#18250#19844#0" expanded="true" />
-                <element signature="e#19843#19844#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaMessageHelpers.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="34">
+              <caret line="135" column="16" lean-forward="true" selection-start-line="135" selection-start-column="16" selection-end-line="135" selection-end-column="16" />
+              <folding>
+                <element signature="e#0#5299#0" expanded="true" />
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaTargetLanguageHelpers.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="476">
+              <caret line="197" column="36" selection-start-line="197" selection-start-column="36" selection-end-line="197" selection-end-column="36" />
+              <folding>
+                <element signature="imports" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -110,7 +129,6 @@
         <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaCrudXmlUtils.java" />
         <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaEditorUtils.java" />
         <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaMessageUtils.java" />
-        <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaMessageHelpers.java" />
         <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaMetaProgramInitUtils.java" />
         <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaMetaProgramInitHelpers.java" />
         <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaProfileUtils.java" />
@@ -150,12 +168,13 @@
         <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/CompletionContributorCommon.java" />
         <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/CompletionProviderSql.java" />
         <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabDAO.java" />
-        <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaTargetLanguageHelpers.java" />
         <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/PsiReferenceContributorCommon.java" />
         <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/PsiReferenceDtoClass.java" />
         <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/PsiReferenceSql.java" />
         <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/SdmActionGroup.java" />
         <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaCrudXmlHelpers.java" />
+        <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaMessageHelpers.java" />
+        <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaTargetLanguageHelpers.java" />
       </list>
     </option>
   </component>
@@ -248,7 +267,7 @@
     <property name="UI_DESIGNER_EDITOR_MODE.UIDesignerToolWindowManager.WIDTH" value="421" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1549568569162" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1549568973640" />
     <property name="dynamic.classpath" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="options.lastSelected" value="project.propVCSSupport.Mappings" />
@@ -1315,16 +1334,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaEditorHelpers.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2244">
-          <caret line="154" column="50" selection-start-line="154" selection-start-column="50" selection-end-line="154" selection-end-column="50" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/com/sqldalmaker/common/XmlHelpers.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="34">
@@ -1337,17 +1346,6 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/plugin.xml">
       <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaMessageHelpers.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="544">
-          <caret line="32" selection-start-line="32" selection-end-line="32" />
-          <folding>
-            <element signature="e#0#5299#0" expanded="true" />
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
     </entry>
     <entry file="jar://$APPLICATION_HOME_DIR$/lib/platform-api.jar!/com/intellij/psi/PsiReferenceBase.class">
       <provider selected="true" editor-type-id="text-editor">
@@ -1444,16 +1442,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="748">
           <caret line="48" column="33" selection-start-line="48" selection-start-column="33" selection-end-line="48" selection-end-column="33" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaTargetLanguageHelpers.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="194">
-          <caret line="372" column="84" selection-start-line="372" selection-start-column="84" selection-end-line="372" selection-end-column="84" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -1561,6 +1549,37 @@
             <element signature="e#14678#14679#0" expanded="true" />
             <element signature="e#18250#19844#0" expanded="true" />
             <element signature="e#19843#19844#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaEditorHelpers.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="616">
+          <caret line="154" column="50" selection-start-line="154" selection-start-column="50" selection-end-line="154" selection-end-column="50" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaMessageHelpers.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="34">
+          <caret line="135" column="16" lean-forward="true" selection-start-line="135" selection-start-column="16" selection-end-line="135" selection-end-column="16" />
+          <folding>
+            <element signature="e#0#5299#0" expanded="true" />
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaTargetLanguageHelpers.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="476">
+          <caret line="197" column="36" selection-start-line="197" selection-start-column="36" selection-end-line="197" selection-end-column="36" />
+          <folding>
+            <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
