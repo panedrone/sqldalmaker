@@ -70,7 +70,7 @@ public final class SdmAction extends AbstractAction implements Presenter.Toolbar
         popup.add(item);
     }
 
-    private static void enum_dal_files(final FileObject root_folder, final FileObject current_folder, final List<String> rel_path_names) {
+    private static void enum_root_files(final FileObject root_folder, final FileObject current_folder, final List<String> rel_path_names) {
 
         FileObject[] children = current_folder.getChildren();
 
@@ -78,7 +78,7 @@ public final class SdmAction extends AbstractAction implements Presenter.Toolbar
 
             if (c.isFolder()) {
 
-                enum_dal_files(root_folder, c, rel_path_names);
+                enum_root_files(root_folder, c, rel_path_names);
 
             } else {
 
@@ -94,7 +94,7 @@ public final class SdmAction extends AbstractAction implements Presenter.Toolbar
         }
     }
 
-    private List<String> getDalFileTitles(final Project[] projects) throws Exception {
+    private List<String> get_root_file_titles(final Project[] projects) throws Exception {
 
         List<String> res = new ArrayList<String>();
 
@@ -106,7 +106,7 @@ public final class SdmAction extends AbstractAction implements Presenter.Toolbar
 
             List<String> rel_path_names = new ArrayList<String>();
 
-            enum_dal_files(project_root_folder, project_root_folder, rel_path_names);
+            enum_root_files(project_root_folder, project_root_folder, rel_path_names);
 
             for (String name : rel_path_names) {
 
@@ -144,23 +144,23 @@ public final class SdmAction extends AbstractAction implements Presenter.Toolbar
 
                     final Project[] projects = open_projects.getOpenProjects();
 
-                    List<String> dal_file_titles = getDalFileTitles(projects);
+                    List<String> root_file_titles = get_root_file_titles(projects);
 
-                    if (dal_file_titles.isEmpty()) {
+                    if (root_file_titles.isEmpty()) {
 
                         add_empty_item(popup);
 
                     } else {
 
-                        for (String name : dal_file_titles) {
+                        for (String name : root_file_titles) {
 
                             JMenuItem item = new JMenuItem(new AbstractAction(name) {
                                 @Override
                                 public void actionPerformed(ActionEvent e) {
 
-                                    String dal_title = e.getActionCommand();
+                                    String title = e.getActionCommand();
 
-                                    open_dal_file(dal_title, projects);
+                                    open_root_file(title, projects);
 
                                 }
                             });
@@ -188,6 +188,7 @@ public final class SdmAction extends AbstractAction implements Presenter.Toolbar
         );
 
         /////////////////////////////////////////////////////////////
+        //
         final String ICON_PATH = "com/sqldalmaker/netbeans/sqldalmaker_24.png";
 
         final JButton drop_down_button = DropDownButtonFactory.createDropDownButton(ImageUtilities.loadImageIcon(ICON_PATH, true), popup);
@@ -205,15 +206,15 @@ public final class SdmAction extends AbstractAction implements Presenter.Toolbar
 
                     final Project[] projects = open_projects.getOpenProjects();
 
-                    List<String> dal_file_titles = getDalFileTitles(projects);
+                    List<String> titles = get_root_file_titles(projects);
 
-                    if (dal_file_titles.size() > 1) {
+                    if (titles.size() > 1) {
 
                         popup.show(drop_down_button, 0, drop_down_button.getHeight());
 
-                    } else if (dal_file_titles.size() == 1) {
+                    } else if (titles.size() == 1) {
 
-                        open_dal_file(dal_file_titles.get(0), projects);
+                        open_root_file(titles.get(0), projects);
                     }
 
                 } catch (Exception ex) {
@@ -238,7 +239,7 @@ public final class SdmAction extends AbstractAction implements Presenter.Toolbar
         return drop_down_button;
     }
 
-    private void open_dal_file(String dal_title, Project[] projects) {
+    private void open_root_file(String title, Project[] projects) {
 
         for (Project pr : projects) {
 
@@ -246,13 +247,13 @@ public final class SdmAction extends AbstractAction implements Presenter.Toolbar
 
             String prefix = info.getDisplayName() + " - ";
 
-            if (dal_title.startsWith(prefix)) {
+            if (title.startsWith(prefix)) {
 
                 try {
 
-                    String dal_rel_path = dal_title.substring(prefix.length());
+                    String rel_path = title.substring(prefix.length());
 
-                    NbpIdeEditorHelpers.open_project_file_in_editor_async(pr.getProjectDirectory(), dal_rel_path);
+                    NbpIdeEditorHelpers.open_project_file_in_editor_async(pr.getProjectDirectory(), rel_path);
 
                 } catch (Exception ex) {
 
