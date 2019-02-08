@@ -57,6 +57,7 @@ public class XmlAttributeHelpers {
 			}
 
 			// Whitespace char is required before attribute name
+			//
 			String attr = text.substring(i - attr_name_len, i + 1);
 
 			ch = attr.charAt(0);
@@ -78,6 +79,7 @@ public class XmlAttributeHelpers {
 	}
 
 	// http://stackoverflow.com/questions/943030/eclipse-3-5-how-to-get-file-name-from-editor
+	//
 	public static IFile get_current_file() {
 
 		IWorkbenchWindow win = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
