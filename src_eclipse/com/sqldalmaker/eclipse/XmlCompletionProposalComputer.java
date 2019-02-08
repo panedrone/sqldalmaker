@@ -16,7 +16,6 @@ import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
@@ -39,7 +38,6 @@ import org.eclipse.wst.sse.ui.contentassist.ICompletionProposalComputer;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 import com.sqldalmaker.common.Const;
 import com.sqldalmaker.common.FileSearchHelpers;
@@ -69,7 +67,7 @@ public class XmlCompletionProposalComputer implements ICompletionProposalCompute
 				return NONE;
 			}
 
-			int cursor_offset_in_document = context.getInvocationOffset();
+			int cursor_offset = context.getInvocationOffset();
 
 			IFile this_xml_file = XmlAttributeHelpers.get_current_file();
 
@@ -96,9 +94,9 @@ public class XmlCompletionProposalComputer implements ICompletionProposalCompute
 
 			String text = doc.get();
 
-			IRegion value_region = XmlAttributeHelpers.get_attribute_value_region(cursor_offset_in_document, text);
+			IRegion region = XmlAttributeHelpers.get_attribute_value_region(cursor_offset, text);
 
-			if (value_region == null) {
+			if (region == null) {
 
 				return NONE;
 			}
@@ -107,14 +105,14 @@ public class XmlCompletionProposalComputer implements ICompletionProposalCompute
 
 			try {
 
-				value = text.substring(value_region.getOffset(), value_region.getOffset() + value_region.getLength());
+				value = text.substring(region.getOffset(), region.getOffset() + region.getLength());
 
 			} catch (Throwable e) {
 
 				return NONE;
 			}
 
-			int offset_inside_value = cursor_offset_in_document - value_region.getOffset();
+			int offset_inside_value = cursor_offset - region.getOffset();
 
 			String qualifier;
 
@@ -131,7 +129,7 @@ public class XmlCompletionProposalComputer implements ICompletionProposalCompute
 				qualifier = value.substring(0, offset_inside_value);
 			}
 
-			int attr_offset = value_region.getOffset() - 2;
+			int attr_offset = region.getOffset() - 2;
 
 			if (XmlAttributeHelpers.is_value_of("ref", attr_offset, text)) {
 
@@ -150,9 +148,9 @@ public class XmlCompletionProposalComputer implements ICompletionProposalCompute
 
 					IResource root = EclipseTargetLanguageHelpers.find_root_file(this_folder);
 
-					String xml_metaprogram_folder_full_path = root.getParent().getLocation().toPortableString();
+					String xml_metaprogram_folder_path = root.getParent().getLocation().toPortableString();
 
-					Settings settings = EclipseHelpers.load_settings(xml_metaprogram_folder_full_path);
+					Settings settings = EclipseHelpers.load_settings(xml_metaprogram_folder_path);
 
 					String sql_root_rel_path = settings.getFolders().getSql();
 
@@ -171,7 +169,7 @@ public class XmlCompletionProposalComputer implements ICompletionProposalCompute
 
 					List<ICompletionProposal> prop_list = new ArrayList<ICompletionProposal>();
 
-					compute_structure_proposals(qualifier, cursor_offset_in_document, prop_list, list);
+					compute_structure_proposals(qualifier, cursor_offset, prop_list, list);
 
 					return prop_list;
 				}
@@ -206,11 +204,11 @@ public class XmlCompletionProposalComputer implements ICompletionProposalCompute
 
 					List<String> list = get_attribute_value("name", xml);
 
-					List<ICompletionProposal> propList = new ArrayList<ICompletionProposal>();
+					List<ICompletionProposal> prop_list = new ArrayList<ICompletionProposal>();
 
-					compute_structure_proposals(qualifier, cursor_offset_in_document, propList, list);
+					compute_structure_proposals(qualifier, cursor_offset, prop_list, list);
 
-					return propList;
+					return prop_list;
 
 				} else if (XmlAttributeHelpers.is_value_of("table", attr_offset, text)) {
 
@@ -252,7 +250,7 @@ public class XmlCompletionProposalComputer implements ICompletionProposalCompute
 
 					List<ICompletionProposal> prop_list = new ArrayList<ICompletionProposal>();
 
-					compute_structure_proposals(qualifier, cursor_offset_in_document, prop_list, list_fillterd);
+					compute_structure_proposals(qualifier, cursor_offset, prop_list, list_fillterd);
 
 					return prop_list;
 				}
@@ -304,17 +302,10 @@ public class XmlCompletionProposalComputer implements ICompletionProposalCompute
 				e.printStackTrace();
 			}
 
-		} catch (ParserConfigurationException pce) {
+		} catch (Exception ex) {
 
-			pce.printStackTrace();
+			ex.printStackTrace();
 
-		} catch (IOException ioe) {
-
-			ioe.printStackTrace();
-
-		} catch (SAXException sae) {
-
-			sae.printStackTrace();
 		}
 
 		return results;
@@ -345,7 +336,7 @@ public class XmlCompletionProposalComputer implements ICompletionProposalCompute
 		}
 	}
 
-	private static void enum_sql_files(final IFolder dir, final List<String> res, final String sql_root_rel_path) {
+	private static void enum_sql_files(IFolder dir, List<String> res, String sql_root_rel_path) {
 
 		try {
 
@@ -381,8 +372,8 @@ public class XmlCompletionProposalComputer implements ICompletionProposalCompute
 	// ===: implementation of computeStructureProposals is based on
 	// http://www.ibm.com/developerworks/library/os-ecca/
 	//
-	private static void compute_structure_proposals(String qualifier, int documentOffset,
-			List<ICompletionProposal> propList, List<String> complete_List) {
+	private static void compute_structure_proposals(String qualifier, int doc_offset,
+			List<ICompletionProposal> prop_list, List<String> complete_List) {
 
 		int qlen = qualifier.length();
 
@@ -393,16 +384,16 @@ public class XmlCompletionProposalComputer implements ICompletionProposalCompute
 			String text = complete_List.get(i);
 
 			// Check if proposal matches qualifier
+			//
 			if (text.startsWith(qualifier)) { // ===: "___".startsWith("") is
 												// true
 				// Derive cursor position
+				//
 				int cursor = text.length();
 
-				// Construct proposal
-				CompletionProposal proposal = new CompletionProposal(text, documentOffset - qlen, qlen, cursor);
+				CompletionProposal proposal = new CompletionProposal(text, doc_offset - qlen, qlen, cursor);
 
-				// and add to result list
-				propList.add(proposal);
+				prop_list.add(proposal);
 			}
 		}
 	}
@@ -416,6 +407,7 @@ public class XmlCompletionProposalComputer implements ICompletionProposalCompute
 
 	@Override
 	public String getErrorMessage() {
+
 		return null;
 	}
 
