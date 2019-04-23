@@ -20,6 +20,9 @@ import com.sqldalmaker.jaxb.settings.Settings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
+import java.util.Collections;
+
 /**
  * usage of PsiReferenceBase<PsiElement> is based on
  * https://confluence.jetbrains.com/display/IntelliJIDEA/Reference+Contributor
@@ -27,6 +30,7 @@ import org.jetbrains.annotations.Nullable;
  * Created with IntelliJ IDEA.
  * User: sqldalmaker@gmail.com
  */
+@SuppressWarnings("unchecked")
 public class PsiReferenceSql extends PsiReferenceBase<PsiElement> {
 
     public PsiReferenceSql(PsiElement element) {
@@ -162,5 +166,14 @@ public class PsiReferenceSql extends PsiReferenceBase<PsiElement> {
         }
 
         return false;
+    }
+
+    @NotNull
+    // @Override
+    public Collection resolveReference() {
+
+        // --- panedrone: implementation to compile and work with IDEA 13...2019. @SuppressWarnings("unchecked") is needed before class declaration.
+
+        return Collections.emptyList();
     }
 }

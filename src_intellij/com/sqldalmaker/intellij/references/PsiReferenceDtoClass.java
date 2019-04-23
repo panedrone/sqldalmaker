@@ -16,6 +16,9 @@ import com.sqldalmaker.common.FileSearchHelpers;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
+import java.util.Collections;
+
 /**
  * Created by sqldalmaker@gmail.com
  * on 17.02.2015.
@@ -23,6 +26,7 @@ import org.jetbrains.annotations.Nullable;
  * usage of PsiReferenceBase<PsiElement> is based on
  * https://confluence.jetbrains.com/display/IntelliJIDEA/Reference+Contributor
  */
+@SuppressWarnings("unchecked")
 public class PsiReferenceDtoClass extends PsiReferenceBase<PsiElement> {
 
     public PsiReferenceDtoClass(PsiElement element) {
@@ -100,5 +104,14 @@ public class PsiReferenceDtoClass extends PsiReferenceBase<PsiElement> {
         String name = containing_file.getName();
 
         return FileSearchHelpers.is_dto_xml(name);
+    }
+
+    @NotNull
+    // @Override
+    public Collection resolveReference() {
+
+        // --- panedrone: implementation to compile and work with IDEA 13...2019. @SuppressWarnings("unchecked") is needed before class declaration.
+
+        return Collections.emptyList();
     }
 }
