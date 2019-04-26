@@ -8,12 +8,21 @@ package com.sqldalmaker.netbeans;
 import com.sqldalmaker.common.Const;
 import com.sqldalmaker.common.FileSearchHelpers;
 import com.sqldalmaker.jaxb.settings.Settings;
+import javax.swing.JEditorPane;
 import javax.swing.text.Document;
 import org.netbeans.api.editor.mimelookup.MimeRegistration;
+import org.netbeans.api.lexer.Token;
+import org.netbeans.api.lexer.TokenHierarchy;
+import org.netbeans.api.lexer.TokenSequence;
+import org.netbeans.api.xml.lexer.XMLTokenId;
 import org.netbeans.lib.editor.hyperlink.spi.HyperlinkProvider;
 import org.netbeans.modules.editor.NbEditorUtilities;
+import org.openide.cookies.EditorCookie;
+import org.openide.cookies.OpenCookie;
 import org.openide.filesystems.FileObject;
 import org.openide.loaders.DataObject;
+import org.openide.loaders.DataObjectNotFoundException;
+import org.openide.util.RequestProcessor;
 
 /**
  *
@@ -49,6 +58,11 @@ public class XmlEditorHyperlinkProvider implements HyperlinkProvider {
     private String identifier;
 
     private String verify_state(Document doc, int offset) {
+
+        start_offset = 0;
+        end_offset = 0;
+
+        identifier = "";
 
         //////////////////////////////////////////////////////
         // Google: swing document get file name java -JFileChooser
@@ -132,10 +146,128 @@ public class XmlEditorHyperlinkProvider implements HyperlinkProvider {
         }
     }
 
+    private static int process_tag(TokenSequence<XMLTokenId> ts, Token<XMLTokenId> tag_token, String search_pattern) {
+
+        String tag_text = tag_token.text().toString();
+
+        if (!(tag_token.id() == XMLTokenId.TAG && tag_text.equals("<dto-class"))) {
+
+            return 0;
+        }
+
+        while (ts.moveNext()) { // search for argument 'name'
+
+            if (tag_text.equals(">")) {
+
+                break;
+            }
+
+            Token<XMLTokenId> arg_token = ts.token();
+
+            if (arg_token == null) {
+
+                break;
+            }
+
+            String arg_text = arg_token.text().toString();
+
+            if (!(arg_token.id() == XMLTokenId.ARGUMENT && arg_text.equals("name"))) {
+
+                continue;
+            }
+
+            while (ts.moveNext()) { // search for operator '='
+
+                Token<XMLTokenId> equal_operator_token = ts.token();
+
+                if (equal_operator_token == null) {
+
+                    break;
+                }
+
+                String equal_operator_text = equal_operator_token.text().toString();
+
+                if (!(equal_operator_token.id() == XMLTokenId.OPERATOR && equal_operator_text.equals("="))) {
+
+                    continue;
+                }
+
+                while (ts.moveNext()) { // skip spaces
+
+                    Token<XMLTokenId> value_token = ts.token();
+
+                    if (value_token == null) {
+
+                        break;
+                    }
+
+                    if (value_token.id() == XMLTokenId.VALUE) {
+
+                        CharSequence cs = value_token.text();
+
+                        if (cs != null) {
+
+                            String dto_class_name = cs.toString();
+
+                            dto_class_name = dto_class_name.substring(1, dto_class_name.length() - 1);
+
+                            // System.out.println(dto_class_name);
+                            if (dto_class_name.equals(search_pattern)) {
+
+                                int tok_offset = ts.offset();
+
+                                // System.out.println(tok_offset);
+                                return tok_offset;
+                            }
+                        }
+
+                        break; // break if XMLTokenId.VALUE found after XMLTokenId.OPERATOR
+                    }
+
+                } // while
+
+                break; // break if XMLTokenId.OPERATOR '=' found
+
+            } // while
+
+        } // while
+
+        return 0;
+    }
+
+    private static int get_gto_class_declaration_offset(Document dto_xml_doc, String search_pattern) throws Exception {
+
+        TokenHierarchy<Document> hi = TokenHierarchy.get(dto_xml_doc);
+
+        TokenSequence<XMLTokenId> ts = hi.tokenSequence(XMLTokenId.language());
+
+        ts.moveStart();
+
+        while (ts.moveNext()) {
+
+            Token<XMLTokenId> tag_token = ts.token();
+
+            if (tag_token == null) {
+
+                break;
+            }
+
+            int offset = process_tag(ts, tag_token, search_pattern);
+
+            if (offset > 0) {
+
+                return offset;
+            }
+
+        } // while
+
+        return 0;
+    }
+
     @Override
     public void performClickAction(Document doc, int offset) {
 
-        String attribute_name = verify_state(doc, offset);
+        String attribute_name = verify_state(doc, offset); // attribute_name is 'ref' or 'table'
 
         if (identifier == null || identifier.length() == 0) {
 
@@ -173,9 +305,9 @@ public class XmlEditorHyperlinkProvider implements HyperlinkProvider {
 
                 NbpIdeEditorHelpers.open_project_file_in_editor_async(this_doc_file, rel_path);
 
-            } catch (Throwable ex) {
+            } catch (Exception ex) {
                 // ex.printStackTrace();
-                
+
                 NbpIdeMessageHelpers.show_error_in_ui_thread(ex);
             }
 
@@ -183,7 +315,85 @@ public class XmlEditorHyperlinkProvider implements HyperlinkProvider {
 
             FileObject folder = this_doc_file.getParent();
 
-            NbpIdeEditorHelpers.open_metaprogram_file_in_editor_async(folder, Const.DTO_XML);
+            String file_name = Const.DTO_XML;
+
+            final FileObject dto_xml_file = folder.getFileObject(file_name);
+
+            if (dto_xml_file == null) {
+
+                NbpIdeMessageHelpers.show_error_in_ui_thread("File not found: " + file_name);
+
+                return;
+            }
+
+            // https://platform.netbeans.org/tutorials/60/nbm-hyperlink.html
+            RequestProcessor.getDefault().post(new Runnable() {
+
+                @Override
+                public void run() {
+
+                    try {
+
+                        final DataObject data_object = DataObject.find(dto_xml_file);
+
+                        data_object.getLookup().lookup(OpenCookie.class).open(); // https://blogs.oracle.com/geertjan/entry/open_file_action
+
+                        org.netbeans.editor.Utilities.runInEventDispatchThread(new Runnable() { // https://platform.netbeans.org/tutorials/60/nbm-hyperlink.html
+//                                // SwingUtilities.invokeAndWait(new Runnable() { // === panedrone: it does not work:
+//                                // SwingUtilities.invokeLater(new Runnable() { // === panedrone: it does not work:
+                            @Override
+                            public void run() {
+
+                                try {
+
+                                    // copy-paste from // https://platform.netbeans.org/tutorials/60/nbm-hyperlink.html
+                                    // warning: [cast] redundant cast to Observable
+                                    // final EditorCookie.Observable ec = (EditorCookie.Observable) dObject.getCookie(EditorCookie.Observable.class);
+                                    final EditorCookie.Observable ec = data_object.getCookie(EditorCookie.Observable.class);
+
+                                    if (ec != null) {
+
+                                        final JEditorPane[] panes = ec.getOpenedPanes(); // UI thread needed
+
+                                        if ((panes != null) && (panes.length > 0)) {
+
+                                            Document dto_xml_doc = panes[0].getDocument();
+
+                                            if (dto_xml_doc == null) {
+
+                                                return;
+                                            }
+
+                                            int tok_offset = get_gto_class_declaration_offset(dto_xml_doc, identifier);
+
+                                            // panes[0].setCaretPosition(tok_offset);
+                                            panes[0].setSelectionStart(tok_offset + 1);
+                                            panes[0].setSelectionEnd(tok_offset + 1 + identifier.length());
+                                        }
+                                    }
+
+                                    // // === panedrone: it does not work:
+                                    //                                    
+                                    // final JTextComponent t = EditorRegistry.lastFocusedComponent(); 
+                                    // t.setCaretPosition(tok_offset);
+                                    //
+                                } catch (Exception ex) {
+                                    // ex.printStackTrace();
+                                    NbpIdeMessageHelpers.show_error_in_ui_thread(ex);
+                                }
+
+                            } // run
+                        });
+
+                    } catch (DataObjectNotFoundException ex) {
+                        // ex.printStackTrace();
+                        NbpIdeMessageHelpers.show_error_in_ui_thread(ex);
+                    }
+
+                } // run
+
+            });
+
         }
     }
 }

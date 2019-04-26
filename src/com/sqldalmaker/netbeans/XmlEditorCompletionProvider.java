@@ -49,35 +49,35 @@ public class XmlEditorCompletionProvider implements CompletionProvider {
         //
         if (queryType != CompletionProvider.COMPLETION_QUERY_TYPE
                 && queryType != CompletionProvider.COMPLETION_ALL_QUERY_TYPE) {
-            
+
             return null;
         }
 
         Document document = jtc.getDocument();
-        
+
         if (document == null) {
-            
+
             return null;
         }
-        
+
         DataObject data_object = NbEditorUtilities.getDataObject(document);
-        
+
         if (data_object == null) {
-            
+
             return null;
         }
-        
+
         final FileObject this_file_object = data_object.getPrimaryFile();
-        
+
         if (this_file_object == null) {
-            
+
             return null;
         }
-        
+
         String doc_name = this_file_object.getNameExt();
-        
+
         if (!FileSearchHelpers.is_dto_xml(doc_name) && !FileSearchHelpers.is_dao_xml(doc_name)) {
-            
+
             return null;
         }
 
@@ -91,37 +91,37 @@ public class XmlEditorCompletionProvider implements CompletionProvider {
                     XmlEditorUtil checker = new XmlEditorUtil();
 
                     String attribute_name = checker.verify_state(document, caretOffset);
-                    
+
                     if (attribute_name == null || attribute_name.length() == 0) {
-                        
+
                         return;
                     }
 
                     int start_offset = checker.get_start_offset() + 1;
-                    
+
                     int end_offset = checker.get_end_offset() + 1;
-                    
+
                     String current_value = checker.get_identifier();
 
                     int filter_len = caretOffset - start_offset;
 
                     if (filter_len > current_value.length()) {
-                        
+
                         filter_len = current_value.length();
-                        
+
                     } else if (filter_len < 0) { // position before starting "
-                        
+
                         return; // go to finally
                     }
 
                     String filter;
-                    
+
                     if (filter_len == 0) {
-                        
+
                         filter = "";
-                        
+
                     } else {
-                        
+
                         filter = current_value.substring(0, filter_len);
                     }
 
@@ -130,20 +130,20 @@ public class XmlEditorCompletionProvider implements CompletionProvider {
                         Settings settings;
 
                         try {
-                            
+
                             settings = NbpHelpers.load_settings(this_file_object);
-                            
+
                         } catch (Throwable e) {
                             //e.printStackTrace();
                             return;
                         }
 
                         FileObject root;
-                        
+
                         try {
-                            
+
                             root = NbpPathHelpers.get_root_folder(this_file_object);
-                            
+
                         } catch (Exception ex) {
                             // ex.printStackTrace();
                             return;
@@ -152,7 +152,7 @@ public class XmlEditorCompletionProvider implements CompletionProvider {
                         FileObject sql_root_folder = root.getFileObject(settings.getFolders().getSql());
 
                         List<String> rel_path_names = new ArrayList<String>();
-                        
+
                         enum_sql_files(sql_root_folder, sql_root_folder, rel_path_names);
 
                         for (String rel_path_name : rel_path_names) {
@@ -174,71 +174,76 @@ public class XmlEditorCompletionProvider implements CompletionProvider {
                             }
                         }
 
-                    } else if (XmlEditorUtil.ATTRIBUTE.DTO.equals(attribute_name)
-                            || XmlEditorUtil.ATTRIBUTE.TABLE.equals(attribute_name)) {
+                    } else {
 
-                        FileObject folder = this_file_object.getParent();
+                        boolean is_dto_attr = XmlEditorUtil.ATTRIBUTE.DTO.equals(attribute_name);
+                        boolean is_table_attr = XmlEditorUtil.ATTRIBUTE.TABLE.equals(attribute_name);
 
-                        List<DtoClass> dto_classes;
-                        
-                        try {
-                            
-                            dto_classes = NbpHelpers.get_dto_classes(folder);
-                            
-                        } catch (Throwable ex) {
-                            // ex.printStackTrace();
-                            return;
-                        }
+                        if (is_dto_attr || is_table_attr) {
 
-                        for (DtoClass dto_class : dto_classes) {
+                            FileObject folder = this_file_object.getParent();
 
-                            String name;
-                            
-                            boolean add;
+                            List<DtoClass> dto_classes;
 
-                            if (XmlEditorUtil.ATTRIBUTE.DTO.equals(attribute_name)) {
+                            try {
 
-                                name = dto_class.getName();
+                                dto_classes = NbpHelpers.get_dto_classes(folder);
 
-                                if (filter.length() == 0) {
-                                    
-                                    add = true;
-                                    
-                                } else {
-                                    
-                                    add = name.startsWith(filter);
-                                }
-
-                            } else if (XmlEditorUtil.ATTRIBUTE.TABLE.equals(attribute_name)) {
-
-                                name = dto_class.getRef();
-
-                                if (filter.length() == 0) {
-                                    
-                                    add = !name.endsWith(".sql");
-                                    
-                                } else {
-                                    
-                                    add = name.startsWith(filter) && !name.endsWith(".sql");
-                                }
-
-                            } else {
-
-                                add = false;
-                                
-                                name = null;
+                            } catch (Throwable ex) {
+                                // ex.printStackTrace();
+                                return;
                             }
 
-                            if (add) {
-                                // System.out.println(name);
-                                completionResultSet.addItem(new XmlEditorCompletionItem(name, start_offset, end_offset));
-                            }
-                        }
+                            for (DtoClass dto_class : dto_classes) {
 
+                                String name;
+
+                                boolean add;
+
+                                if (is_dto_attr) {
+
+                                    name = dto_class.getName();
+
+                                    if (filter.length() == 0) {
+
+                                        add = true;
+
+                                    } else {
+
+                                        add = name.startsWith(filter);
+                                    }
+
+                                } else if (is_table_attr) {
+
+                                    name = dto_class.getRef();
+
+                                    if (filter.length() == 0) {
+
+                                        add = !name.endsWith(".sql");
+
+                                    } else {
+
+                                        add = name.startsWith(filter) && !name.endsWith(".sql");
+                                    }
+
+                                } else {
+
+                                    add = false;
+
+                                    name = null;
+                                }
+
+                                if (add) {
+                                    // System.out.println(name);
+                                    completionResultSet.addItem(new XmlEditorCompletionItem(name, start_offset, end_offset));
+                                }
+                            }
+
+                        }
                     }
 
                 } finally {
-                    
+
                     completionResultSet.finish(); // it must be called anyway to avoid red banner
                 }
             }
@@ -255,19 +260,19 @@ public class XmlEditorCompletionProvider implements CompletionProvider {
     }
 
     private static void enum_sql_files(FileObject root_sql_folder, FileObject current_folder, List<String> rel_path_names) {
-        
+
         FileObject[] children = current_folder.getChildren();
-        
+
         for (FileObject c : children) {
-            
+
             if (c.isFolder()) {
-                
+
                 enum_sql_files(root_sql_folder, c, rel_path_names);
-                
+
             } else {
-                
+
                 String path = NbpPathHelpers.get_relative_path(root_sql_folder, c);
-                
+
                 rel_path_names.add(path);
             }
         }
