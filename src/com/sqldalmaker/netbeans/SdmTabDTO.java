@@ -33,6 +33,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 import org.netbeans.core.spi.multiview.MultiViewElement;
+import org.openide.filesystems.FileObject;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle.Messages;
 import org.openide.util.RequestProcessor;
@@ -62,7 +63,9 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
     private TableRowSorter<AbstractTableModel> sorter;
 
     public SdmTabDTO(Lookup lookup) {
+
         super(lookup);
+
         initComponents();
 
         jTextField1.getDocument().addDocumentListener(new DocumentListener() {
@@ -285,12 +288,15 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
         });
 
         //////////////////////////////////////////////////////
+        //
         if (selectedRows.length > 0) {
+
             task.schedule(0);
         }
     }
 
     private void generate2() {
+
         try {
 
             generate();
@@ -303,6 +309,7 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
     }
 
     private void validateAll2() {
+
         try {
 
             validateAll();
@@ -438,6 +445,7 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
     }
 
     private void genTmpFieldTags() {
+
         try {
 
             int[] selectedRows = getSelection();
@@ -468,7 +476,9 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
 
         @Override
         public String getColumnName(int col) {
+
             switch (col) {
+
                 case 0:
                     return "Class";
                 case 1:
@@ -476,6 +486,7 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
                 case 2:
                     return "State";
             }
+
             return "";
         }
 
@@ -570,7 +581,7 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
                     int row = table.rowAtPoint(new Point(e.getX(), e.getY()));
                     if (row >= 0) {
                         if (col == 0) {
-                            navigateToDtoClassDeclaration();
+                            goto_dto_class_declaration_async();
                         } else if (col == 1) {
                             openSQL();
                         } else {
@@ -597,9 +608,33 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
         }
     }
 
-    private void navigateToDtoClassDeclaration() {
-        // TODO implement navigation
-        NbpIdeEditorHelpers.open_metaprogram_file_async(obj, Const.DTO_XML);
+    private void goto_dto_class_declaration_async() {
+
+        try {
+
+            FileObject this_doc_file = obj.getPrimaryFile();
+
+            if (this_doc_file == null) {
+
+                return;
+            }
+
+            final int[] selected_rows = getSelection();
+
+            if (selected_rows.length == 1) {
+
+                FileObject folder = this_doc_file.getParent();
+
+                String dto_class_name = (String) table.getValueAt(selected_rows[0], 0);
+
+                XmlEditorUtil.goto_dto_class_declaration_async(folder, dto_class_name);
+            }
+
+        } catch (Exception ex) {
+            // ex.printStackTrace();
+            //
+            NbpIdeMessageHelpers.show_error_in_ui_thread(ex);
+        }
     }
 
     private int[] getSelection() throws Exception {

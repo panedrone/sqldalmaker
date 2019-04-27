@@ -156,9 +156,8 @@ public class NbpHelpers {
             cl = Class.forName(driver_class_name);
         }
 
-        Driver driver = (Driver) cl.newInstance();
-
-        Connection con;
+        // Driver driver = (Driver) cl.newInstance();
+        Driver driver = (Driver) cl.getConstructor().newInstance(); // https://github.com/google/error-prone/issues/407
 
         Properties props = new Properties();
 
@@ -169,7 +168,7 @@ public class NbpHelpers {
             props.put("password", password);
         }
 
-        con = driver.connect(url, props);
+        Connection con = driver.connect(url, props);
 
         // connect javadocs:
         // The driver should return "null" if it realizes it is the
@@ -177,7 +176,7 @@ public class NbpHelpers {
         //
         if (con == null) {
 
-            throw new InternalException("Invalid URL");
+            throw new InternalException("JDBC Connection failed");
         }
 
         return con;

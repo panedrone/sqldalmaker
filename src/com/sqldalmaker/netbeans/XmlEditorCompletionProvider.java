@@ -101,7 +101,7 @@ public class XmlEditorCompletionProvider implements CompletionProvider {
 
                     int end_offset = checker.get_end_offset() + 1;
 
-                    String current_value = checker.get_identifier();
+                    String current_value = checker.get_attribute_value();
 
                     int filter_len = caretOffset - start_offset;
 
