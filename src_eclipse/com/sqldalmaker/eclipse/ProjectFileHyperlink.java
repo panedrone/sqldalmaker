@@ -24,13 +24,17 @@ public class ProjectFileHyperlink implements IHyperlink {
 
 	private final boolean crate_missing;
 
-	public ProjectFileHyperlink(IRegion hyperlink_region, IFile file, boolean crate_missing) {
+	private final String dto_class_name;
+
+	public ProjectFileHyperlink(IRegion hyperlink_region, IFile file, boolean crate_missing, String dto_class_name) {
 
 		this.hyperlink_region = hyperlink_region;
 
 		this.file = file;
 
 		this.crate_missing = crate_missing;
+
+		this.dto_class_name = dto_class_name;
 	}
 
 	@Override
@@ -58,7 +62,14 @@ public class ProjectFileHyperlink implements IHyperlink {
 
 			Shell active_shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
 
-			EclipseEditorHelpers.open_editor_sync(active_shell, file, crate_missing);
+			if (dto_class_name == null) {
+		
+				EclipseEditorHelpers.open_editor_sync(active_shell, file, crate_missing);
+				
+			} else {
+
+				EclipseXmlUtils.goto_dto_class_declaration(active_shell, file, dto_class_name);
+			}
 
 		} catch (Throwable e) {
 

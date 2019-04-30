@@ -107,6 +107,8 @@ public class ProjectFileHyperlinkDetector extends AbstractHyperlinkDetector {
 				return NONE;
 			}
 
+			String dto_class_name = null;
+			
 			IContainer this_folder = this_xml_file.getParent();
 
 			IResource profile = EclipseTargetLanguageHelpers.find_root_file(this_folder);
@@ -162,6 +164,8 @@ public class ProjectFileHyperlinkDetector extends AbstractHyperlinkDetector {
 						if (res instanceof IFile) {
 
 							file = (IFile) res;
+							
+							dto_class_name = value;
 						}
 					}
 
@@ -176,7 +180,7 @@ public class ProjectFileHyperlinkDetector extends AbstractHyperlinkDetector {
 				return NONE;
 			}
 
-			ProjectFileHyperlink link = new ProjectFileHyperlink(hyperlink_region, file, crateMissingFile);
+			ProjectFileHyperlink link = new ProjectFileHyperlink(hyperlink_region, file, crateMissingFile, dto_class_name);
 
 			return new IHyperlink[] { link };
 

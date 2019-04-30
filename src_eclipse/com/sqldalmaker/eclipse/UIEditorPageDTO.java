@@ -54,6 +54,8 @@ import org.eclipse.wb.swt.ResourceManager;
 
 import com.sqldalmaker.cg.Helpers;
 import com.sqldalmaker.cg.IDtoCG;
+import com.sqldalmaker.common.Const;
+import com.sqldalmaker.common.InternalException;
 import com.sqldalmaker.jaxb.dto.DtoClass;
 import com.sqldalmaker.jaxb.settings.Settings;
 
@@ -669,9 +671,23 @@ public class UIEditorPageDTO extends Composite {
 		try {
 
 			IFile file = editor2.find_dto_xml();
+			
+			if (file == null) {
+				
+				throw new InternalException("File not found: " + Const.DTO_XML);
+			}
 
-			EclipseEditorHelpers.open_editor_sync(getShell(), file, true);
+			final List<Item> items = prepareSelectedItems();
 
+			if (items == null || items.size() == 0) {
+				
+				EclipseEditorHelpers.open_editor_sync(getShell(), file, false);
+				
+				return;
+			}
+			
+			EclipseXmlUtils.goto_dto_class_declaration(getShell(), file, items.get(0).get_name());
+			
 		} catch (Throwable e) {
 
 			e.printStackTrace();

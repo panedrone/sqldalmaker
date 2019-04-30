@@ -57,7 +57,7 @@ public class EclipseEditorHelpers {
 		open_editor_sync(ei, full_path);
 	}
 
-	public static void open_editor_sync(Shell shell, IFile file, boolean create_missing)
+	public static IEditorPart open_editor_sync(Shell shell, IFile file, boolean create_missing)
 			throws InternalException, PartInitException {
 
 		if (file == null || file.exists() == false) {
@@ -69,7 +69,7 @@ public class EclipseEditorHelpers {
 				if (EclipseMessageHelpers.show_confirmation(
 						"'" + title + "' does not exist. " + "Do you want to create a new one?") == false) {
 
-					return;
+					return null;
 				}
 
 				create_new_file_sync(shell, file, (InputStream) null, title, (IProgressMonitor) null);
@@ -80,7 +80,7 @@ public class EclipseEditorHelpers {
 			}
 		}
 
-		open_editor_sync(new FileEditorInput(file), file.getName());
+		return open_editor_sync(new FileEditorInput(file), file.getName());
 	}
 
 	private static void create_new_file_sync(Shell shell, IFile new_file_handle, InputStream initial_contents,
