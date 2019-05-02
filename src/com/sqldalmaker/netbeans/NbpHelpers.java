@@ -112,7 +112,7 @@ public class NbpHelpers {
 
         url = url.replace("$PROJECT_DIR$", project_abs_path);
 
-        url = url.replace("{$project_loc}", project_abs_path);
+        url = url.replace("${project_loc}", project_abs_path);
 
         String user_name = sett.getJdbc().getUser();
 
