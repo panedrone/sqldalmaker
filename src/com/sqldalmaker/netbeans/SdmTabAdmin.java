@@ -14,6 +14,8 @@ import javax.swing.JToolBar;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import org.netbeans.core.spi.multiview.MultiViewElement;
+import org.openide.modules.ModuleInfo;
+import org.openide.modules.Modules;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
@@ -37,9 +39,19 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
     private final JToolBar toolBar = new JToolBar();
 
     public SdmTabAdmin(Lookup lookup) {
+
         super(lookup);
         initComponents();
 
+        ModuleInfo m = Modules.getDefault().ownerOf(this.getClass());
+
+        String v = m.getSpecificationVersion().toString();
+
+        jTextField1.setText("v. " + v);
+
+        jTextField1.setBorder(javax.swing.BorderFactory.createEmptyBorder());
+
+        ////////////////////////////////////////
         jTextPane1.setEditable(false);
         jTextPane1.setContentType("text/html");
 
@@ -93,8 +105,10 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         jPanel6 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         jButton5 = new javax.swing.JButton();
+        jButton13 = new javax.swing.JButton();
         jButton25 = new javax.swing.JButton();
         jButton6 = new javax.swing.JButton();
+        jTextField1 = new javax.swing.JTextField();
         jPanel4 = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
@@ -122,13 +136,9 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         jButton21 = new javax.swing.JButton();
         jButton22 = new javax.swing.JButton();
         jButton23 = new javax.swing.JButton();
-        jScrollPane2 = new javax.swing.JScrollPane();
         jTextPane1 = new javax.swing.JTextPane();
-        jButton13 = new javax.swing.JButton();
 
-        setLayout(new javax.swing.BoxLayout(this, javax.swing.BoxLayout.LINE_AXIS));
-
-        jPanel1.setLayout(new javax.swing.BoxLayout(jPanel1, javax.swing.BoxLayout.LINE_AXIS));
+        setLayout(new java.awt.BorderLayout());
 
         jPanel6.setPreferredSize(new java.awt.Dimension(540, 300));
 
@@ -142,6 +152,14 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
             }
         });
         jPanel3.add(jButton5);
+
+        org.openide.awt.Mnemonics.setLocalizedText(jButton13, org.openide.util.NbBundle.getMessage(SdmTabAdmin.class, "SdmTabAdmin.jButton13.text")); // NOI18N
+        jButton13.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton13ActionPerformed(evt);
+            }
+        });
+        jPanel3.add(jButton13);
 
         org.openide.awt.Mnemonics.setLocalizedText(jButton25, org.openide.util.NbBundle.getMessage(SdmTabAdmin.class, "SdmTabAdmin.jButton25.text")); // NOI18N
         jButton25.addActionListener(new java.awt.event.ActionListener() {
@@ -158,6 +176,11 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
             }
         });
         jPanel3.add(jButton6);
+
+        jTextField1.setEditable(false);
+        jTextField1.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        jTextField1.setText(org.openide.util.NbBundle.getMessage(SdmTabAdmin.class, "SdmTabAdmin.jTextField1.text")); // NOI18N
+        jPanel3.add(jTextField1);
 
         jPanel4.setBackground(new java.awt.Color(204, 204, 204));
         jPanel4.setLayout(new java.awt.GridLayout(1, 0));
@@ -347,14 +370,6 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         jPanel7.add(jButton23);
 
         jTextPane1.setMargin(new java.awt.Insets(3, 10, 3, 3));
-        jScrollPane2.setViewportView(jTextPane1);
-
-        org.openide.awt.Mnemonics.setLocalizedText(jButton13, org.openide.util.NbBundle.getMessage(SdmTabAdmin.class, "SdmTabAdmin.jButton13.text")); // NOI18N
-        jButton13.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton13ActionPerformed(evt);
-            }
-        });
 
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
         jPanel6.setLayout(jPanel6Layout);
@@ -362,24 +377,18 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel6Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel6Layout.createSequentialGroup()
-                        .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 469, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton13, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, 470, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jScrollPane2)
-                    .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, 835, Short.MAX_VALUE))
-                .addContainerGap(82, Short.MAX_VALUE))
+                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel5, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jTextPane1)
+                    .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 815, Short.MAX_VALUE)))
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel6Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton13))
+                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
@@ -387,20 +396,29 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
                 .addGap(18, 18, 18)
                 .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 269, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jTextPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 267, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(13, Short.MAX_VALUE))
         );
 
-        jPanel1.add(jPanel6);
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, 825, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 75, Short.MAX_VALUE))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, 570, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 45, Short.MAX_VALUE))
+        );
 
         jScrollPane1.setViewportView(jPanel1);
 
-        add(jScrollPane1);
+        add(jScrollPane1, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
-
-    private void jButton13ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton13ActionPerformed
-        NbpIdeEditorHelpers.open_resource_file_in_editor_async("recent_changes.txt", "recent_changes.txt");
-    }//GEN-LAST:event_jButton13ActionPerformed
 
     private void jButton23ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton23ActionPerformed
         NbpIdeEditorHelpers.open_resource_file_in_editor_async("ruby.vm", "com/sqldalmaker/cg/ruby", "ruby.vm");
@@ -434,20 +452,20 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         NbpIdeEditorHelpers.open_resource_file_in_editor_async("DataStore2.py", "DataStore2.py");
     }//GEN-LAST:event_jButton16ActionPerformed
 
-    private void jButton12ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton12ActionPerformed
-        NbpIdeEditorHelpers.open_resource_file_in_editor_async("DataStore.cpp", "DataStore.cpp");
-        NbpIdeEditorHelpers.open_resource_file_in_editor_async("DataStore.h", "DataStore.h");
-    }//GEN-LAST:event_jButton12ActionPerformed
+    private void jButton24ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton24ActionPerformed
+        NbpIdeEditorHelpers.open_resource_file_in_editor_async("DataStore_Qt5.cpp", "DataStore_Qt5.cpp");
+        NbpIdeEditorHelpers.open_resource_file_in_editor_async("DataStore_Qt5.h", "DataStore_Qt5.h");
+    }//GEN-LAST:event_jButton24ActionPerformed
 
     private void jButton14ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton14ActionPerformed
         NbpIdeEditorHelpers.open_resource_file_in_editor_async("DataStore.STL.cpp", "DataStore.STL.cpp");
         NbpIdeEditorHelpers.open_resource_file_in_editor_async("DataStore.STL.h", "DataStore.STL.h");
     }//GEN-LAST:event_jButton14ActionPerformed
 
-    private void jButton24ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton24ActionPerformed
-        NbpIdeEditorHelpers.open_resource_file_in_editor_async("DataStore_Qt5.cpp", "DataStore_Qt5.cpp");
-        NbpIdeEditorHelpers.open_resource_file_in_editor_async("DataStore_Qt5.h", "DataStore_Qt5.h");
-    }//GEN-LAST:event_jButton24ActionPerformed
+    private void jButton12ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton12ActionPerformed
+        NbpIdeEditorHelpers.open_resource_file_in_editor_async("DataStore.cpp", "DataStore.cpp");
+        NbpIdeEditorHelpers.open_resource_file_in_editor_async("DataStore.h", "DataStore.h");
+    }//GEN-LAST:event_jButton12ActionPerformed
 
     private void jButton11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton11ActionPerformed
         NbpIdeEditorHelpers.open_resource_file_in_editor_async("PDODataStore.php", "PDODataStore.php");
@@ -509,13 +527,17 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 
-    private void jButton25ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton25ActionPerformed
-        NbpIdeEditorHelpers.open_resource_file_in_editor_async("reference-settings.xml", "settings.xml");
-    }//GEN-LAST:event_jButton25ActionPerformed
+    private void jButton13ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton13ActionPerformed
+        NbpIdeEditorHelpers.open_resource_file_in_editor_async("recent_changes.txt", "recent_changes.txt");
+    }//GEN-LAST:event_jButton13ActionPerformed
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
         testConnection();
     }//GEN-LAST:event_jButton6ActionPerformed
+
+    private void jButton25ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton25ActionPerformed
+        NbpIdeEditorHelpers.open_resource_file_in_editor_async("reference-settings.xml", "settings.xml");
+    }//GEN-LAST:event_jButton25ActionPerformed
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
         editSettingsXml();
@@ -557,7 +579,7 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JTextField jTextField1;
     private javax.swing.JTextPane jTextPane1;
     // End of variables declaration//GEN-END:variables
 
