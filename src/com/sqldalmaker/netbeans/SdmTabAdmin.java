@@ -143,7 +143,7 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         jPanel6.setPreferredSize(new java.awt.Dimension(540, 300));
 
         jPanel3.setBackground(new java.awt.Color(204, 204, 204));
-        jPanel3.setLayout(new java.awt.GridLayout(1, 3));
+        jPanel3.setLayout(new java.awt.GridLayout());
 
         org.openide.awt.Mnemonics.setLocalizedText(jButton5, org.openide.util.NbBundle.getMessage(SdmTabAdmin.class, "SdmTabAdmin.jButton5.text")); // NOI18N
         jButton5.addActionListener(new java.awt.event.ActionListener() {
@@ -209,7 +209,7 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         });
         jPanel4.add(jButton3);
 
-        jPanel5.setLayout(new java.awt.GridLayout(6, 3));
+        jPanel5.setLayout(new java.awt.GridLayout(6, 0));
 
         org.openide.awt.Mnemonics.setLocalizedText(jButton4, org.openide.util.NbBundle.getMessage(SdmTabAdmin.class, "SdmTabAdmin.jButton4.text")); // NOI18N
         jButton4.addActionListener(new java.awt.event.ActionListener() {
@@ -327,7 +327,7 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         jPanel5.add(jButton18);
 
         jPanel7.setBackground(new java.awt.Color(204, 204, 204));
-        jPanel7.setLayout(new java.awt.GridLayout(1, 3));
+        jPanel7.setLayout(new java.awt.GridLayout());
 
         org.openide.awt.Mnemonics.setLocalizedText(jButton19, org.openide.util.NbBundle.getMessage(SdmTabAdmin.class, "SdmTabAdmin.jButton19.text")); // NOI18N
         jButton19.addActionListener(new java.awt.event.ActionListener() {
@@ -378,11 +378,11 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
             .addGroup(jPanel6Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel5, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jTextPane1)
                     .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 815, Short.MAX_VALUE)))
+                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 916, Short.MAX_VALUE)))
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -405,14 +405,14 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, 825, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 75, Short.MAX_VALUE))
+                .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, 926, Short.MAX_VALUE)
+                .addGap(0, 19, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, 570, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 45, Short.MAX_VALUE))
+                .addGap(0, 11, Short.MAX_VALUE))
         );
 
         jScrollPane1.setViewportView(jPanel1);

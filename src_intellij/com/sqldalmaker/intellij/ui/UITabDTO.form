@@ -3,7 +3,7 @@
   <grid id="27dc6" binding="rootPanel" layout-manager="GridLayoutManager" row-count="3" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="0" left="0" bottom="0" right="0"/>
     <constraints>
-      <xy x="20" y="20" width="557" height="400"/>
+      <xy x="20" y="20" width="783" height="585"/>
     </constraints>
     <properties/>
     <border type="none"/>
@@ -32,19 +32,16 @@
           </component>
         </children>
       </scrollpane>
-      <grid id="39d44" binding="toolbar_1" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="0">
+      <grid id="39d44" binding="top_panel_1" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="0">
         <constraints>
           <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="0" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties/>
         <border type="none"/>
         <children>
-          <toolbar id="6d20d" binding="toolbar1">
+          <grid id="f2e41" binding="toolbar_panel" layout-manager="FlowLayout" hgap="0" vgap="0" flow-align="1">
             <constraints/>
-            <properties>
-              <borderPainted value="false"/>
-              <floatable value="false"/>
-            </properties>
+            <properties/>
             <border type="none"/>
             <children>
               <component id="d0a91" class="javax.swing.JButton" binding="btn_OpenXML">
@@ -52,7 +49,7 @@
                 <properties>
                   <borderPainted value="false"/>
                   <icon value="img/xmldoc.gif"/>
-                  <margin top="5" left="5" bottom="5" right="5"/>
+                  <margin top="0" left="0" bottom="0" right="0"/>
                   <maximumSize width="32" height="32"/>
                   <minimumSize width="32" height="32"/>
                   <opaque value="false"/>
@@ -66,7 +63,7 @@
                 <properties>
                   <borderPainted value="false"/>
                   <icon value="img/qrydoc.gif"/>
-                  <margin top="5" left="5" bottom="5" right="5"/>
+                  <margin top="0" left="0" bottom="0" right="0"/>
                   <maximumSize width="32" height="32"/>
                   <minimumSize width="32" height="32"/>
                   <opaque value="false"/>
@@ -80,7 +77,7 @@
                 <properties>
                   <borderPainted value="false"/>
                   <icon value="img/GeneratedFile.gif"/>
-                  <margin top="5" left="5" bottom="5" right="5"/>
+                  <margin top="0" left="0" bottom="0" right="0"/>
                   <maximumSize width="32" height="32"/>
                   <minimumSize width="32" height="32"/>
                   <opaque value="false"/>
@@ -94,7 +91,7 @@
                 <properties>
                   <borderPainted value="false"/>
                   <icon value="img/177.png"/>
-                  <margin top="5" left="5" bottom="5" right="5"/>
+                  <margin top="0" left="0" bottom="0" right="0"/>
                   <maximumSize width="32" height="32"/>
                   <minimumSize width="32" height="32"/>
                   <opaque value="false"/>
@@ -108,7 +105,7 @@
                 <properties>
                   <borderPainted value="false"/>
                   <icon value="img/180.png"/>
-                  <margin top="5" left="5" bottom="5" right="5"/>
+                  <margin top="0" left="0" bottom="0" right="0"/>
                   <maximumSize width="32" height="32"/>
                   <minimumSize width="32" height="32"/>
                   <opaque value="false"/>
@@ -122,7 +119,7 @@
                 <properties>
                   <borderPainted value="false"/>
                   <icon value="img/arrow-circle-double-135.png"/>
-                  <margin top="5" left="5" bottom="5" right="5"/>
+                  <margin top="0" left="0" bottom="0" right="0"/>
                   <maximumSize width="32" height="32"/>
                   <minimumSize width="32" height="32"/>
                   <opaque value="false"/>
@@ -136,7 +133,7 @@
                 <properties>
                   <borderPainted value="false"/>
                   <icon value="img/none.gif"/>
-                  <margin top="5" left="5" bottom="5" right="5"/>
+                  <margin top="0" left="0" bottom="0" right="0"/>
                   <maximumSize width="32" height="32"/>
                   <minimumSize width="32" height="32"/>
                   <opaque value="false"/>
@@ -150,7 +147,7 @@
                 <properties>
                   <borderPainted value="false"/>
                   <icon value="img/text.gif"/>
-                  <margin top="5" left="5" bottom="5" right="5"/>
+                  <margin top="0" left="0" bottom="0" right="0"/>
                   <maximumSize width="32" height="32"/>
                   <minimumSize width="32" height="32"/>
                   <opaque value="false"/>
@@ -164,7 +161,7 @@
                 <properties>
                   <borderPainted value="false"/>
                   <icon value="img/compile.png"/>
-                  <margin top="5" left="5" bottom="5" right="5"/>
+                  <margin top="0" left="0" bottom="0" right="0"/>
                   <maximumSize width="32" height="32"/>
                   <minimumSize width="32" height="32"/>
                   <opaque value="false"/>
@@ -178,7 +175,7 @@
                 <properties>
                   <borderPainted value="false"/>
                   <icon value="img/validate.gif"/>
-                  <margin top="5" left="5" bottom="5" right="5"/>
+                  <margin top="0" left="0" bottom="0" right="0"/>
                   <maximumSize width="32" height="32"/>
                   <minimumSize width="32" height="32"/>
                   <opaque value="false"/>
@@ -188,7 +185,7 @@
                 </properties>
               </component>
             </children>
-          </toolbar>
+          </grid>
         </children>
       </grid>
     </children>

@@ -5,10 +5,15 @@
  */
 package com.sqldalmaker.intellij.ui;
 
+import com.intellij.ide.plugins.IdeaPluginDescriptor;
+import com.intellij.ide.plugins.PluginManager;
+import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
+import com.intellij.uiDesigner.core.Spacer;
+import com.sqldalmaker.common.Const;
 import com.sqldalmaker.jaxb.settings.Settings;
 
 import javax.swing.*;
@@ -49,29 +54,47 @@ public class UITabAdmin {
     private JTextPane text1;
     private JButton php_vm;
     private JButton java_vm;
-    private JPanel toolbar_1;
-    private JToolBar toolbar1;
-    private JButton btn_OpenXML;
-    private JButton btn_OpenSQL;
     private JButton recentChangesButton;
     private JButton dataStoreQt5CButton;
+    private JTextField vTextField;
+    private JButton referenceSettingsXmlButton;
 
     private Project project;
     private VirtualFile propFile;
 
-    public JComponent getToolBar() {
-        return toolbar_1;
-    }
+//    public JComponent getToolBar() {
+//        return toolbar_1;
+//    }
 
     public UITabAdmin() {
 
-        rootPanel.remove(toolbar_1);
-        Cursor wc = new Cursor(Cursor.HAND_CURSOR);
+//        rootPanel.remove(toolbar_1);
+//        Cursor wc = new Cursor(Cursor.HAND_CURSOR);
+//
+//        for (Component c : toolbar1.getComponents()) {
+//            JButton b = (JButton) c;
+//            b.setCursor(wc);
+//        }
 
-        for (Component c : toolbar1.getComponents()) {
-            JButton b = (JButton) c;
-            b.setCursor(wc);
+        ///////////////////////////////////////////////////////////////////
+        //
+        // google: intellij platform plugin sdk detect plugin version programmatically
+        // Programmatically get the version of an IntelliJ IDEA plugin
+        // https://stackoverflow.com/questions/28080707/programmatically-get-the-version-of-an-intellij-idea-plugin
+
+        PluginId id = PluginId.getId("dal-mpe"); // @NotNull
+
+        // @Nullable
+        IdeaPluginDescriptor ds = PluginManager.getPlugin(id);
+
+        if (ds != null) {
+
+            vTextField.setText(ds.getVersion());
         }
+
+        vTextField.setBorder(BorderFactory.createEmptyBorder());
+
+        ///////////////////////////////////////////////////////////////////
 
         try {
             text1.setContentType("text/html");
@@ -259,18 +282,6 @@ public class UITabAdmin {
                 IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "data_store.rb", "data_store.rb");
             }
         });
-        btn_OpenXML.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                IdeaEditorHelpers.open_settings_xml(project, propFile);
-            }
-        });
-        btn_OpenSQL.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                testConnection();
-            }
-        });
         recentChangesButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -282,6 +293,12 @@ public class UITabAdmin {
             public void actionPerformed(ActionEvent e) {
                 IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "DataStore_Qt5.cpp", "DataStore_Qt5.cpp");
                 IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "DataStore_Qt5.h", "DataStore_Qt5.h");
+            }
+        });
+        referenceSettingsXmlButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, Const.SETTINGS_XML, Const.SETTINGS_XML);
             }
         });
     }
@@ -329,216 +346,115 @@ public class UITabAdmin {
     private void $$$setupUI$$$() {
         rootPanel = new JPanel();
         rootPanel.setLayout(new BorderLayout(0, 0));
-        rootPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(-11513776)), null));
         final JScrollPane scrollPane1 = new JScrollPane();
         rootPanel.add(scrollPane1, BorderLayout.CENTER);
         final JPanel panel1 = new JPanel();
-        panel1.setLayout(new GridLayoutManager(6, 2, new Insets(10, 10, 10, 10), 10, 20));
+        panel1.setLayout(new GridLayoutManager(6, 1, new Insets(0, 10, 0, 0), -1, -1));
+        panel1.setMaximumSize(new Dimension(2147483647, 2147483647));
         scrollPane1.setViewportView(panel1);
         final JPanel panel2 = new JPanel();
-        panel2.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
-        panel1.add(panel2, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
-        editSettingsXmlButton = new JButton();
-        editSettingsXmlButton.setText("Edit settings.xml");
-        panel2.add(editSettingsXmlButton);
+        panel2.setLayout(new GridLayoutManager(1, 5, new Insets(10, 0, 0, 0), -1, -1));
+        panel1.add(panel2, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_NORTHWEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        referenceSettingsXmlButton = new JButton();
+        referenceSettingsXmlButton.setText("Reference settings.xml");
+        panel2.add(referenceSettingsXmlButton, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         testConnectionButton = new JButton();
         testConnectionButton.setText("Test connection");
-        panel2.add(testConnectionButton);
+        panel2.add(testConnectionButton, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         recentChangesButton = new JButton();
         recentChangesButton.setText("Recent changes");
-        panel2.add(recentChangesButton);
+        panel2.add(recentChangesButton, new GridConstraints(0, 3, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        editSettingsXmlButton = new JButton();
+        editSettingsXmlButton.setText("Edit settings.xml");
+        panel2.add(editSettingsXmlButton, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        vTextField = new JTextField();
+        vTextField.setEditable(false);
+        vTextField.setHorizontalAlignment(4);
+        vTextField.setText("v. ?");
+        panel2.add(vTextField, new GridConstraints(0, 4, 1, 1, GridConstraints.ANCHOR_EAST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, new Dimension(200, -1), null, null, 0, false));
         final JPanel panel3 = new JPanel();
-        panel3.setLayout(new GridBagLayout());
-        panel1.add(panel3, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_VERTICAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        panel3.setLayout(new GridLayoutManager(1, 3, new Insets(10, 0, 0, 0), -1, -1));
+        panel1.add(panel3, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_NORTHWEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         createOverwriteXSDFilesButton = new JButton();
         createOverwriteXSDFilesButton.setText("Create/Overwrite XSD files");
-        GridBagConstraints gbc;
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        panel3.add(createOverwriteXSDFilesButton, gbc);
+        panel3.add(createOverwriteXSDFilesButton, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         createOverwriteSettingsXmlButton = new JButton();
         createOverwriteSettingsXmlButton.setText("Create/Overwrite settings.xml");
-        gbc = new GridBagConstraints();
-        gbc.gridx = 1;
-        gbc.gridy = 0;
-        panel3.add(createOverwriteSettingsXmlButton, gbc);
+        panel3.add(createOverwriteSettingsXmlButton, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         createOverwriteDtoXmlButton = new JButton();
         createOverwriteDtoXmlButton.setText("Create/Overwrite dto.xml");
-        gbc = new GridBagConstraints();
-        gbc.gridx = 2;
-        gbc.gridy = 0;
-        panel3.add(createOverwriteDtoXmlButton, gbc);
+        panel3.add(createOverwriteDtoXmlButton, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         final JPanel panel4 = new JPanel();
-        panel4.setLayout(new GridBagLayout());
-        panel1.add(panel4, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_VERTICAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        panel4.setLayout(new GridLayoutManager(6, 3, new Insets(10, 0, 0, 0), -1, -1));
+        panel1.add(panel4, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_NORTHWEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         dataStoreJavaButton = new JButton();
         dataStoreJavaButton.setText("DataStore.java");
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        panel4.add(dataStoreJavaButton, gbc);
+        panel4.add(dataStoreJavaButton, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         dataStoreJavaSpringButton = new JButton();
         dataStoreJavaSpringButton.setText("DataStore Java Spring");
-        gbc = new GridBagConstraints();
-        gbc.gridx = 1;
-        gbc.gridy = 0;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        panel4.add(dataStoreJavaSpringButton, gbc);
+        panel4.add(dataStoreJavaSpringButton, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         dataStoreJavaDbUtilsButton = new JButton();
         dataStoreJavaDbUtilsButton.setText("DataStore Java DbUtils");
-        gbc = new GridBagConstraints();
-        gbc.gridx = 2;
-        gbc.gridy = 0;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        panel4.add(dataStoreJavaDbUtilsButton, gbc);
+        panel4.add(dataStoreJavaDbUtilsButton, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         dataStoreGroovyButton = new JButton();
         dataStoreGroovyButton.setText("DataStore Groovy");
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        panel4.add(dataStoreGroovyButton, gbc);
+        panel4.add(dataStoreGroovyButton, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         dataStoreJavaAndroidButton = new JButton();
         dataStoreJavaAndroidButton.setText("DataStore Java Android");
-        gbc = new GridBagConstraints();
-        gbc.gridx = 1;
-        gbc.gridy = 1;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        panel4.add(dataStoreJavaAndroidButton, gbc);
+        panel4.add(dataStoreJavaAndroidButton, new GridConstraints(1, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         dataStorePyMySQLButton = new JButton();
         dataStorePyMySQLButton.setText("DataStore.py MySQL");
-        gbc = new GridBagConstraints();
-        gbc.gridx = 1;
-        gbc.gridy = 4;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        panel4.add(dataStorePyMySQLButton, gbc);
+        panel4.add(dataStorePyMySQLButton, new GridConstraints(4, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         dataStorePySQLite3Button = new JButton();
         dataStorePySQLite3Button.setText("DataStore.py SQLite3");
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 4;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        panel4.add(dataStorePySQLite3Button, gbc);
+        panel4.add(dataStorePySQLite3Button, new GridConstraints(4, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         dataStoreCSTLButton = new JButton();
         dataStoreCSTLButton.setText("DataStore C++ STL");
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 3;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        panel4.add(dataStoreCSTLButton, gbc);
+        panel4.add(dataStoreCSTLButton, new GridConstraints(3, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         dataStoreCATLButton = new JButton();
         dataStoreCATLButton.setText("DataStore C++ ATL");
-        gbc = new GridBagConstraints();
-        gbc.gridx = 1;
-        gbc.gridy = 3;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        panel4.add(dataStoreCATLButton, gbc);
+        panel4.add(dataStoreCATLButton, new GridConstraints(3, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         dataStorePhpButton = new JButton();
         dataStorePhpButton.setText("DataStore.php");
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        panel4.add(dataStorePhpButton, gbc);
+        panel4.add(dataStorePhpButton, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         PDODataStorePhpButton = new JButton();
         PDODataStorePhpButton.setText("PDODataStore.php");
-        gbc = new GridBagConstraints();
-        gbc.gridx = 1;
-        gbc.gridy = 2;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        panel4.add(PDODataStorePhpButton, gbc);
+        panel4.add(PDODataStorePhpButton, new GridConstraints(2, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         dataStoreQt5CButton = new JButton();
         dataStoreQt5CButton.setText("DataStore Qt5 C++");
-        gbc = new GridBagConstraints();
-        gbc.gridx = 2;
-        gbc.gridy = 3;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        panel4.add(dataStoreQt5CButton, gbc);
+        panel4.add(dataStoreQt5CButton, new GridConstraints(3, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         dataStoreRUBYDBIButton = new JButton();
         dataStoreRUBYDBIButton.setText("DataStore RUBY DBI");
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 5;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        panel4.add(dataStoreRUBYDBIButton, gbc);
+        panel4.add(dataStoreRUBYDBIButton, new GridConstraints(5, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JPanel panel5 = new JPanel();
-        panel5.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
-        panel1.add(panel5, new GridConstraints(3, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        panel5.setLayout(new GridLayoutManager(1, 5, new Insets(10, 0, 0, 0), -1, -1));
+        panel1.add(panel5, new GridConstraints(3, 0, 1, 1, GridConstraints.ANCHOR_NORTHWEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         php_vm = new JButton();
         php_vm.setText("php.vm");
-        panel5.add(php_vm);
+        panel5.add(php_vm, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         java_vm = new JButton();
         java_vm.setText("java.vm");
-        panel5.add(java_vm);
+        panel5.add(java_vm, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         cppVmButton = new JButton();
         cppVmButton.setText("cpp.vm");
-        panel5.add(cppVmButton);
+        panel5.add(cppVmButton, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         pythonVmButton = new JButton();
         pythonVmButton.setText("python.vm");
-        panel5.add(pythonVmButton);
+        panel5.add(pythonVmButton, new GridConstraints(0, 3, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         rubyVmButton = new JButton();
         rubyVmButton.setText("ruby.vm");
-        panel5.add(rubyVmButton);
+        panel5.add(rubyVmButton, new GridConstraints(0, 4, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        final JPanel panel6 = new JPanel();
+        panel6.setLayout(new GridLayoutManager(1, 1, new Insets(10, 0, 0, 0), -1, -1));
+        panel1.add(panel6, new GridConstraints(4, 0, 1, 1, GridConstraints.ANCHOR_NORTH, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         text1 = new JTextPane();
+        text1.setBackground(new Color(-1));
         text1.setEditable(false);
         text1.setMargin(new Insets(0, 15, 15, 5));
         text1.setText("");
-        panel1.add(text1, new GridConstraints(4, 0, 2, 1, GridConstraints.ANCHOR_NORTH, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_WANT_GROW, null, new Dimension(150, 50), null, 0, false));
-        toolbar_1 = new JPanel();
-        toolbar_1.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
-        rootPanel.add(toolbar_1, BorderLayout.NORTH);
-        toolbar1 = new JToolBar();
-        toolbar1.setBorderPainted(false);
-        toolbar1.setFloatable(false);
-        toolbar_1.add(toolbar1);
-        btn_OpenXML = new JButton();
-        btn_OpenXML.setBorderPainted(false);
-        btn_OpenXML.setIcon(new ImageIcon(getClass().getResource("/img/xmldoc.gif")));
-        btn_OpenXML.setMargin(new Insets(5, 5, 5, 5));
-        btn_OpenXML.setMaximumSize(new Dimension(32, 32));
-        btn_OpenXML.setMinimumSize(new Dimension(32, 32));
-        btn_OpenXML.setOpaque(false);
-        btn_OpenXML.setPreferredSize(new Dimension(32, 32));
-        btn_OpenXML.setText("");
-        btn_OpenXML.setToolTipText("Edit settings.xml");
-        toolbar1.add(btn_OpenXML);
-        btn_OpenSQL = new JButton();
-        btn_OpenSQL.setBorderPainted(false);
-        btn_OpenSQL.setIcon(new ImageIcon(getClass().getResource("/img/connection.gif")));
-        btn_OpenSQL.setMargin(new Insets(5, 5, 5, 5));
-        btn_OpenSQL.setMaximumSize(new Dimension(32, 32));
-        btn_OpenSQL.setMinimumSize(new Dimension(32, 32));
-        btn_OpenSQL.setOpaque(false);
-        btn_OpenSQL.setPreferredSize(new Dimension(32, 32));
-        btn_OpenSQL.setText("");
-        btn_OpenSQL.setToolTipText("Test connection");
-        toolbar1.add(btn_OpenSQL);
+        panel6.add(text1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_NORTHWEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_WANT_GROW, new Dimension(800, -1), new Dimension(150, 50), null, 0, false));
+        final Spacer spacer1 = new Spacer();
+        panel1.add(spacer1, new GridConstraints(5, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
     }
 
     /**
@@ -547,4 +463,5 @@ public class UITabAdmin {
     public JComponent $$$getRootComponent$$$() {
         return rootPanel;
     }
+
 }

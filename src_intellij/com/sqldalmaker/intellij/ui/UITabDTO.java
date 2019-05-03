@@ -52,8 +52,8 @@ public class UITabDTO {
     private JButton btn_OpenJava;
     private JButton btn_genTmpFieldTags;
     private JButton btn_CrudXML;
-    private JToolBar toolbar1;
-    private JPanel toolbar_1;
+    private JPanel top_panel_1;
+    private JPanel toolbar_panel;
     private TableRowSorter<AbstractTableModel> sorter;
     private Project project;
     private VirtualFile propFile;
@@ -68,13 +68,13 @@ public class UITabDTO {
     }
 
     public JComponent getToolBar() {
-        return toolbar_1;
+        return toolbar_panel;
     }
 
     public UITabDTO() {
         $$$setupUI$$$();
 
-        rootPanel.remove(toolbar_1);
+        rootPanel.remove(top_panel_1);
 
         textField1.getDocument().addDocumentListener(new DocumentListener() {
             private void updateFilter() {
@@ -158,7 +158,7 @@ public class UITabDTO {
 
         Cursor wc = new Cursor(Cursor.HAND_CURSOR);
 
-        for (Component c : toolbar1.getComponents()) {
+        for (Component c : toolbar_panel.getComponents()) {
             JButton b = (JButton) c;
             b.setCursor(wc);
         }
@@ -203,123 +203,122 @@ public class UITabDTO {
         table.setAutoResizeMode(0);
         table.setFillsViewportHeight(true);
         scrollPane1.setViewportView(table);
-        toolbar_1 = new JPanel();
-        toolbar_1.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
-        rootPanel.add(toolbar_1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
-        toolbar1 = new JToolBar();
-        toolbar1.setBorderPainted(false);
-        toolbar1.setFloatable(false);
-        toolbar_1.add(toolbar1);
+        top_panel_1 = new JPanel();
+        top_panel_1.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
+        rootPanel.add(top_panel_1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        toolbar_panel = new JPanel();
+        toolbar_panel.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
+        top_panel_1.add(toolbar_panel);
         btn_OpenXML = new JButton();
         btn_OpenXML.setBorderPainted(false);
         btn_OpenXML.setIcon(new ImageIcon(getClass().getResource("/img/xmldoc.gif")));
-        btn_OpenXML.setMargin(new Insets(5, 5, 5, 5));
+        btn_OpenXML.setMargin(new Insets(0, 0, 0, 0));
         btn_OpenXML.setMaximumSize(new Dimension(32, 32));
         btn_OpenXML.setMinimumSize(new Dimension(32, 32));
         btn_OpenXML.setOpaque(false);
         btn_OpenXML.setPreferredSize(new Dimension(32, 32));
         btn_OpenXML.setText("");
         btn_OpenXML.setToolTipText("Open XML file");
-        toolbar1.add(btn_OpenXML);
+        toolbar_panel.add(btn_OpenXML);
         btn_OpenSQL = new JButton();
         btn_OpenSQL.setBorderPainted(false);
         btn_OpenSQL.setIcon(new ImageIcon(getClass().getResource("/img/qrydoc.gif")));
-        btn_OpenSQL.setMargin(new Insets(5, 5, 5, 5));
+        btn_OpenSQL.setMargin(new Insets(0, 0, 0, 0));
         btn_OpenSQL.setMaximumSize(new Dimension(32, 32));
         btn_OpenSQL.setMinimumSize(new Dimension(32, 32));
         btn_OpenSQL.setOpaque(false);
         btn_OpenSQL.setPreferredSize(new Dimension(32, 32));
         btn_OpenSQL.setText("");
         btn_OpenSQL.setToolTipText("Open SQL file");
-        toolbar1.add(btn_OpenSQL);
+        toolbar_panel.add(btn_OpenSQL);
         btn_OpenJava = new JButton();
         btn_OpenJava.setBorderPainted(false);
         btn_OpenJava.setIcon(new ImageIcon(getClass().getResource("/img/GeneratedFile.gif")));
-        btn_OpenJava.setMargin(new Insets(5, 5, 5, 5));
+        btn_OpenJava.setMargin(new Insets(0, 0, 0, 0));
         btn_OpenJava.setMaximumSize(new Dimension(32, 32));
         btn_OpenJava.setMinimumSize(new Dimension(32, 32));
         btn_OpenJava.setOpaque(false);
         btn_OpenJava.setPreferredSize(new Dimension(32, 32));
         btn_OpenJava.setText("");
         btn_OpenJava.setToolTipText("Go to generated source");
-        toolbar1.add(btn_OpenJava);
+        toolbar_panel.add(btn_OpenJava);
         btn_genTmpFieldTags = new JButton();
         btn_genTmpFieldTags.setBorderPainted(false);
         btn_genTmpFieldTags.setIcon(new ImageIcon(getClass().getResource("/img/177.png")));
-        btn_genTmpFieldTags.setMargin(new Insets(5, 5, 5, 5));
+        btn_genTmpFieldTags.setMargin(new Insets(0, 0, 0, 0));
         btn_genTmpFieldTags.setMaximumSize(new Dimension(32, 32));
         btn_genTmpFieldTags.setMinimumSize(new Dimension(32, 32));
         btn_genTmpFieldTags.setOpaque(false);
         btn_genTmpFieldTags.setPreferredSize(new Dimension(32, 32));
         btn_genTmpFieldTags.setText("");
         btn_genTmpFieldTags.setToolTipText("Fields definition assistant");
-        toolbar1.add(btn_genTmpFieldTags);
+        toolbar_panel.add(btn_genTmpFieldTags);
         btn_CrudXML = new JButton();
         btn_CrudXML.setBorderPainted(false);
         btn_CrudXML.setIcon(new ImageIcon(getClass().getResource("/img/180.png")));
-        btn_CrudXML.setMargin(new Insets(5, 5, 5, 5));
+        btn_CrudXML.setMargin(new Insets(0, 0, 0, 0));
         btn_CrudXML.setMaximumSize(new Dimension(32, 32));
         btn_CrudXML.setMinimumSize(new Dimension(32, 32));
         btn_CrudXML.setOpaque(false);
         btn_CrudXML.setPreferredSize(new Dimension(32, 32));
         btn_CrudXML.setText("");
         btn_CrudXML.setToolTipText("DTO CRUD assistant");
-        toolbar1.add(btn_CrudXML);
+        toolbar_panel.add(btn_CrudXML);
         btn_Refresh = new JButton();
         btn_Refresh.setBorderPainted(false);
         btn_Refresh.setIcon(new ImageIcon(getClass().getResource("/img/arrow-circle-double-135.png")));
-        btn_Refresh.setMargin(new Insets(5, 5, 5, 5));
+        btn_Refresh.setMargin(new Insets(0, 0, 0, 0));
         btn_Refresh.setMaximumSize(new Dimension(32, 32));
         btn_Refresh.setMinimumSize(new Dimension(32, 32));
         btn_Refresh.setOpaque(false);
         btn_Refresh.setPreferredSize(new Dimension(32, 32));
         btn_Refresh.setText("");
         btn_Refresh.setToolTipText("Refresh");
-        toolbar1.add(btn_Refresh);
+        toolbar_panel.add(btn_Refresh);
         btn_DeselAll = new JButton();
         btn_DeselAll.setBorderPainted(false);
         btn_DeselAll.setIcon(new ImageIcon(getClass().getResource("/img/none.gif")));
-        btn_DeselAll.setMargin(new Insets(5, 5, 5, 5));
+        btn_DeselAll.setMargin(new Insets(0, 0, 0, 0));
         btn_DeselAll.setMaximumSize(new Dimension(32, 32));
         btn_DeselAll.setMinimumSize(new Dimension(32, 32));
         btn_DeselAll.setOpaque(false);
         btn_DeselAll.setPreferredSize(new Dimension(32, 32));
         btn_DeselAll.setText("");
         btn_DeselAll.setToolTipText("Deselect all");
-        toolbar1.add(btn_DeselAll);
+        toolbar_panel.add(btn_DeselAll);
         btn_SelAll = new JButton();
         btn_SelAll.setBorderPainted(false);
         btn_SelAll.setIcon(new ImageIcon(getClass().getResource("/img/text.gif")));
-        btn_SelAll.setMargin(new Insets(5, 5, 5, 5));
+        btn_SelAll.setMargin(new Insets(0, 0, 0, 0));
         btn_SelAll.setMaximumSize(new Dimension(32, 32));
         btn_SelAll.setMinimumSize(new Dimension(32, 32));
         btn_SelAll.setOpaque(false);
         btn_SelAll.setPreferredSize(new Dimension(32, 32));
         btn_SelAll.setText("");
         btn_SelAll.setToolTipText("Select all");
-        toolbar1.add(btn_SelAll);
+        toolbar_panel.add(btn_SelAll);
         btn_Generate = new JButton();
         btn_Generate.setBorderPainted(false);
         btn_Generate.setIcon(new ImageIcon(getClass().getResource("/img/compile.png")));
-        btn_Generate.setMargin(new Insets(5, 5, 5, 5));
+        btn_Generate.setMargin(new Insets(0, 0, 0, 0));
         btn_Generate.setMaximumSize(new Dimension(32, 32));
         btn_Generate.setMinimumSize(new Dimension(32, 32));
         btn_Generate.setOpaque(false);
         btn_Generate.setPreferredSize(new Dimension(32, 32));
         btn_Generate.setText("");
         btn_Generate.setToolTipText("Generate for selection");
-        toolbar1.add(btn_Generate);
+        toolbar_panel.add(btn_Generate);
         btn_Validate = new JButton();
         btn_Validate.setBorderPainted(false);
         btn_Validate.setIcon(new ImageIcon(getClass().getResource("/img/validate.gif")));
-        btn_Validate.setMargin(new Insets(5, 5, 5, 5));
+        btn_Validate.setMargin(new Insets(0, 0, 0, 0));
         btn_Validate.setMaximumSize(new Dimension(32, 32));
         btn_Validate.setMinimumSize(new Dimension(32, 32));
         btn_Validate.setOpaque(false);
         btn_Validate.setPreferredSize(new Dimension(32, 32));
         btn_Validate.setText("");
         btn_Validate.setToolTipText("Validate all");
-        toolbar1.add(btn_Validate);
+        toolbar_panel.add(btn_Validate);
     }
 
     /**

@@ -39,7 +39,7 @@ public class UIProfileEditor {
 
         JButton button = new JButton(text);
 
-        button.setBorder(BorderFactory.createEmptyBorder(6, 10, 6, 10));
+        button.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
 
         button.setCursor(hand);
 
@@ -123,8 +123,8 @@ public class UIProfileEditor {
                     panel_1.remove(toolbar);
                 }
 
-                toolbar = tabAdmin.getToolBar();
-                panel_1.add(toolbar);
+//                toolbar = tabAdmin.getToolBar();
+//                panel_1.add(toolbar);
                 panel_1.updateUI();
             }
         });

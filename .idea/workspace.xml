@@ -23,17 +23,7 @@
     <favorites_list name="com.sqldalmaker.plugins" />
   </component>
   <component name="FileEditorManager">
-    <leaf>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/nbproject/project.xml">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="178">
-              <caret line="40" column="79" lean-forward="true" selection-start-line="40" selection-start-column="79" selection-end-line="40" selection-end-column="79" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -99,12 +89,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaCrudXmlUtils.java" />
-        <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaEditorUtils.java" />
-        <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaMessageUtils.java" />
-        <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaMetaProgramInitUtils.java" />
-        <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaMetaProgramInitHelpers.java" />
-        <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaProfileUtils.java" />
         <option value="$PROJECT_DIR$/src/com/sqldalmaker/common/XmlHelpers.java" />
         <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaEditorHelpers.java" />
         <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/SdmPluginRegistration.java" />
@@ -134,7 +118,6 @@
         <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaHelpers.java" />
         <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/CompletionContributorCommon.java" />
         <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/CompletionProviderSql.java" />
-        <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabDAO.java" />
         <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/PsiReferenceContributorCommon.java" />
         <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/SdmActionGroup.java" />
         <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaCrudXmlHelpers.java" />
@@ -149,7 +132,14 @@
         <option value="$PROJECT_DIR$/src/com/sqldalmaker/cg/ruby/ruby.vm" />
         <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/PsiReferenceSql.java" />
         <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/PsiReferenceDtoClass.java" />
+        <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabDTO.form" />
+        <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabDTO.java" />
+        <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabDAO.form" />
+        <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabDAO.java" />
+        <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UIProfileEditor.java" />
+        <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabAdmin.java" />
         <option value="$PROJECT_DIR$/META-INF/plugin.xml" />
+        <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabAdmin.form" />
       </list>
     </option>
   </component>
@@ -169,8 +159,8 @@
   </component>
   <component name="PhpWorkspaceProjectConfiguration" backward_compatibility_performed="true" />
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="252" />
-    <option name="y" value="52" />
+    <option name="x" value="-8" />
+    <option name="y" value="7" />
     <option name="width" value="1503" />
     <option name="height" value="955" />
   </component>
@@ -180,7 +170,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -191,35 +180,13 @@
             <path>
               <item name="com.sqldalmaker.intellij" type="b2602c69:ProjectViewProjectNode" />
               <item name="sqldalmaker-plugins" type="462c0819:PsiDirectoryNode" />
-              <item name="META-INF" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="com.sqldalmaker.intellij" type="b2602c69:ProjectViewProjectNode" />
-              <item name="sqldalmaker-plugins" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="com.sqldalmaker.intellij" type="b2602c69:ProjectViewProjectNode" />
-              <item name="sqldalmaker-plugins" type="462c0819:PsiDirectoryNode" />
-              <item name="src_intellij" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="com.sqldalmaker.intellij" type="b2602c69:ProjectViewProjectNode" />
-              <item name="sqldalmaker-plugins" type="462c0819:PsiDirectoryNode" />
-              <item name="src_intellij" type="462c0819:PsiDirectoryNode" />
-              <item name="intellij" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="com.sqldalmaker.intellij" type="b2602c69:ProjectViewProjectNode" />
-              <item name="sqldalmaker-plugins" type="462c0819:PsiDirectoryNode" />
-              <item name="src_intellij" type="462c0819:PsiDirectoryNode" />
-              <item name="intellij" type="462c0819:PsiDirectoryNode" />
-              <item name="references" type="462c0819:PsiDirectoryNode" />
+              <item name="lib" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
+      <pane id="PackagesPane" />
       <pane id="Scope" />
     </panes>
   </component>
@@ -242,24 +209,24 @@
     <property name="options.lastSelected" value="project.propVCSSupport.Mappings" />
     <property name="options.splitter.details.proportions" value="0.2" />
     <property name="options.splitter.main.proportions" value="0.3" />
-    <property name="project.structure.last.edited" value="Project" />
+    <property name="project.structure.last.edited" value="Libraries" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.36551723" />
     <property name="recentsLimit" value="5" />
-    <property name="settings.editor.selected.configurable" value="vcs.Git" />
+    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
   <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="D:\work\com.sqldalmaker\com.sqldalmaker.plugins\src_common" />
-      <recent name="D:\work\com.sqldalmaker\com.sqldalmaker.plugins\src_intellij" />
-      <recent name="D:\work\com.sqldalmaker\com.sqldalmaker.plugins\src_common\com\sqldalmaker" />
-    </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\work\com.sqldalmaker\com.sqldalmaker.plugins" />
       <recent name="D:\work\com.sqldalmaker\com.sqldalmaker.plugins\src_intellij" />
       <recent name="D:\work\com.sqldalmaker\com.sqldalmaker.plugins\sqldalmaker-lib\src" />
       <recent name="D:\work\com.sqldalmaker\com.sqldalmaker.plugins\src_common\resources" />
       <recent name="D:\work\com.sqldalmaker\com.sqldalmaker.plugins\src_common\com\sqldalmaker\jaxb\settings" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\work\com.sqldalmaker\com.sqldalmaker.plugins\src_common" />
+      <recent name="D:\work\com.sqldalmaker\com.sqldalmaker.plugins\src_intellij" />
+      <recent name="D:\work\com.sqldalmaker\com.sqldalmaker.plugins\src_common\com\sqldalmaker" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -1016,10 +983,9 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1066" extended-state="6" />
-    <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.33208954" />
-      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.5883644" visible="true" weight="0.17110874" />
+      <window_info id="Structure" order="1" sideWeight="0.41163558" side_tool="true" visible="true" weight="0.17110874" />
       <window_info id="Image Layers" order="2" />
       <window_info id="UI Designer" order="3" />
       <window_info id="Nl-Palette" order="4" />
@@ -1028,12 +994,12 @@
       <window_info id="Capture Tool" order="7" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" sideWeight="0.413113" weight="0.2557629" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.4834931" weight="0.26813188" />
-      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.5133262" weight="0.25356752" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.4834931" weight="0.26783755" />
+      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.5127932" visible="true" weight="0.26015368" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" sideWeight="0.4978701" weight="0.28411633" />
       <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="bottom" id="Event Log" order="7" sideWeight="0.62100214" side_tool="true" visible="true" weight="0.15697037" />
+      <window_info anchor="bottom" id="Event Log" order="7" sideWeight="0.48720682" side_tool="true" weight="0.25356752" />
       <window_info anchor="bottom" id="SVN Repositories" order="8" sideWeight="0.4978701" weight="0.32997763" />
       <window_info anchor="bottom" id="Application Servers" order="9" />
       <window_info anchor="bottom" id="Version Control" order="10" sideWeight="0.49361023" weight="0.25892857" />
@@ -1043,10 +1009,10 @@
       <window_info anchor="bottom" id="SVN Properties" order="14" weight="0.32997763" />
       <window_info anchor="bottom" id="Messages" order="15" sideWeight="0.37899786" weight="0.32930845" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
-      <window_info anchor="right" id="Maven" order="1" weight="0.32995737" />
-      <window_info anchor="right" id="Ant Build" order="2" weight="0.25" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="right" id="Maven" order="2" weight="0.32995737" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="3" weight="0.25" />
-      <window_info anchor="right" id="Palette" order="4" sideWeight="0.531401" side_tool="true" weight="0.10714286" />
+      <window_info anchor="right" id="Palette" order="4" sideWeight="0.531401" side_tool="true" weight="0.09168444" />
       <window_info anchor="right" id="Capture Analysis" order="5" />
       <window_info anchor="right" id="Designer" order="6" />
       <window_info anchor="right" id="Theme Preview" order="7" />
@@ -1187,62 +1153,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/com/sqldalmaker/cg/CrudHelper.java" />
-    <entry file="file://$PROJECT_DIR$/src/com/sqldalmaker/cg/cpp/CppCG.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="7106">
-          <caret line="852" column="1" lean-forward="true" selection-start-line="852" selection-start-column="1" selection-end-line="852" selection-end-column="1" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaMetaProgramInitHelpers.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
-          <caret line="15" column="39" selection-start-line="15" selection-start-column="39" selection-end-line="15" selection-end-column="39" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/sqldalmaker/common/XmlHelpers.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="34">
-          <caret line="2" selection-start-line="2" selection-end-line="2" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/plugin.xml">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/PsiReferenceSqlProvider.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="55" column="57" selection-start-line="55" selection-start-column="57" selection-end-line="55" selection-end-column="57" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/PsiReferenceDtoClassGeneratedSource.java" />
-    <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/SdmPluginRegistration.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="275">
-          <caret line="30" lean-forward="true" selection-start-line="30" selection-end-line="30" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/CompletionProviderDtoClass.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="85">
-          <caret line="116" lean-forward="true" selection-start-line="116" selection-end-line="116" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/com/sqldalmaker/cg/Helpers.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="217">
@@ -1267,13 +1177,6 @@
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabDAO.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="186">
-          <caret line="454" column="119" selection-start-line="454" selection-start-column="119" selection-end-line="454" selection-end-column="119" />
         </state>
       </provider>
     </entry>
@@ -1527,13 +1430,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/META-INF/plugin.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="323">
-          <caret line="19" column="22" selection-start-line="19" selection-start-column="22" selection-end-line="19" selection-end-column="22" />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://D:/Downloads/intellij-community-master.zip!/intellij-community-master/platform/core-api/src/com/intellij/psi/PsiReference.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="430">
@@ -1585,6 +1481,67 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UIProfileEditor.form">
+      <provider selected="true" editor-type-id="ui-designer" />
+    </entry>
+    <entry file="jar://D:/Downloads/intellij-community-master.zip!/intellij-community-master/platform/extensions/src/com/intellij/openapi/extensions/PluginId.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="199">
+          <caret line="17" column="10" lean-forward="true" selection-start-line="17" selection-start-column="2" selection-end-line="17" selection-end-column="10" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://D:/Downloads/intellij-community-master.zip!/intellij-community-master/platform/platform-impl/src/com/intellij/ide/plugins/PluginManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="216">
+          <caret line="218" column="36" selection-start-line="218" selection-start-column="16" selection-end-line="218" selection-end-column="36" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabDTO.form">
+      <provider selected="true" editor-type-id="ui-designer" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabDTO.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1717">
+          <caret line="160" column="40" selection-start-line="160" selection-start-column="40" selection-end-line="160" selection-end-column="40" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UIProfileEditor.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="544">
+          <caret line="42" selection-start-line="41" selection-end-line="42" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabDAO.form">
+      <provider selected="true" editor-type-id="ui-designer" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabDAO.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="697">
+          <caret line="67" column="36" selection-start-line="67" selection-start-column="25" selection-end-line="67" selection-end-column="36" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabAdmin.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="404">
+          <caret line="96" selection-start-line="96" selection-end-line="96" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabAdmin.form">
+      <provider selected="true" editor-type-id="ui-designer" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/META-INF/plugin.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="68">
+          <caret line="4" column="17" selection-start-line="4" selection-start-column="17" selection-end-line="4" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
   </component>
   <component name="masterDetails">
     <states>
@@ -1594,7 +1551,7 @@
           <splitter-proportions>
             <option name="proportions">
               <list>
-                <option value="0.2" />
+                <option value="0.36551723" />
               </list>
             </option>
           </splitter-proportions>
@@ -1642,7 +1599,8 @@
           <splitter-proportions>
             <option name="proportions">
               <list>
-                <option value="0.2" />
+                <option value="0.36551723" />
+                <option value="0.6" />
               </list>
             </option>
           </splitter-proportions>
@@ -1654,7 +1612,7 @@
           <splitter-proportions>
             <option name="proportions">
               <list>
-                <option value="0.2" />
+                <option value="0.36551723" />
               </list>
             </option>
           </splitter-proportions>
