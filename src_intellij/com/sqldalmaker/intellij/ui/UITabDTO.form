@@ -39,9 +39,12 @@
         <properties/>
         <border type="none"/>
         <children>
-          <grid id="f2e41" binding="toolbar_panel" layout-manager="FlowLayout" hgap="0" vgap="0" flow-align="1">
+          <toolbar id="a8bc3" binding="toolbar1">
             <constraints/>
-            <properties/>
+            <properties>
+              <borderPainted value="false"/>
+              <floatable value="false"/>
+            </properties>
             <border type="none"/>
             <children>
               <component id="d0a91" class="javax.swing.JButton" binding="btn_OpenXML">
@@ -185,7 +188,7 @@
                 </properties>
               </component>
             </children>
-          </grid>
+          </toolbar>
         </children>
       </grid>
     </children>

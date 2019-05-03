@@ -23,7 +23,67 @@
     <favorites_list name="com.sqldalmaker.plugins" />
   </component>
   <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300" />
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabAdmin.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1173">
+              <caret line="90" selection-start-line="90" selection-end-line="90" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabAdmin.form">
+          <provider selected="true" editor-type-id="ui-designer" />
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UIProfileEditor.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-884">
+              <caret line="39" column="43" lean-forward="true" selection-start-line="39" selection-start-column="43" selection-end-line="39" selection-end-column="43" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabDAO.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="442">
+              <caret line="151" selection-start-line="146" selection-start-column="1" selection-end-line="151" />
+              <folding>
+                <element signature="e#6703#6704#0" expanded="true" />
+                <element signature="e#17064#17065#0" expanded="true" />
+                <element signature="e#17153#17154#0" expanded="true" />
+                <element signature="e#17225#17226#0" expanded="true" />
+                <element signature="method#$$$setupUI$$$#0;class#UITabDAO#0" expanded="true" />
+                <element signature="e#24847#24848#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UIProfileEditor.form">
+          <provider selected="true" editor-type-id="ui-designer" />
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabDAO.form">
+          <provider selected="true" editor-type-id="ui-designer" />
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabDTO.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="186">
+              <caret line="166" selection-start-line="166" selection-end-line="166" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -132,14 +192,14 @@
         <option value="$PROJECT_DIR$/src/com/sqldalmaker/cg/ruby/ruby.vm" />
         <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/PsiReferenceSql.java" />
         <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/PsiReferenceDtoClass.java" />
-        <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabDTO.form" />
-        <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabDTO.java" />
-        <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabDAO.form" />
-        <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabDAO.java" />
-        <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UIProfileEditor.java" />
-        <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabAdmin.java" />
         <option value="$PROJECT_DIR$/META-INF/plugin.xml" />
+        <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabDAO.form" />
+        <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabDTO.form" />
         <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabAdmin.form" />
+        <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabAdmin.java" />
+        <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UIProfileEditor.java" />
+        <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabDAO.java" />
+        <option value="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabDTO.java" />
       </list>
     </option>
   </component>
@@ -180,7 +240,36 @@
             <path>
               <item name="com.sqldalmaker.intellij" type="b2602c69:ProjectViewProjectNode" />
               <item name="sqldalmaker-plugins" type="462c0819:PsiDirectoryNode" />
-              <item name="lib" type="462c0819:PsiDirectoryNode" />
+              <item name="src_intellij" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="com.sqldalmaker.intellij" type="b2602c69:ProjectViewProjectNode" />
+              <item name="sqldalmaker-plugins" type="462c0819:PsiDirectoryNode" />
+              <item name="src_intellij" type="462c0819:PsiDirectoryNode" />
+              <item name="intellij" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="com.sqldalmaker.intellij" type="b2602c69:ProjectViewProjectNode" />
+              <item name="sqldalmaker-plugins" type="462c0819:PsiDirectoryNode" />
+              <item name="src_intellij" type="462c0819:PsiDirectoryNode" />
+              <item name="intellij" type="462c0819:PsiDirectoryNode" />
+              <item name="ui" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="com.sqldalmaker.intellij" type="b2602c69:ProjectViewProjectNode" />
+              <item name="sqldalmaker-plugins" type="462c0819:PsiDirectoryNode" />
+              <item name="src_intellij" type="462c0819:PsiDirectoryNode" />
+              <item name="intellij" type="462c0819:PsiDirectoryNode" />
+              <item name="ui" type="462c0819:PsiDirectoryNode" />
+              <item name="UIProfileEditor" type="e9f4de52:FormNode" />
+            </path>
+            <path>
+              <item name="com.sqldalmaker.intellij" type="b2602c69:ProjectViewProjectNode" />
+              <item name="sqldalmaker-plugins" type="462c0819:PsiDirectoryNode" />
+              <item name="src_intellij" type="462c0819:PsiDirectoryNode" />
+              <item name="intellij" type="462c0819:PsiDirectoryNode" />
+              <item name="ui" type="462c0819:PsiDirectoryNode" />
+              <item name="UITabDAO" type="e9f4de52:FormNode" />
             </path>
           </expand>
           <select />
@@ -983,9 +1072,10 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1066" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.5883644" visible="true" weight="0.17110874" />
-      <window_info id="Structure" order="1" sideWeight="0.41163558" side_tool="true" visible="true" weight="0.17110874" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.57958287" visible="true" weight="0.18070363" />
+      <window_info id="Structure" order="1" sideWeight="0.42041713" side_tool="true" visible="true" weight="0.18070363" />
       <window_info id="Image Layers" order="2" />
       <window_info id="UI Designer" order="3" />
       <window_info id="Nl-Palette" order="4" />
@@ -995,7 +1085,7 @@
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" sideWeight="0.413113" weight="0.2557629" />
       <window_info anchor="bottom" id="Run" order="2" sideWeight="0.4834931" weight="0.26783755" />
-      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.5127932" visible="true" weight="0.26015368" />
+      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.5127932" weight="0.26015368" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" sideWeight="0.4978701" weight="0.28411633" />
       <window_info anchor="bottom" id="TODO" order="6" />
@@ -1012,7 +1102,7 @@
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" id="Maven" order="2" weight="0.32995737" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="3" weight="0.25" />
-      <window_info anchor="right" id="Palette" order="4" sideWeight="0.531401" side_tool="true" weight="0.09168444" />
+      <window_info anchor="right" id="Palette" order="4" sideWeight="0.531401" side_tool="true" visible="true" weight="0.09168444" />
       <window_info anchor="right" id="Capture Analysis" order="5" />
       <window_info anchor="right" id="Designer" order="6" />
       <window_info anchor="right" id="Theme Preview" order="7" />
@@ -1481,9 +1571,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UIProfileEditor.form">
-      <provider selected="true" editor-type-id="ui-designer" />
-    </entry>
     <entry file="jar://D:/Downloads/intellij-community-master.zip!/intellij-community-master/platform/extensions/src/com/intellij/openapi/extensions/PluginId.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="199">
@@ -1498,49 +1585,60 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabDTO.form">
-      <provider selected="true" editor-type-id="ui-designer" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabDTO.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1717">
-          <caret line="160" column="40" selection-start-line="160" selection-start-column="40" selection-end-line="160" selection-end-column="40" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UIProfileEditor.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="544">
-          <caret line="42" selection-start-line="41" selection-end-line="42" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabDAO.form">
-      <provider selected="true" editor-type-id="ui-designer" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabDAO.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="697">
-          <caret line="67" column="36" selection-start-line="67" selection-start-column="25" selection-end-line="67" selection-end-column="36" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabAdmin.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="404">
-          <caret line="96" selection-start-line="96" selection-end-line="96" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabAdmin.form">
-      <provider selected="true" editor-type-id="ui-designer" />
-    </entry>
     <entry file="file://$PROJECT_DIR$/META-INF/plugin.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="68">
           <caret line="4" column="17" selection-start-line="4" selection-start-column="17" selection-end-line="4" selection-end-column="17" />
         </state>
       </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabDTO.form">
+      <provider selected="true" editor-type-id="ui-designer" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabAdmin.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1173">
+          <caret line="90" selection-start-line="90" selection-end-line="90" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabAdmin.form">
+      <provider selected="true" editor-type-id="ui-designer" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UIProfileEditor.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-884">
+          <caret line="39" column="43" lean-forward="true" selection-start-line="39" selection-start-column="43" selection-end-line="39" selection-end-column="43" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabDTO.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="186">
+          <caret line="166" selection-start-line="166" selection-end-line="166" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabDAO.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="442">
+          <caret line="151" selection-start-line="146" selection-start-column="1" selection-end-line="151" />
+          <folding>
+            <element signature="e#6703#6704#0" expanded="true" />
+            <element signature="e#17064#17065#0" expanded="true" />
+            <element signature="e#17153#17154#0" expanded="true" />
+            <element signature="e#17225#17226#0" expanded="true" />
+            <element signature="method#$$$setupUI$$$#0;class#UITabDAO#0" expanded="true" />
+            <element signature="e#24847#24848#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UIProfileEditor.form">
+      <provider selected="true" editor-type-id="ui-designer" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabDAO.form">
+      <provider selected="true" editor-type-id="ui-designer" />
     </entry>
   </component>
   <component name="masterDetails">
@@ -1600,7 +1698,6 @@
             <option name="proportions">
               <list>
                 <option value="0.36551723" />
-                <option value="0.6" />
               </list>
             </option>
           </splitter-proportions>

@@ -15,16 +15,13 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.FormAttachment;
-import org.eclipse.swt.layout.FormData;
-import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.RowData;
-import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.wb.swt.ResourceManager;
@@ -32,7 +29,7 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
 
 import com.sqldalmaker.cg.Helpers;
-import org.eclipse.swt.widgets.Label;
+import com.sqldalmaker.common.Const;
 
 /**
  *
@@ -47,6 +44,7 @@ public class UIEditorPageAdmin extends Composite {
 	private IEditor2 editor2;
 	private Action action_settings_xml;
 	private Action action_test_conn;
+	private Text txtV;
 
 	protected void testConnection() {
 
@@ -82,20 +80,15 @@ public class UIEditorPageAdmin extends Composite {
 		});
 		toolkit.adapt(this);
 		toolkit.paintBordersFor(this);
-		setLayout(new RowLayout(SWT.HORIZONTAL));
+		setLayout(new FillLayout(SWT.HORIZONTAL));
 
 		Composite composite_top = new Composite(this, SWT.NONE);
-		composite_top.setLayoutData(new RowData(832, SWT.DEFAULT));
-		composite_top.setLayout(new FormLayout());
+		composite_top.setLayout(new GridLayout(1, false));
 		toolkit.adapt(composite_top);
 		toolkit.paintBordersFor(composite_top);
 
 		Composite composite_0 = new Composite(composite_top, SWT.NONE);
-		FormData fd_composite_0 = new FormData();
-		fd_composite_0.top = new FormAttachment(0);
-		fd_composite_0.left = new FormAttachment(0);
-		composite_0.setLayoutData(fd_composite_0);
-		composite_0.setLayout(new GridLayout(3, false));
+		composite_0.setLayout(new GridLayout(6, false));
 		toolkit.adapt(composite_0);
 		toolkit.paintBordersFor(composite_0);
 
@@ -109,6 +102,17 @@ public class UIEditorPageAdmin extends Composite {
 		toolkit.adapt(btnNewButton, true, true);
 		btnNewButton.setText("Edit settings.xml");
 
+		Button btnReferenceSettingsxml = new Button(composite_0, SWT.NONE);
+		btnReferenceSettingsxml.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/" + Const.SETTINGS_XML,
+						"reference_" + Const.SETTINGS_XML);
+			}
+		});
+		btnReferenceSettingsxml.setText("Reference settings.xml");
+		toolkit.adapt(btnReferenceSettingsxml, true, true);
+
 		Button btnNewButton_1 = new Button(composite_0, SWT.NONE);
 		btnNewButton_1.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -120,12 +124,6 @@ public class UIEditorPageAdmin extends Composite {
 		btnNewButton_1.setText("Test connection");
 
 		Composite composite_1 = new Composite(composite_top, SWT.NONE);
-		fd_composite_0.right = new FormAttachment(composite_1, 0, SWT.RIGHT);
-		FormData fd_composite_1 = new FormData();
-		fd_composite_1.top = new FormAttachment(composite_0, 6);
-		fd_composite_1.left = new FormAttachment(0);
-		fd_composite_1.right = new FormAttachment(100);
-		composite_1.setLayoutData(fd_composite_1);
 		composite_1.setLayout(new GridLayout(3, false));
 		toolkit.adapt(composite_1);
 		toolkit.paintBordersFor(composite_1);
@@ -161,12 +159,6 @@ public class UIEditorPageAdmin extends Composite {
 		btnNewButton_2.setText("Create/Overwrite dto.xml");
 
 		Composite composite_2 = new Composite(composite_top, SWT.NONE);
-		FormData fd_composite_2 = new FormData();
-		fd_composite_2.bottom = new FormAttachment(composite_1, 190, SWT.BOTTOM);
-		fd_composite_2.right = new FormAttachment(composite_1, 0, SWT.RIGHT);
-		fd_composite_2.left = new FormAttachment(0);
-		fd_composite_2.top = new FormAttachment(composite_1, 6);
-		composite_2.setLayoutData(fd_composite_2);
 		composite_2.setLayout(new GridLayout(3, false));
 		toolkit.adapt(composite_2);
 		toolkit.paintBordersFor(composite_2);
@@ -236,8 +228,7 @@ public class UIEditorPageAdmin extends Composite {
 		btnNewButton_5.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore.php",
-						"DataStore.php");
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore.php", "DataStore.php");
 			}
 		});
 		btnNewButton_5.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
@@ -275,8 +266,7 @@ public class UIEditorPageAdmin extends Composite {
 		btnNewButton_11.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore.cpp",
-						"DataStore.cpp");
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore.cpp", "DataStore.cpp");
 				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore.h", "DataStore.h");
 			}
 		});
@@ -302,8 +292,7 @@ public class UIEditorPageAdmin extends Composite {
 		btnNewButton_6.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore1.py",
-						"DataStore1.py");
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore1.py", "DataStore1.py");
 			}
 		});
 		btnNewButton_6.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
@@ -314,18 +303,29 @@ public class UIEditorPageAdmin extends Composite {
 		btnNewButton_7.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore2.py",
-						"DataStore2.py");
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore2.py", "DataStore2.py");
 			}
 		});
 		btnNewButton_7.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		toolkit.adapt(btnNewButton_7, true, true);
 		btnNewButton_7.setText("DataStore.py MySQL");
+		new Label(composite_2, SWT.NONE);
+
+		Button btnNewButton_8 = new Button(composite_2, SWT.NONE);
+		btnNewButton_8.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/data_store.rb", "data_store.rb");
+			}
+		});
+		btnNewButton_8.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+		toolkit.adapt(btnNewButton_8, true, true);
+		btnNewButton_8.setText("DataStore RUBY DBI");
+		new Label(composite_2, SWT.NONE);
+		new Label(composite_2, SWT.NONE);
 
 		Composite composite_3 = new Composite(composite_top, SWT.NONE);
 		composite_3.setLayout(new GridLayout(5, false));
-		FormData fd_composite_3 = new FormData();
-		fd_composite_3.left = new FormAttachment(composite_0, 0, SWT.LEFT);
 
 		Button btnRecentChanges = new Button(composite_0, SWT.NONE);
 		btnRecentChanges.addSelectionListener(new SelectionAdapter() {
@@ -338,24 +338,15 @@ public class UIEditorPageAdmin extends Composite {
 		toolkit.adapt(btnRecentChanges, true, true);
 		btnRecentChanges.setText("Recent changes");
 
-		fd_composite_3.top = new FormAttachment(composite_2, 6);
-		fd_composite_3.right = new FormAttachment(composite_2, -10, SWT.RIGHT);
-		new Label(composite_2, SWT.NONE);
+		Label label = new Label(composite_0, SWT.NONE);
+		label.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		toolkit.adapt(label, true, true);
+		label.setText("              ");
 
-		Button btnNewButton_8 = new Button(composite_2, SWT.NONE);
-		btnNewButton_8.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/data_store.rb",
-						"data_store.rb");
-			}
-		});
-		btnNewButton_8.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-		toolkit.adapt(btnNewButton_8, true, true);
-		btnNewButton_8.setText("DataStore RUBY DBI");
-		new Label(composite_2, SWT.NONE);
-		new Label(composite_2, SWT.NONE);
-		composite_3.setLayoutData(fd_composite_3);
+		txtV = new Text(composite_0, SWT.RIGHT);
+		txtV.setEditable(false);
+		txtV.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, false, 1, 1));
+		toolkit.adapt(txtV, true, true);
 		toolkit.adapt(composite_3);
 		toolkit.paintBordersFor(composite_3);
 
@@ -363,7 +354,8 @@ public class UIEditorPageAdmin extends Composite {
 		button.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				EclipseResourceEditorHelpers.open_resource_file_in_text_editor("com/sqldalmaker/cg/php/php.vm", "php.vm");
+				EclipseResourceEditorHelpers.open_resource_file_in_text_editor("com/sqldalmaker/cg/php/php.vm",
+						"php.vm");
 			}
 		});
 		button.setText("php.vm");
@@ -373,7 +365,8 @@ public class UIEditorPageAdmin extends Composite {
 		button_1.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				EclipseResourceEditorHelpers.open_resource_file_in_text_editor("com/sqldalmaker/cg/java/java.vm", "java.vm");
+				EclipseResourceEditorHelpers.open_resource_file_in_text_editor("com/sqldalmaker/cg/java/java.vm",
+						"java.vm");
 			}
 		});
 		button_1.setText("java.vm");
@@ -383,7 +376,8 @@ public class UIEditorPageAdmin extends Composite {
 		button_2.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				EclipseResourceEditorHelpers.open_resource_file_in_text_editor("com/sqldalmaker/cg/cpp/cpp.vm", "cpp.vm");
+				EclipseResourceEditorHelpers.open_resource_file_in_text_editor("com/sqldalmaker/cg/cpp/cpp.vm",
+						"cpp.vm");
 			}
 		});
 		button_2.setText("cpp.vm");
@@ -404,19 +398,16 @@ public class UIEditorPageAdmin extends Composite {
 		button_4.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				EclipseResourceEditorHelpers.open_resource_file_in_text_editor("com/sqldalmaker/cg/ruby/ruby.vm", "ruby.vm");
+				EclipseResourceEditorHelpers.open_resource_file_in_text_editor("com/sqldalmaker/cg/ruby/ruby.vm",
+						"ruby.vm");
 			}
 		});
 		button_4.setText("ruby.vm");
 		toolkit.adapt(button_4, true, true);
 
 		Composite composite_text = new Composite(composite_top, SWT.NONE);
+		composite_text.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		composite_text.setLayout(new GridLayout(1, false));
-		FormData fd_composite_text = new FormData();
-		fd_composite_text.right = new FormAttachment(composite_1, 0, SWT.RIGHT);
-		fd_composite_text.left = new FormAttachment(0);
-		fd_composite_text.top = new FormAttachment(composite_3, 6);
-		composite_text.setLayoutData(fd_composite_text);
 		toolkit.adapt(composite_text);
 		toolkit.paintBordersFor(composite_text);
 
@@ -424,8 +415,6 @@ public class UIEditorPageAdmin extends Composite {
 		text_1.setEditable(false);
 		text_1.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		toolkit.adapt(text_1, true, true);
-
-		init();
 	}
 
 	protected void editSettings() {
@@ -470,16 +459,20 @@ public class UIEditorPageAdmin extends Composite {
 		}
 	}
 
-	private void init() {
+	public void init_runtime() {
 		try {
 
 			Bundle bundle = Platform.getBundle(Activator.PLUGIN_ID);
 			Version version = bundle.getVersion();
-			String v = String.format("Plug-in version %d.%d.%d.%s", version.getMajor(), version.getMinor(),
-					version.getMicro(), version.getQualifier());
+			String v = String.format("%d.%d.%d.%s", version.getMajor(), version.getMinor(), version.getMicro(),
+					version.getQualifier());
+
+			String jv = System.getProperty("java.version");
+
+			txtV.setText(v + " on Java " + jv);
 
 			String text = Helpers.read_from_jar_file_2("ABOUT.txt");
-			text += "\r\n" + v;
+			// text += "\r\n" + v;
 			text_1.setText(text);
 
 		} catch (Exception e1) {

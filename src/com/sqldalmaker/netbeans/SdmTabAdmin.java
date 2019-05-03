@@ -47,7 +47,9 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
 
         String v = m.getSpecificationVersion().toString();
 
-        jTextField1.setText("v. " + v);
+        String jv = System.getProperty("java.version");
+        
+        jTextField1.setText("v. " + v + " on Java " + jv);
 
         jTextField1.setBorder(javax.swing.BorderFactory.createEmptyBorder());
 

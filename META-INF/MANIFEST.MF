@@ -19,6 +19,11 @@ Require-Bundle: org.eclipse.core.runtime,
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: .,
- velocity-1.7-dep.jar
+ velocity-1.7-dep.jar,
+ lib/FastInfoset-1.2.15.jar,
+ lib/istack-commons-runtime-3.0.7.jar,
+ lib/javax.activation-api-1.2.0.jar,
+ lib/jaxb-api-2.3.1.jar,
+ lib/jaxb-impl-2.3.1.jar
 Bundle-Vendor: sqldalmaker@gmail.com
 

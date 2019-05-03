@@ -39,7 +39,7 @@ public class UIProfileEditor {
 
         JButton button = new JButton(text);
 
-        button.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
+        button.setBorder(BorderFactory.createEmptyBorder(8, 6, 8, 6));
 
         button.setCursor(hand);
 

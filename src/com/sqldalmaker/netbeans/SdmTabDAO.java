@@ -15,12 +15,14 @@ import com.sqldalmaker.jaxb.dao.DaoClass;
 import com.sqldalmaker.jaxb.settings.Settings;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.regex.PatternSyntaxException;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
@@ -70,6 +72,20 @@ public final class SdmTabDAO extends SdmMultiViewCloneableEditor {
         super(lookup);
         initComponents();
 
+        Cursor wc = new Cursor(Cursor.HAND_CURSOR);
+
+        for (Component c : jToolBar1.getComponents()) {
+
+            if (c instanceof JButton) {
+             
+                JButton b = (JButton) c;
+
+                b.setCursor(wc);
+
+                b.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 4, 0, 4));
+            }
+        }
+        
         jTextField1.getDocument().addDocumentListener(new DocumentListener() {
             private void updateFilter() {
                 setFilter();
@@ -687,6 +703,7 @@ public final class SdmTabDAO extends SdmMultiViewCloneableEditor {
 
         setLayout(new java.awt.BorderLayout());
 
+        jToolBar1.setFloatable(false);
         jToolBar1.setRollover(true);
         jToolBar1.add(jSeparator1);
 

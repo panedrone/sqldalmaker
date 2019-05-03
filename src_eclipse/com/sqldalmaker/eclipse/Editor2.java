@@ -316,7 +316,7 @@ public class Editor2 extends EditorPart implements IEditor2 {
 		editor_page_dto = new UIEditorPageDTO(composite_tabs, SWT.NONE);
 		editor_page_dao = new UIEditorPageDAO(composite_tabs, SWT.NONE);
 		editor_page_admin = new UIEditorPageAdmin(composite_tabs, SWT.NONE);
-
+		editor_page_admin.init_runtime();
 		// //////////////////////////////////////////
 
 		editor_page_dto.setEditor2(this);
