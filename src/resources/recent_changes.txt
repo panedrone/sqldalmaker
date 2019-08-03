@@ -1,3 +1,7 @@
+Aug 02, 2019
+
+    - Fixed incorrect detection of PK for CRUD + SQLite3    
+	
 Jan 11, 2019
 
     - Fixes for DTO/DAO XML assistants + MySQL.
