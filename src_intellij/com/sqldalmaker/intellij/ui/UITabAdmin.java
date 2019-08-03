@@ -58,6 +58,7 @@ public class UITabAdmin {
     private JButton dataStoreQt5CButton;
     private JTextField vTextField;
     private JButton referenceSettingsXmlButton;
+    private JScrollPane scroll_pane;
 
     private Project project;
     private VirtualFile propFile;
@@ -65,6 +66,45 @@ public class UITabAdmin {
 //    public JComponent getToolBar() {
 //        return toolbar_1;
 //    }
+
+    public void init_runtime() {
+
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+
+                ///////////////////////////////////////////////////////////////////
+                //
+                // google: intellij platform plugin sdk detect plugin version programmatically
+                // Programmatically get the version of an IntelliJ IDEA plugin
+                // https://stackoverflow.com/questions/28080707/programmatically-get-the-version-of-an-intellij-idea-plugin
+
+                PluginId id = PluginId.getId("dal-mpe"); // @NotNull
+
+                // @Nullable
+                IdeaPluginDescriptor ds = PluginManager.getPlugin(id);
+
+                if (ds != null) {
+
+                    String jv = System.getProperty("java.version");
+                    vTextField.setText(ds.getVersion() + " on Java " + jv);
+                }
+
+                vTextField.setBorder(BorderFactory.createEmptyBorder());
+
+                ///////////////////////////////////////////////////////////////////
+                //
+                // https://stackoverflow.com/questions/291115/java-swing-using-jscrollpane-and-having-it-scroll-back-to-top
+                //
+                scroll_pane.getVerticalScrollBar().setValue(0);
+
+                ///////////////////////////////////////////////////////////////////
+                //
+                // https://stackoverflow.com/questions/5583495/how-do-i-speed-up-the-scroll-speed-in-a-jscrollpane-when-using-the-mouse-wheel
+                //
+                scroll_pane.getVerticalScrollBar().setUnitIncrement(20);
+            }
+        });
+    }
 
     public UITabAdmin() {
 
@@ -75,27 +115,6 @@ public class UITabAdmin {
 //            JButton b = (JButton) c;
 //            b.setCursor(wc);
 //        }
-
-        ///////////////////////////////////////////////////////////////////
-        //
-        // google: intellij platform plugin sdk detect plugin version programmatically
-        // Programmatically get the version of an IntelliJ IDEA plugin
-        // https://stackoverflow.com/questions/28080707/programmatically-get-the-version-of-an-intellij-idea-plugin
-
-        PluginId id = PluginId.getId("dal-mpe"); // @NotNull
-
-        // @Nullable
-        IdeaPluginDescriptor ds = PluginManager.getPlugin(id);
-
-        if (ds != null) {
-
-            String jv = System.getProperty("java.version");
-            vTextField.setText(ds.getVersion() + " on Java " + jv);
-        }
-
-        vTextField.setBorder(BorderFactory.createEmptyBorder());
-
-        ///////////////////////////////////////////////////////////////////
 
         try {
             text1.setContentType("text/html");
@@ -347,14 +366,14 @@ public class UITabAdmin {
     private void $$$setupUI$$$() {
         rootPanel = new JPanel();
         rootPanel.setLayout(new BorderLayout(0, 0));
-        final JScrollPane scrollPane1 = new JScrollPane();
-        rootPanel.add(scrollPane1, BorderLayout.CENTER);
+        scroll_pane = new JScrollPane();
+        rootPanel.add(scroll_pane, BorderLayout.CENTER);
         final JPanel panel1 = new JPanel();
         panel1.setLayout(new GridLayoutManager(6, 1, new Insets(0, 10, 0, 0), -1, -1));
         panel1.setMaximumSize(new Dimension(2147483647, 2147483647));
-        scrollPane1.setViewportView(panel1);
+        scroll_pane.setViewportView(panel1);
         final JPanel panel2 = new JPanel();
-        panel2.setLayout(new GridLayoutManager(1, 5, new Insets(10, 0, 0, 0), -1, -1));
+        panel2.setLayout(new GridLayoutManager(1, 5, new Insets(10, 0, 0, 0), 1, -1));
         panel1.add(panel2, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_NORTHWEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         referenceSettingsXmlButton = new JButton();
         referenceSettingsXmlButton.setText("Reference settings.xml");
@@ -374,7 +393,7 @@ public class UITabAdmin {
         vTextField.setText("v. ?");
         panel2.add(vTextField, new GridConstraints(0, 4, 1, 1, GridConstraints.ANCHOR_EAST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, new Dimension(160, -1), null, null, 0, false));
         final JPanel panel3 = new JPanel();
-        panel3.setLayout(new GridLayoutManager(1, 3, new Insets(10, 0, 0, 0), -1, -1));
+        panel3.setLayout(new GridLayoutManager(1, 3, new Insets(10, 0, 0, 0), 1, -1));
         panel1.add(panel3, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_NORTHWEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         createOverwriteXSDFilesButton = new JButton();
         createOverwriteXSDFilesButton.setText("Create/Overwrite XSD files");
@@ -386,7 +405,7 @@ public class UITabAdmin {
         createOverwriteDtoXmlButton.setText("Create/Overwrite dto.xml");
         panel3.add(createOverwriteDtoXmlButton, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         final JPanel panel4 = new JPanel();
-        panel4.setLayout(new GridLayoutManager(6, 3, new Insets(10, 0, 0, 0), -1, -1));
+        panel4.setLayout(new GridLayoutManager(6, 3, new Insets(10, 0, 0, 0), 1, -1));
         panel1.add(panel4, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_NORTHWEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         dataStoreJavaButton = new JButton();
         dataStoreJavaButton.setText("DataStore.java");
@@ -428,7 +447,7 @@ public class UITabAdmin {
         dataStoreRUBYDBIButton.setText("DataStore RUBY DBI");
         panel4.add(dataStoreRUBYDBIButton, new GridConstraints(5, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JPanel panel5 = new JPanel();
-        panel5.setLayout(new GridLayoutManager(1, 5, new Insets(10, 0, 0, 0), -1, -1));
+        panel5.setLayout(new GridLayoutManager(1, 5, new Insets(10, 0, 0, 0), 1, -1));
         panel1.add(panel5, new GridConstraints(3, 0, 1, 1, GridConstraints.ANCHOR_NORTHWEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         php_vm = new JButton();
         php_vm.setText("php.vm");
@@ -446,7 +465,7 @@ public class UITabAdmin {
         rubyVmButton.setText("ruby.vm");
         panel5.add(rubyVmButton, new GridConstraints(0, 4, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         final JPanel panel6 = new JPanel();
-        panel6.setLayout(new GridLayoutManager(1, 1, new Insets(10, 0, 0, 0), -1, -1));
+        panel6.setLayout(new GridLayoutManager(1, 1, new Insets(10, 0, 0, 0), 1, -1));
         panel1.add(panel6, new GridConstraints(4, 0, 1, 1, GridConstraints.ANCHOR_NORTH, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         text1 = new JTextPane();
         text1.setBackground(new Color(-1));

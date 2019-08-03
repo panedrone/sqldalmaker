@@ -39,7 +39,7 @@ public class UIProfileEditor {
 
         JButton button = new JButton(text);
 
-        button.setBorder(BorderFactory.createEmptyBorder(8, 6, 8, 6));
+        button.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
 
         button.setCursor(hand);
 
@@ -170,7 +170,7 @@ public class UIProfileEditor {
             cards1.add(tabAdmin.getRootPanel(), Admin);
             tabAdmin.setProject(project);
             tabAdmin.setFile(file);
-
+            tabAdmin.init_runtime();
 
             toolbar = tabDTO1.getToolBar();
             panel_1.add(toolbar);

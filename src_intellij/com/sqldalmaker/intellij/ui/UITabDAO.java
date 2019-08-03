@@ -47,7 +47,7 @@ public class UITabDAO {
     private JButton btn_CrudDao;
     private JPanel top_panel_1;
     private JButton button_fk_assistant;
-    private JToolBar toolbar1;
+    private JPanel tool_panel;
 
     private TableRowSorter<AbstractTableModel> sorter;
     private Project project;
@@ -59,7 +59,7 @@ public class UITabDAO {
     private static final String STATUS_OK = "OK";
 
     public JComponent getToolBar() {
-        return toolbar1;
+        return tool_panel;
     }
 
     public UITabDAO() {
@@ -143,11 +143,13 @@ public class UITabDAO {
 
         Cursor wc = new Cursor(Cursor.HAND_CURSOR);
 
-        for (Component c : toolbar1.getComponents()) {
+        for (Component c : tool_panel.getComponents()) {
             if (c instanceof JButton) {
                 JButton b = (JButton) c;
                 b.setCursor(wc);
-                b.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 4));
+                b.setBorder(BorderFactory.createEmptyBorder(2, 4, 2, 4));
+                b.setOpaque(false);
+                b.setFocusPainted(false);
             }
         }
 
@@ -556,10 +558,9 @@ public class UITabDAO {
         top_panel_1 = new JPanel();
         top_panel_1.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
         rootPanel.add(top_panel_1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
-        toolbar1 = new JToolBar();
-        toolbar1.setBorderPainted(false);
-        toolbar1.setFloatable(false);
-        top_panel_1.add(toolbar1);
+        tool_panel = new JPanel();
+        tool_panel.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
+        top_panel_1.add(tool_panel);
         btn_NewXML = new JButton();
         btn_NewXML.setBorderPainted(false);
         btn_NewXML.setIcon(new ImageIcon(getClass().getResource("/img/new_xml.gif")));
@@ -570,7 +571,7 @@ public class UITabDAO {
         btn_NewXML.setPreferredSize(new Dimension(32, 32));
         btn_NewXML.setText("");
         btn_NewXML.setToolTipText("New XML file");
-        toolbar1.add(btn_NewXML);
+        tool_panel.add(btn_NewXML);
         btn_OpenXML = new JButton();
         btn_OpenXML.setBorderPainted(false);
         btn_OpenXML.setIcon(new ImageIcon(getClass().getResource("/img/xmldoc.gif")));
@@ -581,7 +582,7 @@ public class UITabDAO {
         btn_OpenXML.setPreferredSize(new Dimension(32, 32));
         btn_OpenXML.setText("");
         btn_OpenXML.setToolTipText("Open XML file");
-        toolbar1.add(btn_OpenXML);
+        tool_panel.add(btn_OpenXML);
         btn_OpenJava = new JButton();
         btn_OpenJava.setBorderPainted(false);
         btn_OpenJava.setIcon(new ImageIcon(getClass().getResource("/img/GeneratedFile.gif")));
@@ -592,7 +593,7 @@ public class UITabDAO {
         btn_OpenJava.setPreferredSize(new Dimension(32, 32));
         btn_OpenJava.setText("");
         btn_OpenJava.setToolTipText("Go to generated source");
-        toolbar1.add(btn_OpenJava);
+        tool_panel.add(btn_OpenJava);
         btn_CrudDao = new JButton();
         btn_CrudDao.setBorderPainted(false);
         btn_CrudDao.setIcon(new ImageIcon(getClass().getResource("/img/180.png")));
@@ -603,7 +604,7 @@ public class UITabDAO {
         btn_CrudDao.setPreferredSize(new Dimension(32, 32));
         btn_CrudDao.setText("");
         btn_CrudDao.setToolTipText("DAO CRUD assistant");
-        toolbar1.add(btn_CrudDao);
+        tool_panel.add(btn_CrudDao);
         button_fk_assistant = new JButton();
         button_fk_assistant.setBorderPainted(false);
         button_fk_assistant.setIcon(new ImageIcon(getClass().getResource("/img/FK.gif")));
@@ -614,7 +615,7 @@ public class UITabDAO {
         button_fk_assistant.setPreferredSize(new Dimension(32, 32));
         button_fk_assistant.setText("");
         button_fk_assistant.setToolTipText("FK access assistant");
-        toolbar1.add(button_fk_assistant);
+        tool_panel.add(button_fk_assistant);
         btn_Refresh = new JButton();
         btn_Refresh.setBorderPainted(false);
         btn_Refresh.setIcon(new ImageIcon(getClass().getResource("/img/arrow-circle-double-135.png")));
@@ -625,7 +626,7 @@ public class UITabDAO {
         btn_Refresh.setPreferredSize(new Dimension(32, 32));
         btn_Refresh.setText("");
         btn_Refresh.setToolTipText("Refresh");
-        toolbar1.add(btn_Refresh);
+        tool_panel.add(btn_Refresh);
         btn_DeselAll = new JButton();
         btn_DeselAll.setBorderPainted(false);
         btn_DeselAll.setIcon(new ImageIcon(getClass().getResource("/img/none.gif")));
@@ -636,7 +637,7 @@ public class UITabDAO {
         btn_DeselAll.setPreferredSize(new Dimension(32, 32));
         btn_DeselAll.setText("");
         btn_DeselAll.setToolTipText("Deselect all");
-        toolbar1.add(btn_DeselAll);
+        tool_panel.add(btn_DeselAll);
         btn_SelAll = new JButton();
         btn_SelAll.setBorderPainted(false);
         btn_SelAll.setIcon(new ImageIcon(getClass().getResource("/img/text.gif")));
@@ -647,7 +648,7 @@ public class UITabDAO {
         btn_SelAll.setPreferredSize(new Dimension(32, 32));
         btn_SelAll.setText("");
         btn_SelAll.setToolTipText("Select all");
-        toolbar1.add(btn_SelAll);
+        tool_panel.add(btn_SelAll);
         btn_Generate = new JButton();
         btn_Generate.setBorderPainted(false);
         btn_Generate.setIcon(new ImageIcon(getClass().getResource("/img/compile-warning.png")));
@@ -658,7 +659,7 @@ public class UITabDAO {
         btn_Generate.setPreferredSize(new Dimension(32, 32));
         btn_Generate.setText("");
         btn_Generate.setToolTipText("Generate for selection");
-        toolbar1.add(btn_Generate);
+        tool_panel.add(btn_Generate);
         btn_Validate = new JButton();
         btn_Validate.setBorderPainted(false);
         btn_Validate.setIcon(new ImageIcon(getClass().getResource("/img/validate.gif")));
@@ -669,7 +670,7 @@ public class UITabDAO {
         btn_Validate.setPreferredSize(new Dimension(32, 32));
         btn_Validate.setText("");
         btn_Validate.setToolTipText("Validate all");
-        toolbar1.add(btn_Validate);
+        tool_panel.add(btn_Validate);
     }
 
     /**
