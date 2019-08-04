@@ -2,6 +2,18 @@ Aug 04, 2019
 
     - Adapted for new naming of SQL columns in SQLite3 JDBC driver
 
+    [INFO]
+    
+        Column labels are possible like 'CustomerID:1'.
+        To enable this, open 'dto.xsd' of your XML meta-program
+        and replace this
+        
+           <xs:attribute name="column" use="required" type="xs:NCName" />
+           
+        with this
+        
+           <xs:attribute name="column" use="required" type="xs:string" /> 
+      
 Aug 02, 2019
 
     - Fixed incorrect detection of PK for CRUD + SQLite3    

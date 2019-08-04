@@ -16,7 +16,7 @@
 				<xs:element minOccurs="0" maxOccurs="unbounded" name="field">
 					<xs:complexType>
 						<xs:attribute name="java-type" use="required" type="xs:string" />
-						<xs:attribute name="column" use="required" type="xs:NCName" />
+						<xs:attribute name="column" use="required" type="xs:string" />
 					</xs:complexType>
 				</xs:element>
 			</xs:sequence>

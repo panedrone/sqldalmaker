@@ -4,11 +4,7 @@
     <list default="true" id="1fb1c605-8c08-4b11-a01b-d42d0945087f" name="Default" comment="added option to exclude views in DTO/DAO assistants">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/META-INF/plugin.xml" beforeDir="false" afterPath="$PROJECT_DIR$/META-INF/plugin.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/manifest.mf" beforeDir="false" afterPath="$PROJECT_DIR$/manifest.mf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nbproject/private/platform-private.properties" beforeDir="false" afterPath="$PROJECT_DIR$/nbproject/private/platform-private.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/nbproject/private/private.xml" beforeDir="false" afterPath="$PROJECT_DIR$/nbproject/private/private.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/FieldInfo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/FieldInfo.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/recent_changes.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/recent_changes.txt" afterDir="false" />
     </list>
     <list id="0b913ed8-6e39-405f-b29b-9d52c75467b5" name="Failed commit: Default" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
