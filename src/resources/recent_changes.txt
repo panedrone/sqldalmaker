@@ -1,3 +1,7 @@
+Aug 04, 2019
+
+    - Adapted for new naming of SQL columns in SQLite3 JDBC driver
+
 Aug 02, 2019
 
     - Fixed incorrect detection of PK for CRUD + SQLite3    
@@ -17,19 +21,16 @@ Nov 07, 2018
     - Added example of DataStore class implemented in Qt5 C++.
 
 Feb 12, 2018
-------------
 
 	Implemented generation of XML for reading data through FK-s.
 	
 Jan 08, 2018
-------------
 
     Improvements of error handling and visualization.
     
     To use new event logging, update XSD-files from the tab 'Admin' and add <ide event-log="true"/> to 'settings.xml'.
 
 Apr 01, 2017
-------------
 
     Shortcuts for simple reading data through FK-s:
 

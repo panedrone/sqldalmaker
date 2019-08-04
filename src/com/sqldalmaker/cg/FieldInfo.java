@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 sqldalmaker@gmail.com
+ * Copyright 2011-2019 sqldalmaker@gmail.com
  * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
  * Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -12,9 +12,9 @@ package com.sqldalmaker.cg;
  */
 public class FieldInfo {
 
-    private String type;
+    private String field_type;
 
-    private String name;
+    private String field_name;
 
     private String name_prefix = "";
 
@@ -26,42 +26,42 @@ public class FieldInfo {
 
         column_name = col_name;
 
-        type = field_type_name;
+        field_type = field_type_name;
+
+        field_name = column_name;
+        
+        field_name = field_name.replace(" ", "_"); // for mysql!
+
+        field_name = field_name.replace(".", "_"); // [OrderDetails].OrderID
+
+        field_name = field_name.replace(":", "_"); // CustomerID:1 -- for latest xenian SQLite3
 
         if (FieldNamesMode.TO_LOWER_CASE.equals(field_names_mode)) {
 
-            name = column_name.toLowerCase();
+            field_name = field_name.toLowerCase();
 
         } else if (FieldNamesMode.TO_LOWER_CAMEL_CASE.equals(field_names_mode)) {
 
-            name = toLowerCamelCase(column_name);
+            field_name = toLowerCamelCase(field_name);
 
         } else if (FieldNamesMode.PYTHON_RUBY.equals(field_names_mode)) {
 
-            name = Helpers.camel_case_to_lower_under_scores(column_name);
+            field_name = Helpers.camel_case_to_lower_under_scores(field_name);
 
             name_prefix = "_";
-
-        } else {
-
-            name = column_name;
         }
-
-        name = name.replace(" ", "_"); // for mysql!
-
-        name = name.replace(".", "_"); // [OrderDetails].OrderID
     }
 
     public String getType() {
-        return type;
+        return field_type;
     }
 
     public void setType(String type) {
-        this.type = type;
+        this.field_type = type;
     }
 
     public String getName() {
-        return name;
+        return field_name;
     }
 
     public String getColumnName() {
@@ -79,7 +79,7 @@ public class FieldInfo {
     // called from Velocity script
     public String getterMethod() { // NO_UCD (unused code)
 
-        String s = name_prefix + name;
+        String s = name_prefix + field_name;
 
         String X = Helpers.replace_char_at(s, 0, Character.toUpperCase(s.charAt(0)));
 
@@ -89,7 +89,7 @@ public class FieldInfo {
     // called from Velocity script
     public String setterMethod() { // NO_UCD (unused code)
 
-        String s = name_prefix + name;
+        String s = name_prefix + field_name;
 
         String X = Helpers.replace_char_at(s, 0, Character.toUpperCase(s.charAt(0)));
 
