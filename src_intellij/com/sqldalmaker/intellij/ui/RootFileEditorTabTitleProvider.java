@@ -19,6 +19,6 @@ public class RootFileEditorTabTitleProvider implements EditorTabTitleProvider {
     @Override
     public String getEditorTabTitle(Project project, VirtualFile file) {
 
-        return IdeaTargetLanguageHelpers.get_relative_path(project, file);
+        return IdeaTargetLanguageHelpers.get_root_file_relative_path(project, file);
     }
 }

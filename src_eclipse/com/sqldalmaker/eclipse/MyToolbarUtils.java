@@ -38,14 +38,17 @@ public class MyToolbarUtils {
 
 					if (!r.isHidden()) {
 
-						enum_dal_files((IFolder) r, res);
+						if (!r.getName().equals("bin")) {
+						
+							enum_dal_files((IFolder) r, res);
+						}
 					}
 
 				} else if (r instanceof IFile) {
 
-					String rel_path = ((IFile) r).getFullPath().toPortableString();
+					String rel_path = EclipseTargetLanguageHelpers.get_root_file_relative_path((IFile) r);
 
-					if (rel_path.endsWith(".dal")) {
+					if (rel_path != null) {
 
 						res.add(rel_path);
 					}
@@ -84,7 +87,8 @@ public class MyToolbarUtils {
 		return res;
 	}
 
-	public static void open_dal_file(String dal_title, IProject[] projects) throws InternalException, PartInitException {
+	public static void open_dal_file(String dal_title, IProject[] projects)
+			throws InternalException, PartInitException {
 
 		String dal_file_path = dal_title.replace("\\", "/");
 

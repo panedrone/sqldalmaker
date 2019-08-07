@@ -51,12 +51,9 @@ public class SdmActionGroup extends ActionGroup {
 
             } else {
 
-                String ext = c.getExtension();
+                String path = IdeaTargetLanguageHelpers.get_root_file_relative_path(project, c);
 
-                if ("dal".equals(ext)) {
-
-                    String path = IdeaTargetLanguageHelpers.get_relative_path(project, c);
-
+                if (path != null) {
                     rel_path_names.add(path);
                 }
             }

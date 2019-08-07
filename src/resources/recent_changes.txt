@@ -1,3 +1,7 @@
+Aug 07, 2019
+
+	- Fixed incorrect enumeration of root-files.
+
 Aug 04, 2019
 
     - Adapted for new naming of SQL columns in SQLite3 JDBC driver

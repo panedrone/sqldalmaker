@@ -433,4 +433,29 @@ public class EclipseTargetLanguageHelpers {
 
 		return null;
 	}
+
+	/**
+	 *
+	 * @param file
+	 * @return null if the file is not root-file
+	 */
+	public static String get_root_file_relative_path(final IFile file) {
+
+		String fn = file.getName();
+
+		if (RootFileName.JAVA.equals(fn) || RootFileName.CPP.equals(fn) || // ProfileNames.OBJC.equals(fn) ||
+				RootFileName.PHP.equals(fn) || RootFileName.PYTHON.equals(fn) || RootFileName.RUBY.equals(fn)) {
+
+			try {
+
+				return file.getFullPath().toPortableString();
+
+			} catch (Exception e) {
+
+				e.printStackTrace();
+			}
+		}
+
+		return null;
+	}
 }

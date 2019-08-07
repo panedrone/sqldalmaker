@@ -63,64 +63,6 @@ public class IdeaTargetLanguageHelpers {
         return "Unknown root file: " + fn;
     }
 
-    public static VirtualFile get_source_file_rel_path(VirtualFile module_dir, String canonical_text) {
-
-        try {
-
-            VirtualFile root_file = module_dir.findFileByRelativePath(RootFileName.JAVA);
-
-            Settings settings = IdeaHelpers.load_settings(root_file);
-
-            String rel_path = null;
-
-            if (root_file != null) {
-
-                String dto_pkg = settings.getDto().getScope();
-
-                rel_path = IdeaHelpers.get_package_relative_path(settings, dto_pkg) + "/" + canonical_text + ".java";
-            }
-
-            root_file = module_dir.findFileByRelativePath(RootFileName.PHP);
-
-            if (root_file != null) {
-
-                rel_path = settings.getFolders().getTarget() + "/" + canonical_text + ".php";
-            }
-
-            root_file = module_dir.findFileByRelativePath(RootFileName.CPP);
-
-            if (root_file != null) {
-
-                rel_path = settings.getFolders().getTarget() + "/" + canonical_text + ".h";
-            }
-
-            root_file = module_dir.findFileByRelativePath(RootFileName.PYTHON);
-
-            if (root_file != null) {
-
-                rel_path = settings.getFolders().getTarget() + "/" + canonical_text + ".py";
-            }
-
-            root_file = module_dir.findFileByRelativePath(RootFileName.RUBY);
-
-            if (root_file != null) {
-
-                rel_path = settings.getFolders().getTarget() + "/" + canonical_text + ".rb";
-            }
-
-            if (rel_path == null) {
-
-                return null;
-            }
-            
-            return module_dir.findFileByRelativePath(rel_path);
-
-        } catch (Throwable e) {
-
-            return null;
-        }
-    }
-
     public static void open_editor(Project project, VirtualFile root_file,
                                    String value, Settings settings, String java_package) throws Exception {
 
@@ -327,14 +269,21 @@ public class IdeaTargetLanguageHelpers {
         }
     }
 
-    public static String get_relative_path(Project project, VirtualFile file) {
+    /**
+     * @param project
+     * @param file
+     * @return null if the file is not root-file
+     */
+    public static String get_root_file_relative_path(Project project, VirtualFile file) {
 
-        if (RootFileName.JAVA.equals(file.getName()) ||
-                RootFileName.CPP.equals(file.getName()) ||
-                //ProfileNames.OBJC.equals(file.getName()) ||
-                RootFileName.PHP.equals(file.getName()) ||
-                RootFileName.PYTHON.equals(file.getName()) ||
-                RootFileName.RUBY.equals(file.getName())) {
+        String fn = file.getName();
+
+        if (RootFileName.JAVA.equals(fn)
+                || RootFileName.CPP.equals(fn)
+                || //ProfileNames.OBJC.equals(fn) ||
+                RootFileName.PHP.equals(fn)
+                || RootFileName.PYTHON.equals(fn)
+                || RootFileName.RUBY.equals(fn)) {
 
             try {
 
