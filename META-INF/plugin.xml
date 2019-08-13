@@ -2,7 +2,7 @@
     <id>dal-mpe</id>
     <name>SQL DAL Maker</name>
     <category>Database</category>
-    <version>1.84.20190807</version>
+    <version>1.85.20190812</version>
     <vendor email="sqldalmaker@gmail.com"/>
     <!-- please see http://confluence.intellij.net/display/IDEADEV/Build+Number+Ranges for description -->
     <idea-version since-build="133.1885"/>
@@ -16,6 +16,10 @@ To generate the class, you declare it in XML meta-program.<br/>
     ]]></description>
 
     <change-notes><![CDATA[
+<h3>v.1.85</h3>
+<ul>
+<li>Fixed incorrect commenting in Python and Ruby target code</li>
+</ul>
 <h3>v.1.84</h3>
 <ul>
 <li>Fixed incorrect detection of PK for CRUD assistants + SQLite3</li>

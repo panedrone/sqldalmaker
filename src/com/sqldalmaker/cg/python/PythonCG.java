@@ -141,6 +141,11 @@ public class PythonCG {
 
             CodeGeneratorHelpers.process_element(this, dao_class, methods);
 
+            for (int i=0; i< methods.size(); i++) {
+            	String m = methods.get(i).replace("\t", "    ").replace("//", "#");
+            	methods.set(i, m);
+            }
+            
             HashMap<String, Object> context = new HashMap<String, Object>();
 
             String[] imports_arr = imports.toArray(new String[imports.size()]);

@@ -6,43 +6,11 @@
       <change beforePath="$PROJECT_DIR$/META-INF/MANIFEST.MF" beforeDir="false" afterPath="$PROJECT_DIR$/META-INF/MANIFEST.MF" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/META-INF/plugin.xml" beforeDir="false" afterPath="$PROJECT_DIR$/META-INF/plugin.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/manifest.mf" beforeDir="false" afterPath="$PROJECT_DIR$/manifest.mf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nbproject/private/platform-private.properties" beforeDir="false" afterPath="$PROJECT_DIR$/nbproject/private/platform-private.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/nbproject/private/private.xml" beforeDir="false" afterPath="$PROJECT_DIR$/nbproject/private/private.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/Bundle.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/NbpCrudXmHelpers.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/NbpHelpers.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/NbpIdeConsoleUtil.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/NbpIdeEditorHelpers.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/NbpIdeMessageHelpers.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/NbpMetaProgramInitHelpers.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/NbpPathHelpers.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/NbpTargetLanguageHelpers.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/SdmAction.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/SdmDataObject.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/SdmMultiViewCloneableEditor.form" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/SdmMultiViewCloneableEditor.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/SdmTabAdmin.form" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/SdmTabAdmin.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/SdmTabDAO.form" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/SdmTabDAO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/SdmTabDTO.form" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/SdmTabDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/UIDialogSelectDbSchema.form" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/UIDialogSelectDbSchema.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/XmlEditorCompletionItem.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/XmlEditorCompletionProvider.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/XmlEditorHyperlinkProvider.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/XmlEditorUtil.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/__build_plugins_README.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/package-info.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/sqldalmaker.gif" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/sqldalmaker_24.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/python/PythonCG.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/python/PythonCG.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/ruby/RubyCG.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/ruby/RubyCG.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/netbeans.zip" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/resources/recent_changes.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/recent_changes.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src_eclipse/com/sqldalmaker/eclipse/EclipseTargetLanguageHelpers.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_eclipse/com/sqldalmaker/eclipse/EclipseTargetLanguageHelpers.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src_eclipse/com/sqldalmaker/eclipse/MyToolbarUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_eclipse/com/sqldalmaker/eclipse/MyToolbarUtils.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/SdmActionGroup.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/SdmActionGroup.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaTargetLanguageHelpers.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaTargetLanguageHelpers.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/RootFileEditorTabTitleProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/RootFileEditorTabTitleProvider.java" afterDir="false" />
     </list>
     <list id="0b913ed8-6e39-405f-b29b-9d52c75467b5" name="Failed commit: Default" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
