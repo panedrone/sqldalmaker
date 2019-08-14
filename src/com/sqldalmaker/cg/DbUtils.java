@@ -674,7 +674,7 @@ public class DbUtils {
 	public void get_crud_info(String table_name, ArrayList<FieldInfo> columns, List<FieldInfo> params,
 			String dto_class_name, DtoClasses dto_classes, TypeMap type_map) throws Exception {
 
-		ArrayList<String> pk = get_pk_col_names(conn, table_name);
+		ArrayList<String> pk_col_names = get_pk_col_names(conn, table_name);
 
 		/*
 		 * DatabaseMetaData.getPrimaryKeys may return pk_col_names in lower case
@@ -683,9 +683,22 @@ public class DbUtils {
 		 */
 		Set<String> pk_col_names_set_lower_case = new HashSet<String>();
 
-		for (String col_name : pk) {
+		for (String pk_col_name : pk_col_names) {
 
-			pk_col_names_set_lower_case.add(col_name.toLowerCase());
+			// xerial SQLite3 returns pk_col_names in the format '[employeeid] asc' (compound PK)
+
+			pk_col_name = pk_col_name.toLowerCase();
+			pk_col_name = pk_col_name.replace("[", "");
+			pk_col_name = pk_col_name.replace("]", "");
+			if (pk_col_name.endsWith(" asc")) {
+				pk_col_name = pk_col_name.replace(" asc", "");
+			}
+			if (pk_col_name.endsWith(" desc")) {
+				pk_col_name = pk_col_name.replace(" desc", "");
+			}
+			pk_col_name = pk_col_name.trim();
+
+			pk_col_names_set_lower_case.add(pk_col_name);
 		}
 
 		DtoClass dto_class = Helpers.find_dto_class(dto_class_name, dto_classes);

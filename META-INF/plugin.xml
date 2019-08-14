@@ -2,7 +2,7 @@
     <id>dal-mpe</id>
     <name>SQL DAL Maker</name>
     <category>Database</category>
-    <version>1.85.20190812</version>
+    <version>1.86.20190814</version>
     <vendor email="sqldalmaker@gmail.com"/>
     <!-- please see http://confluence.intellij.net/display/IDEADEV/Build+Number+Ranges for description -->
     <idea-version since-build="133.1885"/>
@@ -16,15 +16,13 @@ To generate the class, you declare it in XML meta-program.<br/>
     ]]></description>
 
     <change-notes><![CDATA[
+<h3>v.1.86</h3>
+<ul>
+<li>Adapted for xerial PK column names like '[employeeid] asc'</li>
+</ul>
 <h3>v.1.85</h3>
 <ul>
 <li>Fixed incorrect commenting in Python and Ruby target code</li>
-</ul>
-<h3>v.1.84</h3>
-<ul>
-<li>Fixed incorrect detection of PK for CRUD assistants + SQLite3</li>
-<li>Adapted for new naming of SQL columns in SQLite3 JDBC driver</li>
-<li>Fixed incorrect enumeration of root-files</li>
 </ul>]]></change-notes>
 
     <application-components>
