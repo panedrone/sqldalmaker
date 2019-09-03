@@ -99,7 +99,7 @@ public class PythonCG {
 
     public static class DAO implements IDaoCG {
 
-        private final String sql_root;
+        private final String sql_root_abs_path;
 
         private final DtoClasses dto_classes;
 
@@ -111,12 +111,12 @@ public class PythonCG {
 
         private final DbUtils db_utils;
 
-        public DAO(DtoClasses dto_classes, Connection connection, String sql_root, String vm_file_system_dir)
+        public DAO(DtoClasses dto_classes, Connection connection, String sql_root_abs_path, String vm_file_system_dir)
                 throws Exception {
 
             this.dto_classes = dto_classes;
 
-            this.sql_root = sql_root;
+            this.sql_root_abs_path = sql_root_abs_path;
 
             if (vm_file_system_dir == null) {
 
@@ -139,7 +139,7 @@ public class PythonCG {
 
             List<String> methods = new ArrayList<String>();
 
-            CodeGeneratorHelpers.process_element(this, dao_class, methods);
+            Helpers.process_element(this, dao_class, methods);
 
             for (int i=0; i< methods.size(); i++) {
             	String m = methods.get(i).replace("\t", "    ").replace("//", "#");
@@ -176,211 +176,43 @@ public class PythonCG {
         @Override
         public StringBuilder render_element_query(Object element) throws Exception {
 
-            StringBuilder buff = new StringBuilder();
+            MethodInfo mi = new MethodInfo(element);
 
             String xml_node_name = Helpers.get_xml_node_name(element);
 
-            String method;
-
-            String ref;
-
-            boolean is_external_sql;
-
-            boolean return_type_is_dto = false;
-
-            String returnType;
-
-            boolean fetch_list = (element instanceof QueryDtoList) || (element instanceof QueryList);
-
-            if (element instanceof Query) {
-
-                Query q = (Query) element;
-                method = q.getMethod();
-                ref = q.getRef();
-                is_external_sql = q.is_external_sql();
-                returnType = q.getReturnType();
-
-            } else if (element instanceof QueryList) {
-
-                QueryList q = (QueryList) element;
-                method = q.getMethod();
-                ref = q.getRef();
-                is_external_sql = q.is_external_sql();
-                returnType = q.getReturnType();
-
-            } else if (element instanceof QueryDto) {
-
-                QueryDto q = (QueryDto) element;
-                method = q.getMethod();
-                ref = q.getRef();
-                is_external_sql = q.is_external_sql();
-                returnType = q.getDto();
-                return_type_is_dto = true;
-
-            } else if (element instanceof QueryDtoList) {
-
-                QueryDtoList q = (QueryDtoList) element;
-                method = q.getMethod();
-                ref = q.getRef();
-                is_external_sql = q.is_external_sql();
-                returnType = q.getDto();
-                return_type_is_dto = true;
-
-            } else {
-
-                throw new Exception("Unexpected XML element: " + xml_node_name);
-            }
-
-            check_required_attr(xml_node_name, method);
+            check_required_attr(xml_node_name, mi.method);
 
             try {
 
-                String sql_root_abs_path = sql_root;
+                String sql = DbUtils.sql_by_ref(mi.ref, sql_root_abs_path);
 
-                String sql = DbUtils.sql_by_ref(ref, sql_root_abs_path);
-
-                String[] parsed = parse_method_declaration(method);
+                String[] parsed = parse_method_declaration(mi.method);
 
                 String method_name = parsed[0];
-
                 String dto_param_type = parsed[1];
-
                 String param_descriptors = parsed[2];
 
-                String[] paramDescriptorsArr = Helpers.get_listed_items(param_descriptors);
+                String[] param_arr = Helpers.get_listed_items(param_descriptors);
 
-                render_element_query(buff, sql, is_external_sql, returnType, return_type_is_dto, fetch_list,
-                        method_name, dto_param_type, paramDescriptorsArr, false, xml_node_name, ref);
+                StringBuilder buff = new StringBuilder();
 
-            } catch (Throwable e) {
+                render_element_query(buff, sql, mi.is_external_sql, mi.return_type, mi.return_type_is_dto, mi.fetch_list,
+                        method_name, dto_param_type, param_arr, false, xml_node_name, mi.ref);
 
-                // e.printStackTrace();
-                String msg = "<" + xml_node_name + " method=\"" + method + "\" ref=\"" + ref + "\"...\n";
-
-                throw new Exception(Helpers.get_error_message(msg, e));
-            }
-
-            return buff;
-        }
-
-        private String process_dto_class_name(String dto_class_name, boolean add_to_import) throws Exception {
-
-            DtoClass dtoDef = Helpers.find_dto_class(dto_class_name, dto_classes);
-
-            if (add_to_import) {
-
-                imports.add(dtoDef.getName());
-            }
-
-            // String full_name;
-            // if (dao_package != null && dao_package.length() > 0) {
-            // full_name = "\\" + dtoDef.getName();
-            // uses.add(full_name);
-            // }
-            return dtoDef.getName();
-        }
-
-        @Override
-        public StringBuilder render_element_exec_dml(ExecDml element) throws Exception {
-
-            StringBuilder buff = new StringBuilder();
-
-            String xml_node_name = Helpers.get_xml_node_name(element);
-
-            String method = element.getMethod();
-
-            String ref = element.getRef();
-
-            check_required_attr(xml_node_name, method);
-
-            try {
-
-                String sql_root_abs_path = sql_root;
-
-                String sqlFileName = Helpers.concat_path(sql_root_abs_path, ref);
-
-                String sql = Helpers.load_text_from_file(sqlFileName);
-
-                String[] parsed = parse_method_declaration(method);
-
-                String method_name = parsed[0]; // never is null
-
-                String dto_param_type = parsed[1]; // never is null
-
-                String param_descriptors = parsed[2]; // never is null
-
-                String[] paramDescriptorsArr = Helpers.get_listed_items(param_descriptors);
-
-                boolean is_external_sql = element.is_external_sql();
-
-                render_element_exec_dml(buff, sql, is_external_sql, null, method_name, dto_param_type,
-                        paramDescriptorsArr, xml_node_name, ref);
+                return buff;
 
             } catch (Throwable e) {
 
                 // e.printStackTrace();
-                String msg = "<" + xml_node_name + " method=\"" + method + "\" ref=\"" + ref + "\"...\n";
+                String msg = "<" + xml_node_name + " method=\"" + mi.method + "\" ref=\"" + mi.ref + "\"...\n";
 
                 throw new Exception(Helpers.get_error_message(msg, e));
             }
-
-            return buff;
-        }
-
-        private void render_element_exec_dml(StringBuilder buffer, String sql, boolean is_external_sql,
-                String class_name, String method_name, String dto_param_type, String[] param_descriptors,
-                String xml_node_name, String sql_path) throws Exception {
-
-            ArrayList<FieldInfo> fields = new ArrayList<FieldInfo>();
-
-            ArrayList<FieldInfo> params = new ArrayList<FieldInfo>();
-
-            db_utils.sql_to_metadata(sql, fields, dto_param_type, param_descriptors, params, "", dto_classes);
-
-            // For Informix: ResultSetMetaData.getColumnCount() returns
-            // value > 0 for some DML statements, e.g. for 'update orders set
-            // dt_id = ? where o_id = ?' it considers that 'dt_id' is column.
-            String trimmed = sql.toLowerCase().trim();
-
-            String[] parts = trimmed.split("\\s+");
-
-            if (parts.length > 0) {
-
-                if ("select".equals(parts[0])) {
-
-                    throw new Exception("SELECT is not allowed here");
-                }
-            }
-
-            String sql_str = Helpers.sql_to_python_string(sql);
-
-            HashMap<String, Object> context = new HashMap<String, Object>();
-
-            assign_params(params, dto_param_type, context);
-
-            // if (dto_param_type != null && dto_param_type.length() > 0) { FireBug
-            // does not like it
-            context.put("dto_param", dto_param_type);
-            // }
-
-            context.put("class_name", class_name);
-            context.put("method_name", method_name);
-            context.put("sql", sql_str);
-            context.put("xml_node_name", xml_node_name);
-            context.put("sql_path", sql_path);
-            context.put("is_external_sql", is_external_sql);
-            context.put("mode", "dao_exec_dml");
-
-            StringWriter sw = new StringWriter();
-
-            te.merge(context, sw);
-
-            buffer.append(sw.getBuffer());
         }
 
         private void render_element_query(StringBuilder buff, String sql, boolean is_external_sql, String return_type,
-                boolean return_type_is_dto, boolean fetch_list, String method_name, String dto_param_type,
-                String[] param_descriptors, boolean is_crud, String xml_node_name, String ref) throws Exception {
+                                          boolean return_type_is_dto, boolean fetch_list, String method_name, String dto_param_type,
+                                          String[] param_descriptors, boolean is_crud, String xml_node_name, String ref) throws Exception {
 
             ArrayList<FieldInfo> fields = new ArrayList<FieldInfo>();
 
@@ -442,6 +274,116 @@ public class PythonCG {
             te.merge(context, sw);
 
             buff.append(sw.getBuffer());
+        }
+
+        private String process_dto_class_name(String dto_class_name, boolean add_to_import) throws Exception {
+
+            DtoClass dtoDef = Helpers.find_dto_class(dto_class_name, dto_classes);
+
+            if (add_to_import) {
+
+                imports.add(dtoDef.getName());
+            }
+
+            // String full_name;
+            // if (dao_package != null && dao_package.length() > 0) {
+            // full_name = "\\" + dtoDef.getName();
+            // uses.add(full_name);
+            // }
+            return dtoDef.getName();
+        }
+
+        @Override
+        public StringBuilder render_element_exec_dml(ExecDml element) throws Exception {
+
+            String method = element.getMethod();
+            String ref = element.getRef();
+
+            String xml_node_name = Helpers.get_xml_node_name(element);
+
+            check_required_attr(xml_node_name, method);
+
+            try {
+
+                String sql_file_abs_path = Helpers.concat_path(sql_root_abs_path, ref);
+
+                String sql = Helpers.load_text_from_file(sql_file_abs_path);
+
+                String[] parsed = parse_method_declaration(method);
+
+                String method_name = parsed[0]; // never is null
+                String dto_param_type = parsed[1]; // never is null
+                String param_descriptors = parsed[2]; // never is null
+
+                String[] param_arr = Helpers.get_listed_items(param_descriptors);
+
+                boolean is_external_sql = element.is_external_sql();
+
+                StringBuilder buff = new StringBuilder();
+
+                render_element_exec_dml(buff, sql, is_external_sql, null, method_name, dto_param_type,
+                        param_arr, xml_node_name, ref);
+
+                return buff;
+
+            } catch (Throwable e) {
+
+                // e.printStackTrace();
+                String msg = "<" + xml_node_name + " method=\"" + method + "\" ref=\"" + ref + "\"...\n";
+
+                throw new Exception(Helpers.get_error_message(msg, e));
+            }
+        }
+
+        private void render_element_exec_dml(StringBuilder buffer, String sql, boolean is_external_sql,
+                String class_name, String method_name, String dto_param_type, String[] param_descriptors,
+                String xml_node_name, String sql_path) throws Exception {
+
+            ArrayList<FieldInfo> fields = new ArrayList<FieldInfo>();
+
+            ArrayList<FieldInfo> params = new ArrayList<FieldInfo>();
+
+            db_utils.sql_to_metadata(sql, fields, dto_param_type, param_descriptors, params, "", dto_classes);
+
+            // For Informix: ResultSetMetaData.getColumnCount() returns
+            // value > 0 for some DML statements, e.g. for 'update orders set
+            // dt_id = ? where o_id = ?' it considers that 'dt_id' is column.
+            String trimmed = sql.toLowerCase().trim();
+
+            String[] parts = trimmed.split("\\s+");
+
+            if (parts.length > 0) {
+
+                if ("select".equals(parts[0])) {
+
+                    throw new Exception("SELECT is not allowed here");
+                }
+            }
+
+            String sql_str = Helpers.sql_to_python_string(sql);
+
+            HashMap<String, Object> context = new HashMap<String, Object>();
+
+            assign_params(params, dto_param_type, context);
+
+            // if (dto_param_type != null && dto_param_type.length() > 0) { FireBug
+            // does not like it
+            context.put("dto_param", dto_param_type);
+            // }
+
+            context.put("class_name", class_name);
+            context.put("method_name", method_name);
+            context.put("sql", sql_str);
+            context.put("xml_node_name", xml_node_name);
+            context.put("sql_path", sql_path);
+            context.put("is_external_sql", is_external_sql);
+            context.put("mode", "dao_exec_dml");
+
+            StringWriter sw = new StringWriter();
+
+            te.merge(context, sw);
+
+            buffer.append(sw.getBuffer());
         }
 
         private void assign_params(ArrayList<FieldInfo> params, String dto_param_type, HashMap<String, Object> context)
@@ -552,16 +494,16 @@ public class PythonCG {
                 desc.add(k.getType() + " " + k.getName());
             }
 
-            String[] paramDescriptorsArr = desc.toArray(new String[desc.size()]);
+            String[] param_arr = desc.toArray(new String[desc.size()]);
 
             render_element_query(buffer, sql_buff.toString(), false, ret_dto_type, true, fetch_list, method_name, "",
-                    paramDescriptorsArr, true, "", table_name);
+                    param_arr, true, "", table_name);
 
             return buffer;
         }
 
         @Override
-        public StringBuilder render_element_crud_insert(StringBuilder sql_buff, String class_name, String method_name,
+        public StringBuilder render_element_crud_create(StringBuilder sql_buff, String class_name, String method_name,
                 String table_name, String dto_class_name, boolean fetch_generated, String generated) throws Exception {
 
             ArrayList<FieldInfo> params = new ArrayList<FieldInfo>();
@@ -800,7 +742,11 @@ public class PythonCG {
 
                 db_utils.validate_table_name(table_attr);
 
-                return render_element_crud(crud, dto_class_name, table_attr);
+                process_dto_class_name(dto_class_name, false);
+
+                StringBuilder code_buff = Helpers.process_element_crud(this, true, crud, dto_class_name, table_attr);
+
+                return code_buff;
 
             } catch (Throwable e) {
 
@@ -815,16 +761,6 @@ public class PythonCG {
         public DbUtils get_db_utils() {
 
             return db_utils;
-        }
-
-        private StringBuilder render_element_crud(TypeCrud element, String dto_class_name, String table_attr)
-                throws Exception {
-
-            process_dto_class_name(dto_class_name, false);
-
-            StringBuilder code_buff = CodeGeneratorHelpers.process_element_crud(this, true, element, dto_class_name, table_attr);
-
-            return code_buff;
         }
     }
 }

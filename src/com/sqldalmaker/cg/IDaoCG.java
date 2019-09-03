@@ -25,7 +25,7 @@ public interface IDaoCG {
     
     StringBuilder render_element_crud(Object element) throws Exception;
     
-    StringBuilder render_element_crud_insert(StringBuilder sql_buff, String class_name, String method_name,
+    StringBuilder render_element_crud_create(StringBuilder sql_buff, String class_name, String method_name,
                                              String table_name, String dto_class_name, boolean fetch_generated, String generated) throws Exception;
 
     StringBuilder render_element_crud_read(StringBuilder sql_buff, String method_name, String table_name,
