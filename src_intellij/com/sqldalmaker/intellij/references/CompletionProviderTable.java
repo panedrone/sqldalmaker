@@ -20,7 +20,7 @@ import com.intellij.psi.xml.XmlAttributeValue;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
 import com.intellij.util.ProcessingContext;
-import com.sqldalmaker.cg.Helpers;
+import com.sqldalmaker.cg.DbUtils;
 import com.sqldalmaker.common.Const;
 import org.jetbrains.annotations.NotNull;
 
@@ -132,7 +132,7 @@ public class CompletionProviderTable extends CompletionProvider<CompletionParame
 
                         String ref_value = a.getValue();
 
-                        if (Helpers.is_table_ref(ref_value)) {
+                        if (DbUtils.is_table_ref(ref_value)) {
 
                             completionResultSet.addElement(LookupElementBuilder.create(ref_value));
                         }

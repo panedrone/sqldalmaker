@@ -1,9 +1,10 @@
 Sep 22, 2019
 
     - Implemented calling of MySQL stored procedures like '{call test_query()}' or '{call test_query_list(?, ?)}'
-      from 'query', 'query-list', 'query-dto', 'query-dto-list'.
+      for XML-tags 'query', 'query-list', 'query-dto', 'query-dto-list'.
       Out parameters of are not supported yet.
-      At the moment, it works only in PHP + PDO. In SQL files, use JDBC syntax.
+      In v 1.87, it works only in PHP + PDO. Use JDBC syntax in SQL files.
+      Try to use shortcuts: ref='CALL new_procedure_single(?)'.
 
 Aug 17, 2019
 

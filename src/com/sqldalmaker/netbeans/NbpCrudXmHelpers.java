@@ -129,7 +129,7 @@ public class NbpCrudXmHelpers {
 
                 res.add(parts[1]);
 
-            } else if (Helpers.is_table_ref(ref)) {
+            } else if (DbUtils.is_table_ref(ref)) {
 
                 res.add(ref);
             }

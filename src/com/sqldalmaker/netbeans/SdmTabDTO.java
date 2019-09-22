@@ -5,7 +5,7 @@
  */
 package com.sqldalmaker.netbeans;
 
-import com.sqldalmaker.cg.Helpers;
+import com.sqldalmaker.cg.DbUtils;
 import com.sqldalmaker.cg.IDtoCG;
 import com.sqldalmaker.common.Const;
 import com.sqldalmaker.common.InternalException;
@@ -678,7 +678,7 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
 
             String ref = (String) table.getValueAt(selectedRows[0], 1);
 
-            if (Helpers.is_table_ref(ref)) {
+            if (DbUtils.is_table_ref(ref)) {
                 return;
             }
 

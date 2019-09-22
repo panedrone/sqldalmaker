@@ -52,6 +52,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.wb.swt.ResourceManager;
 
+import com.sqldalmaker.cg.DbUtils;
 import com.sqldalmaker.cg.Helpers;
 import com.sqldalmaker.cg.IDtoCG;
 import com.sqldalmaker.common.Const;
@@ -644,7 +645,7 @@ public class UIEditorPageDTO extends Composite {
 				return;
 			}
 			
-			if (Helpers.is_table_ref(relative)) {
+			if (DbUtils.is_table_ref(relative)) {
 				return;
 			}
 

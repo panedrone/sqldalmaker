@@ -12,10 +12,9 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.PsiReferenceBase;
 import com.intellij.util.ArrayUtil;
-import com.sqldalmaker.cg.Helpers;
+import com.sqldalmaker.cg.DbUtils;
 import com.sqldalmaker.common.FileSearchHelpers;
 import com.sqldalmaker.intellij.ui.IdeaHelpers;
-import com.sqldalmaker.intellij.ui.IdeaTargetLanguageHelpers;
 import com.sqldalmaker.jaxb.settings.Settings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -48,7 +47,7 @@ public class PsiReferenceSql extends PsiReferenceBase<PsiElement> {
             return null;
         }
 
-        if (!Helpers.is_sql_file_ref(canonical_text)) {
+        if (!DbUtils.is_sql_file_ref(canonical_text)) {
 
             return null;
         }
@@ -152,7 +151,7 @@ public class PsiReferenceSql extends PsiReferenceBase<PsiElement> {
             // Allowed in DTO: empty string, table name, path to sql-file
             // only path to sql-file must be highlighted in red if invalid
             //
-            if (Helpers.is_table_ref(canonical_text)) {
+            if (DbUtils.is_table_ref(canonical_text)) {
 
                 return true;
             }
@@ -161,7 +160,17 @@ public class PsiReferenceSql extends PsiReferenceBase<PsiElement> {
 
             // Allowed in DAO: ONLY path to sql-file. So, everything must be checked
             //
-            if (Helpers.is_sql_shortcut_ref(canonical_text)) {
+            if (DbUtils.is_sql_shortcut_ref(canonical_text)) {
+
+                return true;
+            }
+
+            if (DbUtils.is_jdbc_stored_proc_call(canonical_text)) {
+
+                return true;
+            }
+
+            if (DbUtils.is_stored_proc_call_shortcut(canonical_text)) {
 
                 return true;
             }

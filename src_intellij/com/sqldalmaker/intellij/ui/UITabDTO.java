@@ -11,7 +11,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.JBColor;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
-import com.sqldalmaker.cg.Helpers;
+import com.sqldalmaker.cg.DbUtils;
 import com.sqldalmaker.cg.IDtoCG;
 import com.sqldalmaker.common.Const;
 import com.sqldalmaker.common.InternalException;
@@ -480,7 +480,7 @@ public class UITabDTO {
 
             String ref = (String) table.getValueAt(selectedRows[0], 1);
 
-            if (Helpers.is_table_ref(ref)) {
+            if (DbUtils.is_table_ref(ref)) {
                 return;
             }
 

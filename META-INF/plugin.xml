@@ -2,7 +2,7 @@
     <id>dal-mpe</id>
     <name>SQL DAL Maker</name>
     <category>Database</category>
-    <version>1.87.20190922</version>
+    <version>1.87.20190923</version>
     <vendor email="sqldalmaker@gmail.com"/>
     <!-- please see http://confluence.intellij.net/display/IDEADEV/Build+Number+Ranges for description -->
     <idea-version since-build="133.1885"/>
@@ -16,18 +16,12 @@ To generate the class, you declare it in XML meta-program.<br/>
     ]]></description>
 
     <change-notes><![CDATA[
-<h3>v.1.87</h3>
-<ul>
-<li>Implemented calling of MySQL stored procedures like '{call test_query()}' or '{call test_query_list(?, ?)}'
-      from 'query', 'query-list', 'query-dto', 'query-dto-list'.
+<h3>v 1.87</h3>
+<p>Implemented calling of MySQL stored procedures like '{call test_query()}' or '{call test_query_list(?, ?)}'
+      for XML-tags 'query', 'query-list', 'query-dto', 'query-dto-list'.
       Out parameters of are not supported yet.
-      At the moment, it works only in PHP + PDO. In SQL files, use JDBC syntax.</li>
-</ul>
-<h3>v.1.86</h3>
-<ul>
-<li>Adapted for xerial PK column names like '[employeeid] asc'</li>
-</ul>
-</ul>]]></change-notes>
+      In v 1.87, it works only in PHP + PDO. Use JDBC syntax in SQL files.
+      Try to use shortcuts: ref='CALL new_procedure_single(?)'</p>]]></change-notes>
 
     <application-components>
         <component>

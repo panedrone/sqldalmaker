@@ -196,12 +196,12 @@ public class PythonCG {
                 String dto_param_type = parsed[1];
                 String param_descriptors = parsed[2];
 
-                String[] param_arr = Helpers.get_listed_items(param_descriptors);
+                String[] method_param_descriptors = Helpers.get_listed_items(param_descriptors);
 
                 StringBuilder buff = new StringBuilder();
 
                 render_element_query(buff, dao_jdbc_sql, mi.ref, mi.is_external_sql, mi.return_type, mi.return_type_is_dto, mi.fetch_list,
-                        method_name, dto_param_type, param_arr, false, xml_node_name);
+                        method_name, dto_param_type, method_param_descriptors, false, xml_node_name);
 
                 return buff;
 
@@ -319,14 +319,14 @@ public class PythonCG {
                 String dto_param_type = parsed[1]; // never is null
                 String param_descriptors = parsed[2]; // never is null
 
-                String[] param_arr = Helpers.get_listed_items(param_descriptors);
+                String[] method_param_descriptors = Helpers.get_listed_items(param_descriptors);
 
                 boolean is_external_sql = element.is_external_sql();
 
                 StringBuilder buff = new StringBuilder();
 
                 render_element_exec_dml(buff, sql, is_external_sql, null, method_name, dto_param_type,
-                        param_arr, xml_node_name, ref);
+                		method_param_descriptors, xml_node_name, ref);
 
                 return buff;
 

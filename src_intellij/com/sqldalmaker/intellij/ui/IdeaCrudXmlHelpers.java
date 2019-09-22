@@ -50,7 +50,7 @@ public class IdeaCrudXmlHelpers {
                 String table_name = parts[1];
                 res.add(table_name);
 
-            } else if (Helpers.is_table_ref(ref)) {
+            } else if (DbUtils.is_table_ref(ref)) {
 
                 res.add(ref);
             }

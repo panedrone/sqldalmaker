@@ -19,6 +19,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.xml.XmlAttribute;
 import com.intellij.psi.xml.XmlAttributeValue;
 import com.intellij.util.ProcessingContext;
+import com.sqldalmaker.cg.DbUtils;
 import com.sqldalmaker.cg.Helpers;
 import com.sqldalmaker.intellij.ui.IdeaHelpers;
 import com.sqldalmaker.intellij.ui.IdeaTargetLanguageHelpers;
@@ -136,7 +137,7 @@ public class CompletionProviderSql extends CompletionProvider<CompletionParamete
 
                     String path = file.getPath();
 
-                    if (Helpers.is_sql_file_ref(path)) {
+                    if (DbUtils.is_sql_file_ref(path)) {
 
                         res.add(path);
                     }
