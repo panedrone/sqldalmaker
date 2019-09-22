@@ -77,7 +77,11 @@ public class PhpCG {
                 throw new Exception("XML element of DTO class '" + dto_class_name + "' not found");
             }
 
-            ArrayList<FieldInfo> fields = db_utils.get_dto_field_info(sql_root_abs_path, cls_element);
+            String jdbc_sql = DbUtils.jdbc_sql_by_ref(cls_element.getRef(), sql_root_abs_path);
+
+            ArrayList<FieldInfo> fields = new ArrayList<FieldInfo>();
+
+            db_utils.get_dto_field_info(jdbc_sql, cls_element, fields);
 
             HashMap<String, Object> context = new HashMap<String, Object>();
 
@@ -189,7 +193,7 @@ public class PhpCG {
 
             try {
 
-                String sql = DbUtils.sql_by_ref(mi.ref, sql_root_abs_path);
+                String dao_jdbc_sql = DbUtils.jdbc_sql_by_ref(mi.ref, sql_root_abs_path);
 
                 String[] parsed = parse_method_declaration(mi.method);
 
@@ -201,8 +205,8 @@ public class PhpCG {
 
                 StringBuilder buff = new StringBuilder();
 
-                render_element_query(buff, sql, mi.is_external_sql, mi.return_type, mi.return_type_is_dto, mi.fetch_list,
-                        method_name, dto_param_type, param_arr, false, xml_node_name, mi.ref);
+                render_element_query(buff, dao_jdbc_sql, mi.ref, mi.is_external_sql, mi.return_type, mi.return_type_is_dto, mi.fetch_list,
+                        method_name, dto_param_type, param_arr, false, xml_node_name);
 
                 return buff;
 
@@ -213,6 +217,79 @@ public class PhpCG {
 
                 throw new Exception(Helpers.get_error_message(msg, e));
             }
+        }
+
+        private void render_element_query(StringBuilder buff, String dao_jdbc_sql, String ref, boolean is_external_sql, String return_type,
+                                          boolean return_type_is_dto, boolean fetch_list, String method_name, String dto_param_type,
+                                          String[] param_descriptors, boolean is_crud, String xml_node_name) throws Exception {
+
+            ArrayList<FieldInfo> fields = new ArrayList<FieldInfo>();
+
+            ArrayList<FieldInfo> params = new ArrayList<FieldInfo>();
+
+            db_utils.get_query_jdbc_sql_info(sql_root_abs_path, dao_jdbc_sql, fields, dto_param_type, param_descriptors, params,
+                    return_type, return_type_is_dto, dto_classes);
+
+            int col_count = fields.size();
+
+            if (col_count == 0) {
+
+                throw new Exception("Columns count is 0. Is SQL statement valid?");
+            }
+
+            boolean is_sp = DbUtils.is_jdbc_stored_proc_call(dao_jdbc_sql);
+            
+            String dao_php_sql;
+            
+            if (is_sp) {
+                
+                dao_php_sql = DbUtils.jdbc_to_php_stored_proc_call(dao_jdbc_sql);
+            
+            } else {
+                
+                dao_php_sql = dao_jdbc_sql;
+            }
+            
+            HashMap<String, Object> context = new HashMap<String, Object>();
+
+            if (return_type_is_dto) {
+
+                return_type = process_dto_class_name(return_type);
+
+            } else {
+
+                if (return_type == null || return_type.length() == 0) {
+
+                    if (col_count != 1) {
+
+                        throw new Exception("ResultSet should contain 1 column. Is SQL statement valid?");
+                    }
+
+                    return_type = fields.get(0).getType();
+                }
+            }
+
+            String sql_str = Helpers.sql_to_php_str(dao_php_sql);
+
+            assign_params(params, dto_param_type, context);
+
+            context.put("fields", fields);
+            context.put("method_name", method_name);
+            context.put("crud", is_crud);
+            context.put("xml_node_name", xml_node_name);
+            context.put("ref", ref);
+            context.put("sql", sql_str);
+            context.put("use_dto", return_type_is_dto);
+            context.put("returned_type_name", return_type);
+            context.put("fetch_list", fetch_list);
+            context.put("imports", includes);
+            context.put("is_external_sql", is_external_sql);
+
+            context.put("mode", "dao_query");
+
+            StringWriter sw = new StringWriter();
+            te.merge(context, sw);
+            buff.append(sw.getBuffer());
         }
 
         private String process_dto_class_name(String dto_class_name) throws Exception {
@@ -282,79 +359,10 @@ public class PhpCG {
             }
         }
 
-        private void render_element_query(StringBuilder buff, String sql, boolean is_external_sql, String return_type,
-                                          boolean return_type_is_dto, boolean fetch_list, String method_name, String dto_param_type,
-                                          String[] param_descriptors, boolean is_crud, String xml_node_name, String ref) throws Exception {
-
-            ArrayList<FieldInfo> fields = new ArrayList<FieldInfo>();
-
-            ArrayList<FieldInfo> params = new ArrayList<FieldInfo>();
-
-            db_utils.sql_to_metadata(sql, fields, dto_param_type, param_descriptors, params,
-                    return_type_is_dto ? return_type : null, dto_classes);
-
-            int col_count = fields.size();
-
-            if (col_count == 0) {
-
-                throw new Exception("Columns count is 0. Is SQL statement valid?");
-            }
-
-            HashMap<String, Object> context = new HashMap<String, Object>();
-
-            if (return_type_is_dto) {
-
-                return_type = process_dto_class_name(return_type);
-
-            } else {
-
-                if (return_type == null || return_type.length() == 0) {
-
-                    if (col_count != 1) {
-
-                        throw new Exception("ResultSet should contain 1 column. Is SQL statement valid?");
-                    }
-
-                    return_type = fields.get(0).getType();
-                }
-            }
-
-            String sql_str = Helpers.sql_to_php_str(sql);
-
-            assign_params(params, dto_param_type, context);
-
-            context.put("fields", fields);
-            context.put("method_name", method_name);
-            context.put("crud", is_crud);
-            context.put("xml_node_name", xml_node_name);
-            context.put("ref", ref);
-            context.put("sql", sql_str);
-            context.put("use_dto", return_type_is_dto);
-            context.put("returned_type_name", return_type);
-            context.put("fetch_list", fetch_list);
-            context.put("imports", includes);
-            context.put("is_external_sql", is_external_sql);
-
-            context.put("mode", "dao_query");
-
-            StringWriter sw = new StringWriter();
-            te.merge(context, sw);
-            buff.append(sw.getBuffer());
-        }
-
         private void render_element_exec_dml(StringBuilder buffer, String sql, boolean is_external_sql,
                                              String class_name, String method_name, String dto_param_type, String[] param_descriptors,
                                              String xml_node_name, String sql_path) throws Exception {
 
-            ArrayList<FieldInfo> fields = new ArrayList<FieldInfo>();
-
-            ArrayList<FieldInfo> params = new ArrayList<FieldInfo>();
-
-            db_utils.sql_to_metadata(sql, fields, dto_param_type, param_descriptors, params, "", dto_classes);
-
-            // For Informix: ResultSetMetaData.getColumnCount() returns
-            // value > 0 for some DML statements, e.g. for 'update orders set
-            // dt_id = ? where o_id = ?' it considers that 'dt_id' is column.
             String trimmed = sql.toLowerCase().trim();
 
             String[] parts = trimmed.split("\\s+");
@@ -367,20 +375,20 @@ public class PhpCG {
                 }
             }
 
-            String sql_str = Helpers.sql_to_php_str(sql);
+            ArrayList<FieldInfo> params = new ArrayList<FieldInfo>();
+
+            db_utils.get_exec_dml_jdbc_sql_info(sql, dto_param_type, param_descriptors, params);
+
+            String php_sql_str = Helpers.sql_to_php_str(sql);
 
             HashMap<String, Object> context = new HashMap<String, Object>();
 
             assign_params(params, dto_param_type, context);
 
-            // if (dto_param_type != null && dto_param_type.length() >= 0) { FireBug
-            // does not like it
             context.put("dto_param", dto_param_type);
-            // }
-
             context.put("class_name", class_name);
             context.put("method_name", method_name);
-            context.put("sql", sql_str);
+            context.put("sql", php_sql_str);
             context.put("xml_node_name", xml_node_name);
             context.put("sql_path", sql_path);
             context.put("is_external_sql", is_external_sql);
@@ -497,8 +505,8 @@ public class PhpCG {
 
             String[] param_arr = desc.toArray(new String[desc.size()]);
 
-            render_element_query(buffer, sql_buff.toString(), false, ret_dto_type, true, fetch_list, method_name, "",
-                    param_arr, true, "", table_name);
+            render_element_query(buffer, sql_buff.toString(), table_name, false, ret_dto_type, true, fetch_list, method_name, "",
+                    param_arr, true, "");
 
             return buffer;
         }

@@ -2,7 +2,7 @@
     <id>dal-mpe</id>
     <name>SQL DAL Maker</name>
     <category>Database</category>
-    <version>1.86.20190814</version>
+    <version>1.87.20190922</version>
     <vendor email="sqldalmaker@gmail.com"/>
     <!-- please see http://confluence.intellij.net/display/IDEADEV/Build+Number+Ranges for description -->
     <idea-version since-build="133.1885"/>
@@ -10,19 +10,23 @@
     <depends>com.intellij.modules.lang</depends>
 
     <description><![CDATA[
-SQL DAL Maker is a generator of DTO and DAO classes. Target programming languages: PHP, Java, C++, Python, Ruby.<br/>
+SQL DAL Maker is a generator of DTO and DAO classes to access relational databases. Target programming languages: PHP, Java, C++, Python, Ruby.<br/>
 <br/>
 To generate the class, you declare it in XML meta-program.<br/>
     ]]></description>
 
     <change-notes><![CDATA[
+<h3>v.1.87</h3>
+<ul>
+<li>Implemented calling of MySQL stored procedures like '{call test_query()}' or '{call test_query_list(?, ?)}'
+      from 'query', 'query-list', 'query-dto', 'query-dto-list'.
+      Out parameters of are not supported yet.
+      At the moment, it works only in PHP + PDO. In SQL files, use JDBC syntax.</li>
+</ul>
 <h3>v.1.86</h3>
 <ul>
 <li>Adapted for xerial PK column names like '[employeeid] asc'</li>
 </ul>
-<h3>v.1.85</h3>
-<ul>
-<li>Fixed incorrect commenting in Python and Ruby target code</li>
 </ul>]]></change-notes>
 
     <application-components>

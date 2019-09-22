@@ -82,8 +82,12 @@ public class JavaCG {
 
                 throw new Exception("XML element of DTO class '" + dto_class_name + "' not found");
             }
+            String jdbc_sql = DbUtils.jdbc_sql_by_ref(cls_element.getRef(), sql_root_abs_path);
 
-            ArrayList<FieldInfo> fields = db_utils.get_dto_field_info(sql_root_abs_path, cls_element);
+            ArrayList<FieldInfo> fields = new ArrayList<FieldInfo>();
+
+            db_utils.get_dto_field_info(jdbc_sql, cls_element, fields);
+
 
             HashMap<String, Object> context = new HashMap<String, Object>();
 
@@ -181,16 +185,14 @@ public class JavaCG {
 
             check_required_attr(xml_node_name, mi.method);
 
-            String ret_type = mi.return_type;
-
             try {
 
                 if (mi.return_type_is_dto) {
 
-                    process_dto_class_name(dto_package, ret_type);
+                    process_dto_class_name(dto_package, mi.return_type);
                 }
 
-                String sql = DbUtils.sql_by_ref(mi.ref, sql_root_abs_path);
+                String dao_jdbc_sql = DbUtils.jdbc_sql_by_ref(mi.ref, sql_root_abs_path);
 
                 String[] parsed = parse_method_declaration(mi.method, dto_package);
 
@@ -202,8 +204,8 @@ public class JavaCG {
 
                 StringBuilder buff = new StringBuilder();
 
-                DAO.this.render_element_query(buff, sql, mi.is_external_sql, ret_type, mi.return_type_is_dto, mi.fetch_list,
-                        method_name, dto_param_type, param_descriptors_arr, false, xml_node_name, mi.ref);
+                render_element_query(buff, dao_jdbc_sql, mi.ref, mi.is_external_sql, mi.return_type, mi.return_type_is_dto, mi.fetch_list,
+                        method_name, dto_param_type, param_descriptors_arr, false, xml_node_name);
 
                 return buff;
 
@@ -216,16 +218,16 @@ public class JavaCG {
             }
         }
 
-        private void render_element_query(StringBuilder buff, String sql, boolean is_external_sql, String return_type,
+        private void render_element_query(StringBuilder buff, String dao_jdbc_sql, String ref, boolean is_external_sql, String return_type,
                                           boolean return_type_is_dto, boolean fetch_list, String method_name, String dto_param_type,
-                                          String[] param_descriptors, boolean crud, String xml_node_name, String ref) throws Exception {
+                                          String[] param_descriptors, boolean crud, String xml_node_name) throws Exception {
 
             ArrayList<FieldInfo> fields = new ArrayList<FieldInfo>();
 
             ArrayList<FieldInfo> params = new ArrayList<FieldInfo>();
 
-            db_utils.sql_to_metadata(sql, fields, dto_param_type, param_descriptors, params,
-                    return_type_is_dto ? return_type : null, dto_classes);
+            db_utils.get_query_jdbc_sql_info(sql_root_abs_path, dao_jdbc_sql, fields, dto_param_type, param_descriptors, params,
+                    return_type, return_type_is_dto, dto_classes);
 
             int col_count = fields.size();
 
@@ -251,7 +253,7 @@ public class JavaCG {
                 }
             }
 
-            String sql_str = Helpers.sql_to_java_str(sql);
+            String sql_str = Helpers.sql_to_java_str(dao_jdbc_sql);
 
             HashMap<String, Object> context = new HashMap<String, Object>();
 
@@ -343,15 +345,6 @@ public class JavaCG {
                                              String class_name, String method_name, String dto_param_type, String[] param_descriptors,
                                              String xml_node_name, String sql_path) throws Exception {
 
-            ArrayList<FieldInfo> fields = new ArrayList<FieldInfo>();
-
-            ArrayList<FieldInfo> params = new ArrayList<FieldInfo>();
-
-            db_utils.sql_to_metadata(sql, fields, dto_param_type, param_descriptors, params, "", dto_classes);
-
-            // For Informix: ResultSetMetaData.getColumnCount() returns
-            // value > 0 for some DML statements, e.g. for 'update orders set
-            // dt_id = ? where o_id = ?' it considers that 'dt_id' is column.
             String trimmed = sql.toLowerCase().trim();
 
             String[] parts = trimmed.split("\\s+");
@@ -364,6 +357,10 @@ public class JavaCG {
                 }
             }
 
+            ArrayList<FieldInfo> params = new ArrayList<FieldInfo>();
+
+            db_utils.get_exec_dml_jdbc_sql_info(sql, dto_param_type, param_descriptors, params);
+
             String java_sql_str = Helpers.sql_to_java_str(sql);
 
             HashMap<String, Object> context = new HashMap<String, Object>();
@@ -373,7 +370,6 @@ public class JavaCG {
             boolean plain_params = dto_param_type.length() == 0;
 
             context.put("plain_params", plain_params);
-
             context.put("class_name", class_name);
             context.put("method_name", method_name);
             context.put("sql", java_sql_str);
@@ -500,8 +496,8 @@ public class JavaCG {
 
             String[] param_descriptors_arr = desc.toArray(new String[desc.size()]);
 
-            DAO.this.render_element_query(buffer, sql_buff.toString(), false, ret_dto_type, true, fetch_list, method_name, "",
-                    param_descriptors_arr, true, null, table_name);
+            DAO.this.render_element_query(buffer, sql_buff.toString(), table_name, false, ret_dto_type, true, fetch_list, method_name, "",
+                    param_descriptors_arr, true, null);
 
             return buffer;
         }

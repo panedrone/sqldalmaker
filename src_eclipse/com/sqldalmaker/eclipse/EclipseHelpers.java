@@ -382,23 +382,25 @@ public class EclipseHelpers {
 		return res;
 	}
 
-	public static void gen_tmp_field_tags(Connection connection, com.sqldalmaker.jaxb.dto.ObjectFactory objectFactory,
-			DtoClass clsElement, String projectRoot, IEditor2 editor2) throws Exception {
+	public static void gen_tmp_field_tags(Connection connection, com.sqldalmaker.jaxb.dto.ObjectFactory object_factory,
+			DtoClass cls_element, String project_root, IEditor2 editor2) throws Exception {
 
 		Settings settings = load_settings(editor2);
 
-		String sql_root_folder_full_path = projectRoot + "/" + settings.getFolders().getSql();
+		String sql_root_folder_full_path = project_root + "/" + settings.getFolders().getSql();
 
 		DbUtils md = new DbUtils(connection, FieldNamesMode.AS_IS, null);
 
-		ArrayList<FieldInfo> fields = md.get_dto_field_info(sql_root_folder_full_path, clsElement);
+		ArrayList<FieldInfo> fields = new ArrayList<FieldInfo>();
+
+		md.get_dto_field_info(sql_root_folder_full_path, cls_element, fields);
 
 		for (FieldInfo f : fields) {
 
-			DtoClass.Field df = objectFactory.createDtoClassField();
+			DtoClass.Field df = object_factory.createDtoClassField();
 			df.setColumn(f.getColumnName());
 			df.setJavaType(f.getType().replace("java.lang.", ""));
-			clsElement.getField().add(df);
+			cls_element.getField().add(df);
 		}
 	}
 

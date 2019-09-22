@@ -145,6 +145,10 @@ public class PsiReferenceSql extends PsiReferenceBase<PsiElement> {
 
         if (FileSearchHelpers.is_dto_xml(name)) {
 
+            if (canonical_text == null || canonical_text.trim().length() == 0) {
+
+                return true; // ref is empty
+            }
             // Allowed in DTO: empty string, table name, path to sql-file
             // only path to sql-file must be highlighted in red if invalid
             //

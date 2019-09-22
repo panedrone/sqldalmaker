@@ -182,7 +182,9 @@ public class NbpIdeEditorHelpers {
 
         DbUtils md = new DbUtils(con, FieldNamesMode.AS_IS, null);
 
-        ArrayList<FieldInfo> fields = md.get_dto_field_info(sql_root_folder_abs_path, dto_class);
+        ArrayList<FieldInfo> fields = new ArrayList<FieldInfo>();
+
+        md.get_dto_field_info(sql_root_folder_abs_path, dto_class, fields);
 
         for (FieldInfo f : fields) {
 

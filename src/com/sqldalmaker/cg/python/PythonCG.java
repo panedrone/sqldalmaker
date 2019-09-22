@@ -75,7 +75,11 @@ public class PythonCG {
                 throw new Exception("XML element of DTO class '" + dto_class_name + "' not found");
             }
 
-            ArrayList<FieldInfo> fields = db_utils.get_dto_field_info(sql_root_abs_path, cls_element);
+            String jdbc_sql = DbUtils.jdbc_sql_by_ref(cls_element.getRef(), sql_root_abs_path);
+
+            ArrayList<FieldInfo> fields = new ArrayList<FieldInfo>();
+
+            db_utils.get_dto_field_info(jdbc_sql, cls_element, fields);
 
             HashMap<String, Object> context = new HashMap<String, Object>();
 
@@ -184,7 +188,7 @@ public class PythonCG {
 
             try {
 
-                String sql = DbUtils.sql_by_ref(mi.ref, sql_root_abs_path);
+                String dao_jdbc_sql = DbUtils.jdbc_sql_by_ref(mi.ref, sql_root_abs_path);
 
                 String[] parsed = parse_method_declaration(mi.method);
 
@@ -196,8 +200,8 @@ public class PythonCG {
 
                 StringBuilder buff = new StringBuilder();
 
-                render_element_query(buff, sql, mi.is_external_sql, mi.return_type, mi.return_type_is_dto, mi.fetch_list,
-                        method_name, dto_param_type, param_arr, false, xml_node_name, mi.ref);
+                render_element_query(buff, dao_jdbc_sql, mi.ref, mi.is_external_sql, mi.return_type, mi.return_type_is_dto, mi.fetch_list,
+                        method_name, dto_param_type, param_arr, false, xml_node_name);
 
                 return buff;
 
@@ -210,16 +214,16 @@ public class PythonCG {
             }
         }
 
-        private void render_element_query(StringBuilder buff, String sql, boolean is_external_sql, String return_type,
+        private void render_element_query(StringBuilder buff, String dao_jdbc_sql, String ref, boolean is_external_sql, String return_type,
                                           boolean return_type_is_dto, boolean fetch_list, String method_name, String dto_param_type,
-                                          String[] param_descriptors, boolean is_crud, String xml_node_name, String ref) throws Exception {
+                                          String[] param_descriptors, boolean is_crud, String xml_node_name) throws Exception {
 
             ArrayList<FieldInfo> fields = new ArrayList<FieldInfo>();
 
             ArrayList<FieldInfo> params = new ArrayList<FieldInfo>();
 
-            db_utils.sql_to_metadata(sql, fields, dto_param_type, param_descriptors, params,
-                    return_type_is_dto ? return_type : null, dto_classes);
+            db_utils.get_query_jdbc_sql_info(sql_root_abs_path, dao_jdbc_sql, fields, dto_param_type, param_descriptors, params,
+                    return_type, return_type_is_dto, dto_classes);
 
             int col_count = fields.size();
 
@@ -247,7 +251,7 @@ public class PythonCG {
                 }
             }
 
-            String sql_str = Helpers.sql_to_python_string(sql);
+            String python_sql_str = Helpers.sql_to_python_string(dao_jdbc_sql);
 
             assign_params(params, dto_param_type, context);
 
@@ -257,7 +261,7 @@ public class PythonCG {
             context.put("crud", is_crud);
             context.put("xml_node_name", xml_node_name);
             context.put("ref", ref);
-            context.put("sql", sql_str);
+            context.put("sql", python_sql_str);
             context.put("use_dto", return_type_is_dto);
             if (!return_type_is_dto) {
                 return_type = Helpers.get_python_type_name(return_type);
@@ -339,15 +343,6 @@ public class PythonCG {
                 String class_name, String method_name, String dto_param_type, String[] param_descriptors,
                 String xml_node_name, String sql_path) throws Exception {
 
-            ArrayList<FieldInfo> fields = new ArrayList<FieldInfo>();
-
-            ArrayList<FieldInfo> params = new ArrayList<FieldInfo>();
-
-            db_utils.sql_to_metadata(sql, fields, dto_param_type, param_descriptors, params, "", dto_classes);
-
-            // For Informix: ResultSetMetaData.getColumnCount() returns
-            // value > 0 for some DML statements, e.g. for 'update orders set
-            // dt_id = ? where o_id = ?' it considers that 'dt_id' is column.
             String trimmed = sql.toLowerCase().trim();
 
             String[] parts = trimmed.split("\\s+");
@@ -360,20 +355,20 @@ public class PythonCG {
                 }
             }
 
-            String sql_str = Helpers.sql_to_python_string(sql);
+            ArrayList<FieldInfo> params = new ArrayList<FieldInfo>();
+
+            db_utils.get_exec_dml_jdbc_sql_info(sql, dto_param_type, param_descriptors, params);
+
+            String python_sql_str = Helpers.sql_to_python_string(sql);
 
             HashMap<String, Object> context = new HashMap<String, Object>();
 
             assign_params(params, dto_param_type, context);
 
-            // if (dto_param_type != null && dto_param_type.length() > 0) { FireBug
-            // does not like it
             context.put("dto_param", dto_param_type);
-            // }
-
             context.put("class_name", class_name);
             context.put("method_name", method_name);
-            context.put("sql", sql_str);
+            context.put("sql", python_sql_str);
             context.put("xml_node_name", xml_node_name);
             context.put("sql_path", sql_path);
             context.put("is_external_sql", is_external_sql);
@@ -496,8 +491,8 @@ public class PythonCG {
 
             String[] param_arr = desc.toArray(new String[desc.size()]);
 
-            render_element_query(buffer, sql_buff.toString(), false, ret_dto_type, true, fetch_list, method_name, "",
-                    param_arr, true, "", table_name);
+            render_element_query(buffer, sql_buff.toString(), table_name, false, ret_dto_type, true, fetch_list, method_name, "",
+                    param_arr, true, "");
 
             return buffer;
         }

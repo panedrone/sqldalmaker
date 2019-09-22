@@ -640,6 +640,10 @@ public class UIEditorPageDTO extends Composite {
 
 			String relative = items.get(0).getRef();
 
+			if (relative == null || relative.trim().length() == 0) {
+				return;
+			}
+			
 			if (Helpers.is_table_ref(relative)) {
 				return;
 			}

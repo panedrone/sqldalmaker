@@ -26,9 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
  * @author sqldalmaker@gmail.com
- *
  */
 public class Helpers {
 
@@ -141,7 +139,7 @@ public class Helpers {
 
     public static String get_error_message(String msg, Throwable e) {
 
-        return msg + ": " + e.getMessage();
+        return msg + " " + e.getMessage();
     }
 
     public static String replace_char_at(String s, int pos, char c) {
@@ -402,7 +400,7 @@ public class Helpers {
         return buffer.toString();
     }
 
-    public static String[] get_listed_items(String list) {
+    public static String[] get_listed_items(String list) throws Exception {
 
         if (list != null && list.length() > 0) {
 
@@ -413,12 +411,48 @@ public class Helpers {
             for (int i = 0; i < items.length; i++) {
 
                 items[i] = items[i].trim();
+
+                String parts[] = items[i].split("\\s+");
+
+                String name;
+
+                if (parts.length == 1) {
+
+                    name = parts[0];
+
+                } else if (parts.length == 2) {
+
+                    name = parts[1];
+
+                } else {
+
+                    throw new Exception("The item is null or empty: " + list);
+                }
+
+                check_item(name);
             }
 
             return items;
         }
 
         return new String[]{};
+    }
+
+    private static void check_item(String name) throws Exception {
+
+        if (name == null || name.length() == 0) {
+            throw new Exception("Item name is null or empty");
+        }
+        for (int i = 0; i < name.length(); i++) {
+            // Google: java is letter
+            // A character is considered to be a Java letter or digit if and only if it is a letter or a digit or the dollar sign "$" or the underscore "_".
+            char ch = name.charAt(i);
+            if (Character.isLetter(ch) == false || ch == '$') {
+                if (ch != '_') {
+                    throw new Exception("Invalid character in the name of item: " + name);
+                }
+            }
+        }
     }
 
     public static String get_dao_class_name(String dao_xml_path) throws Exception {
@@ -435,7 +469,7 @@ public class Helpers {
         String class_name;
 
         switch (parts.length) {
-            
+
             case 2:
 
                 class_name = parts[0];
@@ -446,7 +480,7 @@ public class Helpers {
                 }
 
                 break;
-                
+
             case 3:
 
                 if (parts[0].equals("dao")) {
@@ -457,16 +491,16 @@ public class Helpers {
 
                     class_name = parts[0];
                 }
-                
+
                 if (!parts[2].equals("xml")) {
 
                     throw new Exception(IFN + dao_xml_path);
                 }
-                
+
                 break;
-                
+
             default:
-                
+
                 throw new Exception(IFN + dao_xml_path);
         }
 
@@ -583,7 +617,7 @@ public class Helpers {
         }
 
         final char[] ILLEGAL_CHARACTERS = {'/', '\n', '\r', '\t', '\0', '\f', '`', '?', '*', '\\', '<', '>', '|',
-            '\"'/* , ':' */, ';', ','};
+                '\"'/* , ':' */, ';', ','};
 
         for (char c : ILLEGAL_CHARACTERS) {
 
@@ -759,7 +793,7 @@ public class Helpers {
     }
 
     private static boolean process_element_create(IDaoCG dao_cg, TypeCrud element, String dto_class_name, String table_attr,
-            boolean lower_under_scores, StringBuilder code_buff) throws Exception {
+                                                  boolean lower_under_scores, StringBuilder code_buff) throws Exception {
 
         String method_name = null;
 
@@ -804,7 +838,7 @@ public class Helpers {
     }
 
     private static boolean process_element_read_all(IDaoCG dao_cg, TypeCrud element, String dto_class_name, String table_attr,
-            boolean lower_under_scores, StringBuilder code_buff) throws Exception {
+                                                    boolean lower_under_scores, StringBuilder code_buff) throws Exception {
 
         String method_name = null;
 
@@ -845,7 +879,7 @@ public class Helpers {
     }
 
     private static boolean process_element_read(IDaoCG dao_cg, TypeCrud element, String dto_class_name, String table_attr,
-            boolean lower_under_scores, StringBuilder code_buff) throws Exception {
+                                                boolean lower_under_scores, StringBuilder code_buff) throws Exception {
 
         String method_name = null;
 
@@ -886,7 +920,7 @@ public class Helpers {
     }
 
     private static boolean process_element_update(IDaoCG dao_cg, TypeCrud element, String dto_class_name, String table_attr,
-            boolean lower_under_scores, StringBuilder code_buff) throws Exception {
+                                                  boolean lower_under_scores, StringBuilder code_buff) throws Exception {
 
         String method_name = null;
 
@@ -927,7 +961,7 @@ public class Helpers {
     }
 
     private static boolean process_element_delete(IDaoCG dao_cg, TypeCrud element, String dto_class_name, String table_attr,
-            boolean lower_under_scores, StringBuilder code_buff) throws Exception {
+                                                  boolean lower_under_scores, StringBuilder code_buff) throws Exception {
 
         String method_name = null;
 
@@ -968,7 +1002,7 @@ public class Helpers {
     }
 
     public static StringBuilder process_element_crud(IDaoCG dao_cg, boolean lower_under_scores, TypeCrud element,
-            String dto_class_name, String table_attr) throws Exception {
+                                                     String dto_class_name, String table_attr) throws Exception {
 
         boolean is_empty = true;
 

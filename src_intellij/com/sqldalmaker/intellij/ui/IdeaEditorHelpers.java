@@ -227,18 +227,22 @@ public class IdeaEditorHelpers {
 
     private static void gen_tmp_field_tags(Connection connection,
                                            ObjectFactory object_factory,
-                                           DtoClass element, String sql_root_folder_full_path) throws Exception {
+                                           DtoClass dto_class, String sql_root_folder_full_path) throws Exception {
 
-        DbUtils md = new DbUtils(connection, FieldNamesMode.AS_IS, null);
+        DbUtils db_utils = new DbUtils(connection, FieldNamesMode.AS_IS, null);
 
-        ArrayList<FieldInfo> fields = md.get_dto_field_info(sql_root_folder_full_path, element);
+        String jdbc_sql = DbUtils.jdbc_sql_by_ref(dto_class.getRef(), sql_root_folder_full_path);
+
+        ArrayList<FieldInfo> fields = new ArrayList<FieldInfo>();
+
+        db_utils.get_dto_field_info(jdbc_sql, dto_class, fields);
 
         for (FieldInfo f : fields) {
 
             DtoClass.Field df = object_factory.createDtoClassField();
             df.setColumn(f.getColumnName());
             df.setJavaType(f.getType());
-            element.getField().add(df);
+            dto_class.getField().add(df);
         }
     }
 
