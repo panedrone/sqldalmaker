@@ -78,7 +78,7 @@
                  icon="icons/sqldalmaker.gif"
                  id="com.sqldalmaker.toolbar.command_id"
                  style="pulldown"
-                 tooltip="DAL Files">
+                 tooltip="SQL DAL Maker root files">
            </command>
       
 </toolbar>

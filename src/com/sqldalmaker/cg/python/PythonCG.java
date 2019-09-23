@@ -75,7 +75,7 @@ public class PythonCG {
                 throw new Exception("XML element of DTO class '" + dto_class_name + "' not found");
             }
 
-            String jdbc_sql = DbUtils.jdbc_sql_by_ref(cls_element.getRef(), sql_root_abs_path);
+            String jdbc_sql = DbUtils.jdbc_sql_by_ref_query(cls_element.getRef(), sql_root_abs_path);
 
             ArrayList<FieldInfo> fields = new ArrayList<FieldInfo>();
 
@@ -145,11 +145,11 @@ public class PythonCG {
 
             Helpers.process_element(this, dao_class, methods);
 
-            for (int i=0; i< methods.size(); i++) {
-            	String m = methods.get(i).replace("\t", "    ").replace("//", "#");
-            	methods.set(i, m);
+            for (int i = 0; i < methods.size(); i++) {
+                String m = methods.get(i).replace("\t", "    ").replace("//", "#");
+                methods.set(i, m);
             }
-            
+
             HashMap<String, Object> context = new HashMap<String, Object>();
 
             String[] imports_arr = imports.toArray(new String[imports.size()]);
@@ -188,7 +188,7 @@ public class PythonCG {
 
             try {
 
-                String dao_jdbc_sql = DbUtils.jdbc_sql_by_ref(mi.ref, sql_root_abs_path);
+                String dao_jdbc_sql = DbUtils.jdbc_sql_by_ref_query(mi.ref, sql_root_abs_path);
 
                 String[] parsed = parse_method_declaration(mi.method);
 
@@ -214,9 +214,10 @@ public class PythonCG {
             }
         }
 
+        // this method is called also for CRUD
         private void render_element_query(StringBuilder buff, String dao_jdbc_sql, String ref, boolean is_external_sql, String return_type,
-                                          boolean return_type_is_dto, boolean fetch_list, String method_name, String dto_param_type,
-                                          String[] param_descriptors, boolean is_crud, String xml_node_name) throws Exception {
+                boolean return_type_is_dto, boolean fetch_list, String method_name, String dto_param_type,
+                String[] param_descriptors, boolean is_crud, String xml_node_name) throws Exception {
 
             ArrayList<FieldInfo> fields = new ArrayList<FieldInfo>();
 
@@ -251,7 +252,20 @@ public class PythonCG {
                 }
             }
 
-            String python_sql_str = Helpers.sql_to_python_string(dao_jdbc_sql);
+            boolean is_sp = DbUtils.is_jdbc_stored_proc_call(dao_jdbc_sql);
+
+            String dao_python_sql;
+
+            if (is_sp) {
+
+                dao_python_sql = DbUtils.jdbc_to_python_stored_proc_call(dao_jdbc_sql);
+
+            } else {
+
+                dao_python_sql = dao_jdbc_sql;
+            }
+
+            String python_sql_str = Helpers.sql_to_python_string(dao_python_sql);
 
             assign_params(params, dto_param_type, context);
 
@@ -309,9 +323,7 @@ public class PythonCG {
 
             try {
 
-                String sql_file_abs_path = Helpers.concat_path(sql_root_abs_path, ref);
-
-                String sql = Helpers.load_text_from_file(sql_file_abs_path);
+                String dao_jdbc_sql = DbUtils.jdbc_sql_by_ref_exec_dml(ref, sql_root_abs_path);
 
                 String[] parsed = parse_method_declaration(method);
 
@@ -325,8 +337,8 @@ public class PythonCG {
 
                 StringBuilder buff = new StringBuilder();
 
-                render_element_exec_dml(buff, sql, is_external_sql, null, method_name, dto_param_type,
-                		method_param_descriptors, xml_node_name, ref);
+                render_element_exec_dml(buff, dao_jdbc_sql, is_external_sql, null, method_name, dto_param_type,
+                        method_param_descriptors, xml_node_name, ref);
 
                 return buff;
 
@@ -339,27 +351,30 @@ public class PythonCG {
             }
         }
 
-        private void render_element_exec_dml(StringBuilder buffer, String sql, boolean is_external_sql,
+        private void render_element_exec_dml(StringBuilder buffer, String dao_jdbc_sql, boolean is_external_sql,
                 String class_name, String method_name, String dto_param_type, String[] param_descriptors,
                 String xml_node_name, String sql_path) throws Exception {
 
-            String trimmed = sql.toLowerCase().trim();
-
-            String[] parts = trimmed.split("\\s+");
-
-            if (parts.length > 0) {
-
-                if ("select".equals(parts[0])) {
-
-                    throw new Exception("SELECT is not allowed here");
-                }
-            }
+            DbUtils.check_if_select_sql(dao_jdbc_sql);
 
             ArrayList<FieldInfo> params = new ArrayList<FieldInfo>();
 
-            db_utils.get_exec_dml_jdbc_sql_info(sql, dto_param_type, param_descriptors, params);
+            db_utils.get_exec_dml_jdbc_sql_info(dao_jdbc_sql, dto_param_type, param_descriptors, params);
 
-            String python_sql_str = Helpers.sql_to_python_string(sql);
+            boolean is_sp = DbUtils.is_jdbc_stored_proc_call(dao_jdbc_sql);
+
+            String dao_python_sql;
+
+            if (is_sp) {
+
+                dao_python_sql = DbUtils.jdbc_to_python_stored_proc_call(dao_jdbc_sql);
+
+            } else {
+
+                dao_python_sql = dao_jdbc_sql;
+            }
+
+            String python_sql_str = Helpers.sql_to_python_string(dao_python_sql);
 
             HashMap<String, Object> context = new HashMap<String, Object>();
 

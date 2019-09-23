@@ -21,6 +21,25 @@ import java.util.Set;
  */
 public class DbUtils {
 
+    public static void check_if_select_sql(String dao_jdbc_sql) throws Exception {
+
+        String trimmed = dao_jdbc_sql.toLowerCase().trim();
+
+        String[] parts = trimmed.split("\\s+");
+
+        if (parts.length > 0) {
+
+            if ("select".equals(parts[0])) {
+
+                throw new Exception("SELECT is not allowed here");
+            }
+        }
+    }
+
+    private static Exception Exception(String string) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
     private final Connection conn;
 
     private final FieldNamesMode field_names_mode;
@@ -397,7 +416,7 @@ public class DbUtils {
     }
 
     public FieldInfo[] get_table_columns_info(String table_name, String explicit_gen_keys, String dto_class_name,
-                                              DtoClasses dto_classes) throws Exception {
+            DtoClasses dto_classes) throws Exception {
 
         Set<String> gen_keys = new HashSet<String>();
 
@@ -480,13 +499,13 @@ public class DbUtils {
     }
 
     public void get_crud_info(String table_name, ArrayList<FieldInfo> columns, List<FieldInfo> params,
-                              String dto_class_name, DtoClasses dto_classes) throws Exception {
+            String dto_class_name, DtoClasses dto_classes) throws Exception {
 
         get_crud_info(table_name, columns, params, dto_class_name, dto_classes, type_map);
     }
 
     public void get_crud_info(String table_name, ArrayList<FieldInfo> columns, List<FieldInfo> params,
-                              String dto_class_name, DtoClasses dto_classes, TypeMap type_map) throws Exception {
+            String dto_class_name, DtoClasses dto_classes, TypeMap type_map) throws Exception {
 
         ArrayList<String> pk_col_names = get_pk_col_names(conn, table_name);
 
@@ -663,7 +682,54 @@ public class DbUtils {
         }
     }
 
-    public static String jdbc_sql_by_ref(String ref, String sql_root_abs_path) throws Exception {
+    public static String jdbc_sql_by_ref_exec_dml(String ref, String sql_root_abs_path) throws Exception {
+
+        if (is_jdbc_stored_proc_call(ref)) {
+
+            return ref;
+
+        } else if (is_stored_proc_call_shortcut(ref)) {
+
+            return stored_proc_shortcut_to_jdbc_call(ref);
+
+        } else if (is_sql_file_ref(ref)) {
+
+            String sql_file_path = Helpers.concat_path(sql_root_abs_path, ref);
+
+            return Helpers.load_text_from_file(sql_file_path);
+
+        } else {
+
+            throw new Exception("Invalid 'ref'': " + ref);
+        }
+    }
+
+    private static String query_shortcut_ref_to_jdbc_sql(String ref) throws Exception {
+
+        String[] parts2 = parse_ref(ref);
+
+        String table_name = parts2[0];
+
+        String param_descriptors = parts2[1];
+
+        String[] param_arr = Helpers.get_listed_items(param_descriptors);
+
+        if (param_arr.length < 1) {
+
+            throw new Exception("Not empty list of parameters expected in ref shortcut");
+        }
+
+        String params = param_arr[0] + "=?";
+
+        for (int i = 1; i < param_arr.length; i++) {
+
+            params += " AND " + param_arr[i] + "=?";
+        }
+
+        return "SELECT * FROM " + table_name + " WHERE " + params;
+    }
+
+    public static String jdbc_sql_by_ref_query(String ref, String sql_root_abs_path) throws Exception {
 
         String[] parts = ref.split(":");
 
@@ -679,7 +745,6 @@ public class DbUtils {
         } else if (is_jdbc_stored_proc_call(ref)) {
 
             return ref;
-            // throw new Exception("For shortcuts of SP calls, use syntax like 'CALL sp_name(?, ?)'");
 
         } else if (is_stored_proc_call_shortcut(ref)) {
 
@@ -693,27 +758,9 @@ public class DbUtils {
 
         } else if (is_sql_shortcut_ref(ref)) {
 
-            String[] parts2 = parse_ref(ref);
+            String res = query_shortcut_ref_to_jdbc_sql(ref);
 
-            table_name = parts2[0];
-
-            String param_descriptors = parts2[1];
-
-            String[] param_arr = Helpers.get_listed_items(param_descriptors);
-
-            if (param_arr.length < 1) {
-
-                throw new Exception("Not empty list of parameters expected in ref shortcut");
-            }
-
-            String params = param_arr[0] + "=?";
-
-            for (int i = 1; i < param_arr.length; i++) {
-
-                params += " AND " + param_arr[i] + "=?";
-            }
-
-            return "SELECT * FROM " + table_name + " WHERE " + params;
+            return res;
 
         } else if (is_table_ref(ref)) {
 
@@ -725,7 +772,7 @@ public class DbUtils {
 
         } else {
 
-            throw new Exception("Invalid name of data table or SQL file: " + ref);
+            throw new Exception("Invalid 'ref'': " + ref);
         }
 
         return "SELECT * FROM " + table_name + " WHERE 1 = 0";
@@ -779,7 +826,7 @@ public class DbUtils {
         }
 
         final char[] ILLEGAL_CHARACTERS = {'/', '\n', '\r', '\t', '\0', '\f', '`', '?', '*', '\\', '<', '>', '|',
-                '\"'/* , ':' */, ';', ','};
+            '\"'/* , ':' */, ';', ','};
 
         for (char c : ILLEGAL_CHARACTERS) {
 
@@ -813,7 +860,6 @@ public class DbUtils {
         }
 
         // jdbc_sql = jdbc_sql.trim(); ^^ trimmed
-        
         jdbc_sql = jdbc_sql.substring(1, jdbc_sql.length() - 1);
 
         return is_stored_proc_call_shortcut(jdbc_sql);
@@ -840,24 +886,59 @@ public class DbUtils {
         throw new Exception("This is not a shortcut of stored procedure call: " + text);
     }
 
-    public static String jdbc_to_php_stored_proc_call(String jdbc_sql) {
+    public static String jdbc_to_php_stored_proc_call(final String jdbc_sql) throws java.lang.Exception {
 
-        if (is_jdbc_stored_proc_call(jdbc_sql) == false) {
-            return jdbc_sql;
+        String sql = jdbc_sql.trim();
+
+        if (is_jdbc_stored_proc_call(sql)) { // confirms syntax {call sp_name(...)}
+
+            sql = sql.substring(1, sql.length() - 1).trim(); // converted to call sp_name(...)
+
+        } else if (is_stored_proc_call_shortcut(sql)) {
+            //
+
+        } else {
+
+            throw Exception("Inexpected syntax of CALL: " + jdbc_sql);
         }
 
-        jdbc_sql = jdbc_sql.trim();
-
-        if (is_jdbc_stored_proc_call(jdbc_sql)) {
-            jdbc_sql = jdbc_sql.substring(1, jdbc_sql.length() - 1);
-        }
-
-        return jdbc_sql;
+        return sql;
     }
-    
+
+    public static String jdbc_to_python_stored_proc_call(final String jdbc_sql) throws java.lang.Exception {
+
+        String sql = jdbc_sql.trim();
+
+        if (is_jdbc_stored_proc_call(sql)) { // confirms syntax {call sp_name(...)}
+
+            sql = sql.substring(1, sql.length() - 1).trim(); // converted to call sp_name(...)
+
+        } else if (is_stored_proc_call_shortcut(sql)) {
+            //
+
+        } else {
+
+            throw Exception("Inexpected syntax of CALL: " + jdbc_sql);
+        }
+
+        if (sql.contains("(")) {
+
+            if (sql.endsWith(")") == false) {
+
+                throw Exception("Inexpected syntax of CALL: " + jdbc_sql);
+            }
+            
+            String[] parts = sql.split("[(]");
+            
+            sql = parts[0].trim();
+        }
+
+        return sql;
+    }
+
     public String get_query_jdbc_sql_info(String sql_root_abs_path, String dao_jdbc_sql, ArrayList<FieldInfo> fields, String dto_param_type,
-                                          String[] param_descriptors, ArrayList<FieldInfo> params, String return_type,
-                                          boolean return_type_is_dto, DtoClasses dto_classes)
+            String[] param_descriptors, ArrayList<FieldInfo> params, String return_type,
+            boolean return_type_is_dto, DtoClasses dto_classes)
             throws Exception {
 
         check_duplicates(param_descriptors);
@@ -898,7 +979,7 @@ public class DbUtils {
 
                     if (dto_class != null) {
 
-                        String dto_jdbc_sql = jdbc_sql_by_ref(dto_class.getRef(), sql_root_abs_path);
+                        String dto_jdbc_sql = jdbc_sql_by_ref_query(dto_class.getRef(), sql_root_abs_path);
 
                         get_dto_field_info(dto_jdbc_sql, dto_class, fields);
                     }
@@ -906,7 +987,8 @@ public class DbUtils {
 
             } else { // return_type_is_dto == false
 
-                fields.clear();;
+                fields.clear();
+                ;
 
                 if (return_type == null || return_type.trim().length() == 0) {
                     return_type = "Object";
@@ -962,7 +1044,6 @@ public class DbUtils {
             // ResultSetMetaData.getColumnCount() returns
             // value > 0 for some DML statements, e.g. for 'update orders set
             // dt_id = ? where o_id = ?' it considers that 'dt_id' is column.
-
             // SQLite:
             // throws java.sql.SQLException: column 1 out
             // of bounds [1,0] if the statement is like INSERT
@@ -991,7 +1072,7 @@ public class DbUtils {
     }
 
     private void get_params_info(PreparedStatement ps, String[] param_descriptors,
-                                 FieldNamesMode field_names_mode, ArrayList<FieldInfo> params) throws SQLException {
+            FieldNamesMode field_names_mode, ArrayList<FieldInfo> params) throws SQLException {
 
         params.clear();
 
@@ -1112,7 +1193,7 @@ public class DbUtils {
     }
 
     public void get_crud_create_metadata(String table_name, ArrayList<FieldInfo> keys, List<String> sql_col_names,
-                                         ArrayList<FieldInfo> params, String generated, String dto_class_name, DtoClasses dto_classes)
+            ArrayList<FieldInfo> params, String generated, String dto_class_name, DtoClasses dto_classes)
             throws Exception {
 
         sql_col_names.clear();

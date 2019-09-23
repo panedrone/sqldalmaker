@@ -1,4 +1,6 @@
-import com.sqldalmaker.DataStore;
+package com.sqldalmaker;
+
+import com.mycom.myproject.dao.TestDao;
 import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
@@ -11,10 +13,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /*
-This is an example of how to implement and use DataStore with Apache DbUtils.
-Web-site: http://sqldalmaker.sourceforge.net
-Contact: sqldalmaker@gmail.com
-Copy-paste this code to your project and change it for your needs.
+    SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
+    About DataStore: http://sqldalmaker.sourceforge.net/how-to-start.html
+    Contact: sqldalmaker@gmail.com
+
+    This is an example of how to implement DataStore in Java + Apache DbUtils.
+    Copy-paste this code to your project and change it for your needs.
 */
 public class DataStoreManager {
 
@@ -22,18 +26,17 @@ public class DataStoreManager {
 
     public void open() throws Exception {
 
-        // Or add JDBC driver to the project build-path:
-        // Class.forName("org.h2.Driver").newInstance();
-
-        connection = DriverManager.getConnection("jdbc:h2:d:/orders/h2", "", "");
+        connection = DriverManager.getConnection("jdbc:mysql://localhost/sakila", "root", "root");
         connection.setAutoCommit(false);
     }
 
     public void commit() throws Exception {
+
         connection.commit();
     }
 
     public void rollback() throws Exception {
+
         connection.rollback();
     }
 
@@ -55,30 +58,26 @@ public class DataStoreManager {
     //
     // MyDataStore is hidden, use factory method pattern:
 
-//    public OrderDao createOrderDao() {
-//        return new OrderDao(ds);
-//    }
+    public TestDao createTestDao() {
+
+        return new TestDao(ds);
+    }
 
     private class MyDataStore extends DataStore {
-
-        protected final QueryRunner2 queryRunner;
-
-        public MyDataStore() {
-            queryRunner = new QueryRunner2(false /*pmdKnownBroken*/);
-        }
 
         private boolean isStringValue(Class<?> inValueType) {
             // Consider any CharSequence (including StringBuffer and
             // StringBuilder) as a String.
-            return (CharSequence.class.isAssignableFrom(inValueType) || StringWriter.class
-                    .isAssignableFrom(inValueType));
+            return (CharSequence.class.isAssignableFrom(inValueType)
+                    || StringWriter.class.isAssignableFrom(inValueType));
         }
 
         private boolean isDateValue(Class<?> inValueType) {
-            return (java.util.Date.class.isAssignableFrom(inValueType) && !(java.sql.Date.class
-                    .isAssignableFrom(inValueType)
-                    || java.sql.Time.class.isAssignableFrom(inValueType) || java.sql.Timestamp.class
-                    .isAssignableFrom(inValueType)));
+
+            return (java.util.Date.class.isAssignableFrom(inValueType)
+                    && !(java.sql.Date.class.isAssignableFrom(inValueType)
+                    || java.sql.Time.class.isAssignableFrom(inValueType)
+                    || java.sql.Timestamp.class.isAssignableFrom(inValueType)));
         }
 
         protected void prepareParams(Object... params) {
@@ -90,50 +89,132 @@ public class DataStoreManager {
                     if (isStringValue(params[i].getClass())) {
                         params[i] = params[i].toString();
                     } else if (isDateValue(params[i].getClass())) {
-                        params[i] = new java.sql.Timestamp(
-                                ((java.util.Date) params[i]).getTime());
+                        params[i] = new java.sql.Timestamp(((java.util.Date) params[i]).getTime());
                     }
                 }
             }
         }
 
+        private boolean is_jdbc_stored_proc_call(String jdbc_sql) {
+
+            jdbc_sql = jdbc_sql.trim();
+
+            if (jdbc_sql.startsWith("{") == false || jdbc_sql.endsWith("}") == false) {
+                return false;
+            }
+
+            // jdbc_sql = jdbc_sql.trim(); ^^ trimmed
+
+            jdbc_sql = jdbc_sql.substring(1, jdbc_sql.length() - 1);
+
+            String parts[] = jdbc_sql.split("\\s+");
+
+            if (parts.length < 2) {
+                return false;
+            }
+
+            String call = parts[0];
+
+            return call.compareToIgnoreCase("call") == 0;
+        }
+
         /**
-         * QueryRunner2 allows to get generated keys after INSERT.
+         * MyQueryRunner
+         * 1) allows to get generated keys after INSERT.
          * http://stackoverflow.com/questions/8705036/how-to-get-generated-keys-with-commons-dbutils
          * https://issues.apache.org/jira/browse/DBUTILS-54
+         * 2) allows to call stored procedures that (optionally) obtain IN parameters and (optionally) return result set.
+         * https://stackoverflow.com/questions/8742224/apache-dbutils-stored-procedure/8742300#8742300
+         * https://javabob64.wordpress.com/2012/01/18/calling-a-stored-procedure-from-dbutils/
          */
-        class QueryRunner2 extends QueryRunner {
+        private class MyQueryRunner extends QueryRunner {
 
-            public QueryRunner2(boolean pmdKnownBroken) {
+            public MyQueryRunner() {
+                this(false);
+            }
+
+            public MyQueryRunner(boolean pmdKnownBroken) {
                 super(pmdKnownBroken);
             }
 
-            public int insert(String sql, String[] genColNames, Object[] genValues,
-                              Object... params) throws SQLException {
+            public <T> T queryCall(Connection conn, String sql, ResultSetHandler<T> rsh, Object... params)
+                    throws SQLException {
+
+                CallableStatement stmt = conn.prepareCall(sql);
+
+                try {
+
+                    super.fillStatement(stmt, params);
+
+                    ResultSet rs = super.wrap(stmt.executeQuery());
+
+                    return rsh.handle(rs);
+
+                } catch (SQLException e) {
+
+                    super.rethrow(e, sql, params);
+
+                } finally {
+
+                    DbUtils.close(stmt);
+                }
+
+                return null; // just to suppress compiler error
+            }
+
+            public int executeCall(Connection conn, String sql, Object... params)
+                    throws SQLException {
+
+                CallableStatement stmt = conn.prepareCall(sql);
+
+                try {
+
+                    super.fillStatement(stmt, params);
+
+                    super.wrap(stmt.executeQuery());
+
+                } catch (SQLException e) {
+
+                    super.rethrow(e, sql, params);
+
+                } finally {
+
+                    DbUtils.close(stmt);
+                }
+
+                return 0;
+            }
+
+            public int insert(String sql, String[] genColNames, Object[] genValues, Object... params)
+                    throws SQLException {
 
                 PreparedStatement stmt = null;
+
                 int rows = 0;
 
                 try {
 
                     stmt = connection.prepareStatement(sql, genColNames);
+
                     super.fillStatement(stmt, params);
+
                     rows = stmt.executeUpdate();
 
                     doAfterInsert(stmt, genValues);
 
                 } catch (SQLException e) {
+
                     super.rethrow(e, sql, params);
 
                 } finally {
+
                     DbUtils.close(stmt);
                 }
 
                 return rows;
             }
 
-            private void doAfterInsert(PreparedStatement stmt, Object[] genValues)
-                    throws SQLException {
+            private void doAfterInsert(PreparedStatement stmt, Object[] genValues) throws SQLException {
 
                 ResultSet keys = stmt.getGeneratedKeys();
 
@@ -216,8 +297,7 @@ public class DataStoreManager {
 
                 } else {
 
-                    throw new ClassCastException("Unexpected class '"
-                            + type.getName() + "'");
+                    throw new ClassCastException("Unexpected class '" + type.getName() + "'");
                 }
             }
 
@@ -232,12 +312,13 @@ public class DataStoreManager {
         }
 
         @Override
-        public int insert(String sql, String[] genColNames, Object[] genValues,
-                          Object... params) throws SQLException {
+        public int insert(String sql, String[] genColNames, Object[] genValues, Object... params) throws SQLException {
 
             prepareParams(params);
 
-            return queryRunner.insert(sql, genColNames, genValues, params);
+            MyQueryRunner queryRunner = new MyQueryRunner();
+
+            return queryRunner.insert(sql, genColNames, genValues, params); // TODO: use in-bound QueryRunner.insert(...) instead
         }
 
         @Override
@@ -245,12 +326,22 @@ public class DataStoreManager {
 
             prepareParams(params);
 
-            return queryRunner.update(connection, sql, params);
+            MyQueryRunner queryRunner = new MyQueryRunner();
+
+            boolean sp = is_jdbc_stored_proc_call(sql);
+
+            if (sp) {
+
+                return queryRunner.executeCall(connection, sql, params);
+
+            } else {
+
+                return queryRunner.update(connection, sql, params);
+            }
         }
 
         @Override
-        public <T> T query(final Class<T> type, String sql, Object... params)
-                throws Exception {
+        public <T> T query(final Class<T> type, String sql, Object... params) throws Exception {
 
             ResultSetHandler<T> h = new ResultSetHandler<T>() {
 
@@ -258,13 +349,16 @@ public class DataStoreManager {
                 public T handle(final ResultSet rs) throws SQLException {
 
                     if (!rs.next()) {
+
                         return null;
                     }
 
                     // the first column is 1
+
                     T res = type.cast(rs.getObject(1));
 
                     if (rs.next()) {
+
                         throw new SQLException("More than 1 row available");
                     }
 
@@ -272,14 +366,11 @@ public class DataStoreManager {
                 }
             };
 
-            prepareParams(params);
-
-            return queryRunner.query(connection, sql, h, params);
+            return query(sql, h, params);
         }
 
         @Override
-        public <T> List<T> queryList(final Class<T> type, String sql,
-                                     Object... params) throws Exception {
+        public <T> List<T> queryList(final Class<T> type, String sql, Object... params) throws Exception {
 
             final ArrayList<T> res = new ArrayList<T>();
 
@@ -289,8 +380,11 @@ public class DataStoreManager {
                 public Void handle(final ResultSet rs) throws SQLException {
 
                     while (rs.next()) {
+
                         // the first column is 1
+
                         T t = type.cast(rs.getObject(1));
+
                         res.add(t);
                     }
 
@@ -298,16 +392,13 @@ public class DataStoreManager {
                 }
             };
 
-            prepareParams(params);
-
-            queryRunner.query(connection, sql, h, params);
+            query(sql, h, params);
 
             return res;
         }
 
         @Override
-        public <T> T queryDto(String sql, final RowHandler<T> rowHandler,
-                              Object... params) throws Exception {
+        public <T> T queryDto(String sql, final RowHandler<T> rowHandler, Object... params) throws Exception {
 
             ResultSetHandler<T> h = new ResultSetHandler<T>() {
 
@@ -315,13 +406,13 @@ public class DataStoreManager {
                 public T handle(final ResultSet rs) throws SQLException {
 
                     if (!rs.next()) {
+
                         return null;
                     }
 
                     RowData vr = new RowData() {
 
-                        public <V> V getValue(Class<V> type, String columnLabel)
-                                throws Exception {
+                        public <V> V getValue(Class<V> type, String columnLabel) throws Exception {
 
                             return type.cast(rs.getObject(columnLabel));
                         }
@@ -330,12 +421,16 @@ public class DataStoreManager {
                     T res;
 
                     try {
+
                         res = rowHandler.handleRow(vr);
+
                     } catch (Exception e) {
+
                         throw new SQLException(e);
                     }
 
                     if (rs.next()) {
+
                         throw new SQLException("More than 1 row available");
                     }
 
@@ -343,15 +438,11 @@ public class DataStoreManager {
                 }
             };
 
-            prepareParams(params);
-
-            return queryRunner.query(connection, sql, h, params);
+            return query(sql, h, params);
         }
 
         @Override
-        public <T> List<T> queryDtoList(String sql,
-                                        final RowHandler<T> rowHandler, Object... params)
-                throws Exception {
+        public <T> List<T> queryDtoList(String sql, final RowHandler<T> rowHandler, Object... params) throws Exception {
 
             final ArrayList<T> res = new ArrayList<T>();
 
@@ -362,8 +453,7 @@ public class DataStoreManager {
 
                     RowData vr = new RowData() {
 
-                        public <V> V getValue(Class<V> type, String columnLabel)
-                                throws Exception {
+                        public <V> V getValue(Class<V> type, String columnLabel) throws Exception {
 
                             return type.cast(rs.getObject(columnLabel));
                         }
@@ -372,9 +462,13 @@ public class DataStoreManager {
                     while (rs.next()) {
 
                         try {
+
                             T t = rowHandler.handleRow(vr);
+
                             res.add(t);
+
                         } catch (Exception e) {
+
                             throw new SQLException(e);
                         }
                     }
@@ -383,11 +477,27 @@ public class DataStoreManager {
                 }
             };
 
-            prepareParams(params);
-
-            queryRunner.query(connection, sql, h, params);
+            query(sql, h, params);
 
             return res;
+        }
+
+        private <T> T query(String sql, ResultSetHandler<T> rsh, Object... params) throws SQLException {
+
+            MyQueryRunner queryRunner = new MyQueryRunner();
+
+            prepareParams(params);
+
+            boolean sp = is_jdbc_stored_proc_call(sql);
+
+            if (sp) {
+
+                return queryRunner.queryCall(connection, sql, rsh, params);
+
+            } else {
+
+                return queryRunner.query(connection, sql, rsh, params);
+            }
         }
     }
 }

@@ -47,7 +47,7 @@ import org.openide.util.actions.Presenter;
 //         displayName = "NOT-USED"
 )
 @ActionReference(path = "Toolbars/File", position = 1000)
-@Messages("CTL_SdmAction=DAL Files")
+@Messages("CTL_SdmAction=SQL DAL Maker root files")
 public final class SdmAction extends AbstractAction implements Presenter.Toolbar {
 
     // extends AbstractAction

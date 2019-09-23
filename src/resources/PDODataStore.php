@@ -3,10 +3,12 @@
 // include_once 'DataStore.php'; // uncomment if you need inheritance
 
 /*
-  This is an example of how to implement and use DataStore for PDO.
-  Web-site: http://sqldalmaker.sourceforge.net
-  Contact: sqldalmaker@gmail.com
-  Copy-paste this code to your project and change it for your needs.
+    SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
+    About DataStore: http://sqldalmaker.sourceforge.net/how-to-start.html
+    Contact: sqldalmaker@gmail.com
+
+    This is an example of how to implement DataStore in PHP + PDO.
+    Copy-paste this code to your project and change it for your needs.
  */
 
 // class PDODataStore implements DataStore 

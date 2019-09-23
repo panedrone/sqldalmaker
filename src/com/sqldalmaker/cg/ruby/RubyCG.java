@@ -193,7 +193,7 @@ public class RubyCG {
 
 			try {
 
-				String dao_jdbc_sql = DbUtils.jdbc_sql_by_ref(mi.ref, sql_root_abs_path);
+				String dao_jdbc_sql = DbUtils.jdbc_sql_by_ref_query(mi.ref, sql_root_abs_path);
 
 				String[] parsed = parse_method_declaration(mi.method);
 
@@ -219,6 +219,8 @@ public class RubyCG {
 				throw new Exception(Helpers.get_error_message(msg, e));
 			}
 		}
+
+		// this method is called also for CRUD
 
 		private void render_element_query(StringBuilder buff, String dao_jdbc_sql, String ref, boolean is_external_sql,
 				String return_type, boolean return_type_is_dto, boolean fetch_list, String method_name,
@@ -317,9 +319,7 @@ public class RubyCG {
 
 			try {
 
-				String sql_file_abs_path = Helpers.concat_path(sql_root_abs_path, ref);
-
-				String sql = Helpers.load_text_from_file(sql_file_abs_path);
+				String dao_jdbc_sql = DbUtils.jdbc_sql_by_ref_exec_dml(ref, sql_root_abs_path);
 
 				String[] parsed = parse_method_declaration(method);
 
@@ -333,7 +333,7 @@ public class RubyCG {
 
 				StringBuilder buff = new StringBuilder();
 
-				render_element_exec_dml(buff, sql, is_external_sql, null, method_name, dto_param_type,
+				render_element_exec_dml(buff, dao_jdbc_sql, is_external_sql, null, method_name, dto_param_type,
 						method_param_descriptors, xml_node_name, ref);
 
 				return buff;

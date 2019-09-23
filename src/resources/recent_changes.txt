@@ -1,10 +1,8 @@
-Sep 22, 2019
+Sep 24, 2019
 
-    - Implemented calling of MySQL stored procedures like '{call test_query()}' or '{call test_query_list(?, ?)}'
-      for XML-tags 'query', 'query-list', 'query-dto', 'query-dto-list'.
-      Out parameters of are not supported yet.
-      In v 1.87, it works only in PHP + PDO. Use JDBC syntax in SQL files.
-      Try to use shortcuts: ref='CALL new_procedure_single(?)'.
+    Starting from v.1.89+, you can generate and run PHP, Java, and Python code to call stored procedures.
+    Successfully tested with MySQL. OUT/IN-OUT parameters and RETURN values are not supported yet.
+    Review updated implementations of DataStore. Visit project Website for details.
 
 Aug 17, 2019
 

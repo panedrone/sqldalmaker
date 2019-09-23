@@ -225,12 +225,12 @@ public class Helpers {
 		return res.toString();
 	}
 
-	public static String sql_to_php_str(StringBuilder sql_buff) {
+	public static String php_sql_to_php_str(StringBuilder sql_buff) {
 
-		return sql_to_php_str(sql_buff.toString());
+		return Helpers.php_sql_to_php_str(sql_buff.toString());
 	}
 
-	public static String sql_to_php_str(String sql) {
+	public static String php_sql_to_php_str(String sql) {
 
 		String parts[] = sql.split("(\\n|\\r)+");
 

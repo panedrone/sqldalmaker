@@ -231,7 +231,7 @@ public class IdeaEditorHelpers {
 
         DbUtils db_utils = new DbUtils(connection, FieldNamesMode.AS_IS, null);
 
-        String jdbc_sql = DbUtils.jdbc_sql_by_ref(dto_class.getRef(), sql_root_folder_full_path);
+        String jdbc_sql = DbUtils.jdbc_sql_by_ref_query(dto_class.getRef(), sql_root_folder_full_path);
 
         ArrayList<FieldInfo> fields = new ArrayList<FieldInfo>();
 

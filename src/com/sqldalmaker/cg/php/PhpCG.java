@@ -37,7 +37,7 @@ public class PhpCG {
         private final String namespace;
 
         public DTO(DtoClasses dto_classes, Connection connection, String sql_root_abs_path, String vm_file_system_dir,
-                   String namespace) throws Exception {
+                String namespace) throws Exception {
 
             this.dto_classes = dto_classes.getDtoClass();
 
@@ -77,7 +77,7 @@ public class PhpCG {
                 throw new Exception("XML element of DTO class '" + dto_class_name + "' not found");
             }
 
-            String jdbc_sql = DbUtils.jdbc_sql_by_ref(cls_element.getRef(), sql_root_abs_path);
+            String jdbc_sql = DbUtils.jdbc_sql_by_ref_query(cls_element.getRef(), sql_root_abs_path);
 
             ArrayList<FieldInfo> fields = new ArrayList<FieldInfo>();
 
@@ -122,7 +122,7 @@ public class PhpCG {
         private final String dao_namespace;
 
         public DAO(DtoClasses dto_classes, Connection connection, String sql_root_abs_path, String vm_file_system_dir,
-                   String dto_namespace, String dao_namespace) throws Exception {
+                String dto_namespace, String dao_namespace) throws Exception {
 
             this.dto_classes = dto_classes;
 
@@ -193,7 +193,7 @@ public class PhpCG {
 
             try {
 
-                String dao_jdbc_sql = DbUtils.jdbc_sql_by_ref(mi.ref, sql_root_abs_path);
+                String dao_jdbc_sql = DbUtils.jdbc_sql_by_ref_query(mi.ref, sql_root_abs_path);
 
                 String[] parsed = parse_method_declaration(mi.method);
 
@@ -219,9 +219,10 @@ public class PhpCG {
             }
         }
 
+        // this method is called also for CRUD
         private void render_element_query(StringBuilder buff, String dao_jdbc_sql, String ref, boolean is_external_sql, String return_type,
-                                          boolean return_type_is_dto, boolean fetch_list, String method_name, String dto_param_type,
-                                          String[] param_descriptors, boolean is_crud, String xml_node_name) throws Exception {
+                boolean return_type_is_dto, boolean fetch_list, String method_name, String dto_param_type,
+                String[] param_descriptors, boolean is_crud, String xml_node_name) throws Exception {
 
             ArrayList<FieldInfo> fields = new ArrayList<FieldInfo>();
 
@@ -237,19 +238,6 @@ public class PhpCG {
                 throw new Exception("Columns count is 0. Is SQL statement valid?");
             }
 
-            boolean is_sp = DbUtils.is_jdbc_stored_proc_call(dao_jdbc_sql);
-            
-            String dao_php_sql;
-            
-            if (is_sp) {
-                
-                dao_php_sql = DbUtils.jdbc_to_php_stored_proc_call(dao_jdbc_sql);
-            
-            } else {
-                
-                dao_php_sql = dao_jdbc_sql;
-            }
-            
             HashMap<String, Object> context = new HashMap<String, Object>();
 
             if (return_type_is_dto) {
@@ -269,7 +257,20 @@ public class PhpCG {
                 }
             }
 
-            String sql_str = Helpers.sql_to_php_str(dao_php_sql);
+            boolean is_sp = DbUtils.is_jdbc_stored_proc_call(dao_jdbc_sql);
+
+            String dao_php_sql;
+
+            if (is_sp) {
+
+                dao_php_sql = DbUtils.jdbc_to_php_stored_proc_call(dao_jdbc_sql);
+
+            } else {
+
+                dao_php_sql = dao_jdbc_sql;
+            }
+
+            String php_sql_str = Helpers.php_sql_to_php_str(dao_php_sql);
 
             assign_params(params, dto_param_type, context);
 
@@ -278,7 +279,7 @@ public class PhpCG {
             context.put("crud", is_crud);
             context.put("xml_node_name", xml_node_name);
             context.put("ref", ref);
-            context.put("sql", sql_str);
+            context.put("sql", php_sql_str);
             context.put("use_dto", return_type_is_dto);
             context.put("returned_type_name", return_type);
             context.put("fetch_list", fetch_list);
@@ -329,9 +330,7 @@ public class PhpCG {
 
             try {
 
-                String sql_file_abs_path = Helpers.concat_path(sql_root_abs_path, ref);
-
-                String sql = Helpers.load_text_from_file(sql_file_abs_path);
+                String dao_jdbc_sql = DbUtils.jdbc_sql_by_ref_exec_dml(ref, sql_root_abs_path);
 
                 String[] parsed = parse_method_declaration(method);
 
@@ -345,8 +344,8 @@ public class PhpCG {
 
                 StringBuilder buff = new StringBuilder();
 
-                render_element_exec_dml(buff, sql, is_external_sql, null, method_name, dto_param_type,
-                		method_param_descriptors, xml_node_name, ref);
+                render_element_exec_dml(buff, dao_jdbc_sql, is_external_sql, null, method_name, dto_param_type,
+                        method_param_descriptors, xml_node_name, ref);
 
                 return buff;
 
@@ -359,27 +358,30 @@ public class PhpCG {
             }
         }
 
-        private void render_element_exec_dml(StringBuilder buffer, String sql, boolean is_external_sql,
-                                             String class_name, String method_name, String dto_param_type, String[] param_descriptors,
-                                             String xml_node_name, String sql_path) throws Exception {
+        private void render_element_exec_dml(StringBuilder buffer, String dao_jdbc_sql, boolean is_external_sql,
+                String class_name, String method_name, String dto_param_type, String[] param_descriptors,
+                String xml_node_name, String sql_path) throws Exception {
 
-            String trimmed = sql.toLowerCase().trim();
-
-            String[] parts = trimmed.split("\\s+");
-
-            if (parts.length > 0) {
-
-                if ("select".equals(parts[0])) {
-
-                    throw new Exception("SELECT is not allowed here");
-                }
-            }
+            DbUtils.check_if_select_sql(dao_jdbc_sql);
 
             ArrayList<FieldInfo> params = new ArrayList<FieldInfo>();
 
-            db_utils.get_exec_dml_jdbc_sql_info(sql, dto_param_type, param_descriptors, params);
+            db_utils.get_exec_dml_jdbc_sql_info(dao_jdbc_sql, dto_param_type, param_descriptors, params);
 
-            String php_sql_str = Helpers.sql_to_php_str(sql);
+            boolean is_sp = DbUtils.is_jdbc_stored_proc_call(dao_jdbc_sql);
+
+            String dao_php_sql;
+
+            if (is_sp) {
+
+                dao_php_sql = DbUtils.jdbc_to_php_stored_proc_call(dao_jdbc_sql);
+
+            } else {
+
+                dao_php_sql = dao_jdbc_sql;
+            }
+
+            String php_sql_str = Helpers.php_sql_to_php_str(dao_php_sql);
 
             HashMap<String, Object> context = new HashMap<String, Object>();
 
@@ -467,7 +469,7 @@ public class PhpCG {
 
         @Override
         public StringBuilder render_element_crud_read(StringBuilder sql_buff, String method_name, String table_name,
-                                                      String ret_dto_type, boolean fetch_list) throws Exception {
+                String ret_dto_type, boolean fetch_list) throws Exception {
 
             StringBuilder buffer = new StringBuilder();
 
@@ -513,7 +515,7 @@ public class PhpCG {
 
         @Override
         public StringBuilder render_element_crud_create(StringBuilder sql_buff, String class_name, String method_name,
-                                                        String table_name, String dto_class_name, boolean fetch_generated, String generated) throws Exception {
+                String table_name, String dto_class_name, boolean fetch_generated, String generated) throws Exception {
 
             ArrayList<FieldInfo> params = new ArrayList<FieldInfo>();
 
@@ -538,7 +540,7 @@ public class PhpCG {
                 sql_buff.append(sw.getBuffer());
             }
 
-            String sql_str = Helpers.sql_to_php_str(sql_buff);
+            String sql_str = Helpers.php_sql_to_php_str(sql_buff);
 
             HashMap<String, Object> context = new HashMap<String, Object>();
 
@@ -589,7 +591,7 @@ public class PhpCG {
 
         @Override
         public StringBuilder render_element_crud_update(StringBuilder sql_buff, String class_name, String method_name,
-                                                        String table_name, String dto_class_name, boolean primitive_params) throws Exception {
+                String table_name, String dto_class_name, boolean primitive_params) throws Exception {
 
             StringBuilder buffer = new StringBuilder();
 
@@ -639,7 +641,7 @@ public class PhpCG {
                 params.add(k);
             }
 
-            String sql_str = Helpers.sql_to_php_str(sql_buff);
+            String sql_str = Helpers.php_sql_to_php_str(sql_buff);
 
             HashMap<String, Object> context = new HashMap<String, Object>();
 
@@ -667,7 +669,7 @@ public class PhpCG {
 
         @Override
         public StringBuilder render_element_crud_delete(StringBuilder sql_buff, String class_name, String method_name,
-                                                        String table_name, String dto_class_name) throws Exception {
+                String table_name, String dto_class_name) throws Exception {
 
             StringBuilder buffer = new StringBuilder();
 
@@ -698,7 +700,7 @@ public class PhpCG {
                 sql_buff.append(sw.getBuffer());
             }
 
-            String sql_str = Helpers.sql_to_php_str(sql_buff);
+            String sql_str = Helpers.php_sql_to_php_str(sql_buff);
 
             HashMap<String, Object> context = new HashMap<String, Object>();
 
