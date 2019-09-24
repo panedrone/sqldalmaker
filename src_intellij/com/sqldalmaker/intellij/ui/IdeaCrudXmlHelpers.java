@@ -75,7 +75,7 @@ public class IdeaCrudXmlHelpers {
 
                     DtoClasses dto_classes = object_factory.createDtoClasses();
 
-                    Connection con = IdeaHelpers.get_connection(project, settings);
+                    Connection connection = IdeaHelpers.get_connection(project, settings);
 
                     try {
 
@@ -93,9 +93,9 @@ public class IdeaCrudXmlHelpers {
 
                         List<DtoClass> items = dto_classes.getDtoClass();
 
-                        DatabaseMetaData db_info = con.getMetaData();
+                        DatabaseMetaData db_info = connection.getMetaData();
 
-                        ResultSet rs = DbUtils.get_tables(con, db_info, selected_schema, include_views);
+                        ResultSet rs = DbUtils.get_tables(connection, db_info, selected_schema, include_views);
 
                         try {
 
@@ -138,7 +138,7 @@ public class IdeaCrudXmlHelpers {
 
                     } finally {
 
-                        con.close();
+                        connection.close();
                     }
 
                     IdeaEditorHelpers.open_dto_xml_in_editor(object_factory, project, dto_classes, false);
@@ -257,7 +257,7 @@ public class IdeaCrudXmlHelpers {
 
                     Settings settings = IdeaHelpers.load_settings(root_file);
 
-                    Connection conn = IdeaHelpers.get_connection(project, settings);
+                    Connection connection = IdeaHelpers.get_connection(project, settings);
 
                     try {
 
@@ -275,9 +275,9 @@ public class IdeaCrudXmlHelpers {
 
                         List<Object> nodes = root.getCrudOrCrudAutoOrQuery();
 
-                        DatabaseMetaData db_info = conn.getMetaData();
+                        DatabaseMetaData db_info = connection.getMetaData();
 
-                        ResultSet rs = DbUtils.get_tables(conn, db_info, selected_schema, include_views);
+                        ResultSet rs = DbUtils.get_tables(connection, db_info, selected_schema, include_views);
 
                         try {
 
@@ -365,7 +365,7 @@ public class IdeaCrudXmlHelpers {
 
                                         if (add_fk_access) {
 
-                                            add_fk_access(root_file, conn, selected_schema,
+                                            add_fk_access(root_file, connection, selected_schema,
                                                     db_info, rs, nodes, plural_to_singular);
                                         }
 
@@ -384,7 +384,7 @@ public class IdeaCrudXmlHelpers {
 
                     } finally {
 
-                        conn.close();
+                        connection.close();
                     }
 
                     open_dao_xml_in_editor(project, object_factory, "crud-dao.xml", root);
@@ -540,19 +540,19 @@ public class IdeaCrudXmlHelpers {
 
                     Settings settings = IdeaHelpers.load_settings(root_file);
 
-                    Connection conn = IdeaHelpers.get_connection(project, settings);
+                    Connection connection = IdeaHelpers.get_connection(project, settings);
 
                     try {
 
-                        DatabaseMetaData db_info = conn.getMetaData();
+                        DatabaseMetaData db_info = connection.getMetaData();
 
-                        ResultSet rs = DbUtils.get_tables(conn, db_info, selected_schema, false);
+                        ResultSet rs = DbUtils.get_tables(connection, db_info, selected_schema, false);
 
                         try {
 
                             while (rs.next()) {
 
-                                add_fk_access(root_file, conn, selected_schema, db_info, rs, nodes, plural_to_singular);
+                                add_fk_access(root_file, connection, selected_schema, db_info, rs, nodes, plural_to_singular);
                             }
 
                         } finally {
@@ -562,7 +562,7 @@ public class IdeaCrudXmlHelpers {
 
                     } finally {
 
-                        conn.close();
+                        connection.close();
                     }
 
                     open_dao_xml_in_editor(project, object_factory, "fk-dao.xml", root);

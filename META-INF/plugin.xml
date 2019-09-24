@@ -2,7 +2,7 @@
     <id>dal-mpe</id>
     <name>SQL DAL Maker</name>
     <category>Database</category>
-    <version>1.89.20190924</version>
+    <version>1.89.20190925</version>
     <vendor email="sqldalmaker@gmail.com"/>
     <!-- please see http://confluence.intellij.net/display/IDEADEV/Build+Number+Ranges for description -->
     <idea-version since-build="133.1885"/>
@@ -17,7 +17,7 @@ To generate the class, you declare it in XML meta-program.<br/>
 
     <change-notes><![CDATA[
 <p>
-Starting from v.1.89+, you can generate and run PHP, Java, and Python code to call stored procedures.
+Starting from v.1.89, you can generate and run PHP, Java, and Python code to call stored procedures.
 </p>
 <p>
 Successfully tested with MySQL. OUT/IN-OUT parameters and RETURN values are not supported yet.

@@ -70,6 +70,14 @@ public class UIDialogSelectDbSchema extends JDialog {
             }
         });
 
+        table.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    onOK();
+                }
+            }
+        });
+
 // call onCancel() when cross is clicked
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
@@ -176,36 +184,33 @@ public class UIDialogSelectDbSchema extends JDialog {
 
             Connection con = IdeaHelpers.get_connection(project, settings);
 
-            DbUtils.get_schema_names(con, items);
+            try {
+                DbUtils.get_schema_names(con, items);
 
-            // buttonOK.setEnabled(items.size() <= 1);
+                // buttonOK.setEnabled(items.size() <= 1);
 
-            table.setModel(new AbstractTableModel() {
+                table.setModel(new AbstractTableModel() {
 
-                public Object getValueAt(int rowIndex, int columnIndex) {
-                    return items.get(rowIndex);
-                }
-
-                public int getColumnCount() {
-                    return 1;
-                }
-
-                public String getColumnName(int column) {
-                    return "DB-Schema";
-                }
-
-                public int getRowCount() {
-                    return items.size();
-                }
-            });
-
-            table.addMouseListener(new MouseAdapter() {
-                public void mouseClicked(MouseEvent e) {
-                    if (e.getClickCount() == 2) {
-                        onOK();
+                    public Object getValueAt(int rowIndex, int columnIndex) {
+                        return items.get(rowIndex);
                     }
-                }
-            });
+
+                    public int getColumnCount() {
+                        return 1;
+                    }
+
+                    public String getColumnName(int column) {
+                        return "DB-Schema";
+                    }
+
+                    public int getRowCount() {
+                        return items.size();
+                    }
+                });
+
+            } finally {
+                con.close();
+            }
 
         } catch (Exception e) {
             e.printStackTrace();

@@ -1,6 +1,6 @@
 Sep 24, 2019
 
-    Starting from v.1.89+, you can generate and run PHP, Java, and Python code to call stored procedures.
+    Starting from v.1.89, you can generate and run PHP, Java, and Python code to call stored procedures.
     Successfully tested with MySQL. OUT/IN-OUT parameters and RETURN values are not supported yet.
     Review updated implementations of DataStore. Visit project Website for details.
 
