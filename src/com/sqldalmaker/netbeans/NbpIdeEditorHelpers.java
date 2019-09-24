@@ -178,13 +178,15 @@ public class NbpIdeEditorHelpers {
         }
     }
 
-    private static void gen_tmp_field_tags(Connection con, ObjectFactory object_factory, DtoClass dto_class, String sql_root_folder_abs_path) throws Exception {
+    private static void gen_tmp_field_tags(Connection con, ObjectFactory object_factory, DtoClass dto_class, String sql_root_abs_path) throws Exception {
 
         DbUtils md = new DbUtils(con, FieldNamesMode.AS_IS, null);
 
+        String jdbc_sql = DbUtils.jdbc_sql_by_ref_query(dto_class.getRef(), sql_root_abs_path);
+
         ArrayList<FieldInfo> fields = new ArrayList<FieldInfo>();
 
-        md.get_dto_field_info(sql_root_folder_abs_path, dto_class, fields);
+        md.get_dto_field_info(jdbc_sql, dto_class, fields);
 
         for (FieldInfo f : fields) {
 

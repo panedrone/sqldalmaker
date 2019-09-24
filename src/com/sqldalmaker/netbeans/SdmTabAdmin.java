@@ -203,6 +203,7 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         jPanel3.add(jButton13);
 
         jTextField1.setEditable(false);
+        jTextField1.setBackground(new java.awt.Color(214, 217, 223));
         jTextField1.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         jTextField1.setText(org.openide.util.NbBundle.getMessage(SdmTabAdmin.class, "SdmTabAdmin.jTextField1.text")); // NOI18N
         jTextField1.setBorder(null);
