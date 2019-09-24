@@ -387,13 +387,15 @@ public class EclipseHelpers {
 
 		Settings settings = load_settings(editor2);
 
-		String sql_root_folder_full_path = project_root + "/" + settings.getFolders().getSql();
+		String sql_root_abs_path = project_root + "/" + settings.getFolders().getSql();
 
 		DbUtils md = new DbUtils(connection, FieldNamesMode.AS_IS, null);
 
-		ArrayList<FieldInfo> fields = new ArrayList<FieldInfo>();
+        String jdbc_sql = DbUtils.jdbc_sql_by_ref_query(cls_element.getRef(), sql_root_abs_path);
 
-		md.get_dto_field_info(sql_root_folder_full_path, cls_element, fields);
+        ArrayList<FieldInfo> fields = new ArrayList<FieldInfo>();
+
+		md.get_dto_field_info(jdbc_sql, cls_element, fields);
 
 		for (FieldInfo f : fields) {
 
