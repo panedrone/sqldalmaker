@@ -1,8 +1,11 @@
-Sep 24, 2019
+Sep 26, 2019
 
-    Starting from v.1.89, you can generate and run PHP, Java, and Python code to call stored procedures.
-    Successfully tested with MySQL. OUT/IN-OUT parameters and RETURN values are not supported yet.
-    Review updated implementations of DataStore. Visit project Website for details.
+    Starting from v.1.90, you can generate and run PHP, Java, and Python code to call stored procedures and functions.
+    Successfully tested with MySQL and PostgreSQL.
+    Return values of stored procedures are not supported (v.1.90).
+    OUT and IN-OUT parameters of stored procedures and functions are not supported (v.1.90).
+    Review updated implementations of DataStore: 1) PHP + PDO, 2) Java + Apache DbUtils, 3) Python + PDO.
+    Visit project Website for details.
 
 Aug 17, 2019
 

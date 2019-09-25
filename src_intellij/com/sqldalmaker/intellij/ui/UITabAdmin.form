@@ -166,28 +166,12 @@
                       <text value="DataStore C++ STL"/>
                     </properties>
                   </component>
-                  <component id="a585c" class="javax.swing.JButton" binding="dataStoreJavaDbUtilsButton" default-binding="true">
-                    <constraints>
-                      <grid row="1" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                    </constraints>
-                    <properties>
-                      <text value="DataStore Java DbUtils"/>
-                    </properties>
-                  </component>
                   <component id="ffbb4" class="javax.swing.JButton" binding="dataStoreJavaAndroidButton" default-binding="true">
                     <constraints>
                       <grid row="1" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                     </constraints>
                     <properties>
                       <text value="DataStore Java Android"/>
-                    </properties>
-                  </component>
-                  <component id="87f30" class="javax.swing.JButton" binding="dataStoreJavaSpringButton" default-binding="true">
-                    <constraints>
-                      <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                    </constraints>
-                    <properties>
-                      <text value="DataStore Java Spring"/>
                     </properties>
                   </component>
                   <component id="d85b8" class="javax.swing.JButton" binding="dataStoreJavaButton" default-binding="true">
@@ -212,6 +196,22 @@
                     </constraints>
                     <properties>
                       <text value="PDODataStore.php"/>
+                    </properties>
+                  </component>
+                  <component id="a585c" class="javax.swing.JButton" binding="dataStoreJavaDbUtilsButton" default-binding="true">
+                    <constraints>
+                      <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties>
+                      <text value="DataStore Java DbUtils"/>
+                    </properties>
+                  </component>
+                  <component id="87f30" class="javax.swing.JButton" binding="dataStoreJavaSpringButton" default-binding="true">
+                    <constraints>
+                      <grid row="1" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties>
+                      <text value="DataStore Java Spring"/>
                     </properties>
                   </component>
                 </children>

@@ -18,7 +18,7 @@ import java.util.List;
     About DataStore: http://sqldalmaker.sourceforge.net/how-to-start.html
     Contact: sqldalmaker@gmail.com
 
-    This is an example of how to implement DataStore in Java + Spring JDBC.
+    This is an example of how to implement DataStore in Java using Spring JDBC.
     Copy-paste this code to your project and change it for your needs.
 */
 public class DataStoreManager {

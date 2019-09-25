@@ -21,1242 +21,1315 @@ import java.util.Set;
  */
 public class DbUtils {
 
-    public static void check_if_select_sql(String dao_jdbc_sql) throws Exception {
+	public static void check_if_select_sql(String dao_jdbc_sql) throws Exception {
 
-        String trimmed = dao_jdbc_sql.toLowerCase().trim();
+		String trimmed = dao_jdbc_sql.toLowerCase().trim();
 
-        String[] parts = trimmed.split("\\s+");
+		String[] parts = trimmed.split("\\s+");
 
-        if (parts.length > 0) {
+		if (parts.length > 0) {
 
-            if ("select".equals(parts[0])) {
+			if ("select".equals(parts[0])) {
 
-                throw new Exception("SELECT is not allowed here");
-            }
-        }
-    }
+				throw new Exception("SELECT is not allowed here");
+			}
+		}
+	}
 
-    private static Exception Exception(String string) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+	private static Exception Exception(String string) {
+		throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods, choose
+																		// Tools | Templates.
+	}
 
-    private final Connection conn;
+	private final Connection conn;
 
-    private final FieldNamesMode field_names_mode;
+	private final FieldNamesMode field_names_mode;
 
-    private final TypeMap type_map;
+	private final TypeMap type_map;
 
-    public DbUtils(Connection conn, FieldNamesMode field_names_mode, TypeMap type_map) {
+	public DbUtils(Connection conn, FieldNamesMode field_names_mode, TypeMap type_map) {
 
-        this.conn = conn;
+		this.conn = conn;
 
-        this.field_names_mode = field_names_mode;
+		this.field_names_mode = field_names_mode;
 
-        this.type_map = type_map;
-    }
+		this.type_map = type_map;
+	}
 
-    public FieldNamesMode get_field_names_mode() {
+	public FieldNamesMode get_field_names_mode() {
 
-        return field_names_mode;
-    }
+		return field_names_mode;
+	}
 
-    private static PreparedStatement create_prepared_statement(Connection conn, String table_name) throws SQLException {
+	private static PreparedStatement create_prepared_statement(Connection conn, String table_name) throws SQLException {
 
-        return prepare(conn, "SELECT * FROM " + table_name + " WHERE 1 = 0");
-    }
+		return prepare(conn, "SELECT * FROM " + table_name + " WHERE 1 = 0");
+	}
 
-    private static String get_column_name(ResultSetMetaData meta, int col) throws Exception {
+	private static String get_column_name(ResultSetMetaData meta, int col) throws Exception {
 
-        // in H2, for 'SELECT a as a1, a as a2 FROM...' will be retrieved
-        // duplicate col. names
-        String column_name = null;
+		// in H2, for 'SELECT a as a1, a as a2 FROM...' will be retrieved
+		// duplicate col. names
+		String column_name = null;
 
-        try {
+		try {
 
-            column_name = meta.getColumnLabel(col);
+			column_name = meta.getColumnLabel(col);
 
-        } catch (SQLException e) {
-            // remains null
-        }
+		} catch (SQLException e) {
+			// remains null
+		}
 
-        if (null == column_name || 0 == column_name.length()) {
+		if (null == column_name || 0 == column_name.length()) {
 
-            column_name = meta.getColumnName(col);
-        }
+			column_name = meta.getColumnName(col);
+		}
 
-        if (null == column_name || 0 == column_name.length()) {
+		if (null == column_name || 0 == column_name.length()) {
 
-            throw new Exception(
-                    "Column name cannot be detected. Try to specify column label. For example, 'SELECT COUNT(*) AS RES...'");
-        }
+			throw new Exception(
+					"Column name cannot be detected. Try to specify column label. For example, 'SELECT COUNT(*) AS RES...'");
+		}
 
-        return column_name;
-    }
+		return column_name;
+	}
 
-    /*
-     * DatabaseMetaData.getPrimaryKeys returns pk_col_names in lower case. For other
-     * JDBC drivers, it may differ. To ensure correct comparison of field names, do
-     * it always in lower case
-     */
-    private static ArrayList<String> get_pk_col_names(Connection conn, String table_name) throws SQLException {
+	/*
+	 * DatabaseMetaData.getPrimaryKeys returns pk_col_names in lower case. For other
+	 * JDBC drivers, it may differ. To ensure correct comparison of field names, do
+	 * it always in lower case
+	 */
+	private static ArrayList<String> get_pk_col_names(Connection conn, String table_name) throws SQLException {
 
-        ArrayList<String> res = new ArrayList<String>();
+		ArrayList<String> res = new ArrayList<String>();
 
-        DatabaseMetaData db_info = conn.getMetaData();
+		DatabaseMetaData db_info = conn.getMetaData();
 
-        ResultSet rs = db_info.getPrimaryKeys(null, null, table_name);
+		ResultSet rs = db_info.getPrimaryKeys(null, null, table_name);
 
-        try {
+		try {
 
-            while (rs.next()) {
+			while (rs.next()) {
 
-                res.add(rs.getString("COLUMN_NAME"));
-            }
+				res.add(rs.getString("COLUMN_NAME"));
+			}
 
-        } finally {
+		} finally {
 
-            rs.close();
-        }
+			rs.close();
+		}
 
-        return res;
-    }
+		return res;
+	}
 
-    public void validate_table_name(String table_name) throws SQLException {
+	public void validate_table_name(String table_name) throws SQLException {
 
-        DatabaseMetaData db_info = conn.getMetaData();
+		DatabaseMetaData db_info = conn.getMetaData();
 
-        ResultSet rs = db_info.getTables(null, null, table_name, null);
+		ResultSet rs = db_info.getTables(null, null, table_name, null);
 
-        try {
+		try {
 
-            if (rs.next()) {
+			if (rs.next()) {
 
-                return;
-            }
+				return;
+			}
 
-        } finally {
+		} finally {
 
-            rs.close();
-        }
+			rs.close();
+		}
 
-        throw new SQLException("Data table '" + table_name + "' not found. Table names may be case sensitive.");
-    }
+		throw new SQLException("Data table '" + table_name + "' not found. Table names may be case sensitive.");
+	}
 
-    private static String[] parse_ref(String src) throws Exception {
+	private static String[] parse_ref(String src) throws Exception {
 
-        String before_brackets;
+		String before_brackets;
 
-        String inside_brackets;
+		String inside_brackets;
 
-        src = src.trim();
+		src = src.trim();
 
-        int pos = src.indexOf('(');
+		int pos = src.indexOf('(');
 
-        if (pos == -1) {
+		if (pos == -1) {
 
-            throw new Exception("'(' expected in ref shortcut");
+			throw new Exception("'(' expected in ref shortcut");
 
-        } else {
+		} else {
 
-            if (!src.endsWith(")")) {
+			if (!src.endsWith(")")) {
 
-                throw new Exception("')' expected in ref shortcut");
-            }
+				throw new Exception("')' expected in ref shortcut");
+			}
 
-            before_brackets = src.substring(0, pos);
+			before_brackets = src.substring(0, pos);
 
-            inside_brackets = src.substring(before_brackets.length() + 1, src.length() - 1);
-        }
+			inside_brackets = src.substring(before_brackets.length() + 1, src.length() - 1);
+		}
 
-        return new String[]{before_brackets, inside_brackets};
-    }
+		return new String[] { before_brackets, inside_brackets };
+	}
 
-    private static void validate_element_dto_class(DtoClass dto_class) throws Exception {
+	private static void validate_element_dto_class(DtoClass dto_class) throws Exception {
 
-        List<DtoClass.Field> fields = dto_class.getField();
+		List<DtoClass.Field> fields = dto_class.getField();
 
-        Set<String> col_names = new HashSet<String>();
+		Set<String> col_names = new HashSet<String>();
 
-        for (DtoClass.Field fe : fields) {
+		for (DtoClass.Field fe : fields) {
 
-            String java_class_name = fe.getJavaType();
+			String java_class_name = fe.getJavaType();
 
-            validate_java_class_name(java_class_name);
+			validate_java_class_name(java_class_name);
 
-            String col = fe.getColumn();
+			String col = fe.getColumn();
 
-            if (col == null) {
+			if (col == null) {
 
-                throw new Exception("Invalid column name: null");
-            }
+				throw new Exception("Invalid column name: null");
+			}
 
-            if (col_names.contains(col)) {
+			if (col_names.contains(col)) {
 
-                throw new Exception("Duplicate <field column='" + col + "'...");
-            }
+				throw new Exception("Duplicate <field column='" + col + "'...");
+			}
 
-            col_names.add(col);
-        }
-    }
+			col_names.add(col);
+		}
+	}
 
-    private static void validate_java_class_name(final String java_class_name) throws Exception {
+	private static void validate_java_class_name(final String java_class_name) throws Exception {
 
-        String type;
+		String type;
 
-        String[] arr_parts = java_class_name.split("\\[");
+		String[] arr_parts = java_class_name.split("\\[");
 
-        if (arr_parts.length == 2 && "]".equals(arr_parts[1].trim())) {
+		if (arr_parts.length == 2 && "]".equals(arr_parts[1].trim())) {
 
-            type = arr_parts[0].trim();
+			type = arr_parts[0].trim();
 
-        } else {
+		} else {
 
-            type = java_class_name;
-        }
+			type = java_class_name;
+		}
 
-        try {
+		try {
 
-            Helpers.process_class_name(type);
+			Helpers.process_class_name(type);
 
-        } catch (ClassNotFoundException e) {
+		} catch (ClassNotFoundException e) {
 
-            String java_class_name2 = "java.lang." + type;
+			String java_class_name2 = "java.lang." + type;
 
-            try {
+			try {
 
-                Helpers.process_class_name(java_class_name2);
+				Helpers.process_class_name(java_class_name2);
 
-            } catch (ClassNotFoundException e1) {
+			} catch (ClassNotFoundException e1) {
 
-                throw new Exception("Invalid class name: " + java_class_name);
-            }
-        }
-    }
+				throw new Exception("Invalid class name: " + java_class_name);
+			}
+		}
+	}
 
-    private static String[] parse_param_descriptor(String param_descriptor) {
+	private static String[] parse_param_descriptor(String param_descriptor) {
 
-        String param_type_name;
+		String param_type_name;
 
-        String param_name;
+		String param_name;
 
-        String[] parts = param_descriptor.split("\\s+");
+		String[] parts = param_descriptor.split("\\s+");
 
-        if (parts.length > 1) {
+		if (parts.length > 1) {
 
-            param_name = parts[parts.length - 1];
+			param_name = parts[parts.length - 1];
 
-            param_type_name = param_descriptor.substring(0, param_descriptor.length() - 1 - param_name.length()).trim();
+			param_type_name = param_descriptor.substring(0, param_descriptor.length() - 1 - param_name.length()).trim();
 
-        } else {
+		} else {
 
-            param_name = param_descriptor;
+			param_name = param_descriptor;
 
-            param_type_name = null;
-        }
+			param_type_name = null;
+		}
 
-        return new String[]{param_type_name, param_name};
-    }
+		return new String[] { param_type_name, param_name };
+	}
 
-    private static void check_duplicates(String[] param_names) throws SQLException {
+	private static void check_duplicates(String[] param_names) throws SQLException {
 
-        if (param_names != null) {
+		if (param_names != null) {
 
-            Set<String> set = new HashSet<String>();
+			Set<String> set = new HashSet<String>();
 
-            for (String param_name : param_names) {
+			for (String param_name : param_names) {
 
-                if (set.contains(param_name)) {
+				if (set.contains(param_name)) {
 
-                    throw new SQLException("Duplicated parameter names");
-                }
+					throw new SQLException("Duplicated parameter names");
+				}
 
-                set.add(param_name);
-            }
-        }
-    }
+				set.add(param_name);
+			}
+		}
+	}
 
-    public void validate_sql(StringBuilder sql_buf) throws SQLException {
+	public void validate_sql(StringBuilder sql_buf) throws SQLException {
 
-        if (sql_buf.length() > 0) {
+		if (sql_buf.length() > 0) {
 
-            // CDRU SQL statements cannot be generated for the tables where all
-            // columns are parts of PK
-            PreparedStatement s = prepare(conn, sql_buf.toString());
+			// CDRU SQL statements cannot be generated for the tables where all
+			// columns are parts of PK
+			PreparedStatement s = prepare(conn, sql_buf.toString());
 
-            s.close();
-        }
-    }
+			s.close();
+		}
+	}
 
-    private static PreparedStatement prepare(Connection conn, String jdbc_sql) throws SQLException {
+	private static PreparedStatement prepare(Connection conn, String jdbc_sql) throws SQLException {
 
-        // For MySQL, prepareStatement doesn't throw Exception for
-        // invalid SQL statements
-        // and doesn't return null as well
-        return conn.prepareStatement(jdbc_sql);
-    }
+		// For MySQL, prepareStatement doesn't throw Exception for
+		// invalid SQL statements
+		// and doesn't return null as well
+		return conn.prepareStatement(jdbc_sql);
+	}
 
-    private static CallableStatement prepare_call(Connection conn, String jdbc_sql) throws SQLException {
+	private static CallableStatement prepare_call(Connection conn, String jdbc_sql) throws SQLException {
 
-        return conn.prepareCall(jdbc_sql);
-    }
+		return conn.prepareCall(jdbc_sql);
+	}
 
-    private static String get_qualified_name(String java_class_name) {
+	private static String get_qualified_name(String java_class_name) {
 
-        java_class_name = java_class_name.replaceAll("\\s+", "");
+		java_class_name = java_class_name.replaceAll("\\s+", "");
 
-        String element_name;
+		String element_name;
 
-        boolean is_array;
+		boolean is_array;
 
-        if (java_class_name.contains("[")) {
+		if (java_class_name.contains("[")) {
 
-            element_name = java_class_name.replace('[', ' ').replace(']', ' ').trim();
+			element_name = java_class_name.replace('[', ' ').replace(']', ' ').trim();
 
-            is_array = true;
+			is_array = true;
 
-        } else {
+		} else {
 
-            is_array = false;
+			is_array = false;
 
-            element_name = java_class_name;
-        }
+			element_name = java_class_name;
+		}
 
-        boolean is_primitive = Helpers.PRIMITIVE_CLASSES.containsKey(element_name);
+		boolean is_primitive = Helpers.PRIMITIVE_CLASSES.containsKey(element_name);
 
-        if (!is_primitive && !java_class_name.contains(".")) {
+		if (!is_primitive && !java_class_name.contains(".")) {
 
-            element_name = "java.lang." + element_name;
-        }
+			element_name = "java.lang." + element_name;
+		}
 
-        java_class_name = element_name;
+		java_class_name = element_name;
 
-        if (is_array) {
+		if (is_array) {
 
-            java_class_name += " []";
-        }
+			java_class_name += " []";
+		}
 
-        return java_class_name;
-    }
+		return java_class_name;
+	}
 
-    public static String get_cpp_class_name_from_java_class_name(TypeMap type_map, String java_class_name) {
+	public static String get_cpp_class_name_from_java_class_name(TypeMap type_map, String java_class_name) {
 
-        String s1 = get_qualified_name(java_class_name);
+		String s1 = get_qualified_name(java_class_name);
 
-        for (Type t : type_map.getType()) {
+		for (Type t : type_map.getType()) {
 
-            String s2 = get_qualified_name(t.getJava());
+			String s2 = get_qualified_name(t.getJava());
 
-            if (s2.equals(s1)) {
+			if (s2.equals(s1)) {
 
-                return t.getTarget();
-            }
-        }
+				return t.getTarget();
+			}
+		}
 
-        return type_map.getDefault();
-    }
+		return type_map.getDefault();
+	}
 
-    private static String get_explicit_column_type_name(DtoClass dto_class, String col_name) {
+	private static String get_explicit_column_type_name(DtoClass dto_class, String col_name) {
 
-        if (dto_class != null && dto_class.getField() != null) {
+		if (dto_class != null && dto_class.getField() != null) {
 
-            for (DtoClass.Field c : dto_class.getField()) {
+			for (DtoClass.Field c : dto_class.getField()) {
 
-                if (col_name.equals(c.getColumn())) {
+				if (col_name.equals(c.getColumn())) {
 
-                    return c.getJavaType();
-                }
-            }
-        }
+					return c.getJavaType();
+				}
+			}
+		}
 
-        return null;
-    }
+		return null;
+	}
 
-    private static String get_column_type_name(DtoClass dto_class, String col_name, ResultSetMetaData rsmd, int i) {
+	private static String get_column_type_name(DtoClass dto_class, String col_name, ResultSetMetaData rsmd, int i) {
 
-        String java_class_name = get_explicit_column_type_name(dto_class, col_name);
+		String java_class_name = get_explicit_column_type_name(dto_class, col_name);
 
-        if (java_class_name == null) {
+		if (java_class_name == null) {
 
-            try {
+			try {
 
-                // sometime returns "[B":
-                // See comments for Class.getName() API
-                java_class_name = rsmd.getColumnClassName(i);
+				// sometime returns "[B":
+				// See comments for Class.getName() API
+				java_class_name = rsmd.getColumnClassName(i);
 
-                java_class_name = Helpers.process_class_name(java_class_name);
+				java_class_name = Helpers.process_class_name(java_class_name);
 
-            } catch (Throwable ex) {
+			} catch (Throwable ex) {
 
-                java_class_name = Object.class.getName();
-            }
-        }
-        return java_class_name;
-    }
+				java_class_name = Object.class.getName();
+			}
+		}
+		return java_class_name;
+	}
 
-    private static String get_param_type_name(ParameterMetaData pm, int i) {
+	private static String get_param_type_name(ParameterMetaData pm, int i) {
 
-        String java_class_name;
+		String java_class_name;
 
-        try {
+		try {
 
-            // getParameterClassName throws exception in
-            // mysql-connector-java-5.1.17-bin.jar:
-            // sometime returns "[B":
-            // See comments for Class.getName() API
-            java_class_name = pm.getParameterClassName(i + 1);
+			// getParameterClassName throws exception in
+			// mysql-connector-java-5.1.17-bin.jar:
+			// sometime returns "[B":
+			// See comments for Class.getName() API
+			java_class_name = pm.getParameterClassName(i + 1);
 
-            java_class_name = Helpers.process_class_name(java_class_name);
+			java_class_name = Helpers.process_class_name(java_class_name);
 
-        } catch (Throwable ex) {
+		} catch (Throwable ex) {
 
-            java_class_name = Object.class.getName();
-        }
+			java_class_name = Object.class.getName();
+		}
 
-        return java_class_name;
-    }
+		return java_class_name;
+	}
 
-    public FieldInfo[] get_table_columns_info(String table_name, String explicit_gen_keys, String dto_class_name,
-            DtoClasses dto_classes) throws Exception {
+	public FieldInfo[] get_table_columns_info(String table_name, String explicit_gen_keys, String dto_class_name,
+			DtoClasses dto_classes) throws Exception {
 
-        Set<String> gen_keys = new HashSet<String>();
+		Set<String> gen_keys = new HashSet<String>();
 
-        if (!("*".equals(explicit_gen_keys))) {
+		if (!("*".equals(explicit_gen_keys))) {
 
-            String[] gen_keys_arr = Helpers.get_listed_items(explicit_gen_keys);
+			String[] gen_keys_arr = Helpers.get_listed_items(explicit_gen_keys);
 
-            check_duplicates(gen_keys_arr);
+			check_duplicates(gen_keys_arr);
 
-            for (String k : gen_keys_arr) {
+			for (String k : gen_keys_arr) {
 
-                gen_keys.add(k.toLowerCase());
-            }
-        }
+				gen_keys.add(k.toLowerCase());
+			}
+		}
 
-        DtoClass dto_class = Helpers.find_dto_class(dto_class_name, dto_classes);
+		DtoClass dto_class = Helpers.find_dto_class(dto_class_name, dto_classes);
 
-        PreparedStatement ps = create_prepared_statement(conn, table_name);
+		PreparedStatement ps = create_prepared_statement(conn, table_name);
 
-        try {
+		try {
 
-            ArrayList<FieldInfo> list = new ArrayList<FieldInfo>();
+			ArrayList<FieldInfo> list = new ArrayList<FieldInfo>();
 
-            ResultSetMetaData meta = ps.getMetaData();
+			ResultSetMetaData meta = ps.getMetaData();
 
-            int column_count = meta.getColumnCount();
+			int column_count = meta.getColumnCount();
 
-            for (int i = 1; i <= column_count; i++) {
+			for (int i = 1; i <= column_count; i++) {
 
-                String col_name = get_column_name(meta, i);
+				String col_name = get_column_name(meta, i);
 
-                String type_name = get_column_type_name(dto_class, col_name, meta, i);
+				String type_name = get_column_type_name(dto_class, col_name, meta, i);
 
-                if (type_map != null) {
+				if (type_map != null) {
 
-                    type_name = get_cpp_class_name_from_java_class_name(type_map, type_name);
-                }
+					type_name = get_cpp_class_name_from_java_class_name(type_map, type_name);
+				}
 
-                FieldInfo ci = new FieldInfo(field_names_mode, type_name, col_name);
+				FieldInfo ci = new FieldInfo(field_names_mode, type_name, col_name);
 
-                if (!("*".equals(explicit_gen_keys))) {
+				if (!("*".equals(explicit_gen_keys))) {
 
-                    String key = col_name.toLowerCase();
+					String key = col_name.toLowerCase();
 
-                    if (gen_keys.contains(key)) {
+					if (gen_keys.contains(key)) {
 
-                        ci.setAutoIncrement(true);
+						ci.setAutoIncrement(true);
 
-                        gen_keys.remove(key);
-                    }
+						gen_keys.remove(key);
+					}
 
-                } else {
+				} else {
 
-                    boolean is_auto_inc = meta.isAutoIncrement(i);
+					boolean is_auto_inc = meta.isAutoIncrement(i);
 
-                    ci.setAutoIncrement(is_auto_inc);
-                }
+					ci.setAutoIncrement(is_auto_inc);
+				}
 
-                list.add(ci);
-            }
+				list.add(ci);
+			}
 
-            if (gen_keys.size() > 0) {
+			if (gen_keys.size() > 0) {
 
-                String msg = "Unknown column names are listed as 'generated':";
+				String msg = "Unknown column names are listed as 'generated':";
 
-                for (String s : gen_keys) {
+				for (String s : gen_keys) {
 
-                    msg += " " + s;
-                }
+					msg += " " + s;
+				}
 
-                throw new SQLException(msg);
-            }
+				throw new SQLException(msg);
+			}
 
-            return list.toArray(new FieldInfo[list.size()]);
+			return list.toArray(new FieldInfo[list.size()]);
 
-        } finally {
+		} finally {
 
-            ps.close();
-        }
-    }
+			ps.close();
+		}
+	}
 
-    public void get_crud_info(String table_name, ArrayList<FieldInfo> columns, List<FieldInfo> params,
-            String dto_class_name, DtoClasses dto_classes) throws Exception {
+	public void get_crud_info(String table_name, ArrayList<FieldInfo> columns, List<FieldInfo> params,
+			String dto_class_name, DtoClasses dto_classes) throws Exception {
 
-        get_crud_info(table_name, columns, params, dto_class_name, dto_classes, type_map);
-    }
+		get_crud_info(table_name, columns, params, dto_class_name, dto_classes, type_map);
+	}
 
-    public void get_crud_info(String table_name, ArrayList<FieldInfo> columns, List<FieldInfo> params,
-            String dto_class_name, DtoClasses dto_classes, TypeMap type_map) throws Exception {
+	public void get_crud_info(String table_name, ArrayList<FieldInfo> columns, List<FieldInfo> params,
+			String dto_class_name, DtoClasses dto_classes, TypeMap type_map) throws Exception {
 
-        ArrayList<String> pk_col_names = get_pk_col_names(conn, table_name);
+		ArrayList<String> pk_col_names = get_pk_col_names(conn, table_name);
 
-        /*
-         * DatabaseMetaData.getPrimaryKeys may return pk_col_names in lower case
-         * (SQLite3). For other JDBC drivers, it may differ. To ensure correct
-         * comparison of field names, do it always in lower case
-         */
-        Set<String> pk_col_names_set_lower_case = new HashSet<String>();
+		/*
+		 * DatabaseMetaData.getPrimaryKeys may return pk_col_names in lower case
+		 * (SQLite3). For other JDBC drivers, it may differ. To ensure correct
+		 * comparison of field names, do it always in lower case
+		 */
+		Set<String> pk_col_names_set_lower_case = new HashSet<String>();
 
-        for (String pk_col_name : pk_col_names) {
+		for (String pk_col_name : pk_col_names) {
 
-            // xerial SQLite3 returns pk_col_names in the format '[employeeid] asc'
-            // (compound PK)
-            pk_col_name = pk_col_name.toLowerCase();
-            pk_col_name = pk_col_name.replace("[", "");
-            pk_col_name = pk_col_name.replace("]", "");
-            if (pk_col_name.endsWith(" asc")) {
-                pk_col_name = pk_col_name.replace(" asc", "");
-            }
-            if (pk_col_name.endsWith(" desc")) {
-                pk_col_name = pk_col_name.replace(" desc", "");
-            }
-            pk_col_name = pk_col_name.trim();
+			// xerial SQLite3 returns pk_col_names in the format '[employeeid] asc'
+			// (compound PK)
+			pk_col_name = pk_col_name.toLowerCase();
+			pk_col_name = pk_col_name.replace("[", "");
+			pk_col_name = pk_col_name.replace("]", "");
+			if (pk_col_name.endsWith(" asc")) {
+				pk_col_name = pk_col_name.replace(" asc", "");
+			}
+			if (pk_col_name.endsWith(" desc")) {
+				pk_col_name = pk_col_name.replace(" desc", "");
+			}
+			pk_col_name = pk_col_name.trim();
 
-            pk_col_names_set_lower_case.add(pk_col_name);
-        }
+			pk_col_names_set_lower_case.add(pk_col_name);
+		}
 
-        DtoClass dto_class = Helpers.find_dto_class(dto_class_name, dto_classes);
+		DtoClass dto_class = Helpers.find_dto_class(dto_class_name, dto_classes);
 
-        PreparedStatement ps = create_prepared_statement(conn, table_name);
+		PreparedStatement ps = create_prepared_statement(conn, table_name);
 
-        try {
+		try {
 
-            ResultSetMetaData meta = ps.getMetaData();
+			ResultSetMetaData meta = ps.getMetaData();
 
-            if (meta == null) {
+			if (meta == null) {
 
-                // jTDS returns null for invalid SQL
-                throw new SQLException("PreparedStatement.getMetaData returns null for '" + table_name + "");
-            }
+				// jTDS returns null for invalid SQL
+				throw new SQLException("PreparedStatement.getMetaData returns null for '" + table_name + "");
+			}
 
-            int column_count = meta.getColumnCount();
+			int column_count = meta.getColumnCount();
 
-            for (int i = 1; i <= column_count; i++) {
+			for (int i = 1; i <= column_count; i++) {
 
-                String col_name = get_column_name(meta, i);
+				String col_name = get_column_name(meta, i);
 
-                String type_name = get_column_type_name(dto_class, col_name, meta, i);
+				String type_name = get_column_type_name(dto_class, col_name, meta, i);
 
-                if (type_map != null) {
+				if (type_map != null) {
 
-                    type_name = get_cpp_class_name_from_java_class_name(type_map, type_name);
-                }
+					type_name = get_cpp_class_name_from_java_class_name(type_map, type_name);
+				}
 
-                FieldInfo f = new FieldInfo(field_names_mode, type_name, col_name);
+				FieldInfo f = new FieldInfo(field_names_mode, type_name, col_name);
 
-                if (pk_col_names_set_lower_case.contains(col_name.toLowerCase())) {
+				if (pk_col_names_set_lower_case.contains(col_name.toLowerCase())) {
 
-                    columns.add(f);
+					columns.add(f);
 
-                } else {
+				} else {
 
-                    if (params != null) {
+					if (params != null) {
 
-                        params.add(f);
-                    }
-                }
-            }
+						params.add(f);
+					}
+				}
+			}
 
-        } finally {
+		} finally {
 
-            ps.close();
-        }
-    }
+			ps.close();
+		}
+	}
 
-    public void get_dto_field_info(String dto_jdbc_sql, DtoClass dto_class, ArrayList<FieldInfo> fields) throws Exception {
+	public void get_dto_field_info(String dto_jdbc_sql, DtoClass dto_class, ArrayList<FieldInfo> fields)
+			throws Exception {
 
-        fields.clear();
+		fields.clear();
 
-        String ref = dto_class.getRef();
+		String ref = dto_class.getRef();
 
-        if (ref == null || ref.length() == 0) {
+		if (ref == null || ref.length() == 0) {
 
-            for (DtoClass.Field c : dto_class.getField()) {
+			for (DtoClass.Field c : dto_class.getField()) {
 
-                String type_name = c.getJavaType();
+				String type_name = c.getJavaType();
 
-                if (type_map != null) {
+				if (type_map != null) {
 
-                    type_name = get_cpp_class_name_from_java_class_name(type_map, type_name);
-                }
+					type_name = get_cpp_class_name_from_java_class_name(type_map, type_name);
+				}
 
-                FieldInfo f = new FieldInfo(field_names_mode, type_name, c.getColumn());
+				FieldInfo f = new FieldInfo(field_names_mode, type_name, c.getColumn());
 
-                fields.add(f);
-            }
-        }
+				fields.add(f);
+			}
+		}
 
-        if (dto_jdbc_sql == null || dto_jdbc_sql.trim().length() == 0) {
-            return;
-        }
-        ///////////////////////////////////////////
+		if (dto_jdbc_sql == null || dto_jdbc_sql.trim().length() == 0) {
+			return;
+		}
+		///////////////////////////////////////////
 
-        PreparedStatement ps; // PreparedStatement is interface
+		PreparedStatement ps; // PreparedStatement is interface
 
-        boolean is_sp = is_jdbc_stored_proc_call(dto_jdbc_sql);
+		boolean is_sp = is_jdbc_stored_proc_call(dto_jdbc_sql);
 
-        if (is_sp) {
+		if (is_sp) {
 
-            ps = prepare_call(conn, dto_jdbc_sql); // in MySql, getMetaData() for SP does not work, but maybe it works with others :)
+			ps = prepare_call(conn, dto_jdbc_sql); // in MySql, getMetaData() for SP does not work, but maybe it works
+													// with others :)
 
-        } else {
+		} else {
 
-            ps = prepare(conn, dto_jdbc_sql);
-        }
+			ps = prepare(conn, dto_jdbc_sql);
+		}
 
-        try {
+		try {
 
-            ResultSetMetaData md = ps.getMetaData();
+			ResultSetMetaData md = ps.getMetaData();
 
-            if (md == null) { // jTDS returns null for invalid SQL
+			if (md == null) { // jTDS returns null for invalid SQL
 
-                throw new Exception("PreparedStatement.getMetaData returns null for '" + ref + "");
-            }
+				throw new Exception("PreparedStatement.getMetaData returns null for '" + ref + "");
+			}
 
-            int col_count = md.getColumnCount();
+			int col_count = md.getColumnCount();
 
-            if (col_count == 0) {
+			if (col_count == 0) {
 
-                throw new Exception("getColumnCount returned 0");
-            }
+				throw new Exception("getColumnCount returned 0");
+			}
 
-            // ///////////////////////////////////////////////
-            // create DTO-class even if single field is returned
-            Set<String> col_names = new HashSet<String>();
+			// ///////////////////////////////////////////////
+			// create DTO-class even if single field is returned
+			Set<String> col_names = new HashSet<String>();
 
-            for (int i = 1; i <= col_count; i++) {
+			for (int i = 1; i <= col_count; i++) {
 
-                String col_name = get_column_name(md, i);
+				String col_name = get_column_name(md, i);
 
-                col_names.add(col_name);
+				col_names.add(col_name);
 
-                String type_name = get_column_type_name(dto_class, col_name, md, i);
+				String type_name = get_column_type_name(dto_class, col_name, md, i);
 
-                validate_element_dto_class(dto_class);
+				validate_element_dto_class(dto_class);
 
-                if (type_map != null) {
+				if (type_map != null) {
 
-                    type_name = get_cpp_class_name_from_java_class_name(type_map, type_name);
-                }
+					type_name = get_cpp_class_name_from_java_class_name(type_map, type_name);
+				}
 
-                FieldInfo f = new FieldInfo(field_names_mode, type_name, col_name);
+				FieldInfo f = new FieldInfo(field_names_mode, type_name, col_name);
 
-                fields.add(f);
-            }
+				fields.add(f);
+			}
 
-            List<DtoClass.Field> field_list = dto_class.getField();
+			List<DtoClass.Field> field_list = dto_class.getField();
 
-            for (DtoClass.Field fe : field_list) {
+			for (DtoClass.Field fe : field_list) {
 
-                String col = fe.getColumn();
+				String col = fe.getColumn();
 
-                if (!col_names.contains(col)) {
+				if (!col_names.contains(col)) {
 
-                    throw new Exception(
-                            "Duplicated column name in declaration of DTO class " + dto_class.getName() + ": " + col);
-                }
-            }
+					throw new Exception(
+							"Duplicated column name in declaration of DTO class " + dto_class.getName() + ": " + col);
+				}
+			}
 
-        } finally {
+		} finally {
 
-            ps.close();
-        }
-    }
+			ps.close();
+		}
+	}
 
-    public static String jdbc_sql_by_ref_exec_dml(String ref, String sql_root_abs_path) throws Exception {
+	public static String jdbc_sql_by_ref_exec_dml(String ref, String sql_root_abs_path) throws Exception {
 
-        if (is_jdbc_stored_proc_call(ref)) {
+		if (is_jdbc_stored_proc_call(ref)) {
 
-            return ref;
+			return ref;
 
-        } else if (is_stored_proc_call_shortcut(ref)) {
+		} else if (is_stored_proc_call_shortcut(ref)) {
 
-            return stored_proc_shortcut_to_jdbc_call(ref);
+			return ref; // stored_proc_shortcut_to_jdbc_call(ref);
 
-        } else if (is_sql_file_ref(ref)) {
+		} else if (is_sql_file_ref(ref)) {
 
-            String sql_file_path = Helpers.concat_path(sql_root_abs_path, ref);
+			String sql_file_path = Helpers.concat_path(sql_root_abs_path, ref);
 
-            return Helpers.load_text_from_file(sql_file_path);
+			return Helpers.load_text_from_file(sql_file_path);
 
-        } else {
+		} else {
 
-            throw new Exception("Invalid 'ref'': " + ref);
-        }
-    }
+			throw new Exception("Invalid 'ref'': " + ref);
+		}
+	}
 
-    private static String query_shortcut_ref_to_jdbc_sql(String ref) throws Exception {
+	private static String query_shortcut_ref_to_jdbc_sql(String ref) throws Exception {
 
-        String[] parts2 = parse_ref(ref);
+		String[] parts2 = parse_ref(ref);
 
-        String table_name = parts2[0];
+		String table_name = parts2[0];
 
-        String param_descriptors = parts2[1];
+		String param_descriptors = parts2[1];
 
-        String[] param_arr = Helpers.get_listed_items(param_descriptors);
+		String[] param_arr = Helpers.get_listed_items(param_descriptors);
 
-        if (param_arr.length < 1) {
+		if (param_arr.length < 1) {
 
-            throw new Exception("Not empty list of parameters expected in ref shortcut");
-        }
+			throw new Exception("Not empty list of parameters expected in ref shortcut");
+		}
 
-        String params = param_arr[0] + "=?";
+		String params = param_arr[0] + "=?";
 
-        for (int i = 1; i < param_arr.length; i++) {
+		for (int i = 1; i < param_arr.length; i++) {
 
-            params += " AND " + param_arr[i] + "=?";
-        }
+			params += " AND " + param_arr[i] + "=?";
+		}
 
-        return "SELECT * FROM " + table_name + " WHERE " + params;
-    }
+		return "SELECT * FROM " + table_name + " WHERE " + params;
+	}
 
-    public static String jdbc_sql_by_ref_query(String ref, String sql_root_abs_path) throws Exception {
+	public static String jdbc_sql_by_ref_query(String ref, String sql_root_abs_path) throws Exception {
 
-        String[] parts = ref.split(":");
+		String[] parts = ref.split(":");
 
-        String table_name = null;
+		String table_name = null;
 
-        if (parts.length >= 2) {
+		if (parts.length >= 2) {
 
-            if ("table".compareTo(parts[0].toLowerCase().trim()) == 0) {
+			if ("table".compareTo(parts[0].toLowerCase().trim()) == 0) {
 
-                table_name = ref.substring(parts[0].length() + 1);
-            }
+				table_name = ref.substring(parts[0].length() + 1);
+			}
 
-        } else if (is_jdbc_stored_proc_call(ref)) {
+		} else if (is_jdbc_stored_proc_call(ref)) {
 
-            return ref;
+			return ref;
 
-        } else if (is_stored_proc_call_shortcut(ref)) {
+		} else if (is_stored_proc_call_shortcut(ref)) {
 
-            return stored_proc_shortcut_to_jdbc_call(ref);
+			return ref; // stored_proc_shortcut_to_jdbc_call(ref);
 
-        } else if (is_sql_file_ref(ref)) {
+		} else if (is_stored_func_call_shortcut(ref)) {
 
-            String sql_file_path = Helpers.concat_path(sql_root_abs_path, ref);
+			return ref;
 
-            return Helpers.load_text_from_file(sql_file_path);
+		} else if (is_sql_file_ref(ref)) {
 
-        } else if (is_sql_shortcut_ref(ref)) {
+			String sql_file_path = Helpers.concat_path(sql_root_abs_path, ref);
 
-            String res = query_shortcut_ref_to_jdbc_sql(ref);
+			return Helpers.load_text_from_file(sql_file_path);
 
-            return res;
+		} else if (is_sql_shortcut_ref(ref)) {
 
-        } else if (is_table_ref(ref)) {
+			String res = query_shortcut_ref_to_jdbc_sql(ref);
 
-            table_name = ref;
+			return res;
 
-        } else if (ref == null || ref.trim().length() == 0) {
+		} else if (is_table_ref(ref)) {
 
-            return "";
+			table_name = ref;
 
-        } else {
+		} else if (ref == null || ref.trim().length() == 0) {
 
-            throw new Exception("Invalid 'ref'': " + ref);
-        }
+			return "";
 
-        return "SELECT * FROM " + table_name + " WHERE 1 = 0";
-    }
+		} else {
 
-    public static boolean is_sql_shortcut_ref(String ref) {
+			throw new Exception("Invalid 'ref'': " + ref);
+		}
 
-        return ref != null && ref.length() >= 4 && ref.contains("(") && ref.trim().endsWith(")");
-    }
+		return "SELECT * FROM " + table_name + " WHERE 1 = 0";
+	}
 
-    public static boolean is_sql_file_ref(String ref) {
+	public static boolean is_sql_shortcut_ref(String ref) {
 
-        if (is_sql_shortcut_ref(ref)) {
+		return ref != null && ref.length() >= 4 && ref.contains("(") && ref.trim().endsWith(")");
+	}
 
-            return false;
-        }
+	public static boolean is_sql_file_ref(String ref) {
 
-        if (is_jdbc_stored_proc_call(ref)) {
+		if (is_sql_shortcut_ref(ref)) {
 
-            return false;
-        }
+			return false;
+		}
 
-        return ref != null && ref.length() > 4 && ref.endsWith(".sql");
-    }
+		if (is_jdbc_stored_proc_call(ref)) {
 
-    public static boolean is_table_ref(String ref) {
+			return false;
+		}
 
-        if (ref == null || ref.length() == 0) {
+		return ref != null && ref.length() > 4 && ref.endsWith(".sql");
+	}
 
-            return false;
-        }
+	public static boolean is_table_ref(String ref) {
 
-        if (is_sql_shortcut_ref(ref)) {
+		if (ref == null || ref.length() == 0) {
 
-            return false;
-        }
+			return false;
+		}
 
-        if (is_jdbc_stored_proc_call(ref)) {
+		if (is_sql_shortcut_ref(ref)) {
 
-            return false;
-        }
+			return false;
+		}
 
-        if (is_sql_file_ref(ref)) {
+		if (is_jdbc_stored_proc_call(ref)) {
 
-            return false;
-        }
+			return false;
+		}
 
-        if (is_stored_proc_call_shortcut(ref)) {
+		if (is_sql_file_ref(ref)) {
 
-            return false;
-        }
+			return false;
+		}
 
-        final char[] ILLEGAL_CHARACTERS = {'/', '\n', '\r', '\t', '\0', '\f', '`', '?', '*', '\\', '<', '>', '|',
-            '\"'/* , ':' */, ';', ','};
+		if (is_stored_proc_call_shortcut(ref)) {
 
-        for (char c : ILLEGAL_CHARACTERS) {
+			return false;
+		}
 
-            if (ref.contains(Character.toString(c))) {
+		if (is_stored_func_call_shortcut(ref)) {
 
-                return false;
-            }
-        }
+			return false;
+		}
 
-        // no empty strings separated by dots
-        //
-        String parts[] = ref.split("\\.", -1); // -1 to leave empty strings
+		final char[] ILLEGAL_CHARACTERS = { '/', '\n', '\r', '\t', '\0', '\f', '`', '?', '*', '\\', '<', '>', '|',
+				'\"'/* , ':' */, ';', ',' };
 
-        for (String s : parts) {
+		for (char c : ILLEGAL_CHARACTERS) {
 
-            if (s.length() == 0) {
+			if (ref.contains(Character.toString(c))) {
 
-                return false;
-            }
-        }
+				return false;
+			}
+		}
 
-        return true;
-    }
+		// no empty strings separated by dots
+		//
+		String parts[] = ref.split("\\.", -1); // -1 to leave empty strings
 
-    public static boolean is_jdbc_stored_proc_call(String jdbc_sql) {
+		for (String s : parts) {
 
-        jdbc_sql = jdbc_sql.trim();
+			if (s.length() == 0) {
 
-        if (jdbc_sql.startsWith("{") == false || jdbc_sql.endsWith("}") == false) {
-            return false;
-        }
+				return false;
+			}
+		}
 
-        // jdbc_sql = jdbc_sql.trim(); ^^ trimmed
-        jdbc_sql = jdbc_sql.substring(1, jdbc_sql.length() - 1);
+		return true;
+	}
 
-        return is_stored_proc_call_shortcut(jdbc_sql);
-    }
+	public static boolean is_jdbc_stored_proc_call(String jdbc_sql) {
 
-    public static boolean is_stored_proc_call_shortcut(String text) {
+		jdbc_sql = jdbc_sql.trim();
 
-        String parts[] = text.split("\\s+");
+		if (jdbc_sql.startsWith("{") == false || jdbc_sql.endsWith("}") == false) {
+			return false;
+		}
 
-        if (parts.length < 2) {
-            return false;
-        }
+		// jdbc_sql = jdbc_sql.trim(); ^^ trimmed
+		jdbc_sql = jdbc_sql.substring(1, jdbc_sql.length() - 1);
 
-        String call = parts[0];
+		return is_stored_proc_call_shortcut(jdbc_sql);
+	}
 
-        return call.compareToIgnoreCase("call") == 0;
-    }
+	public static boolean is_stored_proc_call_shortcut(String text) {
 
-    public static String stored_proc_shortcut_to_jdbc_call(String text) throws Exception {
+		String parts[] = text.split("\\s+");
 
-        if (is_stored_proc_call_shortcut(text)) {
-            return "{" + text + "}";
-        }
-        throw new Exception("This is not a shortcut of stored procedure call: " + text);
-    }
+		if (parts.length < 2) {
+			return false;
+		}
 
-    public static String jdbc_to_php_stored_proc_call(final String jdbc_sql) throws java.lang.Exception {
+		String call = parts[0];
 
-        String sql = jdbc_sql.trim();
+		return call.compareToIgnoreCase("call") == 0;
+	}
 
-        if (is_jdbc_stored_proc_call(sql)) { // confirms syntax {call sp_name(...)}
+	public static boolean is_stored_func_call_shortcut(String text) {
 
-            sql = sql.substring(1, sql.length() - 1).trim(); // converted to call sp_name(...)
+		String parts[] = text.split("\\s+");
 
-        } else if (is_stored_proc_call_shortcut(sql)) {
-            //
+		if (parts.length < 2) {
+			return false;
+		}
 
-        } else {
+		String call = parts[0];
 
-            throw Exception("Inexpected syntax of CALL: " + jdbc_sql);
-        }
+		return call.compareToIgnoreCase("select") == 0;
+	}
 
-        return sql;
-    }
+	public static String stored_proc_shortcut_to_jdbc_call(String text) throws Exception {
 
-    public static String jdbc_to_python_stored_proc_call(final String jdbc_sql) throws java.lang.Exception {
+		if (is_stored_proc_call_shortcut(text)) {
+			return "{" + text + "}";
+		}
+		throw new Exception("This is not a shortcut of stored procedure call: " + text);
+	}
 
-        String sql = jdbc_sql.trim();
+	public static String jdbc_to_php_stored_proc_call(final String jdbc_sql) throws java.lang.Exception {
 
-        if (is_jdbc_stored_proc_call(sql)) { // confirms syntax {call sp_name(...)}
+		String sql = jdbc_sql.trim();
 
-            sql = sql.substring(1, sql.length() - 1).trim(); // converted to call sp_name(...)
+		if (is_jdbc_stored_proc_call(sql)) { // confirms syntax {call sp_name(...)}
 
-        } else if (is_stored_proc_call_shortcut(sql)) {
-            //
+			sql = sql.substring(1, sql.length() - 1).trim(); // converted to call sp_name(...)
 
-        } else {
+		} else if (is_stored_proc_call_shortcut(sql)) {
+			//
 
-            throw Exception("Inexpected syntax of CALL: " + jdbc_sql);
-        }
+		} else {
 
-        if (sql.contains("(")) {
+			throw Exception("Inexpected syntax of CALL: " + jdbc_sql);
+		}
 
-            if (sql.endsWith(")") == false) {
+		return sql;
+	}
 
-                throw Exception("Inexpected syntax of CALL: " + jdbc_sql);
-            }
-            
-            String[] parts = sql.split("[(]");
-            
-            sql = parts[0].trim();
-        }
+	public static String jdbc_to_python_stored_proc_call(final String jdbc_sql) throws java.lang.Exception {
 
-        return sql;
-    }
+		String sql = jdbc_sql.trim();
 
-    public String get_query_jdbc_sql_info(String sql_root_abs_path, String dao_jdbc_sql, ArrayList<FieldInfo> fields, String dto_param_type,
-            String[] param_descriptors, ArrayList<FieldInfo> params, String return_type,
-            boolean return_type_is_dto, DtoClasses dto_classes)
-            throws Exception {
+		if (is_jdbc_stored_proc_call(sql)) { // confirms syntax {call sp_name(...)}
 
-        check_duplicates(param_descriptors);
+			sql = sql.substring(1, sql.length() - 1).trim(); // converted to call sp_name(...)
 
-        PreparedStatement ps; // PreparedStatement is interface
+		} else if (is_stored_proc_call_shortcut(sql)) {
+			//
 
-        boolean is_sp = is_jdbc_stored_proc_call(dao_jdbc_sql);
+		} else {
 
-        if (is_sp) {
+			throw Exception("Inexpected syntax of CALL: " + jdbc_sql);
+		}
 
-            ps = prepare_call(conn, dao_jdbc_sql);
+		if (sql.contains("(")) {
 
-        } else {
+			if (sql.endsWith(")") == false) {
 
-            ps = prepare(conn, dao_jdbc_sql);
-        }
+				throw Exception("Inexpected syntax of CALL: " + jdbc_sql);
+			}
 
-        try {
+			String[] parts = sql.split("[(]");
 
-            DtoClass dto_class;
+			sql = parts[0].trim();
+		}
 
-            if (return_type_is_dto) {
+		return sql;
+	}
 
-                String dto_class_name = return_type;
+	public String get_query_jdbc_sql_info(String sql_root_abs_path, String dao_jdbc_sql, ArrayList<FieldInfo> fields,
+			String dto_param_type, String[] param_descriptors, ArrayList<FieldInfo> params, String return_type,
+			boolean return_type_is_dto, DtoClasses dto_classes) throws Exception {
 
-                if (dto_class_name != null && dto_class_name.length() > 0) {
+		check_duplicates(param_descriptors);
 
-                    dto_class = Helpers.find_dto_class(dto_class_name, dto_classes);
+		PreparedStatement ps; // PreparedStatement is interface
 
-                } else {
+		boolean is_sp = is_jdbc_stored_proc_call(dao_jdbc_sql);
 
-                    dto_class = null;
-                }
+		if (is_sp) {
 
-                get_fields_info(ps, dto_class, fields);
+			ps = prepare_call(conn, dao_jdbc_sql);
 
-                if (fields.size() == 0) {
+		} else {
 
-                    if (dto_class != null) {
+			ps = prepare(conn, dao_jdbc_sql);
+		}
 
-                        String dto_jdbc_sql = jdbc_sql_by_ref_query(dto_class.getRef(), sql_root_abs_path);
+		try {
 
-                        get_dto_field_info(dto_jdbc_sql, dto_class, fields);
-                    }
-                }
+			DtoClass dto_class;
 
-            } else { // return_type_is_dto == false
+			if (return_type_is_dto) {
 
-                fields.clear();
-                ;
+				String dto_class_name = return_type;
 
-                if (return_type == null || return_type.trim().length() == 0) {
-                    return_type = "Object";
-                }
+				if (dto_class_name != null && dto_class_name.length() > 0) {
 
-                FieldInfo f = new FieldInfo(field_names_mode, return_type, "");
+					dto_class = Helpers.find_dto_class(dto_class_name, dto_classes);
 
-                fields.add(f);
-            }
+				} else {
 
-            get_params_info(ps, param_descriptors, dto_param_type == null || dto_param_type.length() == 0 ? FieldNamesMode.AS_IS : field_names_mode, params);
+					dto_class = null;
+				}
 
-        } finally {
+				get_fields_info(ps, dto_class, fields);
 
-            ps.close();
-        }
+				if (fields.size() == 0) {
 
-        return dao_jdbc_sql;
-    }
+					if (dto_class != null) {
 
-    public void get_exec_dml_jdbc_sql_info(String sql, String dto_param_type, String[] param_descriptors, ArrayList<FieldInfo> params) throws Exception {
+						String dto_jdbc_sql = jdbc_sql_by_ref_query(dto_class.getRef(), sql_root_abs_path);
 
-        check_duplicates(param_descriptors);
+						get_dto_field_info(dto_jdbc_sql, dto_class, fields);
+					}
+				}
 
-        PreparedStatement ps = prepare(conn, sql);
+			} else { // return_type_is_dto == false
 
-        try {
+				fields.clear();
 
-            get_params_info(ps, param_descriptors, dto_param_type == null || dto_param_type.length() == 0 ? FieldNamesMode.AS_IS : field_names_mode, params);
+				if (return_type == null || return_type.trim().length() == 0) {
 
-        } finally {
+					return_type = "Object";
+				}
 
-            ps.close();
-        }
-    }
+				FieldInfo f = new FieldInfo(field_names_mode, return_type, "");
 
-    private void get_fields_info(PreparedStatement ps, DtoClass dto_class, List<FieldInfo> fields) throws Exception {
+				fields.add(f);
+			}
 
-        fields.clear();
+			get_params_info(ps, param_descriptors,
+					dto_param_type == null || dto_param_type.length() == 0 ? FieldNamesMode.AS_IS : field_names_mode,
+					params);
 
-        ResultSetMetaData rsmd = ps.getMetaData();
+		} finally {
 
-        if (rsmd == null) { // null if no columns or prepare was called instead of prepare_call for stored proc
+			ps.close();
+		}
 
-            return;
-        }
+		return dao_jdbc_sql;
+	}
 
-        int col_count;
+	public void get_exec_dml_jdbc_sql_info(String sql, String dto_param_type, String[] param_descriptors,
+			ArrayList<FieldInfo> params) throws Exception {
 
-        try {
+		check_duplicates(param_descriptors);
 
-            // Informix:
-            // ResultSetMetaData.getColumnCount() returns
-            // value > 0 for some DML statements, e.g. for 'update orders set
-            // dt_id = ? where o_id = ?' it considers that 'dt_id' is column.
-            // SQLite:
-            // throws java.sql.SQLException: column 1 out
-            // of bounds [1,0] if the statement is like INSERT
-            col_count = rsmd.getColumnCount();
+		PreparedStatement ps = prepare(conn, sql);
 
-        } catch (Throwable e) {
+		try {
 
-            col_count = 0;
-        }
+			get_params_info(ps, param_descriptors,
+					dto_param_type == null || dto_param_type.length() == 0 ? FieldNamesMode.AS_IS : field_names_mode,
+					params);
 
-        for (int i = 1; i <= col_count; i++) {
+		} finally {
 
-            String col_name = get_column_name(rsmd, i);
+			ps.close();
+		}
+	}
 
-            String type_name = get_column_type_name(dto_class, col_name, rsmd, i);
+	private void get_fields_info(PreparedStatement ps, DtoClass dto_class, List<FieldInfo> fields) throws Exception {
 
-            if (type_map != null) {
+		fields.clear();
 
-                type_name = get_cpp_class_name_from_java_class_name(type_map, type_name);
-            }
+		// PostgreSQL:
 
-            FieldInfo f = new FieldInfo(field_names_mode, type_name, col_name);
+		// Initial SQL is '{call get_tests(4)}'; ps is CallableStatement.
+		// ps.toString() returns something like 'select * from get_tests(4) as result'
+		// and ps.getMetaData() throws SQLException.
 
-            fields.add(f);
-        }
-    }
+		ResultSetMetaData rsmd = null;
 
-    private void get_params_info(PreparedStatement ps, String[] param_descriptors,
-            FieldNamesMode field_names_mode, ArrayList<FieldInfo> params) throws SQLException {
+		try {
 
-        params.clear();
+			// String prepared = ps.toString(); //
 
-        ParameterMetaData pm;
+			rsmd = ps.getMetaData();
 
-        try {
+		} catch (SQLException ex) {
 
-            // Sybase ADS + adsjdbc.jar throws java.lang.AbstractMethodError
-            // for all statements
-            // SQL Server 2008 + sqljdbc4.jar throws
-            // com.microsoft.sqlserver.jdbc.SQLServerException for
-            // some parametrised statements like
-            // 'SELECT count(*) FROM orders o WHERE o_date BETWEEN ? AND ?'
-            // and for statements without parameters
-            pm = ps.getParameterMetaData();
+		}
 
-        } catch (Throwable err) {
+		if (rsmd == null) { // null if no columns or prepare was called instead of prepare_call for stored
+							// proc
 
-            if (param_descriptors == null) {
+			return;
+		}
 
-                return;
-            }
+		int col_count;
 
-            for (String param_descriptor : param_descriptors) {
+		try {
 
-                String param_type_name;
+			// Informix:
+			// ResultSetMetaData.getColumnCount() returns
+			// value > 0 for some DML statements, e.g. for 'update orders set
+			// dt_id = ? where o_id = ?' it considers that 'dt_id' is column.
+			// SQLite:
+			// throws java.sql.SQLException: column 1 out
+			// of bounds [1,0] if the statement is like INSERT
+			col_count = rsmd.getColumnCount();
 
-                String param_name;
+		} catch (Throwable e) {
 
-                String[] parts = parse_param_descriptor(param_descriptor);
+			col_count = 0;
+		}
 
-                if (parts[0] == null) {
+		if (col_count == 1) { // PostgreSQL: query to function 'select * from fn_get_tests(?, ?)' returns
+								// ResultSet
 
-                    param_type_name = Object.class.getName();
+			String java_class_name = rsmd.getColumnClassName(1); // it starts from 1!
 
-                    param_name = param_descriptor;
+			String rs_class_name = ResultSet.class.getName();
 
-                } else {
+			if (java_class_name == rs_class_name) {
 
-                    param_type_name = parts[0];
+				return;
+			}
+		}
 
-                    param_name = parts[1];
-                }
+		for (int i = 1; i <= col_count; i++) {
 
-                if (type_map != null) {
+			String col_name = get_column_name(rsmd, i);
 
-                    param_type_name = get_cpp_class_name_from_java_class_name(type_map, param_type_name);
-                }
+			String type_name = get_column_type_name(dto_class, col_name, rsmd, i);
 
-                FieldInfo f = new FieldInfo(field_names_mode, param_type_name, param_name);
+			if (type_map != null) {
 
-                params.add(f);
-            }
+				type_name = get_cpp_class_name_from_java_class_name(type_map, type_name);
+			}
 
-            return;
-        }
+			FieldInfo f = new FieldInfo(field_names_mode, type_name, col_name);
 
-        int params_count;
+			fields.add(f);
+		}
+	}
 
-        try {
+	private void get_params_info(PreparedStatement ps, String[] param_descriptors, FieldNamesMode field_names_mode,
+			ArrayList<FieldInfo> params) throws SQLException {
 
-            params_count = pm.getParameterCount();
+		params.clear();
 
-        } catch (SQLException e) {
+		ParameterMetaData pm;
 
-            params_count = 0;
-        }
+		try {
 
-        if (param_descriptors == null && params_count > 0) {
+			// Sybase ADS + adsjdbc.jar:
+			// ------------------------
 
-            throw new SQLException(
-                    "Specified parameters count: 0. Detected parameters count: " + Integer.toString(params_count));
-        }
+			// ps.getParameterMetaData() throws java.lang.AbstractMethodError for all
+			// statements
 
-        if (param_descriptors != null && params_count != param_descriptors.length) {
+			// SQL Server 2008 + sqljdbc4.jar:
+			// -------------------------------
 
-            throw new SQLException("Specified parameters count: " + param_descriptors.length
-                    + ". Detected parameters count: " + params_count);
-        }
+			// ps.getParameterMetaData() throws
+			// com.microsoft.sqlserver.jdbc.SQLServerException for
+			// some statements SQL with parameters like 'SELECT count(*) FROM orders o WHERE
+			// o_date BETWEEN ? AND ?'
+			// and for SQL statements without parameters
 
-        if (param_descriptors == null) {
+			// PostgeSQL:
+			// ----------
 
-            return;
-        }
+			// ps.getParameterMetaData() throws SQLException for both PreparedStatement and
+			// CallableStatement
 
-        for (int i = 0; i < params_count; i++) {
+			pm = ps.getParameterMetaData();
 
-            String param_descriptor = param_descriptors[i];
+		} catch (Throwable err) {
 
-            String param_type_name;
+			if (param_descriptors == null) {
 
-            String param_name;
+				return;
+			}
 
-            String[] parts = parse_param_descriptor(param_descriptor);
+			for (String param_descriptor : param_descriptors) {
 
-            if (parts[0] == null) {
+				String param_type_name;
 
-                param_type_name = get_param_type_name(pm, i);
+				String param_name;
 
-                param_name = param_descriptor;
+				String[] parts = parse_param_descriptor(param_descriptor);
 
-            } else {
+				if (parts[0] == null) {
 
-                param_type_name = parts[0];
+					param_type_name = Object.class.getName();
 
-                param_name = parts[1];
-            }
+					param_name = param_descriptor;
 
-            if (type_map != null) {
+				} else {
 
-                param_type_name = get_cpp_class_name_from_java_class_name(type_map, param_type_name);
-            }
+					param_type_name = parts[0];
 
-            FieldInfo f = new FieldInfo(field_names_mode, param_type_name, param_name);
+					param_name = parts[1];
+				}
 
-            params.add(f);
-        }
-    }
+				if (type_map != null) {
 
-    public void get_crud_create_metadata(String table_name, ArrayList<FieldInfo> keys, List<String> sql_col_names,
-            ArrayList<FieldInfo> params, String generated, String dto_class_name, DtoClasses dto_classes)
-            throws Exception {
+					param_type_name = get_cpp_class_name_from_java_class_name(type_map, param_type_name);
+				}
 
-        sql_col_names.clear();
+				FieldInfo f = new FieldInfo(field_names_mode, param_type_name, param_name);
 
-        FieldInfo[] ci_arr = get_table_columns_info(table_name, generated, dto_class_name, dto_classes);
+				params.add(f);
+			}
 
-        for (FieldInfo tci : ci_arr) {
+			return;
+		}
 
-            if (tci.isAutoIncrement()) {
+		int params_count;
 
-                keys.add(tci);
+		try {
 
-            } else {
+			params_count = pm.getParameterCount();
 
-                // original column name:
-                sql_col_names.add(tci.getColumnName());
+		} catch (SQLException e) {
 
-                params.add(tci);
-            }
-        }
-    }
+			params_count = 0;
+		}
 
-    public static ResultSet get_tables(Connection conn, DatabaseMetaData db_info, String root, boolean include_views)
-            throws SQLException {
+		if (param_descriptors == null && params_count > 0) {
 
-        String[] types;
+			throw new SQLException(
+					"Specified parameters count: 0. Detected parameters count: " + Integer.toString(params_count));
+		}
 
-        if (include_views) {
+		if (param_descriptors != null && params_count != param_descriptors.length) {
 
-            types = new String[]{"TABLE", "VIEW"};
+			throw new SQLException("Specified parameters count: " + param_descriptors.length
+					+ ". Detected parameters count: " + params_count);
+		}
 
-        } else {
+		if (param_descriptors == null) {
 
-            types = new String[]{"TABLE"};
-        }
+			return;
+		}
 
-        ResultSet rs_tables;
+		for (int i = 0; i < params_count; i++) {
 
-        String catalog = conn.getCatalog();
+			String param_descriptor = param_descriptors[i];
 
-        rs_tables = db_info.getTables(catalog, root, "%", types);
+			String param_type_name;
 
-        return rs_tables;
-    }
+			String param_name;
 
-    public static void get_schema_names(Connection con, List<String> schema_names) throws SQLException {
+			String[] parts = parse_param_descriptor(param_descriptor);
 
-        DatabaseMetaData db_info = con.getMetaData();
+			if (parts[0] == null) {
 
-        ResultSet rs;
+				param_type_name = get_param_type_name(pm, i);
 
-        rs = db_info.getSchemas();
+				param_name = param_descriptor;
 
-        try {
+			} else {
 
-            while (rs.next()) {
+				param_type_name = parts[0];
 
-                schema_names.add(rs.getString("TABLE_SCHEM"));
-            }
+				param_name = parts[1];
+			}
 
-        } finally {
+			if (type_map != null) {
 
-            rs.close();
-        }
-    }
+				param_type_name = get_cpp_class_name_from_java_class_name(type_map, param_type_name);
+			}
+
+			FieldInfo f = new FieldInfo(field_names_mode, param_type_name, param_name);
+
+			params.add(f);
+		}
+	}
+
+	public void get_crud_create_metadata(String table_name, ArrayList<FieldInfo> keys, List<String> sql_col_names,
+			ArrayList<FieldInfo> params, String generated, String dto_class_name, DtoClasses dto_classes)
+			throws Exception {
+
+		sql_col_names.clear();
+
+		FieldInfo[] ci_arr = get_table_columns_info(table_name, generated, dto_class_name, dto_classes);
+
+		for (FieldInfo tci : ci_arr) {
+
+			if (tci.isAutoIncrement()) {
+
+				keys.add(tci);
+
+			} else {
+
+				// original column name:
+				sql_col_names.add(tci.getColumnName());
+
+				params.add(tci);
+			}
+		}
+	}
+
+	public static ResultSet get_tables(Connection conn, DatabaseMetaData db_info, String root, boolean include_views)
+			throws SQLException {
+
+		String[] types;
+
+		if (include_views) {
+
+			types = new String[] { "TABLE", "VIEW" };
+
+		} else {
+
+			types = new String[] { "TABLE" };
+		}
+
+		ResultSet rs_tables;
+
+		String catalog = conn.getCatalog();
+
+		rs_tables = db_info.getTables(catalog, root, "%", types);
+
+		return rs_tables;
+	}
+
+	public static void get_schema_names(Connection con, List<String> schema_names) throws SQLException {
+
+		DatabaseMetaData db_info = con.getMetaData();
+
+		ResultSet rs;
+
+		rs = db_info.getSchemas();
+
+		try {
+
+			while (rs.next()) {
+
+				schema_names.add(rs.getString("TABLE_SCHEM"));
+			}
+
+		} finally {
+
+			rs.close();
+		}
+	}
 }

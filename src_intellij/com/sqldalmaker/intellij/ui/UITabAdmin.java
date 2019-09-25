@@ -425,15 +425,9 @@ public class UITabAdmin {
         dataStoreCSTLButton = new JButton();
         dataStoreCSTLButton.setText("DataStore C++ STL");
         panel4.add(dataStoreCSTLButton, new GridConstraints(2, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        dataStoreJavaDbUtilsButton = new JButton();
-        dataStoreJavaDbUtilsButton.setText("DataStore Java DbUtils");
-        panel4.add(dataStoreJavaDbUtilsButton, new GridConstraints(1, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         dataStoreJavaAndroidButton = new JButton();
         dataStoreJavaAndroidButton.setText("DataStore Java Android");
         panel4.add(dataStoreJavaAndroidButton, new GridConstraints(1, 3, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        dataStoreJavaSpringButton = new JButton();
-        dataStoreJavaSpringButton.setText("DataStore Java Spring");
-        panel4.add(dataStoreJavaSpringButton, new GridConstraints(1, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         dataStoreJavaButton = new JButton();
         dataStoreJavaButton.setText("DataStore.java");
         panel4.add(dataStoreJavaButton, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
@@ -443,6 +437,12 @@ public class UITabAdmin {
         PDODataStorePhpButton = new JButton();
         PDODataStorePhpButton.setText("PDODataStore.php");
         panel4.add(PDODataStorePhpButton, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        dataStoreJavaDbUtilsButton = new JButton();
+        dataStoreJavaDbUtilsButton.setText("DataStore Java DbUtils");
+        panel4.add(dataStoreJavaDbUtilsButton, new GridConstraints(1, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        dataStoreJavaSpringButton = new JButton();
+        dataStoreJavaSpringButton.setText("DataStore Java Spring");
+        panel4.add(dataStoreJavaSpringButton, new GridConstraints(1, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JPanel panel5 = new JPanel();
         panel5.setLayout(new GridLayoutManager(1, 5, new Insets(10, 0, 0, 0), 1, -1));
         panel1.add(panel5, new GridConstraints(3, 0, 1, 1, GridConstraints.ANCHOR_NORTHWEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));

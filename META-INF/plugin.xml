@@ -2,7 +2,7 @@
     <id>dal-mpe</id>
     <name>SQL DAL Maker</name>
     <category>Database</category>
-    <version>1.89.20190925</version>
+    <version>1.90.20190926</version>
     <vendor email="sqldalmaker@gmail.com"/>
     <!-- please see http://confluence.intellij.net/display/IDEADEV/Build+Number+Ranges for description -->
     <idea-version since-build="133.1885"/>
@@ -16,15 +16,17 @@ To generate the class, you declare it in XML meta-program.<br/>
     ]]></description>
 
     <change-notes><![CDATA[
-<p>
-Starting from v.1.89, you can generate and run PHP, Java, and Python code to call stored procedures.
-</p>
-<p>
-Successfully tested with MySQL. OUT/IN-OUT parameters and RETURN values are not supported yet.
-</p>
-<p>
-Review updated implementations of DataStore. Visit project Website for details.
-</p>]]></change-notes>
+Starting from v.1.90, you can generate and run PHP, Java, and Python code to call stored procedures and functions.
+<br/>
+Successfully tested with MySQL and PostgreSQL.
+<br/>
+Return values of stored procedures are not supported (v.1.90).
+<br/>
+OUT and IN-OUT parameters of stored procedures and functions are not supported (v.1.90).
+<br/>
+Review updated implementations of DataStore: 1) PHP + PDO, 2) Java + Apache DbUtils, 3) Python + PDO.
+<br/>
+Visit project Website for details.]]></change-notes>
 
     <application-components>
         <component>
