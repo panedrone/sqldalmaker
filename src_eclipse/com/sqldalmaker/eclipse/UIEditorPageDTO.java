@@ -645,7 +645,7 @@ public class UIEditorPageDTO extends Composite {
 				return;
 			}
 			
-			if (DbUtils.is_table_ref(relative)) {
+			if (DbUtils.is_sql_file_ref(relative) == false) {
 				return;
 			}
 

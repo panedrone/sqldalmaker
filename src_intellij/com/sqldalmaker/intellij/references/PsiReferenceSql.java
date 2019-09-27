@@ -156,6 +156,14 @@ public class PsiReferenceSql extends PsiReferenceBase<PsiElement> {
                 return true;
             }
 
+            // if stored function returns table, then meta-data about columns of this table
+            // may be obtained using 'ref' like 'select * from get_test_table_by_rating(?)'
+
+            if (DbUtils.is_stored_func_call_shortcut(canonical_text)) {
+
+                return true;
+            }
+
         } else if (FileSearchHelpers.is_dao_xml(name)) {
 
             // Allowed in DAO: ONLY path to sql-file. So, everything must be checked
@@ -171,6 +179,11 @@ public class PsiReferenceSql extends PsiReferenceBase<PsiElement> {
             }
 
             if (DbUtils.is_stored_proc_call_shortcut(canonical_text)) {
+
+                return true;
+            }
+
+            if (DbUtils.is_stored_func_call_shortcut(canonical_text)) {
 
                 return true;
             }

@@ -787,6 +787,11 @@ public class DbUtils {
 
 	public static boolean is_sql_shortcut_ref(String ref) {
 
+		if (is_sql_file_ref_base(ref)) {
+                    
+                    return false;
+                }
+
 		return ref != null && ref.length() >= 4 && ref.contains("(") && ref.trim().endsWith(")");
 	}
 
@@ -802,9 +807,14 @@ public class DbUtils {
 			return false;
 		}
 
-		return ref != null && ref.length() > 4 && ref.endsWith(".sql");
+		return is_sql_file_ref_base(ref);
 	}
 
+	private static boolean is_sql_file_ref_base(String ref) {
+
+		return ref != null && ref.length() > 4 && ref.endsWith(".sql");
+	}
+        
 	public static boolean is_table_ref(String ref) {
 
 		if (ref == null || ref.length() == 0) {

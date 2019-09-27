@@ -146,7 +146,7 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
 
             reloadTable();
 
-        } catch (Throwable e) {
+        } catch (Exception e) {
 
             if (showErrorMsg) {
                 //e.printStackTrace();
@@ -237,9 +237,11 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
                                 table.setValueAt(STATUS_GENERATED, row, 2);
 
                                 try {
+                                    
                                     Thread.sleep(50);
+                                    
                                 } catch (InterruptedException e) {
-                                    e.printStackTrace();
+                                    // e.printStackTrace();
                                 }
 
                                 // myTableModel.refresh(); cleares selection
@@ -251,7 +253,7 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
                                     }
                                 });
 
-                            } catch (Throwable ex) {
+                            } catch (Exception ex) {
 
                                 String msg = ex.getMessage();
 
@@ -317,7 +319,7 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
 
             generate();
 
-        } catch (Throwable e) {
+        } catch (Exception e) {
 
             // e.printStackTrace();
             NbpIdeMessageHelpers.show_error_in_ui_thread(e);
@@ -330,7 +332,7 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
 
             validateAll();
 
-        } catch (Throwable e) {
+        } catch (Exception e) {
 
             // e.printStackTrace();
             NbpIdeMessageHelpers.show_error_in_ui_thread(e);
@@ -392,9 +394,11 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
                                 }
 
                                 try {
+                                    
                                     Thread.sleep(50);
+                                    
                                 } catch (InterruptedException e) {
-                                    e.printStackTrace();
+                                    // e.printStackTrace();
                                 }
 
                                 // myTableModel.refresh(); cleares selection
@@ -406,7 +410,7 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
                                     }
                                 });
 
-                            } catch (Throwable ex) {
+                            } catch (Exception ex) {
 
                                 String msg = ex.getMessage();
 
@@ -443,7 +447,7 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
                         });
                     }
 
-                } catch (Throwable ex) {
+                } catch (Exception ex) {
 
                     err_log.add_error_message(ex);
 
@@ -674,11 +678,13 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
     private void openSQL() {
 
         try {
+            
             int[] selectedRows = getSelection();
 
             String ref = (String) table.getValueAt(selectedRows[0], 1);
 
-            if (DbUtils.is_table_ref(ref)) {
+            if (DbUtils.is_sql_file_ref(ref) == false) {
+                
                 return;
             }
 
@@ -688,7 +694,7 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
 
             NbpIdeEditorHelpers.open_project_file_in_editor_async(obj, relPath);
 
-        } catch (Throwable ex) {
+        } catch (Exception ex) {
             // ex.printStackTrace();
             NbpIdeMessageHelpers.show_error_in_ui_thread(ex);
         }

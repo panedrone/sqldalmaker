@@ -480,7 +480,7 @@ public class UITabDTO {
 
             String ref = (String) table.getValueAt(selectedRows[0], 1);
 
-            if (DbUtils.is_table_ref(ref)) {
+            if (DbUtils.is_sql_file_ref(ref) == false) {
                 return;
             }
 
