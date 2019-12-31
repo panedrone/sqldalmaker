@@ -105,7 +105,21 @@ public class DbUtils {
 
 		DatabaseMetaData db_info = conn.getMetaData();
 
-		ResultSet rs = db_info.getPrimaryKeys(null, null, table_name);
+		String schema = null;
+
+		if (table_name.contains(".")) {
+
+			String[] parts = table_name.split("\\.");
+
+			if (parts.length != 2) {
+				throw new SQLException("Invalid table name: '" + table_name + "'");
+			}
+
+			schema = parts[0];
+			table_name = parts[1];
+		}
+		
+		ResultSet rs = db_info.getPrimaryKeys(null, schema, table_name);
 
 		try {
 
@@ -126,7 +140,21 @@ public class DbUtils {
 
 		DatabaseMetaData db_info = conn.getMetaData();
 
-		ResultSet rs = db_info.getTables(null, null, table_name, null);
+		String schema = null;
+
+		if (table_name.contains(".")) {
+
+			String[] parts = table_name.split("\\.");
+
+			if (parts.length != 2) {
+				throw new SQLException("Invalid table name: '" + table_name + "'");
+			}
+
+			schema = parts[0];
+			table_name = parts[1];
+		}
+
+		ResultSet rs = db_info.getTables(null, schema, table_name, null);
 
 		try {
 
@@ -386,7 +414,7 @@ public class DbUtils {
 
 				java_class_name = Helpers.process_class_name(java_class_name);
 
-			} catch (Throwable ex) {
+			} catch (Exception ex) {
 
 				java_class_name = Object.class.getName();
 			}
@@ -408,7 +436,7 @@ public class DbUtils {
 
 			java_class_name = Helpers.process_class_name(java_class_name);
 
-		} catch (Throwable ex) {
+		} catch (Exception ex) {
 
 			java_class_name = Object.class.getName();
 		}
@@ -707,12 +735,14 @@ public class DbUtils {
 		}
 	}
 
-	private static String query_shortcut_ref_to_jdbc_sql(String ref) throws Exception {
+	private String query_shortcut_ref_to_jdbc_sql(String ref) throws Exception {
 
 		String[] parts2 = parse_ref(ref);
 
 		String table_name = parts2[0];
 
+                validate_table_name(table_name); // PostgreSQL JDBC prepareStatement passes wrong table names
+                
 		String param_descriptors = parts2[1];
 
 		String[] param_arr = Helpers.get_listed_items(param_descriptors);
@@ -732,7 +762,7 @@ public class DbUtils {
 		return "SELECT * FROM " + table_name + " WHERE " + params;
 	}
 
-	public static String jdbc_sql_by_ref_query(String ref, String sql_root_abs_path) throws Exception {
+	public String jdbc_sql_by_ref_query(String ref, String sql_root_abs_path) throws Exception {
 
 		String[] parts = ref.split(":");
 
@@ -788,9 +818,9 @@ public class DbUtils {
 	public static boolean is_sql_shortcut_ref(String ref) {
 
 		if (is_sql_file_ref_base(ref)) {
-                    
-                    return false;
-                }
+
+			return false;
+		}
 
 		return ref != null && ref.length() >= 4 && ref.contains("(") && ref.trim().endsWith(")");
 	}
@@ -814,7 +844,7 @@ public class DbUtils {
 
 		return ref != null && ref.length() > 4 && ref.endsWith(".sql");
 	}
-        
+
 	public static boolean is_table_ref(String ref) {
 
 		if (ref == null || ref.length() == 0) {
@@ -1105,7 +1135,7 @@ public class DbUtils {
 			// of bounds [1,0] if the statement is like INSERT
 			col_count = rsmd.getColumnCount();
 
-		} catch (Throwable e) {
+		} catch (Exception e) {
 
 			col_count = 0;
 		}
@@ -1172,7 +1202,7 @@ public class DbUtils {
 
 			pm = ps.getParameterMetaData();
 
-		} catch (Throwable err) {
+		} catch (Exception err) {
 
 			if (param_descriptors == null) {
 
@@ -1299,7 +1329,7 @@ public class DbUtils {
 		}
 	}
 
-	public static ResultSet get_tables(Connection conn, DatabaseMetaData db_info, String root, boolean include_views)
+	public static ResultSet get_tables(Connection conn, DatabaseMetaData db_info, String schema, boolean include_views)
 			throws SQLException {
 
 		String[] types;
@@ -1317,7 +1347,7 @@ public class DbUtils {
 
 		String catalog = conn.getCatalog();
 
-		rs_tables = db_info.getTables(catalog, root, "%", types);
+		rs_tables = db_info.getTables(catalog, schema, "%", types);
 
 		return rs_tables;
 	}

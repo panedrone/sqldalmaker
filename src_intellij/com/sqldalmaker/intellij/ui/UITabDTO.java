@@ -15,6 +15,7 @@ import com.sqldalmaker.cg.DbUtils;
 import com.sqldalmaker.cg.IDtoCG;
 import com.sqldalmaker.common.Const;
 import com.sqldalmaker.common.InternalException;
+import com.sqldalmaker.common.SdmUtils;
 import com.sqldalmaker.jaxb.dto.DtoClass;
 import com.sqldalmaker.jaxb.settings.Settings;
 
@@ -737,7 +738,7 @@ public class UITabDTO {
 
         try {
 
-            IdeaHelpers.run_write_action_to_generate_source_file(output_dir.toString(), list, project, propFile);
+            IdeaHelpers.run_write_action_to_generate_source_file(output_dir.toString(), list, project);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -794,11 +795,10 @@ public class UITabDTO {
 
             String xml_configs_folder_full_path = propFile.getParent().getPath();
 
-            String dtoXmlAbsPath = xml_configs_folder_full_path + "/" + Const.DTO_XML;
-            String dtoXsdAbsPath = xml_configs_folder_full_path + "/" + Const.DTO_XSD;
+            String dto_xml_abs_path = xml_configs_folder_full_path + "/" + Const.DTO_XML;
+            String dto_xsd_abs_path = xml_configs_folder_full_path + "/" + Const.DTO_XSD;
 
-            List<DtoClass> res = IdeaHelpers.get_dto_classes(
-                    dtoXmlAbsPath, dtoXsdAbsPath);
+            List<DtoClass> res = SdmUtils.get_dto_classes(dto_xml_abs_path, dto_xsd_abs_path);
 
             for (DtoClass cls : res) {
 

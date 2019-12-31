@@ -193,7 +193,7 @@ public class RubyCG {
 
 			try {
 
-				String dao_jdbc_sql = DbUtils.jdbc_sql_by_ref_query(mi.ref, sql_root_abs_path);
+				String dao_jdbc_sql = db_utils.jdbc_sql_by_ref_query(mi.ref, sql_root_abs_path);
 
 				String[] parsed = parse_method_declaration(mi.method);
 

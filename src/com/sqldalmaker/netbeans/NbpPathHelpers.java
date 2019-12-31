@@ -1,12 +1,12 @@
 /*
- * Copyright 2011-2018 sqldalmaker@gmail.com
+ * Copyright 2011-2019 sqldalmaker@gmail.com
  * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
  * Read LICENSE.txt in the root of this project/archive for details.
+ *
  */
 package com.sqldalmaker.netbeans;
 
 import com.sqldalmaker.common.Const;
-import com.sqldalmaker.jaxb.settings.Settings;
 import org.netbeans.api.project.FileOwnerQuery;
 import org.netbeans.api.project.Project;
 import org.openide.filesystems.FileObject;
@@ -102,18 +102,6 @@ public class NbpPathHelpers {
         String pp = get_root_folder_abs_path(obj.getPrimaryFile());
 
         return pp + "/" + rel_path;
-    }
-
-    public static String get_package_relative_path(Settings settings, String package_name) {
-
-        String source_folder = settings.getFolders().getTarget();
-
-        if (package_name.length() == 0) {
-
-            return source_folder;
-        }
-
-        return source_folder + "/" + package_name.replace(".", "/");
     }
 
     public static String get_dto_xml_abs_path(SdmDataObject obj) {

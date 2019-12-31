@@ -20,9 +20,8 @@ import com.intellij.psi.xml.XmlAttribute;
 import com.intellij.psi.xml.XmlAttributeValue;
 import com.intellij.util.ProcessingContext;
 import com.sqldalmaker.cg.DbUtils;
-import com.sqldalmaker.cg.Helpers;
+import com.sqldalmaker.common.SdmUtils;
 import com.sqldalmaker.intellij.ui.IdeaHelpers;
-import com.sqldalmaker.intellij.ui.IdeaTargetLanguageHelpers;
 import com.sqldalmaker.jaxb.settings.Settings;
 import org.jetbrains.annotations.NotNull;
 
@@ -94,7 +93,7 @@ public class CompletionProviderSql extends CompletionProvider<CompletionParamete
 
         try {
 
-            settings = IdeaHelpers.load_settings(xml_file_dir.getPath());
+            settings = SdmUtils.load_settings(xml_file_dir.getPath());
 
             sql_root_rel_path = settings.getFolders().getSql();
 
@@ -126,6 +125,7 @@ public class CompletionProviderSql extends CompletionProvider<CompletionParamete
         }
     }
 
+    @SuppressWarnings("rawtypes")
     private void find_sql_files_recursive(VirtualFile base_dir, final List<String> res) {
 
         VfsUtilCore.visitChildrenRecursively(base_dir, new VirtualFileVisitor() {

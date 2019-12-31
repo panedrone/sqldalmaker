@@ -57,6 +57,7 @@ import com.sqldalmaker.cg.Helpers;
 import com.sqldalmaker.cg.IDtoCG;
 import com.sqldalmaker.common.Const;
 import com.sqldalmaker.common.InternalException;
+import com.sqldalmaker.common.SdmUtils;
 import com.sqldalmaker.jaxb.dto.DtoClass;
 import com.sqldalmaker.jaxb.settings.Settings;
 
@@ -851,10 +852,10 @@ public class UIEditorPageDTO extends Composite {
 
 			try {
 
-				String dtoXmlAbsPath = editor2.get_dto_xml_abs_path();
-				String dtoXsdAbsPath = editor2.get_dto_xsd_abs_path();
+				String dto_xml_abs_path = editor2.get_dto_xml_abs_path();
+				String dto_xsd_abs_path = editor2.get_dto_xsd_abs_path();
 
-				List<DtoClass> list = EclipseHelpers.get_dto_classes(dtoXmlAbsPath, dtoXsdAbsPath);
+				List<DtoClass> list = SdmUtils.get_dto_classes(dto_xml_abs_path, dto_xsd_abs_path);
 
 				for (DtoClass cls : list) {
 

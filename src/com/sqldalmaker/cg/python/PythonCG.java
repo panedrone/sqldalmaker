@@ -75,7 +75,7 @@ public class PythonCG {
                 throw new Exception("XML element of DTO class '" + dto_class_name + "' not found");
             }
 
-            String jdbc_sql = DbUtils.jdbc_sql_by_ref_query(cls_element.getRef(), sql_root_abs_path);
+            String jdbc_sql = db_utils.jdbc_sql_by_ref_query(cls_element.getRef(), sql_root_abs_path);
 
             ArrayList<FieldInfo> fields = new ArrayList<FieldInfo>();
 
@@ -188,7 +188,7 @@ public class PythonCG {
 
             try {
 
-                String dao_jdbc_sql = DbUtils.jdbc_sql_by_ref_query(mi.ref, sql_root_abs_path);
+                String dao_jdbc_sql = db_utils.jdbc_sql_by_ref_query(mi.ref, sql_root_abs_path);
 
                 String[] parsed = parse_method_declaration(mi.method);
 

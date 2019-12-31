@@ -21,6 +21,7 @@ import com.sqldalmaker.cg.python.PythonCG;
 import com.sqldalmaker.cg.ruby.RubyCG;
 import com.sqldalmaker.common.Const;
 import com.sqldalmaker.common.RootFileName;
+import com.sqldalmaker.common.SdmUtils;
 import com.sqldalmaker.common.XmlParser;
 import com.sqldalmaker.jaxb.dto.DtoClasses;
 import com.sqldalmaker.jaxb.settings.Settings;
@@ -72,7 +73,7 @@ public class IdeaTargetLanguageHelpers {
 
         if (RootFileName.JAVA.equals(fn)) {
 
-            rel_path = IdeaHelpers.get_package_relative_path(settings, java_package) + "/" + value + ".java";
+            rel_path = SdmUtils.get_package_relative_path(settings, java_package) + "/" + value + ".java";
 
         } else if (RootFileName.PHP.equals(fn)) {
 
@@ -366,7 +367,7 @@ public class IdeaTargetLanguageHelpers {
 
             if (output_dir_rel_path != null) {
 
-                String package_rel_path = IdeaHelpers.get_package_relative_path(settings, dto_package);
+                String package_rel_path = SdmUtils.get_package_relative_path(settings, dto_package);
 
                 output_dir_rel_path.append(package_rel_path);
             }
@@ -490,7 +491,7 @@ public class IdeaTargetLanguageHelpers {
 
             if (output_dir_rel_path != null) {
 
-                String package_rel_path = IdeaHelpers.get_package_relative_path(settings, dao_package);
+                String package_rel_path = SdmUtils.get_package_relative_path(settings, dao_package);
 
                 output_dir_rel_path.append(package_rel_path);
             }

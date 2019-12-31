@@ -14,6 +14,7 @@ import com.intellij.psi.PsiReferenceBase;
 import com.intellij.util.ArrayUtil;
 import com.sqldalmaker.cg.DbUtils;
 import com.sqldalmaker.common.FileSearchHelpers;
+import com.sqldalmaker.common.SdmUtils;
 import com.sqldalmaker.intellij.ui.IdeaHelpers;
 import com.sqldalmaker.jaxb.settings.Settings;
 import org.jetbrains.annotations.NotNull;
@@ -92,7 +93,7 @@ public class PsiReferenceSql extends PsiReferenceBase<PsiElement> {
 
         try {
 
-            final Settings settings = IdeaHelpers.load_settings(xml_file_dir.getPath());
+            final Settings settings = SdmUtils.load_settings(xml_file_dir.getPath());
 
             sql_root_rel_path = settings.getFolders().getSql();
 
@@ -144,7 +145,7 @@ public class PsiReferenceSql extends PsiReferenceBase<PsiElement> {
 
         if (FileSearchHelpers.is_dto_xml(name)) {
 
-            if (canonical_text == null || canonical_text.trim().length() == 0) {
+            if (/*canonical_text == null ||*/ canonical_text.trim().length() == 0) {
 
                 return true; // ref is empty
             }
@@ -194,8 +195,9 @@ public class PsiReferenceSql extends PsiReferenceBase<PsiElement> {
         return false;
     }
 
+    @SuppressWarnings("rawtypes")
     @NotNull
-    // @Override
+    @Override
     public Collection resolveReference() {
 
         // --- panedrone: implementation to compile and work with IDEA 13...2019. @SuppressWarnings("unchecked") is needed before class declaration.

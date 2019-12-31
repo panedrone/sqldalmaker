@@ -2,7 +2,7 @@
     <id>dal-mpe</id>
     <name>SQL DAL Maker</name>
     <category>Database</category>
-    <version>1.90.20190927</version>
+    <version>1.91.20191231</version>
     <vendor email="sqldalmaker@gmail.com"/>
     <!-- please see http://confluence.intellij.net/display/IDEADEV/Build+Number+Ranges for description -->
     <idea-version since-build="133.1885"/>
@@ -15,18 +15,7 @@ SQL DAL Maker is a generator of DTO and DAO classes to access relational databas
 To generate the class, you declare it in XML meta-program.<br/>
     ]]></description>
 
-    <change-notes><![CDATA[
-Starting from v.1.90, you can generate and run PHP, Java, and Python code to call stored procedures and functions.
-<br/>
-Successfully tested with MySQL and PostgreSQL.
-<br/>
-Return values of stored procedures are not supported (v.1.90).
-<br/>
-OUT and IN-OUT parameters of stored procedures and functions are not supported (v.1.90).
-<br/>
-Review updated implementations of DataStore: 1) PHP + PDO, 2) Java + Apache DbUtils, 3) Python + PDO.
-<br/>
-Visit project Website for details.]]></change-notes>
+    <change-notes><![CDATA[Enabled specifying schema of data table for 'crud' and 'crud-auto': &lt;crud table=&quot;public.orders&quot;...]]></change-notes>
 
     <application-components>
         <component>

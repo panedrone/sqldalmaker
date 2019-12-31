@@ -73,7 +73,12 @@ class DataStore:
         parts = sql.split()
 
         if len(parts) >= 2 and parts[0].lower() == "call":
-            return parts[1]
+            name = parts[1]
+            end = name.find("(")
+            if end == -1:
+                return name
+            else:
+                return name[0:end]
 
         return None
 
@@ -121,7 +126,10 @@ class DataStore:
         if len(rows) > 1:
             raise Exception('More than 1 row exists')
 
-        return rows[0][0]
+        if isinstance(rows[0], list):
+            return rows[0][0]
+        else:
+            return rows[0]  # 'select get_test_rating(?)' returns just scalar value, not array of arrays
 
     def query_scalar_array(self, sql, params):
         """

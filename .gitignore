@@ -1,7 +1,6 @@
 /build/
 /out/
 /release/
-/bin
-/com.sqldalmaker.intellij.jar
-
+/bin/
+/classes/
 /com.sqldalmaker.intellij.jar

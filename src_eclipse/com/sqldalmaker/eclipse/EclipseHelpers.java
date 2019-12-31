@@ -1,7 +1,8 @@
 /*
- * Copyright 2011-2018 sqldalmaker@gmail.com
+ * Copyright 2011-2019 sqldalmaker@gmail.com
  * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
  * Read LICENSE.txt in the root of this project/archive for details.
+ * 
  */
 package com.sqldalmaker.eclipse;
 
@@ -16,8 +17,6 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.sql.Connection;
 import java.sql.Driver;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 
 import org.eclipse.core.resources.IProject;
@@ -26,19 +25,14 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.variables.IStringVariableManager;
 import org.eclipse.core.variables.VariablesPlugin;
 
-import com.sqldalmaker.cg.DbUtils;
-import com.sqldalmaker.cg.FieldInfo;
-import com.sqldalmaker.cg.FieldNamesMode;
 import com.sqldalmaker.cg.Helpers;
-import com.sqldalmaker.common.Const;
-import com.sqldalmaker.common.EnglishNoun;
 import com.sqldalmaker.common.InternalException;
-import com.sqldalmaker.common.XmlParser;
+import com.sqldalmaker.common.SdmUtils;
 import com.sqldalmaker.jaxb.dto.DtoClass;
-import com.sqldalmaker.jaxb.dto.DtoClasses;
 import com.sqldalmaker.jaxb.settings.Settings;
 
 /**
+ * 
  * @author sqldalmaker@gmail.com
  *
  */
@@ -48,21 +42,7 @@ public class EclipseHelpers {
 
 		String xml_metaprogram_folder_full_path = ed.get_metaprogram_folder_abs_path();
 
-		return load_settings(xml_metaprogram_folder_full_path);
-	}
-
-	public static Settings load_settings(String xml_metaprogram_folder_full_path) throws Exception {
-
-		String xml_abs_path = xml_metaprogram_folder_full_path + "/" + Const.SETTINGS_XML;
-		String xsd_abs_path = xml_metaprogram_folder_full_path + "/" + Const.SETTINGS_XSD;
-
-		String context_path = Settings.class.getPackage().getName();
-
-		XmlParser xml_parser = new XmlParser(context_path, xsd_abs_path);
-
-		Settings res = xml_parser.unmarshal(xml_abs_path);
-
-		return res;
+		return SdmUtils.load_settings(xml_metaprogram_folder_full_path);
 	}
 
 	public static String get_absolute_dir_path_str(IProject project, String rel_dir_path) {
@@ -266,150 +246,13 @@ public class EclipseHelpers {
 		}
 	}
 
-	private static String to_camel_case(String str) {
-
-		if (!str.contains("_")) {
-
-			boolean all_is_upper_case = Helpers.is_upper_case(str);
-
-			if (all_is_upper_case) {
-
-				str = str.toLowerCase();
-			}
-
-			return Helpers.replace_char_at(str, 0, Character.toUpperCase(str.charAt(0)));
-		}
-
-		// http://stackoverflow.com/questions/1143951/what-is-the-simplest-way-to-convert-a-java-string-from-all-caps-words-separated
-
-		StringBuffer sb = new StringBuffer();
-
-		String[] arr = str.split("_");
-
-		for (int i = 0; i < arr.length; i++) {
-
-			String s = arr[i];
-
-			if (s.length() == 0) {
-
-				continue; // E.g. _ALL_FILE_GROUPS
-			}
-
-			// if (i == 0) {
-			//
-			// sb.append(s.toLowerCase());
-			//
-			// } else {
-
-			sb.append(Character.toUpperCase(s.charAt(0)));
-
-			if (s.length() > 1) {
-
-				sb.append(s.substring(1, s.length()).toLowerCase());
-			}
-		}
-		// }
-
-		return sb.toString();
-	}
-
-	public static String table_name_to_dto_class_name(String table_name, boolean plural_to_singular) {
-
-		String word = to_camel_case(table_name);
-
-		if (plural_to_singular) {
-
-			int last_word_index = -1;
-
-			String last_word;
-
-			for (int i = word.length() - 1; i >= 0; i--) {
-
-				if (Character.isUpperCase(word.charAt(i))) {
-
-					last_word_index = i;
-
-					break;
-				}
-			}
-
-			last_word = word.substring(last_word_index);
-
-			last_word = EnglishNoun.singularOf(last_word); // makes lowercase
-
-			StringBuilder sb = new StringBuilder();
-
-			sb.append(Character.toUpperCase(last_word.charAt(0)));
-
-			if (last_word.length() > 1) {
-
-				sb.append(last_word.substring(1, last_word.length()).toLowerCase());
-			}
-
-			last_word = sb.toString();
-
-			if (last_word_index == 0) {
-
-				word = last_word;
-
-			} else {
-
-				word = word.substring(0, last_word_index);
-
-				word = word + last_word;
-			}
-		}
-
-		return word;
-	}
-
-	public static List<DtoClass> get_dto_classes(String dto_xml_abs_file_path, String dto_xsd_abs_file_path)
-			throws Exception {
-
-		List<DtoClass> res = new ArrayList<DtoClass>();
-
-		String context_path = DtoClasses.class.getPackage().getName();
-
-		XmlParser xml_parser = new XmlParser(context_path, dto_xsd_abs_file_path);
-
-		DtoClasses elements = xml_parser.unmarshal(dto_xml_abs_file_path);
-
-		for (DtoClass cls : elements.getDtoClass()) {
-
-			res.add(cls);
-		}
-
-		return res;
-	}
-
 	public static void gen_tmp_field_tags(Connection connection, com.sqldalmaker.jaxb.dto.ObjectFactory object_factory,
-			DtoClass cls_element, String project_root, IEditor2 editor2) throws Exception {
+			DtoClass dto_class, String project_root, IEditor2 editor2) throws Exception {
 
 		Settings settings = load_settings(editor2);
 
 		String sql_root_abs_path = project_root + "/" + settings.getFolders().getSql();
 
-		DbUtils md = new DbUtils(connection, FieldNamesMode.AS_IS, null);
-
-        String jdbc_sql = DbUtils.jdbc_sql_by_ref_query(cls_element.getRef(), sql_root_abs_path);
-
-        ArrayList<FieldInfo> fields = new ArrayList<FieldInfo>();
-
-		md.get_dto_field_info(jdbc_sql, cls_element, fields);
-
-		for (FieldInfo f : fields) {
-
-			DtoClass.Field df = object_factory.createDtoClassField();
-			df.setColumn(f.getColumnName());
-			df.setJavaType(f.getType().replace("java.lang.", ""));
-			cls_element.getField().add(df);
-		}
-	}
-
-	public static String get_package_relative_path(Settings settings, String package_name) {
-
-		String source_folder = settings.getFolders().getTarget();
-
-		return source_folder + "/" + package_name.replace(".", "/");
+		SdmUtils.gen_tmp_field_tags(connection, object_factory, dto_class, sql_root_abs_path);
 	}
 }

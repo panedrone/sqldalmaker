@@ -290,7 +290,7 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
                         });
                     }
 
-                } catch (Throwable ex) {
+                } catch (Exception ex) {
 
                     err_log.add_error_message(ex);
 
@@ -476,7 +476,7 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
             NbpIdeEditorHelpers.generate_tmp_field_tags_and_open_in_editor_async(obj, className, ref);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             NbpIdeMessageHelpers.show_error_in_ui_thread(e);
         }
     }

@@ -1,7 +1,8 @@
 /*
- * Copyright 2011-2018 sqldalmaker@gmail.com
+ * Copyright 2011-2019 sqldalmaker@gmail.com
  * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
  * Read LICENSE.txt in the root of this project/archive for details.
+ * 
  */
 package com.sqldalmaker.eclipse;
 
@@ -41,6 +42,7 @@ import org.xml.sax.InputSource;
 
 import com.sqldalmaker.common.Const;
 import com.sqldalmaker.common.FileSearchHelpers;
+import com.sqldalmaker.common.SdmUtils;
 import com.sqldalmaker.jaxb.settings.Settings;
 
 /**
@@ -150,7 +152,7 @@ public class XmlCompletionProposalComputer implements ICompletionProposalCompute
 
 					String xml_metaprogram_folder_path = root.getParent().getLocation().toPortableString();
 
-					Settings settings = EclipseHelpers.load_settings(xml_metaprogram_folder_path);
+					Settings settings = SdmUtils.load_settings(xml_metaprogram_folder_path);
 
 					String sql_root_rel_path = settings.getFolders().getSql();
 

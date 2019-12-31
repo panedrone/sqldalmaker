@@ -5,7 +5,6 @@
  */
 package com.sqldalmaker.intellij.ui;
 
-import com.intellij.application.options.PathMacrosImpl;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.impl.ProjectPathMacroManager;
 import com.intellij.openapi.fileEditor.FileEditor;
@@ -13,18 +12,16 @@ import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.NavigatableFileEditor;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.pom.Navigatable;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.sqldalmaker.cg.Helpers;
 import com.sqldalmaker.common.Const;
-import com.sqldalmaker.common.EnglishNoun;
 import com.sqldalmaker.common.InternalException;
-import com.sqldalmaker.common.XmlParser;
+import com.sqldalmaker.common.SdmUtils;
 import com.sqldalmaker.intellij.references.IdeaReferenceCompletion;
-import com.sqldalmaker.jaxb.dto.DtoClass;
-import com.sqldalmaker.jaxb.dto.DtoClasses;
 import com.sqldalmaker.jaxb.settings.Settings;
 import org.jetbrains.annotations.NotNull;
 
@@ -37,7 +34,6 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.sql.Connection;
 import java.sql.Driver;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -51,19 +47,35 @@ public class IdeaHelpers {
     @NotNull // or exception
     public static VirtualFile get_project_base_dir(final Project project) throws Exception {
 
-        VirtualFile res = project.getBaseDir();
+        // VirtualFile res = project.getBaseDir(); // deprecated
+
+        String path = project.getBasePath();
+
+        if (path == null) {
+
+            throw new Exception("Cannot detect the project base path");
+        }
+
+        //https://intellij-support.jetbrains.com/hc/en-us/community/posts/206144389-Create-virtual-file-from-file-path
+
+        VirtualFile res = LocalFileSystem.getInstance().findFileByPath(path);
 
         if (res == null) {
 
-            throw new Exception("Cannot detect the project base dir");
+            throw new Exception("Cannot find project base path in local file system");
         }
 
         return res;
     }
 
-    public static String get_relative_path(Project project, VirtualFile file) {
+    public static String get_relative_path(Project project, VirtualFile file) throws Exception {
 
         String base_abs_path = project.getBasePath();
+
+        if (base_abs_path == null) {
+
+            throw new Exception("Cannot detect the project base path");
+        }
 
         String file_abs_path = file.getPath();
 
@@ -98,34 +110,21 @@ public class IdeaHelpers {
 
         String xml_meraprogram_folder_full_path = root_file.getParent().getPath();
 
-        return load_settings(xml_meraprogram_folder_full_path);
-    }
-
-    public static Settings load_settings(String xml_meraprogram_folder_full_path) throws Exception {
-
-        String xml_abs_path = xml_meraprogram_folder_full_path + "/" + Const.SETTINGS_XML;
-
-        String xsd_abs_path = xml_meraprogram_folder_full_path + "/" + Const.SETTINGS_XSD;
-
-        String context_path = Settings.class.getPackage().getName();
-
-        XmlParser xml_parser = new XmlParser(context_path, xsd_abs_path);
-
-        return xml_parser.unmarshal(xml_abs_path);
+        return SdmUtils.load_settings(xml_meraprogram_folder_full_path);
     }
 
     /**
      * Must be called only from DispatchThread
      */
-    public static void start_write_action_from_ui_thread_and_refresh_folder_sync(VirtualFile folder) throws Exception {
+    public static void start_write_action_from_ui_thread_and_refresh_folder_sync(VirtualFile folder) {
 
-        start_write_action_from_ui_thread_and_refresh_folder(folder, false);
+        start_write_action_from_ui_thread_and_refresh_folder(folder);
     }
 
     /**
      * Must be called only from DispatchThread
      */
-    private static void start_write_action_from_ui_thread_and_refresh_folder(final VirtualFile folder, final boolean async) throws Exception {
+    private static void start_write_action_from_ui_thread_and_refresh_folder(final VirtualFile folder) {
 
         // com.intellij.openapi.vfs.VirtualFile
         // public void refresh(boolean asynchronous, boolean recursive) {
@@ -138,7 +137,7 @@ public class IdeaHelpers {
 
                 try {
 
-                    folder.refresh(async, true);
+                    folder.refresh(/*asynchronous*/ false, /*recursive*/ true);
 
                 } catch (Throwable e) {
 
@@ -148,27 +147,6 @@ public class IdeaHelpers {
                 }
             }
 
-        });
-    }
-
-    /**
-     * Must be called only from DispatchThread
-     */
-    public static void start_write_action_from_ui_thread_and_refresh_module_sync(final Project project) throws Exception {
-
-        final VirtualFile project_dir = get_project_base_dir(project);
-
-        // com.intellij.openapi.vfs.VirtualFile
-        // public void refresh(boolean asynchronous, boolean recursive) {
-        // This method should be only called within write-action.
-
-        ApplicationManager.getApplication().runWriteAction(new Runnable() {
-
-            @Override
-            public void run() {
-
-                project_dir.refresh(false, true);
-            }
         });
     }
 
@@ -241,9 +219,10 @@ public class IdeaHelpers {
                                             String driver_class_name, String url,
                                             String user_name, String password) throws Exception {
 
-        PathMacrosImpl pm = PathMacrosImpl.getInstanceEx();
-        ProjectPathMacroManager pPmm = new ProjectPathMacroManager(pm, project);
         url = url.replace("${project_loc}", "$PROJECT_DIR$"); // for compatibility with Eclipse
+
+        ProjectPathMacroManager pPmm = new ProjectPathMacroManager(project);
+
         url = pPmm.expandPath(url);
 
         VirtualFile project_dir = get_project_base_dir(project);
@@ -299,117 +278,6 @@ public class IdeaHelpers {
         return con;
     }
 
-    public static List<DtoClass> get_dto_classes(String dto_xml_abs_file_path,
-                                                 String dto_xsd_abs_file_path) throws Exception {
-
-        List<DtoClass> res = new ArrayList<DtoClass>();
-
-        String context_path = DtoClasses.class.getPackage().getName();
-
-        XmlParser xml_parser = new XmlParser(context_path, dto_xsd_abs_file_path);
-
-        DtoClasses elements = xml_parser.unmarshal(dto_xml_abs_file_path);
-
-        for (DtoClass cls : elements.getDtoClass()) {
-
-            res.add(cls);
-        }
-
-        return res;
-    }
-
-    private static String to_camel_case(String str) {
-
-        if (!str.contains("_")) {
-
-            boolean all_is_upper_case = Helpers.is_upper_case(str);
-
-            if (all_is_upper_case) {
-
-                str = str.toLowerCase();
-            }
-
-            return Helpers.replace_char_at(str, 0, Character.toUpperCase(str.charAt(0)));
-        }
-
-        // http://stackoverflow.com/questions/1143951/what-is-the-simplest-way-to-convert-a-java-string-from-all-caps-words-separated
-
-        StringBuilder sb = new StringBuilder();
-
-        String[] arr = str.split("_");
-
-        for (String s : arr) {
-
-            if (s.length() == 0) {
-                continue; // E.g. _ALL_FILE_GROUPS
-            }
-
-            // if (i == 0) {
-            //
-            // sb.append(s.toLowerCase());
-            //
-            // } else {
-
-            sb.append(Character.toUpperCase(s.charAt(0)));
-
-            if (s.length() > 1) {
-
-                sb.append(s.substring(1, s.length()).toLowerCase());
-            }
-        }
-        // }
-
-        return sb.toString();
-    }
-
-    public static String table_name_to_dto_class_name(String table_name, boolean plural_to_singular) {
-
-        String word = to_camel_case(table_name);
-
-        if (plural_to_singular) {
-
-            int last_word_index = -1;
-
-            String last_word;
-
-            for (int i = word.length() - 1; i >= 0; i--) {
-
-                if (Character.isUpperCase(word.charAt(i))) {
-
-                    last_word_index = i;
-
-                    break;
-                }
-            }
-
-            last_word = word.substring(last_word_index);
-            last_word = EnglishNoun.singularOf(last_word); // makes lowercase
-
-            StringBuilder sb = new StringBuilder();
-
-            sb.append(Character.toUpperCase(last_word.charAt(0)));
-
-            if (last_word.length() > 1) {
-
-                sb.append(last_word.substring(1, last_word.length()).toLowerCase());
-            }
-
-            last_word = sb.toString();
-
-            if (last_word_index == 0) {
-
-                word = last_word;
-
-            } else {
-
-                word = word.substring(0, last_word_index);
-                word = word + last_word;
-            }
-        }
-
-        return word;
-    }
-
     public static class GeneratedFileData {
 
         String file_name;
@@ -419,13 +287,8 @@ public class IdeaHelpers {
     private static class GenerateSourceFileWriteAction implements Runnable {
 
         private Throwable error;
-
         private List<GeneratedFileData> generated_file_data_list;
-
         private Project project;
-
-        private VirtualFile root_file;
-
         private String output_dir_module_relative_path;
 
         private static void writeFile(VirtualFile dir, GeneratedFileData gf) throws Exception {
@@ -475,13 +338,12 @@ public class IdeaHelpers {
     }
 
     public static void run_write_action_to_generate_source_file(final String output_dir_module_relative_path, List<GeneratedFileData> generated_file_data_list,
-                                                                final Project project, final VirtualFile root_file) throws Exception {
+                                                                final Project project) throws Exception {
 
         GenerateSourceFileWriteAction write_action = new GenerateSourceFileWriteAction();
 
         write_action.generated_file_data_list = generated_file_data_list;
         write_action.project = project;
-        write_action.root_file = root_file;
         write_action.output_dir_module_relative_path = output_dir_module_relative_path;
 
         ApplicationManager.getApplication().runWriteAction(write_action);
@@ -572,20 +434,6 @@ public class IdeaHelpers {
 
             throw new IOException(_save_text_file_error);
         }
-    }
-
-    // for Java
-    public static String get_package_relative_path(Settings settings,
-                                                   String package_name) {
-
-        String source_folder = settings.getFolders().getTarget();
-
-        if (package_name.length() == 0) {
-
-            return source_folder;
-        }
-
-        return source_folder + "/" + package_name.replace(".", "/");
     }
 
     // thanks to https://plugins.jetbrains.com/plugin/3202?pr=

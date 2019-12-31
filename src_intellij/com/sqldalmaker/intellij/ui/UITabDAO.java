@@ -386,7 +386,7 @@ public class UITabDAO {
 
         try {
 
-            IdeaHelpers.run_write_action_to_generate_source_file(output_dir.toString(), list, project, propFile);
+            IdeaHelpers.run_write_action_to_generate_source_file(output_dir.toString(), list, project);
 
         } catch (Exception e) {
             e.printStackTrace();

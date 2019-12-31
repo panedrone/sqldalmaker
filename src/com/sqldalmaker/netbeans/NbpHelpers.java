@@ -1,17 +1,16 @@
 /*
- * Copyright 2011-2018 sqldalmaker@gmail.com
+ * Copyright 2011-2019 sqldalmaker@gmail.com
  * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
  * Read LICENSE.txt in the root of this project/archive for details.
+ *
  */
 package com.sqldalmaker.netbeans;
 
 import com.sqldalmaker.cg.Helpers;
 import com.sqldalmaker.common.Const;
-import com.sqldalmaker.common.EnglishNoun;
 import com.sqldalmaker.common.InternalException;
-import com.sqldalmaker.common.XmlParser;
+import com.sqldalmaker.common.SdmUtils;
 import com.sqldalmaker.jaxb.dto.DtoClass;
-import com.sqldalmaker.jaxb.dto.DtoClasses;
 import com.sqldalmaker.jaxb.settings.Settings;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -38,21 +37,6 @@ import org.openide.filesystems.FileUtil;
  */
 public class NbpHelpers {
 
-    private static Settings load_settings(String folder_abs_path) throws Exception {
-
-        String config_xsd_abs_path = folder_abs_path + "/" + Const.SETTINGS_XSD;
-
-        String context_path = Settings.class.getPackage().getName();
-
-        XmlParser config_xml_parser = new XmlParser(context_path, config_xsd_abs_path);
-
-        String config_xml_abs_path = folder_abs_path + "/" + Const.SETTINGS_XML;
-
-        Settings res = config_xml_parser.unmarshal(config_xml_abs_path);
-
-        return res;
-    }
-
     public static Settings load_settings(SdmDataObject obj) throws Exception {
 
         return load_settings(obj.getPrimaryFile());
@@ -64,7 +48,7 @@ public class NbpHelpers {
 
         String folder_abs_path = folder.getPath();
 
-        return NbpHelpers.load_settings(folder_abs_path);
+        return SdmUtils.load_settings(folder_abs_path);
     }
 
     public static List<DtoClass> get_dto_classes(SdmDataObject obj) throws Exception {
@@ -80,20 +64,12 @@ public class NbpHelpers {
 
         String folder_abs_path = folder.getPath();
 
-        String dto_xsd_abs_file_path = folder_abs_path + "/" + Const.DTO_XSD;
+        String dto_xsd_abs_path = folder_abs_path + "/" + Const.DTO_XSD;
+        String dto_xml_abs_path = folder_abs_path + "/" + Const.DTO_XML;
 
-        String context_path = DtoClasses.class.getPackage().getName();
+        List<DtoClass> list = SdmUtils.get_dto_classes(dto_xml_abs_path, dto_xsd_abs_path);
 
-        XmlParser xml_parser = new XmlParser(context_path, dto_xsd_abs_file_path);
-
-        String dto_xml_abs_file_path = folder_abs_path + "/" + Const.DTO_XML;
-
-        DtoClasses elements = xml_parser.unmarshal(dto_xml_abs_file_path);
-
-        for (DtoClass cls : elements.getDtoClass()) {
-
-            res.add(cls);
-        }
+        res.addAll(list);
 
         return res;
     }
@@ -103,7 +79,6 @@ public class NbpHelpers {
         Settings sett = NbpHelpers.load_settings(obj);
 
         String driver_jar = sett.getJdbc().getJar();
-
         String driver_class_name = sett.getJdbc().getClazz();
 
         String url = sett.getJdbc().getUrl();
@@ -111,11 +86,9 @@ public class NbpHelpers {
         String project_abs_path = NbpPathHelpers.get_root_folder(obj.getPrimaryFile()).getPath();
 
         url = url.replace("$PROJECT_DIR$", project_abs_path);
-
         url = url.replace("${project_loc}", project_abs_path);
 
         String user_name = sett.getJdbc().getUser();
-
         String password = sett.getJdbc().getPwd();
 
         FileObject res = null;
@@ -164,7 +137,6 @@ public class NbpHelpers {
         if (user_name != null) {
 
             props.put("user", user_name);
-
             props.put("password", password);
         }
 
@@ -296,99 +268,5 @@ public class NbpHelpers {
         file = folder.createData(file_name);
 
         write_file_content(file, file_content);
-    }
-
-    public static String table_name_to_dto_class_name(String table_name, boolean plural_to_singular) {
-
-        String word = to_camel_case(table_name);
-
-        if (plural_to_singular) {
-
-            int last_word_index = -1;
-
-            String last_word;
-
-            for (int i = word.length() - 1; i >= 0; i--) {
-
-                if (Character.isUpperCase(word.charAt(i))) {
-
-                    last_word_index = i;
-
-                    break;
-                }
-            }
-
-            last_word = word.substring(last_word_index);
-
-            last_word = EnglishNoun.singularOf(last_word); // makes lowercase
-
-            StringBuilder sb = new StringBuilder();
-
-            sb.append(Character.toUpperCase(last_word.charAt(0)));
-
-            if (last_word.length() > 1) {
-
-                sb.append(last_word.substring(1, last_word.length()).toLowerCase());
-            }
-
-            last_word = sb.toString();
-
-            if (last_word_index == 0) {
-
-                word = last_word;
-
-            } else {
-
-                word = word.substring(0, last_word_index);
-
-                word = word + last_word;
-            }
-        }
-
-        return word;
-    }
-
-    private static String to_camel_case(String str) {
-
-        if (!str.contains("_")) {
-
-            boolean all_is_upper_case = Helpers.is_upper_case(str);
-
-            if (all_is_upper_case) {
-
-                str = str.toLowerCase();
-            }
-
-            return Helpers.replace_char_at(str, 0, Character.toUpperCase(str.charAt(0)));
-        }
-
-        // http://stackoverflow.com/questions/1143951/what-is-the-simplest-way-to-convert-a-java-string-from-all-caps-words-separated
-        //
-        StringBuilder sb = new StringBuilder();
-
-        String[] arr = str.split("_");
-
-        for (String s : arr) {
-
-            if (s.length() == 0) {
-
-                continue; // E.g. _ALL_FILE_GROUPS
-            }
-
-            // if (i == 0) {
-            //
-            // sb.append(s.toLowerCase());
-            //
-            // } else {
-            sb.append(Character.toUpperCase(s.charAt(0)));
-
-            if (s.length() > 1) {
-
-                sb.append(s.substring(1, s.length()).toLowerCase());
-            }
-        }
-        // }
-
-        return sb.toString();
     }
 }

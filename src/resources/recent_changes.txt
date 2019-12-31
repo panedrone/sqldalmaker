@@ -1,29 +1,30 @@
-Sep 26, 2019
+2019-12-31
+	
+	Enabled <crud(-auto) table="my_schema.orders"...
 
-    Starting from v.1.90, you can generate and run PHP, Java, and Python code to call stored procedures and functions.
-    Successfully tested with MySQL and PostgreSQL.
-    Return values of stored procedures are not supported (v.1.90).
-    OUT and IN-OUT parameters of stored procedures and functions are not supported (v.1.90).
-    Review updated implementations of DataStore: 1) PHP + PDO, 2) Java + Apache DbUtils, 3) Python + PDO.
-    Visit project Website for details.
+2019-09-30
 
-Aug 17, 2019
+	Starting from plug-in v.1.90, you can generate and run PHP, Java, and Python code to call stored procedures and functions.
+	Review updated implementations of DataStore: 1) PHP + PDO, 2) Java + Apache DbUtils, 3) Python + MySQL Connector/Python.
+	Tested with MySQL, Oracle DB, and PostgreSQL. Visit project Website for details.
+
+2019-08-17
 
     - Fixes of DTO navigation in Eclipse.
 
-Aug 14, 2019
+2019-08-14
 
     - Adapted for xerial PK column names like '[employeeid] asc'.
 
-Aug 12, 2019
+2019-08-13
 
     - Fixed incorrect commenting in Python and Ruby target code.
 
-Aug 07, 2019
+2019-08-07
 
     - Fixed incorrect enumeration of root-files.
 
-Aug 04, 2019
+2019-08-04
 
     - Adapted for new naming of SQL columns in SQLite3 JDBC driver
 
@@ -39,35 +40,35 @@ Aug 04, 2019
         
            <xs:attribute name="column" use="required" type="xs:string" /> 
       
-Aug 02, 2019
+2019-08-02
 
     - Fixed incorrect detection of PK for CRUD + SQLite3    
 	
-Jan 11, 2019
+2019-01-11
 
     - Fixes for DTO/DAO XML assistants + MySQL.
 
-Nov 11, 2018
+2018-11-11
 
     - Fixes for DTO/DAO XML assistants + MySQL.
 
-Nov 07, 2018
+2018-11-07
 
     - Added an option to exclude views in DTO/DAO assistants.
     - Fixes of C++ formatting in VM.
     - Added example of DataStore class implemented in Qt5 C++.
 
-Feb 12, 2018
+2018-02-12
 
 	Implemented generation of XML for reading data through FK-s.
 	
-Jan 08, 2018
+2018-01-08
 
     Improvements of error handling and visualization.
     
     To use new event logging, update XSD-files from the tab 'Admin' and add <ide event-log="true"/> to 'settings.xml'.
 
-Apr 01, 2017
+2017-04-01
 
     Shortcuts for simple reading data through FK-s:
 

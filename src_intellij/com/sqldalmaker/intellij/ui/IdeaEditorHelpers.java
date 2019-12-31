@@ -16,6 +16,7 @@ import com.sqldalmaker.cg.FieldInfo;
 import com.sqldalmaker.cg.FieldNamesMode;
 import com.sqldalmaker.common.Const;
 import com.sqldalmaker.common.InternalException;
+import com.sqldalmaker.common.SdmUtils;
 import com.sqldalmaker.common.XmlHelpers;
 import com.sqldalmaker.jaxb.dto.DtoClass;
 import com.sqldalmaker.jaxb.dto.DtoClasses;
@@ -225,27 +226,6 @@ public class IdeaEditorHelpers {
         }
     }
 
-    private static void gen_tmp_field_tags(Connection connection,
-                                           ObjectFactory object_factory,
-                                           DtoClass dto_class, String sql_root_folder_full_path) throws Exception {
-
-        DbUtils db_utils = new DbUtils(connection, FieldNamesMode.AS_IS, null);
-
-        String jdbc_sql = DbUtils.jdbc_sql_by_ref_query(dto_class.getRef(), sql_root_folder_full_path);
-
-        ArrayList<FieldInfo> fields = new ArrayList<FieldInfo>();
-
-        db_utils.get_dto_field_info(jdbc_sql, dto_class, fields);
-
-        for (FieldInfo f : fields) {
-
-            DtoClass.Field df = object_factory.createDtoClassField();
-            df.setColumn(f.getColumnName());
-            df.setJavaType(f.getType());
-            dto_class.getField().add(df);
-        }
-    }
-
     public static void gen_tmp_field_tags(String class_name, String ref,
                                           Project project, VirtualFile root_file) throws Exception {
 
@@ -270,7 +250,7 @@ public class IdeaEditorHelpers {
 
             String sql_root_folder_full_path = module_root + "/" + settings.getFolders().getSql();
 
-            gen_tmp_field_tags(con, object_factory, cls, sql_root_folder_full_path);
+            SdmUtils.gen_tmp_field_tags(con, object_factory, cls, sql_root_folder_full_path);
 
             open_dto_xml_in_editor(object_factory, project, dto_classes, true);
 

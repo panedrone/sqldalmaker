@@ -22,6 +22,7 @@ import com.sqldalmaker.cg.php.PhpCG;
 import com.sqldalmaker.cg.python.PythonCG;
 import com.sqldalmaker.cg.ruby.RubyCG;
 import com.sqldalmaker.common.RootFileName;
+import com.sqldalmaker.common.SdmUtils;
 import com.sqldalmaker.common.XmlParser;
 import com.sqldalmaker.jaxb.dto.DtoClasses;
 import com.sqldalmaker.jaxb.settings.Settings;
@@ -151,7 +152,7 @@ public class EclipseTargetLanguageHelpers {
 
 			if (output_dir != null) {
 
-				String rel_path = EclipseHelpers.get_package_relative_path(settings, dto_package);
+				String rel_path = SdmUtils.get_package_relative_path(settings, dto_package);
 
 				String abs_path = EclipseHelpers.get_absolute_dir_path_str(editor2.get_project(), rel_path);
 
@@ -291,7 +292,7 @@ public class EclipseTargetLanguageHelpers {
 
 			if (output_dir != null) {
 
-				String rel_path = EclipseHelpers.get_package_relative_path(settings, dao_package);
+				String rel_path = SdmUtils.get_package_relative_path(settings, dao_package);
 
 				String abs_path = EclipseHelpers.get_absolute_dir_path_str(project, rel_path);
 
@@ -334,7 +335,7 @@ public class EclipseTargetLanguageHelpers {
 
 		if (RootFileName.JAVA.equals(root_fn)) {
 
-			String path = EclipseHelpers.get_package_relative_path(settings, java_package) + "/" + class_name + ".java";
+			String path = SdmUtils.get_package_relative_path(settings, java_package) + "/" + class_name + ".java";
 
 			return project.getFile(path);
 
