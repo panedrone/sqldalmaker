@@ -138,22 +138,17 @@ public class UIDialogSelectDbSchema extends TitleAreaDialog {
 
 		getContents().getShell().setText("Select schema and provide options");
 
-		// Select DB-Schema
-		// setTitle("Select schema");
-		// Just click OK if DB-Schema list is empty
-
 		if (schema_names.size() == 0) {
-			
+
 			setMessage("This database doesn't have schemas. Just provide options.");
 			radio_selected_schema.setText("Without schema");
 
 		} else {
-			
+
 			setMessage("Select a schema from the list below and provide options.");
 			radio_selected_schema.setText("Use selected schema");
 		}
 
-		
 		selected_schema = null;
 
 		if (open_mode == Open_Mode.FK) {
@@ -171,7 +166,7 @@ public class UIDialogSelectDbSchema extends TitleAreaDialog {
 
 		tableViewer.setInput(schema_names);
 
-		doOnSelectionChanged();
+		on_selection_changed();
 	}
 
 	@Override
@@ -231,7 +226,7 @@ public class UIDialogSelectDbSchema extends TitleAreaDialog {
 		radio_selected_schema.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				doOnSelectionChanged();
+				on_selection_changed();
 			}
 		});
 		radio_selected_schema.setText("Use selected schema");
@@ -240,13 +235,13 @@ public class UIDialogSelectDbSchema extends TitleAreaDialog {
 		radio_user_as_schema.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				doOnSelectionChanged();
+				on_selection_changed();
 			}
 		});
 		radio_user_as_schema.setText("DB user name as schema");
 
 		chk_schema_in_xml = new Button(container, SWT.CHECK);
-		chk_schema_in_xml.setText("Schema name in generated XML");
+		chk_schema_in_xml.setText("Schema in generated XML declarations");
 
 		chk_Skip = new Button(container, SWT.CHECK);
 		chk_Skip.setSelection(true);
@@ -293,7 +288,7 @@ public class UIDialogSelectDbSchema extends TitleAreaDialog {
 
 			public void selectionChanged(SelectionChangedEvent evt) {
 
-				doOnSelectionChanged();
+				on_selection_changed();
 			}
 		});
 
@@ -302,7 +297,7 @@ public class UIDialogSelectDbSchema extends TitleAreaDialog {
 
 	protected void onSchemaDoubleClick() {
 
-		doOnSelectionChanged();
+		on_selection_changed();
 
 		if (buttonOK.getEnabled()) {
 
@@ -312,7 +307,7 @@ public class UIDialogSelectDbSchema extends TitleAreaDialog {
 		}
 	}
 
-	protected void doOnSelectionChanged() {
+	protected void on_selection_changed() {
 
 		@SuppressWarnings("unchecked")
 		List<String> items = (List<String>) tableViewer.getInput();
@@ -320,6 +315,8 @@ public class UIDialogSelectDbSchema extends TitleAreaDialog {
 		boolean enabled = false;
 
 		if (radio_user_as_schema.getSelection()) {
+
+			chk_schema_in_xml.setEnabled(true);
 
 			try {
 
@@ -342,25 +339,33 @@ public class UIDialogSelectDbSchema extends TitleAreaDialog {
 
 			if (items.size() == 0) {
 
+				chk_schema_in_xml.setSelection(false);
+				chk_schema_in_xml.setEnabled(false);
+
 				enabled = true;
 
 				selected_schema = null;
 
-			} else if (items.size() == 1) {
-
-				enabled = true;
-
-				selected_schema = items.get(0);
-
 			} else {
 
-				int[] indexes = table.getSelectionIndices();
+				chk_schema_in_xml.setEnabled(true);
 
-				enabled = indexes.length == 1;
+				if (items.size() == 1) {
 
-				if (enabled) {
+					enabled = true;
 
-					selected_schema = items.get(indexes[0]);
+					selected_schema = items.get(0);
+
+				} else {
+
+					int[] indexes = table.getSelectionIndices();
+
+					enabled = indexes.length == 1;
+
+					if (enabled) {
+
+						selected_schema = items.get(indexes[0]);
+					}
 				}
 			}
 		}

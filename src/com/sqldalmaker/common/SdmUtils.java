@@ -157,7 +157,7 @@ public class SdmUtils {
 
 			node.setMethod(method);
 
-			if (schema_in_xml && selected_schema != null) {
+			if (schema_in_xml && selected_schema != null && selected_schema.length() > 0) {
 				
 				node.setRef(selected_schema + "." + fk_table_name + "(" + columns + ")");
 				
@@ -291,7 +291,7 @@ public class SdmUtils {
 
 					String dto_class_name = table_name_to_dto_class_name(table_name, plural_to_singular);
 
-					if (schema_in_xml && selected_schema != null) {
+					if (schema_in_xml && selected_schema != null && selected_schema.length() > 0) {
 						
 						table_name = selected_schema + "." + table_name;
 					}
@@ -425,18 +425,11 @@ public class SdmUtils {
 
 			while (rs.next()) {
 
-//				String table_type = rs.getString("TABLE_TYPE");
-//
-//				if (!("TABLE".equalsIgnoreCase(table_type) || "VIEW".equalsIgnoreCase(table_type))) {
-//
-//					continue;
-//				}
-
 				String table_name = rs.getString("TABLE_NAME");
 
 				String dto_class_name = SdmUtils.table_name_to_dto_class_name(table_name, plural_to_singular);
 
-				if (schema_in_xml && selected_schema != null) {
+				if (schema_in_xml && selected_schema != null && selected_schema.length() > 0) {
 					
 					table_name = selected_schema + "." + table_name;
 				}

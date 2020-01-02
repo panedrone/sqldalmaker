@@ -42,8 +42,14 @@ public class UIDialogSelectDbSchema extends JDialog {
     private JPanel radioPanel;
     private JCheckBox chk_add_fk_access;
     private JCheckBox chk_including_views;
+    private JCheckBox chk_schema_in_xml;
+    private JLabel lbl_hint;
+    private JRadioButton radio_selected_schema;
+    private JRadioButton radio_user_as_schema;
 
     private final Settings settings;
+
+    private String selected_schema = null;
 
     private UIDialogSelectDbSchema(Project project, VirtualFile profile, ISelectDbSchemaCallback callback, boolean dto, boolean fk) throws Exception {
         $$$setupUI$$$();
@@ -73,7 +79,12 @@ public class UIDialogSelectDbSchema extends JDialog {
         table.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
+
                     onOK();
+
+                } else if (e.getClickCount() == 1) {
+
+                    on_selection_changed();
                 }
             }
         });
@@ -103,10 +114,75 @@ public class UIDialogSelectDbSchema extends JDialog {
             this.chk_including_views.setVisible(false);
         }
 
+        radio_selected_schema.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                on_selection_changed();
+            }
+        });
+        radio_user_as_schema.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                on_selection_changed();
+            }
+        });
+
         refresh();
     }
 
-    private int[] getSelection() throws InternalException {
+    private void on_selection_changed() {
+
+        boolean enabled = false;
+
+        if (radio_user_as_schema.isSelected()) {
+
+            enabled = true;
+
+            chk_schema_in_xml.setEnabled(true);
+
+            String user = settings.getJdbc().getUser();
+
+            selected_schema = user;
+
+        } else if (radio_selected_schema.isSelected()) {
+
+            if (table.getRowCount() == 0) {
+
+                chk_schema_in_xml.setSelected(false);
+                chk_schema_in_xml.setEnabled(false);
+
+                enabled = true;
+
+                selected_schema = null;
+
+            } else {
+
+                chk_schema_in_xml.setEnabled(true);
+
+                if (table.getRowCount() == 1) {
+
+                    enabled = true;
+
+                    selected_schema = null;
+
+                } else {
+
+                    int[] indexes = getSelection();
+
+                    enabled = indexes.length == 1;
+
+                    if (enabled) {
+
+                        selected_schema = (String) table.getModel().getValueAt(indexes[0], 0);
+                    }
+                }
+            }
+        }
+
+        buttonOK.setEnabled(enabled);
+    }
+
+    private int[] getSelection() {
 
         int rc = table.getModel().getRowCount();
 
@@ -114,50 +190,18 @@ public class UIDialogSelectDbSchema extends JDialog {
             return new int[]{0};
         }
 
-        int[] selectedRows = table.getSelectedRows();
+        int[] selected_rows = table.getSelectedRows();
 
-        if (selectedRows.length == 0) {
-
-            throw new InternalException("Selection is empty.");
-        }
-
-        return selectedRows;
+        return selected_rows;
     }
 
     private void onOK() {
 
-        try {
+        callback.process_ok(chk_schema_in_xml.isSelected(), selected_schema,
+                chk_Skip.isSelected(), chk_including_views.isSelected(), chk_DeleteS.isSelected(),
+                crudAutoRadioButton.isSelected(), chk_add_fk_access.isSelected());
 
-            String selected_schema = null;
-
-            if (table.getRowCount() == 1) {
-
-                selected_schema = (String) table.getValueAt(0, 0);
-
-            } else {
-
-                if (table.getRowCount() != 0) {
-
-                    int[] indexes = getSelection();
-
-                    if (indexes.length == 1) {
-
-                        selected_schema = (String) table.getValueAt(indexes[0], 0);
-
-                    } else {
-
-                        throw new InternalException("Selection is empty.");
-                    }
-                }
-            }
-
-            callback.process_ok(selected_schema, chk_Skip.isSelected(), chk_including_views.isSelected(), chk_DeleteS.isSelected(), crudAutoRadioButton.isSelected(), chk_add_fk_access.isSelected());
-
-            dispose();
-
-        } catch (InternalException e) {
-            IdeaMessageHelpers.show_error_in_ui_thread(e);
-        }
+        dispose();
     }
 
     private void onCancel() {
@@ -180,14 +224,14 @@ public class UIDialogSelectDbSchema extends JDialog {
     private void refresh() {
 
         try {
+
             final ArrayList<String> items = new ArrayList<String>();
 
             Connection con = IdeaHelpers.get_connection(project, settings);
 
             try {
-                DbUtils.get_schema_names(con, items);
 
-                // buttonOK.setEnabled(items.size() <= 1);
+                DbUtils.get_schema_names(con, items);
 
                 table.setModel(new AbstractTableModel() {
 
@@ -200,7 +244,7 @@ public class UIDialogSelectDbSchema extends JDialog {
                     }
 
                     public String getColumnName(int column) {
-                        return "DB-Schema";
+                        return "Schema";
                     }
 
                     public int getRowCount() {
@@ -208,9 +252,23 @@ public class UIDialogSelectDbSchema extends JDialog {
                     }
                 });
 
+                if (items.size() == 0) {
+
+                    lbl_hint.setText("This database doesn't have schemas. Just provide options.");
+                    radio_selected_schema.setText("Without schema");
+
+                } else {
+
+                    lbl_hint.setText("Select a schema from the list below and provide options.");
+                    radio_selected_schema.setText("Use selected schema");
+                }
+
             } finally {
+
                 con.close();
             }
+
+            on_selection_changed();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -248,16 +306,16 @@ public class UIDialogSelectDbSchema extends JDialog {
         final JPanel panel4 = new JPanel();
         panel4.setLayout(new GridLayoutManager(2, 1, new Insets(10, 10, 10, 10), -1, -1));
         panel3.add(panel4, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        lbl_hint = new JLabel();
+        lbl_hint.setText("???");
+        panel4.add(lbl_hint, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JLabel label1 = new JLabel();
-        label1.setText("(just click OK if the list is empty)");
-        panel4.add(label1, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        final JLabel label2 = new JLabel();
-        Font label2Font = this.$$$getFont$$$(null, Font.BOLD, 14, label2.getFont());
-        if (label2Font != null) label2.setFont(label2Font);
-        label2.setText("Select DB-Schema");
-        panel4.add(label2, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        Font label1Font = this.$$$getFont$$$(null, Font.BOLD, 14, label1.getFont());
+        if (label1Font != null) label1.setFont(label1Font);
+        label1.setText("Select schema and provide options");
+        panel4.add(label1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JPanel panel5 = new JPanel();
-        panel5.setLayout(new GridLayoutManager(6, 1, new Insets(10, 10, 10, 10), -1, -1));
+        panel5.setLayout(new GridLayoutManager(8, 1, new Insets(10, 10, 10, 10), -1, -1));
         panel3.add(panel5, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         final JScrollPane scrollPane1 = new JScrollPane();
         panel5.add(scrollPane1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
@@ -266,14 +324,14 @@ public class UIDialogSelectDbSchema extends JDialog {
         chk_Skip = new JCheckBox();
         chk_Skip.setSelected(true);
         chk_Skip.setText("Skip tables/views used in existing declarations");
-        panel5.add(chk_Skip, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panel5.add(chk_Skip, new GridConstraints(3, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         chk_DeleteS = new JCheckBox();
         chk_DeleteS.setSelected(true);
         chk_DeleteS.setText("English plural to singular for DTO class names");
-        panel5.add(chk_DeleteS, new GridConstraints(3, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panel5.add(chk_DeleteS, new GridConstraints(5, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         radioPanel = new JPanel();
         radioPanel.setLayout(new GridLayoutManager(1, 3, new Insets(0, 0, 0, 0), -1, -1));
-        panel5.add(radioPanel, new GridConstraints(5, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        panel5.add(radioPanel, new GridConstraints(7, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         crudRadioButton = new JRadioButton();
         crudRadioButton.setSelected(true);
         crudRadioButton.setText("crud");
@@ -286,11 +344,27 @@ public class UIDialogSelectDbSchema extends JDialog {
         chk_add_fk_access = new JCheckBox();
         chk_add_fk_access.setSelected(true);
         chk_add_fk_access.setText("Including FK access code");
-        panel5.add(chk_add_fk_access, new GridConstraints(4, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panel5.add(chk_add_fk_access, new GridConstraints(6, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         chk_including_views = new JCheckBox();
         chk_including_views.setSelected(true);
         chk_including_views.setText("Including Views");
-        panel5.add(chk_including_views, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panel5.add(chk_including_views, new GridConstraints(4, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        chk_schema_in_xml = new JCheckBox();
+        chk_schema_in_xml.setSelected(false);
+        chk_schema_in_xml.setText("Schema in generated XMLdeclarations");
+        panel5.add(chk_schema_in_xml, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        final JPanel panel6 = new JPanel();
+        panel6.setLayout(new GridLayoutManager(1, 3, new Insets(0, 0, 0, 0), -1, -1));
+        panel5.add(panel6, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        radio_selected_schema = new JRadioButton();
+        radio_selected_schema.setSelected(true);
+        radio_selected_schema.setText("Use selected schema");
+        panel6.add(radio_selected_schema, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        final Spacer spacer3 = new Spacer();
+        panel6.add(spacer3, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
+        radio_user_as_schema = new JRadioButton();
+        radio_user_as_schema.setText("DB user name as schema");
+        panel6.add(radio_user_as_schema, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JSeparator separator1 = new JSeparator();
         panel3.add(separator1, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         ButtonGroup buttonGroup;
@@ -300,6 +374,7 @@ public class UIDialogSelectDbSchema extends JDialog {
     }
 
     /**
+     * @noinspection ALL
      */
     private Font $$$getFont$$$(String fontName, int style, int size, Font currentFont) {
         if (currentFont == null) return null;
@@ -318,8 +393,10 @@ public class UIDialogSelectDbSchema extends JDialog {
     }
 
     /**
+     * @noinspection ALL
      */
     public JComponent $$$getRootComponent$$$() {
         return contentPane;
     }
+
 }
