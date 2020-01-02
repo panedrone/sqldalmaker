@@ -20,6 +20,8 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
@@ -27,15 +29,15 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.wb.swt.ResourceManager;
 
 import com.sqldalmaker.cg.DbUtils;
 import com.sqldalmaker.common.ISelectDbSchemaCallback;
-
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import com.sqldalmaker.common.SdmUtils;
+import com.sqldalmaker.jaxb.settings.Settings;
 
 /**
  *
@@ -45,7 +47,7 @@ import org.eclipse.swt.events.SelectionEvent;
 public class UIDialogSelectDbSchema extends TitleAreaDialog {
 
 	private String selected_schema;
-	private ArrayList<String> items;
+	private ArrayList<String> schema_names;
 
 	private Table table;
 	private TableViewer tableViewer;
@@ -56,6 +58,8 @@ public class UIDialogSelectDbSchema extends TitleAreaDialog {
 	private Composite compositeCrud;
 	private Button radioCrudAuto;
 	private Button radioCrud;
+	private Button radio_selected_schema;
+	private Button radio_user_as_schema;
 
 	public enum Open_Mode {
 		DTO, DAO, FK
@@ -68,8 +72,14 @@ public class UIDialogSelectDbSchema extends TitleAreaDialog {
 	private boolean delS;
 	private boolean use_crud_auto;
 	private boolean add_fk_access;
+	private boolean schema_in_xml;
+
 	private Button chk_add_fk_access;
 	private Button chk_views;
+	private Composite composite;
+
+	private String sdm_folder_abs_path;
+	private Button chk_schema_in_xml;
 
 	/**
 	 * Create the dialog.
@@ -77,7 +87,8 @@ public class UIDialogSelectDbSchema extends TitleAreaDialog {
 	 * @param parentShell
 	 * @param dto2
 	 */
-	private UIDialogSelectDbSchema(Shell parentShell, IProject project, ArrayList<String> items, Open_Mode open_mode) {
+	private UIDialogSelectDbSchema(Shell parentShell, IProject project, ArrayList<String> schema_names,
+			Open_Mode open_mode) {
 
 		super(parentShell);
 
@@ -85,7 +96,7 @@ public class UIDialogSelectDbSchema extends TitleAreaDialog {
 
 		setShellStyle(SWT.MAX | SWT.RESIZE | SWT.TITLE | SWT.APPLICATION_MODAL);
 
-		this.items = items;
+		this.schema_names = schema_names;
 
 		this.open_mode = open_mode;
 
@@ -110,10 +121,13 @@ public class UIDialogSelectDbSchema extends TitleAreaDialog {
 		UIDialogSelectDbSchema dlg = new UIDialogSelectDbSchema(parentShell, editor2.get_project(), schema_names,
 				open_mode);
 
+		dlg.schema_names = schema_names;
+		dlg.sdm_folder_abs_path = editor2.get_metaprogram_folder_abs_path();
+
 		if (dlg.open() == IDialogConstants.OK_ID) {
 
-			callback.process_ok(dlg.selected_schema, dlg.skip, dlg.include_views, dlg.delS, dlg.use_crud_auto,
-					dlg.add_fk_access);
+			callback.process_ok(dlg.schema_in_xml, dlg.selected_schema, dlg.skip, dlg.include_views, dlg.delS,
+					dlg.use_crud_auto, dlg.add_fk_access);
 		}
 	}
 
@@ -122,15 +136,24 @@ public class UIDialogSelectDbSchema extends TitleAreaDialog {
 
 		super.create();
 
-		getContents().getShell().setText("Select DB-Schema");
+		getContents().getShell().setText("Select schema and provide options");
 
 		// Select DB-Schema
-		setTitle("Select DB-Schema");
+		// setTitle("Select schema");
 		// Just click OK if DB-Schema list is empty
-		setMessage("Just click OK if DB-Schema list is empty.");
 
-		buttonOK.setEnabled(items.size() <= 1);
+		if (schema_names.size() == 0) {
+			
+			setMessage("This database doesn't have schemas. Just provide options.");
+			radio_selected_schema.setText("Without schema");
 
+		} else {
+			
+			setMessage("Select a schema from the list below and provide options.");
+			radio_selected_schema.setText("Use selected schema");
+		}
+
+		
 		selected_schema = null;
 
 		if (open_mode == Open_Mode.FK) {
@@ -146,7 +169,9 @@ public class UIDialogSelectDbSchema extends TitleAreaDialog {
 			chk_add_fk_access.setVisible(false);
 		}
 
-		tableViewer.setInput(items);
+		tableViewer.setInput(schema_names);
+
+		doOnSelectionChanged();
 	}
 
 	@Override
@@ -159,6 +184,7 @@ public class UIDialogSelectDbSchema extends TitleAreaDialog {
 		delS = chk_delEndingS.getSelection();
 		use_crud_auto = radioCrudAuto.getSelection();
 		add_fk_access = chk_add_fk_access.getSelection();
+		schema_in_xml = chk_schema_in_xml.getSelection();
 
 		return super.close();
 	}
@@ -195,6 +221,32 @@ public class UIDialogSelectDbSchema extends TitleAreaDialog {
 		tableViewer = new TableViewer(container, SWT.BORDER | SWT.FULL_SELECTION);
 		table = tableViewer.getTable();
 		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+		new Label(container, SWT.NONE);
+
+		composite = new Composite(container, SWT.NONE);
+		composite.setLayout(new GridLayout(2, false));
+
+		radio_selected_schema = new Button(composite, SWT.RADIO);
+		radio_selected_schema.setSelection(true);
+		radio_selected_schema.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				doOnSelectionChanged();
+			}
+		});
+		radio_selected_schema.setText("Use selected schema");
+
+		radio_user_as_schema = new Button(composite, SWT.RADIO);
+		radio_user_as_schema.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				doOnSelectionChanged();
+			}
+		});
+		radio_user_as_schema.setText("DB user name as schema");
+
+		chk_schema_in_xml = new Button(container, SWT.CHECK);
+		chk_schema_in_xml.setText("Schema name in generated XML");
 
 		chk_Skip = new Button(container, SWT.CHECK);
 		chk_Skip.setSelection(true);
@@ -203,15 +255,16 @@ public class UIDialogSelectDbSchema extends TitleAreaDialog {
 
 		chk_views = new Button(container, SWT.CHECK);
 		chk_views.setSelection(true);
-		chk_views.setText("Including Views");
+		chk_views.setText("Including views");
 
 		chk_delEndingS = new Button(container, SWT.CHECK);
 		chk_delEndingS.setSelection(true);
-		chk_delEndingS.setText("English plural to singular for DTO class names");
+		chk_delEndingS.setText("English plural to English singular for DTO class names");
 
 		chk_add_fk_access = new Button(container, SWT.CHECK);
-		chk_add_fk_access.setText("Including FK access code");
+		chk_add_fk_access.setText("Including FK access");
 		chk_add_fk_access.setSelection(true);
+		new Label(container, SWT.NONE);
 
 		compositeCrud = new Composite(container, SWT.NONE);
 		compositeCrud.setLayout(new GridLayout(2, false));
@@ -251,9 +304,12 @@ public class UIDialogSelectDbSchema extends TitleAreaDialog {
 
 		doOnSelectionChanged();
 
-		setReturnCode(IDialogConstants.OK_ID);
+		if (buttonOK.getEnabled()) {
 
-		close();
+			setReturnCode(IDialogConstants.OK_ID);
+
+			close();
+		}
 	}
 
 	protected void doOnSelectionChanged() {
@@ -261,23 +317,51 @@ public class UIDialogSelectDbSchema extends TitleAreaDialog {
 		@SuppressWarnings("unchecked")
 		List<String> items = (List<String>) tableViewer.getInput();
 
-		boolean enabled;
+		boolean enabled = false;
 
-		if (items.size() == 1) {
+		if (radio_user_as_schema.getSelection()) {
 
-			enabled = true;
+			try {
 
-			selected_schema = items.get(0);
+				Settings sett = SdmUtils.load_settings(sdm_folder_abs_path);
 
-		} else {
+				enabled = true;
 
-			int[] indexes = table.getSelectionIndices();
+				String user = sett.getJdbc().getUser();
 
-			enabled = indexes.length == 1;
+				selected_schema = user;
 
-			if (enabled) {
+			} catch (Exception e) {
 
-				selected_schema = items.get(indexes[0]);
+				e.printStackTrace();
+
+				EclipseMessageHelpers.show_error(e);
+			}
+
+		} else if (radio_selected_schema.getSelection()) {
+
+			if (items.size() == 0) {
+
+				enabled = true;
+
+				selected_schema = null;
+
+			} else if (items.size() == 1) {
+
+				enabled = true;
+
+				selected_schema = items.get(0);
+
+			} else {
+
+				int[] indexes = table.getSelectionIndices();
+
+				enabled = indexes.length == 1;
+
+				if (enabled) {
+
+					selected_schema = items.get(indexes[0]);
+				}
 			}
 		}
 
@@ -293,11 +377,6 @@ public class UIDialogSelectDbSchema extends TitleAreaDialog {
 	protected void createButtonsForButtonBar(Composite parent) {
 
 		buttonOK = createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL, true);
-		buttonOK.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-			}
-		});
 		createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, false);
 	}
 
@@ -307,6 +386,6 @@ public class UIDialogSelectDbSchema extends TitleAreaDialog {
 	@Override
 	protected Point getInitialSize() {
 
-		return new Point(450, 384);
+		return new Point(601, 617);
 	}
 }

@@ -12,5 +12,5 @@ package com.sqldalmaker.common;
  */
 public interface ISelectDbSchemaCallback {
 
-    void process_ok(String selected_schema, boolean skip_used, boolean include_views, boolean plural_to_singular, boolean crud_auto, boolean add_fk_access);
+    void process_ok(boolean schema_in_xml, String selected_schema, boolean skip_used, boolean include_views, boolean plural_to_singular, boolean crud_auto, boolean add_fk_access);
 }

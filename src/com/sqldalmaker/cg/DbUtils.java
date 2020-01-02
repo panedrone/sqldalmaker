@@ -36,11 +36,6 @@ public class DbUtils {
 		}
 	}
 
-	private static Exception Exception(String string) {
-		throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods, choose
-																		// Tools | Templates.
-	}
-
 	private final Connection conn;
 
 	private final FieldNamesMode field_names_mode;
@@ -56,6 +51,7 @@ public class DbUtils {
 		this.type_map = type_map;
 	}
 
+	@SuppressWarnings("unused")
 	public FieldNamesMode get_field_names_mode() {
 
 		return field_names_mode;
@@ -118,7 +114,7 @@ public class DbUtils {
 			schema = parts[0];
 			table_name = parts[1];
 		}
-		
+
 		ResultSet rs = db_info.getPrimaryKeys(null, schema, table_name);
 
 		try {
@@ -741,8 +737,8 @@ public class DbUtils {
 
 		String table_name = parts2[0];
 
-                validate_table_name(table_name); // PostgreSQL JDBC prepareStatement passes wrong table names
-                
+		validate_table_name(table_name); // PostgreSQL JDBC prepareStatement passes wrong table names
+
 		String param_descriptors = parts2[1];
 
 		String[] param_arr = Helpers.get_listed_items(param_descriptors);
@@ -803,7 +799,7 @@ public class DbUtils {
 
 			table_name = ref;
 
-		} else if (ref == null || ref.trim().length() == 0) {
+		} else if (/* ref == null || */ ref.trim().length() == 0) {
 
 			return "";
 
@@ -890,7 +886,7 @@ public class DbUtils {
 
 		// no empty strings separated by dots
 		//
-		String parts[] = ref.split("\\.", -1); // -1 to leave empty strings
+		String[] parts = ref.split("\\.", -1); // -1 to leave empty strings
 
 		for (String s : parts) {
 
@@ -907,7 +903,7 @@ public class DbUtils {
 
 		jdbc_sql = jdbc_sql.trim();
 
-		if (jdbc_sql.startsWith("{") == false || jdbc_sql.endsWith("}") == false) {
+		if (!jdbc_sql.startsWith("{") || !jdbc_sql.endsWith("}")) {
 			return false;
 		}
 
@@ -919,7 +915,7 @@ public class DbUtils {
 
 	public static boolean is_stored_proc_call_shortcut(String text) {
 
-		String parts[] = text.split("\\s+");
+		String[] parts = text.split("\\s+");
 
 		if (parts.length < 2) {
 			return false;
@@ -932,7 +928,7 @@ public class DbUtils {
 
 	public static boolean is_stored_func_call_shortcut(String text) {
 
-		String parts[] = text.split("\\s+");
+		String[] parts = text.split("\\s+");
 
 		if (parts.length < 2) {
 			return false;
@@ -943,13 +939,13 @@ public class DbUtils {
 		return call.compareToIgnoreCase("select") == 0;
 	}
 
-	public static String stored_proc_shortcut_to_jdbc_call(String text) throws Exception {
-
-		if (is_stored_proc_call_shortcut(text)) {
-			return "{" + text + "}";
-		}
-		throw new Exception("This is not a shortcut of stored procedure call: " + text);
-	}
+//	public static String stored_proc_shortcut_to_jdbc_call(String text) throws Exception {
+//
+//		if (is_stored_proc_call_shortcut(text)) {
+//			return "{" + text + "}";
+//		}
+//		throw new Exception("This is not a shortcut of stored procedure call: " + text);
+//	}
 
 	public static String jdbc_to_php_stored_proc_call(final String jdbc_sql) throws java.lang.Exception {
 
@@ -964,7 +960,7 @@ public class DbUtils {
 
 		} else {
 
-			throw Exception("Inexpected syntax of CALL: " + jdbc_sql);
+			throw new Exception("Inexpected syntax of CALL: " + jdbc_sql);
 		}
 
 		return sql;
@@ -983,14 +979,14 @@ public class DbUtils {
 
 		} else {
 
-			throw Exception("Inexpected syntax of CALL: " + jdbc_sql);
+			throw new Exception("Inexpected syntax of CALL: " + jdbc_sql);
 		}
 
 		if (sql.contains("(")) {
 
-			if (sql.endsWith(")") == false) {
+			if (!sql.endsWith(")")) {
 
-				throw Exception("Inexpected syntax of CALL: " + jdbc_sql);
+				throw new Exception("Inexpected syntax of CALL: " + jdbc_sql);
 			}
 
 			String[] parts = sql.split("[(]");
@@ -1147,7 +1143,7 @@ public class DbUtils {
 
 			String rs_class_name = ResultSet.class.getName();
 
-			if (java_class_name == rs_class_name) {
+			if (java_class_name.equals(rs_class_name)) {
 
 				return;
 			}
@@ -1256,8 +1252,7 @@ public class DbUtils {
 
 		if (param_descriptors == null && params_count > 0) {
 
-			throw new SQLException(
-					"Specified parameters count: 0. Detected parameters count: " + Integer.toString(params_count));
+			throw new SQLException("Specified parameters count: 0. Detected parameters count: " + params_count);
 		}
 
 		if (param_descriptors != null && params_count != param_descriptors.length) {

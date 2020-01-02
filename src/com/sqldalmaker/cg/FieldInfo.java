@@ -77,6 +77,7 @@ public class FieldInfo {
     }
 
     // called from Velocity script
+    @SuppressWarnings("unused")
     public String getterMethod() { // NO_UCD (unused code)
 
         String s = name_prefix + field_name;
@@ -87,6 +88,7 @@ public class FieldInfo {
     }
 
     // called from Velocity script
+    @SuppressWarnings("unused")
     public String setterMethod() { // NO_UCD (unused code)
 
         String s = name_prefix + field_name;
@@ -134,7 +136,7 @@ public class FieldInfo {
 
                 if (s.length() > 1) {
 
-                    sb.append(s.substring(1, s.length()).toLowerCase());
+                    sb.append(s.substring(1).toLowerCase());
                 }
             }
         }

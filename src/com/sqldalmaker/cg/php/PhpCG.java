@@ -270,7 +270,7 @@ public class PhpCG {
                 dao_php_sql = dao_jdbc_sql;
             }
 
-            String php_sql_str = Helpers.php_sql_to_php_str(dao_php_sql);
+            String php_sql_str = Helpers.sql_to_php_str(dao_php_sql);
 
             assign_params(params, dto_param_type, context);
 
@@ -381,7 +381,7 @@ public class PhpCG {
                 dao_php_sql = dao_jdbc_sql;
             }
 
-            String php_sql_str = Helpers.php_sql_to_php_str(dao_php_sql);
+            String php_sql_str = Helpers.sql_to_php_str(dao_php_sql);
 
             HashMap<String, Object> context = new HashMap<String, Object>();
 
@@ -540,7 +540,7 @@ public class PhpCG {
                 sql_buff.append(sw.getBuffer());
             }
 
-            String sql_str = Helpers.php_sql_to_php_str(sql_buff);
+            String sql_str = Helpers.sql_to_php_str(sql_buff);
 
             HashMap<String, Object> context = new HashMap<String, Object>();
 
@@ -641,7 +641,7 @@ public class PhpCG {
                 params.add(k);
             }
 
-            String sql_str = Helpers.php_sql_to_php_str(sql_buff);
+            String sql_str = Helpers.sql_to_php_str(sql_buff);
 
             HashMap<String, Object> context = new HashMap<String, Object>();
 
@@ -700,7 +700,7 @@ public class PhpCG {
                 sql_buff.append(sw.getBuffer());
             }
 
-            String sql_str = Helpers.php_sql_to_php_str(sql_buff);
+            String sql_str = Helpers.sql_to_php_str(sql_buff);
 
             HashMap<String, Object> context = new HashMap<String, Object>();
 

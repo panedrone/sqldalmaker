@@ -55,9 +55,6 @@ public class UITabDAO {
 
     private MyTableModel tableModel;
 
-    private static final String STATUS_GENERATED = "Generated successfully";
-    private static final String STATUS_OK = "OK";
-
     public JComponent getToolBar() {
         return tool_panel;
     }
@@ -330,7 +327,7 @@ public class UITabDAO {
 
                                 IdeaTargetLanguageHelpers.prepare_generated_file_data(propFile, dao_class_name, fileContent, list);
 
-                                table.setValueAt(STATUS_GENERATED, row, 1);
+                                table.setValueAt(Const.STATUS_GENERATED, row, 1);
 
                                 try {
                                     Thread.sleep(50);
@@ -483,7 +480,7 @@ public class UITabDAO {
                             String status = validationBuff.toString();
 
                             if (status.length() == 0) {
-                                model.setValueAt(STATUS_OK, i, 1);
+                                model.setValueAt(Const.STATUS_OK, i, 1);
                             } else {
                                 model.setValueAt(status, i, 1);
                                 IdeaMessageHelpers.add_dao_error_message(settings, project, propFile, daoXmlRelPath, status);
@@ -693,7 +690,7 @@ public class UITabDAO {
 
             setText(sValue);
 
-            if (isSelected || STATUS_OK.equals(sValue) || STATUS_GENERATED.equals(sValue)) {
+            if (isSelected || Const.STATUS_OK.equals(sValue) || Const.STATUS_GENERATED.equals(sValue)) {
 
                 TableCellRenderer r = table.getCellRenderer(row, column);
 

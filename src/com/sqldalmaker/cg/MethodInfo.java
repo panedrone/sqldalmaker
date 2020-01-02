@@ -16,10 +16,10 @@ public class MethodInfo {
 
     public MethodInfo(Object element) throws Exception {
 
-        fetch_list = (element instanceof QueryDtoList) || (element instanceof QueryList);
+        this.fetch_list = (element instanceof QueryDtoList) || (element instanceof QueryList);
 
-        boolean return_type_is_dto = false;
-
+        this.return_type_is_dto = (element instanceof QueryDto) || (element instanceof QueryDtoList);
+        
         if (element instanceof Query) {
 
             Query q = (Query) element;
@@ -43,7 +43,6 @@ public class MethodInfo {
             ref = q.getRef();
             is_external_sql = q.is_external_sql();
             return_type = q.getDto();
-            return_type_is_dto = true;
 
         } else if (element instanceof QueryDtoList) {
 
@@ -52,7 +51,6 @@ public class MethodInfo {
             ref = q.getRef();
             is_external_sql = q.is_external_sql();
             return_type = q.getDto();
-            return_type_is_dto = true;
 
         } else {
 
@@ -60,7 +58,5 @@ public class MethodInfo {
 
             throw new Exception("Unexpected XML element: " + xml_node_name);
         }
-
-        this.return_type_is_dto = return_type_is_dto;
     }
 }

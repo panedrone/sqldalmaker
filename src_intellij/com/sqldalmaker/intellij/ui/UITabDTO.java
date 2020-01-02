@@ -61,9 +61,6 @@ public class UITabDTO {
 
     private MyTableModel myTableModel;
 
-    private static final String STATUS_GENERATED = "Generated successfully";
-    private static final String STATUS_OK = "OK";
-
     public JComponent getRootPanel() {
         return rootPanel;
     }
@@ -395,7 +392,7 @@ public class UITabDTO {
 
             setText(sValue);
 
-            if (isSelected || STATUS_OK.equals(sValue) || STATUS_GENERATED.equals(sValue)) {
+            if (isSelected || Const.STATUS_OK.equals(sValue) || Const.STATUS_GENERATED.equals(sValue)) {
 
                 TableCellRenderer r = table.getCellRenderer(row, column);
 
@@ -588,7 +585,7 @@ public class UITabDTO {
                         String status = validationBuff.toString();
 
                         if (status.length() == 0) {
-                            model.setValueAt(STATUS_OK, i, 2);
+                            model.setValueAt(Const.STATUS_OK, i, 2);
                         } else {
                             model.setValueAt(status, i, 2);
                             IdeaMessageHelpers.add_dto_error_message(settings, project, propFile, dto_class_name, status);
@@ -682,7 +679,7 @@ public class UITabDTO {
 
                                 IdeaTargetLanguageHelpers.prepare_generated_file_data(propFile, dto_class_name, fileContent, list);
 
-                                table.setValueAt(STATUS_GENERATED, row, 2);
+                                table.setValueAt(Const.STATUS_GENERATED, row, 2);
 
                                 try {
                                     Thread.sleep(50);

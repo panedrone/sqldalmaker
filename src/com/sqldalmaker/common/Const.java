@@ -22,8 +22,7 @@ public class Const {
     public static final String DTO_XML = "dto.xml";
 
     public static final String STATUS_OK = "OK";
-    public static final String STATUS_FIXED = "FIXED";
-    public static final String STATUS_FILE_MISSING = "The file is missing";
+    public static final String STATUS_GENERATED = "Generated successfully";
 
     public static final String OUTPUT_FILE_IS_OUT_OF_DATE = "Generated file is out of date";
     public static final String OUTPUT_FILE_IS_MISSING = "Generated file is missing";

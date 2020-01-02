@@ -46,7 +46,7 @@ public class FileSearchHelpers {
 
     public static boolean is_setting_xml(String name) {
 
-        return name != null && Const.SETTINGS_XML.equals(name);
+        return /*name != null &&*/ Const.SETTINGS_XML.equals(name);
     }
 
     public static void enum_dao_xml_file_names(String xml_configs_folder_full_path,

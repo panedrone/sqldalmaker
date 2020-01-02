@@ -191,7 +191,7 @@ public class Helpers {
 
 	public static String sql_to_java_str(String sql) {
 
-		String parts[] = sql.split("(\\n|\\r)+");
+		String[] parts = sql.split("(\\n|\\r)+");
 
 		// "\n" it is OK for Eclipse debugger window:
 		String new_line = "\n"; // System.getProperty("line.separator");
@@ -225,14 +225,14 @@ public class Helpers {
 		return res.toString();
 	}
 
-	public static String php_sql_to_php_str(StringBuilder sql_buff) {
+	public static String sql_to_php_str(StringBuilder sql_buff) {
 
-		return Helpers.php_sql_to_php_str(sql_buff.toString());
+		return Helpers.sql_to_php_str(sql_buff.toString());
 	}
 
-	public static String php_sql_to_php_str(String sql) {
+	public static String sql_to_php_str(String sql) {
 
-		String parts[] = sql.split("(\\n|\\r)+");
+		String[] parts = sql.split("(\\n|\\r)+");
 
 		String new_line = "\n"; // System.getProperty("line.separator");
 
@@ -282,7 +282,7 @@ public class Helpers {
 
 	public static String sql_to_python_string(String sql) {
 
-		String parts[] = sql.split("(\\n|\\r)+");
+		String[] parts = sql.split("(\\n|\\r)+");
 
 		String new_line = "\n"; // System.getProperty("line.separator");
 
@@ -322,7 +322,7 @@ public class Helpers {
 
 	public static String sql_to_cpp_str(String sql) {
 
-		String parts[] = sql.split("(\\n|\\r)+");
+		String[] parts = sql.split("(\\n|\\r)+");
 
 		String new_line = System.getProperty("line.separator");
 
@@ -412,7 +412,7 @@ public class Helpers {
 
 				items[i] = items[i].trim();
 
-				String parts[] = items[i].split("\\s+");
+				String[] parts = items[i].split("\\s+");
 
 				String name;
 
@@ -446,7 +446,7 @@ public class Helpers {
 
 		char ch_0 = name.charAt(0);
 		boolean is_letter_at_0 = Character.isLetter(ch_0);
-		if (is_letter_at_0 == false || ch_0 == '$') {
+		if (!is_letter_at_0 || ch_0 == '$') {
 			if (ch_0 != '_') {
 				throw new Exception("Invalid starting character in the name of item: " + name);
 			}
@@ -458,7 +458,7 @@ public class Helpers {
 			// letter or a digit or the dollar sign "$" or the underscore "_".
 			char ch = name.charAt(i);
 			boolean is_letter_or_digit = Character.isLetterOrDigit(ch);
-			if (is_letter_or_digit== false || ch == '$') {
+			if (!is_letter_or_digit || ch == '$') {
 				if (ch != '_') {
 					throw new Exception("Invalid character in the name of item: " + name);
 				}
@@ -697,6 +697,7 @@ public class Helpers {
 		return "object";
 	}
 
+	@SuppressWarnings("unused")
 	public static void convert_to_ruby_type_names(List<FieldInfo> fields) {
 
 	}
