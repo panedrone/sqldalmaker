@@ -237,13 +237,13 @@ public class UITabAdmin {
         dataStoreJavaSpringButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "DataStoreManagerSpring.java_", "DataStoreManagerSpring.java");
+                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "DataStoreManagerSpring.java_", "DataStoreManager.java");
             }
         });
         dataStoreJavaDbUtilsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "DataStoreManagerDbUtils.java_", "DataStoreManagerDbUtils.java");
+                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "DataStoreManagerDbUtils.java_", "DataStoreManager.java");
             }
         });
 //        dataStoreGroovyButton.addActionListener(new ActionListener() {
@@ -255,7 +255,7 @@ public class UITabAdmin {
         dataStoreJavaAndroidButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "DataStoreManagerAndroid.java_", "DataStoreManagerAndroid.java");
+                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "DataStoreManagerAndroid.java_", "DataStoreManager.java");
             }
         });
         dataStorePhpButton.addActionListener(new ActionListener() {
@@ -267,14 +267,14 @@ public class UITabAdmin {
         PDODataStorePhpButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "PDODataStore.php", "PDODataStore.php");
+                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "PDODataStore.php", "DataStore.php");
             }
         });
         dataStoreCSTLButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "DataStore.STL.cpp", "DataStore.STL.cpp");
-                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "DataStore.STL.h", "DataStore.STL.h");
+                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "DataStore.STL.cpp", "DataStore.cpp");
+                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "DataStore.STL.h", "DataStore.h");
             }
         });
         dataStoreCATLButton.addActionListener(new ActionListener() {
@@ -287,13 +287,13 @@ public class UITabAdmin {
         dataStorePySQLite3Button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "DataStore1.py", "DataStore1.py");
+                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "DataStore1.py", "DataStore.py");
             }
         });
         dataStorePyMySQLButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "DataStore2.py", "DataStore2.py");
+                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "DataStore2.py", "DataStore.py");
             }
         });
         dataStoreRUBYDBIButton.addActionListener(new ActionListener() {
@@ -311,8 +311,8 @@ public class UITabAdmin {
         dataStoreQt5CButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "DataStore_Qt5.cpp", "DataStore_Qt5.cpp");
-                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "DataStore_Qt5.h", "DataStore_Qt5.h");
+                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "DataStore_Qt5.cpp", "DataStore.cpp");
+                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "DataStore_Qt5.h", "DataStore.h");
             }
         });
         referenceSettingsXmlButton.addActionListener(new ActionListener() {
@@ -408,25 +408,25 @@ public class UITabAdmin {
         panel4.setLayout(new GridLayoutManager(5, 4, new Insets(10, 0, 0, 0), 1, -1));
         panel1.add(panel4, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_NORTHWEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         dataStorePyMySQLButton = new JButton();
-        dataStorePyMySQLButton.setText("DataStore.py MySQL");
+        dataStorePyMySQLButton.setText("DataStore.py (MySQL)");
         panel4.add(dataStorePyMySQLButton, new GridConstraints(3, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         dataStorePySQLite3Button = new JButton();
-        dataStorePySQLite3Button.setText("DataStore.py SQLite3");
+        dataStorePySQLite3Button.setText("DataStore.py (SQLite3)");
         panel4.add(dataStorePySQLite3Button, new GridConstraints(3, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         dataStoreCATLButton = new JButton();
-        dataStoreCATLButton.setText("DataStore C++ ATL");
+        dataStoreCATLButton.setText("DataStore, C++ (ATL, , SQLite3)");
         panel4.add(dataStoreCATLButton, new GridConstraints(2, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         dataStoreRUBYDBIButton = new JButton();
-        dataStoreRUBYDBIButton.setText("DataStore RUBY DBI");
+        dataStoreRUBYDBIButton.setText("data_store.rb (DBI)");
         panel4.add(dataStoreRUBYDBIButton, new GridConstraints(4, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         dataStoreQt5CButton = new JButton();
-        dataStoreQt5CButton.setText("DataStore Qt5 C++");
+        dataStoreQt5CButton.setText("DataStore, C++ (Qt5, Qt5Sql)");
         panel4.add(dataStoreQt5CButton, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         dataStoreCSTLButton = new JButton();
-        dataStoreCSTLButton.setText("DataStore C++ STL");
+        dataStoreCSTLButton.setText("DataStore, C++ (STL, , SQLite3)");
         panel4.add(dataStoreCSTLButton, new GridConstraints(2, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         dataStoreJavaAndroidButton = new JButton();
-        dataStoreJavaAndroidButton.setText("DataStore Java Android");
+        dataStoreJavaAndroidButton.setText("DataStoreManager.java (Android)");
         panel4.add(dataStoreJavaAndroidButton, new GridConstraints(1, 3, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         dataStoreJavaButton = new JButton();
         dataStoreJavaButton.setText("DataStore.java");
@@ -435,13 +435,13 @@ public class UITabAdmin {
         dataStorePhpButton.setText("DataStore.php");
         panel4.add(dataStorePhpButton, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         PDODataStorePhpButton = new JButton();
-        PDODataStorePhpButton.setText("PDODataStore.php");
+        PDODataStorePhpButton.setText("DataStore.php (PDO)");
         panel4.add(PDODataStorePhpButton, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         dataStoreJavaDbUtilsButton = new JButton();
-        dataStoreJavaDbUtilsButton.setText("DataStore Java DbUtils");
+        dataStoreJavaDbUtilsButton.setText("DataStoreManager.java (Apache DbUtils)");
         panel4.add(dataStoreJavaDbUtilsButton, new GridConstraints(1, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         dataStoreJavaSpringButton = new JButton();
-        dataStoreJavaSpringButton.setText("DataStore Java Spring");
+        dataStoreJavaSpringButton.setText("DataStoreManager.java (Spring JDBC)");
         panel4.add(dataStoreJavaSpringButton, new GridConstraints(1, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JPanel panel5 = new JPanel();
         panel5.setLayout(new GridLayoutManager(1, 5, new Insets(10, 0, 0, 0), 1, -1));

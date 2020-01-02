@@ -162,155 +162,153 @@ public class UIEditorPageAdmin extends Composite {
 		composite_2.setLayout(new GridLayout(4, false));
 		toolkit.adapt(composite_2);
 		toolkit.paintBordersFor(composite_2);
-				
-						Button btnNewButton_5 = new Button(composite_2, SWT.NONE);
-						btnNewButton_5.addSelectionListener(new SelectionAdapter() {
-							@Override
-							public void widgetSelected(SelectionEvent e) {
-								EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore.php", "DataStore.php");
-							}
-						});
-						btnNewButton_5.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-						toolkit.adapt(btnNewButton_5, true, true);
-						btnNewButton_5.setText("DataStore.php");
-						
-								Button btnNewButton_12 = new Button(composite_2, SWT.NONE);
-								btnNewButton_12.addSelectionListener(new SelectionAdapter() {
-									@Override
-									public void widgetSelected(SelectionEvent e) {
-										EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/PDODataStore.php",
-												"PDODataStore.php");
-									}
-								});
-								btnNewButton_12.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-								toolkit.adapt(btnNewButton_12, true, true);
-								btnNewButton_12.setText("PDODataStore.php");
+
+		Button btnNewButton_5 = new Button(composite_2, SWT.NONE);
+		btnNewButton_5.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore.php", "DataStore.php");
+			}
+		});
+		btnNewButton_5.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+		toolkit.adapt(btnNewButton_5, true, true);
+		btnNewButton_5.setText("DataStore.php");
+
+		Button btnNewButton_12 = new Button(composite_2, SWT.NONE);
+		btnNewButton_12.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/PDODataStore.php",
+						"DataStore.php");
+			}
+		});
+		btnNewButton_12.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+		toolkit.adapt(btnNewButton_12, true, true);
+		btnNewButton_12.setText("DataStore.php (PDO)");
 		new Label(composite_2, SWT.NONE);
 		new Label(composite_2, SWT.NONE);
-				
-						Button btnDatastorejava = new Button(composite_2, SWT.NONE);
-						btnDatastorejava.addSelectionListener(new SelectionAdapter() {
-							@Override
-							public void widgetSelected(SelectionEvent e) {
-								EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore.java_",
-										"DataStore.java");
-							}
-						});
-						btnDatastorejava.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-						btnDatastorejava.setText("DataStore.java");
-						toolkit.adapt(btnDatastorejava, true, true);
-						
-								Button btnDatastoreJavaDbutils = new Button(composite_2, SWT.NONE);
-								btnDatastoreJavaDbutils.addSelectionListener(new SelectionAdapter() {
-									@Override
-									public void widgetSelected(SelectionEvent e) {
-										EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStoreManagerDbUtils.java_",
-												"DataStoreManagerDbUtils.java");
-									}
-								});
-								btnDatastoreJavaDbutils.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-								btnDatastoreJavaDbutils.setText("DataStore Java DbUtils");
-								toolkit.adapt(btnDatastoreJavaDbutils, true, true);
-						
-								Button btnDatastoreJavaSpring = new Button(composite_2, SWT.NONE);
-								btnDatastoreJavaSpring.addSelectionListener(new SelectionAdapter() {
-									@Override
-									public void widgetSelected(SelectionEvent e) {
-										EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStoreManagerSpring.java_",
-												"DataStoreManagerSpring.java");
-									}
-								});
-								btnDatastoreJavaSpring.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-								btnDatastoreJavaSpring.setText("DataStore Java Spring");
-								toolkit.adapt(btnDatastoreJavaSpring, true, true);
-				
-						Button btnNewButton_4 = new Button(composite_2, SWT.NONE);
-						btnNewButton_4.addSelectionListener(new SelectionAdapter() {
-							@Override
-							public void widgetSelected(SelectionEvent e) {
-								EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStoreManagerAndroid.java_",
-										"DataStoreManagerAndroid.java");
-							}
-						});
-						btnNewButton_4.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-						toolkit.adapt(btnNewButton_4, true, true);
-						btnNewButton_4.setText("DataStore Java Android");
-				
-						Button btnDatastoreCQt = new Button(composite_2, SWT.NONE);
-						btnDatastoreCQt.addSelectionListener(new SelectionAdapter() {
-							@Override
-							public void widgetSelected(SelectionEvent e) {
-								EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore_Qt5.cpp",
-										"DataStore_Qt5.cpp");
-								EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore_Qt5.h",
-										"DataStore_Qt5.h");
-							}
-						});
-						btnDatastoreCQt.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-						toolkit.adapt(btnDatastoreCQt, true, true);
-						btnDatastoreCQt.setText("DataStore C++ Qt 5");
-				
-						Button btnNewButton_11 = new Button(composite_2, SWT.NONE);
-						btnNewButton_11.addSelectionListener(new SelectionAdapter() {
-							@Override
-							public void widgetSelected(SelectionEvent e) {
-								EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore.cpp", "DataStore.cpp");
-								EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore.h", "DataStore.h");
-							}
-						});
-						btnNewButton_11.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-						toolkit.adapt(btnNewButton_11, true, true);
-						btnNewButton_11.setText("DataStore C++ ATL");
-		
-				Button btnDatastoreCStl = new Button(composite_2, SWT.NONE);
-				btnDatastoreCStl.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(SelectionEvent e) {
-						EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore.STL.cpp",
-								"DataStore.STL.cpp");
-						EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore.STL.h",
-								"DataStore.STL.h");
-					}
-				});
-				btnDatastoreCStl.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-				toolkit.adapt(btnDatastoreCStl, true, true);
-				btnDatastoreCStl.setText("DataStore C++ STL");
+
+		Button btnDatastorejava = new Button(composite_2, SWT.NONE);
+		btnDatastorejava.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore.java_",
+						"DataStore.java");
+			}
+		});
+		btnDatastorejava.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+		btnDatastorejava.setText("DataStore.java");
+		toolkit.adapt(btnDatastorejava, true, true);
+
+		Button btnDatastoreJavaDbutils = new Button(composite_2, SWT.NONE);
+		btnDatastoreJavaDbutils.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStoreManagerDbUtils.java_",
+						"DataStoreManager.java");
+			}
+		});
+		btnDatastoreJavaDbutils.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+		btnDatastoreJavaDbutils.setText("DataStoreManager.java (Apache DbUtils)");
+		toolkit.adapt(btnDatastoreJavaDbutils, true, true);
+
+		Button btnDatastoreJavaSpring = new Button(composite_2, SWT.NONE);
+		btnDatastoreJavaSpring.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStoreManagerSpring.java_",
+						"DataStoreManager.java");
+			}
+		});
+		btnDatastoreJavaSpring.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+		btnDatastoreJavaSpring.setText("DataStoreManager.java (Spring JDBC)");
+		toolkit.adapt(btnDatastoreJavaSpring, true, true);
+
+		Button btnNewButton_4 = new Button(composite_2, SWT.NONE);
+		btnNewButton_4.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStoreManagerAndroid.java_",
+						"DataStoreManager.java");
+			}
+		});
+		btnNewButton_4.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+		toolkit.adapt(btnNewButton_4, true, true);
+		btnNewButton_4.setText("DataStoreManager.java (Android)");
+
+		Button btnDatastoreCQt = new Button(composite_2, SWT.NONE);
+		btnDatastoreCQt.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore_Qt5.cpp",
+						"DataStore.cpp");
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore_Qt5.h", "DataStore.h");
+			}
+		});
+		btnDatastoreCQt.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+		toolkit.adapt(btnDatastoreCQt, true, true);
+		btnDatastoreCQt.setText("DataStore, C++ (Qt5, Qt5Sql)");
+
+		Button btnNewButton_11 = new Button(composite_2, SWT.NONE);
+		btnNewButton_11.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore.cpp", "DataStore.cpp");
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore.h", "DataStore.h");
+			}
+		});
+		btnNewButton_11.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+		toolkit.adapt(btnNewButton_11, true, true);
+		btnNewButton_11.setText("DataStore, C++ (ATL, , SQLite3)");
+
+		Button btnDatastoreCStl = new Button(composite_2, SWT.NONE);
+		btnDatastoreCStl.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore.STL.cpp",
+						"DataStore.cpp");
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore.STL.h", "DataStore.h");
+			}
+		});
+		btnDatastoreCStl.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+		toolkit.adapt(btnDatastoreCStl, true, true);
+		btnDatastoreCStl.setText("DataStore, C++ (STL, , SQLite3)");
 		new Label(composite_2, SWT.NONE);
-		
-				Button btnNewButton_6 = new Button(composite_2, SWT.NONE);
-				btnNewButton_6.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(SelectionEvent e) {
-						EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore1.py", "DataStore1.py");
-					}
-				});
-				btnNewButton_6.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-				toolkit.adapt(btnNewButton_6, true, true);
-				btnNewButton_6.setText("DataStore.py SQLite3");
-				
-						Button btnNewButton_7 = new Button(composite_2, SWT.NONE);
-						btnNewButton_7.addSelectionListener(new SelectionAdapter() {
-							@Override
-							public void widgetSelected(SelectionEvent e) {
-								EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore2.py", "DataStore2.py");
-							}
-						});
-						btnNewButton_7.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-						toolkit.adapt(btnNewButton_7, true, true);
-						btnNewButton_7.setText("DataStore.py MySQL");
+
+		Button btnNewButton_6 = new Button(composite_2, SWT.NONE);
+		btnNewButton_6.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore1.py", "DataStore.py");
+			}
+		});
+		btnNewButton_6.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+		toolkit.adapt(btnNewButton_6, true, true);
+		btnNewButton_6.setText("DataStore.py (SQLite3)");
+
+		Button btnNewButton_7 = new Button(composite_2, SWT.NONE);
+		btnNewButton_7.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore2.py", "DataStore.py");
+			}
+		});
+		btnNewButton_7.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+		toolkit.adapt(btnNewButton_7, true, true);
+		btnNewButton_7.setText("DataStore.py (MySQL)");
 		new Label(composite_2, SWT.NONE);
 		new Label(composite_2, SWT.NONE);
-		
-				Button btnNewButton_8 = new Button(composite_2, SWT.NONE);
-				btnNewButton_8.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(SelectionEvent e) {
-						EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/data_store.rb", "data_store.rb");
-					}
-				});
-				btnNewButton_8.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-				toolkit.adapt(btnNewButton_8, true, true);
-				btnNewButton_8.setText("DataStore RUBY DBI");
+
+		Button btnNewButton_8 = new Button(composite_2, SWT.NONE);
+		btnNewButton_8.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/data_store.rb", "data_store.rb");
+			}
+		});
+		btnNewButton_8.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+		toolkit.adapt(btnNewButton_8, true, true);
+		btnNewButton_8.setText("data_store.rb (DBI)");
 		new Label(composite_2, SWT.NONE);
 		new Label(composite_2, SWT.NONE);
 		new Label(composite_2, SWT.NONE);

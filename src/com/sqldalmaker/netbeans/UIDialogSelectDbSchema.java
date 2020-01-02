@@ -38,6 +38,8 @@ public final class UIDialogSelectDbSchema extends JDialog {
 
     private final ISelectDbSchemaCallback callback;
 
+    private String selected_schema;
+    
     private UIDialogSelectDbSchema(SdmDataObject obj, ISelectDbSchemaCallback callback, boolean dto, boolean fk) throws Exception {
 
         initComponents();
@@ -138,7 +140,7 @@ public final class UIDialogSelectDbSchema extends JDialog {
 
         try {
 
-            String selected_schema = null;
+            selected_schema = null;
 
             if (jTable1.getRowCount() == 1) {
 
@@ -276,12 +278,14 @@ public final class UIDialogSelectDbSchema extends JDialog {
 
         buttonGroup1 = new javax.swing.ButtonGroup();
         jPanel1 = new javax.swing.JPanel();
+        jPanel4 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
-        jPanel4 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
+        jPanel7 = new javax.swing.JPanel();
+        jPanel2 = new javax.swing.JPanel();
         jCheckBox1 = new javax.swing.JCheckBox();
         chk_views = new javax.swing.JCheckBox();
         jCheckBox2 = new javax.swing.JCheckBox();
@@ -289,24 +293,28 @@ public final class UIDialogSelectDbSchema extends JDialog {
         jPanel6 = new javax.swing.JPanel();
         jRadioButton3 = new javax.swing.JRadioButton();
         jRadioButton4 = new javax.swing.JRadioButton();
-        jPanel2 = new javax.swing.JPanel();
+        jPanel5 = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
 
         getContentPane().setLayout(new java.awt.BorderLayout(5, 5));
 
-        jPanel1.setLayout(new java.awt.GridLayout(2, 1, 5, 5));
+        jPanel1.setLayout(new java.awt.BorderLayout(5, 5));
+
+        jPanel4.setLayout(new javax.swing.BoxLayout(jPanel4, javax.swing.BoxLayout.Y_AXIS));
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(UIDialogSelectDbSchema.class, "UIDialogSelectDbSchema.jLabel1.text")); // NOI18N
         jLabel1.setToolTipText(org.openide.util.NbBundle.getMessage(UIDialogSelectDbSchema.class, "UIDialogSelectDbSchema.jLabel1.toolTipText")); // NOI18N
-        jPanel1.add(jLabel1);
+        jPanel4.add(jLabel1);
         jLabel1.getAccessibleContext().setAccessibleName(org.openide.util.NbBundle.getMessage(UIDialogSelectDbSchema.class, "UIDialogSelectDbSchema.jLabel1.AccessibleContext.accessibleName")); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(UIDialogSelectDbSchema.class, "UIDialogSelectDbSchema.jLabel2.text")); // NOI18N
-        jPanel1.add(jLabel2);
+        jPanel4.add(jLabel2);
 
-        getContentPane().add(jPanel1, java.awt.BorderLayout.PAGE_START);
+        jPanel1.add(jPanel4, java.awt.BorderLayout.PAGE_START);
+
+        jScrollPane1.setPreferredSize(new java.awt.Dimension(0, 0));
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -319,36 +327,42 @@ public final class UIDialogSelectDbSchema extends JDialog {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        jTable1.setMinimumSize(new java.awt.Dimension(0, 0));
         jScrollPane1.setViewportView(jTable1);
 
-        getContentPane().add(jScrollPane1, java.awt.BorderLayout.CENTER);
+        jPanel1.add(jScrollPane1, java.awt.BorderLayout.CENTER);
 
-        jPanel4.setLayout(new java.awt.GridLayout(3, 1));
+        getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
 
-        jPanel3.setLayout(new javax.swing.BoxLayout(jPanel3, javax.swing.BoxLayout.PAGE_AXIS));
+        jPanel3.setLayout(new java.awt.BorderLayout());
+
+        jPanel7.setLayout(new javax.swing.BoxLayout(jPanel7, javax.swing.BoxLayout.LINE_AXIS));
+
+        jPanel2.setLayout(new javax.swing.BoxLayout(jPanel2, javax.swing.BoxLayout.Y_AXIS));
 
         jCheckBox1.setSelected(true);
         org.openide.awt.Mnemonics.setLocalizedText(jCheckBox1, org.openide.util.NbBundle.getMessage(UIDialogSelectDbSchema.class, "UIDialogSelectDbSchema.jCheckBox1.text")); // NOI18N
-        jPanel3.add(jCheckBox1);
+        jPanel2.add(jCheckBox1);
 
         chk_views.setSelected(true);
         org.openide.awt.Mnemonics.setLocalizedText(chk_views, org.openide.util.NbBundle.getMessage(UIDialogSelectDbSchema.class, "UIDialogSelectDbSchema.chk_views.text")); // NOI18N
-        jPanel3.add(chk_views);
+        jPanel2.add(chk_views);
 
         jCheckBox2.setSelected(true);
         org.openide.awt.Mnemonics.setLocalizedText(jCheckBox2, org.openide.util.NbBundle.getMessage(UIDialogSelectDbSchema.class, "UIDialogSelectDbSchema.jCheckBox2.text")); // NOI18N
-        jPanel3.add(jCheckBox2);
+        jPanel2.add(jCheckBox2);
 
         jCheckBox3.setSelected(true);
         org.openide.awt.Mnemonics.setLocalizedText(jCheckBox3, org.openide.util.NbBundle.getMessage(UIDialogSelectDbSchema.class, "UIDialogSelectDbSchema.jCheckBox3.text")); // NOI18N
-        jPanel3.add(jCheckBox3);
+        jPanel2.add(jCheckBox3);
 
-        jPanel4.add(jPanel3);
+        jPanel7.add(jPanel2);
 
+        jPanel6.setMinimumSize(new java.awt.Dimension(0, 0));
+        jPanel6.setPreferredSize(new java.awt.Dimension(0, 0));
         jPanel6.setLayout(new javax.swing.BoxLayout(jPanel6, javax.swing.BoxLayout.LINE_AXIS));
 
         buttonGroup1.add(jRadioButton3);
-        jRadioButton3.setSelected(true);
         org.openide.awt.Mnemonics.setLocalizedText(jRadioButton3, org.openide.util.NbBundle.getMessage(UIDialogSelectDbSchema.class, "UIDialogSelectDbSchema.jRadioButton3.text")); // NOI18N
         jPanel6.add(jRadioButton3);
 
@@ -356,19 +370,21 @@ public final class UIDialogSelectDbSchema extends JDialog {
         org.openide.awt.Mnemonics.setLocalizedText(jRadioButton4, org.openide.util.NbBundle.getMessage(UIDialogSelectDbSchema.class, "UIDialogSelectDbSchema.jRadioButton4.text")); // NOI18N
         jPanel6.add(jRadioButton4);
 
-        jPanel4.add(jPanel6);
+        jPanel7.add(jPanel6);
 
-        jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
+        jPanel3.add(jPanel7, java.awt.BorderLayout.PAGE_START);
+
+        jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
         org.openide.awt.Mnemonics.setLocalizedText(jButton1, org.openide.util.NbBundle.getMessage(UIDialogSelectDbSchema.class, "UIDialogSelectDbSchema.jButton1.text")); // NOI18N
-        jPanel2.add(jButton1);
+        jPanel5.add(jButton1);
 
         org.openide.awt.Mnemonics.setLocalizedText(jButton2, org.openide.util.NbBundle.getMessage(UIDialogSelectDbSchema.class, "UIDialogSelectDbSchema.jButton2.text")); // NOI18N
-        jPanel2.add(jButton2);
+        jPanel5.add(jButton2);
 
-        jPanel4.add(jPanel2);
+        jPanel3.add(jPanel5, java.awt.BorderLayout.CENTER);
 
-        getContentPane().add(jPanel4, java.awt.BorderLayout.PAGE_END);
+        getContentPane().add(jPanel3, java.awt.BorderLayout.PAGE_END);
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -385,7 +401,9 @@ public final class UIDialogSelectDbSchema extends JDialog {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
     private javax.swing.JRadioButton jRadioButton3;
     private javax.swing.JRadioButton jRadioButton4;
     private javax.swing.JScrollPane jScrollPane1;
