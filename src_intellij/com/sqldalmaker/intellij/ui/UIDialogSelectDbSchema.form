@@ -70,15 +70,15 @@
                   <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
-                  <text value="???"/>
+                  <text value="Hint???"/>
                 </properties>
               </component>
-              <component id="69cdd" class="javax.swing.JLabel">
+              <component id="69cdd" class="javax.swing.JLabel" binding="lbl_jdbc_url">
                 <constraints>
                   <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
-                  <font size="14" style="1"/>
+                  <font size="14" style="0"/>
                   <text value="Select schema and provide options"/>
                 </properties>
               </component>
@@ -105,22 +105,22 @@
                   </component>
                 </children>
               </scrollpane>
-              <component id="7f744" class="javax.swing.JCheckBox" binding="chk_Skip">
+              <component id="7f744" class="javax.swing.JCheckBox" binding="chk_skip">
                 <constraints>
                   <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
                   <selected value="true"/>
-                  <text value="Skip tables/views used in existing declarations"/>
+                  <text value="Skip tables/views used in existing declarations" noi18n="true"/>
                 </properties>
               </component>
-              <component id="efa9a" class="javax.swing.JCheckBox" binding="chk_DeleteS">
+              <component id="efa9a" class="javax.swing.JCheckBox" binding="chk_singular">
                 <constraints>
                   <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
                   <selected value="true"/>
-                  <text value="English plural to singular for DTO class names"/>
+                  <text value="English plural to English singular for DTO class names" noi18n="true"/>
                 </properties>
               </component>
               <grid id="acf34" binding="radioPanel" layout-manager="GridLayoutManager" row-count="1" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
@@ -170,7 +170,7 @@
                 </constraints>
                 <properties>
                   <selected value="true"/>
-                  <text value="Including Views"/>
+                  <text value="Including views" noi18n="true"/>
                 </properties>
               </component>
               <component id="aa667" class="javax.swing.JCheckBox" binding="chk_schema_in_xml">
@@ -179,7 +179,7 @@
                 </constraints>
                 <properties>
                   <selected value="false"/>
-                  <text value="Schema in generated XMLdeclarations"/>
+                  <text value="Schema in generated XML declarations" noi18n="true"/>
                 </properties>
               </component>
               <grid id="93c49" layout-manager="GridLayoutManager" row-count="1" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
@@ -196,7 +196,7 @@
                     </constraints>
                     <properties>
                       <selected value="true"/>
-                      <text value="Use selected schema"/>
+                      <text value="Use selected schema" noi18n="true"/>
                     </properties>
                   </component>
                   <hspacer id="7641a">
@@ -209,7 +209,7 @@
                       <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                     </constraints>
                     <properties>
-                      <text value="DB user name as schema"/>
+                      <text value="DB user name as schema" noi18n="true"/>
                     </properties>
                   </component>
                 </children>

@@ -134,23 +134,21 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         jButton11 = new javax.swing.JButton();
         jLabel9 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
-        jLabel10 = new javax.swing.JLabel();
         jButton4 = new javax.swing.JButton();
         jButton8 = new javax.swing.JButton();
         jButton7 = new javax.swing.JButton();
         jButton17 = new javax.swing.JButton();
-        jLabel7 = new javax.swing.JLabel();
         jButton24 = new javax.swing.JButton();
         jButton12 = new javax.swing.JButton();
         jButton14 = new javax.swing.JButton();
-        jLabel4 = new javax.swing.JLabel();
-        jLabel1 = new javax.swing.JLabel();
-        jButton15 = new javax.swing.JButton();
+        jLabel7 = new javax.swing.JLabel();
         jButton16 = new javax.swing.JButton();
+        jButton15 = new javax.swing.JButton();
+        jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
+        jButton18 = new javax.swing.JButton();
         jLabel6 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
-        jButton18 = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
         jPanel7 = new javax.swing.JPanel();
         jButton19 = new javax.swing.JButton();
@@ -209,7 +207,7 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         jTextField1.setBorder(null);
         jPanel3.add(jTextField1);
 
-        jPanel4.setLayout(new java.awt.GridLayout(1, 0));
+        jPanel4.setLayout(new java.awt.GridLayout());
 
         org.openide.awt.Mnemonics.setLocalizedText(jButton1, org.openide.util.NbBundle.getMessage(SdmTabAdmin.class, "SdmTabAdmin.jButton1.text")); // NOI18N
         jButton1.setFocusPainted(false);
@@ -264,9 +262,6 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         org.openide.awt.Mnemonics.setLocalizedText(jLabel11, org.openide.util.NbBundle.getMessage(SdmTabAdmin.class, "SdmTabAdmin.jLabel11.text")); // NOI18N
         jPanel5.add(jLabel11);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel10, org.openide.util.NbBundle.getMessage(SdmTabAdmin.class, "SdmTabAdmin.jLabel10.text")); // NOI18N
-        jPanel5.add(jLabel10);
-
         org.openide.awt.Mnemonics.setLocalizedText(jButton4, org.openide.util.NbBundle.getMessage(SdmTabAdmin.class, "SdmTabAdmin.jButton4.text")); // NOI18N
         jButton4.setFocusPainted(false);
         jButton4.addActionListener(new java.awt.event.ActionListener() {
@@ -303,9 +298,6 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         });
         jPanel5.add(jButton17);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel7, org.openide.util.NbBundle.getMessage(SdmTabAdmin.class, "SdmTabAdmin.jLabel7.text")); // NOI18N
-        jPanel5.add(jLabel7);
-
         org.openide.awt.Mnemonics.setLocalizedText(jButton24, org.openide.util.NbBundle.getMessage(SdmTabAdmin.class, "SdmTabAdmin.jButton24.text")); // NOI18N
         jButton24.setFocusPainted(false);
         jButton24.addActionListener(new java.awt.event.ActionListener() {
@@ -333,20 +325,8 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         });
         jPanel5.add(jButton14);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel4, org.openide.util.NbBundle.getMessage(SdmTabAdmin.class, "SdmTabAdmin.jLabel4.text")); // NOI18N
-        jPanel5.add(jLabel4);
-
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(SdmTabAdmin.class, "SdmTabAdmin.jLabel1.text")); // NOI18N
-        jPanel5.add(jLabel1);
-
-        org.openide.awt.Mnemonics.setLocalizedText(jButton15, org.openide.util.NbBundle.getMessage(SdmTabAdmin.class, "SdmTabAdmin.jButton15.text")); // NOI18N
-        jButton15.setFocusPainted(false);
-        jButton15.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton15ActionPerformed(evt);
-            }
-        });
-        jPanel5.add(jButton15);
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel7, org.openide.util.NbBundle.getMessage(SdmTabAdmin.class, "SdmTabAdmin.jLabel7.text")); // NOI18N
+        jPanel5.add(jLabel7);
 
         org.openide.awt.Mnemonics.setLocalizedText(jButton16, org.openide.util.NbBundle.getMessage(SdmTabAdmin.class, "SdmTabAdmin.jButton16.text")); // NOI18N
         jButton16.setToolTipText(org.openide.util.NbBundle.getMessage(SdmTabAdmin.class, "SdmTabAdmin.jButton16.toolTipText")); // NOI18N
@@ -358,14 +338,20 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         });
         jPanel5.add(jButton16);
 
+        org.openide.awt.Mnemonics.setLocalizedText(jButton15, org.openide.util.NbBundle.getMessage(SdmTabAdmin.class, "SdmTabAdmin.jButton15.text")); // NOI18N
+        jButton15.setFocusPainted(false);
+        jButton15.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton15ActionPerformed(evt);
+            }
+        });
+        jPanel5.add(jButton15);
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel4, org.openide.util.NbBundle.getMessage(SdmTabAdmin.class, "SdmTabAdmin.jLabel4.text")); // NOI18N
+        jPanel5.add(jLabel4);
+
         org.openide.awt.Mnemonics.setLocalizedText(jLabel5, org.openide.util.NbBundle.getMessage(SdmTabAdmin.class, "SdmTabAdmin.jLabel5.text")); // NOI18N
         jPanel5.add(jLabel5);
-
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel6, org.openide.util.NbBundle.getMessage(SdmTabAdmin.class, "SdmTabAdmin.jLabel6.text")); // NOI18N
-        jPanel5.add(jLabel6);
-
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(SdmTabAdmin.class, "SdmTabAdmin.jLabel2.text")); // NOI18N
-        jPanel5.add(jLabel2);
 
         org.openide.awt.Mnemonics.setLocalizedText(jButton18, org.openide.util.NbBundle.getMessage(SdmTabAdmin.class, "SdmTabAdmin.jButton18.text")); // NOI18N
         jButton18.setToolTipText(org.openide.util.NbBundle.getMessage(SdmTabAdmin.class, "SdmTabAdmin.jButton18.toolTipText")); // NOI18N
@@ -377,10 +363,16 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         });
         jPanel5.add(jButton18);
 
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel6, org.openide.util.NbBundle.getMessage(SdmTabAdmin.class, "SdmTabAdmin.jLabel6.text")); // NOI18N
+        jPanel5.add(jLabel6);
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(SdmTabAdmin.class, "SdmTabAdmin.jLabel2.text")); // NOI18N
+        jPanel5.add(jLabel2);
+
         org.openide.awt.Mnemonics.setLocalizedText(jLabel3, org.openide.util.NbBundle.getMessage(SdmTabAdmin.class, "SdmTabAdmin.jLabel3.text")); // NOI18N
         jPanel5.add(jLabel3);
 
-        jPanel7.setLayout(new java.awt.GridLayout(1, 0));
+        jPanel7.setLayout(new java.awt.GridLayout(1, 1));
 
         org.openide.awt.Mnemonics.setLocalizedText(jButton19, org.openide.util.NbBundle.getMessage(SdmTabAdmin.class, "SdmTabAdmin.jButton19.text")); // NOI18N
         jButton19.setFocusPainted(false);
@@ -436,11 +428,15 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
             .addGroup(jPanel6Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jTextPane1)
                     .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel5, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 861, Short.MAX_VALUE)))
+                    .addComponent(jPanel5, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 1348, Short.MAX_VALUE)
+                    .addGroup(jPanel6Layout.createSequentialGroup()
+                        .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, 810, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(jPanel6Layout.createSequentialGroup()
+                        .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addContainerGap())))
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -462,9 +458,7 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, 867, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 16, Short.MAX_VALUE))
+            .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, 1354, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -622,8 +616,6 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
     private javax.swing.JButton jButton6;
     private javax.swing.JButton jButton7;
     private javax.swing.JButton jButton8;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

@@ -36,7 +36,7 @@ public class NbpCrudXmHelpers {
         ISelectDbSchemaCallback callback = new ISelectDbSchemaCallback() {
 
             @Override
-            public void process_ok(String selected_schema, boolean skip_used,
+            public void process_ok(boolean schema_in_xml, String selected_schema, boolean skip_used,
                     boolean include_views, boolean plural_to_singular, boolean crud_auto, boolean add_fk_access) {
 
                 try {
@@ -60,7 +60,8 @@ public class NbpCrudXmHelpers {
                             in_use = new HashSet<String>();
                         }
 
-                        root = SdmUtils.get_crud_dto_xml(object_factory, connection, in_use, selected_schema, include_views,
+                        root = SdmUtils.get_crud_dto_xml(object_factory, connection, in_use,
+                                schema_in_xml, selected_schema, include_views,
                                 plural_to_singular);
 
                     } finally {
@@ -128,7 +129,7 @@ public class NbpCrudXmHelpers {
         ISelectDbSchemaCallback callback = new ISelectDbSchemaCallback() {
 
             @Override
-            public void process_ok(String selected_schema, boolean skip_used,
+            public void process_ok(boolean schema_in_xml, String selected_schema, boolean skip_used,
                     boolean include_views, boolean plural_to_singular, boolean use_crud_auto, boolean add_fk_access) {
 
                 try {
@@ -155,7 +156,7 @@ public class NbpCrudXmHelpers {
                         }
 
                         root = SdmUtils.create_crud_xml_DaoClass(object_factory,
-                                connection, in_use, selected_schema,
+                                connection, in_use, schema_in_xml, selected_schema,
                                 include_views, use_crud_auto, add_fk_access,
                                 plural_to_singular, underscores_needed);
 
@@ -223,7 +224,7 @@ public class NbpCrudXmHelpers {
         ISelectDbSchemaCallback callback = new ISelectDbSchemaCallback() {
 
             @Override
-            public void process_ok(String selected_schema, boolean skip_used,
+            public void process_ok(boolean schema_in_xml, String selected_schema, boolean skip_used,
                     boolean include_views, boolean plural_to_singular, boolean crud_auto, boolean add_fk_access) {
 
                 try {
@@ -238,7 +239,8 @@ public class NbpCrudXmHelpers {
 
                     try {
 
-                        root = SdmUtils.get_fk_access_xml(conn, object_factory, selected_schema, plural_to_singular,
+                        root = SdmUtils.get_fk_access_xml(conn, object_factory, schema_in_xml, selected_schema, 
+                                plural_to_singular,
                                 underscores_needed);
 
                     } finally {

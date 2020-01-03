@@ -2,7 +2,7 @@
     <id>dal-mpe</id>
     <name>SQL DAL Maker</name>
     <category>Database</category>
-    <version>1.92.20200102</version>
+    <version>1.92.20200103</version>
     <vendor email="sqldalmaker@gmail.com"/>
     <!-- please see http://confluence.intellij.net/display/IDEADEV/Build+Number+Ranges for description -->
     <idea-version since-build="133.1885"/>
@@ -31,8 +31,8 @@ To generate the class, you declare it in XML meta-program.<br/>
 
     <actions>
 
-        <group class="com.sqldalmaker.intellij.SdmActionGroup" id="SdmActionGroup" text="SQL DAL Maker root files"
-               description="SQL DAL Maker root files" icon="/img/sqldalmaker.gif" popup="true">
+        <group class="com.sqldalmaker.intellij.SdmActionGroup" id="SdmActionGroup" text="SQL DAL Maker Root-files"
+               description="SQL DAL Maker Root-files" icon="/img/sqldalmaker.gif" popup="true">
 
         </group>
 

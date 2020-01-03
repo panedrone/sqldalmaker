@@ -39,7 +39,9 @@ public final class UIDialogSelectDbSchema extends JDialog {
     private final ISelectDbSchemaCallback callback;
 
     private String selected_schema;
-    
+
+    private Settings settings;
+
     private UIDialogSelectDbSchema(SdmDataObject obj, ISelectDbSchemaCallback callback, boolean dto, boolean fk) throws Exception {
 
         initComponents();
@@ -51,12 +53,15 @@ public final class UIDialogSelectDbSchema extends JDialog {
 
         // setContentPane(jPanel1);
         setModal(true);
-        getRootPane().setDefaultButton(jButton1);
+        getRootPane().setDefaultButton(button_ok);
 
-        Settings sett = NbpHelpers.load_settings(obj);
-        setTitle(sett.getJdbc().getUrl());
+        setTitle("Select schema and provide options");
 
-        jButton1.addActionListener(new ActionListener() {
+        settings = NbpHelpers.load_settings(obj);
+
+        lbl_jdbc_url.setText(settings.getJdbc().getUrl());
+
+        button_ok.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 onOK();
@@ -93,18 +98,31 @@ public final class UIDialogSelectDbSchema extends JDialog {
 
         if (dto || fk) {
 
-            this.jRadioButton3.setVisible(false);
-            this.jRadioButton4.setVisible(false);
+            this.radio_crud.setVisible(false);
+            this.radio_crud_auto.setVisible(false);
 
-            jCheckBox3.setVisible(false);
+            chk_add_fk_access.setVisible(false);
         }
 
         if (fk) {
 
-            jCheckBox1.setVisible(false);
-            chk_views.setVisible(false);
+            chk_skip_used.setVisible(false);
+            chk_including_views.setVisible(false);
         }
 
+        jTable1.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+//                if (e.getClickCount() == 2) {
+//
+//                    onOK();
+//
+//                } else 
+                if (e.getClickCount() == 1) {
+
+                    on_selection_changed();
+                }
+            }
+        });
         refresh();
     }
 
@@ -117,7 +135,7 @@ public final class UIDialogSelectDbSchema extends JDialog {
         dlg.setVisible(true);
     }
 
-    private int[] getSelection() throws InternalException {
+    private int[] getSelection() {
 
         int rc = jTable1.getModel().getRowCount();
 
@@ -128,49 +146,16 @@ public final class UIDialogSelectDbSchema extends JDialog {
 
         int[] selectedRows = jTable1.getSelectedRows();
 
-        if (selectedRows.length == 0) {
-
-            throw new InternalException("Selection is empty.");
-        }
-
         return selectedRows;
     }
 
     private void onOK() {
 
-        try {
+        callback.process_ok(chk_schema_in_xml.isSelected(), selected_schema,
+                chk_skip_used.isSelected(), chk_including_views.isSelected(), chk_singular.isSelected(),
+                radio_crud_auto.isSelected(), chk_add_fk_access.isSelected());
 
-            selected_schema = null;
-
-            if (jTable1.getRowCount() == 1) {
-
-                selected_schema = (String) jTable1.getValueAt(0, 0);
-
-            } else {
-
-                if (jTable1.getRowCount() != 0) {
-
-                    int[] indexes = getSelection();
-
-                    if (indexes.length == 1) {
-
-                        selected_schema = (String) jTable1.getValueAt(indexes[0], 0);
-
-                    } else {
-
-                        throw new InternalException("Selection is empty.");
-                    }
-                }
-            }
-
-            callback.process_ok(selected_schema, jCheckBox1.isSelected(), chk_views.isSelected(), jCheckBox2.isSelected(), jRadioButton4.isSelected(), jCheckBox3.isSelected());
-
-            dispose();
-
-        } catch (InternalException e) {
-
-            NbpIdeMessageHelpers.show_error_in_ui_thread(e);
-        }
+        dispose();
     }
 
     private void onCancel() {
@@ -262,10 +247,75 @@ public final class UIDialogSelectDbSchema extends JDialog {
                 }
             });
 
+            if (items.size() == 0) {
+
+                lbl_hint.setText("This database doesn't have schemas. Just provide options.");
+                radio_selected_schema.setText("Without schema");
+
+            } else {
+
+                lbl_hint.setText("Select schema or click 'DB user name as schema'. Provide options.");
+                radio_selected_schema.setText("Use selected schema");
+            }
+
+            on_selection_changed();
+
         } catch (Exception e) {
 
             NbpIdeMessageHelpers.show_error_in_ui_thread(e);
         }
+    }
+
+    private void on_selection_changed() {
+
+        boolean enabled = false;
+
+        if (radio_user_as_schema.isSelected()) {
+
+            enabled = true;
+
+            chk_schema_in_xml.setEnabled(true);
+
+            String user = settings.getJdbc().getUser();
+
+            selected_schema = user;
+
+        } else if (radio_selected_schema.isSelected()) {
+
+            if (jTable1.getRowCount() == 0) {
+
+                chk_schema_in_xml.setSelected(false);
+                chk_schema_in_xml.setEnabled(false);
+
+                enabled = true;
+
+                selected_schema = null;
+
+            } else {
+
+                chk_schema_in_xml.setEnabled(true);
+
+                if (jTable1.getRowCount() == 1) {
+
+                    enabled = true;
+
+                    selected_schema = null;
+
+                } else {
+
+                    int[] indexes = getSelection();
+
+                    enabled = indexes.length == 1;
+
+                    if (enabled) {
+
+                        selected_schema = (String) jTable1.getModel().getValueAt(indexes[0], 0);
+                    }
+                }
+            }
+        }
+
+        button_ok.setEnabled(enabled);
     }
 
     /**
@@ -277,40 +327,46 @@ public final class UIDialogSelectDbSchema extends JDialog {
     private void initComponents() {
 
         buttonGroup1 = new javax.swing.ButtonGroup();
+        buttonGroup2 = new javax.swing.ButtonGroup();
         jPanel1 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
+        lbl_jdbc_url = new javax.swing.JLabel();
+        lbl_hint = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
-        jPanel3 = new javax.swing.JPanel();
-        jPanel7 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
-        jCheckBox1 = new javax.swing.JCheckBox();
-        chk_views = new javax.swing.JCheckBox();
-        jCheckBox2 = new javax.swing.JCheckBox();
-        jCheckBox3 = new javax.swing.JCheckBox();
+        jPanel7 = new javax.swing.JPanel();
+        radio_selected_schema = new javax.swing.JRadioButton();
+        radio_user_as_schema = new javax.swing.JRadioButton();
+        chk_schema_in_xml = new javax.swing.JCheckBox();
+        chk_skip_used = new javax.swing.JCheckBox();
+        chk_including_views = new javax.swing.JCheckBox();
+        chk_singular = new javax.swing.JCheckBox();
+        chk_add_fk_access = new javax.swing.JCheckBox();
         jPanel6 = new javax.swing.JPanel();
-        jRadioButton3 = new javax.swing.JRadioButton();
-        jRadioButton4 = new javax.swing.JRadioButton();
+        radio_crud = new javax.swing.JRadioButton();
+        radio_crud_auto = new javax.swing.JRadioButton();
         jPanel5 = new javax.swing.JPanel();
-        jButton1 = new javax.swing.JButton();
+        button_ok = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
 
-        getContentPane().setLayout(new java.awt.BorderLayout(5, 5));
+        setMinimumSize(new java.awt.Dimension(600, 600));
+        setPreferredSize(new java.awt.Dimension(600, 600));
 
-        jPanel1.setLayout(new java.awt.BorderLayout(5, 5));
+        jPanel1.setLayout(new java.awt.BorderLayout());
 
-        jPanel4.setLayout(new javax.swing.BoxLayout(jPanel4, javax.swing.BoxLayout.Y_AXIS));
+        jPanel4.setLayout(new java.awt.GridLayout(2, 0));
 
-        jLabel1.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(UIDialogSelectDbSchema.class, "UIDialogSelectDbSchema.jLabel1.text")); // NOI18N
-        jLabel1.setToolTipText(org.openide.util.NbBundle.getMessage(UIDialogSelectDbSchema.class, "UIDialogSelectDbSchema.jLabel1.toolTipText")); // NOI18N
-        jPanel4.add(jLabel1);
-        jLabel1.getAccessibleContext().setAccessibleName(org.openide.util.NbBundle.getMessage(UIDialogSelectDbSchema.class, "UIDialogSelectDbSchema.jLabel1.AccessibleContext.accessibleName")); // NOI18N
+        lbl_jdbc_url.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        lbl_jdbc_url.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        org.openide.awt.Mnemonics.setLocalizedText(lbl_jdbc_url, org.openide.util.NbBundle.getMessage(UIDialogSelectDbSchema.class, "UIDialogSelectDbSchema.lbl_jdbc_url.text")); // NOI18N
+        lbl_jdbc_url.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        jPanel4.add(lbl_jdbc_url);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(UIDialogSelectDbSchema.class, "UIDialogSelectDbSchema.jLabel2.text")); // NOI18N
-        jPanel4.add(jLabel2);
+        lbl_hint.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        org.openide.awt.Mnemonics.setLocalizedText(lbl_hint, org.openide.util.NbBundle.getMessage(UIDialogSelectDbSchema.class, "UIDialogSelectDbSchema.lbl_hint.text")); // NOI18N
+        lbl_hint.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 5, 5, 5));
+        jPanel4.add(lbl_hint);
 
         jPanel1.add(jPanel4, java.awt.BorderLayout.PAGE_START);
 
@@ -332,81 +388,124 @@ public final class UIDialogSelectDbSchema extends JDialog {
 
         jPanel1.add(jScrollPane1, java.awt.BorderLayout.CENTER);
 
-        getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
+        jPanel2.setLayout(new java.awt.GridLayout(8, 1));
 
-        jPanel3.setLayout(new java.awt.BorderLayout());
+        jPanel7.setMinimumSize(new java.awt.Dimension(10, 100));
+        jPanel7.setPreferredSize(new java.awt.Dimension(0, 0));
+        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jPanel7.setLayout(new javax.swing.BoxLayout(jPanel7, javax.swing.BoxLayout.LINE_AXIS));
+        buttonGroup2.add(radio_selected_schema);
+        radio_selected_schema.setSelected(true);
+        org.openide.awt.Mnemonics.setLocalizedText(radio_selected_schema, org.openide.util.NbBundle.getMessage(UIDialogSelectDbSchema.class, "UIDialogSelectDbSchema.radio_selected_schema.text")); // NOI18N
+        radio_selected_schema.setMargin(new java.awt.Insets(5, 0, 0, 0));
+        radio_selected_schema.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                radio_selected_schemaActionPerformed(evt);
+            }
+        });
+        jPanel7.add(radio_selected_schema);
 
-        jPanel2.setLayout(new javax.swing.BoxLayout(jPanel2, javax.swing.BoxLayout.Y_AXIS));
+        buttonGroup2.add(radio_user_as_schema);
+        org.openide.awt.Mnemonics.setLocalizedText(radio_user_as_schema, org.openide.util.NbBundle.getMessage(UIDialogSelectDbSchema.class, "UIDialogSelectDbSchema.radio_user_as_schema.text")); // NOI18N
+        radio_user_as_schema.setMargin(new java.awt.Insets(5, 0, 0, 0));
+        radio_user_as_schema.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                radio_user_as_schemaActionPerformed(evt);
+            }
+        });
+        jPanel7.add(radio_user_as_schema);
 
-        jCheckBox1.setSelected(true);
-        org.openide.awt.Mnemonics.setLocalizedText(jCheckBox1, org.openide.util.NbBundle.getMessage(UIDialogSelectDbSchema.class, "UIDialogSelectDbSchema.jCheckBox1.text")); // NOI18N
-        jPanel2.add(jCheckBox1);
+        jPanel2.add(jPanel7);
 
-        chk_views.setSelected(true);
-        org.openide.awt.Mnemonics.setLocalizedText(chk_views, org.openide.util.NbBundle.getMessage(UIDialogSelectDbSchema.class, "UIDialogSelectDbSchema.chk_views.text")); // NOI18N
-        jPanel2.add(chk_views);
+        org.openide.awt.Mnemonics.setLocalizedText(chk_schema_in_xml, org.openide.util.NbBundle.getMessage(UIDialogSelectDbSchema.class, "UIDialogSelectDbSchema.chk_schema_in_xml.text")); // NOI18N
+        chk_schema_in_xml.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        chk_schema_in_xml.setMargin(new java.awt.Insets(0, 5, 0, 0));
+        jPanel2.add(chk_schema_in_xml);
 
-        jCheckBox2.setSelected(true);
-        org.openide.awt.Mnemonics.setLocalizedText(jCheckBox2, org.openide.util.NbBundle.getMessage(UIDialogSelectDbSchema.class, "UIDialogSelectDbSchema.jCheckBox2.text")); // NOI18N
-        jPanel2.add(jCheckBox2);
+        chk_skip_used.setSelected(true);
+        org.openide.awt.Mnemonics.setLocalizedText(chk_skip_used, org.openide.util.NbBundle.getMessage(UIDialogSelectDbSchema.class, "UIDialogSelectDbSchema.chk_skip_used.text")); // NOI18N
+        chk_skip_used.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        chk_skip_used.setMargin(new java.awt.Insets(0, 5, 0, 0));
+        jPanel2.add(chk_skip_used);
 
-        jCheckBox3.setSelected(true);
-        org.openide.awt.Mnemonics.setLocalizedText(jCheckBox3, org.openide.util.NbBundle.getMessage(UIDialogSelectDbSchema.class, "UIDialogSelectDbSchema.jCheckBox3.text")); // NOI18N
-        jPanel2.add(jCheckBox3);
+        chk_including_views.setSelected(true);
+        org.openide.awt.Mnemonics.setLocalizedText(chk_including_views, org.openide.util.NbBundle.getMessage(UIDialogSelectDbSchema.class, "UIDialogSelectDbSchema.chk_including_views.text")); // NOI18N
+        chk_including_views.setMargin(new java.awt.Insets(0, 5, 0, 0));
+        jPanel2.add(chk_including_views);
 
-        jPanel7.add(jPanel2);
+        chk_singular.setSelected(true);
+        org.openide.awt.Mnemonics.setLocalizedText(chk_singular, org.openide.util.NbBundle.getMessage(UIDialogSelectDbSchema.class, "UIDialogSelectDbSchema.chk_singular.text")); // NOI18N
+        chk_singular.setMargin(new java.awt.Insets(0, 5, 0, 0));
+        jPanel2.add(chk_singular);
 
-        jPanel6.setMinimumSize(new java.awt.Dimension(0, 0));
+        chk_add_fk_access.setSelected(true);
+        org.openide.awt.Mnemonics.setLocalizedText(chk_add_fk_access, org.openide.util.NbBundle.getMessage(UIDialogSelectDbSchema.class, "UIDialogSelectDbSchema.chk_add_fk_access.text")); // NOI18N
+        chk_add_fk_access.setMargin(new java.awt.Insets(0, 5, 0, 0));
+        jPanel2.add(chk_add_fk_access);
+
+        jPanel6.setMinimumSize(new java.awt.Dimension(10, 100));
         jPanel6.setPreferredSize(new java.awt.Dimension(0, 0));
-        jPanel6.setLayout(new javax.swing.BoxLayout(jPanel6, javax.swing.BoxLayout.LINE_AXIS));
+        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        buttonGroup1.add(jRadioButton3);
-        org.openide.awt.Mnemonics.setLocalizedText(jRadioButton3, org.openide.util.NbBundle.getMessage(UIDialogSelectDbSchema.class, "UIDialogSelectDbSchema.jRadioButton3.text")); // NOI18N
-        jPanel6.add(jRadioButton3);
+        buttonGroup1.add(radio_crud);
+        radio_crud.setSelected(true);
+        org.openide.awt.Mnemonics.setLocalizedText(radio_crud, org.openide.util.NbBundle.getMessage(UIDialogSelectDbSchema.class, "UIDialogSelectDbSchema.radio_crud.text")); // NOI18N
+        radio_crud.setMargin(new java.awt.Insets(5, 0, 0, 0));
+        jPanel6.add(radio_crud);
 
-        buttonGroup1.add(jRadioButton4);
-        org.openide.awt.Mnemonics.setLocalizedText(jRadioButton4, org.openide.util.NbBundle.getMessage(UIDialogSelectDbSchema.class, "UIDialogSelectDbSchema.jRadioButton4.text")); // NOI18N
-        jPanel6.add(jRadioButton4);
+        buttonGroup1.add(radio_crud_auto);
+        org.openide.awt.Mnemonics.setLocalizedText(radio_crud_auto, org.openide.util.NbBundle.getMessage(UIDialogSelectDbSchema.class, "UIDialogSelectDbSchema.radio_crud_auto.text")); // NOI18N
+        radio_crud_auto.setMargin(new java.awt.Insets(5, 0, 0, 0));
+        jPanel6.add(radio_crud_auto);
 
-        jPanel7.add(jPanel6);
-
-        jPanel3.add(jPanel7, java.awt.BorderLayout.PAGE_START);
+        jPanel2.add(jPanel6);
 
         jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
-        org.openide.awt.Mnemonics.setLocalizedText(jButton1, org.openide.util.NbBundle.getMessage(UIDialogSelectDbSchema.class, "UIDialogSelectDbSchema.jButton1.text")); // NOI18N
-        jPanel5.add(jButton1);
+        org.openide.awt.Mnemonics.setLocalizedText(button_ok, org.openide.util.NbBundle.getMessage(UIDialogSelectDbSchema.class, "UIDialogSelectDbSchema.button_ok.text")); // NOI18N
+        jPanel5.add(button_ok);
 
         org.openide.awt.Mnemonics.setLocalizedText(jButton2, org.openide.util.NbBundle.getMessage(UIDialogSelectDbSchema.class, "UIDialogSelectDbSchema.jButton2.text")); // NOI18N
         jPanel5.add(jButton2);
 
-        jPanel3.add(jPanel5, java.awt.BorderLayout.CENTER);
+        jPanel2.add(jPanel5);
 
-        getContentPane().add(jPanel3, java.awt.BorderLayout.PAGE_END);
+        jPanel1.add(jPanel2, java.awt.BorderLayout.PAGE_END);
+
+        getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void radio_selected_schemaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radio_selected_schemaActionPerformed
+        on_selection_changed();
+    }//GEN-LAST:event_radio_selected_schemaActionPerformed
+
+    private void radio_user_as_schemaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radio_user_as_schemaActionPerformed
+        on_selection_changed();
+    }//GEN-LAST:event_radio_user_as_schemaActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
-    private javax.swing.JCheckBox chk_views;
-    private javax.swing.JButton jButton1;
+    private javax.swing.ButtonGroup buttonGroup2;
+    private javax.swing.JButton button_ok;
+    private javax.swing.JCheckBox chk_add_fk_access;
+    private javax.swing.JCheckBox chk_including_views;
+    private javax.swing.JCheckBox chk_schema_in_xml;
+    private javax.swing.JCheckBox chk_singular;
+    private javax.swing.JCheckBox chk_skip_used;
     private javax.swing.JButton jButton2;
-    private javax.swing.JCheckBox jCheckBox1;
-    private javax.swing.JCheckBox jCheckBox2;
-    private javax.swing.JCheckBox jCheckBox3;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
-    private javax.swing.JRadioButton jRadioButton3;
-    private javax.swing.JRadioButton jRadioButton4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
+    private javax.swing.JLabel lbl_hint;
+    private javax.swing.JLabel lbl_jdbc_url;
+    private javax.swing.JRadioButton radio_crud;
+    private javax.swing.JRadioButton radio_crud_auto;
+    private javax.swing.JRadioButton radio_selected_schema;
+    private javax.swing.JRadioButton radio_user_as_schema;
     // End of variables declaration//GEN-END:variables
 }
