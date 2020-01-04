@@ -149,7 +149,15 @@ public class XmlEditorCompletionProvider implements CompletionProvider {
                             return;
                         }
 
-                        FileObject sql_root_folder = root.getFileObject(settings.getFolders().getSql());
+                        String sql_root_path = settings.getFolders().getSql();
+
+                        FileObject sql_root_folder = root.getFileObject(sql_root_path);
+
+                        if (sql_root_folder == null) { // it happens if project-folder/meta-program-folder/settings-sql_root_path renamed
+
+                            // NbpIdeConsoleUtil err_log = new NbpIdeConsoleUtil(settings, obj);
+                            return;
+                        }
 
                         List<String> rel_path_names = new ArrayList<String>();
 
@@ -260,6 +268,11 @@ public class XmlEditorCompletionProvider implements CompletionProvider {
     }
 
     private static void enum_sql_files(FileObject root_sql_folder, FileObject current_folder, List<String> rel_path_names) {
+
+        if (root_sql_folder == null || current_folder == null) {
+
+            return;
+        }
 
         FileObject[] children = current_folder.getChildren();
 

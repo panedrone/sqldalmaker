@@ -35,6 +35,16 @@ public class NbpIdeConsoleUtil {
             }
         }
 
+        construct(obj);
+    }
+
+    public NbpIdeConsoleUtil(SdmDataObject obj) {
+
+        construct(obj);
+    }
+    
+    private void construct(SdmDataObject obj) {
+        
         String display_name;
         
         try {
@@ -67,7 +77,7 @@ public class NbpIdeConsoleUtil {
 
         io.select();
     }
-
+    
     public void add_error_message(String clazz, String msg) {
 
         if (io != null) {

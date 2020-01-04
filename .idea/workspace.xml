@@ -3,18 +3,11 @@
   <component name="ChangeListManager">
     <list default="true" id="1fb1c605-8c08-4b11-a01b-d42d0945087f" name="Default" comment="added option to exclude views in DTO/DAO assistants">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/META-INF/plugin.xml" beforeDir="false" afterPath="$PROJECT_DIR$/META-INF/plugin.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/manifest.mf" beforeDir="false" afterPath="$PROJECT_DIR$/manifest.mf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/nbproject/genfiles.properties" beforeDir="false" afterPath="$PROJECT_DIR$/nbproject/genfiles.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/nbproject/private/private.xml" beforeDir="false" afterPath="$PROJECT_DIR$/nbproject/private/private.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/Bundle.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/Bundle.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/NbpCrudXmHelpers.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/NbpCrudXmHelpers.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/SdmAction.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/SdmAction.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/SdmTabAdmin.form" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/SdmTabAdmin.form" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/SdmTabAdmin.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/SdmTabAdmin.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/UIDialogSelectDbSchema.form" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/UIDialogSelectDbSchema.form" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/UIDialogSelectDbSchema.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/UIDialogSelectDbSchema.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UIDialogSelectDbSchema.form" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UIDialogSelectDbSchema.form" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UIDialogSelectDbSchema.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UIDialogSelectDbSchema.java" afterDir="false" />
     </list>
     <list id="0b913ed8-6e39-405f-b29b-9d52c75467b5" name="Failed commit: Default" comment="" />
     <option name="SHOW_DIALOG" value="false" />
@@ -925,26 +918,26 @@
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
     <state x="501" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.0.1920.1050@0.0.1920.1050" timestamp="1577881858977" />
-    <state x="740" y="281" key="FileChooserDialogImpl" timestamp="1577725013335">
+    <state x="740" y="281" key="FileChooserDialogImpl" timestamp="1578072341373">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state x="740" y="281" key="FileChooserDialogImpl/0.0.1920.1050@0.0.1920.1050" timestamp="1577725013335" />
-    <state width="923" height="266" key="GridCell.Tab.0.bottom" timestamp="1578020688096">
+    <state x="740" y="281" key="FileChooserDialogImpl/0.0.1920.1050@0.0.1920.1050" timestamp="1578072341373" />
+    <state width="924" height="204" key="GridCell.Tab.0.bottom" timestamp="1578057570967">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="923" height="266" key="GridCell.Tab.0.bottom/0.0.1920.1050@0.0.1920.1050" timestamp="1578020688096" />
-    <state width="923" height="266" key="GridCell.Tab.0.center" timestamp="1578020688096">
+    <state width="924" height="204" key="GridCell.Tab.0.bottom/0.0.1920.1050@0.0.1920.1050" timestamp="1578057570967" />
+    <state width="924" height="204" key="GridCell.Tab.0.center" timestamp="1578057570967">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="923" height="266" key="GridCell.Tab.0.center/0.0.1920.1050@0.0.1920.1050" timestamp="1578020688096" />
-    <state width="923" height="266" key="GridCell.Tab.0.left" timestamp="1578020688096">
+    <state width="924" height="204" key="GridCell.Tab.0.center/0.0.1920.1050@0.0.1920.1050" timestamp="1578057570967" />
+    <state width="924" height="204" key="GridCell.Tab.0.left" timestamp="1578057570967">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="923" height="266" key="GridCell.Tab.0.left/0.0.1920.1050@0.0.1920.1050" timestamp="1578020688096" />
-    <state width="923" height="266" key="GridCell.Tab.0.right" timestamp="1578020688096">
+    <state width="924" height="204" key="GridCell.Tab.0.left/0.0.1920.1050@0.0.1920.1050" timestamp="1578057570967" />
+    <state width="924" height="204" key="GridCell.Tab.0.right" timestamp="1578057570967">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="923" height="266" key="GridCell.Tab.0.right/0.0.1920.1050@0.0.1920.1050" timestamp="1578020688096" />
+    <state width="924" height="204" key="GridCell.Tab.0.right/0.0.1920.1050@0.0.1920.1050" timestamp="1578057570967" />
     <state width="923" height="266" key="GridCell.Tab.1.bottom" timestamp="1578020688097">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
@@ -961,10 +954,10 @@
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
     <state width="923" height="266" key="GridCell.Tab.1.right/0.0.1920.1050@0.0.1920.1050" timestamp="1578020688097" />
-    <state x="440" y="101" key="SettingsEditor" timestamp="1577969713870">
+    <state x="440" y="101" key="SettingsEditor" timestamp="1578072346513">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state x="440" y="101" key="SettingsEditor/0.0.1920.1050@0.0.1920.1050" timestamp="1577969713870" />
+    <state x="440" y="101" key="SettingsEditor/0.0.1920.1050@0.0.1920.1050" timestamp="1578072346513" />
     <state x="732" y="418" key="com.intellij.uiDesigner.propertyInspector.editors.string.StringEditorDialog" timestamp="1578016925866">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>

@@ -24,6 +24,9 @@ import javax.swing.JDialog;
 import javax.swing.KeyStroke;
 import javax.swing.table.AbstractTableModel;
 import com.sqldalmaker.common.ISelectDbSchemaCallback;
+import java.util.List;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 /**
  *
@@ -40,14 +43,23 @@ public final class UIDialogSelectDbSchema extends JDialog {
 
     private String selected_schema;
 
-    private Settings settings;
+    private final Settings settings;
 
+    private final List<String> schemas = new ArrayList<String>();
+
+    private UIDialogSelectDbSchema(){
+        obj = null;
+        callback = null;
+        settings = null;
+    }
+    
     private UIDialogSelectDbSchema(SdmDataObject obj, ISelectDbSchemaCallback callback, boolean dto, boolean fk) throws Exception {
 
         initComponents();
 
         this.obj = obj;
         this.callback = callback;
+        this.settings = NbpHelpers.load_settings(obj);
 
         jTable1.setTableHeader(null);
 
@@ -56,8 +68,6 @@ public final class UIDialogSelectDbSchema extends JDialog {
         getRootPane().setDefaultButton(button_ok);
 
         setTitle("Select schema and provide options");
-
-        settings = NbpHelpers.load_settings(obj);
 
         lbl_jdbc_url.setText(settings.getJdbc().getUrl());
 
@@ -110,20 +120,58 @@ public final class UIDialogSelectDbSchema extends JDialog {
             chk_including_views.setVisible(false);
         }
 
-        jTable1.addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent e) {
-//                if (e.getClickCount() == 2) {
-//
-//                    onOK();
-//
-//                } else 
-                if (e.getClickCount() == 1) {
+        jTable1.setModel(new AbstractTableModel() { // before refresh_schemas();
 
-                    on_selection_changed();
-                }
+            @Override
+            public Object getValueAt(int rowIndex, int columnIndex) {
+
+                return schemas.get(rowIndex);
+            }
+
+            @Override
+            public int getColumnCount() {
+
+                return 1;
+            }
+
+            @Override
+            public String getColumnName(int column) {
+
+                return "Schema";
+            }
+
+            @Override
+            public int getRowCount() {
+
+                return schemas.size();
             }
         });
-        refresh();
+
+        refresh_schemas();
+
+        // sometime it works wrong...
+//        jTable1.addMouseListener(new MouseAdapter() {
+//            public void mouseClicked(MouseEvent e) {
+//                if (e.getClickCount() == 1) {
+//
+//                    on_selection_changed();
+//                }
+//            }
+//        });
+        jTable1.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+
+            // https://stackoverflow.com/questions/375265/jtable-selection-change-event-handling-find-the-source-table-dynamically
+            //
+            @Override
+            public void valueChanged(ListSelectionEvent lse) {
+
+                on_selection_changed();
+
+//                if (!lse.getValueIsAdjusting()) {
+//                    System.out.println("Selection Changed");
+//                }
+            }
+        });
     }
 
     public static void open(SdmDataObject obj, ISelectDbSchemaCallback callback, boolean dto, boolean fk) throws Exception {
@@ -144,9 +192,9 @@ public final class UIDialogSelectDbSchema extends JDialog {
             return new int[]{0};
         }
 
-        int[] selectedRows = jTable1.getSelectedRows();
+        int[] selected_rows = jTable1.getSelectedRows();
 
-        return selectedRows;
+        return selected_rows;
     }
 
     private void onOK() {
@@ -159,15 +207,15 @@ public final class UIDialogSelectDbSchema extends JDialog {
     }
 
     private void onCancel() {
-// add your code here if necessary
+
         dispose();
     }
 
-    private void refresh() {
+    private void refresh_schemas() {
 
         try {
 
-            final ArrayList<String> items = new ArrayList<String>();
+            schemas.clear();;
 
             Connection con = NbpHelpers.get_connection(obj);
 
@@ -177,25 +225,13 @@ public final class UIDialogSelectDbSchema extends JDialog {
 
                 ResultSet rs;
 
-//                if (enum_catalogs) {
-//
-//                    rs = db_info.getCatalogs();
-//
-//                } else {
                 rs = db_info.getSchemas();
-//                }
 
                 try {
 
                     while (rs.next()) {
 
-//                       if (enum_catalogs) {
-//
-//                           items.add(rs.getString("TABLE_CAT"));
-//
-//                       } else {
-                        items.add(rs.getString("TABLE_SCHEM"));
-//                       }
+                        schemas.add(rs.getString("TABLE_SCHEM"));
                     }
 
                 } finally {
@@ -208,46 +244,7 @@ public final class UIDialogSelectDbSchema extends JDialog {
                 con.close();
             }
 
-            // buttonOK.setEnabled(items.size() <= 1);
-            jTable1.setModel(new AbstractTableModel() {
-
-                @Override
-                public Object getValueAt(int rowIndex, int columnIndex) {
-
-                    return items.get(rowIndex);
-                }
-
-                @Override
-                public int getColumnCount() {
-
-                    return 1;
-                }
-
-                @Override
-                public String getColumnName(int column) {
-
-                    return "Catalog/Schema";
-                }
-
-                @Override
-                public int getRowCount() {
-
-                    return items.size();
-                }
-            });
-
-            jTable1.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-
-                    if (e.getClickCount() == 2) {
-
-                        onOK();
-                    }
-                }
-            });
-
-            if (items.size() == 0) {
+            if (schemas.size() == 0) {
 
                 lbl_hint.setText("This database doesn't have schemas. Just provide options.");
                 radio_selected_schema.setText("Without schema");
