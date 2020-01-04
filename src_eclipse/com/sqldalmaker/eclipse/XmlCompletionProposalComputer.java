@@ -264,6 +264,9 @@ public class XmlCompletionProposalComputer implements ICompletionProposalCompute
 
 			e.printStackTrace();
 
+			// EclipseConsoleHelpers.init_console();
+			EclipseConsoleHelpers.add_error_msg(this.getClass().getName(), e.getMessage());
+
 			return NONE;
 		}
 	}
@@ -338,36 +341,29 @@ public class XmlCompletionProposalComputer implements ICompletionProposalCompute
 		}
 	}
 
-	private static void enum_sql_files(IFolder dir, List<String> res, String sql_root_rel_path) {
+	private static void enum_sql_files(IFolder dir, List<String> res, String sql_root_rel_path) throws Exception {
 
-		try {
+		IResource[] members = dir.members();
 
-			IResource[] members = dir.members();
+		for (IResource r : members) {
 
-			for (IResource r : members) {
+			if (r instanceof IFolder) {
 
-				if (r instanceof IFolder) {
+				enum_sql_files((IFolder) r, res, sql_root_rel_path);
 
-					enum_sql_files((IFolder) r, res, sql_root_rel_path);
+			} else if (r instanceof IFile) {
 
-				} else if (r instanceof IFile) {
+				String rel_path = ((IFile) r).getFullPath().toPortableString();
 
-					String rel_path = ((IFile) r).getFullPath().toPortableString();
+				if (rel_path.endsWith(".sql")) {
 
-					if (rel_path.endsWith(".sql")) {
+					int start = sql_root_rel_path.length() + 1;
 
-						int start = sql_root_rel_path.length() + 1;
+					String path = rel_path.substring(start);
 
-						String path = rel_path.substring(start);
-
-						res.add(path);
-					}
+					res.add(path);
 				}
 			}
-
-		} catch (Throwable e) {
-
-			e.printStackTrace();
 		}
 	}
 

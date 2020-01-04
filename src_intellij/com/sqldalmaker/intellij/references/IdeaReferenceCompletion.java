@@ -25,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
 public class IdeaReferenceCompletion {
 
     public static final String[] DAO_TAGS_USING_DTO = new String[]{"crud", "crud-auto", "query-dto", "query-dto-list"};
-    public static final String[] DAO_TAGS_USING_REF = new String[]{"query", "query-list", "query-dto", "query-dto-list", "exec-dml", "sa-exec-dml"};
+    public static final String[] DAO_TAGS_USING_REF = new String[]{"query", "query-list", "query-dto", "query-dto-list", "exec-dml"};
 
     public class ATTRIBUTE {
 
