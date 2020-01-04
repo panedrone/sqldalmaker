@@ -3,7 +3,10 @@
   <component name="ChangeListManager">
     <list default="true" id="1fb1c605-8c08-4b11-a01b-d42d0945087f" name="Default" comment="added option to exclude views in DTO/DAO assistants">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/IdeaReferenceCompletion.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/IdeaReferenceCompletion.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/META-INF/plugin.xml" beforeDir="false" afterPath="$PROJECT_DIR$/META-INF/plugin.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/CompletionProviderSql.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/CompletionProviderSql.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaMessageHelpers.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaMessageHelpers.java" afterDir="false" />
     </list>
     <list id="0b913ed8-6e39-405f-b29b-9d52c75467b5" name="Failed commit: Default" comment="" />
     <option name="SHOW_DIALOG" value="false" />
@@ -71,17 +74,17 @@
     <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
   <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="D:\work\com.sqldalmaker\com.sqldalmaker.plugins\src_common" />
-      <recent name="D:\work\com.sqldalmaker\com.sqldalmaker.plugins\src_intellij" />
-      <recent name="D:\work\com.sqldalmaker\com.sqldalmaker.plugins\src_common\com\sqldalmaker" />
-    </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\work\com.sqldalmaker\com.sqldalmaker.plugins" />
       <recent name="D:\work\com.sqldalmaker\com.sqldalmaker.plugins\src_intellij" />
       <recent name="D:\work\com.sqldalmaker\com.sqldalmaker.plugins\sqldalmaker-lib\src" />
       <recent name="D:\work\com.sqldalmaker\com.sqldalmaker.plugins\src_common\resources" />
       <recent name="D:\work\com.sqldalmaker\com.sqldalmaker.plugins\src_common\com\sqldalmaker\jaxb\settings" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\work\com.sqldalmaker\com.sqldalmaker.plugins\src_common" />
+      <recent name="D:\work\com.sqldalmaker\com.sqldalmaker.plugins\src_intellij" />
+      <recent name="D:\work\com.sqldalmaker\com.sqldalmaker.plugins\src_common\com\sqldalmaker" />
     </key>
   </component>
   <component name="RunManager">
@@ -918,38 +921,38 @@
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
     <state x="740" y="281" key="FileChooserDialogImpl/0.0.1920.1050@0.0.1920.1050" timestamp="1578072341373" />
-    <state width="924" height="204" key="GridCell.Tab.0.bottom" timestamp="1578057570967">
+    <state width="923" height="266" key="GridCell.Tab.0.bottom" timestamp="1578132041512">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="924" height="204" key="GridCell.Tab.0.bottom/0.0.1920.1050@0.0.1920.1050" timestamp="1578057570967" />
-    <state width="924" height="204" key="GridCell.Tab.0.center" timestamp="1578057570967">
+    <state width="923" height="266" key="GridCell.Tab.0.bottom/0.0.1920.1050@0.0.1920.1050" timestamp="1578132041512" />
+    <state width="923" height="266" key="GridCell.Tab.0.center" timestamp="1578132041512">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="924" height="204" key="GridCell.Tab.0.center/0.0.1920.1050@0.0.1920.1050" timestamp="1578057570967" />
-    <state width="924" height="204" key="GridCell.Tab.0.left" timestamp="1578057570967">
+    <state width="923" height="266" key="GridCell.Tab.0.center/0.0.1920.1050@0.0.1920.1050" timestamp="1578132041512" />
+    <state width="923" height="266" key="GridCell.Tab.0.left" timestamp="1578132041512">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="924" height="204" key="GridCell.Tab.0.left/0.0.1920.1050@0.0.1920.1050" timestamp="1578057570967" />
-    <state width="924" height="204" key="GridCell.Tab.0.right" timestamp="1578057570967">
+    <state width="923" height="266" key="GridCell.Tab.0.left/0.0.1920.1050@0.0.1920.1050" timestamp="1578132041512" />
+    <state width="923" height="266" key="GridCell.Tab.0.right" timestamp="1578132041512">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="924" height="204" key="GridCell.Tab.0.right/0.0.1920.1050@0.0.1920.1050" timestamp="1578057570967" />
-    <state width="923" height="266" key="GridCell.Tab.1.bottom" timestamp="1578020688097">
+    <state width="923" height="266" key="GridCell.Tab.0.right/0.0.1920.1050@0.0.1920.1050" timestamp="1578132041512" />
+    <state width="923" height="266" key="GridCell.Tab.1.bottom" timestamp="1578132041298">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="923" height="266" key="GridCell.Tab.1.bottom/0.0.1920.1050@0.0.1920.1050" timestamp="1578020688097" />
-    <state width="923" height="266" key="GridCell.Tab.1.center" timestamp="1578020688097">
+    <state width="923" height="266" key="GridCell.Tab.1.bottom/0.0.1920.1050@0.0.1920.1050" timestamp="1578132041298" />
+    <state width="923" height="266" key="GridCell.Tab.1.center" timestamp="1578132041298">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="923" height="266" key="GridCell.Tab.1.center/0.0.1920.1050@0.0.1920.1050" timestamp="1578020688097" />
-    <state width="923" height="266" key="GridCell.Tab.1.left" timestamp="1578020688097">
+    <state width="923" height="266" key="GridCell.Tab.1.center/0.0.1920.1050@0.0.1920.1050" timestamp="1578132041298" />
+    <state width="923" height="266" key="GridCell.Tab.1.left" timestamp="1578132041298">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="923" height="266" key="GridCell.Tab.1.left/0.0.1920.1050@0.0.1920.1050" timestamp="1578020688097" />
-    <state width="923" height="266" key="GridCell.Tab.1.right" timestamp="1578020688097">
+    <state width="923" height="266" key="GridCell.Tab.1.left/0.0.1920.1050@0.0.1920.1050" timestamp="1578132041298" />
+    <state width="923" height="266" key="GridCell.Tab.1.right" timestamp="1578132041298">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="923" height="266" key="GridCell.Tab.1.right/0.0.1920.1050@0.0.1920.1050" timestamp="1578020688097" />
+    <state width="923" height="266" key="GridCell.Tab.1.right/0.0.1920.1050@0.0.1920.1050" timestamp="1578132041298" />
     <state x="440" y="101" key="SettingsEditor" timestamp="1578072346513">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>

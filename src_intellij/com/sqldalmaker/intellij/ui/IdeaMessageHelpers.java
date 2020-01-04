@@ -29,6 +29,24 @@ public class IdeaMessageHelpers {
     public static final NotificationGroup GROUP_DISPLAY_ID_INFO =
             new NotificationGroup("sqldalmaker", NotificationDisplayType.NONE, true);
 
+    public static void add_error_to_ide_log(final String clazz, String msg) {
+
+        NotificationListener listener = new NotificationListener.Adapter() {
+
+            @Override
+            protected void hyperlinkActivated(@NotNull Notification notification, @NotNull HyperlinkEvent hyperlinkEvent) {
+
+                notification.expire();
+
+                // notification.setTitle("");
+
+                // notification.hideBalloon();
+            }
+        };
+
+        Notifications.Bus.notify(GROUP_DISPLAY_ID_INFO.createNotification(clazz, msg, NotificationType.ERROR, listener));
+    }
+
     public static void add_dto_error_message(Settings settings, final Project project,
                                              final VirtualFile root_file, final String clazz, String msg) {
 

@@ -22,6 +22,7 @@ import com.intellij.util.ProcessingContext;
 import com.sqldalmaker.cg.DbUtils;
 import com.sqldalmaker.common.SdmUtils;
 import com.sqldalmaker.intellij.ui.IdeaHelpers;
+import com.sqldalmaker.intellij.ui.IdeaMessageHelpers;
 import com.sqldalmaker.jaxb.settings.Settings;
 import org.jetbrains.annotations.NotNull;
 
@@ -84,6 +85,8 @@ public class CompletionProviderSql extends CompletionProvider<CompletionParamete
 
             e.printStackTrace();
 
+            IdeaMessageHelpers.add_error_to_ide_log(this.getClass().getName(), e.getMessage());
+
             return;
         }
 
@@ -101,12 +104,16 @@ public class CompletionProviderSql extends CompletionProvider<CompletionParamete
 
             e.printStackTrace();
 
+            IdeaMessageHelpers.add_error_to_ide_log(this.getClass().getName(), e.getMessage());
+
             return;
         }
 
         VirtualFile sql_base_dir = project_dir.findFileByRelativePath(sql_root_rel_path);
 
         if (sql_base_dir == null) {
+
+            IdeaMessageHelpers.add_error_to_ide_log(this.getClass().getName(), "File not found: " + sql_root_rel_path);
 
             return;
         }
