@@ -6,25 +6,23 @@
  */
 package com.sqldalmaker.netbeans;
 
-import com.sqldalmaker.cg.DbUtils;
-import com.sqldalmaker.cg.Helpers;
-import com.sqldalmaker.common.Const;
 import com.sqldalmaker.common.FileSearchHelpers;
-import com.sqldalmaker.common.XmlParser;
 import com.sqldalmaker.jaxb.dao.DaoClass;
-import com.sqldalmaker.jaxb.dto.DtoClass;
 import com.sqldalmaker.jaxb.dto.DtoClasses;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import com.sqldalmaker.common.ISelectDbSchemaCallback;
 import com.sqldalmaker.common.SdmUtils;
+import java.util.List;
 
 /**
- * The class to control DTO XML assistant, DAO XML assistant, FK access XML
- * assistant
+ * The class to control 
+ * 
+ * - DTO XML assistant
+ * - DAO XML assistant
+ * - FK access XML assistant
  *
  * @author sqldalmaker@gmail.com
  *
@@ -53,7 +51,7 @@ public class NbpCrudXmHelpers {
 
                         if (skip_used) {
 
-                            in_use = find_tables_used_in_dto_xml(obj);
+                            in_use = find_dto_declared_in_dto_xml(obj);
 
                         } else {
 
@@ -61,8 +59,7 @@ public class NbpCrudXmHelpers {
                         }
 
                         root = SdmUtils.get_crud_dto_xml(object_factory, connection, in_use,
-                                schema_in_xml, selected_schema, include_views,
-                                plural_to_singular);
+                                schema_in_xml, selected_schema, include_views, plural_to_singular);
 
                     } finally {
 
@@ -81,45 +78,12 @@ public class NbpCrudXmHelpers {
         UIDialogSelectDbSchema.open(obj, callback, true, false);
     }
 
-    private static Set<String> find_tables_used_in_dto_xml(SdmDataObject obj) throws Exception {
+    private static Set<String> find_dto_declared_in_dto_xml(SdmDataObject obj) throws Exception {
 
-        Set<String> res = new HashSet<String>();
+        String dto_xml_abs_file_path = NbpPathHelpers.get_dto_xml_abs_path(obj);
+        String dto_xsd_abs_file_path = NbpPathHelpers.get_dto_xsd_abs_path(obj);
 
-        String dto_xml_abs_path = NbpPathHelpers.get_dto_xml_abs_path(obj);
-
-        String dto_xsd_abs_path = NbpPathHelpers.get_dto_xsd_abs_path(obj);
-
-        List<DtoClass> list = get_dto_classes(dto_xml_abs_path, dto_xsd_abs_path);
-
-        for (DtoClass cls : list) {
-
-            String ref = cls.getRef();
-
-            if (ref.startsWith("table:")) {
-
-                String[] parts = ref.split(":");
-
-                res.add(parts[1]);
-
-            } else if (DbUtils.is_table_ref(ref)) {
-
-                res.add(ref);
-            }
-        }
-        return res;
-    }
-
-    private static List<DtoClass> get_dto_classes(String dto_xml_abs_path, String dto_xsd_abs_path) throws Exception {
-
-        List<DtoClass> res = new ArrayList<DtoClass>();
-
-        String context_path = DtoClasses.class.getPackage().getName();
-
-        XmlParser xml_parser = new XmlParser(context_path, dto_xsd_abs_path);
-
-        DtoClasses elements = xml_parser.unmarshal(dto_xml_abs_path);
-
-        res.addAll(elements.getDtoClass());
+        Set<String> res = SdmUtils.get_dto_classes_names_used_in_dto_xml(dto_xml_abs_file_path, dto_xsd_abs_file_path);
 
         return res;
     }
@@ -148,7 +112,7 @@ public class NbpCrudXmHelpers {
 
                         if (skip_used) {
 
-                            in_use = find_tables_used_in_dao_xml(obj);
+                            in_use = find_dto_used_in_dao_xml_crud(obj);
 
                         } else {
 
@@ -197,25 +161,13 @@ public class NbpCrudXmHelpers {
         return res;
     }
 
-    private static Set<String> find_tables_used_in_dao_xml(SdmDataObject obj) throws Exception {
-
-        Set<String> res = new HashSet<String>();
-
-        ArrayList<String> dao_file_path_list = fill_dao_file_path_list(obj);
+    private static Set<String> find_dto_used_in_dao_xml_crud(SdmDataObject obj) throws Exception {
 
         String metaprogram_abs_path = NbpPathHelpers.get_metaprogram_abs_path(obj);
+        List<String> dao_xml_file_name_list = fill_dao_file_path_list(obj);
 
-        String context_path = DaoClass.class.getPackage().getName();
-
-        XmlParser xml_parser = new XmlParser(context_path, Helpers.concat_path(metaprogram_abs_path, Const.DAO_XSD));
-
-        for (String file_name : dao_file_path_list) {
-
-            Set<String> dao_tables = SdmUtils.find_tables_in_use(xml_parser, metaprogram_abs_path + "/" + file_name);
-
-            res.addAll(dao_tables);
-        }
-
+        Set<String> res = SdmUtils.find_dto_used_in_dao_xml_crud(metaprogram_abs_path, dao_xml_file_name_list);
+                
         return res;
     }
 
@@ -239,9 +191,8 @@ public class NbpCrudXmHelpers {
 
                     try {
 
-                        root = SdmUtils.get_fk_access_xml(conn, object_factory, schema_in_xml, selected_schema, 
-                                plural_to_singular,
-                                underscores_needed);
+                        root = SdmUtils.get_fk_access_xml(conn, object_factory, schema_in_xml, selected_schema,
+                                plural_to_singular, underscores_needed);
 
                     } finally {
 

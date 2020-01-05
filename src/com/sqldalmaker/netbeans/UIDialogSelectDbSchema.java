@@ -1,18 +1,16 @@
 /*
- * Copyright 2011-2018 sqldalmaker@gmail.com
+ * Copyright 2011-2019 sqldalmaker@gmail.com
  * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
  * Read LICENSE.txt in the root of this project/archive for details.
+ *
  */
 package com.sqldalmaker.netbeans;
 
-import com.sqldalmaker.common.InternalException;
 import com.sqldalmaker.jaxb.settings.Settings;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.sql.Connection;
@@ -47,12 +45,12 @@ public final class UIDialogSelectDbSchema extends JDialog {
 
     private final List<String> schemas = new ArrayList<String>();
 
-    private UIDialogSelectDbSchema(){
+    private UIDialogSelectDbSchema() {
         obj = null;
         callback = null;
         settings = null;
     }
-    
+
     private UIDialogSelectDbSchema(SdmDataObject obj, ISelectDbSchemaCallback callback, boolean dto, boolean fk) throws Exception {
 
         initComponents();
@@ -116,7 +114,7 @@ public final class UIDialogSelectDbSchema extends JDialog {
 
         if (fk) {
 
-            chk_skip_used.setVisible(false);
+            chk_omit_used.setVisible(false);
             chk_including_views.setVisible(false);
         }
 
@@ -149,7 +147,8 @@ public final class UIDialogSelectDbSchema extends JDialog {
 
         refresh_schemas();
 
-        // sometime it works wrong...
+//        // sometime it works wrong...
+//        //
 //        jTable1.addMouseListener(new MouseAdapter() {
 //            public void mouseClicked(MouseEvent e) {
 //                if (e.getClickCount() == 1) {
@@ -158,6 +157,7 @@ public final class UIDialogSelectDbSchema extends JDialog {
 //                }
 //            }
 //        });
+//
         jTable1.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 
             // https://stackoverflow.com/questions/375265/jtable-selection-change-event-handling-find-the-source-table-dynamically
@@ -200,7 +200,7 @@ public final class UIDialogSelectDbSchema extends JDialog {
     private void onOK() {
 
         callback.process_ok(chk_schema_in_xml.isSelected(), selected_schema,
-                chk_skip_used.isSelected(), chk_including_views.isSelected(), chk_singular.isSelected(),
+                chk_omit_used.isSelected(), chk_including_views.isSelected(), chk_singular.isSelected(),
                 radio_crud_auto.isSelected(), chk_add_fk_access.isSelected());
 
         dispose();
@@ -215,7 +215,7 @@ public final class UIDialogSelectDbSchema extends JDialog {
 
         try {
 
-            schemas.clear();;
+            schemas.clear();
 
             Connection con = NbpHelpers.get_connection(obj);
 
@@ -253,6 +253,7 @@ public final class UIDialogSelectDbSchema extends JDialog {
 
                 lbl_hint.setText("Select schema or click 'DB user name as schema'. Provide options.");
                 radio_selected_schema.setText("Use selected schema");
+                chk_schema_in_xml.setSelected(true);
             }
 
             on_selection_changed();
@@ -336,7 +337,7 @@ public final class UIDialogSelectDbSchema extends JDialog {
         radio_selected_schema = new javax.swing.JRadioButton();
         radio_user_as_schema = new javax.swing.JRadioButton();
         chk_schema_in_xml = new javax.swing.JCheckBox();
-        chk_skip_used = new javax.swing.JCheckBox();
+        chk_omit_used = new javax.swing.JCheckBox();
         chk_including_views = new javax.swing.JCheckBox();
         chk_singular = new javax.swing.JCheckBox();
         chk_add_fk_access = new javax.swing.JCheckBox();
@@ -419,11 +420,12 @@ public final class UIDialogSelectDbSchema extends JDialog {
         chk_schema_in_xml.setMargin(new java.awt.Insets(0, 5, 0, 0));
         jPanel2.add(chk_schema_in_xml);
 
-        chk_skip_used.setSelected(true);
-        org.openide.awt.Mnemonics.setLocalizedText(chk_skip_used, org.openide.util.NbBundle.getMessage(UIDialogSelectDbSchema.class, "UIDialogSelectDbSchema.chk_skip_used.text")); // NOI18N
-        chk_skip_used.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        chk_skip_used.setMargin(new java.awt.Insets(0, 5, 0, 0));
-        jPanel2.add(chk_skip_used);
+        chk_omit_used.setSelected(true);
+        org.openide.awt.Mnemonics.setLocalizedText(chk_omit_used, org.openide.util.NbBundle.getMessage(UIDialogSelectDbSchema.class, "UIDialogSelectDbSchema.chk_omit_used.text")); // NOI18N
+        chk_omit_used.setActionCommand(org.openide.util.NbBundle.getMessage(UIDialogSelectDbSchema.class, "UIDialogSelectDbSchema.chk_omit_used.actionCommand")); // NOI18N
+        chk_omit_used.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        chk_omit_used.setMargin(new java.awt.Insets(0, 5, 0, 0));
+        jPanel2.add(chk_omit_used);
 
         chk_including_views.setSelected(true);
         org.openide.awt.Mnemonics.setLocalizedText(chk_including_views, org.openide.util.NbBundle.getMessage(UIDialogSelectDbSchema.class, "UIDialogSelectDbSchema.chk_including_views.text")); // NOI18N
@@ -486,9 +488,9 @@ public final class UIDialogSelectDbSchema extends JDialog {
     private javax.swing.JButton button_ok;
     private javax.swing.JCheckBox chk_add_fk_access;
     private javax.swing.JCheckBox chk_including_views;
+    private javax.swing.JCheckBox chk_omit_used;
     private javax.swing.JCheckBox chk_schema_in_xml;
     private javax.swing.JCheckBox chk_singular;
-    private javax.swing.JCheckBox chk_skip_used;
     private javax.swing.JButton jButton2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;

@@ -29,8 +29,6 @@ import javax.xml.bind.annotation.XmlType;
  *           &lt;element ref="{}query-dto"/>
  *           &lt;element ref="{}query-dto-list"/>
  *           &lt;element ref="{}exec-dml"/>
- *           &lt;element ref="{}sa-exec-dml"/>
- *           &lt;element ref="{}sa-crud"/>
  *         &lt;/choice>
  *       &lt;/sequence>
  *     &lt;/restriction>

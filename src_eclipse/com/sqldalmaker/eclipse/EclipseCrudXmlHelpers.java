@@ -16,17 +16,17 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.swt.widgets.Shell;
 
 import com.sqldalmaker.common.FileSearchHelpers;
+import com.sqldalmaker.common.FileSearchHelpers.IFile_List;
 import com.sqldalmaker.common.ISelectDbSchemaCallback;
 import com.sqldalmaker.common.SdmUtils;
-import com.sqldalmaker.common.XmlParser;
 import com.sqldalmaker.jaxb.dao.DaoClass;
 import com.sqldalmaker.jaxb.dao.ObjectFactory;
-import com.sqldalmaker.jaxb.dto.DtoClass;
 import com.sqldalmaker.jaxb.dto.DtoClasses;
 
 /**
- * The class to control DTO XML assistant, DAO XML assistant, FK access XML
- * assistant
+ * The class to control
+ * 
+ * - DTO XML assistant - DAO XML assistant - FK access XML assistant
  *
  * @author sqldalmaker@gmail.com
  *
@@ -56,7 +56,7 @@ public class EclipseCrudXmlHelpers {
 
 							String project_abs_path = EclipseHelpers.get_absolute_dir_path_str(editor2.get_project());
 
-							in_use = find_tables_used_in_dto_xml(editor2, project_abs_path);
+							in_use = find_dto_declared_in_dto_xml(editor2, project_abs_path);
 
 						} else {
 
@@ -85,34 +85,22 @@ public class EclipseCrudXmlHelpers {
 		UIDialogSelectDbSchema.open(parent_shell, editor2, callback, UIDialogSelectDbSchema.Open_Mode.DTO);
 	}
 
-	private static Set<String> find_tables_used_in_dto_xml(IEditor2 editor2, String project_abs_path) throws Exception {
+	private static Set<String> find_dto_declared_in_dto_xml(IEditor2 editor2, String project_abs_path)
+			throws Exception {
 
-		Set<String> res = new HashSet<String>();
+		String dto_xml_abs_file_path = editor2.get_dto_xml_abs_path();
+		String dto_xsd_abs_file_path = editor2.get_dto_xsd_abs_path();
 
-		String dto_xml_abs_path = editor2.get_dto_xml_abs_path();
-
-		String dto_xsd_abs_path = editor2.get_dto_xsd_abs_path();
-
-		List<DtoClass> list = SdmUtils.get_dto_classes(dto_xml_abs_path, dto_xsd_abs_path);
-
-		for (DtoClass cls : list) {
-
-			String ref = cls.getRef();
-
-			if (ref.toLowerCase().endsWith(".sql") == false) {
-
-				res.add(ref);
-			}
-		}
+		Set<String> res = SdmUtils.get_dto_classes_names_used_in_dto_xml(dto_xml_abs_file_path, dto_xsd_abs_file_path);
 
 		return res;
 	}
 
-	private static ArrayList<String> get_dao_file_names(IProject project, String xml_configs_folder_full_path) {
+	private static List<String> get_dao_xml_file_name_list(IProject project, String xml_configs_folder_full_path) {
 
-		final ArrayList<String> res = new ArrayList<String>();
+		final List<String> res = new ArrayList<String>();
 
-		FileSearchHelpers.IFile_List file_list = new FileSearchHelpers.IFile_List() {
+		IFile_List file_list = new IFile_List() {
 
 			@Override
 			public void add(String abs_file_path) {
@@ -126,32 +114,15 @@ public class EclipseCrudXmlHelpers {
 		return res;
 	}
 
-	static Set<String> find_tables_used_in_dao_xml(IEditor2 editor2, String project_abs_path) throws Exception {
+	public static Set<String> find_dto_used_in_dao_xml_crud(IEditor2 editor2, String project_abs_path)
+			throws Exception {
 
-		Set<String> res = new HashSet<String>();
+		String metaprogram_folder_abs_path = editor2.get_metaprogram_folder_abs_path();
 
-		ArrayList<String> dao_file_names = get_dao_file_names(editor2.get_project(),
+		List<String> dao_xml_file_name_list = get_dao_xml_file_name_list(editor2.get_project(),
 				editor2.get_metaprogram_folder_abs_path());
 
-		String context_path = DaoClass.class.getPackage().getName();
-
-		String xsd_file_path = editor2.get_dao_xsd_abs_path();
-
-		XmlParser xml_parser = new XmlParser(context_path, xsd_file_path);
-
-		for (int i = 0; i < dao_file_names.size(); i++) {
-
-			String file_name = dao_file_names.get(i);
-
-			String xml_file_abs_path = editor2.get_metaprogram_file_abs_path(file_name);
-
-			Set<String> dao_tables = SdmUtils.find_tables_in_use(xml_parser, xml_file_abs_path);
-
-			for (String t : dao_tables) {
-
-				res.add(t);
-			}
-		}
+		Set<String> res = SdmUtils.find_dto_used_in_dao_xml_crud(metaprogram_folder_abs_path, dao_xml_file_name_list);
 
 		return res;
 	}
@@ -183,7 +154,7 @@ public class EclipseCrudXmlHelpers {
 
 							String project_root = EclipseHelpers.get_absolute_dir_path_str(editor2.get_project());
 
-							in_use = find_tables_used_in_dao_xml(editor2, project_root);
+							in_use = find_dto_used_in_dao_xml_crud(editor2, project_root);
 
 						} else {
 

@@ -105,13 +105,13 @@
                   </component>
                 </children>
               </scrollpane>
-              <component id="7f744" class="javax.swing.JCheckBox" binding="chk_skip">
+              <component id="7f744" class="javax.swing.JCheckBox" binding="chk_omit">
                 <constraints>
                   <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
                   <selected value="true"/>
-                  <text value="Skip tables/views used in existing declarations" noi18n="true"/>
+                  <text value="Omit DTO that are already used in existing CRUD XML declarations" noi18n="true"/>
                 </properties>
               </component>
               <component id="efa9a" class="javax.swing.JCheckBox" binding="chk_singular">

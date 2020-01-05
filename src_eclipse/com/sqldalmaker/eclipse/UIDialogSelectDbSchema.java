@@ -52,7 +52,7 @@ public class UIDialogSelectDbSchema extends TitleAreaDialog {
 	private Table table;
 	private TableViewer tableViewer;
 	private Button buttonOK;
-	private Button chk_Skip;
+	private Button chk_omit;
 	private Button chk_delEndingS;
 
 	private Composite compositeCrud;
@@ -138,6 +138,15 @@ public class UIDialogSelectDbSchema extends TitleAreaDialog {
 
 		getContents().getShell().setText("Select schema and provide options");
 
+		try {
+			
+			Settings sett = SdmUtils.load_settings(sdm_folder_abs_path);
+			setTitle(sett.getJdbc().getUrl());
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
 		if (schema_names.size() == 0) {
 
 			setMessage("This database doesn't have schemas. Just provide options.");
@@ -147,13 +156,14 @@ public class UIDialogSelectDbSchema extends TitleAreaDialog {
 
 			setMessage("Select a schema from the list below and provide options.");
 			radio_selected_schema.setText("Use selected schema");
+			chk_schema_in_xml.setSelection(true);
 		}
 
 		selected_schema = null;
 
 		if (open_mode == Open_Mode.FK) {
 
-			chk_Skip.setVisible(false);
+			chk_omit.setVisible(false);
 			chk_views.setVisible(false);
 			compositeCrud.setVisible(false);
 			chk_add_fk_access.setVisible(false);
@@ -174,7 +184,7 @@ public class UIDialogSelectDbSchema extends TitleAreaDialog {
 
 		// http://alvinalexander.com/java/jwarehouse/eclipse/org.eclipse.jface/src/org/eclipse/jface/dialogs/TrayDialog.java.shtml
 
-		skip = chk_Skip.getSelection();
+		skip = chk_omit.getSelection();
 		include_views = chk_views.getSelection();
 		delS = chk_delEndingS.getSelection();
 		use_crud_auto = radioCrudAuto.getSelection();
@@ -243,10 +253,10 @@ public class UIDialogSelectDbSchema extends TitleAreaDialog {
 		chk_schema_in_xml = new Button(container, SWT.CHECK);
 		chk_schema_in_xml.setText("Schema in generated XML declarations");
 
-		chk_Skip = new Button(container, SWT.CHECK);
-		chk_Skip.setSelection(true);
-		chk_Skip.setText("Skip the tables used in existing declarations");
-		skip = chk_Skip.getSelection();
+		chk_omit = new Button(container, SWT.CHECK);
+		chk_omit.setSelection(true);
+		chk_omit.setText("Omit DTO that are already used in existing CRUD XML declarations");
+		skip = chk_omit.getSelection();
 
 		chk_views = new Button(container, SWT.CHECK);
 		chk_views.setSelection(true);

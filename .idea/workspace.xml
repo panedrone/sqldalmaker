@@ -2,11 +2,21 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1fb1c605-8c08-4b11-a01b-d42d0945087f" name="Default" comment="added option to exclude views in DTO/DAO assistants">
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/META-INF/plugin.xml" beforeDir="false" afterPath="$PROJECT_DIR$/META-INF/plugin.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/CompletionProviderSql.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/CompletionProviderSql.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaMessageHelpers.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaMessageHelpers.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/nbproject/private/private.xml" beforeDir="false" afterPath="$PROJECT_DIR$/nbproject/private/private.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/common/SdmUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/common/SdmUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/jaxb/dao/DaoClass.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/jaxb/dao/DaoClass.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/Bundle.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/Bundle.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/NbpCrudXmHelpers.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/NbpCrudXmHelpers.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/UIDialogSelectDbSchema.form" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/UIDialogSelectDbSchema.form" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/UIDialogSelectDbSchema.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/UIDialogSelectDbSchema.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src_eclipse/com/sqldalmaker/eclipse/EclipseCrudXmlHelpers.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_eclipse/com/sqldalmaker/eclipse/EclipseCrudXmlHelpers.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src_eclipse/com/sqldalmaker/eclipse/UIDialogSelectDbSchema.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_eclipse/com/sqldalmaker/eclipse/UIDialogSelectDbSchema.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaCrudXmlHelpers.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaCrudXmlHelpers.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UIDialogSelectDbSchema.form" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UIDialogSelectDbSchema.form" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UIDialogSelectDbSchema.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UIDialogSelectDbSchema.java" afterDir="false" />
     </list>
     <list id="0b913ed8-6e39-405f-b29b-9d52c75467b5" name="Failed commit: Default" comment="" />
     <option name="SHOW_DIALOG" value="false" />
@@ -74,17 +84,17 @@
     <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
   <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\work\com.sqldalmaker\com.sqldalmaker.plugins\src_common" />
+      <recent name="D:\work\com.sqldalmaker\com.sqldalmaker.plugins\src_intellij" />
+      <recent name="D:\work\com.sqldalmaker\com.sqldalmaker.plugins\src_common\com\sqldalmaker" />
+    </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\work\com.sqldalmaker\com.sqldalmaker.plugins" />
       <recent name="D:\work\com.sqldalmaker\com.sqldalmaker.plugins\src_intellij" />
       <recent name="D:\work\com.sqldalmaker\com.sqldalmaker.plugins\sqldalmaker-lib\src" />
       <recent name="D:\work\com.sqldalmaker\com.sqldalmaker.plugins\src_common\resources" />
       <recent name="D:\work\com.sqldalmaker\com.sqldalmaker.plugins\src_common\com\sqldalmaker\jaxb\settings" />
-    </key>
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="D:\work\com.sqldalmaker\com.sqldalmaker.plugins\src_common" />
-      <recent name="D:\work\com.sqldalmaker\com.sqldalmaker.plugins\src_intellij" />
-      <recent name="D:\work\com.sqldalmaker\com.sqldalmaker.plugins\src_common\com\sqldalmaker" />
     </key>
   </component>
   <component name="RunManager">
@@ -897,10 +907,10 @@
     <option name="LAST_COMMIT_MESSAGE" value="added option to exclude views in DTO/DAO assistants" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="552" y="185" key="#Inspections" timestamp="1577882451743">
+    <state x="552" y="185" key="#Inspections" timestamp="1578233824330">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state x="552" y="185" key="#Inspections/0.0.1920.1050@0.0.1920.1050" timestamp="1577882451743" />
+    <state x="552" y="185" key="#Inspections/0.0.1920.1050@0.0.1920.1050" timestamp="1578233824330" />
     <state x="552" y="185" width="816" height="727" key="#Intentions" timestamp="1577815677612">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
@@ -917,50 +927,54 @@
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
     <state x="501" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.0.1920.1050@0.0.1920.1050" timestamp="1577881858977" />
+    <state width="406" height="466" key="DebuggerActiveHint" timestamp="1578235348607">
+      <screen x="0" y="0" width="1920" height="1050" />
+    </state>
+    <state width="406" height="466" key="DebuggerActiveHint/0.0.1920.1050@0.0.1920.1050" timestamp="1578235348607" />
     <state x="740" y="281" key="FileChooserDialogImpl" timestamp="1578072341373">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
     <state x="740" y="281" key="FileChooserDialogImpl/0.0.1920.1050@0.0.1920.1050" timestamp="1578072341373" />
-    <state width="923" height="266" key="GridCell.Tab.0.bottom" timestamp="1578132041512">
+    <state width="923" height="266" key="GridCell.Tab.0.bottom" timestamp="1578235864356">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="923" height="266" key="GridCell.Tab.0.bottom/0.0.1920.1050@0.0.1920.1050" timestamp="1578132041512" />
-    <state width="923" height="266" key="GridCell.Tab.0.center" timestamp="1578132041512">
+    <state width="923" height="266" key="GridCell.Tab.0.bottom/0.0.1920.1050@0.0.1920.1050" timestamp="1578235864356" />
+    <state width="923" height="266" key="GridCell.Tab.0.center" timestamp="1578235864356">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="923" height="266" key="GridCell.Tab.0.center/0.0.1920.1050@0.0.1920.1050" timestamp="1578132041512" />
-    <state width="923" height="266" key="GridCell.Tab.0.left" timestamp="1578132041512">
+    <state width="923" height="266" key="GridCell.Tab.0.center/0.0.1920.1050@0.0.1920.1050" timestamp="1578235864356" />
+    <state width="923" height="266" key="GridCell.Tab.0.left" timestamp="1578235864356">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="923" height="266" key="GridCell.Tab.0.left/0.0.1920.1050@0.0.1920.1050" timestamp="1578132041512" />
-    <state width="923" height="266" key="GridCell.Tab.0.right" timestamp="1578132041512">
+    <state width="923" height="266" key="GridCell.Tab.0.left/0.0.1920.1050@0.0.1920.1050" timestamp="1578235864356" />
+    <state width="923" height="266" key="GridCell.Tab.0.right" timestamp="1578235864356">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="923" height="266" key="GridCell.Tab.0.right/0.0.1920.1050@0.0.1920.1050" timestamp="1578132041512" />
-    <state width="923" height="266" key="GridCell.Tab.1.bottom" timestamp="1578132041298">
+    <state width="923" height="266" key="GridCell.Tab.0.right/0.0.1920.1050@0.0.1920.1050" timestamp="1578235864356" />
+    <state width="923" height="266" key="GridCell.Tab.1.bottom" timestamp="1578235864356">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="923" height="266" key="GridCell.Tab.1.bottom/0.0.1920.1050@0.0.1920.1050" timestamp="1578132041298" />
-    <state width="923" height="266" key="GridCell.Tab.1.center" timestamp="1578132041298">
+    <state width="923" height="266" key="GridCell.Tab.1.bottom/0.0.1920.1050@0.0.1920.1050" timestamp="1578235864356" />
+    <state width="923" height="266" key="GridCell.Tab.1.center" timestamp="1578235864356">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="923" height="266" key="GridCell.Tab.1.center/0.0.1920.1050@0.0.1920.1050" timestamp="1578132041298" />
-    <state width="923" height="266" key="GridCell.Tab.1.left" timestamp="1578132041298">
+    <state width="923" height="266" key="GridCell.Tab.1.center/0.0.1920.1050@0.0.1920.1050" timestamp="1578235864356" />
+    <state width="923" height="266" key="GridCell.Tab.1.left" timestamp="1578235864356">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="923" height="266" key="GridCell.Tab.1.left/0.0.1920.1050@0.0.1920.1050" timestamp="1578132041298" />
-    <state width="923" height="266" key="GridCell.Tab.1.right" timestamp="1578132041298">
+    <state width="923" height="266" key="GridCell.Tab.1.left/0.0.1920.1050@0.0.1920.1050" timestamp="1578235864356" />
+    <state width="923" height="266" key="GridCell.Tab.1.right" timestamp="1578235864356">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="923" height="266" key="GridCell.Tab.1.right/0.0.1920.1050@0.0.1920.1050" timestamp="1578132041298" />
+    <state width="923" height="266" key="GridCell.Tab.1.right/0.0.1920.1050@0.0.1920.1050" timestamp="1578235864356" />
     <state x="440" y="101" key="SettingsEditor" timestamp="1578072346513">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
     <state x="440" y="101" key="SettingsEditor/0.0.1920.1050@0.0.1920.1050" timestamp="1578072346513" />
-    <state x="732" y="418" key="com.intellij.uiDesigner.propertyInspector.editors.string.StringEditorDialog" timestamp="1578016925866">
+    <state x="732" y="418" key="com.intellij.uiDesigner.propertyInspector.editors.string.StringEditorDialog" timestamp="1578233560423">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state x="732" y="418" key="com.intellij.uiDesigner.propertyInspector.editors.string.StringEditorDialog/0.0.1920.1050@0.0.1920.1050" timestamp="1578016925866" />
+    <state x="732" y="418" key="com.intellij.uiDesigner.propertyInspector.editors.string.StringEditorDialog/0.0.1920.1050@0.0.1920.1050" timestamp="1578233560423" />
     <state x="667" y="281" width="585" height="488" key="find.popup" timestamp="1578127725830">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>

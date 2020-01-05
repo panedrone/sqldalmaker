@@ -23,46 +23,66 @@ import java.util.*;
 
 public class SdmUtils {
 
-	/*
+    /*
 	 * Used in XML assistants
-	 */
-	public static Set<String> find_tables_in_use(XmlParser xml_parser, String xml_file_abs_path) throws Exception {
+     */
+    public static Set<String> find_dto_used_in_dao_xml_crud(String metaprogram_abs_path, List<String> dao_xml_file_name_list) throws Exception {
 
-		Set<String> res = new HashSet<String>();
+        String context_path = DaoClass.class.getPackage().getName();
 
-		DaoClass dao_class = xml_parser.unmarshal(xml_file_abs_path);
+        XmlParser xml_parser = new XmlParser(context_path,
+                Helpers.concat_path(metaprogram_abs_path, Const.DAO_XSD));
 
-		if (dao_class.getCrudOrCrudAutoOrQuery() != null) {
+        Set<String> res = new HashSet<String>();
 
-			for (int i = 0; i < dao_class.getCrudOrCrudAutoOrQuery().size(); i++) {
+        for (String dao_xml_file_name : dao_xml_file_name_list) {
 
-				Object element = dao_class.getCrudOrCrudAutoOrQuery().get(i);
+            Set<String> dto_in_use = find_dto_used_in_dao_xml_crud(xml_parser,
+                    Helpers.concat_path(metaprogram_abs_path, dao_xml_file_name));
 
-				if (element instanceof Crud) {
+            res.addAll(dto_in_use);
+        }
 
-					Crud c = (Crud) element;
+        return res;
+    }
 
-					res.add(c.getTable());
+    private static Set<String> find_dto_used_in_dao_xml_crud(XmlParser xml_parser, String xml_file_abs_path) throws Exception {
 
-				} else if (element instanceof CrudAuto) {
+        Set<String> res = new HashSet<String>();
 
-					CrudAuto c = (CrudAuto) element;
+        DaoClass dao_class = xml_parser.unmarshal(xml_file_abs_path);
 
-					res.add(c.getTable());
-				}
-			}
-		}
+        if (dao_class.getCrudOrCrudAutoOrQuery() != null) {
 
-		return res;
-	}
+            for (int i = 0; i < dao_class.getCrudOrCrudAutoOrQuery().size(); i++) {
 
-	/*
+                Object element = dao_class.getCrudOrCrudAutoOrQuery().get(i);
+
+                if (element instanceof Crud) {
+
+                    Crud c = (Crud) element;
+
+                    res.add(c.getDto());
+
+                } else if (element instanceof CrudAuto) {
+
+                    CrudAuto c = (CrudAuto) element;
+
+                    res.add(c.getDto());
+                }
+            }
+        }
+
+        return res;
+    }
+
+    /*
 	 * Used in XML assistants
 	 *
-	 */
-	public static void add_fk_access(boolean underscores_needed, Connection conn, boolean schema_in_xml,
-			String selected_schema, DatabaseMetaData db_info, ResultSet rs_tables, List<Object> nodes,
-			boolean plural_to_singular) throws SQLException {
+     */
+    public static void add_fk_access(boolean underscores_needed, Connection conn, boolean schema_in_xml,
+            String selected_schema, DatabaseMetaData db_info, ResultSet rs_tables, List<Object> nodes,
+            boolean plural_to_singular) throws SQLException {
 
 //		String table_type = rs_tables.getString("TABLE_TYPE");
 //
@@ -71,214 +91,213 @@ public class SdmUtils {
 //													 */)) {
 //			return;
 //		}
+        String fk_table_name = rs_tables.getString("TABLE_NAME");
 
-		String fk_table_name = rs_tables.getString("TABLE_NAME");
+        ResultSet rs = db_info.getImportedKeys(conn.getCatalog(), selected_schema, fk_table_name);
 
-		ResultSet rs = db_info.getImportedKeys(conn.getCatalog(), selected_schema, fk_table_name);
+        // [pk_table_name - list of fk_column_name]
+        HashMap<String, List<String>> map = new HashMap<String, List<String>>();
 
-		// [pk_table_name - list of fk_column_name]
-		HashMap<String, List<String>> map = new HashMap<String, List<String>>();
+        try {
 
-		try {
+            while (rs.next()) {
 
-			while (rs.next()) {
+                String pk_table_name = rs.getString("PKTABLE_NAME");
 
-				String pk_table_name = rs.getString("PKTABLE_NAME");
+                String fk_column_name = rs.getString("FKCOLUMN_NAME");
 
-				String fk_column_name = rs.getString("FKCOLUMN_NAME");
+                if (!map.containsKey(pk_table_name)) {
 
-				if (!map.containsKey(pk_table_name)) {
+                    map.put(pk_table_name, new ArrayList<String>());
+                }
 
-					map.put(pk_table_name, new ArrayList<String>());
-				}
+                map.get(pk_table_name).add(fk_column_name);
 
-				map.get(pk_table_name).add(fk_column_name);
+                // int fkSequence = rs.getInt("KEY_SEQ");
+                //
+                // System.out.print(fk_table_name);
+                // System.out.print("\t" + fk_column_name);
+                // System.out.println("\t" + fkSequence);
+            }
 
-				// int fkSequence = rs.getInt("KEY_SEQ");
-				//
-				// System.out.print(fk_table_name);
-				// System.out.print("\t" + fk_column_name);
-				// System.out.println("\t" + fkSequence);
-			}
+        } finally {
 
-		} finally {
+            rs.close();
+        }
 
-			rs.close();
-		}
+        for (String pk_table_name : map.keySet()) {
 
-		for (String pk_table_name : map.keySet()) {
+            List<String> fk_column_names = map.get(pk_table_name);
 
-			List<String> fk_column_names = map.get(pk_table_name);
+            String params = "";
 
-			String params = "";
+            String columns = "";
 
-			String columns = "";
+            boolean first = true;
 
-			boolean first = true;
+            for (String fk_column_name : fk_column_names) {
 
-			for (String fk_column_name : fk_column_names) {
+                String c = fk_column_name;
 
-				String c = fk_column_name;
+                // if (IdeaTargetLanguageHelpers.underscores_needed(editor2)) {
+                c = Helpers.camel_case_to_lower_under_scores(c);
+                // }
 
-				// if (IdeaTargetLanguageHelpers.underscores_needed(editor2)) {
-				c = Helpers.camel_case_to_lower_under_scores(c);
-				// }
+                if (first) {
 
-				if (first) {
+                    params += c;
 
-					params += c;
+                    columns += fk_column_name;
 
-					columns += fk_column_name;
+                } else {
 
-				} else {
+                    params += ", " + c;
 
-					params += ", " + c;
+                    columns += ", " + fk_column_name;
+                }
 
-					columns += ", " + fk_column_name;
-				}
+                first = false;
+            }
 
-				first = false;
-			}
+            String dto_class_name = table_name_to_dto_class_name(fk_table_name, plural_to_singular);
 
-			String dto_class_name = table_name_to_dto_class_name(fk_table_name, plural_to_singular);
+            String method_name = "get" + table_name_to_dto_class_name(fk_table_name, false) + "By"
+                    + table_name_to_dto_class_name(pk_table_name, true);
 
-			String method_name = "get" + table_name_to_dto_class_name(fk_table_name, false) + "By"
-					+ table_name_to_dto_class_name(pk_table_name, true);
+            QueryDtoList node = new QueryDtoList();
 
-			QueryDtoList node = new QueryDtoList();
+            node.setDto(dto_class_name);
 
-			node.setDto(dto_class_name);
+            if (underscores_needed) {
+                method_name = Helpers.camel_case_to_lower_under_scores(method_name);
+            }
 
-			if (underscores_needed) {
-				method_name = Helpers.camel_case_to_lower_under_scores(method_name);
-			}
+            String method = method_name + "(" + params.toLowerCase() + ")";
 
-			String method = method_name + "(" + params.toLowerCase() + ")";
+            node.setMethod(method);
 
-			node.setMethod(method);
+            if (schema_in_xml && selected_schema != null && selected_schema.length() > 0) {
 
-			if (schema_in_xml && selected_schema != null && selected_schema.length() > 0) {
-				
-				node.setRef(selected_schema + "." + fk_table_name + "(" + columns + ")");
-				
-			} else {
-				
-				node.setRef(fk_table_name + "(" + columns + ")");
-			}
+                node.setRef(selected_schema + "." + fk_table_name + "(" + columns + ")");
 
-			nodes.add(node);
-		}
-	}
+            } else {
 
-	private static String to_camel_case(String str) {
+                node.setRef(fk_table_name + "(" + columns + ")");
+            }
 
-		if (!str.contains("_")) {
+            nodes.add(node);
+        }
+    }
 
-			boolean all_is_upper_case = Helpers.is_upper_case(str);
+    private static String to_camel_case(String str) {
 
-			if (all_is_upper_case) {
+        if (!str.contains("_")) {
 
-				str = str.toLowerCase();
-			}
+            boolean all_is_upper_case = Helpers.is_upper_case(str);
 
-			return Helpers.replace_char_at(str, 0, Character.toUpperCase(str.charAt(0)));
-		}
+            if (all_is_upper_case) {
 
-		// http://stackoverflow.com/questions/1143951/what-is-the-simplest-way-to-convert-a-java-string-from-all-caps-words-separated
-		StringBuilder sb = new StringBuilder();
+                str = str.toLowerCase();
+            }
 
-		String[] arr = str.split("_");
+            return Helpers.replace_char_at(str, 0, Character.toUpperCase(str.charAt(0)));
+        }
 
-		for (String s : arr) {
+        // http://stackoverflow.com/questions/1143951/what-is-the-simplest-way-to-convert-a-java-string-from-all-caps-words-separated
+        StringBuilder sb = new StringBuilder();
 
-			if (s.length() == 0) {
-				continue; // E.g. _ALL_FILE_GROUPS
-			}
+        String[] arr = str.split("_");
 
-			// if (i == 0) {
-			//
-			// sb.append(s.toLowerCase());
-			//
-			// } else {
-			sb.append(Character.toUpperCase(s.charAt(0)));
+        for (String s : arr) {
 
-			if (s.length() > 1) {
+            if (s.length() == 0) {
+                continue; // E.g. _ALL_FILE_GROUPS
+            }
 
-				sb.append(s.substring(1).toLowerCase());
-			}
-		}
-		// }
+            // if (i == 0) {
+            //
+            // sb.append(s.toLowerCase());
+            //
+            // } else {
+            sb.append(Character.toUpperCase(s.charAt(0)));
 
-		return sb.toString();
-	}
+            if (s.length() > 1) {
 
-	public static String table_name_to_dto_class_name(String table_name, boolean plural_to_singular) {
+                sb.append(s.substring(1).toLowerCase());
+            }
+        }
+        // }
 
-		String word = to_camel_case(table_name);
+        return sb.toString();
+    }
 
-		if (plural_to_singular) {
+    public static String table_name_to_dto_class_name(String table_name, boolean plural_to_singular) {
 
-			int last_word_index = -1;
+        String word = to_camel_case(table_name);
 
-			String last_word;
+        if (plural_to_singular) {
 
-			for (int i = word.length() - 1; i >= 0; i--) {
+            int last_word_index = -1;
 
-				if (Character.isUpperCase(word.charAt(i))) {
+            String last_word;
 
-					last_word_index = i;
+            for (int i = word.length() - 1; i >= 0; i--) {
 
-					break;
-				}
-			}
+                if (Character.isUpperCase(word.charAt(i))) {
 
-			last_word = word.substring(last_word_index);
-			last_word = EnglishNoun.singularOf(last_word); // makes lowercase
+                    last_word_index = i;
 
-			StringBuilder sb = new StringBuilder();
+                    break;
+                }
+            }
 
-			sb.append(Character.toUpperCase(last_word.charAt(0)));
+            last_word = word.substring(last_word_index);
+            last_word = EnglishNoun.singularOf(last_word); // makes lowercase
 
-			if (last_word.length() > 1) {
+            StringBuilder sb = new StringBuilder();
 
-				sb.append(last_word.substring(1).toLowerCase());
-			}
+            sb.append(Character.toUpperCase(last_word.charAt(0)));
 
-			last_word = sb.toString();
+            if (last_word.length() > 1) {
 
-			if (last_word_index == 0) {
+                sb.append(last_word.substring(1).toLowerCase());
+            }
 
-				word = last_word;
+            last_word = sb.toString();
 
-			} else {
+            if (last_word_index == 0) {
 
-				word = word.substring(0, last_word_index);
-				word = word + last_word;
-			}
-		}
+                word = last_word;
 
-		return word;
-	}
+            } else {
 
-	public static DaoClass create_crud_xml_DaoClass(com.sqldalmaker.jaxb.dao.ObjectFactory object_factory,
-			Connection connection, Set<String> in_use, boolean schema_in_xml, String selected_schema,
-			boolean include_views, boolean crud_auto, boolean add_fk_access, boolean plural_to_singular,
-			boolean underscores_needed) throws SQLException {
+                word = word.substring(0, last_word_index);
+                word = word + last_word;
+            }
+        }
 
-		DaoClass root = object_factory.createDaoClass();
+        return word;
+    }
 
-		List<Object> nodes = root.getCrudOrCrudAutoOrQuery();
+    public static DaoClass create_crud_xml_DaoClass(com.sqldalmaker.jaxb.dao.ObjectFactory object_factory,
+            Connection connection, Set<String> in_use, boolean schema_in_xml, String selected_schema,
+            boolean include_views, boolean crud_auto, boolean add_fk_access, boolean plural_to_singular,
+            boolean underscores_needed) throws SQLException {
 
-		DatabaseMetaData db_info = connection.getMetaData();
+        DaoClass root = object_factory.createDaoClass();
 
-		ResultSet rs = DbUtils.get_tables(connection, db_info, selected_schema, include_views);
+        List<Object> nodes = root.getCrudOrCrudAutoOrQuery();
 
-		try {
+        DatabaseMetaData db_info = connection.getMetaData();
 
-			while (rs.next()) {
+        ResultSet rs = DbUtils.get_tables(connection, db_info, selected_schema, include_views);
 
-				// http://docs.oracle.com/javase/1.4.2/docs/api/java/sql/DatabaseMetaData.html
-				try {
+        try {
+
+            while (rs.next()) {
+
+                // http://docs.oracle.com/javase/1.4.2/docs/api/java/sql/DatabaseMetaData.html
+                try {
 
 //					String table_type = rs.getString("TABLE_TYPE");
 //
@@ -286,229 +305,248 @@ public class SdmUtils {
 //
 //						continue;
 //					}
+                    String table_name = rs.getString("TABLE_NAME");
+
+                    String dto_class_name = table_name_to_dto_class_name(table_name, plural_to_singular);
+
+                    if (schema_in_xml && selected_schema != null && selected_schema.length() > 0) {
+
+                        table_name = selected_schema + "." + table_name;
+                    }
+
+                    if (!in_use.contains(dto_class_name)) {
+
+                        if (crud_auto) {
+
+                            CrudAuto ca = object_factory.createCrudAuto();
+                            ca.setTable(table_name);
+                            ca.setDto(dto_class_name);
+                            nodes.add(ca);
+
+                        } else {
+
+                            Crud crud = object_factory.createCrud();
+                            crud.setDto(dto_class_name);
+                            crud.setTable(table_name);
+
+                            {
+                                TypeMethod tm = new TypeMethod();
+                                String m = "create" + dto_class_name;
+                                if (underscores_needed) {
+                                    m = Helpers.camel_case_to_lower_under_scores(m);
+                                }
+                                tm.setMethod(m);
+                                crud.setCreate(tm);
+                            }
+                            {
+                                TypeMethod tm = new TypeMethod();
+                                String m = "read" + dto_class_name + "List";
+                                if (underscores_needed) {
+                                    m = Helpers.camel_case_to_lower_under_scores(m);
+                                }
+                                tm.setMethod(m);
+                                crud.setReadAll(tm);
+                            }
+                            {
+                                TypeMethod tm = new TypeMethod();
+                                String m = "read" + dto_class_name;
+                                if (underscores_needed) {
+                                    m = Helpers.camel_case_to_lower_under_scores(m);
+                                }
+                                tm.setMethod(m);
+                                crud.setRead(tm);
+                            }
+                            {
+                                TypeMethod tm = new TypeMethod();
+                                String m = "update" + dto_class_name;
+                                if (underscores_needed) {
+                                    m = Helpers.camel_case_to_lower_under_scores(m);
+                                }
+                                tm.setMethod(m);
+                                crud.setUpdate(tm);
+                            }
+                            {
+                                TypeMethod tm = new TypeMethod();
+                                String m = "delete" + dto_class_name;
+                                if (underscores_needed) {
+                                    m = Helpers.camel_case_to_lower_under_scores(m);
+                                }
+                                tm.setMethod(m);
+                                crud.setDelete(tm);
+                            }
 
-					String table_name = rs.getString("TABLE_NAME");
-
-					String dto_class_name = table_name_to_dto_class_name(table_name, plural_to_singular);
-
-					if (schema_in_xml && selected_schema != null && selected_schema.length() > 0) {
-						
-						table_name = selected_schema + "." + table_name;
-					}
-
-					if (!in_use.contains(table_name)) {
-
-						if (crud_auto) {
-
-							CrudAuto ca = object_factory.createCrudAuto();
-							ca.setTable(table_name);
-							ca.setDto(dto_class_name);
-							nodes.add(ca);
-
-						} else {
-
-							Crud crud = object_factory.createCrud();
-							crud.setDto(dto_class_name);
-							crud.setTable(table_name);
-
-							{
-								TypeMethod tm = new TypeMethod();
-								String m = "create" + dto_class_name;
-								if (underscores_needed) {
-									m = Helpers.camel_case_to_lower_under_scores(m);
-								}
-								tm.setMethod(m);
-								crud.setCreate(tm);
-							}
-							{
-								TypeMethod tm = new TypeMethod();
-								String m = "read" + dto_class_name + "List";
-								if (underscores_needed) {
-									m = Helpers.camel_case_to_lower_under_scores(m);
-								}
-								tm.setMethod(m);
-								crud.setReadAll(tm);
-							}
-							{
-								TypeMethod tm = new TypeMethod();
-								String m = "read" + dto_class_name;
-								if (underscores_needed) {
-									m = Helpers.camel_case_to_lower_under_scores(m);
-								}
-								tm.setMethod(m);
-								crud.setRead(tm);
-							}
-							{
-								TypeMethod tm = new TypeMethod();
-								String m = "update" + dto_class_name;
-								if (underscores_needed) {
-									m = Helpers.camel_case_to_lower_under_scores(m);
-								}
-								tm.setMethod(m);
-								crud.setUpdate(tm);
-							}
-							{
-								TypeMethod tm = new TypeMethod();
-								String m = "delete" + dto_class_name;
-								if (underscores_needed) {
-									m = Helpers.camel_case_to_lower_under_scores(m);
-								}
-								tm.setMethod(m);
-								crud.setDelete(tm);
-							}
+                            nodes.add(crud);
+                        }
 
-							nodes.add(crud);
-						}
+                        if (add_fk_access) {
 
-						if (add_fk_access) {
+                            add_fk_access(underscores_needed, connection, schema_in_xml, selected_schema, db_info, rs,
+                                    nodes, plural_to_singular);
+                        }
 
-							add_fk_access(underscores_needed, connection, schema_in_xml, selected_schema, db_info, rs,
-									nodes, plural_to_singular);
-						}
+                    }
 
-					}
+                } catch (SQLException e) {
 
-				} catch (SQLException e) {
+                    // just skip
+                }
+            }
 
-					// just skip
-				}
-			}
+        } finally {
 
-		} finally {
+            rs.close();
+        }
 
-			rs.close();
-		}
+        return root;
+    }
 
-		return root;
-	}
+    public static DaoClass get_fk_access_xml(Connection conn, ObjectFactory object_factory, boolean schema_in_xml,
+            String selected_schema, boolean plural_to_singular, boolean underscores_needed) throws SQLException {
 
-	public static DaoClass get_fk_access_xml(Connection conn, ObjectFactory object_factory, boolean schema_in_xml,
-			String selected_schema, boolean plural_to_singular, boolean underscores_needed) throws SQLException {
+        DaoClass root = object_factory.createDaoClass();
 
-		DaoClass root = object_factory.createDaoClass();
+        List<Object> nodes = root.getCrudOrCrudAutoOrQuery();
 
-		List<Object> nodes = root.getCrudOrCrudAutoOrQuery();
+        DatabaseMetaData db_info = conn.getMetaData();
 
-		DatabaseMetaData db_info = conn.getMetaData();
+        ResultSet rs = DbUtils.get_tables(conn, db_info, selected_schema, /* include_views */ false); // no FK in views
 
-		ResultSet rs = DbUtils.get_tables(conn, db_info, selected_schema, /* include_views */ false); // no FK in views
+        try {
 
-		try {
+            while (rs.next()) {
 
-			while (rs.next()) {
+                add_fk_access(underscores_needed, conn, schema_in_xml, selected_schema, db_info, rs, nodes,
+                        plural_to_singular);
+            }
 
-				add_fk_access(underscores_needed, conn, schema_in_xml, selected_schema, db_info, rs, nodes,
-						plural_to_singular);
-			}
+        } finally {
 
-		} finally {
+            rs.close();
+        }
 
-			rs.close();
-		}
+        return root;
+    }
 
-		return root;
-	}
+    public static DtoClasses get_crud_dto_xml(com.sqldalmaker.jaxb.dto.ObjectFactory object_factory, Connection con,
+            Set<String> in_use, boolean schema_in_xml, String selected_schema, boolean include_views,
+            boolean plural_to_singular) throws SQLException {
 
-	public static DtoClasses get_crud_dto_xml(com.sqldalmaker.jaxb.dto.ObjectFactory object_factory, Connection con,
-			Set<String> in_use, boolean schema_in_xml, String selected_schema, boolean include_views,
-			boolean plural_to_singular) throws SQLException {
+        DtoClasses root = object_factory.createDtoClasses();
 
-		DtoClasses root = object_factory.createDtoClasses();
+        List<DtoClass> items = root.getDtoClass();
 
-		List<DtoClass> items = root.getDtoClass();
+        DatabaseMetaData db_info = con.getMetaData();
 
-		DatabaseMetaData db_info = con.getMetaData();
+        ResultSet rs = DbUtils.get_tables(con, db_info, selected_schema, include_views);
 
-		ResultSet rs = DbUtils.get_tables(con, db_info, selected_schema, include_views);
+        try {
 
-		try {
+            while (rs.next()) {
 
-			while (rs.next()) {
+                String table_name = rs.getString("TABLE_NAME");
 
-				String table_name = rs.getString("TABLE_NAME");
+                String dto_class_name = table_name_to_dto_class_name(table_name, plural_to_singular);
 
-				String dto_class_name = SdmUtils.table_name_to_dto_class_name(table_name, plural_to_singular);
+                if (schema_in_xml && selected_schema != null && selected_schema.length() > 0) {
 
-				if (schema_in_xml && selected_schema != null && selected_schema.length() > 0) {
-					
-					table_name = selected_schema + "." + table_name;
-				}
+                    table_name = selected_schema + "." + table_name;
+                }
 
-				if (!in_use.contains(table_name)) {
+                if (!in_use.contains(dto_class_name)) {
 
-					DtoClass cls = object_factory.createDtoClass();
-					cls.setName(dto_class_name);
-					cls.setRef(/* "table:" + */table_name);
-					items.add(cls);
-				}
-			}
+                    DtoClass cls = object_factory.createDtoClass();
+                    cls.setName(dto_class_name);
+                    cls.setRef(table_name);
+                    items.add(cls);
+                }
+            }
 
-		} finally {
+        } finally {
 
-			rs.close();
-		}
+            rs.close();
+        }
 
-		return root;
-	}
+        return root;
+    }
 
-	// for Java
-	public static String get_package_relative_path(Settings settings, String package_name) {
+    // for Java
+    public static String get_package_relative_path(Settings settings, String package_name) {
 
-		String source_folder = settings.getFolders().getTarget();
+        String source_folder = settings.getFolders().getTarget();
 
-		if (package_name.length() == 0) {
+        if (package_name.length() == 0) {
 
-			return source_folder;
-		}
+            return source_folder;
+        }
 
-		return source_folder + "/" + package_name.replace(".", "/");
-	}
+        return source_folder + "/" + package_name.replace(".", "/");
+    }
 
-	public static void gen_tmp_field_tags(Connection connection, com.sqldalmaker.jaxb.dto.ObjectFactory object_factory,
-			DtoClass dto_class, String sql_root_folder_full_path) throws Exception {
+    public static void gen_tmp_field_tags(Connection connection, com.sqldalmaker.jaxb.dto.ObjectFactory object_factory,
+            DtoClass dto_class, String sql_root_folder_full_path) throws Exception {
 
-		DbUtils db_utils = new DbUtils(connection, FieldNamesMode.AS_IS, null);
+        DbUtils db_utils = new DbUtils(connection, FieldNamesMode.AS_IS, null);
 
-		String jdbc_sql = db_utils.jdbc_sql_by_ref_query(dto_class.getRef(), sql_root_folder_full_path);
+        String jdbc_sql = db_utils.jdbc_sql_by_ref_query(dto_class.getRef(), sql_root_folder_full_path);
 
-		ArrayList<FieldInfo> fields = new ArrayList<FieldInfo>();
+        ArrayList<FieldInfo> fields = new ArrayList<FieldInfo>();
 
-		db_utils.get_dto_field_info(jdbc_sql, dto_class, fields);
+        db_utils.get_dto_field_info(jdbc_sql, dto_class, fields);
 
-		for (FieldInfo f : fields) {
+        for (FieldInfo f : fields) {
 
-			DtoClass.Field df = object_factory.createDtoClassField();
-			df.setColumn(f.getColumnName());
-			df.setJavaType(f.getType());
-			dto_class.getField().add(df);
-		}
-	}
+            DtoClass.Field df = object_factory.createDtoClassField();
+            df.setColumn(f.getColumnName());
+            df.setJavaType(f.getType());
+            dto_class.getField().add(df);
+        }
+    }
 
-	public static List<DtoClass> get_dto_classes(String dto_xml_abs_file_path, String dto_xsd_abs_file_path)
-			throws Exception {
+    public static List<DtoClass> get_dto_classes(String dto_xml_abs_file_path, String dto_xsd_abs_file_path)
+            throws Exception {
 
-		String context_path = DtoClasses.class.getPackage().getName();
+        String context_path = DtoClasses.class.getPackage().getName();
 
-		XmlParser xml_parser = new XmlParser(context_path, dto_xsd_abs_file_path);
+        XmlParser xml_parser = new XmlParser(context_path, dto_xsd_abs_file_path);
 
-		DtoClasses elements = xml_parser.unmarshal(dto_xml_abs_file_path);
+        DtoClasses elements = xml_parser.unmarshal(dto_xml_abs_file_path);
 
-		List<DtoClass> res = new ArrayList<DtoClass>(elements.getDtoClass());
+        List<DtoClass> res = new ArrayList<DtoClass>(elements.getDtoClass());
 
-		return res;
-	}
+        return res;
+    }
 
-	public static Settings load_settings(String folder_abs_path) throws Exception {
+    public static Set<String> get_dto_classes_names_used_in_dto_xml(String dto_xml_abs_file_path,
+            String dto_xsd_abs_file_path) throws Exception {
 
-		String config_xml_abs_path = folder_abs_path + "/" + Const.SETTINGS_XML;
-		String config_xsd_abs_path = folder_abs_path + "/" + Const.SETTINGS_XSD;
+        Set<String> res = new HashSet<String>();
 
-		String context_path = Settings.class.getPackage().getName();
+        List<DtoClass> list = SdmUtils.get_dto_classes(dto_xml_abs_file_path, dto_xsd_abs_file_path);
 
-		XmlParser config_xml_parser = new XmlParser(context_path, config_xsd_abs_path);
+        for (DtoClass cls : list) {
 
-		Settings res = config_xml_parser.unmarshal(config_xml_abs_path);
+            String class_name = cls.getName();
 
-		return res;
-	}
+            if (!res.contains(class_name)) {
+
+                res.add(class_name);
+            }
+        }
+
+        return res;
+    }
+
+    public static Settings load_settings(String folder_abs_path) throws Exception {
+
+        String config_xml_abs_path = folder_abs_path + "/" + Const.SETTINGS_XML;
+        String config_xsd_abs_path = folder_abs_path + "/" + Const.SETTINGS_XSD;
+
+        String context_path = Settings.class.getPackage().getName();
+
+        XmlParser config_xml_parser = new XmlParser(context_path, config_xsd_abs_path);
+
+        Settings res = config_xml_parser.unmarshal(config_xml_abs_path);
+
+        return res;
+    }
 }

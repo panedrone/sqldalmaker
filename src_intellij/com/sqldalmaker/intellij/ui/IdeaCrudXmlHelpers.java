@@ -1,26 +1,31 @@
 /*
- * Copyright 2011-2018 sqldalmaker@gmail.com
+ * Copyright 2011-2019 sqldalmaker@gmail.com
  * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
  * Read LICENSE.txt in the root of this project/archive for details.
+ *
  */
 package com.sqldalmaker.intellij.ui;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.sqldalmaker.cg.DbUtils;
 import com.sqldalmaker.cg.Helpers;
 import com.sqldalmaker.common.*;
-import com.sqldalmaker.jaxb.dao.*;
-import com.sqldalmaker.jaxb.dto.DtoClass;
+import com.sqldalmaker.common.FileSearchHelpers.IFile_List;
+import com.sqldalmaker.jaxb.dao.DaoClass;
 import com.sqldalmaker.jaxb.dto.DtoClasses;
 import com.sqldalmaker.jaxb.settings.Settings;
 
 import java.sql.Connection;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
- * The class to control DTO XML assistant, DAO XML assistant, FK access XML
- * assistant
+ * The class to control
+ * <p>
+ * - DTO XML assistant
+ * - DAO XML assistant
+ * - FK access XML assistant
  * <p>
  * Created with IntelliJ IDEA.
  * User: sqldalmaker@gmail.com
@@ -52,7 +57,7 @@ public class IdeaCrudXmlHelpers {
 
                         if (skip_used) {
 
-                            in_use = find_tables_used_in_dto_xml(root_file);
+                            in_use = find_dto_declared_in_dto_xml(root_file);
 
                         } else {
 
@@ -90,33 +95,14 @@ public class IdeaCrudXmlHelpers {
         }
     }
 
-    private static Set<String> find_tables_used_in_dto_xml(VirtualFile root_file) throws Exception {
-
-        Set<String> res = new HashSet<String>();
+    private static Set<String> find_dto_declared_in_dto_xml(VirtualFile root_file) throws Exception {
 
         String xml_configs_folder_full_path = root_file.getParent().getPath();
 
-        String dto_xml_abs_path = xml_configs_folder_full_path + "/" + Const.DTO_XML;
+        String dto_xml_abs_file_path = Helpers.concat_path(xml_configs_folder_full_path, Const.DTO_XML);
+        String dto_xsd_abs_file_path = Helpers.concat_path(xml_configs_folder_full_path, Const.DTO_XSD);
 
-        String dto_xsd_abs_path = xml_configs_folder_full_path + "/" + Const.DTO_XSD;
-
-        List<DtoClass> list = SdmUtils.get_dto_classes(dto_xml_abs_path, dto_xsd_abs_path);
-
-        for (DtoClass cls : list) {
-
-            String ref = cls.getRef();
-
-            if (ref.startsWith("table:")) {
-
-                String[] parts = ref.split(":");
-                String table_name = parts[1];
-                res.add(table_name);
-
-            } else if (DbUtils.is_table_ref(ref)) {
-
-                res.add(ref);
-            }
-        }
+        Set<String> res = SdmUtils.get_dto_classes_names_used_in_dto_xml(dto_xml_abs_file_path, dto_xsd_abs_file_path);
 
         return res;
     }
@@ -125,7 +111,7 @@ public class IdeaCrudXmlHelpers {
 
         final ArrayList<String> res = new ArrayList<String>();
 
-        FileSearchHelpers.IFile_List file_list = new FileSearchHelpers.IFile_List() {
+        FileSearchHelpers.IFile_List file_list = new IFile_List() {
 
             @Override
             public void add(String file_path) {
@@ -140,27 +126,13 @@ public class IdeaCrudXmlHelpers {
         return res;
     }
 
-    private static Set<String> find_tables_used_in_dao_xml(VirtualFile root_file) throws Exception {
+    private static Set<String> find_dto_used_in_dao_xml_crud(VirtualFile root_file) throws Exception {
 
-        Set<String> res = new HashSet<String>();
-
-        ArrayList<String> dao_file_path_list = fill_dao_file_path_list(root_file);
+        ArrayList<String> dao_xml_file_name_list = fill_dao_file_path_list(root_file);
 
         String meta_program_folder_abs_path = root_file.getParent().getPath();
 
-        String context_path = DaoClass.class.getPackage().getName();
-
-        XmlParser xml_parser = new XmlParser(context_path,
-                Helpers.concat_path(meta_program_folder_abs_path, Const.DAO_XSD));
-
-        for (String file_path : dao_file_path_list) {
-
-            String xml_file_abs_path = Helpers.concat_path(meta_program_folder_abs_path, file_path);
-
-            Set<String> dao_tables = SdmUtils.find_tables_in_use(xml_parser, xml_file_abs_path);
-
-            res.addAll(dao_tables);
-        }
+        Set<String> res = SdmUtils.find_dto_used_in_dao_xml_crud(meta_program_folder_abs_path, dao_xml_file_name_list);
 
         return res;
     }
@@ -191,7 +163,7 @@ public class IdeaCrudXmlHelpers {
 
                         if (skip_used) {
 
-                            in_use = find_tables_used_in_dao_xml(root_file);
+                            in_use = find_dto_used_in_dao_xml_crud(root_file);
 
                         } else {
 

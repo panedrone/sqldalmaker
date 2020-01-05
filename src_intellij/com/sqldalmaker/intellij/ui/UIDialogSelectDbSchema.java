@@ -34,7 +34,7 @@ public class UIDialogSelectDbSchema extends JDialog {
     private JButton buttonOK;
     private JButton buttonCancel;
     private JTable table;
-    private JCheckBox chk_skip;
+    private JCheckBox chk_omit;
     private JCheckBox chk_singular;
     private JRadioButton crudRadioButton;
     private JRadioButton crudAutoRadioButton;
@@ -112,7 +112,7 @@ public class UIDialogSelectDbSchema extends JDialog {
         }
 
         if (fk) {
-            this.chk_skip.setVisible(false);
+            this.chk_omit.setVisible(false);
             this.chk_including_views.setVisible(false);
         }
 
@@ -200,7 +200,7 @@ public class UIDialogSelectDbSchema extends JDialog {
     private void onOK() {
 
         callback.process_ok(chk_schema_in_xml.isSelected(), selected_schema,
-                chk_skip.isSelected(), chk_including_views.isSelected(), chk_singular.isSelected(),
+                chk_omit.isSelected(), chk_including_views.isSelected(), chk_singular.isSelected(),
                 crudAutoRadioButton.isSelected(), chk_add_fk_access.isSelected());
 
         dispose();
@@ -263,6 +263,7 @@ public class UIDialogSelectDbSchema extends JDialog {
 
                     lbl_hint.setText("Select schema or click 'DB user name as schema'. Provide options.");
                     radio_selected_schema.setText("Use selected schema");
+                    chk_schema_in_xml.setSelected(true);
                 }
 
             } finally {
@@ -323,10 +324,10 @@ public class UIDialogSelectDbSchema extends JDialog {
         panel5.add(scrollPane1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
         table = new JTable();
         scrollPane1.setViewportView(table);
-        chk_skip = new JCheckBox();
-        chk_skip.setSelected(true);
-        chk_skip.setText("Skip tables/views used in existing declarations");
-        panel5.add(chk_skip, new GridConstraints(3, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        chk_omit = new JCheckBox();
+        chk_omit.setSelected(true);
+        chk_omit.setText("Omit DTO that are already used in existing CRUD XML declarations");
+        panel5.add(chk_omit, new GridConstraints(3, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         chk_singular = new JCheckBox();
         chk_singular.setSelected(true);
         chk_singular.setText("English plural to English singular for DTO class names");
