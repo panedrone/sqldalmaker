@@ -11,9 +11,6 @@ import com.intellij.openapi.fileTypes.FileTypes;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.testFramework.LightVirtualFile;
-import com.sqldalmaker.cg.DbUtils;
-import com.sqldalmaker.cg.FieldInfo;
-import com.sqldalmaker.cg.FieldNamesMode;
 import com.sqldalmaker.common.Const;
 import com.sqldalmaker.common.InternalException;
 import com.sqldalmaker.common.SdmUtils;
@@ -24,7 +21,6 @@ import com.sqldalmaker.jaxb.dto.ObjectFactory;
 import com.sqldalmaker.jaxb.settings.Settings;
 
 import java.sql.Connection;
-import java.util.ArrayList;
 
 /**
  * Created with IntelliJ IDEA.

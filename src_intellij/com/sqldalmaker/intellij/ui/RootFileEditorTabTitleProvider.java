@@ -8,6 +8,7 @@ package com.sqldalmaker.intellij.ui;
 import com.intellij.openapi.fileEditor.impl.EditorTabTitleProvider;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Created with IntelliJ IDEA.
@@ -17,7 +18,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 public class RootFileEditorTabTitleProvider implements EditorTabTitleProvider {
 
     @Override
-    public String getEditorTabTitle(Project project, VirtualFile file) {
+    public String getEditorTabTitle(@NotNull Project project, @NotNull VirtualFile file) {
 
         return IdeaTargetLanguageHelpers.get_root_file_relative_path(project, file);
     }

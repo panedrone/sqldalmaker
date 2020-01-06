@@ -1,7 +1,8 @@
 /*
- * Copyright 2011-2018 sqldalmaker@gmail.com
+ * Copyright 2011-2020 sqldalmaker@gmail.com
  * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
  * Read LICENSE.txt in the root of this project/archive for details.
+ *
  */
 package com.sqldalmaker.cg;
 
@@ -30,968 +31,970 @@ import java.util.Map;
  */
 public class Helpers {
 
-	// http://stackoverflow.com/questions/5032898/how-to-instantiate-class-class-for-a-primitive-type
-	public static final Map<String, Class<?>> PRIMITIVE_CLASSES = new HashMap<String, Class<?>>();
+    // http://stackoverflow.com/questions/5032898/how-to-instantiate-class-class-for-a-primitive-type
+    public static final Map<String, Class<?>> PRIMITIVE_CLASSES = new HashMap<String, Class<?>>();
 
-	private static final String IFN = "Invalid file name: ";
+    private static final String IFN = "Invalid file name: ";
 
-	static {
+    static {
 
-		// Use the wrapper variant if necessary, like Integer.class,
-		// so that you can instantiate it.
-		// http://www.idevelopment.info/data/Programming/java/miscellaneous_java/Java_Primitive_Types.html
-		PRIMITIVE_CLASSES.put("byte", Byte.class);
-		PRIMITIVE_CLASSES.put("short", Short.class);
-		PRIMITIVE_CLASSES.put("char", Character.class);
-		PRIMITIVE_CLASSES.put("int", Integer.class);
-		PRIMITIVE_CLASSES.put("long", Long.class);
-		PRIMITIVE_CLASSES.put("float", Float.class);
-		PRIMITIVE_CLASSES.put("double", Double.class);
-	}
+        // Use the wrapper variant if necessary, like Integer.class,
+        // so that you can instantiate it.
+        // http://www.idevelopment.info/data/Programming/java/miscellaneous_java/Java_Primitive_Types.html
+        PRIMITIVE_CLASSES.put("byte", Byte.class);
+        PRIMITIVE_CLASSES.put("short", Short.class);
+        PRIMITIVE_CLASSES.put("char", Character.class);
+        PRIMITIVE_CLASSES.put("int", Integer.class);
+        PRIMITIVE_CLASSES.put("long", Long.class);
+        PRIMITIVE_CLASSES.put("float", Float.class);
+        PRIMITIVE_CLASSES.put("double", Double.class);
+    }
 
-	public static String[] parse_method_params(String src) throws Exception {
+    public static String[] parse_method_params(String src) throws Exception {
 
-		String before_brackets;
+        String before_brackets;
 
-		String inside_brackets;
+        String inside_brackets;
 
-		src = src.trim();
+        src = src.trim();
 
-		int pos = src.indexOf('(');
+        int pos = src.indexOf('(');
 
-		if (pos == -1) {
+        if (pos == -1) {
 
-			before_brackets = src;
+            before_brackets = src;
 
-			inside_brackets = "";
+            inside_brackets = "";
 
-		} else {
+        } else {
 
-			if (!src.endsWith(")")) {
+            if (!src.endsWith(")")) {
 
-				throw new Exception("')' expected");
-			}
+                throw new Exception("')' expected");
+            }
 
-			before_brackets = src.substring(0, pos);
+            before_brackets = src.substring(0, pos);
 
-			inside_brackets = src.substring(before_brackets.length() + 1, src.length() - 1);
-		}
+            inside_brackets = src.substring(before_brackets.length() + 1, src.length() - 1);
+        }
 
-		return new String[] { before_brackets, inside_brackets };
-	}
+        return new String[]{before_brackets, inside_brackets};
+    }
 
-	public static String camel_case_to_lower_under_scores(String src) {
+    public static String camel_case_to_lower_under_scores(String src) {
 
-		// http://stackoverflow.com/questions/10310321/regex-for-converting-camelcase-to-camel-case-in-java
-		String regex = "([a-z])([A-Z]+)";
+        // http://stackoverflow.com/questions/10310321/regex-for-converting-camelcase-to-camel-case-in-java
+        String regex = "([a-z])([A-Z]+)";
 
-		String replacement = "$1_$2";
+        String replacement = "$1_$2";
 
-		return src.replaceAll(regex, replacement).toLowerCase();
-	}
+        return src.replaceAll(regex, replacement).toLowerCase();
+    }
 
-	public static String convert_to_ruby_file_name(String class_name) {
+    public static String convert_to_ruby_file_name(String class_name) {
 
-		// http://stackoverflow.com/questions/221320/standard-file-naming-conventions-in-ruby
-		// In Rails the convention of using underscores is necessary (almost).
-		return Helpers.camel_case_to_lower_under_scores(class_name) + ".rb";
-	}
+        // http://stackoverflow.com/questions/221320/standard-file-naming-conventions-in-ruby
+        // In Rails the convention of using underscores is necessary (almost).
+        return Helpers.camel_case_to_lower_under_scores(class_name) + ".rb";
+    }
 
-	private static String try_convert_primitive(String name) {
+    private static String java_primitive_name_to_class_name(String name) {
 
-		if (PRIMITIVE_CLASSES.containsKey(name)) {
+        Class<?> clazz = PRIMITIVE_CLASSES.get(name);
 
-			return PRIMITIVE_CLASSES.get(name).getName();
+        if (clazz != null) {
 
-		} else {
+            return clazz.getName();
 
-			return name;
-		}
-	}
+        } else {
 
-	public static String process_class_name(String java_class_name) throws ClassNotFoundException {
+            return name;
+        }
+    }
 
-		java_class_name = try_convert_primitive(java_class_name);
+    public static String process_java_type_name(String java_type_name) throws ClassNotFoundException {
 
-		// does not throw Exception for "[B"; returns byte[]
-		Class<?> cl = Class.forName(java_class_name);
+        java_type_name = java_primitive_name_to_class_name(java_type_name);
 
-		if (cl.isArray()) {
+        // does not throw Exception for "[B"; returns byte[]
+        Class<?> cl = Class.forName(java_type_name);
 
-			// Returns the simple name of the underlying class as given in
-			// the source code. Returns an empty string if the underlying
-			// class is anonymous. The simple name of an array is the simple
-			// name of the component type with "[]" appended.
-			// In particular the simple name of an array whose component
-			// type is anonymous is "[]".
-			java_class_name = cl.getSimpleName();
+        if (cl.isArray()) {
 
-		} else if (java.sql.Date.class.equals(cl) || Time.class.equals(cl) || Timestamp.class.equals(cl)) {
+            // Returns the simple name of the underlying class as given in
+            // the source code. Returns an empty string if the underlying
+            // class is anonymous. The simple name of an array is the simple
+            // name of the component type with "[]" appended.
+            // In particular the simple name of an array whose component
+            // type is anonymous is "[]".
+            java_type_name = cl.getSimpleName();
 
-			// JDBC date-time types will be rendered as java.util.Date.
-			// To assign parameter of type java.util.Date it should be
-			// converted to java.sql.Timestamp
-			return java.util.Date.class.getName();
-		}
+        } else if (java.sql.Date.class.equals(cl) || Time.class.equals(cl) || Timestamp.class.equals(cl)) {
 
-		return java_class_name;
-	}
+            // JDBC date-time types will be rendered as java.util.Date.
+            // To assign parameter of type java.util.Date it should be
+            // converted to java.sql.Timestamp
+            return java.util.Date.class.getName();
+        }
 
-	public static String get_error_message(String msg, Throwable e) {
+        return java_type_name;
+    }
 
-		return msg + " " + e.getMessage();
-	}
+    public static String get_error_message(String msg, Throwable e) {
 
-	public static String replace_char_at(String s, int pos, char c) {
+        return msg + " " + e.getMessage();
+    }
 
-		// http://www.rgagnon.com/javadetails/java-0030.html
-		StringBuilder buf = new StringBuilder(s);
+    public static String replace_char_at(String s, int pos, char c) {
 
-		buf.setCharAt(pos, c);
+        // http://www.rgagnon.com/javadetails/java-0030.html
+        StringBuilder buf = new StringBuilder(s);
 
-		return buf.toString();
-	}
+        buf.setCharAt(pos, c);
 
-	public static boolean is_upper_case(String str) {
+        return buf.toString();
+    }
 
-		for (int i = 0; i < str.length(); i++) {
+    public static boolean is_upper_case(String str) {
 
-			if (Character.isLowerCase(str.charAt(i))) {
+        for (int i = 0; i < str.length(); i++) {
 
-				return false;
-			}
-		}
+            if (Character.isLowerCase(str.charAt(i))) {
 
-		return str.length() > 0;
-	}
+                return false;
+            }
+        }
 
-	public static String concat_path(String seg0, String seg1) {
+        return str.length() > 0;
+    }
 
-		return seg0 + "/" + seg1;
-	}
+    public static String concat_path(String seg0, String seg1) {
 
-	public static String concat_path(String seg0, String seg1, String seg2) {
+        return seg0 + "/" + seg1;
+    }
 
-		String res = concat_path(seg0, seg1);
+    public static String concat_path(String seg0, String seg1, String seg2) {
 
-		return concat_path(res, seg2);
-	}
+        String res = concat_path(seg0, seg1);
 
-	public static String get_xml_node_name(Object element) {
+        return concat_path(res, seg2);
+    }
 
-		XmlRootElement attr = element.getClass().getAnnotation(XmlRootElement.class);
+    public static String get_xml_node_name(Object element) {
 
-		return attr.name();
-	}
+        XmlRootElement attr = element.getClass().getAnnotation(XmlRootElement.class);
 
-	public static String sql_to_java_str(StringBuilder sql_buff) {
+        return attr.name();
+    }
 
-		return sql_to_java_str(sql_buff.toString());
-	}
+    public static String sql_to_java_str(StringBuilder sql_buff) {
 
-	public static String sql_to_java_str(String sql) {
+        return sql_to_java_str(sql_buff.toString());
+    }
 
-		String[] parts = sql.split("(\\n|\\r)+");
+    public static String sql_to_java_str(String sql) {
 
-		// "\n" it is OK for Eclipse debugger window:
-		String new_line = "\n"; // System.getProperty("line.separator");
+        String[] parts = sql.split("(\\n|\\r)+");
 
-		StringBuilder res = new StringBuilder();
+        // "\n" it is OK for Eclipse debugger window:
+        String new_line = "\n"; // System.getProperty("line.separator");
 
-		for (int i = 0; i < parts.length; i++) {
+        StringBuilder res = new StringBuilder();
 
-			String j_str = parts[i].replace('\t', ' ');
+        for (int i = 0; i < parts.length; i++) {
 
-			// packed into Velocity JAR:
-			j_str = org.apache.commons.lang.StringEscapeUtils.escapeJava(j_str);
+            String j_str = parts[i].replace('\t', ' ');
 
-			// fix the bug in StringEscapeUtils:
-			// case '/':
-			// out.write('\\');
-			// out.write('/');
-			// break;
-			j_str = j_str.replace("\\/", "/");
+            // packed into Velocity JAR:
+            j_str = org.apache.commons.lang.StringEscapeUtils.escapeJava(j_str);
 
-			res.append(j_str);
+            // fix the bug in StringEscapeUtils:
+            // case '/':
+            // out.write('\\');
+            // out.write('/');
+            // break;
+            j_str = j_str.replace("\\/", "/");
 
-			if (i < parts.length - 1) {
+            res.append(j_str);
 
-				String s = " \" " + new_line + "\t\t\t\t + \"";
+            if (i < parts.length - 1) {
 
-				res.append(s);
-			}
-		}
+                String s = " \" " + new_line + "\t\t\t\t + \"";
 
-		return res.toString();
-	}
+                res.append(s);
+            }
+        }
 
-	public static String sql_to_php_str(StringBuilder sql_buff) {
+        return res.toString();
+    }
 
-		return Helpers.sql_to_php_str(sql_buff.toString());
-	}
+    public static String sql_to_php_str(StringBuilder sql_buff) {
 
-	public static String sql_to_php_str(String sql) {
+        return Helpers.sql_to_php_str(sql_buff.toString());
+    }
 
-		String[] parts = sql.split("(\\n|\\r)+");
+    public static String sql_to_php_str(String sql) {
 
-		String new_line = "\n"; // System.getProperty("line.separator");
+        String[] parts = sql.split("(\\n|\\r)+");
 
-		StringBuilder res = new StringBuilder();
+        String new_line = "\n"; // System.getProperty("line.separator");
 
-		for (int i = 0; i < parts.length; i++) {
+        StringBuilder res = new StringBuilder();
 
-			String j_str = parts[i].replace('\t', ' ');
+        for (int i = 0; i < parts.length; i++) {
 
-			// packed into Velocity JAR:
-			j_str = org.apache.commons.lang.StringEscapeUtils.escapeJava(j_str);
+            String j_str = parts[i].replace('\t', ' ');
 
-			// fix the bug in StringEscapeUtils:
-			// case '/':
-			// out.write('\\');
-			// out.write('/');
-			// break;
-			j_str = j_str.replace("\\/", "/");
+            // packed into Velocity JAR:
+            j_str = org.apache.commons.lang.StringEscapeUtils.escapeJava(j_str);
 
-			res.append(j_str);
+            // fix the bug in StringEscapeUtils:
+            // case '/':
+            // out.write('\\');
+            // out.write('/');
+            // break;
+            j_str = j_str.replace("\\/", "/");
 
-			if (i < parts.length - 1) {
+            res.append(j_str);
 
-				String s = " \" " + new_line + "\t\t\t\t . \"";
+            if (i < parts.length - 1) {
 
-				res.append(s);
-			}
-		}
+                String s = " \" " + new_line + "\t\t\t\t . \"";
 
-		return res.toString();
-	}
+                res.append(s);
+            }
+        }
 
-	public static String sql_to_python_string(StringBuilder sql_buff) {
+        return res.toString();
+    }
 
-		return sql_to_python_string(sql_buff.toString());
-	}
+    public static String sql_to_python_string(StringBuilder sql_buff) {
 
-	public static String sql_to_ruby_string(StringBuilder sql_buff) {
+        return sql_to_python_string(sql_buff.toString());
+    }
 
-		return sql_to_ruby_string(sql_buff.toString());
-	}
+    public static String sql_to_ruby_string(StringBuilder sql_buff) {
 
-	public static String sql_to_ruby_string(String sql) {
+        return sql_to_ruby_string(sql_buff.toString());
+    }
 
-		return sql_to_python_string(sql);
-	}
+    public static String sql_to_ruby_string(String sql) {
 
-	public static String sql_to_python_string(String sql) {
+        return sql_to_python_string(sql);
+    }
 
-		String[] parts = sql.split("(\\n|\\r)+");
+    public static String sql_to_python_string(String sql) {
 
-		String new_line = "\n"; // System.getProperty("line.separator");
+        String[] parts = sql.split("(\\n|\\r)+");
 
-		StringBuilder res = new StringBuilder();
+        String new_line = "\n"; // System.getProperty("line.separator");
 
-		for (int i = 0; i < parts.length; i++) {
+        StringBuilder res = new StringBuilder();
 
-			String j_str = parts[i].replace('\t', ' ');
+        for (int i = 0; i < parts.length; i++) {
 
-			// packed into Velocity JAR:
-			j_str = org.apache.commons.lang.StringEscapeUtils.escapeJava(j_str);
+            String j_str = parts[i].replace('\t', ' ');
 
-			// fix the bug in StringEscapeUtils:
-			// case '/':
-			// out.write('\\');
-			// out.write('/');
-			// break;
-			j_str = j_str.replace("\\/", "/");
+            // packed into Velocity JAR:
+            j_str = org.apache.commons.lang.StringEscapeUtils.escapeJava(j_str);
 
-			res.append(j_str);
+            // fix the bug in StringEscapeUtils:
+            // case '/':
+            // out.write('\\');
+            // out.write('/');
+            // break;
+            j_str = j_str.replace("\\/", "/");
 
-			if (i < parts.length - 1) { // python wants 4 spaces instead of 1 tab
+            res.append(j_str);
 
-				String s = " " + new_line + "                ";
+            if (i < parts.length - 1) { // python wants 4 spaces instead of 1 tab
 
-				res.append(s);
-			}
-		}
+                String s = " " + new_line + "                ";
 
-		return res.toString();
-	}
+                res.append(s);
+            }
+        }
 
-	public static String sql_to_cpp_str(StringBuilder sql_buff) {
+        return res.toString();
+    }
 
-		return sql_to_cpp_str(sql_buff.toString());
-	}
+    public static String sql_to_cpp_str(StringBuilder sql_buff) {
 
-	public static String sql_to_cpp_str(String sql) {
+        return sql_to_cpp_str(sql_buff.toString());
+    }
 
-		String[] parts = sql.split("(\\n|\\r)+");
+    public static String sql_to_cpp_str(String sql) {
 
-		String new_line = System.getProperty("line.separator");
+        String[] parts = sql.split("(\\n|\\r)+");
 
-		String new_line_j = org.apache.commons.lang.StringEscapeUtils.escapeJava("\n");
+        String new_line = System.getProperty("line.separator");
 
-		StringBuilder res = new StringBuilder();
+        String new_line_j = org.apache.commons.lang.StringEscapeUtils.escapeJava("\n");
 
-		res.append("\"");
+        StringBuilder res = new StringBuilder();
 
-		for (int i = 0; i < parts.length; i++) {
+        res.append("\"");
 
-			String j_str = parts[i].replace('\t', ' ');
+        for (int i = 0; i < parts.length; i++) {
 
-			// packed into Velocity JAR:
-			j_str = org.apache.commons.lang.StringEscapeUtils.escapeJava(j_str);
+            String j_str = parts[i].replace('\t', ' ');
 
-			// fix the bug in StringEscapeUtils:
-			// case '/':
-			// out.write('\\');
-			// out.write('/');
-			// break;
-			j_str = j_str.replace("\\/", "/");
+            // packed into Velocity JAR:
+            j_str = org.apache.commons.lang.StringEscapeUtils.escapeJava(j_str);
 
-			res.append(j_str);
+            // fix the bug in StringEscapeUtils:
+            // case '/':
+            // out.write('\\');
+            // out.write('/');
+            // break;
+            j_str = j_str.replace("\\/", "/");
 
-			if (i < parts.length - 1) {
+            res.append(j_str);
 
-				res.append(" ");
-				res.append(new_line_j);
-				res.append("\\");
-				res.append(new_line);
-				// res.append("\t\t");
+            if (i < parts.length - 1) {
 
-			} else {
+                res.append(" ");
+                res.append(new_line_j);
+                res.append("\\");
+                res.append(new_line);
+                // res.append("\t\t");
 
-				res.append("\"");
-			}
-		}
+            } else {
 
-		return res.toString();
-	}
+                res.append("\"");
+            }
+        }
 
-	//
-	// http://www.java2s.com/Tutorial/Java/0180__File/LoadatextfilecontentsasaString.htm
-	//
-	public static String load_text_from_file(String file_path) throws IOException {
+        return res.toString();
+    }
 
-		File file = new File(file_path);
+    //
+    // http://www.java2s.com/Tutorial/Java/0180__File/LoadatextfilecontentsasaString.htm
+    //
+    public static String load_text_from_file(String file_path) throws IOException {
 
-		FileReader reader = new FileReader(file);
+        File file = new File(file_path);
 
-		try {
+        FileReader reader = new FileReader(file);
 
-			return load_text(reader);
+        try {
 
-		} finally {
+            return load_text(reader);
 
-			reader.close();
-		}
-	}
+        } finally {
 
-	public static String load_text(InputStreamReader reader) throws IOException {
+            reader.close();
+        }
+    }
 
-		int len;
+    public static String load_text(InputStreamReader reader) throws IOException {
 
-		char[] chr = new char[4096];
+        int len;
 
-		StringBuilder buffer = new StringBuilder();
+        char[] chr = new char[4096];
 
-		while ((len = reader.read(chr)) > 0) {
+        StringBuilder buffer = new StringBuilder();
 
-			buffer.append(chr, 0, len);
-		}
+        while ((len = reader.read(chr)) > 0) {
 
-		return buffer.toString();
-	}
+            buffer.append(chr, 0, len);
+        }
 
-	public static String[] get_listed_items(String list/* , boolean is_sp */) throws Exception {
+        return buffer.toString();
+    }
 
-		if (list != null && list.length() > 0) {
+    public static String[] get_listed_items(String list/* , boolean is_sp */) throws Exception {
 
-			String[] items;
+        if (list != null && list.length() > 0) {
 
-			items = list.split("[,]");
+            String[] items;
 
-			for (int i = 0; i < items.length; i++) {
+            items = list.split("[,]");
 
-				items[i] = items[i].trim();
+            for (int i = 0; i < items.length; i++) {
 
-				String[] parts = items[i].split("\\s+");
+                items[i] = items[i].trim();
 
-				String name;
+                String[] parts = items[i].split("\\s+");
 
-				if (parts.length == 1) {
+                String name;
 
-					name = parts[0];
+                if (parts.length == 1) {
 
-				} else if (parts.length == 2) {
+                    name = parts[0];
 
-					name = parts[1];
+                } else if (parts.length == 2) {
 
-				} else {
+                    name = parts[1];
 
-					throw new Exception("The item is null or empty: " + list);
-				}
+                } else {
 
-				check_item(name/* , is_sp */);
-			}
+                    throw new Exception("The item is null or empty: " + list);
+                }
 
-			return items;
-		}
+                check_item(name/* , is_sp */);
+            }
 
-		return new String[] {};
-	}
+            return items;
+        }
 
-	private static void check_item(String name/* , boolean is_sp */) throws Exception {
+        return new String[]{};
+    }
 
-		if (name == null || name.length() == 0) {
-			throw new Exception("Item name is null or empty");
-		}
+    private static void check_item(String name/* , boolean is_sp */) throws Exception {
 
-		char ch_0 = name.charAt(0);
-		boolean is_letter_at_0 = Character.isLetter(ch_0);
-		if (!is_letter_at_0 || ch_0 == '$') {
-			if (ch_0 != '_') {
-				throw new Exception("Invalid starting character in the name of item: " + name);
-			}
-		}
+        if (name == null || name.length() == 0) {
+            throw new Exception("Item name is null or empty");
+        }
 
-		for (int i = 1; i < name.length(); i++) {
-			// Google: java is letter
-			// A character is considered to be a Java letter or digit if and only if it is a
-			// letter or a digit or the dollar sign "$" or the underscore "_".
-			char ch = name.charAt(i);
-			boolean is_letter_or_digit = Character.isLetterOrDigit(ch);
-			if (!is_letter_or_digit || ch == '$') {
-				if (ch != '_') {
-					throw new Exception("Invalid character in the name of item: " + name);
-				}
-			}
-		}
-	}
+        char ch_0 = name.charAt(0);
+        boolean is_letter_at_0 = Character.isLetter(ch_0);
+        if (!is_letter_at_0 || ch_0 == '$') {
+            if (ch_0 != '_') {
+                throw new Exception("Invalid starting character in the name of item: " + name);
+            }
+        }
 
-	public static String get_dao_class_name(String dao_xml_path) throws Exception {
+        for (int i = 1; i < name.length(); i++) {
+            // Google: java is letter
+            // A character is considered to be a Java letter or digit if and only if it is a
+            // letter or a digit or the dollar sign "$" or the underscore "_".
+            char ch = name.charAt(i);
+            boolean is_letter_or_digit = Character.isLetterOrDigit(ch);
+            if (!is_letter_or_digit || ch == '$') {
+                if (ch != '_') {
+                    throw new Exception("Invalid character in the name of item: " + name);
+                }
+            }
+        }
+    }
 
-		String[] parts = dao_xml_path.split("[/\\\\]");
+    public static String get_dao_class_name(String dao_xml_path) throws Exception {
 
-		if (parts.length == 0) {
+        String[] parts = dao_xml_path.split("[/\\\\]");
 
-			throw new Exception(IFN + dao_xml_path);
-		}
+        if (parts.length == 0) {
 
-		parts = parts[parts.length - 1].split("\\.");
+            throw new Exception(IFN + dao_xml_path);
+        }
 
-		String class_name;
+        parts = parts[parts.length - 1].split("\\.");
 
-		switch (parts.length) {
+        String class_name;
 
-		case 2:
+        switch (parts.length) {
 
-			class_name = parts[0];
+            case 2:
 
-			if (!parts[1].equals("xml")) {
+                class_name = parts[0];
 
-				throw new Exception(IFN + dao_xml_path);
-			}
+                if (!parts[1].equals("xml")) {
 
-			break;
+                    throw new Exception(IFN + dao_xml_path);
+                }
 
-		case 3:
+                break;
 
-			if (parts[0].equals("dao")) {
+            case 3:
 
-				class_name = parts[1];
+                if (parts[0].equals("dao")) {
 
-			} else {
+                    class_name = parts[1];
 
-				class_name = parts[0];
-			}
+                } else {
 
-			if (!parts[2].equals("xml")) {
+                    class_name = parts[0];
+                }
 
-				throw new Exception(IFN + dao_xml_path);
-			}
+                if (!parts[2].equals("xml")) {
 
-			break;
+                    throw new Exception(IFN + dao_xml_path);
+                }
 
-		default:
+                break;
 
-			throw new Exception(IFN + dao_xml_path);
-		}
+            default:
 
-		if (class_name.length() == 0) {
+                throw new Exception(IFN + dao_xml_path);
+        }
 
-			throw new Exception(IFN + dao_xml_path);
-		}
+        if (class_name.length() == 0) {
 
-		if (Character.isLowerCase(class_name.charAt(0))) {
+            throw new Exception(IFN + dao_xml_path);
+        }
 
-			throw new Exception("Class name must start with an uppercase letter: " + class_name);
-		}
+        if (Character.isLowerCase(class_name.charAt(0))) {
 
-		return class_name;
-	}
+            throw new Exception("Class name must start with an uppercase letter: " + class_name);
+        }
 
-	public static DtoClass find_dto_class(String dto_attr, DtoClasses dto_classes) throws Exception {
+        return class_name;
+    }
 
-		if (dto_attr == null || dto_attr.length() == 0) {
+    public static DtoClass find_dto_class(String dto_attr, DtoClasses dto_classes) throws Exception {
 
-			throw new Exception("Invalid name of DTO class: " + dto_attr);
-		}
+        if (dto_attr == null || dto_attr.length() == 0) {
 
-		DtoClass res = null;
+            throw new Exception("Invalid name of DTO class: " + dto_attr);
+        }
 
-		int found = 0;
+        DtoClass res = null;
 
-		for (DtoClass cls : dto_classes.getDtoClass()) {
+        int found = 0;
 
-			String name = cls.getName();
+        for (DtoClass cls : dto_classes.getDtoClass()) {
 
-			if (name != null && name.equals(dto_attr)) {
+            String name = cls.getName();
 
-				res = cls;
+            if (name != null && name.equals(dto_attr)) {
 
-				found++;
-			}
-		}
+                res = cls;
 
-		if (found == 0) {
+                found++;
+            }
+        }
 
-			throw new Exception("DTO XML element not found: '" + dto_attr + "'");
+        if (found == 0) {
 
-		} else if (found > 1) {
+            throw new Exception("DTO XML element not found: '" + dto_attr + "'");
 
-			throw new Exception("Duplicate DTO XML elements for name='" + dto_attr + "' found.");
-		}
+        } else if (found > 1) {
 
-		return res;
-	}
+            throw new Exception("Duplicate DTO XML elements for name='" + dto_attr + "' found.");
+        }
 
-	public static InputStream get_resource_as_stream_2(String res_path) throws Exception {
+        return res;
+    }
 
-		// swing app wants 'resources/' but plug-in wants '/resources/' WHY?
-		//
-		ClassLoader cl = Helpers.class.getClassLoader();
+    public static InputStream get_resource_as_stream_2(String res_path) throws Exception {
 
-		InputStream is = cl.getResourceAsStream(res_path);
+        // swing app wants 'resources/' but plug-in wants '/resources/' WHY?
+        //
+        ClassLoader cl = Helpers.class.getClassLoader();
 
-		if (is == null) {
+        InputStream is = cl.getResourceAsStream(res_path);
 
-			is = cl.getResourceAsStream("/" + res_path);
-		}
+        if (is == null) {
 
-		if (is == null) {
+            is = cl.getResourceAsStream("/" + res_path);
+        }
 
-			throw new Exception("Resource not found: " + res_path);
-		}
+        if (is == null) {
 
-		return is;
-	}
+            throw new Exception("Resource not found: " + res_path);
+        }
 
-	//
-	// http://www.devdaily.com/blog/post/java/read-text-file-from-jar-file
-	//
-	public static String read_from_jar_file_2(String res_name) throws Exception {
+        return is;
+    }
 
-		InputStream is = get_resource_as_stream_2(res_name);
+    //
+    // http://www.devdaily.com/blog/post/java/read-text-file-from-jar-file
+    //
+    public static String read_from_jar_file_2(String res_name) throws Exception {
 
-		try {
+        InputStream is = get_resource_as_stream_2(res_name);
 
-			InputStreamReader reader = new InputStreamReader(is);
+        try {
 
-			try {
+            InputStreamReader reader = new InputStreamReader(is);
 
-				return load_text(reader);
+            try {
 
-			} finally {
+                return load_text(reader);
 
-				reader.close();
-			}
+            } finally {
 
-		} finally {
+                reader.close();
+            }
 
-			is.close();
-		}
-	}
+        } finally {
 
-	private static boolean is_class_of(String type, Class<?> clazz) {
+            is.close();
+        }
+    }
 
-		// getSimpleName is used for types of parameters that are declared in XML
-		//
-		return (type.equals(clazz.getName()) || type.equals(clazz.getSimpleName()));
-	}
+    private static boolean is_class_of(String type, Class<?> clazz) {
 
-	private static boolean is_java_type(String type) {
+        // getSimpleName is used for types of parameters that are declared in XML
+        //
+        return (type.equals(clazz.getName()) || type.equals(clazz.getSimpleName()));
+    }
 
-		try {
+    private static boolean is_java_type(String type) {
 
-			Class.forName(type);
+        try {
 
-			return true;
+            Class.forName(type);
 
-		} catch (ClassNotFoundException e) {
+            return true;
 
-			return false;
-		}
-	}
+        } catch (ClassNotFoundException e) {
 
-	public static void convert_to_python_type_names(List<FieldInfo> fields) {
+            return false;
+        }
+    }
 
-		for (FieldInfo fi : fields) {
+    public static void convert_to_python_type_names(List<FieldInfo> fields) {
 
-			String type = fi.getType();
+        for (FieldInfo fi : fields) {
 
-			type = get_python_type_name(type);
+            String type = fi.getType();
 
-			fi.setType(type);
-		}
-	}
+            type = get_python_type_name(type);
 
-	public static String get_python_type_name(String type) {
+            fi.setType(type);
+        }
+    }
 
-		if (is_class_of(type, String.class)) {
+    public static String get_python_type_name(String type) {
 
-			return "basestring";
-		}
+        if (is_class_of(type, String.class)) {
 
-		if (is_class_of(type, Boolean.class)) {
+            return "basestring";
+        }
 
-			return "bool";
-		}
+        if (is_class_of(type, Boolean.class)) {
 
-		if (is_class_of(type, java.util.Date.class)) {
+            return "bool";
+        }
 
-			return "basestring"; // built-in, datetime.datetime can be used instead
-		}
+        if (is_class_of(type, java.util.Date.class)) {
 
-		if (is_class_of(type, Float.class)) {
+            return "basestring"; // built-in, datetime.datetime can be used instead
+        }
 
-			return "float"; // built-in
-		}
+        if (is_class_of(type, Float.class)) {
 
-		if (is_class_of(type, Double.class)) {
+            return "float"; // built-in
+        }
 
-			return "float"; // built-in, no double
-		}
+        if (is_class_of(type, Double.class)) {
 
-		if (is_class_of(type, java.math.BigDecimal.class)) {
+            return "float"; // built-in, no double
+        }
 
-			return "float"; // built-in, maybe decimal.Decimal is better?
-		}
+        if (is_class_of(type, java.math.BigDecimal.class)) {
 
-		if (is_class_of(type, Integer.class)) {
+            return "float"; // built-in, maybe decimal.Decimal is better?
+        }
 
-			return "int"; // built-in
-		}
+        if (is_class_of(type, Integer.class)) {
 
-		if (is_class_of(type, Long.class)) {
+            return "int"; // built-in
+        }
 
-			return "long"; // built-in
-		}
+        if (is_class_of(type, Long.class)) {
 
-		// last chance for PythonRuby types specified in XML: datetime.datetime,
-		// decimal.Decimal, etc.
-		// (bool, int, long, float, basestring are processed by previous code)
-		//
-		if (!is_java_type(type)) {
+            return "long"; // built-in
+        }
 
-			return type;
-		}
+        // last chance for PythonRuby types specified in XML: datetime.datetime,
+        // decimal.Decimal, etc.
+        // (bool, int, long, float, basestring are processed by previous code)
+        //
+        if (!is_java_type(type)) {
 
-		return "object";
-	}
+            return type;
+        }
 
-	@SuppressWarnings("unused")
-	public static void convert_to_ruby_type_names(List<FieldInfo> fields) {
+        return "object";
+    }
 
-	}
+    @SuppressWarnings("unused")
+    public static void convert_to_ruby_type_names(List<FieldInfo> fields) {
 
-	public static void build_warning_comment(StringBuilder buffer, String msg) {
+    }
 
-		String ls = System.getProperty("line.separator");
-		buffer.append(ls);
-		buffer.append(msg);
-		buffer.append(ls);
-	}
+    public static void build_warning_comment(StringBuilder buffer, String msg) {
 
-	public static String get_no_pk_message(String method_name) {
+        String ls = System.getProperty("line.separator");
+        buffer.append(ls);
+        buffer.append(msg);
+        buffer.append(ls);
+    }
 
-		return "\t// INFO: " + method_name + " is omitted because PK is not detected.";
-	}
+    public static String get_no_pk_message(String method_name) {
 
-	public static String get_only_pk_message(String method_name) {
+        return "\t// INFO: " + method_name + " is omitted because PK is not detected.";
+    }
 
-		return "\t// INFO: " + method_name + " is omitted because all columns are part of PK.";
-	}
+    public static String get_only_pk_message(String method_name) {
 
-	public static void process_element(IDaoCG dao_cg, DaoClass dao_class, List<String> methods) throws Exception {
+        return "\t// INFO: " + method_name + " is omitted because all columns are part of PK.";
+    }
 
-		if (dao_class.getCrudOrCrudAutoOrQuery() != null) {
+    public static void process_element(IDaoCG dao_cg, DaoClass dao_class, List<String> methods) throws Exception {
 
-			for (int i = 0; i < dao_class.getCrudOrCrudAutoOrQuery().size(); i++) {
+        if (dao_class.getCrudOrCrudAutoOrQuery() != null) {
 
-				Object element = dao_class.getCrudOrCrudAutoOrQuery().get(i);
+            for (int i = 0; i < dao_class.getCrudOrCrudAutoOrQuery().size(); i++) {
 
-				if (element instanceof Query || element instanceof QueryList || element instanceof QueryDto
-						|| element instanceof QueryDtoList) {
+                Object element = dao_class.getCrudOrCrudAutoOrQuery().get(i);
 
-					StringBuilder buf = dao_cg.render_element_query(element);
+                if (element instanceof Query || element instanceof QueryList || element instanceof QueryDto
+                        || element instanceof QueryDtoList) {
 
-					methods.add(buf.toString());
+                    StringBuilder buf = dao_cg.render_element_query(element);
 
-				} else if (element instanceof ExecDml) {
+                    methods.add(buf.toString());
 
-					StringBuilder buf = dao_cg.render_element_exec_dml((ExecDml) element);
+                } else if (element instanceof ExecDml) {
 
-					methods.add(buf.toString());
+                    StringBuilder buf = dao_cg.render_element_exec_dml((ExecDml) element);
 
-				} else {
+                    methods.add(buf.toString());
 
-					StringBuilder buf = dao_cg.render_element_crud(element);
+                } else {
 
-					methods.add(buf.toString());
-				}
-			}
-		}
-	}
+                    StringBuilder buf = dao_cg.render_element_crud(element);
 
-	private static boolean process_element_create(IDaoCG dao_cg, TypeCrud element, String dto_class_name,
-			String table_attr, boolean lower_under_scores, StringBuilder code_buff) throws Exception {
+                    methods.add(buf.toString());
+                }
+            }
+        }
+    }
 
-		String method_name = null;
+    private static boolean process_element_create(IDaoCG dao_cg, TypeCrud element, String dto_class_name,
+            String table_attr, boolean lower_under_scores, StringBuilder code_buff) throws Exception {
 
-		if (element.getCreate() != null) {
+        String method_name = null;
 
-			method_name = element.getCreate().getMethod();
+        if (element.getCreate() != null) {
 
-		} else {
+            method_name = element.getCreate().getMethod();
 
-			if (element instanceof CrudAuto) {
+        } else {
 
-				method_name = "create" + dto_class_name;
-			}
-		}
+            if (element instanceof CrudAuto) {
 
-		if (method_name == null) {
+                method_name = "create" + dto_class_name;
+            }
+        }
 
-			return true;
-		}
+        if (method_name == null) {
 
-		if (lower_under_scores) {
+            return true;
+        }
 
-			method_name = Helpers.camel_case_to_lower_under_scores(method_name);
-		}
+        if (lower_under_scores) {
 
-		StringBuilder sql_buff = new StringBuilder();
+            method_name = Helpers.camel_case_to_lower_under_scores(method_name);
+        }
 
-		boolean fetch_generated = element.isFetchGenerated();
+        StringBuilder sql_buff = new StringBuilder();
 
-		String generated = element.getGenerated();
+        boolean fetch_generated = element.isFetchGenerated();
 
-		StringBuilder tmp = dao_cg.render_element_crud_create(sql_buff, null, method_name, table_attr, dto_class_name,
-				fetch_generated, generated);
+        String generated = element.getGenerated();
 
-		code_buff.append(tmp);
+        StringBuilder tmp = dao_cg.render_element_crud_create(sql_buff, null, method_name, table_attr, dto_class_name,
+                fetch_generated, generated);
 
-		DbUtils db_utils = dao_cg.get_db_utils();
+        code_buff.append(tmp);
 
-		db_utils.validate_sql(sql_buff);
+        DbUtils db_utils = dao_cg.get_db_utils();
 
-		return true;
-	}
+        db_utils.validate_sql(sql_buff);
 
-	private static boolean process_element_read_all(IDaoCG dao_cg, TypeCrud element, String dto_class_name,
-			String table_attr, boolean lower_under_scores, StringBuilder code_buff) throws Exception {
+        return true;
+    }
 
-		String method_name = null;
+    private static boolean process_element_read_all(IDaoCG dao_cg, TypeCrud element, String dto_class_name,
+            String table_attr, boolean lower_under_scores, StringBuilder code_buff) throws Exception {
 
-		if (element.getReadAll() != null) {
+        String method_name = null;
 
-			method_name = element.getReadAll().getMethod();
+        if (element.getReadAll() != null) {
 
-		} else {
+            method_name = element.getReadAll().getMethod();
 
-			if (element instanceof CrudAuto) {
+        } else {
 
-				method_name = "read" + dto_class_name + "List";
-			}
-		}
+            if (element instanceof CrudAuto) {
 
-		if (method_name == null) {
+                method_name = "read" + dto_class_name + "List";
+            }
+        }
 
-			return true;
-		}
+        if (method_name == null) {
 
-		if (lower_under_scores) {
+            return true;
+        }
 
-			method_name = Helpers.camel_case_to_lower_under_scores(method_name);
-		}
+        if (lower_under_scores) {
 
-		StringBuilder sql_buff = new StringBuilder();
+            method_name = Helpers.camel_case_to_lower_under_scores(method_name);
+        }
 
-		StringBuilder tmp = dao_cg.render_element_crud_read(sql_buff, method_name, table_attr, dto_class_name, true);
+        StringBuilder sql_buff = new StringBuilder();
 
-		code_buff.append(tmp);
+        StringBuilder tmp = dao_cg.render_element_crud_read(sql_buff, method_name, table_attr, dto_class_name, true);
 
-		DbUtils db_utils = dao_cg.get_db_utils();
+        code_buff.append(tmp);
 
-		db_utils.validate_sql(sql_buff);
+        DbUtils db_utils = dao_cg.get_db_utils();
 
-		return true;
-	}
+        db_utils.validate_sql(sql_buff);
 
-	private static boolean process_element_read(IDaoCG dao_cg, TypeCrud element, String dto_class_name,
-			String table_attr, boolean lower_under_scores, StringBuilder code_buff) throws Exception {
+        return true;
+    }
 
-		String method_name = null;
+    private static boolean process_element_read(IDaoCG dao_cg, TypeCrud element, String dto_class_name,
+            String table_attr, boolean lower_under_scores, StringBuilder code_buff) throws Exception {
 
-		if (element.getRead() != null) {
+        String method_name = null;
 
-			method_name = element.getRead().getMethod();
+        if (element.getRead() != null) {
 
-		} else {
+            method_name = element.getRead().getMethod();
 
-			if (element instanceof CrudAuto) {
+        } else {
 
-				method_name = "read" + dto_class_name;
-			}
-		}
+            if (element instanceof CrudAuto) {
 
-		if (method_name == null) {
+                method_name = "read" + dto_class_name;
+            }
+        }
 
-			return true;
-		}
+        if (method_name == null) {
 
-		if (lower_under_scores) {
+            return true;
+        }
 
-			method_name = Helpers.camel_case_to_lower_under_scores(method_name);
-		}
+        if (lower_under_scores) {
 
-		StringBuilder sql_buff = new StringBuilder();
+            method_name = Helpers.camel_case_to_lower_under_scores(method_name);
+        }
 
-		StringBuilder tmp = dao_cg.render_element_crud_read(sql_buff, method_name, table_attr, dto_class_name, false);
+        StringBuilder sql_buff = new StringBuilder();
 
-		code_buff.append(tmp);
+        StringBuilder tmp = dao_cg.render_element_crud_read(sql_buff, method_name, table_attr, dto_class_name, false);
 
-		DbUtils db_utils = dao_cg.get_db_utils();
+        code_buff.append(tmp);
 
-		db_utils.validate_sql(sql_buff);
+        DbUtils db_utils = dao_cg.get_db_utils();
 
-		return true;
-	}
+        db_utils.validate_sql(sql_buff);
 
-	private static boolean process_element_update(IDaoCG dao_cg, TypeCrud element, String dto_class_name,
-			String table_attr, boolean lower_under_scores, StringBuilder code_buff) throws Exception {
+        return true;
+    }
 
-		String method_name = null;
+    private static boolean process_element_update(IDaoCG dao_cg, TypeCrud element, String dto_class_name,
+            String table_attr, boolean lower_under_scores, StringBuilder code_buff) throws Exception {
 
-		if (element.getUpdate() != null) {
+        String method_name = null;
 
-			method_name = element.getUpdate().getMethod();
+        if (element.getUpdate() != null) {
 
-		} else {
+            method_name = element.getUpdate().getMethod();
 
-			if (element instanceof CrudAuto) {
+        } else {
 
-				method_name = "update" + dto_class_name;
-			}
-		}
+            if (element instanceof CrudAuto) {
 
-		if (method_name == null) {
+                method_name = "update" + dto_class_name;
+            }
+        }
 
-			return true;
-		}
+        if (method_name == null) {
 
-		if (lower_under_scores) {
+            return true;
+        }
 
-			method_name = Helpers.camel_case_to_lower_under_scores(method_name);
-		}
+        if (lower_under_scores) {
 
-		StringBuilder sql_buff = new StringBuilder();
+            method_name = Helpers.camel_case_to_lower_under_scores(method_name);
+        }
 
-		StringBuilder tmp = dao_cg.render_element_crud_update(sql_buff, null, method_name, table_attr, dto_class_name,
-				false);
+        StringBuilder sql_buff = new StringBuilder();
 
-		code_buff.append(tmp);
+        StringBuilder tmp = dao_cg.render_element_crud_update(sql_buff, null, method_name, table_attr, dto_class_name,
+                false);
 
-		DbUtils db_utils = dao_cg.get_db_utils();
+        code_buff.append(tmp);
 
-		db_utils.validate_sql(sql_buff);
+        DbUtils db_utils = dao_cg.get_db_utils();
 
-		return true;
-	}
+        db_utils.validate_sql(sql_buff);
 
-	private static boolean process_element_delete(IDaoCG dao_cg, TypeCrud element, String dto_class_name,
-			String table_attr, boolean lower_under_scores, StringBuilder code_buff) throws Exception {
+        return true;
+    }
 
-		String method_name = null;
+    private static boolean process_element_delete(IDaoCG dao_cg, TypeCrud element, String dto_class_name,
+            String table_attr, boolean lower_under_scores, StringBuilder code_buff) throws Exception {
 
-		if (element.getDelete() != null) {
+        String method_name = null;
 
-			method_name = element.getDelete().getMethod();
+        if (element.getDelete() != null) {
 
-		} else {
+            method_name = element.getDelete().getMethod();
 
-			if (element instanceof CrudAuto) {
+        } else {
 
-				method_name = "delete" + dto_class_name;
-			}
-		}
+            if (element instanceof CrudAuto) {
 
-		if (method_name == null) {
+                method_name = "delete" + dto_class_name;
+            }
+        }
 
-			return true;
-		}
+        if (method_name == null) {
 
-		if (lower_under_scores) {
+            return true;
+        }
 
-			method_name = Helpers.camel_case_to_lower_under_scores(method_name);
-		}
+        if (lower_under_scores) {
 
-		StringBuilder sql_buff = new StringBuilder();
+            method_name = Helpers.camel_case_to_lower_under_scores(method_name);
+        }
 
-		StringBuilder tmp = dao_cg.render_element_crud_delete(sql_buff, null, method_name, table_attr, dto_class_name);
+        StringBuilder sql_buff = new StringBuilder();
 
-		code_buff.append(tmp);
+        StringBuilder tmp = dao_cg.render_element_crud_delete(sql_buff, null, method_name, table_attr, dto_class_name);
 
-		DbUtils db_utils = dao_cg.get_db_utils();
+        code_buff.append(tmp);
 
-		db_utils.validate_sql(sql_buff);
+        DbUtils db_utils = dao_cg.get_db_utils();
 
-		return true;
-	}
+        db_utils.validate_sql(sql_buff);
 
-	public static StringBuilder process_element_crud(IDaoCG dao_cg, boolean lower_under_scores, TypeCrud element,
-			String dto_class_name, String table_attr) throws Exception {
+        return true;
+    }
 
-		boolean is_empty = true;
+    public static StringBuilder process_element_crud(IDaoCG dao_cg, boolean lower_under_scores, TypeCrud element,
+            String dto_class_name, String table_attr) throws Exception {
 
-		StringBuilder code_buff = new StringBuilder();
+        boolean is_empty = true;
 
-		if (process_element_create(dao_cg, element, dto_class_name, table_attr, lower_under_scores, code_buff)) {
-			is_empty = false;
-		}
+        StringBuilder code_buff = new StringBuilder();
 
-		if (process_element_read_all(dao_cg, element, dto_class_name, table_attr, lower_under_scores, code_buff)) {
-			is_empty = false;
-		}
+        if (process_element_create(dao_cg, element, dto_class_name, table_attr, lower_under_scores, code_buff)) {
+            is_empty = false;
+        }
 
-		if (process_element_read(dao_cg, element, dto_class_name, table_attr, lower_under_scores, code_buff)) {
-			is_empty = false;
-		}
+        if (process_element_read_all(dao_cg, element, dto_class_name, table_attr, lower_under_scores, code_buff)) {
+            is_empty = false;
+        }
 
-		if (process_element_update(dao_cg, element, dto_class_name, table_attr, lower_under_scores, code_buff)) {
-			is_empty = false;
-		}
+        if (process_element_read(dao_cg, element, dto_class_name, table_attr, lower_under_scores, code_buff)) {
+            is_empty = false;
+        }
 
-		if (process_element_delete(dao_cg, element, dto_class_name, table_attr, lower_under_scores, code_buff)) {
-			is_empty = false;
-		}
+        if (process_element_update(dao_cg, element, dto_class_name, table_attr, lower_under_scores, code_buff)) {
+            is_empty = false;
+        }
 
-		if ((element instanceof Crud) && is_empty) {
+        if (process_element_delete(dao_cg, element, dto_class_name, table_attr, lower_under_scores, code_buff)) {
+            is_empty = false;
+        }
 
-			String node_name = Helpers.get_xml_node_name(element);
+        if ((element instanceof Crud) && is_empty) {
 
-			throw new Exception(
-					"Element '" + node_name + "' is empty. Add the method declarations or change to 'crud-auto'");
-		}
+            String node_name = Helpers.get_xml_node_name(element);
 
-		return code_buff;
-	}
+            throw new Exception(
+                    "Element '" + node_name + "' is empty. Add the method declarations or change to 'crud-auto'");
+        }
+
+        return code_buff;
+    }
 }

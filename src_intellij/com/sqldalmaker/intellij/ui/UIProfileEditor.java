@@ -148,7 +148,7 @@ public class UIProfileEditor {
 
     private UITabDTO tabDTO1;
     private UITabDAO tabDAO1;
-    private UITabAdmin tabAdmin;
+    protected UITabAdmin tabAdmin; // protected to supress warning
 
     public void init(Project project, VirtualFile file) {
 
@@ -186,7 +186,6 @@ public class UIProfileEditor {
      * >>> IMPORTANT!! <<<
      * DO NOT edit this method OR call it in your code!
      *
-     * @noinspection ALL
      */
     private void $$$setupUI$$$() {
         root = new JPanel();
@@ -200,7 +199,6 @@ public class UIProfileEditor {
     }
 
     /**
-     * @noinspection ALL
      */
     public JComponent $$$getRootComponent$$$() {
         return root;

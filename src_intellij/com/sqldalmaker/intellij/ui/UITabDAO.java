@@ -376,7 +376,7 @@ public class UITabDAO {
         };
 
         ProgressManager.getInstance().runProcessWithProgressSynchronously(runnable,
-                "Code generation", false, project);
+                "Code Generation", false, project);
 
         // write only the generated files
         // writeActions can show their own dialogs
@@ -671,13 +671,12 @@ public class UITabDAO {
     }
 
     /**
-     * @noinspection ALL
      */
     public JComponent $$$getRootComponent$$$() {
         return rootPanel;
     }
 
-    private class ColorRenderer extends DefaultTableCellRenderer {
+    private static class ColorRenderer extends DefaultTableCellRenderer {
         @Override
         public Component getTableCellRendererComponent(JTable table,
                                                        Object value, boolean isSelected, boolean hasFocus, int row,

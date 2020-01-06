@@ -270,10 +270,8 @@ public class IdeaTargetLanguageHelpers {
         }
     }
 
-    /**
-     * @param project
-     * @param file
-     * @return null if the file is not root-file
+    /*
+     * returns null if the file is not root-file
      */
     public static String get_root_file_relative_path(Project project, VirtualFile file) {
 

@@ -102,7 +102,7 @@ public class IdeaCrudXmlHelpers {
         String dto_xml_abs_file_path = Helpers.concat_path(xml_configs_folder_full_path, Const.DTO_XML);
         String dto_xsd_abs_file_path = Helpers.concat_path(xml_configs_folder_full_path, Const.DTO_XSD);
 
-        Set<String> res = SdmUtils.get_dto_classes_names_used_in_dto_xml(dto_xml_abs_file_path, dto_xsd_abs_file_path);
+        Set<String> res = SdmUtils.get_dto_class_names_used_in_dto_xml(dto_xml_abs_file_path, dto_xsd_abs_file_path);
 
         return res;
     }

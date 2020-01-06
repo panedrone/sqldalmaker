@@ -1,7 +1,8 @@
 /*
- * Copyright 2011-2018 sqldalmaker@gmail.com
+ * Copyright 2011-2020 sqldalmaker@gmail.com
  * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
  * Read LICENSE.txt in the root of this project/archive for details.
+ *
  */
 package com.sqldalmaker.cg;
 
@@ -206,7 +207,7 @@ public class DbUtils {
 
 			String java_class_name = fe.getJavaType();
 
-			validate_java_class_name(java_class_name);
+			validate_java_type_name(java_class_name);
 
 			String col = fe.getColumn();
 
@@ -224,11 +225,11 @@ public class DbUtils {
 		}
 	}
 
-	private static void validate_java_class_name(final String java_class_name) throws Exception {
+	private static void validate_java_type_name(final String java_type_name) throws Exception {
 
 		String type;
 
-		String[] arr_parts = java_class_name.split("\\[");
+		String[] arr_parts = java_type_name.split("\\[");
 
 		if (arr_parts.length == 2 && "]".equals(arr_parts[1].trim())) {
 
@@ -236,12 +237,12 @@ public class DbUtils {
 
 		} else {
 
-			type = java_class_name;
+			type = java_type_name;
 		}
 
 		try {
 
-			Helpers.process_class_name(type);
+			Helpers.process_java_type_name(type);
 
 		} catch (ClassNotFoundException e) {
 
@@ -249,11 +250,11 @@ public class DbUtils {
 
 			try {
 
-				Helpers.process_class_name(java_class_name2);
+				Helpers.process_java_type_name(java_class_name2);
 
 			} catch (ClassNotFoundException e1) {
 
-				throw new Exception("Invalid class name: " + java_class_name);
+				throw new Exception("Invalid type name: " + java_type_name);
 			}
 		}
 	}
@@ -408,7 +409,7 @@ public class DbUtils {
 				// See comments for Class.getName() API
 				java_class_name = rsmd.getColumnClassName(i);
 
-				java_class_name = Helpers.process_class_name(java_class_name);
+				java_class_name = Helpers.process_java_type_name(java_class_name);
 
 			} catch (Exception ex) {
 
@@ -430,7 +431,7 @@ public class DbUtils {
 			// See comments for Class.getName() API
 			java_class_name = pm.getParameterClassName(i + 1);
 
-			java_class_name = Helpers.process_class_name(java_class_name);
+			java_class_name = Helpers.process_java_type_name(java_class_name);
 
 		} catch (Exception ex) {
 

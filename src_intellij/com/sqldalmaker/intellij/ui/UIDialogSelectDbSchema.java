@@ -377,7 +377,6 @@ public class UIDialogSelectDbSchema extends JDialog {
     }
 
     /**
-     * @noinspection ALL
      */
     private Font $$$getFont$$$(String fontName, int style, int size, Font currentFont) {
         if (currentFont == null) return null;
@@ -396,7 +395,6 @@ public class UIDialogSelectDbSchema extends JDialog {
     }
 
     /**
-     * @noinspection ALL
      */
     public JComponent $$$getRootComponent$$$() {
         return contentPane;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2019 sqldalmaker@gmail.com
+ * Copyright 2011-2020 sqldalmaker@gmail.com
  * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
  * Read LICENSE.txt in the root of this project/archive for details.
  * 
@@ -231,6 +231,9 @@ public class SdmUtils {
         return sb.toString();
     }
 
+    /*
+        just table name without schema needed
+     */
     public static String table_name_to_dto_class_name(String table_name, boolean plural_to_singular) {
 
         String word = to_camel_case(table_name);
@@ -296,15 +299,8 @@ public class SdmUtils {
 
             while (rs.next()) {
 
-                // http://docs.oracle.com/javase/1.4.2/docs/api/java/sql/DatabaseMetaData.html
                 try {
 
-//					String table_type = rs.getString("TABLE_TYPE");
-//
-//					if (!("TABLE".equalsIgnoreCase(table_type) || "VIEW".equalsIgnoreCase(table_type))) {
-//
-//						continue;
-//					}
                     String table_name = rs.getString("TABLE_NAME");
 
                     String dto_class_name = table_name_to_dto_class_name(table_name, plural_to_singular);
@@ -479,7 +475,7 @@ public class SdmUtils {
             return source_folder;
         }
 
-        return source_folder + "/" + package_name.replace(".", "/");
+        return Helpers.concat_path(source_folder, package_name.replace(".", "/"));
     }
 
     public static void gen_tmp_field_tags(Connection connection, com.sqldalmaker.jaxb.dto.ObjectFactory object_factory,
@@ -516,7 +512,7 @@ public class SdmUtils {
         return res;
     }
 
-    public static Set<String> get_dto_classes_names_used_in_dto_xml(String dto_xml_abs_file_path,
+    public static Set<String> get_dto_class_names_used_in_dto_xml(String dto_xml_abs_file_path,
             String dto_xsd_abs_file_path) throws Exception {
 
         Set<String> res = new HashSet<String>();
@@ -527,25 +523,26 @@ public class SdmUtils {
 
             String class_name = cls.getName();
 
-            if (!res.contains(class_name)) {
-
-                res.add(class_name);
+            if (res.contains(class_name)) {
+                continue;
             }
+
+            res.add(class_name);
         }
 
         return res;
     }
 
-    public static Settings load_settings(String folder_abs_path) throws Exception {
+    public static Settings load_settings(String settings_folder_abs_path) throws Exception {
 
-        String config_xml_abs_path = folder_abs_path + "/" + Const.SETTINGS_XML;
-        String config_xsd_abs_path = folder_abs_path + "/" + Const.SETTINGS_XSD;
+        String settings_xml_abs_path = Helpers.concat_path(settings_folder_abs_path, Const.SETTINGS_XML);
+        String settings_xsd_abs_path = Helpers.concat_path(settings_folder_abs_path, Const.SETTINGS_XSD);
 
         String context_path = Settings.class.getPackage().getName();
 
-        XmlParser config_xml_parser = new XmlParser(context_path, config_xsd_abs_path);
+        XmlParser xml_parser = new XmlParser(context_path, settings_xsd_abs_path);
 
-        Settings res = config_xml_parser.unmarshal(config_xml_abs_path);
+        Settings res = xml_parser.unmarshal(settings_xml_abs_path);
 
         return res;
     }

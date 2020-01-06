@@ -250,7 +250,8 @@ public class IdeaHelpers {
             cl = Class.forName(driver_class_name);
         }
 
-        Driver driver = (Driver) cl.newInstance();
+        // https://stackoverflow.com/questions/46393863/what-to-use-instead-of-class-newinstance
+        Driver driver = (Driver) cl.getDeclaredConstructor().newInstance();
 
         Connection con;
 
@@ -259,7 +260,6 @@ public class IdeaHelpers {
         if (user_name != null) {
 
             props.put("user", user_name);
-
             props.put("password", password);
         }
 

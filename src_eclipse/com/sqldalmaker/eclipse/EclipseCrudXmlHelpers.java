@@ -91,7 +91,7 @@ public class EclipseCrudXmlHelpers {
 		String dto_xml_abs_file_path = editor2.get_dto_xml_abs_path();
 		String dto_xsd_abs_file_path = editor2.get_dto_xsd_abs_path();
 
-		Set<String> res = SdmUtils.get_dto_classes_names_used_in_dto_xml(dto_xml_abs_file_path, dto_xsd_abs_file_path);
+		Set<String> res = SdmUtils.get_dto_class_names_used_in_dto_xml(dto_xml_abs_file_path, dto_xsd_abs_file_path);
 
 		return res;
 	}

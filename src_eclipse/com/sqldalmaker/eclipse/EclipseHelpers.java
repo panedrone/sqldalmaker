@@ -145,7 +145,8 @@ public class EclipseHelpers {
 			cl = Class.forName(driver_class_name);
 		}
 
-		Driver driver = (Driver) cl.newInstance();
+        // https://stackoverflow.com/questions/46393863/what-to-use-instead-of-class-newinstance
+        Driver driver = (Driver) cl.getConstructor().newInstance();
 
 		Connection con;
 

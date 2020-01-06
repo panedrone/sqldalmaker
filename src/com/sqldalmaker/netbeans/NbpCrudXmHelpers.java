@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2019 sqldalmaker@gmail.com
+ * Copyright 2011-2020 sqldalmaker@gmail.com
  * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
  * Read LICENSE.txt in the root of this project/archive for details.
  *
@@ -18,11 +18,9 @@ import com.sqldalmaker.common.SdmUtils;
 import java.util.List;
 
 /**
- * The class to control 
- * 
- * - DTO XML assistant
- * - DAO XML assistant
- * - FK access XML assistant
+ * The class to control
+ *
+ * - DTO XML assistant - DAO XML assistant - FK access XML assistant
  *
  * @author sqldalmaker@gmail.com
  *
@@ -34,7 +32,7 @@ public class NbpCrudXmHelpers {
         ISelectDbSchemaCallback callback = new ISelectDbSchemaCallback() {
 
             @Override
-            public void process_ok(boolean schema_in_xml, String selected_schema, boolean skip_used,
+            public void process_ok(boolean schema_in_xml, String selected_schema, boolean omit_used,
                     boolean include_views, boolean plural_to_singular, boolean crud_auto, boolean add_fk_access) {
 
                 try {
@@ -49,7 +47,7 @@ public class NbpCrudXmHelpers {
 
                         Set<String> in_use;
 
-                        if (skip_used) {
+                        if (omit_used) {
 
                             in_use = find_dto_declared_in_dto_xml(obj);
 
@@ -83,7 +81,7 @@ public class NbpCrudXmHelpers {
         String dto_xml_abs_file_path = NbpPathHelpers.get_dto_xml_abs_path(obj);
         String dto_xsd_abs_file_path = NbpPathHelpers.get_dto_xsd_abs_path(obj);
 
-        Set<String> res = SdmUtils.get_dto_classes_names_used_in_dto_xml(dto_xml_abs_file_path, dto_xsd_abs_file_path);
+        Set<String> res = SdmUtils.get_dto_class_names_used_in_dto_xml(dto_xml_abs_file_path, dto_xsd_abs_file_path);
 
         return res;
     }
@@ -93,7 +91,7 @@ public class NbpCrudXmHelpers {
         ISelectDbSchemaCallback callback = new ISelectDbSchemaCallback() {
 
             @Override
-            public void process_ok(boolean schema_in_xml, String selected_schema, boolean skip_used,
+            public void process_ok(boolean schema_in_xml, String selected_schema, boolean omit_used,
                     boolean include_views, boolean plural_to_singular, boolean use_crud_auto, boolean add_fk_access) {
 
                 try {
@@ -110,7 +108,7 @@ public class NbpCrudXmHelpers {
 
                         Set<String> in_use;
 
-                        if (skip_used) {
+                        if (omit_used) {
 
                             in_use = find_dto_used_in_dao_xml_crud(obj);
 
@@ -119,9 +117,8 @@ public class NbpCrudXmHelpers {
                             in_use = new HashSet<String>();
                         }
 
-                        root = SdmUtils.create_crud_xml_DaoClass(object_factory,
-                                connection, in_use, schema_in_xml, selected_schema,
-                                include_views, use_crud_auto, add_fk_access,
+                        root = SdmUtils.create_crud_xml_DaoClass(object_factory, connection, in_use,
+                                schema_in_xml, selected_schema, include_views, use_crud_auto, add_fk_access,
                                 plural_to_singular, underscores_needed);
 
                     } finally {
@@ -167,7 +164,7 @@ public class NbpCrudXmHelpers {
         List<String> dao_xml_file_name_list = fill_dao_file_path_list(obj);
 
         Set<String> res = SdmUtils.find_dto_used_in_dao_xml_crud(metaprogram_abs_path, dao_xml_file_name_list);
-                
+
         return res;
     }
 
@@ -176,7 +173,7 @@ public class NbpCrudXmHelpers {
         ISelectDbSchemaCallback callback = new ISelectDbSchemaCallback() {
 
             @Override
-            public void process_ok(boolean schema_in_xml, String selected_schema, boolean skip_used,
+            public void process_ok(boolean schema_in_xml, String selected_schema, boolean omit_used,
                     boolean include_views, boolean plural_to_singular, boolean crud_auto, boolean add_fk_access) {
 
                 try {

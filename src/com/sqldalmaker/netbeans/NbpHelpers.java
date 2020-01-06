@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2019 sqldalmaker@gmail.com
+ * Copyright 2011-2020 sqldalmaker@gmail.com
  * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
  * Read LICENSE.txt in the root of this project/archive for details.
  *
@@ -129,8 +129,8 @@ public class NbpHelpers {
             cl = Class.forName(driver_class_name);
         }
 
-        // Driver driver = (Driver) cl.newInstance();
-        Driver driver = (Driver) cl.getConstructor().newInstance(); // https://github.com/google/error-prone/issues/407
+        // https://stackoverflow.com/questions/46393863/what-to-use-instead-of-class-newinstance
+        Driver driver = (Driver) cl.getConstructor().newInstance();
 
         Properties props = new Properties();
 

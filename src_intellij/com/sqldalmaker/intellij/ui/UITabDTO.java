@@ -325,7 +325,6 @@ public class UITabDTO {
     }
 
     /**
-     * @noinspection ALL
      */
     public JComponent $$$getRootComponent$$$() {
         return rootPanel;
@@ -378,7 +377,7 @@ public class UITabDTO {
         }
     }
 
-    private class ColorTableCellRenderer extends DefaultTableCellRenderer {
+    private static class ColorTableCellRenderer extends DefaultTableCellRenderer {
 
         @Override
         public Component getTableCellRendererComponent(JTable table,
@@ -728,7 +727,7 @@ public class UITabDTO {
         };
 
         ProgressManager.getInstance().runProcessWithProgressSynchronously(runnable,
-                "Code generation", false, project);
+                "Code Generation", false, project);
 
         // write only the generated files
         // writeActions can show their own dialogs
