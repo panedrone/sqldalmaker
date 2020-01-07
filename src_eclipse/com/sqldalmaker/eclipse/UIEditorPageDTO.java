@@ -247,7 +247,7 @@ public class UIEditorPageDTO extends Composite {
 					generate_crud_dto_xml();
 				}
 			};
-			action_import.setToolTipText("DTO CRUD assistant");
+			action_import.setToolTipText("DTO CRUD XML Assistant");
 			action_import.setImageDescriptor(ResourceManager.getImageDescriptor(UIEditorPageDTO.class, "/img/180.png"));
 		}
 
@@ -335,7 +335,7 @@ public class UIEditorPageDTO extends Composite {
 			};
 			action_genTmpFieldTags
 					.setImageDescriptor(ResourceManager.getImageDescriptor(UIEditorPageDTO.class, "/img/177.png"));
-			action_genTmpFieldTags.setToolTipText("Fields definition assistant");
+			action_genTmpFieldTags.setToolTipText("Fields Definition Assistant");
 		}
 	}
 

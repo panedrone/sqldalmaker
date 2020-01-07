@@ -236,7 +236,7 @@ public class UIEditorPageDAO extends Composite {
 					generate_crud_dao_xml();
 				}
 			};
-			action_getCrudDao.setToolTipText("DAO CRUD assistant");
+			action_getCrudDao.setToolTipText("DAO CRUD XML Assistant");
 			action_getCrudDao
 					.setImageDescriptor(ResourceManager.getImageDescriptor(UIEditorPageDAO.class, "/img/180.png"));
 		}
@@ -335,7 +335,7 @@ public class UIEditorPageDAO extends Composite {
 				}
 			};
 			action_FK.setImageDescriptor(ResourceManager.getImageDescriptor(UIEditorPageDAO.class, "/img/FK.gif"));
-			action_FK.setToolTipText("FK access assistant");
+			action_FK.setToolTipText("FK Access Assistant");
 		}
 	}
 

@@ -97,7 +97,7 @@
                   <opaque value="false"/>
                   <preferredSize width="32" height="32"/>
                   <text value=""/>
-                  <toolTipText value="Fields definition assistant"/>
+                  <toolTipText value="Fields Definition Assistant"/>
                 </properties>
               </component>
               <component id="8dfcb" class="javax.swing.JButton" binding="btn_CrudXML">
@@ -111,7 +111,7 @@
                   <opaque value="false"/>
                   <preferredSize width="32" height="32"/>
                   <text value=""/>
-                  <toolTipText value="DTO CRUD assistant"/>
+                  <toolTipText value="DTO CRUD XML Assistant"/>
                 </properties>
               </component>
               <component id="43324" class="javax.swing.JButton" binding="btn_Refresh">

@@ -97,7 +97,7 @@
                   <opaque value="false"/>
                   <preferredSize width="32" height="32"/>
                   <text value=""/>
-                  <toolTipText value="DAO CRUD assistant"/>
+                  <toolTipText value="DAO CRUD XML Assistant"/>
                 </properties>
               </component>
               <component id="b0d83" class="javax.swing.JButton" binding="button_fk_assistant">
@@ -111,7 +111,7 @@
                   <opaque value="false"/>
                   <preferredSize width="32" height="32"/>
                   <text value=""/>
-                  <toolTipText value="FK access assistant"/>
+                  <toolTipText value="FK Access Assistant"/>
                 </properties>
               </component>
               <component id="f2f7e" class="javax.swing.JButton" binding="btn_Refresh">

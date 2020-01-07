@@ -600,7 +600,7 @@ public class UITabDAO {
         btn_CrudDao.setOpaque(false);
         btn_CrudDao.setPreferredSize(new Dimension(32, 32));
         btn_CrudDao.setText("");
-        btn_CrudDao.setToolTipText("DAO CRUD assistant");
+        btn_CrudDao.setToolTipText("DAO CRUD XML Assistant");
         tool_panel.add(btn_CrudDao);
         button_fk_assistant = new JButton();
         button_fk_assistant.setBorderPainted(false);
@@ -611,7 +611,7 @@ public class UITabDAO {
         button_fk_assistant.setOpaque(false);
         button_fk_assistant.setPreferredSize(new Dimension(32, 32));
         button_fk_assistant.setText("");
-        button_fk_assistant.setToolTipText("FK access assistant");
+        button_fk_assistant.setToolTipText("FK Access Assistant");
         tool_panel.add(button_fk_assistant);
         btn_Refresh = new JButton();
         btn_Refresh.setBorderPainted(false);
@@ -671,6 +671,7 @@ public class UITabDAO {
     }
 
     /**
+     * @noinspection ALL
      */
     public JComponent $$$getRootComponent$$$() {
         return rootPanel;

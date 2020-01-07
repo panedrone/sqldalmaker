@@ -1,3 +1,7 @@
+2010-01-07
+
+        DTO fields may be declared in XML even they are missing in metadata. You calculate the values of such fields outside of RDBMS.
+
 2019-12-31
 	
 	Enabled <crud(-auto) table="my_schema.orders"...

@@ -287,15 +287,13 @@ public class JavaCG {
 
         private void process_dto_class_name(String dto_package, String dto_class_name) throws Exception {
 
-            // no need to import if the package is the same
-            if (!dao_package.equals(dto_package)) {
+            if (dto_package != null && dto_package.length() > 0) {
 
-                DtoClass dto_def = Helpers.find_dto_class(dto_class_name, dto_classes);
-
-                if (dto_def != null) {
-
-                    imports.add(dto_package + "." + dto_def.getName());
-                }
+                    imports.add(dto_package + "." + dto_class_name);
+                
+            } else {
+                                
+                    imports.add(dto_class_name);
             }
         }
 
@@ -343,7 +341,7 @@ public class JavaCG {
                 String class_name, String method_name, String dto_param_type, String[] param_descriptors,
                 String xml_node_name, String sql_path) throws Exception {
 
-            DbUtils.check_if_select_sql(dao_jdbc_sql);
+            DbUtils.throw_if_select_sql(dao_jdbc_sql);
 
             ArrayList<FieldInfo> params = new ArrayList<FieldInfo>();
 

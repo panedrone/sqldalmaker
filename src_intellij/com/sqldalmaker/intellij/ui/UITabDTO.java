@@ -254,7 +254,7 @@ public class UITabDTO {
         btn_genTmpFieldTags.setOpaque(false);
         btn_genTmpFieldTags.setPreferredSize(new Dimension(32, 32));
         btn_genTmpFieldTags.setText("");
-        btn_genTmpFieldTags.setToolTipText("Fields definition assistant");
+        btn_genTmpFieldTags.setToolTipText("Fields Definition Assistant");
         tool_panel.add(btn_genTmpFieldTags);
         btn_CrudXML = new JButton();
         btn_CrudXML.setBorderPainted(false);
@@ -265,7 +265,7 @@ public class UITabDTO {
         btn_CrudXML.setOpaque(false);
         btn_CrudXML.setPreferredSize(new Dimension(32, 32));
         btn_CrudXML.setText("");
-        btn_CrudXML.setToolTipText("DTO CRUD assistant");
+        btn_CrudXML.setToolTipText("DTO CRUD XML Assistant");
         tool_panel.add(btn_CrudXML);
         btn_Refresh = new JButton();
         btn_Refresh.setBorderPainted(false);
@@ -325,6 +325,7 @@ public class UITabDTO {
     }
 
     /**
+     * @noinspection ALL
      */
     public JComponent $$$getRootComponent$$$() {
         return rootPanel;

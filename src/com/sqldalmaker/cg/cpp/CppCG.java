@@ -343,7 +343,7 @@ public class CppCG {
                 String class_name, String method_name, String dto_param_type, String[] param_descriptors,
                 String xml_node_name, String sql_path) throws Exception {
 
-            DbUtils.check_if_select_sql(dao_jdbc_sql);
+            DbUtils.throw_if_select_sql(dao_jdbc_sql);
 
             ArrayList<FieldInfo> params = new ArrayList<FieldInfo>();
 
