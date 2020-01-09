@@ -14,47 +14,47 @@ public class MethodInfo {
     public final String return_type;
     public final boolean fetch_list;
 
-    public MethodInfo(Object element) throws Exception {
+    public MethodInfo(Object jaxb_element) throws Exception {
 
-        this.fetch_list = (element instanceof QueryDtoList) || (element instanceof QueryList);
+        this.fetch_list = (jaxb_element instanceof QueryDtoList) || (jaxb_element instanceof QueryList);
 
-        this.return_type_is_dto = (element instanceof QueryDto) || (element instanceof QueryDtoList);
+        this.return_type_is_dto = (jaxb_element instanceof QueryDto) || (jaxb_element instanceof QueryDtoList);
         
-        if (element instanceof Query) {
+        if (jaxb_element instanceof Query) {
 
-            Query q = (Query) element;
+            Query q = (Query) jaxb_element;
             method = q.getMethod();
             ref = q.getRef();
-            is_external_sql = q.is_external_sql();
+            is_external_sql = q.isExternalSql();
             return_type = q.getReturnType();
 
-        } else if (element instanceof QueryList) {
+        } else if (jaxb_element instanceof QueryList) {
 
-            QueryList q = (QueryList) element;
+            QueryList q = (QueryList) jaxb_element;
             method = q.getMethod();
             ref = q.getRef();
-            is_external_sql = q.is_external_sql();
+            is_external_sql = q.isExternalSql();
             return_type = q.getReturnType();
 
-        } else if (element instanceof QueryDto) {
+        } else if (jaxb_element instanceof QueryDto) {
 
-            QueryDto q = (QueryDto) element;
+            QueryDto q = (QueryDto) jaxb_element;
             method = q.getMethod();
             ref = q.getRef();
-            is_external_sql = q.is_external_sql();
+            is_external_sql = q.isExternalSql();
             return_type = q.getDto();
 
-        } else if (element instanceof QueryDtoList) {
+        } else if (jaxb_element instanceof QueryDtoList) {
 
-            QueryDtoList q = (QueryDtoList) element;
+            QueryDtoList q = (QueryDtoList) jaxb_element;
             method = q.getMethod();
             ref = q.getRef();
-            is_external_sql = q.is_external_sql();
+            is_external_sql = q.isExternalSql();
             return_type = q.getDto();
 
         } else {
 
-            String xml_node_name = Helpers.get_xml_node_name(element);
+            String xml_node_name = Helpers.get_jaxb_node_name(jaxb_element);
 
             throw new Exception("Unexpected XML element: " + xml_node_name);
         }

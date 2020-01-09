@@ -180,9 +180,9 @@ public class Helpers {
         return concat_path(res, seg2);
     }
 
-    public static String get_xml_node_name(Object element) {
+    public static String get_jaxb_node_name(Object jaxb_node) {
 
-        XmlRootElement attr = element.getClass().getAnnotation(XmlRootElement.class);
+        XmlRootElement attr = jaxb_node.getClass().getAnnotation(XmlRootElement.class);
 
         return attr.name();
     }
@@ -729,43 +729,47 @@ public class Helpers {
 
             for (int i = 0; i < dao_class.getCrudOrCrudAutoOrQuery().size(); i++) {
 
-                Object element = dao_class.getCrudOrCrudAutoOrQuery().get(i);
+                Object jaxb_element = dao_class.getCrudOrCrudAutoOrQuery().get(i);
 
-                if (element instanceof Query || element instanceof QueryList || element instanceof QueryDto
-                        || element instanceof QueryDtoList) {
+                if (jaxb_element instanceof Query || jaxb_element instanceof QueryList || jaxb_element instanceof QueryDto
+                        || jaxb_element instanceof QueryDtoList) {
 
-                    StringBuilder buf = dao_cg.render_element_query(element);
-
-                    methods.add(buf.toString());
-
-                } else if (element instanceof ExecDml) {
-
-                    StringBuilder buf = dao_cg.render_element_exec_dml((ExecDml) element);
+                    StringBuilder buf = dao_cg.render_element_query(jaxb_element);
 
                     methods.add(buf.toString());
 
+                } else if (jaxb_element instanceof ExecDml) {
+
+                    StringBuilder buf = dao_cg.render_element_exec_dml((ExecDml) jaxb_element);
+
+                    methods.add(buf.toString());
+
+                } else if (jaxb_element instanceof TypeCrud) {
+
+                    StringBuilder buf = dao_cg.render_element_crud((TypeCrud)jaxb_element);
+
+                    methods.add(buf.toString());
+                    
                 } else {
 
-                    StringBuilder buf = dao_cg.render_element_crud(element);
-
-                    methods.add(buf.toString());
+                    throw new Exception("Unexpected element found in DTO XML file");
                 }
             }
         }
     }
 
-    private static boolean process_element_create(IDaoCG dao_cg, TypeCrud element, String dto_class_name,
+    private static boolean process_element_create(IDaoCG dao_cg, TypeCrud jaxb_type_crud, String dto_class_name,
             String table_attr, boolean lower_under_scores, StringBuilder code_buff) throws Exception {
 
         String method_name = null;
 
-        if (element.getCreate() != null) {
+        if (jaxb_type_crud.getCreate() != null) {
 
-            method_name = element.getCreate().getMethod();
+            method_name = jaxb_type_crud.getCreate().getMethod();
 
         } else {
 
-            if (element instanceof CrudAuto) {
+            if (jaxb_type_crud instanceof CrudAuto) {
 
                 method_name = "create" + dto_class_name;
             }
@@ -783,9 +787,9 @@ public class Helpers {
 
         StringBuilder sql_buff = new StringBuilder();
 
-        boolean fetch_generated = element.isFetchGenerated();
+        boolean fetch_generated = jaxb_type_crud.isFetchGenerated();
 
-        String generated = element.getGenerated();
+        String generated = jaxb_type_crud.getGenerated();
 
         StringBuilder tmp = dao_cg.render_element_crud_create(sql_buff, null, method_name, table_attr, dto_class_name,
                 fetch_generated, generated);
@@ -960,36 +964,36 @@ public class Helpers {
         return true;
     }
 
-    public static StringBuilder process_element_crud(IDaoCG dao_cg, boolean lower_under_scores, TypeCrud element,
+    public static StringBuilder process_element_crud(IDaoCG dao_cg, boolean lower_under_scores, TypeCrud jaxb_type_crud,
             String dto_class_name, String table_attr) throws Exception {
 
         boolean is_empty = true;
 
         StringBuilder code_buff = new StringBuilder();
 
-        if (process_element_create(dao_cg, element, dto_class_name, table_attr, lower_under_scores, code_buff)) {
+        if (process_element_create(dao_cg, jaxb_type_crud, dto_class_name, table_attr, lower_under_scores, code_buff)) {
             is_empty = false;
         }
 
-        if (process_element_read_all(dao_cg, element, dto_class_name, table_attr, lower_under_scores, code_buff)) {
+        if (process_element_read_all(dao_cg, jaxb_type_crud, dto_class_name, table_attr, lower_under_scores, code_buff)) {
             is_empty = false;
         }
 
-        if (process_element_read(dao_cg, element, dto_class_name, table_attr, lower_under_scores, code_buff)) {
+        if (process_element_read(dao_cg, jaxb_type_crud, dto_class_name, table_attr, lower_under_scores, code_buff)) {
             is_empty = false;
         }
 
-        if (process_element_update(dao_cg, element, dto_class_name, table_attr, lower_under_scores, code_buff)) {
+        if (process_element_update(dao_cg, jaxb_type_crud, dto_class_name, table_attr, lower_under_scores, code_buff)) {
             is_empty = false;
         }
 
-        if (process_element_delete(dao_cg, element, dto_class_name, table_attr, lower_under_scores, code_buff)) {
+        if (process_element_delete(dao_cg, jaxb_type_crud, dto_class_name, table_attr, lower_under_scores, code_buff)) {
             is_empty = false;
         }
 
-        if ((element instanceof Crud) && is_empty) {
+        if ((jaxb_type_crud instanceof Crud) && is_empty) {
 
-            String node_name = Helpers.get_xml_node_name(element);
+            String node_name = Helpers.get_jaxb_node_name(jaxb_type_crud);
 
             throw new Exception(
                     "Element '" + node_name + "' is empty. Add the method declarations or change to 'crud-auto'");

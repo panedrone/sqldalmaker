@@ -175,11 +175,11 @@ public class JavaCG {
         }
 
         @Override
-        public StringBuilder render_element_query(Object element) throws Exception {
+        public StringBuilder render_element_query(Object jaxb_element) throws Exception {
 
-            MethodInfo mi = new MethodInfo(element);
+            MethodInfo mi = new MethodInfo(jaxb_element);
 
-            String xml_node_name = Helpers.get_xml_node_name(element);
+            String xml_node_name = Helpers.get_jaxb_node_name(jaxb_element);
 
             check_required_attr(xml_node_name, mi.method);
 
@@ -303,7 +303,7 @@ public class JavaCG {
             String method = jaxb_exec_dml.getMethod();
             String ref = jaxb_exec_dml.getRef();
 
-            String xml_node_name = Helpers.get_xml_node_name(jaxb_exec_dml);
+            String xml_node_name = Helpers.get_jaxb_node_name(jaxb_exec_dml);
 
             check_required_attr(xml_node_name, method);
 
@@ -319,7 +319,7 @@ public class JavaCG {
 
                 String[] method_param_descriptors = Helpers.get_listed_items(param_descriptors);
 
-                boolean is_external_sql = jaxb_exec_dml.is_external_sql();
+                boolean is_external_sql = jaxb_exec_dml.isExternalSql();
 
                 StringBuilder buff = new StringBuilder();
 
@@ -685,25 +685,18 @@ public class JavaCG {
         }
 
         @Override
-        public StringBuilder render_element_crud(Object element) throws Exception {
+        public StringBuilder render_element_crud(TypeCrud jaxb_type_crud) throws Exception {
 
-            if (!(element instanceof TypeCrud)) {
+            String node_name = Helpers.get_jaxb_node_name(jaxb_type_crud);
 
-                throw new Exception("Unexpected element found in DTO XML file");
-            }
-
-            TypeCrud element_crud = (TypeCrud) element;
-
-            String node_name = Helpers.get_xml_node_name(element);
-
-            String dto_class_name = element_crud.getDto();
+            String dto_class_name = jaxb_type_crud.getDto();
 
             if (dto_class_name.length() == 0) {
 
                 throw new Exception("<" + node_name + "...\nDTO class is not set");
             }
 
-            String table_attr = element_crud.getTable();
+            String table_attr = jaxb_type_crud.getTable();
 
             if (table_attr == null || table_attr.length() == 0) {
 
@@ -716,7 +709,7 @@ public class JavaCG {
 
                 process_dto_class_name(dto_package, dto_class_name);
 
-                StringBuilder code_buff = Helpers.process_element_crud(this, false, element_crud, dto_class_name,
+                StringBuilder code_buff = Helpers.process_element_crud(this, false, jaxb_type_crud, dto_class_name,
                         table_attr);
 
                 return code_buff;
