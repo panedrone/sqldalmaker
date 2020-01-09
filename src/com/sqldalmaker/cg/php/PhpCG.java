@@ -28,7 +28,7 @@ public class PhpCG {
 
         private final String sql_root_abs_path;
 
-        private final List<DtoClass> dto_classes;
+        private final List<DtoClass> jaxb_dto_classes;
 
         private final TemplateEngine te;
 
@@ -36,10 +36,10 @@ public class PhpCG {
 
         private final String namespace;
 
-        public DTO(DtoClasses dto_classes, Connection connection, String sql_root_abs_path, String vm_file_system_dir,
+        public DTO(DtoClasses jaxb_dto_classes, Connection connection, String sql_root_abs_path, String vm_file_system_dir,
                 String namespace) throws Exception {
 
-            this.dto_classes = dto_classes.getDtoClass();
+            this.jaxb_dto_classes = jaxb_dto_classes.getDtoClass();
 
             this.sql_root_abs_path = sql_root_abs_path;
 
@@ -60,30 +60,30 @@ public class PhpCG {
         @Override
         public String[] translate(String dto_class_name) throws Exception {
 
-            DtoClass cls_element = null;
+            DtoClass jaxb_dto_class = null;
 
-            for (DtoClass cls : dto_classes) {
+            for (DtoClass cls : jaxb_dto_classes) {
 
                 if (cls.getName().equals(dto_class_name)) {
 
-                    cls_element = cls;
+                    jaxb_dto_class = cls;
 
                     break;
                 }
             }
 
-            if (cls_element == null) {
+            if (jaxb_dto_class == null) {
 
                 throw new Exception("XML element of DTO class '" + dto_class_name + "' not found");
             }
 
-            String jdbc_sql = db_utils.jdbc_sql_by_ref_query(cls_element.getRef(), sql_root_abs_path);
+            String jdbc_sql = db_utils.jdbc_sql_by_ref_query(jaxb_dto_class.getRef(), sql_root_abs_path);
 
-            ArrayList<FieldInfo> fields = new ArrayList<FieldInfo>();
+            List<FieldInfo> fields = new ArrayList<FieldInfo>();
 
-            db_utils.get_dto_field_info(jdbc_sql, cls_element, fields);
+            db_utils.get_dto_field_info(jdbc_sql, jaxb_dto_class, fields);
 
-            HashMap<String, Object> context = new HashMap<String, Object>();
+            Map<String, Object> context = new HashMap<String, Object>();
 
             context.put("class_name", dto_class_name);
             context.put("fields", fields);
@@ -107,7 +107,7 @@ public class PhpCG {
 
         private final String sql_root_abs_path;
 
-        private final DtoClasses dto_classes;
+        private final DtoClasses jaxb_dto_classes;
 
         private final Set<String> includes = new HashSet<String>();
 
@@ -121,10 +121,10 @@ public class PhpCG {
 
         private final String dao_namespace;
 
-        public DAO(DtoClasses dto_classes, Connection connection, String sql_root_abs_path, String vm_file_system_dir,
+        public DAO(DtoClasses jaxb_dto_classes, Connection connection, String sql_root_abs_path, String vm_file_system_dir,
                 String dto_namespace, String dao_namespace) throws Exception {
 
-            this.dto_classes = dto_classes;
+            this.jaxb_dto_classes = jaxb_dto_classes;
 
             this.sql_root_abs_path = sql_root_abs_path;
 
@@ -155,7 +155,7 @@ public class PhpCG {
 
             Helpers.process_element(this, dao_class, methods);
 
-            HashMap<String, Object> context = new HashMap<String, Object>();
+            Map<String, Object> context = new HashMap<String, Object>();
 
             String[] imports_arr = includes.toArray(new String[includes.size()]);
             Arrays.sort(imports_arr);
@@ -224,12 +224,11 @@ public class PhpCG {
                 boolean return_type_is_dto, boolean fetch_list, String method_name, String dto_param_type,
                 String[] param_descriptors, boolean is_crud, String xml_node_name) throws Exception {
 
-            ArrayList<FieldInfo> fields = new ArrayList<FieldInfo>();
-
-            ArrayList<FieldInfo> params = new ArrayList<FieldInfo>();
+            List<FieldInfo> fields = new ArrayList<FieldInfo>();
+            List<FieldInfo> params = new ArrayList<FieldInfo>();
 
             db_utils.get_query_jdbc_sql_info(sql_root_abs_path, dao_jdbc_sql, fields, dto_param_type, param_descriptors, params,
-                    return_type, return_type_is_dto, dto_classes);
+                    return_type, return_type_is_dto, jaxb_dto_classes);
 
             int col_count = fields.size();
 
@@ -238,7 +237,7 @@ public class PhpCG {
                 throw new Exception("Columns count is 0. Is SQL statement valid?");
             }
 
-            HashMap<String, Object> context = new HashMap<String, Object>();
+            Map<String, Object> context = new HashMap<String, Object>();
 
             if (return_type_is_dto) {
 
@@ -295,27 +294,27 @@ public class PhpCG {
 
         private String process_dto_class_name(String dto_class_name) throws Exception {
 
-            DtoClass dtoDef = Helpers.find_dto_class(dto_class_name, dto_classes);
+            DtoClass jaxb_dto_class = Helpers.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
 
-            includes.add(dtoDef.getName());
+            includes.add(jaxb_dto_class.getName());
 
             String full_name;
 
             if (dto_namespace != null && dto_namespace.length() > 0) {
 
-                full_name = "\\" + dto_namespace + "\\" + dtoDef.getName();
+                full_name = "\\" + dto_namespace + "\\" + jaxb_dto_class.getName();
 
                 uses.add(full_name);
 
             } else if (dao_namespace != null && dao_namespace.length() > 0) {
 
-                full_name = "\\" + dtoDef.getName();
+                full_name = "\\" + jaxb_dto_class.getName();
 
                 uses.add(full_name);
             }
 
             // do not add use if both namespaces are empty
-            return dtoDef.getName();
+            return jaxb_dto_class.getName();
         }
 
         @Override
@@ -364,7 +363,7 @@ public class PhpCG {
 
             DbUtils.throw_if_select_sql(dao_jdbc_sql);
 
-            ArrayList<FieldInfo> params = new ArrayList<FieldInfo>();
+            List<FieldInfo> params = new ArrayList<FieldInfo>();
 
             db_utils.get_exec_dml_jdbc_sql_info(dao_jdbc_sql, dto_param_type, param_descriptors, params);
 
@@ -383,7 +382,7 @@ public class PhpCG {
 
             String php_sql_str = Helpers.sql_to_php_str(dao_php_sql);
 
-            HashMap<String, Object> context = new HashMap<String, Object>();
+            Map<String, Object> context = new HashMap<String, Object>();
 
             assign_params(params, dto_param_type, context);
 
@@ -401,7 +400,7 @@ public class PhpCG {
             buffer.append(sw.getBuffer());
         }
 
-        private void assign_params(ArrayList<FieldInfo> params, String dto_param_type, HashMap<String, Object> context)
+        private void assign_params(List<FieldInfo> params, String dto_param_type, Map<String, Object> context)
                 throws Exception {
 
             int paramsCount = params.size();
@@ -473,11 +472,11 @@ public class PhpCG {
 
             StringBuilder buffer = new StringBuilder();
 
-            ArrayList<FieldInfo> keys = new ArrayList<FieldInfo>();
+            List<FieldInfo> keys = new ArrayList<FieldInfo>();
 
             if (!fetch_list) {
 
-                db_utils.get_crud_info(table_name, keys, null, ret_dto_type, dto_classes);
+                db_utils.get_crud_info(table_name, keys, null, ret_dto_type, jaxb_dto_classes);
 
                 if (keys.isEmpty()) {
 
@@ -489,7 +488,8 @@ public class PhpCG {
                 }
             }
 
-            HashMap<String, Object> context = new HashMap<String, Object>();
+            Map<String, Object> context = new HashMap<String, Object>();
+            
             context.put("keys", keys);
 
             String mode = fetch_list ? "crud_sql_read_all" : "crud_sql_read_single";
@@ -498,7 +498,7 @@ public class PhpCG {
             generate_sql(mode, context, table_name, sw);
             sql_buff.append(sw.getBuffer());
 
-            ArrayList<String> desc = new ArrayList<String>();
+            List<String> desc = new ArrayList<String>();
 
             for (FieldInfo k : keys) {
 
@@ -517,19 +517,17 @@ public class PhpCG {
         public StringBuilder render_element_crud_create(StringBuilder sql_buff, String class_name, String method_name,
                 String table_name, String dto_class_name, boolean fetch_generated, String generated) throws Exception {
 
-            ArrayList<FieldInfo> params = new ArrayList<FieldInfo>();
-
-            ArrayList<FieldInfo> keys = new ArrayList<FieldInfo>();
-
+            List<FieldInfo> params = new ArrayList<FieldInfo>();
+            List<FieldInfo> keys = new ArrayList<FieldInfo>();
             List<String> sql_col_names = new ArrayList<String>();
 
             db_utils.get_crud_create_metadata(table_name, keys, sql_col_names, params, generated, dto_class_name,
-                    dto_classes);
+                    jaxb_dto_classes);
 
             // reuse buffer filled earlier
             if (sql_buff.length() == 0) {
 
-                HashMap<String, Object> context = new HashMap<String, Object>();
+                Map<String, Object> context = new HashMap<String, Object>();
 
                 context.put("col_names", sql_col_names);
 
@@ -542,7 +540,7 @@ public class PhpCG {
 
             String sql_str = Helpers.sql_to_php_str(sql_buff);
 
-            HashMap<String, Object> context = new HashMap<String, Object>();
+            Map<String, Object> context = new HashMap<String, Object>();
 
             context.put("method_type", "CREATE");
             context.put("table_name", table_name);
@@ -581,7 +579,7 @@ public class PhpCG {
             return buffer;
         }
 
-        private void generate_sql(String mode, HashMap<String, Object> context, String table_name, StringWriter sw) {
+        private void generate_sql(String mode, Map<String, Object> context, String table_name, StringWriter sw) {
 
             context.put("table_name", table_name);
             context.put("mode", mode);
@@ -595,11 +593,10 @@ public class PhpCG {
 
             StringBuilder buffer = new StringBuilder();
 
-            ArrayList<FieldInfo> params = new ArrayList<FieldInfo>();
+            List<FieldInfo> params = new ArrayList<FieldInfo>();
+            List<FieldInfo> keys = new ArrayList<FieldInfo>();
 
-            ArrayList<FieldInfo> keys = new ArrayList<FieldInfo>();
-
-            db_utils.get_crud_info(table_name, keys, params, dto_class_name, dto_classes);
+            db_utils.get_crud_info(table_name, keys, params, dto_class_name, jaxb_dto_classes);
 
             if (keys.isEmpty()) {
 
@@ -626,7 +623,8 @@ public class PhpCG {
             // reuse buffer filled earlier
             if (sql_buff.length() == 0) {
 
-                HashMap<String, Object> context = new HashMap<String, Object>();
+                Map<String, Object> context = new HashMap<String, Object>();
+                
                 context.put("params", params);
                 context.put("keys", keys);
 
@@ -643,7 +641,7 @@ public class PhpCG {
 
             String sql_str = Helpers.sql_to_php_str(sql_buff);
 
-            HashMap<String, Object> context = new HashMap<String, Object>();
+            Map<String, Object> context = new HashMap<String, Object>();
 
             context.put("class_name", class_name);
             context.put("method_name", method_name);
@@ -673,9 +671,9 @@ public class PhpCG {
 
             StringBuilder buffer = new StringBuilder();
 
-            ArrayList<FieldInfo> keys = new ArrayList<FieldInfo>();
+            List<FieldInfo> keys = new ArrayList<FieldInfo>();
 
-            db_utils.get_crud_info(table_name, keys, null, dto_class_name, dto_classes);
+            db_utils.get_crud_info(table_name, keys, null, dto_class_name, jaxb_dto_classes);
 
             if (keys.isEmpty()) {
 
@@ -689,7 +687,7 @@ public class PhpCG {
             // reuse buffer filled earlier
             if (sql_buff.length() == 0) {
 
-                HashMap<String, Object> context = new HashMap<String, Object>();
+                Map<String, Object> context = new HashMap<String, Object>();
 
                 context.put("keys", keys);
 
@@ -702,7 +700,7 @@ public class PhpCG {
 
             String sql_str = Helpers.sql_to_php_str(sql_buff);
 
-            HashMap<String, Object> context = new HashMap<String, Object>();
+            Map<String, Object> context = new HashMap<String, Object>();
 
             context.put("class_name", class_name);
             context.put("method_name", method_name);

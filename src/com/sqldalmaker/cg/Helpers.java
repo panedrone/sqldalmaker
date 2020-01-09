@@ -531,7 +531,7 @@ public class Helpers {
         return class_name;
     }
 
-    public static DtoClass find_dto_class(String dto_attr, DtoClasses dto_classes) throws Exception {
+    public static DtoClass find_jaxb_dto_class(String dto_attr, DtoClasses jaxb_dto_classes) throws Exception {
 
         if (dto_attr == null || dto_attr.length() == 0) {
 
@@ -542,7 +542,7 @@ public class Helpers {
 
         int found = 0;
 
-        for (DtoClass cls : dto_classes.getDtoClass()) {
+        for (DtoClass cls : jaxb_dto_classes.getDtoClass()) {
 
             String name = cls.getName();
 

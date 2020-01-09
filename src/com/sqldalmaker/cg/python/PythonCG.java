@@ -30,16 +30,16 @@ public class PythonCG {
 
         private final String sql_root_abs_path;
 
-        private final List<DtoClass> dto_classes;
+        private final List<DtoClass> jaxb_dto_classes;
 
         private final TemplateEngine te;
 
         private final DbUtils db_utils;
 
-        public DTO(DtoClasses dto_classes, Connection connection, String sql_root_abs_path, String vm_file_system_dir)
+        public DTO(DtoClasses jaxb_dto_classes, Connection connection, String sql_root_abs_path, String vm_file_system_dir)
                 throws Exception {
 
-            this.dto_classes = dto_classes.getDtoClass();
+            this.jaxb_dto_classes = jaxb_dto_classes.getDtoClass();
 
             this.sql_root_abs_path = sql_root_abs_path;
 
@@ -58,30 +58,30 @@ public class PythonCG {
         @Override
         public String[] translate(String dto_class_name) throws Exception {
 
-            DtoClass cls_element = null;
+            DtoClass jaxb_dto_class = null;
 
-            for (DtoClass cls : dto_classes) {
+            for (DtoClass cls : jaxb_dto_classes) {
 
                 if (cls.getName().equals(dto_class_name)) {
 
-                    cls_element = cls;
+                    jaxb_dto_class = cls;
 
                     break;
                 }
             }
 
-            if (cls_element == null) {
+            if (jaxb_dto_class == null) {
 
                 throw new Exception("XML element of DTO class '" + dto_class_name + "' not found");
             }
 
-            String jdbc_sql = db_utils.jdbc_sql_by_ref_query(cls_element.getRef(), sql_root_abs_path);
+            String jdbc_sql = db_utils.jdbc_sql_by_ref_query(jaxb_dto_class.getRef(), sql_root_abs_path);
 
-            ArrayList<FieldInfo> fields = new ArrayList<FieldInfo>();
+            List<FieldInfo> fields = new ArrayList<FieldInfo>();
 
-            db_utils.get_dto_field_info(jdbc_sql, cls_element, fields);
+            db_utils.get_dto_field_info(jdbc_sql, jaxb_dto_class, fields);
 
-            HashMap<String, Object> context = new HashMap<String, Object>();
+            Map<String, Object> context = new HashMap<String, Object>();
 
             context.put("class_name", dto_class_name);
 
@@ -105,7 +105,7 @@ public class PythonCG {
 
         private final String sql_root_abs_path;
 
-        private final DtoClasses dto_classes;
+        private final DtoClasses jaxb_dto_classes;
 
         private final Set<String> imports = new HashSet<String>();
 
@@ -115,10 +115,10 @@ public class PythonCG {
 
         private final DbUtils db_utils;
 
-        public DAO(DtoClasses dto_classes, Connection connection, String sql_root_abs_path, String vm_file_system_dir)
+        public DAO(DtoClasses jaxb_dto_classes, Connection connection, String sql_root_abs_path, String vm_file_system_dir)
                 throws Exception {
 
-            this.dto_classes = dto_classes;
+            this.jaxb_dto_classes = jaxb_dto_classes;
 
             this.sql_root_abs_path = sql_root_abs_path;
 
@@ -150,7 +150,7 @@ public class PythonCG {
                 methods.set(i, m);
             }
 
-            HashMap<String, Object> context = new HashMap<String, Object>();
+            Map<String, Object> context = new HashMap<String, Object>();
 
             String[] imports_arr = imports.toArray(new String[imports.size()]);
             Arrays.sort(imports_arr);
@@ -219,12 +219,11 @@ public class PythonCG {
                 boolean return_type_is_dto, boolean fetch_list, String method_name, String dto_param_type,
                 String[] param_descriptors, boolean is_crud, String xml_node_name) throws Exception {
 
-            ArrayList<FieldInfo> fields = new ArrayList<FieldInfo>();
-
-            ArrayList<FieldInfo> params = new ArrayList<FieldInfo>();
+            List<FieldInfo> fields = new ArrayList<FieldInfo>();
+            List<FieldInfo> params = new ArrayList<FieldInfo>();
 
             db_utils.get_query_jdbc_sql_info(sql_root_abs_path, dao_jdbc_sql, fields, dto_param_type, param_descriptors, params,
-                    return_type, return_type_is_dto, dto_classes);
+                    return_type, return_type_is_dto, jaxb_dto_classes);
 
             int col_count = fields.size();
 
@@ -233,7 +232,7 @@ public class PythonCG {
                 throw new Exception("Columns count is 0. Is SQL statement valid?");
             }
 
-            HashMap<String, Object> context = new HashMap<String, Object>();
+            Map<String, Object> context = new HashMap<String, Object>();
 
             if (return_type_is_dto) {
 
@@ -296,14 +295,14 @@ public class PythonCG {
 
         private String process_dto_class_name(String dto_class_name, boolean add_to_import) throws Exception {
 
-            DtoClass dtoDef = Helpers.find_dto_class(dto_class_name, dto_classes);
+            DtoClass jaxb_dto_class = Helpers.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
 
             if (add_to_import) {
 
-                imports.add(dtoDef.getName());
+                imports.add(jaxb_dto_class.getName());
             }
 
-            return dtoDef.getName();
+            return jaxb_dto_class.getName();
         }
 
         @Override
@@ -352,7 +351,7 @@ public class PythonCG {
 
             DbUtils.throw_if_select_sql(dao_jdbc_sql);
 
-            ArrayList<FieldInfo> params = new ArrayList<FieldInfo>();
+            List<FieldInfo> params = new ArrayList<FieldInfo>();
 
             db_utils.get_exec_dml_jdbc_sql_info(dao_jdbc_sql, dto_param_type, param_descriptors, params);
 
@@ -371,7 +370,7 @@ public class PythonCG {
 
             String python_sql_str = Helpers.sql_to_python_string(dao_python_sql);
 
-            HashMap<String, Object> context = new HashMap<String, Object>();
+            Map<String, Object> context = new HashMap<String, Object>();
 
             assign_params(params, dto_param_type, context);
 
@@ -391,7 +390,7 @@ public class PythonCG {
             buffer.append(sw.getBuffer());
         }
 
-        private void assign_params(ArrayList<FieldInfo> params, String dto_param_type, HashMap<String, Object> context)
+        private void assign_params(List<FieldInfo> params, String dto_param_type, Map<String, Object> context)
                 throws Exception {
 
             int paramsCount = params.size();
@@ -463,11 +462,11 @@ public class PythonCG {
 
             StringBuilder buffer = new StringBuilder();
 
-            ArrayList<FieldInfo> keys = new ArrayList<FieldInfo>();
+            List<FieldInfo> keys = new ArrayList<FieldInfo>();
 
             if (!fetch_list) {
 
-                db_utils.get_crud_info(table_name, keys, null, ret_dto_type, dto_classes);
+                db_utils.get_crud_info(table_name, keys, null, ret_dto_type, jaxb_dto_classes);
 
                 if (keys.isEmpty()) {
 
@@ -484,7 +483,8 @@ public class PythonCG {
                 // but maybe, somebody needs it...
             }
 
-            HashMap<String, Object> context = new HashMap<String, Object>();
+            Map<String, Object> context = new HashMap<String, Object>();
+            
             context.put("keys", keys);
 
             String mode = fetch_list ? "crud_sql_read_all" : "crud_sql_read_single";
@@ -493,7 +493,7 @@ public class PythonCG {
             generate_sql(mode, context, table_name, sw);
             sql_buff.append(sw.getBuffer());
 
-            ArrayList<String> desc = new ArrayList<String>();
+            List<String> desc = new ArrayList<String>();
 
             for (FieldInfo k : keys) {
                 desc.add(k.getType() + " " + k.getName());
@@ -511,19 +511,18 @@ public class PythonCG {
         public StringBuilder render_element_crud_create(StringBuilder sql_buff, String class_name, String method_name,
                 String table_name, String dto_class_name, boolean fetch_generated, String generated) throws Exception {
 
-            ArrayList<FieldInfo> params = new ArrayList<FieldInfo>();
-
-            ArrayList<FieldInfo> keys = new ArrayList<FieldInfo>();
-
+            List<FieldInfo> params = new ArrayList<FieldInfo>();
+            List<FieldInfo> keys = new ArrayList<FieldInfo>();
             List<String> sql_col_names = new ArrayList<String>();
 
             db_utils.get_crud_create_metadata(table_name, keys, sql_col_names, params, generated, dto_class_name,
-                    dto_classes);
+                    jaxb_dto_classes);
 
             // reuse buffer filled earlier
             if (sql_buff.length() == 0) {
 
-                HashMap<String, Object> context = new HashMap<String, Object>();
+                Map<String, Object> context = new HashMap<String, Object>();
+                
                 context.put("col_names", sql_col_names);
 
                 StringWriter sw = new StringWriter();
@@ -533,7 +532,7 @@ public class PythonCG {
 
             String sql_str = Helpers.sql_to_python_string(sql_buff);
 
-            HashMap<String, Object> context = new HashMap<String, Object>();
+            Map<String, Object> context = new HashMap<String, Object>();
 
             context.put("method_type", "CREATE");
             context.put("table_name", table_name);
@@ -573,7 +572,7 @@ public class PythonCG {
             return buffer;
         }
 
-        private void generate_sql(String mode, HashMap<String, Object> context, String table_name, StringWriter sw) {
+        private void generate_sql(String mode, Map<String, Object> context, String table_name, StringWriter sw) {
 
             context.put("table_name", table_name);
             context.put("mode", mode);
@@ -587,11 +586,10 @@ public class PythonCG {
 
             StringBuilder buffer = new StringBuilder();
 
-            ArrayList<FieldInfo> params = new ArrayList<FieldInfo>();
+            List<FieldInfo> params = new ArrayList<FieldInfo>();
+            List<FieldInfo> keys = new ArrayList<FieldInfo>();
 
-            ArrayList<FieldInfo> keys = new ArrayList<FieldInfo>();
-
-            db_utils.get_crud_info(table_name, keys, params, dto_class_name, dto_classes);
+            db_utils.get_crud_info(table_name, keys, params, dto_class_name, jaxb_dto_classes);
 
             if (keys.isEmpty()) {
 
@@ -618,7 +616,8 @@ public class PythonCG {
             // reuse buffer filled earlier
             if (sql_buff.length() == 0) {
 
-                HashMap<String, Object> context = new HashMap<String, Object>();
+                Map<String, Object> context = new HashMap<String, Object>();
+                
                 context.put("params", params);
                 context.put("keys", keys);
 
@@ -637,7 +636,7 @@ public class PythonCG {
 
             String sql_str = Helpers.sql_to_python_string(sql_buff);
 
-            HashMap<String, Object> context = new HashMap<String, Object>();
+            Map<String, Object> context = new HashMap<String, Object>();
 
             context.put("class_name", class_name);
             context.put("method_name", method_name);
@@ -665,9 +664,9 @@ public class PythonCG {
 
             StringBuilder buffer = new StringBuilder();
 
-            ArrayList<FieldInfo> keys = new ArrayList<FieldInfo>();
+            List<FieldInfo> keys = new ArrayList<FieldInfo>();
 
-            db_utils.get_crud_info(table_name, keys, null, dto_class_name, dto_classes);
+            db_utils.get_crud_info(table_name, keys, null, dto_class_name, jaxb_dto_classes);
 
             if (keys.isEmpty()) {
 
@@ -681,7 +680,8 @@ public class PythonCG {
             // reuse buffer filled earlier
             if (sql_buff.length() == 0) {
 
-                HashMap<String, Object> context = new HashMap<String, Object>();
+                Map<String, Object> context = new HashMap<String, Object>();
+                
                 context.put("keys", keys);
 
                 StringWriter sw = new StringWriter();
@@ -691,7 +691,7 @@ public class PythonCG {
 
             String sql_str = Helpers.sql_to_python_string(sql_buff);
 
-            HashMap<String, Object> context = new HashMap<String, Object>();
+            Map<String, Object> context = new HashMap<String, Object>();
 
             context.put("class_name", class_name);
             context.put("method_name", method_name);

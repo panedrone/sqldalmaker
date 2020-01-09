@@ -1,6 +1,6 @@
 2010-01-07
 
-        DTO fields may be declared in XML even they are missing in metadata. You calculate the values of such fields outside of RDBMS.
+	DTO fields may be declared in XML even they are missing in metadata. You calculate the values of such fields outside of RDBMS.
 
 2019-12-31
 	
@@ -14,23 +14,23 @@
 
 2019-08-17
 
-    - Fixes of DTO navigation in Eclipse.
+    Fixes of DTO navigation in Eclipse.
 
 2019-08-14
 
-    - Adapted for xerial PK column names like '[employeeid] asc'.
+    Adapted for xerial PK column names like '[employeeid] asc'.
 
 2019-08-13
 
-    - Fixed incorrect commenting in Python and Ruby target code.
+    Fixed incorrect commenting in Python and Ruby target code.
 
 2019-08-07
 
-    - Fixed incorrect enumeration of root-files.
+    Fixed incorrect enumeration of root-files.
 
 2019-08-04
 
-    - Adapted for new naming of SQL columns in SQLite3 JDBC driver
+    Adapted for new naming of SQL columns in SQLite3 JDBC driver
 
     [INFO]
     
@@ -46,15 +46,15 @@
       
 2019-08-02
 
-    - Fixed incorrect detection of PK for CRUD + SQLite3    
+    Fixed incorrect detection of PK for CRUD + SQLite3    
 	
 2019-01-11
 
-    - Fixes for DTO/DAO XML assistants + MySQL.
+    Fixes for DTO/DAO XML assistants + MySQL.
 
 2018-11-11
 
-    - Fixes for DTO/DAO XML assistants + MySQL.
+    Fixes for DTO/DAO XML assistants + MySQL.
 
 2018-11-07
 

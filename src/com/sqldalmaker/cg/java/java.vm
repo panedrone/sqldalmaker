@@ -88,7 +88,7 @@ public class ${class_name} {
 }## ====================================================================================================================
 #elseif($mode=="dao_create")
 
-	/**
+	/*
 	 * CRUD-Create. The table '${table_name}'.
 	 * Auto-generated values are assigned to appropriate fields of DTO.
 	 * Returns the number of affected rows or -1 on error.
@@ -112,7 +112,7 @@ public class ${class_name} {
 #elseif($mode=="dao_query")
 
 #if($crud)
-	/**
+	/*
 	 * CRUD-Read. The table '${ref}'.
 	 */
 #end
@@ -174,7 +174,7 @@ public class ${class_name} {
 #elseif($mode=="dao_exec_dml")
 #if(${dto_param} != "")
 
-	/**
+	/*
 #if($method_type == "CREATE")
 	 * CRUD-Create. The table '${table_name}'.
 #elseif($method_type == "UPDATE")
@@ -192,7 +192,7 @@ public class ${class_name} {
 #end
 #if($plain_params)
 
-	/**
+	/*
 #if($method_type == "CREATE")
 	 * CRUD-Create. The table '${table_name}'.
 #elseif($method_type == "UPDATE")

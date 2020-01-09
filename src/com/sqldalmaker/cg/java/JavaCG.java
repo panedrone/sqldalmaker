@@ -32,16 +32,16 @@ public class JavaCG {
 
         private final String dto_inheritance;
 
-        private final List<DtoClass> dto_classes;
+        private final List<DtoClass> jaxb_dto_classes;
 
         private final TemplateEngine te;
 
         private final DbUtils db_utils;
 
-        public DTO(DtoClasses dto_classes, Connection connection, String dto_package, String sql_root_abs_path,
+        public DTO(DtoClasses jaxb_dto_classes, Connection connection, String dto_package, String sql_root_abs_path,
                 String dto_inheritance, FieldNamesMode field_names_mode, String vm_file_system_dir) throws Exception {
 
-            this.dto_classes = dto_classes.getDtoClass();
+            this.jaxb_dto_classes = jaxb_dto_classes.getDtoClass();
 
             this.dto_package = dto_package;
 
@@ -64,29 +64,30 @@ public class JavaCG {
         @Override
         public String[] translate(String dto_class_name) throws Exception {
 
-            DtoClass cls_element = null;
+            DtoClass jaxb_dto_class = null;
 
-            for (DtoClass cls : dto_classes) {
+            for (DtoClass cls : jaxb_dto_classes) {
 
                 if (cls.getName().equals(dto_class_name)) {
 
-                    cls_element = cls;
+                    jaxb_dto_class = cls;
 
                     break;
                 }
             }
 
-            if (cls_element == null) {
+            if (jaxb_dto_class == null) {
 
                 throw new Exception("XML element of DTO class '" + dto_class_name + "' not found");
             }
-            String jdbc_sql = db_utils.jdbc_sql_by_ref_query(cls_element.getRef(), sql_root_abs_path);
+            
+            String jdbc_sql = db_utils.jdbc_sql_by_ref_query(jaxb_dto_class.getRef(), sql_root_abs_path);
 
-            ArrayList<FieldInfo> fields = new ArrayList<FieldInfo>();
+            List<FieldInfo> fields = new ArrayList<FieldInfo>();
 
-            db_utils.get_dto_field_info(jdbc_sql, cls_element, fields);
+            db_utils.get_dto_field_info(jdbc_sql, jaxb_dto_class, fields);
 
-            HashMap<String, Object> context = new HashMap<String, Object>();
+            Map<String, Object> context = new HashMap<String, Object>();
 
             context.put("package", dto_package);
             context.put("class_name", dto_class_name);
@@ -113,7 +114,7 @@ public class JavaCG {
 
         private final String sql_root_abs_path;
 
-        private final DtoClasses dto_classes;
+        private final DtoClasses jaxb_dto_classes;
 
         private final Set<String> imports = new HashSet<String>();
 
@@ -121,10 +122,10 @@ public class JavaCG {
 
         private final DbUtils db_utils;
 
-        public DAO(DtoClasses dto_classes, Connection connection, String dto_package, String dao_package,
+        public DAO(DtoClasses jaxb_dto_classes, Connection connection, String dto_package, String dao_package,
                 String sql_root_abs_path, FieldNamesMode field_names_mode, String vm_file_system_dir) throws Exception {
 
-            this.dto_classes = dto_classes;
+            this.jaxb_dto_classes = jaxb_dto_classes;
 
             this.dto_package = dto_package;
 
@@ -153,7 +154,7 @@ public class JavaCG {
 
             Helpers.process_element(this, dao_class, methods);
 
-            HashMap<String, Object> context = new HashMap<String, Object>();
+            Map<String, Object> context = new HashMap<String, Object>();
 
             context.put("package", dao_package);
 
@@ -222,12 +223,11 @@ public class JavaCG {
                 String dto_param_type, String[] param_descriptors, boolean crud, String xml_node_name)
                 throws Exception {
 
-            ArrayList<FieldInfo> fields = new ArrayList<FieldInfo>();
-
-            ArrayList<FieldInfo> params = new ArrayList<FieldInfo>();
+            List<FieldInfo> fields = new ArrayList<FieldInfo>();
+            List<FieldInfo> params = new ArrayList<FieldInfo>();
 
             db_utils.get_query_jdbc_sql_info(sql_root_abs_path, dao_jdbc_sql, fields, dto_param_type, param_descriptors,
-                    params, return_type, return_type_is_dto, dto_classes);
+                    params, return_type, return_type_is_dto, jaxb_dto_classes);
 
             int col_count = fields.size();
 
@@ -255,7 +255,7 @@ public class JavaCG {
 
             String java_sql_str = Helpers.sql_to_java_str(dao_jdbc_sql);
 
-            HashMap<String, Object> context = new HashMap<String, Object>();
+            Map<String, Object> context = new HashMap<String, Object>();
 
             assign_params(params, dto_param_type, context);
 
@@ -280,9 +280,9 @@ public class JavaCG {
 
         public String get_rendered_dto_class_name(String dto_class_name) throws Exception {
 
-            DtoClass dto_def = Helpers.find_dto_class(dto_class_name, dto_classes);
+            DtoClass jaxb_dto_class = Helpers.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
 
-            return dto_def.getName();
+            return jaxb_dto_class.getName();
         }
 
         private void process_dto_class_name(String dto_package, String dto_class_name) throws Exception {
@@ -298,12 +298,12 @@ public class JavaCG {
         }
 
         @Override
-        public StringBuilder render_element_exec_dml(ExecDml element) throws Exception {
+        public StringBuilder render_element_exec_dml(ExecDml jaxb_exec_dml) throws Exception {
 
-            String method = element.getMethod();
-            String ref = element.getRef();
+            String method = jaxb_exec_dml.getMethod();
+            String ref = jaxb_exec_dml.getRef();
 
-            String xml_node_name = Helpers.get_xml_node_name(element);
+            String xml_node_name = Helpers.get_xml_node_name(jaxb_exec_dml);
 
             check_required_attr(xml_node_name, method);
 
@@ -319,7 +319,7 @@ public class JavaCG {
 
                 String[] method_param_descriptors = Helpers.get_listed_items(param_descriptors);
 
-                boolean is_external_sql = element.is_external_sql();
+                boolean is_external_sql = jaxb_exec_dml.is_external_sql();
 
                 StringBuilder buff = new StringBuilder();
 
@@ -343,13 +343,13 @@ public class JavaCG {
 
             DbUtils.throw_if_select_sql(dao_jdbc_sql);
 
-            ArrayList<FieldInfo> params = new ArrayList<FieldInfo>();
+            List<FieldInfo> params = new ArrayList<FieldInfo>();
 
             db_utils.get_exec_dml_jdbc_sql_info(dao_jdbc_sql, dto_param_type, param_descriptors, params);
 
             String java_sql = Helpers.sql_to_java_str(dao_jdbc_sql);
 
-            HashMap<String, Object> context = new HashMap<String, Object>();
+            Map<String, Object> context = new HashMap<String, Object>();
 
             assign_params(params, dto_param_type, context);
 
@@ -369,7 +369,7 @@ public class JavaCG {
             buffer.append(sw.getBuffer());
         }
 
-        private void assign_params(ArrayList<FieldInfo> params, String dto_param_type, HashMap<String, Object> context)
+        private void assign_params(List<FieldInfo> params, String dto_param_type, Map<String, Object> context)
                 throws Exception {
 
             int params_count = params.size();
@@ -443,11 +443,11 @@ public class JavaCG {
 
             StringBuilder buffer = new StringBuilder();
 
-            ArrayList<FieldInfo> keys = new ArrayList<FieldInfo>();
+            List<FieldInfo> keys = new ArrayList<FieldInfo>();
 
             if (!fetch_list) {
 
-                db_utils.get_crud_info(table_name, keys, null, ret_dto_type, dto_classes);
+                db_utils.get_crud_info(table_name, keys, null, ret_dto_type, jaxb_dto_classes);
 
                 if (keys.isEmpty()) {
 
@@ -464,7 +464,8 @@ public class JavaCG {
                 // but maybe, somebody needs it...
             }
 
-            HashMap<String, Object> context = new HashMap<String, Object>();
+            Map<String, Object> context = new HashMap<String, Object>();
+            
             context.put("keys", keys);
 
             String mode = fetch_list ? "crud_sql_read_all" : "crud_sql_read_single";
@@ -473,7 +474,7 @@ public class JavaCG {
             generate_sql(mode, context, table_name, sw);
             sql_buff.append(sw.getBuffer());
 
-            ArrayList<String> desc = new ArrayList<String>();
+            List<String> desc = new ArrayList<String>();
 
             for (FieldInfo k : keys) {
 
@@ -492,19 +493,18 @@ public class JavaCG {
         public StringBuilder render_element_crud_create(StringBuilder sql_buff, String class_name, String method_name,
                 String table_name, String dto_class_name, boolean fetch_generated, String generated) throws Exception {
 
-            ArrayList<FieldInfo> params = new ArrayList<FieldInfo>();
-
-            ArrayList<FieldInfo> keys = new ArrayList<FieldInfo>();
-
+            List<FieldInfo> params = new ArrayList<FieldInfo>();
+            List<FieldInfo> keys = new ArrayList<FieldInfo>();
             List<String> sql_col_names = new ArrayList<String>();
 
             db_utils.get_crud_create_metadata(table_name, keys, sql_col_names, params, generated, dto_class_name,
-                    dto_classes);
+                    jaxb_dto_classes);
 
             // reuse buffer filled earlier
             if (sql_buff.length() == 0) {
 
-                HashMap<String, Object> context = new HashMap<String, Object>();
+                Map<String, Object> context = new HashMap<String, Object>();
+                
                 context.put("col_names", sql_col_names);
 
                 StringWriter sw = new StringWriter();
@@ -514,7 +514,7 @@ public class JavaCG {
 
             String java_sql_str = Helpers.sql_to_java_str(sql_buff);
 
-            HashMap<String, Object> context = new HashMap<String, Object>();
+            Map<String, Object> context = new HashMap<String, Object>();
 
             context.put("method_type", "CREATE");
             context.put("table_name", table_name);
@@ -549,7 +549,7 @@ public class JavaCG {
             return buffer;
         }
 
-        private void generate_sql(String mode, HashMap<String, Object> context, String table_name, StringWriter sw) {
+        private void generate_sql(String mode, Map<String, Object> context, String table_name, StringWriter sw) {
 
             context.put("table_name", table_name);
             context.put("mode", mode);
@@ -563,11 +563,10 @@ public class JavaCG {
 
             StringBuilder buffer = new StringBuilder();
 
-            ArrayList<FieldInfo> keys = new ArrayList<FieldInfo>();
+            List<FieldInfo> keys = new ArrayList<FieldInfo>();
+            List<FieldInfo> params = new ArrayList<FieldInfo>();
 
-            ArrayList<FieldInfo> params = new ArrayList<FieldInfo>();
-
-            db_utils.get_crud_info(table_name, keys, params, dto_class_name, dto_classes);
+            db_utils.get_crud_info(table_name, keys, params, dto_class_name, jaxb_dto_classes);
 
             if (keys.isEmpty()) {
 
@@ -594,7 +593,8 @@ public class JavaCG {
             // reuse buffer filled earlier
             if (sql_buff.length() == 0) {
 
-                HashMap<String, Object> context = new HashMap<String, Object>();
+                Map<String, Object> context = new HashMap<String, Object>();
+                
                 context.put("params", params);
                 context.put("keys", keys);
 
@@ -611,7 +611,7 @@ public class JavaCG {
 
             String java_sql_str = Helpers.sql_to_java_str(sql_buff);
 
-            HashMap<String, Object> context = new HashMap<String, Object>();
+            Map<String, Object> context = new HashMap<String, Object>();
 
             context.put("class_name", class_name);
             context.put("plain_params", true);
@@ -637,9 +637,9 @@ public class JavaCG {
 
             StringBuilder buffer = new StringBuilder();
 
-            ArrayList<FieldInfo> keys = new ArrayList<FieldInfo>();
+            List<FieldInfo> keys = new ArrayList<FieldInfo>();
 
-            db_utils.get_crud_info(table_name, keys, null, dto_class_name, dto_classes);
+            db_utils.get_crud_info(table_name, keys, null, dto_class_name, jaxb_dto_classes);
 
             if (keys.isEmpty()) {
 
@@ -653,7 +653,8 @@ public class JavaCG {
             // reuse buffer filled earlier
             if (sql_buff.length() == 0) {
 
-                HashMap<String, Object> context = new HashMap<String, Object>();
+                Map<String, Object> context = new HashMap<String, Object>();
+                
                 context.put("keys", keys);
 
                 StringWriter sw = new StringWriter();
@@ -663,7 +664,7 @@ public class JavaCG {
 
             String java_sql_str = Helpers.sql_to_java_str(sql_buff);
 
-            HashMap<String, Object> context = new HashMap<String, Object>();
+            Map<String, Object> context = new HashMap<String, Object>();
 
             context.put("class_name", class_name);
             context.put("plain_params", true);
