@@ -17,25 +17,23 @@ import com.sqldalmaker.jaxb.dao.TypeCrud;
  */
 public interface IDaoCG {
 
-    String[] translate(String dao_class_name, DaoClass dao_class) throws Exception;
+	String[] translate(String dao_class_name, DaoClass dao_class) throws Exception;
 
-    DbUtils get_db_utils();
+	StringBuilder render_jaxb_query(Object jaxb_query) throws Exception;
 
-    StringBuilder render_element_query(Object jaxb_element) throws Exception;
-    
-    StringBuilder render_element_exec_dml(ExecDml jaxb_exec_dml) throws Exception;
-    
-    StringBuilder render_element_crud(TypeCrud jaxb_type_crud) throws Exception;
-    
-    StringBuilder render_element_crud_create(StringBuilder sql_buff, String class_name, String method_name,
-                                             String table_name, String dto_class_name, boolean fetch_generated, String generated) throws Exception;
+	StringBuilder render_jaxb_exec_dml(ExecDml jaxb_exec_dml) throws Exception;
 
-    StringBuilder render_element_crud_read(StringBuilder sql_buff, String method_name, String table_name,
-                                           String ret_dto_type, boolean fetch_list) throws Exception;
+	StringBuilder render_jaxb_crud(TypeCrud jaxb_type_crud) throws Exception;
 
-    StringBuilder render_element_crud_update(StringBuilder sql_buff, String class_name, String method_name,
-                                             String table_name, String dto_class_name, boolean primitive_params) throws Exception;
+	StringBuilder render_crud_create(String class_name, String method_name, String table_name, String dto_class_name,
+			boolean fetch_generated, String generated) throws Exception;
 
-    StringBuilder render_element_crud_delete(StringBuilder sql_buff, String class_name, String method_name,
-                                             String table_name, String dto_class_name) throws Exception;
+	StringBuilder render_crud_read(String method_name, String table_name, String ret_dto_type, boolean fetch_list)
+			throws Exception;
+
+	StringBuilder render_crud_update(String class_name, String method_name, String table_name, String dto_class_name,
+			boolean primitive_params) throws Exception;
+
+	StringBuilder render_crud_delete(String class_name, String method_name, String table_name, String dto_class_name)
+			throws Exception;
 }

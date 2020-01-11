@@ -96,7 +96,9 @@ class $class_name:
 #sql_var(false $sql)
         params = [#foreach ($param in $params)#set($p="p."+${param.getName()})#list_item($velocityCount $p)#end]
         ai_values = [#foreach ($key in $keys)#set($p='["'+${key.getColumnName()} +'", None]')#list_item($velocityCount $p)#end]
+
         self._ds.insert_row(sql, params, ai_values)
+
 #foreach ($key in $keys)
 #set($i = $velocityCount - 1)
         p.$key.getName() = ai_values[$i][1]
@@ -167,8 +169,10 @@ class $class_name:
         """
 #sql_var(false $sql)
 #param_array($dto_param $params)
+
 #if($use_dto)
         row = self._ds.query_single_row(sql, params)
+        
 #foreach($field in ${fields})
         obj.${field.getName()} = row["${field.getColumnName()}"]
 #end
@@ -204,5 +208,6 @@ class $class_name:
         """
 #sql_var(false $sql)
 #param_array($dto_param $params)
+
         return self._ds.exec_dml(sql, params)
 #end

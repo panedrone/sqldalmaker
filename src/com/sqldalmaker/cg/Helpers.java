@@ -17,6 +17,8 @@ import com.sqldalmaker.jaxb.dao.QueryList;
 import com.sqldalmaker.jaxb.dao.TypeCrud;
 import com.sqldalmaker.jaxb.dto.DtoClass;
 import com.sqldalmaker.jaxb.dto.DtoClasses;
+import com.sqldalmaker.jaxb.settings.Type;
+import com.sqldalmaker.jaxb.settings.TypeMap;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.*;
@@ -185,187 +187,6 @@ public class Helpers {
         XmlRootElement attr = jaxb_node.getClass().getAnnotation(XmlRootElement.class);
 
         return attr.name();
-    }
-
-    public static String sql_to_java_str(StringBuilder sql_buff) {
-
-        return sql_to_java_str(sql_buff.toString());
-    }
-
-    public static String sql_to_java_str(String sql) {
-
-        String[] parts = sql.split("(\\n|\\r)+");
-
-        // "\n" it is OK for Eclipse debugger window:
-        String new_line = "\n"; // System.getProperty("line.separator");
-
-        StringBuilder res = new StringBuilder();
-
-        for (int i = 0; i < parts.length; i++) {
-
-            String j_str = parts[i].replace('\t', ' ');
-
-            // packed into Velocity JAR:
-            j_str = org.apache.commons.lang.StringEscapeUtils.escapeJava(j_str);
-
-            // fix the bug in StringEscapeUtils:
-            // case '/':
-            // out.write('\\');
-            // out.write('/');
-            // break;
-            j_str = j_str.replace("\\/", "/");
-
-            res.append(j_str);
-
-            if (i < parts.length - 1) {
-
-                String s = " \" " + new_line + "\t\t\t\t + \"";
-
-                res.append(s);
-            }
-        }
-
-        return res.toString();
-    }
-
-    public static String sql_to_php_str(StringBuilder sql_buff) {
-
-        return Helpers.sql_to_php_str(sql_buff.toString());
-    }
-
-    public static String sql_to_php_str(String sql) {
-
-        String[] parts = sql.split("(\\n|\\r)+");
-
-        String new_line = "\n"; // System.getProperty("line.separator");
-
-        StringBuilder res = new StringBuilder();
-
-        for (int i = 0; i < parts.length; i++) {
-
-            String j_str = parts[i].replace('\t', ' ');
-
-            // packed into Velocity JAR:
-            j_str = org.apache.commons.lang.StringEscapeUtils.escapeJava(j_str);
-
-            // fix the bug in StringEscapeUtils:
-            // case '/':
-            // out.write('\\');
-            // out.write('/');
-            // break;
-            j_str = j_str.replace("\\/", "/");
-
-            res.append(j_str);
-
-            if (i < parts.length - 1) {
-
-                String s = " \" " + new_line + "\t\t\t\t . \"";
-
-                res.append(s);
-            }
-        }
-
-        return res.toString();
-    }
-
-    public static String sql_to_python_string(StringBuilder sql_buff) {
-
-        return sql_to_python_string(sql_buff.toString());
-    }
-
-    public static String sql_to_ruby_string(StringBuilder sql_buff) {
-
-        return sql_to_ruby_string(sql_buff.toString());
-    }
-
-    public static String sql_to_ruby_string(String sql) {
-
-        return sql_to_python_string(sql);
-    }
-
-    public static String sql_to_python_string(String sql) {
-
-        String[] parts = sql.split("(\\n|\\r)+");
-
-        String new_line = "\n"; // System.getProperty("line.separator");
-
-        StringBuilder res = new StringBuilder();
-
-        for (int i = 0; i < parts.length; i++) {
-
-            String j_str = parts[i].replace('\t', ' ');
-
-            // packed into Velocity JAR:
-            j_str = org.apache.commons.lang.StringEscapeUtils.escapeJava(j_str);
-
-            // fix the bug in StringEscapeUtils:
-            // case '/':
-            // out.write('\\');
-            // out.write('/');
-            // break;
-            j_str = j_str.replace("\\/", "/");
-
-            res.append(j_str);
-
-            if (i < parts.length - 1) { // python wants 4 spaces instead of 1 tab
-
-                String s = " " + new_line + "                ";
-
-                res.append(s);
-            }
-        }
-
-        return res.toString();
-    }
-
-    public static String sql_to_cpp_str(StringBuilder sql_buff) {
-
-        return sql_to_cpp_str(sql_buff.toString());
-    }
-
-    public static String sql_to_cpp_str(String sql) {
-
-        String[] parts = sql.split("(\\n|\\r)+");
-
-        String new_line = System.getProperty("line.separator");
-
-        String new_line_j = org.apache.commons.lang.StringEscapeUtils.escapeJava("\n");
-
-        StringBuilder res = new StringBuilder();
-
-        res.append("\"");
-
-        for (int i = 0; i < parts.length; i++) {
-
-            String j_str = parts[i].replace('\t', ' ');
-
-            // packed into Velocity JAR:
-            j_str = org.apache.commons.lang.StringEscapeUtils.escapeJava(j_str);
-
-            // fix the bug in StringEscapeUtils:
-            // case '/':
-            // out.write('\\');
-            // out.write('/');
-            // break;
-            j_str = j_str.replace("\\/", "/");
-
-            res.append(j_str);
-
-            if (i < parts.length - 1) {
-
-                res.append(" ");
-                res.append(new_line_j);
-                res.append("\\");
-                res.append(new_line);
-                // res.append("\t\t");
-
-            } else {
-
-                res.append("\"");
-            }
-        }
-
-        return res.toString();
     }
 
     //
@@ -700,10 +521,64 @@ public class Helpers {
         return "object";
     }
 
-    @SuppressWarnings("unused")
     public static void convert_to_ruby_type_names(List<FieldInfo> fields) {
 
     }
+
+	private static String get_qualified_name(String java_class_name) {
+
+		java_class_name = java_class_name.replaceAll("\\s+", "");
+
+		String element_name;
+
+		boolean is_array;
+
+		if (java_class_name.contains("[")) {
+
+			element_name = java_class_name.replace('[', ' ').replace(']', ' ').trim();
+
+			is_array = true;
+
+		} else {
+
+			is_array = false;
+
+			element_name = java_class_name;
+		}
+
+		boolean is_primitive = Helpers.PRIMITIVE_CLASSES.containsKey(element_name);
+
+		if (!is_primitive && !java_class_name.contains(".")) {
+
+			element_name = "java.lang." + element_name;
+		}
+
+		java_class_name = element_name;
+
+		if (is_array) {
+
+			java_class_name += " []";
+		}
+
+		return java_class_name;
+	}
+
+	public static String get_cpp_class_name_from_java_class_name(TypeMap jaxb_type_map, String java_class_name) {
+
+		String s1 = get_qualified_name(java_class_name);
+
+		for (Type t : jaxb_type_map.getType()) {
+
+			String s2 = get_qualified_name(t.getJava());
+
+			if (s2.equals(s1)) {
+
+				return t.getTarget();
+			}
+		}
+
+		return jaxb_type_map.getDefault();
+	}
 
     public static void build_warning_comment(StringBuilder buffer, String msg) {
 
@@ -734,19 +609,19 @@ public class Helpers {
                 if (jaxb_element instanceof Query || jaxb_element instanceof QueryList || jaxb_element instanceof QueryDto
                         || jaxb_element instanceof QueryDtoList) {
 
-                    StringBuilder buf = dao_cg.render_element_query(jaxb_element);
+                    StringBuilder buf = dao_cg.render_jaxb_query(jaxb_element);
 
                     methods.add(buf.toString());
 
                 } else if (jaxb_element instanceof ExecDml) {
 
-                    StringBuilder buf = dao_cg.render_element_exec_dml((ExecDml) jaxb_element);
+                    StringBuilder buf = dao_cg.render_jaxb_exec_dml((ExecDml) jaxb_element);
 
                     methods.add(buf.toString());
 
                 } else if (jaxb_element instanceof TypeCrud) {
 
-                    StringBuilder buf = dao_cg.render_element_crud((TypeCrud)jaxb_element);
+                    StringBuilder buf = dao_cg.render_jaxb_crud((TypeCrud)jaxb_element);
 
                     methods.add(buf.toString());
                     
@@ -785,20 +660,14 @@ public class Helpers {
             method_name = Helpers.camel_case_to_lower_under_scores(method_name);
         }
 
-        StringBuilder sql_buff = new StringBuilder();
-
         boolean fetch_generated = jaxb_type_crud.isFetchGenerated();
 
         String generated = jaxb_type_crud.getGenerated();
 
-        StringBuilder tmp = dao_cg.render_element_crud_create(sql_buff, null, method_name, table_attr, dto_class_name,
+        StringBuilder tmp = dao_cg.render_crud_create(null, method_name, table_attr, dto_class_name,
                 fetch_generated, generated);
 
         code_buff.append(tmp);
-
-        DbUtils db_utils = dao_cg.get_db_utils();
-
-        db_utils.validate_sql(sql_buff);
 
         return true;
     }
@@ -830,15 +699,9 @@ public class Helpers {
             method_name = Helpers.camel_case_to_lower_under_scores(method_name);
         }
 
-        StringBuilder sql_buff = new StringBuilder();
-
-        StringBuilder tmp = dao_cg.render_element_crud_read(sql_buff, method_name, table_attr, dto_class_name, true);
+        StringBuilder tmp = dao_cg.render_crud_read(method_name, table_attr, dto_class_name, true);
 
         code_buff.append(tmp);
-
-        DbUtils db_utils = dao_cg.get_db_utils();
-
-        db_utils.validate_sql(sql_buff);
 
         return true;
     }
@@ -870,15 +733,9 @@ public class Helpers {
             method_name = Helpers.camel_case_to_lower_under_scores(method_name);
         }
 
-        StringBuilder sql_buff = new StringBuilder();
-
-        StringBuilder tmp = dao_cg.render_element_crud_read(sql_buff, method_name, table_attr, dto_class_name, false);
+        StringBuilder tmp = dao_cg.render_crud_read(method_name, table_attr, dto_class_name, false);
 
         code_buff.append(tmp);
-
-        DbUtils db_utils = dao_cg.get_db_utils();
-
-        db_utils.validate_sql(sql_buff);
 
         return true;
     }
@@ -910,16 +767,10 @@ public class Helpers {
             method_name = Helpers.camel_case_to_lower_under_scores(method_name);
         }
 
-        StringBuilder sql_buff = new StringBuilder();
-
-        StringBuilder tmp = dao_cg.render_element_crud_update(sql_buff, null, method_name, table_attr, dto_class_name,
+        StringBuilder tmp = dao_cg.render_crud_update(null, method_name, table_attr, dto_class_name,
                 false);
 
         code_buff.append(tmp);
-
-        DbUtils db_utils = dao_cg.get_db_utils();
-
-        db_utils.validate_sql(sql_buff);
 
         return true;
     }
@@ -951,15 +802,9 @@ public class Helpers {
             method_name = Helpers.camel_case_to_lower_under_scores(method_name);
         }
 
-        StringBuilder sql_buff = new StringBuilder();
-
-        StringBuilder tmp = dao_cg.render_element_crud_delete(sql_buff, null, method_name, table_attr, dto_class_name);
+        StringBuilder tmp = dao_cg.render_crud_delete(null, method_name, table_attr, dto_class_name);
 
         code_buff.append(tmp);
-
-        DbUtils db_utils = dao_cg.get_db_utils();
-
-        db_utils.validate_sql(sql_buff);
 
         return true;
     }

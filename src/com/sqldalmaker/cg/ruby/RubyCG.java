@@ -1,7 +1,8 @@
 /*
- * Copyright 2011-2018 sqldalmaker@gmail.com
+ * Copyright 2011-2020 sqldalmaker@gmail.com
  * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
  * Read LICENSE.txt in the root of this project/archive for details.
+ * 
  */
 package com.sqldalmaker.cg.ruby;
 
@@ -19,730 +20,714 @@ import java.util.*;
  */
 public class RubyCG {
 
-    private static String get_template_path() {
+	private static String get_template_path() {
 
-        return Helpers.class.getPackage().getName().replace('.', '/') + "/ruby/ruby.vm";
-    }
+		return Helpers.class.getPackage().getName().replace('.', '/') + "/ruby/ruby.vm";
+	}
 
-    public static class DTO implements IDtoCG {
+	public static class DTO implements IDtoCG {
 
-        private final String sql_root_abs_path;
+		private final String sql_root_abs_path;
 
-        private final List<DtoClass> jaxb_dto_classes;
+		private final List<DtoClass> jaxb_dto_classes;
 
-        private final TemplateEngine te;
+		private final TemplateEngine te;
 
-        private final DbUtils db_utils;
+		private final DbUtils db_utils;
 
-        public DTO(DtoClasses jaxb_dto_classes, Connection connection, String sql_root_abs_path, String vm_file_system_dir)
-                throws Exception {
+		public DTO(DtoClasses jaxb_dto_classes, Connection connection, String sql_root_abs_path,
+				String vm_file_system_dir) throws Exception {
 
-            this.jaxb_dto_classes = jaxb_dto_classes.getDtoClass();
+			this.jaxb_dto_classes = jaxb_dto_classes.getDtoClass();
 
-            this.sql_root_abs_path = sql_root_abs_path;
+			this.sql_root_abs_path = sql_root_abs_path;
 
-            if (vm_file_system_dir == null) {
+			if (vm_file_system_dir == null) {
 
-                te = new TemplateEngine(get_template_path(), false);
+				te = new TemplateEngine(get_template_path(), false);
 
-            } else {
+			} else {
 
-                te = new TemplateEngine(vm_file_system_dir, true);
-            }
+				te = new TemplateEngine(vm_file_system_dir, true);
+			}
 
-            // http://rubylearning.com/satishtalim/ruby_names.html
-            // A constant name starts with an uppercase letter followed by name
-            // characters.
-            // Class names and module names are constants, and follow the constant
-            // naming conventions.
-            db_utils = new DbUtils(connection, FieldNamesMode.PYTHON_RUBY, null);
-        }
+			// http://rubylearning.com/satishtalim/ruby_names.html
+			// A constant name starts with an uppercase letter followed by name
+			// characters.
+			// Class names and module names are constants, and follow the constant
+			// naming conventions.
+			db_utils = new DbUtils(connection, FieldNamesMode.PYTHON_RUBY, null);
+		}
 
-        @Override
-        public String[] translate(String dto_class_name) throws Exception {
+		@Override
+		public String[] translate(String dto_class_name) throws Exception {
 
-            DtoClass jaxb_dto_class = null;
+			DtoClass jaxb_dto_class = null;
 
-            for (DtoClass cls : jaxb_dto_classes) {
+			for (DtoClass cls : jaxb_dto_classes) {
 
-                if (cls.getName().equals(dto_class_name)) {
+				if (cls.getName().equals(dto_class_name)) {
 
-                    jaxb_dto_class = cls;
+					jaxb_dto_class = cls;
 
-                    break;
-                }
-            }
+					break;
+				}
+			}
 
-            if (jaxb_dto_class == null) {
+			if (jaxb_dto_class == null) {
 
-                throw new Exception("XML element of DTO class '" + dto_class_name + "' not found");
-            }
+				throw new Exception("XML element of DTO class '" + dto_class_name + "' not found");
+			}
 
-            List<FieldInfo> fields = new ArrayList<FieldInfo>();
+			String jdbc_sql = db_utils.jdbc_sql_by_ref_query(jaxb_dto_class.getRef(), sql_root_abs_path);
 
-            db_utils.get_dto_field_info(sql_root_abs_path, jaxb_dto_class, fields);
+			List<FieldInfo> fields = new ArrayList<FieldInfo>();
 
-            Map<String, Object> context = new HashMap<String, Object>();
+			db_utils.get_dto_field_info(jdbc_sql, jaxb_dto_class, fields);
 
-            context.put("class_name", dto_class_name);
+			Map<String, Object> context = new HashMap<String, Object>();
 
-            Helpers.convert_to_ruby_type_names(fields);
-            context.put("fields", fields);
-            context.put("mode", "dto_class");
+			context.put("class_name", dto_class_name);
 
-            StringWriter sw = new StringWriter();
-            te.merge(context, sw);
+			Helpers.convert_to_ruby_type_names(fields);
+			context.put("fields", fields);
+			context.put("mode", "dto_class");
 
-            String text = sw.toString();
-            text = text.replace("java.lang.", "");
-            text = text.replace("java.util.", "");
-            text = text.replace("java.math.", "");
+			StringWriter sw = new StringWriter();
+			te.merge(context, sw);
 
-            return new String[]{text};
-        }
-    }
+			String text = sw.toString();
+			text = text.replace("java.lang.", "");
+			text = text.replace("java.util.", "");
+			text = text.replace("java.math.", "");
 
-    public static class DAO implements IDaoCG {
+			return new String[] { text };
+		}
+	}
 
-        private final String sql_root_abs_path;
+	public static class DAO implements IDaoCG {
 
-        private final DtoClasses jaxb_dto_classes;
+		private final String sql_root_abs_path;
 
-        private final Set<String> imports = new HashSet<String>();
+		private final DtoClasses jaxb_dto_classes;
 
-        private final Set<String> uses = new HashSet<String>();
+		private final Set<String> imports = new HashSet<String>();
 
-        private final TemplateEngine te;
+		private final Set<String> uses = new HashSet<String>();
 
-        private final DbUtils db_utils;
+		private final TemplateEngine te;
 
-        public DAO(DtoClasses jaxb_dto_classes, Connection connection, String sql_root_abs_path, String vm_file_system_dir)
-                throws Exception {
+		private final DbUtils db_utils;
 
-            this.jaxb_dto_classes = jaxb_dto_classes;
+		public DAO(DtoClasses jaxb_dto_classes, Connection connection, String sql_root_abs_path,
+				String vm_file_system_dir) throws Exception {
 
-            this.sql_root_abs_path = sql_root_abs_path;
+			this.jaxb_dto_classes = jaxb_dto_classes;
 
-            if (vm_file_system_dir == null) {
+			this.sql_root_abs_path = sql_root_abs_path;
 
-                te = new TemplateEngine(get_template_path(), false);
+			if (vm_file_system_dir == null) {
 
-            } else {
+				te = new TemplateEngine(get_template_path(), false);
 
-                te = new TemplateEngine(vm_file_system_dir, true);
-            }
+			} else {
 
-            db_utils = new DbUtils(connection, FieldNamesMode.PYTHON_RUBY, null);
-        }
+				te = new TemplateEngine(vm_file_system_dir, true);
+			}
 
-        @Override
-        public String[] translate(String dao_class_name, DaoClass dao_class) throws Exception {
+			db_utils = new DbUtils(connection, FieldNamesMode.PYTHON_RUBY, null);
+		}
 
-            imports.clear();
+		@Override
+		public String[] translate(String dao_class_name, DaoClass dao_class) throws Exception {
 
-            uses.clear();
+			imports.clear();
 
-            List<String> methods = new ArrayList<String>();
+			uses.clear();
 
-            Helpers.process_element(this, dao_class, methods);
+			List<String> methods = new ArrayList<String>();
 
-            for (int i = 0; i < methods.size(); i++) {
-                String m = methods.get(i).replace("\t", "  ").replace("//", "#");
-                methods.set(i, m);
-            }
+			Helpers.process_element(this, dao_class, methods);
 
-            Map<String, Object> context = new HashMap<String, Object>();
+			for (int i = 0; i < methods.size(); i++) {
+				String m = methods.get(i).replace("\t", "  ").replace("//", "#");
+				methods.set(i, m);
+			}
 
-            String[] imports_arr = imports.toArray(new String[imports.size()]);
-            Arrays.sort(imports_arr);
+			Map<String, Object> context = new HashMap<String, Object>();
 
-            context.put("imports", imports_arr);
-            // context.put("imports", imports);
+			String[] imports_arr = imports.toArray(new String[imports.size()]);
+			Arrays.sort(imports_arr);
 
-            String[] uses_arr = uses.toArray(new String[uses.size()]);
-            Arrays.sort(uses_arr);
+			context.put("imports", imports_arr);
+			// context.put("imports", imports);
 
-            context.put("uses", uses_arr);
+			String[] uses_arr = uses.toArray(new String[uses.size()]);
+			Arrays.sort(uses_arr);
 
-            context.put("class_name", dao_class_name);
-            context.put("methods", methods);
-            context.put("mode", "dao_class");
+			context.put("uses", uses_arr);
 
-            StringWriter sw = new StringWriter();
-            te.merge(context, sw);
+			context.put("class_name", dao_class_name);
+			context.put("methods", methods);
+			context.put("mode", "dao_class");
 
-            String text = sw.toString();
+			StringWriter sw = new StringWriter();
+			te.merge(context, sw);
 
-            text = text.replace("java.lang.", "");
-            text = text.replace("java.util.", "");
-            text = text.replace("java.math.", "");
+			String text = sw.toString();
 
-            text = text.replace("()", "");
+			text = text.replace("java.lang.", "");
+			text = text.replace("java.util.", "");
+			text = text.replace("java.math.", "");
 
-            return new String[]{text};
-        }
+			text = text.replace("()", "");
 
-        @Override
-        public StringBuilder render_element_query(Object jaxb_element) throws Exception {
+			return new String[] { text };
+		}
 
-            MethodInfo mi = new MethodInfo(jaxb_element);
+		@Override
+		public StringBuilder render_jaxb_query(Object jaxb_element) throws Exception {
 
-            String xml_node_name = Helpers.get_jaxb_node_name(jaxb_element);
+			QueryMethodInfo mi = new QueryMethodInfo(jaxb_element);
 
-            check_required_attr(xml_node_name, mi.method);
+			String xml_node_name = Helpers.get_jaxb_node_name(jaxb_element);
 
-            try {
+			check_required_attr(xml_node_name, mi.jaxb_method);
 
-                String dao_jdbc_sql = db_utils.jdbc_sql_by_ref_query(mi.ref, sql_root_abs_path);
+			try {
 
-                String[] parsed = parse_method_declaration(mi.method);
+				String dao_jdbc_sql = db_utils.jdbc_sql_by_ref_query(mi.jaxb_ref, sql_root_abs_path);
 
-                String method_name = parsed[0];
-                String dto_param_type = parsed[1];
-                String param_descriptors = parsed[2];
+				String[] parsed = parse_method_declaration(mi.jaxb_method);
 
-                String[] method_param_descriptors = Helpers.get_listed_items(param_descriptors);
+				String method_name = parsed[0];
+				String dto_param_type = parsed[1];
+				String param_descriptors = parsed[2];
 
-                StringBuilder buff = new StringBuilder();
+				String[] method_param_descriptors = Helpers.get_listed_items(param_descriptors);
 
-                render_element_query(buff, dao_jdbc_sql, mi.ref, mi.is_external_sql, mi.return_type,
-                        mi.return_type_is_dto, mi.fetch_list, method_name, dto_param_type, method_param_descriptors,
-                        false, xml_node_name);
+				StringBuilder buff = new StringBuilder();
 
-                return buff;
+				render_query(buff, dao_jdbc_sql, mi.jaxb_ref, mi.jaxb_is_external_sql,
+						mi.jaxb_dto_or_return_type, mi.return_type_is_dto, mi.fetch_list, method_name, dto_param_type,
+						method_param_descriptors, false, xml_node_name);
 
-            } catch (Throwable e) {
+				return buff;
 
-                // e.printStackTrace();
-                String msg = "<" + xml_node_name + " method=\"" + mi.method + "\" ref=\"" + mi.ref + "\"...\n";
+			} catch (Throwable e) {
 
-                throw new Exception(Helpers.get_error_message(msg, e));
-            }
-        }
+				// e.printStackTrace();
+				String msg = "<" + xml_node_name + " method=\"" + mi.jaxb_method + "\" ref=\"" + mi.jaxb_ref
+						+ "\"...\n";
 
-        // this method is called also for CRUD
-        private void render_element_query(StringBuilder buff, String dao_jdbc_sql, String ref, boolean is_external_sql,
-                String return_type, boolean return_type_is_dto, boolean fetch_list, String method_name,
-                String dto_param_type, String[] param_descriptors, boolean is_crud, String xml_node_name)
-                throws Exception {
+				throw new Exception(Helpers.get_error_message(msg, e));
+			}
+		}
 
-            List<FieldInfo> fields = new ArrayList<FieldInfo>();
-            List<FieldInfo> params = new ArrayList<FieldInfo>();
+		//////////////////////////////////////////////////////////////////
+		//
+		// this method is called from 'query...' and 'crud(-auto)->read'
+		//
+		private void render_query(StringBuilder buff, String jdbc_dao_sql, String ref, boolean is_external_sql,
+				String jaxb_dto_or_return_type, boolean jaxb_return_type_is_dto, boolean fetch_list, String method_name,
+				String dto_param_type, String[] param_descriptors, boolean is_crud, String xml_node_name)
+				throws Exception {
 
-            db_utils.get_query_jdbc_sql_info(sql_root_abs_path, dao_jdbc_sql, fields, dto_param_type, param_descriptors,
-                    params, return_type, return_type_is_dto, jaxb_dto_classes);
+			List<FieldInfo> fields = new ArrayList<FieldInfo>();
+			List<FieldInfo> params = new ArrayList<FieldInfo>();
 
-            int col_count = fields.size();
+			db_utils.get_jdbc_sql_info(sql_root_abs_path, jdbc_dao_sql, fields, dto_param_type, param_descriptors,
+					params, jaxb_dto_or_return_type, jaxb_return_type_is_dto, jaxb_dto_classes);
 
-            if (col_count == 0) {
+			String returned_type_name;
 
-                throw new Exception("Columns count is 0. Is SQL statement valid?");
-            }
+			if (jaxb_return_type_is_dto) {
 
-            Map<String, Object> context = new HashMap<String, Object>();
+				returned_type_name = process_dto_class_name(jaxb_dto_or_return_type, fetch_list);
 
-            if (return_type_is_dto) {
+			} else {
 
-                return_type = process_dto_class_name(return_type, fetch_list);
+				returned_type_name = fields.get(0).getType();
 
-            } else {
+				// returned_type_name = Helpers.get_ruby_type_name(returned_type_name);
+			}
 
-                if (return_type == null || return_type.length() == 0) {
+			String sql_str = SqlUtils.jdbc_sql_to_ruby_string(jdbc_dao_sql);
 
-                    if (col_count != 1) {
+			Map<String, Object> context = new HashMap<String, Object>();
 
-                        throw new Exception("ResultSet should contain 1 column. Is SQL statement valid?");
-                    }
+			context.put("mode", "dao_query");
 
-                    return_type = fields.get(0).getType();
-                }
-            }
+			Helpers.convert_to_ruby_type_names(fields);
+			
+			context.put("fields", fields);
+			context.put("method_name", method_name);
+			context.put("crud", is_crud);
+			context.put("xml_node_name", xml_node_name);
+			context.put("ref", ref);
+			context.put("sql", sql_str);
+			context.put("use_dto", jaxb_return_type_is_dto);
+			context.put("returned_type_name", returned_type_name);
+			context.put("fetch_list", fetch_list);
+			context.put("is_external_sql", is_external_sql);
 
-            String sql_str = Helpers.sql_to_ruby_string(dao_jdbc_sql);
+			assign_params(params, dto_param_type, context);
 
-            assign_params(params, dto_param_type, context);
+			StringWriter sw = new StringWriter();
+			te.merge(context, sw);
+			buff.append(sw.getBuffer());
+		}
 
-            Helpers.convert_to_ruby_type_names(fields);
-            context.put("fields", fields);
-            context.put("method_name", method_name);
-            context.put("crud", is_crud);
-            context.put("xml_node_name", xml_node_name);
-            context.put("ref", ref);
-            context.put("sql", sql_str);
-            context.put("use_dto", return_type_is_dto);
-            if (!return_type_is_dto) {
-                return_type = Helpers.get_python_type_name(return_type);
-            }
-            context.put("returned_type_name", return_type);
-            context.put("fetch_list", fetch_list);
-            context.put("is_external_sql", is_external_sql);
+		private String process_dto_class_name(String dto_class_name, boolean add_to_import) throws Exception {
 
-            context.put("mode", "dao_query");
+			DtoClass jaxb_dto_class = Helpers.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
 
-            StringWriter sw = new StringWriter();
+			if (add_to_import) {
 
-            te.merge(context, sw);
+				String s = Helpers.convert_to_ruby_file_name(jaxb_dto_class.getName());
 
-            buff.append(sw.getBuffer());
-        }
+				imports.add(s);
+			}
 
-        private String process_dto_class_name(String dto_class_name, boolean add_to_import) throws Exception {
+			return jaxb_dto_class.getName();
+		}
 
-            DtoClass jaxb_dto_class = Helpers.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
+		@Override
+		public StringBuilder render_jaxb_exec_dml(ExecDml element) throws Exception {
 
-            if (add_to_import) {
+			String method = element.getMethod();
+			String ref = element.getRef();
 
-                String s = Helpers.convert_to_ruby_file_name(jaxb_dto_class.getName());
+			String xml_node_name = Helpers.get_jaxb_node_name(element);
 
-                imports.add(s);
-            }
+			check_required_attr(xml_node_name, method);
 
-            return jaxb_dto_class.getName();
-        }
+			try {
 
-        @Override
-        public StringBuilder render_element_exec_dml(ExecDml element) throws Exception {
+				String dao_jdbc_sql = DbUtils.jdbc_sql_by_ref_exec_dml(ref, sql_root_abs_path);
 
-            String method = element.getMethod();
-            String ref = element.getRef();
+				String[] parsed = parse_method_declaration(method);
 
-            String xml_node_name = Helpers.get_jaxb_node_name(element);
+				String method_name = parsed[0]; // never is null
+				String dto_param_type = parsed[1]; // never is null
+				String param_descriptors = parsed[2]; // never is null
 
-            check_required_attr(xml_node_name, method);
+				String[] method_param_descriptors = Helpers.get_listed_items(param_descriptors);
 
-            try {
+				boolean is_external_sql = element.isExternalSql();
 
-                String dao_jdbc_sql = DbUtils.jdbc_sql_by_ref_exec_dml(ref, sql_root_abs_path);
+				StringBuilder buff = new StringBuilder();
 
-                String[] parsed = parse_method_declaration(method);
+				render_exec_dml(buff, dao_jdbc_sql, is_external_sql, null, method_name, dto_param_type,
+						method_param_descriptors, xml_node_name, ref);
 
-                String method_name = parsed[0]; // never is null
-                String dto_param_type = parsed[1]; // never is null
-                String param_descriptors = parsed[2]; // never is null
+				return buff;
 
-                String[] method_param_descriptors = Helpers.get_listed_items(param_descriptors);
+			} catch (Throwable e) {
 
-                boolean is_external_sql = element.isExternalSql();
+				// e.printStackTrace();
+				String msg = "<" + xml_node_name + " method=\"" + method + "\" ref=\"" + ref + "\"...\n";
 
-                StringBuilder buff = new StringBuilder();
+				throw new Exception(Helpers.get_error_message(msg, e));
+			}
+		}
 
-                render_element_exec_dml(buff, dao_jdbc_sql, is_external_sql, null, method_name, dto_param_type,
-                        method_param_descriptors, xml_node_name, ref);
+		private void render_exec_dml(StringBuilder buffer, String jdbc_dao_sql, boolean is_external_sql,
+				String class_name, String method_name, String dto_param_type, String[] param_descriptors,
+				String xml_node_name, String sql_path) throws Exception {
 
-                return buff;
+			DbUtils.throw_if_select_sql(jdbc_dao_sql);
 
-            } catch (Throwable e) {
+			List<FieldInfo> params = new ArrayList<FieldInfo>();
 
-                // e.printStackTrace();
-                String msg = "<" + xml_node_name + " method=\"" + method + "\" ref=\"" + ref + "\"...\n";
+			db_utils.get_exec_dml_jdbc_sql_info(jdbc_dao_sql, dto_param_type, param_descriptors, params);
 
-                throw new Exception(Helpers.get_error_message(msg, e));
-            }
-        }
+			String sql_str = SqlUtils.jdbc_sql_to_ruby_string(jdbc_dao_sql);
 
-        private void render_element_exec_dml(StringBuilder buffer, String dao_jdbc_sql, boolean is_external_sql,
-                String class_name, String method_name, String dto_param_type, String[] param_descriptors,
-                String xml_node_name, String sql_path) throws Exception {
+			Map<String, Object> context = new HashMap<String, Object>();
 
-            DbUtils.throw_if_select_sql(dao_jdbc_sql);
+			context.put("mode", "dao_exec_dml");
 
-            List<FieldInfo> params = new ArrayList<FieldInfo>();
+			context.put("dto_param", dto_param_type);
+			context.put("class_name", class_name);
+			context.put("method_name", method_name);
+			context.put("sql", sql_str);
+			context.put("xml_node_name", xml_node_name);
+			context.put("sql_path", sql_path);
+			context.put("is_external_sql", is_external_sql);
 
-            db_utils.get_exec_dml_jdbc_sql_info(dao_jdbc_sql, dto_param_type, param_descriptors, params);
+			assign_params(params, dto_param_type, context);
 
-            String ruby_sql_str = Helpers.sql_to_ruby_string(dao_jdbc_sql);
+			StringWriter sw = new StringWriter();
+			te.merge(context, sw);
+			buffer.append(sw.getBuffer());
+		}
 
-            Map<String, Object> context = new HashMap<String, Object>();
+		private void assign_params(List<FieldInfo> params, String dto_param_type, Map<String, Object> context)
+				throws Exception {
 
-            assign_params(params, dto_param_type, context);
+			int paramsCount = params.size();
 
-            context.put("dto_param", dto_param_type);
-            context.put("class_name", class_name);
-            context.put("method_name", method_name);
-            context.put("sql", ruby_sql_str);
-            context.put("xml_node_name", xml_node_name);
-            context.put("sql_path", sql_path);
-            context.put("is_external_sql", is_external_sql);
-            context.put("mode", "dao_exec_dml");
+			if (dto_param_type.length() > 0) {
 
-            StringWriter sw = new StringWriter();
+				if (paramsCount == 0) {
 
-            te.merge(context, sw);
+					throw new Exception("DTO parameter specified but SQL-query does not contain any parameters");
+				}
 
-            buffer.append(sw.getBuffer());
-        }
+				context.put("dto_param", process_dto_class_name(dto_param_type, false));
 
-        private void assign_params(List<FieldInfo> params, String dto_param_type, Map<String, Object> context)
-                throws Exception {
+			} else {
 
-            int paramsCount = params.size();
+				context.put("dto_param", "");
+			}
 
-            if (dto_param_type.length() > 0) {
+			Helpers.convert_to_ruby_type_names(params);
+			context.put("params", params);
+		}
 
-                if (paramsCount == 0) {
+		private String[] parse_method_declaration(String method_text) throws Exception {
 
-                    throw new Exception("DTO parameter specified but SQL-query does not contain any parameters");
-                }
+			String dto_param_type = "";
 
-                context.put("dto_param", process_dto_class_name(dto_param_type, false));
+			String param_descriptors = "";
 
-            } else {
+			String method_name;
 
-                context.put("dto_param", "");
-            }
+			String[] parts = Helpers.parse_method_params(method_text);
 
-            Helpers.convert_to_ruby_type_names(params);
-            context.put("params", params);
-        }
+			method_name = parts[0];
 
-        private String[] parse_method_declaration(String method_text) throws Exception {
+			if (!("".equals(parts[1]))) {
 
-            String dto_param_type = "";
+				parts = Helpers.parse_method_params(parts[1]);
 
-            String param_descriptors = "";
+				if (!("".equals(parts[1]))) {
 
-            String method_name;
+					dto_param_type = parts[0];
 
-            String[] parts = Helpers.parse_method_params(method_text);
+					param_descriptors = parts[1];
 
-            method_name = parts[0];
+					if (dto_param_type.length() > 0) {
 
-            if (!("".equals(parts[1]))) {
+						process_dto_class_name(dto_param_type, false);
+					}
 
-                parts = Helpers.parse_method_params(parts[1]);
+				} else {
 
-                if (!("".equals(parts[1]))) {
+					param_descriptors = parts[0];
+				}
+			}
 
-                    dto_param_type = parts[0];
+			return new String[] { method_name, dto_param_type, param_descriptors };
+		}
 
-                    param_descriptors = parts[1];
+		private static void check_required_attr(String node_name, String method_name_attr) throws Exception {
 
-                    if (dto_param_type.length() > 0) {
+			if (method_name_attr == null || method_name_attr.length() == 0) {
 
-                        process_dto_class_name(dto_param_type, false);
-                    }
+				throw new Exception("<" + node_name + "...\n'method' is not set.");
+			}
+		}
 
-                } else {
+		@Override
+		public StringBuilder render_crud_read(String method_name, String table_name, String ret_dto_type,
+				boolean fetch_list) throws Exception {
 
-                    param_descriptors = parts[0];
-                }
-            }
+			StringBuilder buffer = new StringBuilder();
 
-            return new String[]{method_name, dto_param_type, param_descriptors};
-        }
+			List<FieldInfo> keys = new ArrayList<FieldInfo>();
 
-        private static void check_required_attr(String node_name, String method_name_attr) throws Exception {
+			if (!fetch_list) {
 
-            if (method_name_attr == null || method_name_attr.length() == 0) {
+				db_utils.get_crud_info(table_name, keys, null, ret_dto_type, jaxb_dto_classes);
 
-                throw new Exception("<" + node_name + "...\n'method' is not set.");
-            }
-        }
+				if (keys.isEmpty()) {
 
-        @Override
-        public StringBuilder render_element_crud_read(StringBuilder sql_buff, String method_name, String table_name,
-                String ret_dto_type, boolean fetch_list) throws Exception {
+					String msg = Helpers.get_no_pk_message(method_name);
 
-            StringBuilder buffer = new StringBuilder();
+					Helpers.build_warning_comment(buffer, msg);
 
-            List<FieldInfo> keys = new ArrayList<FieldInfo>();
+					return buffer;
+				}
 
-            if (!fetch_list) {
+				// if all values of the table are the parts of PK,
+				// the query like 'select k1, k2 from table where k1=? and k2=?'
+				// is useless
+				// but maybe, somebody needs it...
+			}
 
-                db_utils.get_crud_info(table_name, keys, null, ret_dto_type, jaxb_dto_classes);
+			Map<String, Object> context = new HashMap<String, Object>();
 
-                if (keys.isEmpty()) {
+			context.put("keys", keys);
 
-                    String msg = Helpers.get_no_pk_message(method_name);
+			String mode = fetch_list ? "crud_sql_read_all" : "crud_sql_read_single";
 
-                    Helpers.build_warning_comment(buffer, msg);
+			StringWriter sw = new StringWriter();
+			generate_sql(mode, context, table_name, sw);
 
-                    return buffer;
-                }
+			StringBuilder jdbc_sql_buff = new StringBuilder();
+			jdbc_sql_buff.append(sw.getBuffer());
+			db_utils.validate_jdbc_sql(jdbc_sql_buff);
 
-                // if all values of the table are the parts of PK,
-                // the query like 'select k1, k2 from table where k1=? and k2=?'
-                // is useless
-                // but maybe, somebody needs it...
-            }
+			List<String> desc = new ArrayList<String>();
 
-            Map<String, Object> context = new HashMap<String, Object>();
-            
-            context.put("keys", keys);
+			for (FieldInfo k : keys) {
 
-            String mode = fetch_list ? "crud_sql_read_all" : "crud_sql_read_single";
+				desc.add(k.getType() + " " + k.getName());
+			}
 
-            StringWriter sw = new StringWriter();
-            generate_sql(mode, context, table_name, sw);
-            sql_buff.append(sw.getBuffer());
+			String[] param_arr = desc.toArray(new String[desc.size()]);
 
-            List<String> desc = new ArrayList<String>();
+			render_query(buffer, jdbc_sql_buff.toString(), table_name, false, ret_dto_type, true, fetch_list,
+					method_name, "", param_arr, true, "");
 
-            for (FieldInfo k : keys) {
+			return buffer;
+		}
 
-                desc.add(k.getType() + " " + k.getName());
-            }
+		@Override
+		public StringBuilder render_crud_create(String class_name, String method_name, String table_name,
+				String dto_class_name, boolean fetch_generated, String generated) throws Exception {
 
-            String[] param_arr = desc.toArray(new String[desc.size()]);
+			List<FieldInfo> params = new ArrayList<FieldInfo>();
+			List<FieldInfo> keys = new ArrayList<FieldInfo>();
+			List<String> sql_col_names = new ArrayList<String>();
 
-            render_element_query(buffer, sql_buff.toString(), table_name, false, ret_dto_type, true, fetch_list,
-                    method_name, "", param_arr, true, "");
+			db_utils.get_crud_create_metadata(table_name, keys, sql_col_names, params, generated, dto_class_name,
+					jaxb_dto_classes);
 
-            return buffer;
-        }
+			String sql_str;
+			{
 
-        @Override
-        public StringBuilder render_element_crud_create(StringBuilder sql_buff, String class_name, String method_name,
-                String table_name, String dto_class_name, boolean fetch_generated, String generated) throws Exception {
+				Map<String, Object> context = new HashMap<String, Object>();
 
-            List<FieldInfo> params = new ArrayList<FieldInfo>();
-            List<FieldInfo> keys = new ArrayList<FieldInfo>();
-            List<String> sql_col_names = new ArrayList<String>();
+				context.put("col_names", sql_col_names);
 
-            db_utils.get_crud_create_metadata(table_name, keys, sql_col_names, params, generated, dto_class_name,
-                    jaxb_dto_classes);
+				StringWriter sw = new StringWriter();
 
-            // reuse buffer filled earlier
-            if (sql_buff.length() == 0) {
+				generate_sql("crud_sql_create", context, table_name, sw);
 
-                Map<String, Object> context = new HashMap<String, Object>();
-                
-                context.put("col_names", sql_col_names);
+				StringBuilder jdbc_sql_buff = new StringBuilder();
+				jdbc_sql_buff.append(sw.getBuffer());
+				db_utils.validate_jdbc_sql(jdbc_sql_buff);
+				sql_str = SqlUtils.ruby_sql_to_ruby_string(jdbc_sql_buff);
+			}
 
-                StringWriter sw = new StringWriter();
+			Map<String, Object> context = new HashMap<String, Object>();
 
-                generate_sql("crud_sql_create", context, table_name, sw);
+			context.put("method_type", "CREATE");
+			context.put("table_name", table_name);
+			context.put("crud", "create");
+			context.put("class_name", class_name);
+			context.put("sql", sql_str);
+			context.put("method_name", method_name);
+			context.put("params", params);
+			// PythonRuby does support "method overloading". More useful for
+			// update is
+			// version with DTO parameter:
+			context.put("dto_param", process_dto_class_name(dto_class_name, false));
 
-                sql_buff.append(sw.getBuffer());
-            }
+			if (fetch_generated && keys.size() > 0) {
 
-            String sql_str = Helpers.sql_to_ruby_string(sql_buff);
+				context.put("keys", keys);
+				context.put("mode", "dao_create");
 
-            Map<String, Object> context = new HashMap<String, Object>();
+			} else {
 
-            context.put("method_type", "CREATE");
-            context.put("table_name", table_name);
-            context.put("crud", "create");
-            context.put("class_name", class_name);
-            context.put("sql", sql_str);
-            context.put("method_name", method_name);
-            context.put("params", params);
-            // PythonRuby does support "method overloading". More useful for
-            // update is
-            // version with DTO parameter:
-            context.put("dto_param", process_dto_class_name(dto_class_name, false));
+				// Examples of situations when data table doesn't have
+				// auto-increment keys:
+				// 1) PK is the name or serial NO
+				// 2) PK == FK of 1:1 relation
+				// 2) unique PK is assigned by trigger
+				context.put("is_external_sql", false);
+				context.put("mode", "dao_exec_dml");
+			}
 
-            if (fetch_generated && keys.size() > 0) {
+			StringWriter sw = new StringWriter();
+			te.merge(context, sw);
+			StringBuilder buffer = new StringBuilder();
+			buffer.append(sw.getBuffer());
 
-                context.put("keys", keys);
-                context.put("mode", "dao_create");
+			return buffer;
+		}
 
-            } else {
+		private void generate_sql(String mode, Map<String, Object> context, String table_name, StringWriter sw) {
 
-                // Examples of situations when data table doesn't have
-                // auto-increment keys:
-                // 1) PK is the name or serial NO
-                // 2) PK == FK of 1:1 relation
-                // 2) unique PK is assigned by trigger
-                context.put("is_external_sql", false);
-                context.put("mode", "dao_exec_dml");
-            }
+			context.put("table_name", table_name);
+			context.put("mode", mode);
 
-            StringWriter sw = new StringWriter();
+			te.merge(context, sw);
+		}
 
-            te.merge(context, sw);
+		@Override
+		public StringBuilder render_crud_update(String class_name, String method_name, String table_name,
+				String dto_class_name, boolean primitive_params) throws Exception {
 
-            StringBuilder buffer = new StringBuilder();
+			StringBuilder buffer = new StringBuilder();
 
-            buffer.append(sw.getBuffer());
+			List<FieldInfo> params = new ArrayList<FieldInfo>();
+			List<FieldInfo> keys = new ArrayList<FieldInfo>();
 
-            return buffer;
-        }
+			db_utils.get_crud_info(table_name, keys, params, dto_class_name, jaxb_dto_classes);
 
-        private void generate_sql(String mode, Map<String, Object> context, String table_name, StringWriter sw) {
+			if (keys.isEmpty()) {
 
-            context.put("table_name", table_name);
-            context.put("mode", mode);
+				String msg = Helpers.get_no_pk_message(method_name);
 
-            te.merge(context, sw);
-        }
+				Helpers.build_warning_comment(buffer, msg);
 
-        @Override
-        public StringBuilder render_element_crud_update(StringBuilder sql_buff, String class_name, String method_name,
-                String table_name, String dto_class_name, boolean primitive_params) throws Exception {
+				return buffer;
+			}
 
-            StringBuilder buffer = new StringBuilder();
+			if (params.isEmpty()) {
 
-            List<FieldInfo> params = new ArrayList<FieldInfo>();
-            List<FieldInfo> keys = new ArrayList<FieldInfo>();
+				// if all values of the table are the parts of PK,
+				// SQL will be invalid like ''UPDATE term_groups SET WHERE g_id
+				// = ? AND t_id = ?'
+				// (missing assignments between SET and WHERE)
+				String msg = Helpers.get_only_pk_message(method_name);
 
-            db_utils.get_crud_info(table_name, keys, params, dto_class_name, jaxb_dto_classes);
+				Helpers.build_warning_comment(buffer, msg);
 
-            if (keys.isEmpty()) {
+				return buffer;
+			}
 
-                String msg = Helpers.get_no_pk_message(method_name);
+			String sql_str;
+			{
 
-                Helpers.build_warning_comment(buffer, msg);
+				Map<String, Object> context = new HashMap<String, Object>();
 
-                return buffer;
-            }
+				context.put("params", params);
+				context.put("keys", keys);
 
-            if (params.isEmpty()) {
+				StringWriter sw = new StringWriter();
+				generate_sql("crud_sql_update", context, table_name, sw);
 
-                // if all values of the table are the parts of PK,
-                // SQL will be invalid like ''UPDATE term_groups SET WHERE g_id
-                // = ? AND t_id = ?'
-                // (missing assignments between SET and WHERE)
-                String msg = Helpers.get_only_pk_message(method_name);
+				StringBuilder jdbc_sql_buff = new StringBuilder();
+				jdbc_sql_buff.append(sw.getBuffer());
+				db_utils.validate_jdbc_sql(jdbc_sql_buff);
+				sql_str = SqlUtils.ruby_sql_to_ruby_string(jdbc_sql_buff);
+			}
 
-                Helpers.build_warning_comment(buffer, msg);
+			params.addAll(keys);
 
-                return buffer;
-            }
+			Map<String, Object> context = new HashMap<String, Object>();
 
-            // reuse buffer filled earlier
-            if (sql_buff.length() == 0) {
+			context.put("class_name", class_name);
+			context.put("method_name", method_name);
+			context.put("sql", sql_str);
+			context.put("method_type", "UPDATE");
+			context.put("crud", "update");
+			context.put("table_name", table_name);
+			context.put("dto_param", primitive_params ? "" : process_dto_class_name(dto_class_name, false));
+			context.put("params", params);
+			context.put("is_external_sql", false);
+			context.put("mode", "dao_exec_dml");
 
-                Map<String, Object> context = new HashMap<String, Object>();
-                
-                context.put("params", params);
-                context.put("keys", keys);
+			StringWriter sw = new StringWriter();
+			te.merge(context, sw);
+			buffer.append(sw.getBuffer());
 
-                StringWriter sw = new StringWriter();
-                generate_sql("crud_sql_update", context, table_name, sw);
-                sql_buff.append(sw.getBuffer());
-            }
+			return buffer;
+		}
 
-            // after rendering of SQL
-            for (FieldInfo k : keys) {
+		@Override
+		public StringBuilder render_crud_delete(String class_name, String method_name, String table_name,
+				String dto_class_name) throws Exception {
 
-                params.add(k);
-            }
+			StringBuilder buffer = new StringBuilder();
 
-            String sql_str = Helpers.sql_to_ruby_string(sql_buff);
+			List<FieldInfo> keys = new ArrayList<FieldInfo>();
 
-            Map<String, Object> context = new HashMap<String, Object>();
+			db_utils.get_crud_info(table_name, keys, null, dto_class_name, jaxb_dto_classes);
 
-            context.put("class_name", class_name);
-            context.put("method_name", method_name);
-            context.put("sql", sql_str);
-            context.put("method_type", "UPDATE");
-            context.put("crud", "update");
-            context.put("table_name", table_name);
-            context.put("dto_param", primitive_params ? "" : process_dto_class_name(dto_class_name, false));
-            context.put("params", params);
-            context.put("is_external_sql", false);
-            context.put("mode", "dao_exec_dml");
+			if (keys.isEmpty()) {
 
-            StringWriter sw = new StringWriter();
+				String msg = Helpers.get_no_pk_message(method_name);
 
-            te.merge(context, sw);
+				Helpers.build_warning_comment(buffer, msg);
 
-            buffer.append(sw.getBuffer());
+				return buffer;
+			}
 
-            return buffer;
-        }
+			String sql_str;
+			{
 
-        @Override
-        public StringBuilder render_element_crud_delete(StringBuilder sql_buff, String class_name, String method_name,
-                String table_name, String dto_class_name) throws Exception {
+				Map<String, Object> context = new HashMap<String, Object>();
 
-            StringBuilder buffer = new StringBuilder();
+				context.put("keys", keys);
 
-            List<FieldInfo> keys = new ArrayList<FieldInfo>();
+				StringWriter sw = new StringWriter();
+				generate_sql("crud_sql_delete", context, table_name, sw);
 
-            db_utils.get_crud_info(table_name, keys, null, dto_class_name, jaxb_dto_classes);
+				StringBuilder jdbc_sql_buff = new StringBuilder();
+				jdbc_sql_buff.append(sw.getBuffer());
 
-            if (keys.isEmpty()) {
+				db_utils.validate_jdbc_sql(jdbc_sql_buff);
 
-                String msg = Helpers.get_no_pk_message(method_name);
+				sql_str = SqlUtils.ruby_sql_to_ruby_string(jdbc_sql_buff);
+			}
 
-                Helpers.build_warning_comment(buffer, msg);
+			Map<String, Object> context = new HashMap<String, Object>();
 
-                return buffer;
-            }
+			context.put("class_name", class_name);
+			context.put("method_name", method_name);
+			context.put("sql", sql_str);
+			context.put("method_type", "DELETE");
+			context.put("crud", "delete");
+			context.put("table_name", table_name);
+			// PythonRuby does support "method overloading". More useful for
+			// delete is
+			// version with scalar parameters:
+			context.put("dto_param", "");
+			context.put("params", keys);
+			context.put("is_external_sql", false);
+			context.put("mode", "dao_exec_dml");
 
-            // reuse buffer filled earlier
-            if (sql_buff.length() == 0) {
+			StringWriter sw = new StringWriter();
+			te.merge(context, sw);
+			buffer.append(sw.getBuffer());
 
-                Map<String, Object> context = new HashMap<String, Object>();
-                
-                context.put("keys", keys);
+			return buffer;
+		}
 
-                StringWriter sw = new StringWriter();
-                generate_sql("crud_sql_delete", context, table_name, sw);
-                sql_buff.append(sw.getBuffer());
-            }
+		@Override
+		public StringBuilder render_jaxb_crud(TypeCrud jaxb_type_crud) throws Exception {
 
-            String sql_str = Helpers.sql_to_ruby_string(sql_buff);
+			String node_name = Helpers.get_jaxb_node_name(jaxb_type_crud);
 
-            Map<String, Object> context = new HashMap<String, Object>();
+			String dto_class_name = jaxb_type_crud.getDto();
 
-            context.put("class_name", class_name);
-            context.put("method_name", method_name);
-            context.put("sql", sql_str);
-            context.put("method_type", "DELETE");
-            context.put("crud", "delete");
-            context.put("table_name", table_name);
-            // PythonRuby does support "method overloading". More useful for
-            // delete is
-            // version with scalar parameters:
-            context.put("dto_param", "");
-            context.put("params", keys);
-            context.put("is_external_sql", false);
-            context.put("mode", "dao_exec_dml");
+			if (dto_class_name.length() == 0) {
 
-            StringWriter sw = new StringWriter();
+				throw new Exception("<" + node_name + "...\nDTO class is not set");
+			}
 
-            te.merge(context, sw);
+			String table_attr = jaxb_type_crud.getTable();
 
-            buffer.append(sw.getBuffer());
+			if (table_attr == null || table_attr.length() == 0) {
 
-            return buffer;
-        }
+				throw new Exception("<" + node_name + "...\nRequired attribute is not set");
+			}
 
-        @Override
-        public StringBuilder render_element_crud(TypeCrud jaxb_type_crud) throws Exception {
+			try {
 
-            String node_name = Helpers.get_jaxb_node_name(jaxb_type_crud);
+				db_utils.validate_table_name(table_attr);
 
-            String dto_class_name = jaxb_type_crud.getDto();
+				process_dto_class_name(dto_class_name, false);
 
-            if (dto_class_name.length() == 0) {
+				StringBuilder code_buff = Helpers.process_element_crud(this, true, jaxb_type_crud, dto_class_name,
+						table_attr);
 
-                throw new Exception("<" + node_name + "...\nDTO class is not set");
-            }
+				return code_buff;
 
-            String table_attr = jaxb_type_crud.getTable();
+			} catch (Throwable e) {
 
-            if (table_attr == null || table_attr.length() == 0) {
+				// e.printStackTrace();
+				String msg = "<" + node_name + " dto=\"" + dto_class_name + "\" table=\"" + table_attr + "\"...\n";
 
-                throw new Exception("<" + node_name + "...\nRequired attribute is not set");
-            }
-
-            try {
-
-                db_utils.validate_table_name(table_attr);
-
-                process_dto_class_name(dto_class_name, false);
-
-                StringBuilder code_buff = Helpers.process_element_crud(this, true, jaxb_type_crud, dto_class_name, table_attr);
-
-                return code_buff;
-
-            } catch (Throwable e) {
-
-                // e.printStackTrace();
-                String msg = "<" + node_name + " dto=\"" + dto_class_name + "\" table=\"" + table_attr + "\"...\n";
-
-                throw new Exception(Helpers.get_error_message(msg, e));
-            }
-        }
-
-        @Override
-        public DbUtils get_db_utils() {
-
-            return db_utils;
-        }
-    }
+				throw new Exception(Helpers.get_error_message(msg, e));
+			}
+		}
+	}
 }

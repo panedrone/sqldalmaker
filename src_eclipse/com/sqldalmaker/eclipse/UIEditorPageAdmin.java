@@ -320,7 +320,7 @@ public class UIEditorPageAdmin extends Composite {
 		btnRecentChanges.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/recent_changes.txt",
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("recent_changes.txt",
 						"recent_changes.txt");
 			}
 		});
