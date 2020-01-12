@@ -8,6 +8,7 @@ package com.sqldalmaker.netbeans;
 import com.sqldalmaker.cg.DbUtils;
 import com.sqldalmaker.cg.FieldInfo;
 import com.sqldalmaker.cg.FieldNamesMode;
+import com.sqldalmaker.cg.SqlUtils;
 import com.sqldalmaker.common.Const;
 import com.sqldalmaker.common.XmlHelpers;
 import com.sqldalmaker.jaxb.dao.DaoClass;
@@ -182,7 +183,7 @@ public class NbpIdeEditorHelpers {
 
         DbUtils db_utils= new DbUtils(con, FieldNamesMode.AS_IS, null);
 
-        String jdbc_sql = db_utils.jdbc_sql_by_ref_query(dto_class.getRef(), sql_root_abs_path);
+        String jdbc_sql = SqlUtils.jdbc_sql_by_query_ref(dto_class.getRef(), sql_root_abs_path);
 
         ArrayList<FieldInfo> fields = new ArrayList<FieldInfo>();
 

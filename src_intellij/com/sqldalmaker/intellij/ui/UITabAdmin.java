@@ -305,7 +305,7 @@ public class UITabAdmin {
         recentChangesButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "recent_changes.txt", "recent_changes.txt");
+                IdeaEditorHelpers.open_or_activate_jar_file_in_editor(project, "", "recent_changes.txt", "recent_changes.txt");
             }
         });
         dataStoreQt5CButton.addActionListener(new ActionListener() {

@@ -1,7 +1,8 @@
 /*
- * Copyright 2011-2018 sqldalmaker@gmail.com
+ * Copyright 2011-2020 sqldalmaker@gmail.com
  * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
  * Read LICENSE.txt in the root of this project/archive for details.
+ *
  */
 package com.sqldalmaker.netbeans;
 
@@ -550,8 +551,10 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
     }//GEN-LAST:event_jButton10ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        int dialogResult = JOptionPane.showConfirmDialog(null, "This action creates/overwrites dto.xml in the folder of XML meta-program. Continue?",
-            "Warning", JOptionPane.YES_NO_OPTION);
+        
+        int dialogResult = JOptionPane.showConfirmDialog(null, 
+                "This action creates/overwrites 'dto.xml' in the folder of XML meta-program. Continue?",
+            "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 
         if (dialogResult == JOptionPane.YES_OPTION) {
 
@@ -561,8 +564,8 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
 
-        int dialogResult = JOptionPane.showConfirmDialog(null, "This action creates/overwrites settings.xml in the folder of XML meta-program. Continue?",
-            "Warning", JOptionPane.YES_NO_OPTION);
+        int dialogResult = JOptionPane.showConfirmDialog(null, "This action creates/overwrites 'settings.xml' in the folder of XML meta-program. Continue?",
+            "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 
         if (dialogResult == JOptionPane.YES_OPTION) {
 
@@ -573,7 +576,7 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
 
         int dialogResult = JOptionPane.showConfirmDialog(null, "This action creates/overwrites XSD files in the folder of XML meta-program. Continue?",
-            "Warning", JOptionPane.YES_NO_OPTION);
+            "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 
         if (dialogResult == JOptionPane.YES_OPTION) {
 
@@ -582,7 +585,7 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton13ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton13ActionPerformed
-        NbpIdeEditorHelpers.open_resource_file_in_editor_async("recent_changes.txt", "recent_changes.txt");
+        NbpIdeEditorHelpers.open_resource_file_in_editor_async("recent_changes.txt", "", "recent_changes.txt");
     }//GEN-LAST:event_jButton13ActionPerformed
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed

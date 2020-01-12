@@ -1,3 +1,9 @@
+/*
+ * Copyright 2011-2020 sqldalmaker@gmail.com
+ * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
+ * Read LICENSE.txt in the root of this project/archive for details.
+ *
+ */
 package com.sqldalmaker.cg;
 
 import com.sqldalmaker.jaxb.dao.Query;
@@ -5,6 +11,11 @@ import com.sqldalmaker.jaxb.dao.QueryDto;
 import com.sqldalmaker.jaxb.dao.QueryDtoList;
 import com.sqldalmaker.jaxb.dao.QueryList;
 
+/**
+ *
+ * @author sqldalmaker@gmail.com
+ *
+ */
 public class QueryMethodInfo {
 
     public final String jaxb_method;

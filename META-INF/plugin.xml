@@ -31,8 +31,8 @@ To generate the class, you declare it in XML meta-program.<br/>
 
     <actions>
 
-        <group class="com.sqldalmaker.intellij.SdmActionGroup" id="SdmActionGroup" text="SQL DAL Maker Root-files"
-               description="SQL DAL Maker Root-files" icon="/img/sqldalmaker.gif" popup="true">
+        <group class="com.sqldalmaker.intellij.SdmActionGroup" id="SdmActionGroup" text="SQL DAL Maker Root-Files"
+               description="SQL DAL Maker Root-Files" icon="/img/sqldalmaker.gif" popup="true">
 
         </group>
 

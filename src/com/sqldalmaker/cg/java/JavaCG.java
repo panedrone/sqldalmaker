@@ -82,7 +82,7 @@ public class JavaCG {
 				throw new Exception("XML element of DTO class '" + dto_class_name + "' not found");
 			}
 
-			String jdbc_sql = db_utils.jdbc_sql_by_ref_query(jaxb_dto_class.getRef(), sql_root_abs_path);
+			String jdbc_sql = SqlUtils.jdbc_sql_by_query_ref(jaxb_dto_class.getRef(), sql_root_abs_path);
 
 			List<FieldInfo> fields = new ArrayList<FieldInfo>();
 
@@ -191,7 +191,7 @@ public class JavaCG {
 					process_dto_class_name(dto_package, mi.jaxb_dto_or_return_type);
 				}
 
-				String dao_jdbc_sql = db_utils.jdbc_sql_by_ref_query(mi.jaxb_ref, sql_root_abs_path);
+				String dao_jdbc_sql = SqlUtils.jdbc_sql_by_query_ref(mi.jaxb_ref, sql_root_abs_path);
 
 				String[] parsed = parse_method_declaration(mi.jaxb_method, dto_package);
 
@@ -245,7 +245,7 @@ public class JavaCG {
 				returned_type_name = fields.get(0).getType();
 			}
 
-			String sql_str = SqlUtils.jdb_sql_to_java_str(jdbc_dao_sql);
+			String sql_str = SqlUtils.jdbc_sql_to_java_str(jdbc_dao_sql);
 
 			Map<String, Object> context = new HashMap<String, Object>();
 
@@ -301,7 +301,7 @@ public class JavaCG {
 
 			try {
 
-				String dao_jdbc_sql = DbUtils.jdbc_sql_by_ref_exec_dml(ref, sql_root_abs_path);
+				String dao_jdbc_sql = SqlUtils.jdbc_sql_by_exec_dml_ref(ref, sql_root_abs_path);
 
 				String[] parsed = parse_method_declaration(method, dto_package);
 
@@ -333,13 +333,13 @@ public class JavaCG {
 				String class_name, String method_name, String dto_param_type, String[] param_descriptors,
 				String xml_node_name, String sql_path) throws Exception {
 
-			DbUtils.throw_if_select_sql(jdbc_dao_sql);
+			SqlUtils.throw_if_select_sql(jdbc_dao_sql);
 
 			List<FieldInfo> params = new ArrayList<FieldInfo>();
 
 			db_utils.get_exec_dml_jdbc_sql_info(jdbc_dao_sql, dto_param_type, param_descriptors, params);
 
-			String java_sql = SqlUtils.jdb_sql_to_java_str(jdbc_dao_sql);
+			String java_sql = SqlUtils.jdbc_sql_to_java_str(jdbc_dao_sql);
 
 			Map<String, Object> context = new HashMap<String, Object>();
 
@@ -491,7 +491,7 @@ public class JavaCG {
 			List<FieldInfo> keys = new ArrayList<FieldInfo>();
 			List<String> sql_col_names = new ArrayList<String>();
 
-			db_utils.get_crud_create_metadata(table_name, keys, sql_col_names, params, generated, dto_class_name,
+			db_utils.get_crud_create_info(table_name, keys, sql_col_names, params, generated, dto_class_name,
 					jaxb_dto_classes);
 
 			String sql_str;

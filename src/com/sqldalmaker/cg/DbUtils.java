@@ -28,21 +28,6 @@ import com.sqldalmaker.jaxb.settings.TypeMap;
  */
 public class DbUtils {
 
-    public static void throw_if_select_sql(String dao_jdbc_sql) throws Exception {
-
-        String trimmed = dao_jdbc_sql.toLowerCase().trim();
-
-        String[] parts = trimmed.split("\\s+");
-
-        if (parts.length > 0) {
-
-            if ("select".equals(parts[0])) {
-
-                throw new Exception("SELECT is not allowed here");
-            }
-        }
-    }
-
     private final Connection conn;
 
     private final FieldNamesMode field_names_mode;
@@ -168,35 +153,6 @@ public class DbUtils {
         }
 
         throw new SQLException("Data table '" + table_name + "' not found. Table names may be case sensitive.");
-    }
-
-    private static String[] parse_ref(String src) throws Exception {
-
-        String before_brackets;
-
-        String inside_brackets;
-
-        src = src.trim();
-
-        int pos = src.indexOf('(');
-
-        if (pos == -1) {
-
-            throw new Exception("'(' expected in ref shortcut");
-
-        } else {
-
-            if (!src.endsWith(")")) {
-
-                throw new Exception("')' expected in ref shortcut");
-            }
-
-            before_brackets = src.substring(0, pos);
-
-            inside_brackets = src.substring(before_brackets.length() + 1, src.length() - 1);
-        }
-
-        return new String[]{before_brackets, inside_brackets};
     }
 
     private static void validate_jaxb_dto_class(DtoClass jaxb_dto_class) throws Exception {
@@ -567,7 +523,7 @@ public class DbUtils {
 
             PreparedStatement ps; // PreparedStatement is interface
 
-            boolean is_sp = is_jdbc_stored_proc_call(jdbc_dto_sql);
+            boolean is_sp = SqlUtils.is_jdbc_stored_proc_call(jdbc_dto_sql);
 
             if (is_sp) {
 
@@ -648,309 +604,6 @@ public class DbUtils {
         }
     }
 
-    public static String jdbc_sql_by_ref_exec_dml(String ref, String sql_root_abs_path) throws Exception {
-
-        if (is_jdbc_stored_proc_call(ref)) {
-
-            return ref;
-
-        } else if (is_stored_proc_call_shortcut(ref)) {
-
-            return ref; // stored_proc_shortcut_to_jdbc_call(ref);
-
-        } else if (is_sql_file_ref(ref)) {
-
-            String sql_file_path = Helpers.concat_path(sql_root_abs_path, ref);
-
-            return Helpers.load_text_from_file(sql_file_path);
-
-        } else {
-
-            throw new Exception("Invalid 'ref'': " + ref);
-        }
-    }
-
-    private String query_shortcut_ref_to_jdbc_sql(String ref) throws Exception {
-
-        String[] parts2 = parse_ref(ref);
-
-        String table_name = parts2[0];
-
-        validate_table_name(table_name); // PostgreSQL JDBC prepareStatement passes wrong table names
-
-        String param_descriptors = parts2[1];
-
-        String[] param_arr = Helpers.get_listed_items(param_descriptors);
-
-        if (param_arr.length < 1) {
-
-            throw new Exception("Not empty list of parameters expected in ref shortcut");
-        }
-
-        String params = param_arr[0] + "=?";
-
-        for (int i = 1; i < param_arr.length; i++) {
-
-            params += " AND " + param_arr[i] + "=?";
-        }
-
-        return "SELECT * FROM " + table_name + " WHERE " + params;
-    }
-
-    public String jdbc_sql_by_ref_query(String ref, String sql_root_abs_path) throws Exception {
-
-        String[] parts = ref.split(":");
-
-        String table_name = null;
-
-        if (parts.length >= 2) {
-
-            if ("table".compareTo(parts[0].toLowerCase().trim()) == 0) {
-
-                table_name = ref.substring(parts[0].length() + 1);
-            }
-
-        } else if (is_jdbc_stored_proc_call(ref)) {
-
-            return ref;
-
-        } else if (is_stored_proc_call_shortcut(ref)) {
-
-            return ref; // stored_proc_shortcut_to_jdbc_call(ref);
-
-        } else if (is_stored_func_call_shortcut(ref)) {
-
-            return ref;
-
-        } else if (is_sql_file_ref(ref)) {
-
-            String sql_file_path = Helpers.concat_path(sql_root_abs_path, ref);
-
-            return Helpers.load_text_from_file(sql_file_path);
-
-        } else if (is_sql_shortcut_ref(ref)) {
-
-            String res = query_shortcut_ref_to_jdbc_sql(ref);
-
-            return res;
-
-        } else if (is_table_ref(ref)) {
-
-            table_name = ref;
-
-        } else if (/* ref == null || */ref.trim().length() == 0) {
-
-            return "";
-
-        } else {
-
-            throw new Exception("Invalid 'ref'': " + ref);
-        }
-
-        return "SELECT * FROM " + table_name + " WHERE 1 = 0";
-    }
-
-    public static boolean is_sql_shortcut_ref(String ref) {
-
-        if (is_sql_file_ref_base(ref)) {
-
-            return false;
-        }
-
-        return ref != null && ref.length() >= 4 && ref.contains("(") && ref.trim().endsWith(")");
-    }
-
-    public static boolean is_sql_file_ref(String ref) {
-
-        if (is_sql_shortcut_ref(ref)) {
-
-            return false;
-        }
-
-        if (is_jdbc_stored_proc_call(ref)) {
-
-            return false;
-        }
-
-        return is_sql_file_ref_base(ref);
-    }
-
-    private static boolean is_sql_file_ref_base(String ref) {
-
-        return ref != null && ref.length() > 4 && ref.endsWith(".sql");
-    }
-
-    public static boolean is_table_ref(String ref) {
-
-        if (ref == null || ref.length() == 0) {
-
-            return false;
-        }
-
-        if (is_sql_shortcut_ref(ref)) {
-
-            return false;
-        }
-
-        if (is_jdbc_stored_proc_call(ref)) {
-
-            return false;
-        }
-
-        if (is_sql_file_ref(ref)) {
-
-            return false;
-        }
-
-        if (is_stored_proc_call_shortcut(ref)) {
-
-            return false;
-        }
-
-        if (is_stored_func_call_shortcut(ref)) {
-
-            return false;
-        }
-
-        final char[] ILLEGAL_CHARACTERS = {'/', '\n', '\r', '\t', '\0', '\f', '`', '?', '*', '\\', '<', '>', '|',
-                '\"'/* , ':' */, ';', ','};
-
-        for (char c : ILLEGAL_CHARACTERS) {
-
-            if (ref.contains(Character.toString(c))) {
-
-                return false;
-            }
-        }
-
-        // no empty strings separated by dots
-        //
-        String[] parts = ref.split("\\.", -1); // -1 to leave empty strings
-
-        for (String s : parts) {
-
-            if (s.length() == 0) {
-
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    public static boolean is_jdbc_stored_proc_call(String jdbc_sql) {
-
-        jdbc_sql = jdbc_sql.trim();
-
-        if (jdbc_sql.startsWith("{") && jdbc_sql.endsWith("}")) {
-
-            jdbc_sql = jdbc_sql.substring(1, jdbc_sql.length() - 1);
-
-        } else if (jdbc_sql.startsWith("{") && !jdbc_sql.endsWith("}")
-                || !jdbc_sql.startsWith("{") && jdbc_sql.endsWith("}")) {
-
-            // throw new Exception("Invalid JDBC call: " + jdbc_sql);
-
-            return false;
-        }
-
-        return is_stored_proc_call_shortcut(jdbc_sql);
-    }
-
-    public static String get_jdbc_stored_proc_call(String jdbc_sql) throws Exception {
-
-        String res = jdbc_sql.trim();
-
-        if (jdbc_sql.startsWith("{") && jdbc_sql.endsWith("}")) {
-
-            res = jdbc_sql.substring(1, jdbc_sql.length() - 1);
-
-        } else if (jdbc_sql.startsWith("{") && !jdbc_sql.endsWith("}")
-                || !jdbc_sql.startsWith("{") && jdbc_sql.endsWith("}")) {
-
-            throw new Exception("Invalid JDBC call: " + jdbc_sql);
-        }
-
-        return res;
-    }
-
-    public static boolean is_stored_proc_call_shortcut(String text) {
-
-        String[] parts = text.split("\\s+");
-
-        if (parts.length < 2) {
-
-            return false;
-        }
-
-        String call = parts[0];
-
-        return call.compareToIgnoreCase("call") == 0;
-    }
-
-    public static boolean is_stored_func_call_shortcut(String text) {
-
-        String[] parts = text.split("\\s+");
-
-        if (parts.length < 2) {
-            return false;
-        }
-
-        String call = parts[0];
-
-        return call.compareToIgnoreCase("select") == 0;
-    }
-
-    public static String jdbc_to_php_stored_proc_call(final String jdbc_sql) throws java.lang.Exception {
-
-        String sql = jdbc_sql.trim();
-
-        if (is_jdbc_stored_proc_call(sql)) { // confirms syntax {call sp_name(...)}
-
-            sql = sql.substring(1, sql.length() - 1).trim(); // converted to call sp_name(...)
-
-        } else if (is_stored_proc_call_shortcut(sql)) {
-            //
-
-        } else {
-
-            throw new Exception("Unexpected syntax of CALL: " + jdbc_sql);
-        }
-
-        return sql;
-    }
-
-    public static String jdbc_to_python_stored_proc_call(final String jdbc_sql) throws java.lang.Exception {
-
-        String sql = jdbc_sql.trim();
-
-        if (is_jdbc_stored_proc_call(sql)) { // confirms syntax {call sp_name(...)}
-
-            sql = get_jdbc_stored_proc_call(sql); // converted to call sp_name(...)
-
-        } else if (is_stored_proc_call_shortcut(sql)) {
-            //
-
-        } else {
-
-            throw new Exception("Unexpected syntax of CALL: " + jdbc_sql);
-        }
-
-        if (sql.contains("(")) {
-
-            if (!sql.endsWith(")")) {
-
-                throw new Exception("Unexpected syntax of CALL: " + jdbc_sql);
-            }
-
-            String[] parts = sql.split("[(]");
-
-            sql = parts[0].trim();
-        }
-
-        return sql;
-    }
-
     public void get_jdbc_sql_info(String sql_root_abs_path, String jdbc_dao_sql, List<FieldInfo> fields,
                                   String dto_param_type, String[] param_descriptors, List<FieldInfo> params, String jaxb_dto_or_return_type,
                                   boolean jaxb_return_type_is_dto, DtoClasses jaxb_dto_classes) throws Exception {
@@ -962,7 +615,7 @@ public class DbUtils {
 
         PreparedStatement ps; // PreparedStatement is interface
 
-        boolean is_sp = is_jdbc_stored_proc_call(jdbc_dao_sql);
+        boolean is_sp = SqlUtils.is_jdbc_stored_proc_call(jdbc_dao_sql);
 
         if (is_sp) {
 
@@ -991,7 +644,7 @@ public class DbUtils {
 
                 if (fields.size() == 0) { // no fields from DAO SQL, try to get fields from declaration of DTO
 
-                    String jdbc_dto_sql = jdbc_sql_by_ref_query(jaxb_dto_class.getRef(), sql_root_abs_path);
+                    String jdbc_dto_sql = SqlUtils.jdbc_sql_by_query_ref(jaxb_dto_class.getRef(), sql_root_abs_path);
 
                     get_dto_field_info(jdbc_dto_sql, jaxb_dto_class, fields);
                 }
@@ -1045,12 +698,12 @@ public class DbUtils {
         }
     }
 
-    public void get_exec_dml_jdbc_sql_info(String sql, String dto_param_type, String[] param_descriptors,
+    public void get_exec_dml_jdbc_sql_info(String jdbc_sql, String dto_param_type, String[] param_descriptors,
                                            List<FieldInfo> params) throws Exception {
 
         check_duplicates(param_descriptors);
 
-        PreparedStatement ps = prepare(conn, sql);
+        PreparedStatement ps = prepare(conn, jdbc_sql);
 
         try {
 
@@ -1269,7 +922,7 @@ public class DbUtils {
         }
     }
 
-    public void get_crud_create_metadata(String table_name, List<FieldInfo> keys, List<String> sql_col_names,
+    public void get_crud_create_info(String table_name, List<FieldInfo> keys, List<String> sql_col_names,
                                          List<FieldInfo> params, String generated, String dto_class_name, DtoClasses jaxb_dto_classes)
             throws Exception {
 

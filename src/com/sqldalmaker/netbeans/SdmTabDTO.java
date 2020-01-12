@@ -1,12 +1,13 @@
 /*
- * Copyright 2011-2018 sqldalmaker@gmail.com
+ * Copyright 2011-2020 sqldalmaker@gmail.com
  * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
  * Read LICENSE.txt in the root of this project/archive for details.
+ *
  */
 package com.sqldalmaker.netbeans;
 
-import com.sqldalmaker.cg.DbUtils;
 import com.sqldalmaker.cg.IDtoCG;
+import com.sqldalmaker.cg.SqlUtils;
 import com.sqldalmaker.common.Const;
 import com.sqldalmaker.common.InternalException;
 import com.sqldalmaker.jaxb.dto.DtoClass;
@@ -683,7 +684,7 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
 
             String ref = (String) table.getValueAt(selectedRows[0], 1);
 
-            if (DbUtils.is_sql_file_ref(ref) == false) {
+            if (SqlUtils.is_sql_file_ref(ref) == false) {
                 
                 return;
             }

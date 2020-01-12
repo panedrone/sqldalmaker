@@ -10,6 +10,7 @@ import com.sqldalmaker.cg.DbUtils;
 import com.sqldalmaker.cg.FieldInfo;
 import com.sqldalmaker.cg.FieldNamesMode;
 import com.sqldalmaker.cg.Helpers;
+import com.sqldalmaker.cg.SqlUtils;
 import com.sqldalmaker.jaxb.dao.*;
 import com.sqldalmaker.jaxb.dto.DtoClass;
 import com.sqldalmaker.jaxb.dto.DtoClasses;
@@ -21,6 +22,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
+/**
+ *
+ * @author sqldalmaker@gmail.com
+ *
+ */
 public class SdmUtils {
 
     /*
@@ -483,7 +489,7 @@ public class SdmUtils {
 
         DbUtils db_utils = new DbUtils(connection, FieldNamesMode.AS_IS, null);
 
-        String jdbc_sql = db_utils.jdbc_sql_by_ref_query(dto_class.getRef(), sql_root_folder_full_path);
+        String jdbc_sql = SqlUtils.jdbc_sql_by_query_ref(dto_class.getRef(), sql_root_folder_full_path);
 
         ArrayList<FieldInfo> fields = new ArrayList<FieldInfo>();
 
