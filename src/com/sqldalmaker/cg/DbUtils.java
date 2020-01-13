@@ -281,26 +281,10 @@ public class DbUtils {
         return conn.prepareCall(jdbc_sql);
     }
 
-    private static String get_jaxb_field_type_name(DtoClass jaxb_dto_class, String col_name) {
-
-        if (jaxb_dto_class != null && jaxb_dto_class.getField() != null) {
-
-            for (DtoClass.Field c : jaxb_dto_class.getField()) {
-
-                if (col_name.equals(c.getColumn())) {
-
-                    return c.getJavaType();
-                }
-            }
-        }
-
-        return null;
-    }
-
     private static String get_column_type_name(DtoClass jaxb_dto_class, String col_name, ResultSetMetaData rsmd,
-                                               int i) {
+            int i) {
 
-        String java_class_name = get_jaxb_field_type_name(jaxb_dto_class, col_name);
+        String java_class_name = JaxbProcessor.get_jaxb_field_type_name(jaxb_dto_class, col_name);
 
         if (java_class_name == null) {
 
@@ -344,7 +328,7 @@ public class DbUtils {
     }
 
     public FieldInfo[] get_table_columns_info(String table_name, String explicit_gen_keys, String dto_class_name,
-                                              DtoClasses jaxb_dto_classes) throws Exception {
+            DtoClasses jaxb_dto_classes) throws Exception {
 
         Set<String> gen_keys = new HashSet<String>();
 
@@ -360,7 +344,7 @@ public class DbUtils {
             }
         }
 
-        DtoClass jaxb_dto_class = Helpers.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
+        DtoClass jaxb_dto_class = JaxbProcessor.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
 
         PreparedStatement ps = create_prepared_statement(conn, table_name);
 
@@ -427,13 +411,13 @@ public class DbUtils {
     }
 
     public void get_crud_info(String table_name, List<FieldInfo> columns, List<FieldInfo> params, String dto_class_name,
-                              DtoClasses jaxb_dto_classes) throws Exception {
+            DtoClasses jaxb_dto_classes) throws Exception {
 
         get_crud_info(table_name, columns, params, dto_class_name, jaxb_dto_classes, type_map);
     }
 
     public void get_crud_info(String table_name, List<FieldInfo> columns, List<FieldInfo> params, String dto_class_name,
-                              DtoClasses jaxb_dto_classes, TypeMap jaxb_type_map) throws Exception {
+            DtoClasses jaxb_dto_classes, TypeMap jaxb_type_map) throws Exception {
 
         List<String> pk_col_names = get_pk_col_names(conn, table_name);
 
@@ -462,7 +446,7 @@ public class DbUtils {
             pk_col_names_set_lower_case.add(pk_col_name);
         }
 
-        DtoClass jaxb_dto_class = Helpers.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
+        DtoClass jaxb_dto_class = JaxbProcessor.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
 
         PreparedStatement ps = create_prepared_statement(conn, table_name);
 
@@ -581,8 +565,8 @@ public class DbUtils {
 
         ////////////////////////////////////////////////
         //
-        // If the field is missing in metadata then it will be calculated outside of
-        //////////////////////////////////////////////// RDBMS.
+        // If the field is missing in metadata,
+        // it will be calculated outside of RDBMS.
         //
         for (DtoClass.Field field : jaxb_dto_class.getField()) {
 
@@ -605,8 +589,8 @@ public class DbUtils {
     }
 
     public void get_jdbc_sql_info(String sql_root_abs_path, String jdbc_dao_sql, List<FieldInfo> fields,
-                                  String dto_param_type, String[] param_descriptors, List<FieldInfo> params, String jaxb_dto_or_return_type,
-                                  boolean jaxb_return_type_is_dto, DtoClasses jaxb_dto_classes) throws Exception {
+            String dto_param_type, String[] param_descriptors, List<FieldInfo> params, String jaxb_dto_or_return_type,
+            boolean jaxb_return_type_is_dto, DtoClasses jaxb_dto_classes) throws Exception {
 
         fields.clear();
         params.clear();
@@ -638,7 +622,7 @@ public class DbUtils {
                 //
                 // find_jaxb_dto_class(...) throws if no class or several classes
                 //
-                DtoClass jaxb_dto_class = Helpers.find_jaxb_dto_class(jaxb_dto_or_return_type, jaxb_dto_classes);
+                DtoClass jaxb_dto_class = JaxbProcessor.find_jaxb_dto_class(jaxb_dto_or_return_type, jaxb_dto_classes);
 
                 get_fields_info(ps, jaxb_dto_class, fields);
 
@@ -672,7 +656,6 @@ public class DbUtils {
                     if (fields.size() < 1) {
 
                         // throw new Exception("Columns count is < 1 . Is SQL statement valid?");
-
                         ret_type_name = "Object";
 
                     } else {
@@ -699,11 +682,22 @@ public class DbUtils {
     }
 
     public void get_exec_dml_jdbc_sql_info(String jdbc_sql, String dto_param_type, String[] param_descriptors,
-                                           List<FieldInfo> params) throws Exception {
+            List<FieldInfo> params) throws Exception {
 
         check_duplicates(param_descriptors);
 
-        PreparedStatement ps = prepare(conn, jdbc_sql);
+        PreparedStatement ps; // PreparedStatement is interface
+
+        boolean is_sp = SqlUtils.is_jdbc_stored_proc_call(jdbc_sql);
+
+        if (is_sp) {
+
+            ps = prepare_call(conn, jdbc_sql);
+
+        } else {
+
+            ps = prepare(conn, jdbc_sql);
+        }
 
         try {
 
@@ -795,7 +789,7 @@ public class DbUtils {
     }
 
     private void get_params_info(PreparedStatement ps, String[] param_descriptors, FieldNamesMode field_names_mode,
-                                 List<FieldInfo> params) throws SQLException {
+            List<FieldInfo> params) throws SQLException {
 
         params.clear();
 
@@ -923,7 +917,7 @@ public class DbUtils {
     }
 
     public void get_crud_create_info(String table_name, List<FieldInfo> keys, List<String> sql_col_names,
-                                         List<FieldInfo> params, String generated, String dto_class_name, DtoClasses jaxb_dto_classes)
+            List<FieldInfo> params, String generated, String dto_class_name, DtoClasses jaxb_dto_classes)
             throws Exception {
 
         sql_col_names.clear();

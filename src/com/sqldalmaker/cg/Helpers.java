@@ -6,21 +6,9 @@
  */
 package com.sqldalmaker.cg;
 
-import com.sqldalmaker.jaxb.dao.Crud;
-import com.sqldalmaker.jaxb.dao.CrudAuto;
-import com.sqldalmaker.jaxb.dao.DaoClass;
-import com.sqldalmaker.jaxb.dao.ExecDml;
-import com.sqldalmaker.jaxb.dao.Query;
-import com.sqldalmaker.jaxb.dao.QueryDto;
-import com.sqldalmaker.jaxb.dao.QueryDtoList;
-import com.sqldalmaker.jaxb.dao.QueryList;
-import com.sqldalmaker.jaxb.dao.TypeCrud;
-import com.sqldalmaker.jaxb.dto.DtoClass;
-import com.sqldalmaker.jaxb.dto.DtoClasses;
 import com.sqldalmaker.jaxb.settings.Type;
 import com.sqldalmaker.jaxb.settings.TypeMap;
 
-import javax.xml.bind.annotation.XmlRootElement;
 import java.io.*;
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -142,11 +130,6 @@ public class Helpers {
         return java_type_name;
     }
 
-    public static String get_error_message(String msg, Throwable e) {
-
-        return msg + " " + e.getMessage();
-    }
-
     public static String replace_char_at(String s, int pos, char c) {
 
         // http://www.rgagnon.com/javadetails/java-0030.html
@@ -180,13 +163,6 @@ public class Helpers {
         String res = concat_path(seg0, seg1);
 
         return concat_path(res, seg2);
-    }
-
-    public static String get_jaxb_node_name(Object jaxb_node) {
-
-        XmlRootElement attr = jaxb_node.getClass().getAnnotation(XmlRootElement.class);
-
-        return attr.name();
     }
 
     //
@@ -224,7 +200,7 @@ public class Helpers {
         return buffer.toString();
     }
 
-    public static String[] get_listed_items(String list/* , boolean is_sp */) throws Exception {
+    public static String[] get_listed_items(String list) throws Exception {
 
         if (list != null && list.length() > 0) {
 
@@ -262,7 +238,7 @@ public class Helpers {
         return new String[]{};
     }
 
-    private static void check_item(String name/* , boolean is_sp */) throws Exception {
+    private static void check_item(String name) throws Exception {
 
         if (name == null || name.length() == 0) {
             throw new Exception("Item name is null or empty");
@@ -350,41 +326,6 @@ public class Helpers {
         }
 
         return class_name;
-    }
-
-    public static DtoClass find_jaxb_dto_class(String dto_attr, DtoClasses jaxb_dto_classes) throws Exception {
-
-        if (dto_attr == null || dto_attr.length() == 0) {
-
-            throw new Exception("Invalid name of DTO class: " + dto_attr);
-        }
-
-        DtoClass res = null;
-
-        int found = 0;
-
-        for (DtoClass cls : jaxb_dto_classes.getDtoClass()) {
-
-            String name = cls.getName();
-
-            if (name != null && name.equals(dto_attr)) {
-
-                res = cls;
-
-                found++;
-            }
-        }
-
-        if (found == 0) {
-
-            throw new Exception("DTO XML element not found: '" + dto_attr + "'");
-
-        } else if (found > 1) {
-
-            throw new Exception("Duplicate DTO XML elements for name='" + dto_attr + "' found.");
-        }
-
-        return res;
     }
 
     public static InputStream get_resource_as_stream_2(String res_path) throws Exception {
@@ -598,252 +539,8 @@ public class Helpers {
         return "\t// INFO: " + method_name + " is omitted because all columns are part of PK.";
     }
 
-    public static void process_element(IDaoCG dao_cg, DaoClass dao_class, List<String> methods) throws Exception {
+    public static String get_error_message(String msg, Throwable e) {
 
-        if (dao_class.getCrudOrCrudAutoOrQuery() != null) {
-
-            for (int i = 0; i < dao_class.getCrudOrCrudAutoOrQuery().size(); i++) {
-
-                Object jaxb_element = dao_class.getCrudOrCrudAutoOrQuery().get(i);
-
-                if (jaxb_element instanceof Query || jaxb_element instanceof QueryList || jaxb_element instanceof QueryDto
-                        || jaxb_element instanceof QueryDtoList) {
-
-                    StringBuilder buf = dao_cg.render_jaxb_query(jaxb_element);
-
-                    methods.add(buf.toString());
-
-                } else if (jaxb_element instanceof ExecDml) {
-
-                    StringBuilder buf = dao_cg.render_jaxb_exec_dml((ExecDml) jaxb_element);
-
-                    methods.add(buf.toString());
-
-                } else if (jaxb_element instanceof TypeCrud) {
-
-                    StringBuilder buf = dao_cg.render_jaxb_crud((TypeCrud)jaxb_element);
-
-                    methods.add(buf.toString());
-                    
-                } else {
-
-                    throw new Exception("Unexpected element found in DTO XML file");
-                }
-            }
-        }
-    }
-
-    private static boolean process_element_create(IDaoCG dao_cg, TypeCrud jaxb_type_crud, String dto_class_name,
-            String table_attr, boolean lower_under_scores, StringBuilder code_buff) throws Exception {
-
-        String method_name = null;
-
-        if (jaxb_type_crud.getCreate() != null) {
-
-            method_name = jaxb_type_crud.getCreate().getMethod();
-
-        } else {
-
-            if (jaxb_type_crud instanceof CrudAuto) {
-
-                method_name = "create" + dto_class_name;
-            }
-        }
-
-        if (method_name == null) {
-
-            return true;
-        }
-
-        if (lower_under_scores) {
-
-            method_name = Helpers.camel_case_to_lower_under_scores(method_name);
-        }
-
-        boolean fetch_generated = jaxb_type_crud.isFetchGenerated();
-
-        String generated = jaxb_type_crud.getGenerated();
-
-        StringBuilder tmp = dao_cg.render_crud_create(null, method_name, table_attr, dto_class_name,
-                fetch_generated, generated);
-
-        code_buff.append(tmp);
-
-        return true;
-    }
-
-    private static boolean process_element_read_all(IDaoCG dao_cg, TypeCrud element, String dto_class_name,
-            String table_attr, boolean lower_under_scores, StringBuilder code_buff) throws Exception {
-
-        String method_name = null;
-
-        if (element.getReadAll() != null) {
-
-            method_name = element.getReadAll().getMethod();
-
-        } else {
-
-            if (element instanceof CrudAuto) {
-
-                method_name = "read" + dto_class_name + "List";
-            }
-        }
-
-        if (method_name == null) {
-
-            return true;
-        }
-
-        if (lower_under_scores) {
-
-            method_name = Helpers.camel_case_to_lower_under_scores(method_name);
-        }
-
-        StringBuilder tmp = dao_cg.render_crud_read(method_name, table_attr, dto_class_name, true);
-
-        code_buff.append(tmp);
-
-        return true;
-    }
-
-    private static boolean process_element_read(IDaoCG dao_cg, TypeCrud element, String dto_class_name,
-            String table_attr, boolean lower_under_scores, StringBuilder code_buff) throws Exception {
-
-        String method_name = null;
-
-        if (element.getRead() != null) {
-
-            method_name = element.getRead().getMethod();
-
-        } else {
-
-            if (element instanceof CrudAuto) {
-
-                method_name = "read" + dto_class_name;
-            }
-        }
-
-        if (method_name == null) {
-
-            return true;
-        }
-
-        if (lower_under_scores) {
-
-            method_name = Helpers.camel_case_to_lower_under_scores(method_name);
-        }
-
-        StringBuilder tmp = dao_cg.render_crud_read(method_name, table_attr, dto_class_name, false);
-
-        code_buff.append(tmp);
-
-        return true;
-    }
-
-    private static boolean process_element_update(IDaoCG dao_cg, TypeCrud element, String dto_class_name,
-            String table_attr, boolean lower_under_scores, StringBuilder code_buff) throws Exception {
-
-        String method_name = null;
-
-        if (element.getUpdate() != null) {
-
-            method_name = element.getUpdate().getMethod();
-
-        } else {
-
-            if (element instanceof CrudAuto) {
-
-                method_name = "update" + dto_class_name;
-            }
-        }
-
-        if (method_name == null) {
-
-            return true;
-        }
-
-        if (lower_under_scores) {
-
-            method_name = Helpers.camel_case_to_lower_under_scores(method_name);
-        }
-
-        StringBuilder tmp = dao_cg.render_crud_update(null, method_name, table_attr, dto_class_name,
-                false);
-
-        code_buff.append(tmp);
-
-        return true;
-    }
-
-    private static boolean process_element_delete(IDaoCG dao_cg, TypeCrud element, String dto_class_name,
-            String table_attr, boolean lower_under_scores, StringBuilder code_buff) throws Exception {
-
-        String method_name = null;
-
-        if (element.getDelete() != null) {
-
-            method_name = element.getDelete().getMethod();
-
-        } else {
-
-            if (element instanceof CrudAuto) {
-
-                method_name = "delete" + dto_class_name;
-            }
-        }
-
-        if (method_name == null) {
-
-            return true;
-        }
-
-        if (lower_under_scores) {
-
-            method_name = Helpers.camel_case_to_lower_under_scores(method_name);
-        }
-
-        StringBuilder tmp = dao_cg.render_crud_delete(null, method_name, table_attr, dto_class_name);
-
-        code_buff.append(tmp);
-
-        return true;
-    }
-
-    public static StringBuilder process_element_crud(IDaoCG dao_cg, boolean lower_under_scores, TypeCrud jaxb_type_crud,
-            String dto_class_name, String table_attr) throws Exception {
-
-        boolean is_empty = true;
-
-        StringBuilder code_buff = new StringBuilder();
-
-        if (process_element_create(dao_cg, jaxb_type_crud, dto_class_name, table_attr, lower_under_scores, code_buff)) {
-            is_empty = false;
-        }
-
-        if (process_element_read_all(dao_cg, jaxb_type_crud, dto_class_name, table_attr, lower_under_scores, code_buff)) {
-            is_empty = false;
-        }
-
-        if (process_element_read(dao_cg, jaxb_type_crud, dto_class_name, table_attr, lower_under_scores, code_buff)) {
-            is_empty = false;
-        }
-
-        if (process_element_update(dao_cg, jaxb_type_crud, dto_class_name, table_attr, lower_under_scores, code_buff)) {
-            is_empty = false;
-        }
-
-        if (process_element_delete(dao_cg, jaxb_type_crud, dto_class_name, table_attr, lower_under_scores, code_buff)) {
-            is_empty = false;
-        }
-
-        if ((jaxb_type_crud instanceof Crud) && is_empty) {
-
-            String node_name = Helpers.get_jaxb_node_name(jaxb_type_crud);
-
-            throw new Exception(
-                    "Element '" + node_name + "' is empty. Add the method declarations or change to 'crud-auto'");
-        }
-
-        return code_buff;
+        return msg + " " + e.getMessage();
     }
 }

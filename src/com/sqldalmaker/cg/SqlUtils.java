@@ -117,7 +117,7 @@ public class SqlUtils {
 
         if (is_sp) {
 
-            php_sql = jdbc_to_php_stored_proc_call(jdbc_sql);
+            php_sql = jdbc_sp_call_to_php_sp_call(jdbc_sql);
 
         } else {
 
@@ -185,7 +185,7 @@ public class SqlUtils {
 
         if (is_sp) {
 
-            python_sql = jdbc_to_python_stored_proc_call(jdbc_sql);
+            python_sql = jdbc_sp_call_to_python_sp_call(jdbc_sql);
 
         } else {
 
@@ -195,7 +195,7 @@ public class SqlUtils {
         return python_sql_to_python_string(python_sql);
     }
 
-    public static String python_sql_to_python_string(String python_sql) {
+    private static String python_sql_to_python_string(String python_sql) {
 
         String[] parts = python_sql.split("(\\n|\\r)+");
 
@@ -320,6 +320,9 @@ public class SqlUtils {
         return "SELECT * FROM " + table_name + " WHERE 1 = 0";
     }
 
+    //
+    // called from PsiReferenceSql
+    //
     public static boolean is_sql_shortcut_ref(String ref) {
 
         if (is_sql_file_ref_base(ref)) {
@@ -350,6 +353,9 @@ public class SqlUtils {
         return ref != null && ref.length() > 4 && ref.endsWith(".sql");
     }
 
+    //
+    // called from PsiReferenceSql
+    //
     public static boolean is_table_ref(String ref) {
 
         if (ref == null || ref.length() == 0) {
@@ -427,7 +433,7 @@ public class SqlUtils {
         return is_stored_proc_call_shortcut(jdbc_sql);
     }
 
-    public static String get_jdbc_stored_proc_call(String jdbc_sql) throws Exception {
+    private static String get_jdbc_stored_proc_call(String jdbc_sql) throws Exception {
 
         String res = jdbc_sql.trim();
 
@@ -444,6 +450,9 @@ public class SqlUtils {
         return res;
     }
 
+    //
+    // called from PsiReferenceSql
+    //
     public static boolean is_stored_proc_call_shortcut(String text) {
 
         String[] parts = text.split("\\s+");
@@ -458,20 +467,24 @@ public class SqlUtils {
         return call.compareToIgnoreCase("call") == 0;
     }
 
-    public static boolean is_stored_func_call_shortcut(String text) {
+    //
+    // called from PsiReferenceSql
+    //
+    public static boolean is_stored_func_call_shortcut(String sql) {
 
-        String[] parts = text.split("\\s+");
+        String[] parts = sql.split("\\s+");
 
         if (parts.length < 2) {
+            
             return false;
         }
 
-        String call = parts[0];
+        String select = parts[0];
 
-        return call.compareToIgnoreCase("select") == 0;
+        return select.compareToIgnoreCase("select") == 0;
     }
 
-    public static String jdbc_to_php_stored_proc_call(final String jdbc_sql) throws java.lang.Exception {
+    private static String jdbc_sp_call_to_php_sp_call(final String jdbc_sql) throws java.lang.Exception {
 
         String sql = jdbc_sql.trim();
 
@@ -490,7 +503,7 @@ public class SqlUtils {
         return sql;
     }
 
-    public static String jdbc_to_python_stored_proc_call(final String jdbc_sql) throws java.lang.Exception {
+    private static String jdbc_sp_call_to_python_sp_call(final String jdbc_sql) throws java.lang.Exception {
 
         String sql = jdbc_sql.trim();
 
@@ -550,7 +563,7 @@ public class SqlUtils {
         return new String[]{before_brackets, inside_brackets};
     }
 
-    public static String shortcut_ref_to_jdbc_sql(String ref) throws Exception {
+    private static String shortcut_ref_to_jdbc_sql(String ref) throws Exception {
 
         String[] parts2 = parse_ref(ref);
 

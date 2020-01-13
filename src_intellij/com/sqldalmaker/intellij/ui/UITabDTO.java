@@ -13,6 +13,7 @@ import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.sqldalmaker.cg.DbUtils;
 import com.sqldalmaker.cg.IDtoCG;
+import com.sqldalmaker.cg.SqlUtils;
 import com.sqldalmaker.common.Const;
 import com.sqldalmaker.common.InternalException;
 import com.sqldalmaker.common.SdmUtils;
@@ -478,7 +479,7 @@ public class UITabDTO {
 
             String ref = (String) table.getValueAt(selectedRows[0], 1);
 
-            if (DbUtils.is_sql_file_ref(ref) == false) {
+            if (SqlUtils.is_sql_file_ref(ref) == false) {
                 return;
             }
 

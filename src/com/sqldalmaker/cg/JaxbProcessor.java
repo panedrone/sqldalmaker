@@ -1,12 +1,71 @@
-package com.sqldalmaker;
+package com.sqldalmaker.cg;
 
-import com.sqldalmaker.cg.Helpers;
-import com.sqldalmaker.cg.IDaoCG;
 import com.sqldalmaker.jaxb.dao.*;
+import com.sqldalmaker.jaxb.dto.DtoClass;
+import com.sqldalmaker.jaxb.dto.DtoClasses;
 
+import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
 
 public class JaxbProcessor {
+
+    public static String get_jaxb_node_name(Object jaxb_node) {
+
+        XmlRootElement attr = jaxb_node.getClass().getAnnotation(XmlRootElement.class);
+
+        return attr.name();
+    }
+
+    public static String get_jaxb_field_type_name(DtoClass jaxb_dto_class, String col_name) {
+
+        if (jaxb_dto_class != null && jaxb_dto_class.getField() != null) {
+
+            for (DtoClass.Field c : jaxb_dto_class.getField()) {
+
+                if (col_name.equals(c.getColumn())) {
+
+                    return c.getJavaType();
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public static DtoClass find_jaxb_dto_class(String dto_attr, DtoClasses jaxb_dto_classes) throws Exception {
+
+        if (dto_attr == null || dto_attr.length() == 0) {
+
+            throw new Exception("Invalid name of DTO class: " + dto_attr);
+        }
+
+        DtoClass res = null;
+
+        int found = 0;
+
+        for (DtoClass cls : jaxb_dto_classes.getDtoClass()) {
+
+            String name = cls.getName();
+
+            if (name != null && name.equals(dto_attr)) {
+
+                res = cls;
+
+                found++;
+            }
+        }
+
+        if (found == 0) {
+
+            throw new Exception("DTO XML element not found: '" + dto_attr + "'");
+
+        } else if (found > 1) {
+
+            throw new Exception("Duplicate DTO XML elements for name='" + dto_attr + "' found.");
+        }
+
+        return res;
+    }
 
     public static void process_jaxb_dao_class(IDaoCG dao_cg, DaoClass jaxb_dao_class, List<String> methods) throws Exception {
 
@@ -253,7 +312,7 @@ public class JaxbProcessor {
 
         if ((jaxb_type_crud instanceof Crud) && is_empty) {
 
-            String node_name = Helpers.get_jaxb_node_name(jaxb_type_crud);
+            String node_name = get_jaxb_node_name(jaxb_type_crud);
 
             throw new Exception(
                     "Element '" + node_name + "' is empty. Add the method declarations or change to 'crud-auto'");

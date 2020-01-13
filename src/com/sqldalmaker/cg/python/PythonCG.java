@@ -144,7 +144,7 @@ public class PythonCG {
 
 			List<String> methods = new ArrayList<String>();
 
-			Helpers.process_element(this, dao_class, methods);
+			JaxbProcessor.process_jaxb_dao_class(this, dao_class, methods);
 
 			for (int i = 0; i < methods.size(); i++) {
 				String m = methods.get(i).replace("\t", "    ").replace("//", "#");
@@ -183,7 +183,7 @@ public class PythonCG {
 
 			QueryMethodInfo mi = new QueryMethodInfo(jaxb_query);
 
-			String jaxb_node_name = Helpers.get_jaxb_node_name(jaxb_query);
+			String jaxb_node_name = JaxbProcessor.get_jaxb_node_name(jaxb_query);
 
 			check_required_attr(jaxb_node_name, mi.jaxb_method);
 
@@ -271,7 +271,7 @@ public class PythonCG {
 
 		private String process_dto_class_name(String dto_class_name, boolean add_to_import) throws Exception {
 
-			DtoClass jaxb_dto_class = Helpers.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
+			DtoClass jaxb_dto_class = JaxbProcessor.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
 
 			if (add_to_import) {
 
@@ -287,7 +287,7 @@ public class PythonCG {
 			String method = element.getMethod();
 			String ref = element.getRef();
 
-			String xml_node_name = Helpers.get_jaxb_node_name(element);
+			String xml_node_name = JaxbProcessor.get_jaxb_node_name(element);
 
 			check_required_attr(xml_node_name, method);
 
@@ -671,7 +671,7 @@ public class PythonCG {
 		@Override
 		public StringBuilder render_jaxb_crud(TypeCrud jaxb_type_crud) throws Exception {
 
-			String node_name = Helpers.get_jaxb_node_name(jaxb_type_crud);
+			String node_name = JaxbProcessor.get_jaxb_node_name(jaxb_type_crud);
 
 			String dto_class_name = jaxb_type_crud.getDto();
 
@@ -680,28 +680,28 @@ public class PythonCG {
 				throw new Exception("<" + node_name + "...\nDTO class is not set");
 			}
 
-			String table_attr = jaxb_type_crud.getTable();
+			String table_name = jaxb_type_crud.getTable();
 
-			if (table_attr == null || table_attr.length() == 0) {
+			if (table_name == null || table_name.length() == 0) {
 
 				throw new Exception("<" + node_name + "...\nRequired attribute is not set");
 			}
 
 			try {
 
-				db_utils.validate_table_name(table_attr);
+				db_utils.validate_table_name(table_name);
 
 				process_dto_class_name(dto_class_name, false);
 
-				StringBuilder code_buff = Helpers.process_element_crud(this, true, jaxb_type_crud, dto_class_name,
-						table_attr);
+				StringBuilder code_buff = JaxbProcessor.process_jaxb_crud(this, true, jaxb_type_crud, dto_class_name,
+						table_name);
 
 				return code_buff;
 
 			} catch (Throwable e) {
 
 				// e.printStackTrace();
-				String msg = "<" + node_name + " dto=\"" + dto_class_name + "\" table=\"" + table_attr + "\"...\n";
+				String msg = "<" + node_name + " dto=\"" + dto_class_name + "\" table=\"" + table_name + "\"...\n";
 
 				throw new Exception(Helpers.get_error_message(msg, e));
 			}

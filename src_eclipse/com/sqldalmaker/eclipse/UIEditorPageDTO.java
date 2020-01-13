@@ -52,9 +52,9 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.wb.swt.ResourceManager;
 
-import com.sqldalmaker.cg.DbUtils;
 import com.sqldalmaker.cg.Helpers;
 import com.sqldalmaker.cg.IDtoCG;
+import com.sqldalmaker.cg.SqlUtils;
 import com.sqldalmaker.common.Const;
 import com.sqldalmaker.common.InternalException;
 import com.sqldalmaker.common.SdmUtils;
@@ -643,10 +643,12 @@ public class UIEditorPageDTO extends Composite {
 			String relative = items.get(0).getRef();
 
 			if (relative == null || relative.trim().length() == 0) {
+				
 				return;
 			}
 			
-			if (DbUtils.is_sql_file_ref(relative) == false) {
+			if (SqlUtils.is_sql_file_ref(relative) == false) {
+				
 				return;
 			}
 

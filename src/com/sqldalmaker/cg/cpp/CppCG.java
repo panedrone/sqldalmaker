@@ -149,7 +149,7 @@ public class CppCG {
 
 			List<String> methods = new ArrayList<String>();
 
-			Helpers.process_element(this, dao_class, methods);
+			JaxbProcessor.process_jaxb_dao_class(this, dao_class, methods);
 
 			Map<String, Object> context = new HashMap<String, Object>();
 
@@ -173,7 +173,7 @@ public class CppCG {
 
 			QueryMethodInfo mi = new QueryMethodInfo(jaxb_element);
 
-			String xml_node_name = Helpers.get_jaxb_node_name(jaxb_element);
+			String xml_node_name = JaxbProcessor.get_jaxb_node_name(jaxb_element);
 
 			check_required_attr(xml_node_name, mi.jaxb_method);
 
@@ -267,7 +267,7 @@ public class CppCG {
 
 		private String get_rendered_dto_class_name(String dto_class_name) throws Exception {
 
-			DtoClass jaxb_dto_class = Helpers.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
+			DtoClass jaxb_dto_class = JaxbProcessor.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
 
 			if (jaxb_dto_class != null) {
 
@@ -281,7 +281,7 @@ public class CppCG {
 
 		private void process_dto_class_name(String dto_class_name) throws Exception {
 
-			DtoClass jaxb_dto_class = Helpers.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
+			DtoClass jaxb_dto_class = JaxbProcessor.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
 
 			if (jaxb_dto_class != null) {
 
@@ -295,7 +295,7 @@ public class CppCG {
 			String method = jaxb_exec_dml.getMethod();
 			String ref = jaxb_exec_dml.getRef();
 
-			String xml_node_name = Helpers.get_jaxb_node_name(jaxb_exec_dml);
+			String xml_node_name = JaxbProcessor.get_jaxb_node_name(jaxb_exec_dml);
 
 			check_required_attr(xml_node_name, method);
 
@@ -689,20 +689,20 @@ public class CppCG {
 		@Override
 		public StringBuilder render_jaxb_crud(TypeCrud jaxb_type_crud) throws Exception {
 
-			String node_name = Helpers.get_jaxb_node_name(jaxb_type_crud);
+			String node_name = JaxbProcessor.get_jaxb_node_name(jaxb_type_crud);
 
 			String dto_class_name = jaxb_type_crud.getDto();
 
 			if (dto_class_name.length() == 0) {
 
-				throw new Exception("<" + node_name + "...\nDTO class is not set");
+				throw new Exception("<" + node_name + "...\nAttribute 'dto' is empty");
 			}
 
 			String table_attr = jaxb_type_crud.getTable();
 
 			if (table_attr == null || table_attr.length() == 0) {
 
-				throw new Exception("<" + node_name + "...\nRequired attribute is not set");
+				throw new Exception("<" + node_name + "...\nAttribute 'table' is empty");
 			}
 
 			try {
@@ -711,7 +711,7 @@ public class CppCG {
 
 				process_dto_class_name(dto_class_name);
 
-				StringBuilder code_buff = Helpers.process_element_crud(this, true, jaxb_type_crud, dto_class_name,
+				StringBuilder code_buff = JaxbProcessor.process_jaxb_crud(this, true, jaxb_type_crud, dto_class_name,
 						table_attr);
 
 				return code_buff;
