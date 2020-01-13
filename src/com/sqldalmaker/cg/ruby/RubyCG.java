@@ -249,7 +249,7 @@ public class RubyCG {
 
 				returned_type_name = fields.get(0).getType();
 
-				// returned_type_name = Helpers.get_ruby_type_name(returned_type_name);
+				returned_type_name = Helpers.get_ruby_type_name(returned_type_name);
 			}
 
 			String sql_str = SqlUtils.jdbc_sql_to_ruby_string(jdbc_dao_sql);
@@ -430,6 +430,81 @@ public class RubyCG {
 			}
 		}
 
+		private void generate_sql(String mode, Map<String, Object> context, String table_name, StringWriter sw) {
+
+			context.put("table_name", table_name);
+			context.put("mode", mode);
+
+			te.merge(context, sw);
+		}
+
+		@Override
+		public StringBuilder render_crud_create(String class_name, String method_name, String table_name,
+				String dto_class_name, boolean fetch_generated, String generated) throws Exception {
+
+			List<FieldInfo> ai_fields = new ArrayList<FieldInfo>();
+			List<FieldInfo> not_ai_fields = new ArrayList<FieldInfo>();
+
+			db_utils.get_crud_create_info(table_name, ai_fields, not_ai_fields, generated, dto_class_name,
+					jaxb_dto_classes);
+
+			String sql_str;
+			{
+				Map<String, Object> context = new HashMap<String, Object>();
+
+				List<String> sql_col_names = new ArrayList<String>();
+
+				for (FieldInfo fi : not_ai_fields) {
+					sql_col_names.add(fi.getColumnName()); // DB column name
+				}
+
+				context.put("col_names", sql_col_names);
+
+				StringWriter sw = new StringWriter();
+				generate_sql("crud_sql_create", context, table_name, sw);
+				StringBuilder jdbc_sql_buff = new StringBuilder();
+				jdbc_sql_buff.append(sw.getBuffer());
+				db_utils.validate_jdbc_sql(jdbc_sql_buff);
+				sql_str = SqlUtils.ruby_sql_to_ruby_string(jdbc_sql_buff);
+			}
+
+			Map<String, Object> context = new HashMap<String, Object>();
+
+			context.put("method_type", "CREATE");
+			context.put("table_name", table_name);
+			context.put("crud", "create");
+			context.put("class_name", class_name);
+			context.put("sql", sql_str);
+			context.put("method_name", method_name);
+			context.put("params", not_ai_fields);
+			// 1) python and ruby don't support "method overloading".
+			// 2) more useful for update is version with DTO parameter:
+			context.put("dto_param", process_dto_class_name(dto_class_name, false));
+
+			if (fetch_generated && ai_fields.size() > 0) {
+
+				context.put("keys", ai_fields);
+				context.put("mode", "dao_create");
+
+			} else {
+
+				// Examples of situations when data table doesn't have
+				// auto-increment keys:
+				// 1) PK is the name or serial NO
+				// 2) PK == FK of 1:1 relation
+				// 2) unique PK is assigned by trigger
+				context.put("is_external_sql", false);
+				context.put("mode", "dao_exec_dml");
+			}
+
+			StringWriter sw = new StringWriter();
+			te.merge(context, sw);
+			StringBuilder buffer = new StringBuilder();
+			buffer.append(sw.getBuffer());
+
+			return buffer;
+		}
+
 		@Override
 		public StringBuilder render_crud_read(String method_name, String table_name, String ret_dto_type,
 				boolean fetch_list) throws Exception {
@@ -483,80 +558,6 @@ public class RubyCG {
 					method_name, "", param_arr, true, "");
 
 			return buffer;
-		}
-
-		@Override
-		public StringBuilder render_crud_create(String class_name, String method_name, String table_name,
-				String dto_class_name, boolean fetch_generated, String generated) throws Exception {
-
-			List<FieldInfo> params = new ArrayList<FieldInfo>();
-			List<FieldInfo> keys = new ArrayList<FieldInfo>();
-			List<String> sql_col_names = new ArrayList<String>();
-
-			db_utils.get_crud_create_info(table_name, keys, sql_col_names, params, generated, dto_class_name,
-					jaxb_dto_classes);
-
-			String sql_str;
-			{
-
-				Map<String, Object> context = new HashMap<String, Object>();
-
-				context.put("col_names", sql_col_names);
-
-				StringWriter sw = new StringWriter();
-
-				generate_sql("crud_sql_create", context, table_name, sw);
-
-				StringBuilder jdbc_sql_buff = new StringBuilder();
-				jdbc_sql_buff.append(sw.getBuffer());
-				db_utils.validate_jdbc_sql(jdbc_sql_buff);
-				sql_str = SqlUtils.ruby_sql_to_ruby_string(jdbc_sql_buff);
-			}
-
-			Map<String, Object> context = new HashMap<String, Object>();
-
-			context.put("method_type", "CREATE");
-			context.put("table_name", table_name);
-			context.put("crud", "create");
-			context.put("class_name", class_name);
-			context.put("sql", sql_str);
-			context.put("method_name", method_name);
-			context.put("params", params);
-			// PythonRuby does support "method overloading". More useful for
-			// update is
-			// version with DTO parameter:
-			context.put("dto_param", process_dto_class_name(dto_class_name, false));
-
-			if (fetch_generated && keys.size() > 0) {
-
-				context.put("keys", keys);
-				context.put("mode", "dao_create");
-
-			} else {
-
-				// Examples of situations when data table doesn't have
-				// auto-increment keys:
-				// 1) PK is the name or serial NO
-				// 2) PK == FK of 1:1 relation
-				// 2) unique PK is assigned by trigger
-				context.put("is_external_sql", false);
-				context.put("mode", "dao_exec_dml");
-			}
-
-			StringWriter sw = new StringWriter();
-			te.merge(context, sw);
-			StringBuilder buffer = new StringBuilder();
-			buffer.append(sw.getBuffer());
-
-			return buffer;
-		}
-
-		private void generate_sql(String mode, Map<String, Object> context, String table_name, StringWriter sw) {
-
-			context.put("table_name", table_name);
-			context.put("mode", mode);
-
-			te.merge(context, sw);
 		}
 
 		@Override

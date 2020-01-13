@@ -282,7 +282,7 @@ public class DbUtils {
     }
 
     private static String get_column_type_name(DtoClass jaxb_dto_class, String col_name, ResultSetMetaData rsmd,
-            int i) {
+                                               int i) {
 
         String java_class_name = JaxbProcessor.get_jaxb_field_type_name(jaxb_dto_class, col_name);
 
@@ -328,7 +328,7 @@ public class DbUtils {
     }
 
     public FieldInfo[] get_table_columns_info(String table_name, String explicit_gen_keys, String dto_class_name,
-            DtoClasses jaxb_dto_classes) throws Exception {
+                                              DtoClasses jaxb_dto_classes) throws Exception {
 
         Set<String> gen_keys = new HashSet<String>();
 
@@ -411,13 +411,13 @@ public class DbUtils {
     }
 
     public void get_crud_info(String table_name, List<FieldInfo> columns, List<FieldInfo> params, String dto_class_name,
-            DtoClasses jaxb_dto_classes) throws Exception {
+                              DtoClasses jaxb_dto_classes) throws Exception {
 
         get_crud_info(table_name, columns, params, dto_class_name, jaxb_dto_classes, type_map);
     }
 
     public void get_crud_info(String table_name, List<FieldInfo> columns, List<FieldInfo> params, String dto_class_name,
-            DtoClasses jaxb_dto_classes, TypeMap jaxb_type_map) throws Exception {
+                              DtoClasses jaxb_dto_classes, TypeMap jaxb_type_map) throws Exception {
 
         List<String> pk_col_names = get_pk_col_names(conn, table_name);
 
@@ -589,8 +589,8 @@ public class DbUtils {
     }
 
     public void get_jdbc_sql_info(String sql_root_abs_path, String jdbc_dao_sql, List<FieldInfo> fields,
-            String dto_param_type, String[] param_descriptors, List<FieldInfo> params, String jaxb_dto_or_return_type,
-            boolean jaxb_return_type_is_dto, DtoClasses jaxb_dto_classes) throws Exception {
+                                  String dto_param_type, String[] param_descriptors, List<FieldInfo> params, String jaxb_dto_or_return_type,
+                                  boolean jaxb_return_type_is_dto, DtoClasses jaxb_dto_classes) throws Exception {
 
         fields.clear();
         params.clear();
@@ -666,7 +666,7 @@ public class DbUtils {
 
                 fields.clear();
 
-                FieldInfo f = new FieldInfo(field_names_mode, ret_type_name, "");
+                FieldInfo f = new FieldInfo(field_names_mode, ret_type_name, "ret_value");
 
                 fields.add(f);
             }
@@ -682,7 +682,7 @@ public class DbUtils {
     }
 
     public void get_exec_dml_jdbc_sql_info(String jdbc_sql, String dto_param_type, String[] param_descriptors,
-            List<FieldInfo> params) throws Exception {
+                                           List<FieldInfo> params) throws Exception {
 
         check_duplicates(param_descriptors);
 
@@ -789,7 +789,7 @@ public class DbUtils {
     }
 
     private void get_params_info(PreparedStatement ps, String[] param_descriptors, FieldNamesMode field_names_mode,
-            List<FieldInfo> params) throws SQLException {
+                                 List<FieldInfo> params) throws SQLException {
 
         params.clear();
 
@@ -916,26 +916,24 @@ public class DbUtils {
         }
     }
 
-    public void get_crud_create_info(String table_name, List<FieldInfo> keys, List<String> sql_col_names,
-            List<FieldInfo> params, String generated, String dto_class_name, DtoClasses jaxb_dto_classes)
-            throws Exception {
+    public void get_crud_create_info(String table_name,
+                                     List<FieldInfo> ai_fields, List<FieldInfo> not_ai_fields,
+                                     String generated, String dto_class_name, DtoClasses jaxb_dto_classes) throws Exception {
 
-        sql_col_names.clear();
+        ai_fields.clear();
+        not_ai_fields.clear();
 
-        FieldInfo[] ci_arr = get_table_columns_info(table_name, generated, dto_class_name, jaxb_dto_classes);
+        FieldInfo[] fi_arr = get_table_columns_info(table_name, generated, dto_class_name, jaxb_dto_classes);
 
-        for (FieldInfo tci : ci_arr) {
+        for (FieldInfo fi : fi_arr) {
 
-            if (tci.isAutoIncrement()) {
+            if (fi.isAutoIncrement()) {
 
-                keys.add(tci);
+                ai_fields.add(fi);
 
             } else {
 
-                // original column name:
-                sql_col_names.add(tci.getColumnName());
-
-                params.add(tci);
+                not_ai_fields.add(fi);
             }
         }
     }

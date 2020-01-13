@@ -2,22 +2,13 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1fb1c605-8c08-4b11-a01b-d42d0945087f" name="Default" comment="added option to exclude views in DTO/DAO assistants">
-      <change afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/JaxbProcessor.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nbproject/private/private.xml" beforeDir="false" afterPath="$PROJECT_DIR$/nbproject/private/private.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/DbUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/DbUtils.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/Helpers.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/Helpers.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/QueryMethodInfo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/QueryMethodInfo.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/SqlUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/SqlUtils.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/cpp/CppCG.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/cpp/CppCG.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/java/JavaCG.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/java/JavaCG.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/php/PhpCG.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/php/PhpCG.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/python/PythonCG.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/python/PythonCG.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/ruby/RubyCG.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/ruby/RubyCG.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/CompletionProviderSql.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/CompletionProviderSql.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/CompletionProviderTable.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/CompletionProviderTable.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/PsiReferenceSql.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/PsiReferenceSql.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabDTO.java" afterDir="false" />
     </list>
     <list id="0b913ed8-6e39-405f-b29b-9d52c75467b5" name="Failed commit: Default" comment="" />
     <option name="SHOW_DIALOG" value="false" />
@@ -920,10 +911,10 @@
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
     <state x="552" y="185" width="816" height="727" key="#Intentions/0.0.1920.1050@0.0.1920.1050" timestamp="1577815677612" />
-    <state x="765" y="233" key="#com.intellij.ide.util.MemberChooser" timestamp="1577969310298">
+    <state x="765" y="233" key="#com.intellij.ide.util.MemberChooser" timestamp="1578939087861">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state x="765" y="233" key="#com.intellij.ide.util.MemberChooser/0.0.1920.1050@0.0.1920.1050" timestamp="1577969310298" />
+    <state x="765" y="233" key="#com.intellij.ide.util.MemberChooser/0.0.1920.1050@0.0.1920.1050" timestamp="1578939087861" />
     <state x="640" y="255" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog" timestamp="1577542768590">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
@@ -940,38 +931,38 @@
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
     <state x="740" y="281" key="FileChooserDialogImpl/0.0.1920.1050@0.0.1920.1050" timestamp="1578753395529" />
-    <state width="923" height="185" key="GridCell.Tab.0.bottom" timestamp="1578774648815">
+    <state width="923" height="185" key="GridCell.Tab.0.bottom" timestamp="1578940250683">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="923" height="185" key="GridCell.Tab.0.bottom/0.0.1920.1050@0.0.1920.1050" timestamp="1578774648815" />
-    <state width="923" height="185" key="GridCell.Tab.0.center" timestamp="1578774648815">
+    <state width="923" height="185" key="GridCell.Tab.0.bottom/0.0.1920.1050@0.0.1920.1050" timestamp="1578940250683" />
+    <state width="923" height="185" key="GridCell.Tab.0.center" timestamp="1578940250683">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="923" height="185" key="GridCell.Tab.0.center/0.0.1920.1050@0.0.1920.1050" timestamp="1578774648815" />
-    <state width="923" height="185" key="GridCell.Tab.0.left" timestamp="1578774648815">
+    <state width="923" height="185" key="GridCell.Tab.0.center/0.0.1920.1050@0.0.1920.1050" timestamp="1578940250683" />
+    <state width="923" height="185" key="GridCell.Tab.0.left" timestamp="1578940250683">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="923" height="185" key="GridCell.Tab.0.left/0.0.1920.1050@0.0.1920.1050" timestamp="1578774648815" />
-    <state width="923" height="185" key="GridCell.Tab.0.right" timestamp="1578774648815">
+    <state width="923" height="185" key="GridCell.Tab.0.left/0.0.1920.1050@0.0.1920.1050" timestamp="1578940250683" />
+    <state width="923" height="185" key="GridCell.Tab.0.right" timestamp="1578940250683">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="923" height="185" key="GridCell.Tab.0.right/0.0.1920.1050@0.0.1920.1050" timestamp="1578774648815" />
-    <state width="923" height="185" key="GridCell.Tab.1.bottom" timestamp="1578774648815">
+    <state width="923" height="185" key="GridCell.Tab.0.right/0.0.1920.1050@0.0.1920.1050" timestamp="1578940250683" />
+    <state width="923" height="185" key="GridCell.Tab.1.bottom" timestamp="1578940250683">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="923" height="185" key="GridCell.Tab.1.bottom/0.0.1920.1050@0.0.1920.1050" timestamp="1578774648815" />
-    <state width="923" height="185" key="GridCell.Tab.1.center" timestamp="1578774648815">
+    <state width="923" height="185" key="GridCell.Tab.1.bottom/0.0.1920.1050@0.0.1920.1050" timestamp="1578940250683" />
+    <state width="923" height="185" key="GridCell.Tab.1.center" timestamp="1578940250683">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="923" height="185" key="GridCell.Tab.1.center/0.0.1920.1050@0.0.1920.1050" timestamp="1578774648815" />
-    <state width="923" height="185" key="GridCell.Tab.1.left" timestamp="1578774648815">
+    <state width="923" height="185" key="GridCell.Tab.1.center/0.0.1920.1050@0.0.1920.1050" timestamp="1578940250683" />
+    <state width="923" height="185" key="GridCell.Tab.1.left" timestamp="1578940250683">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="923" height="185" key="GridCell.Tab.1.left/0.0.1920.1050@0.0.1920.1050" timestamp="1578774648815" />
-    <state width="923" height="185" key="GridCell.Tab.1.right" timestamp="1578774648815">
+    <state width="923" height="185" key="GridCell.Tab.1.left/0.0.1920.1050@0.0.1920.1050" timestamp="1578940250683" />
+    <state width="923" height="185" key="GridCell.Tab.1.right" timestamp="1578940250683">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="923" height="185" key="GridCell.Tab.1.right/0.0.1920.1050@0.0.1920.1050" timestamp="1578774648815" />
+    <state width="923" height="185" key="GridCell.Tab.1.right/0.0.1920.1050@0.0.1920.1050" timestamp="1578940250683" />
     <state x="440" y="101" key="SettingsEditor" timestamp="1578753403771">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>

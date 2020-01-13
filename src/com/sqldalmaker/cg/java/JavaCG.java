@@ -203,7 +203,7 @@ public class JavaCG {
 
 				StringBuilder buff = new StringBuilder();
 
-				render_element_query(buff, dao_jdbc_sql, mi.jaxb_ref, mi.jaxb_is_external_sql,
+				render_query(buff, dao_jdbc_sql, mi.jaxb_ref, mi.jaxb_is_external_sql,
 						mi.jaxb_dto_or_return_type, mi.return_type_is_dto, mi.fetch_list, method_name, dto_param_type,
 						method_param_descriptors, false, xml_node_name);
 
@@ -223,7 +223,7 @@ public class JavaCG {
 		//
 		// this method is called from 'query...' and 'crud(-auto)->read'
 		//
-		private void render_element_query(StringBuilder buff, String jdbc_dao_sql, String ref, boolean is_external_sql,
+		private void render_query(StringBuilder buff, String jdbc_dao_sql, String ref, boolean is_external_sql,
 				String jaxb_dto_or_return_type, boolean jaxb_return_type_is_dto, boolean fetch_list, String method_name,
 				String dto_param_type, String[] param_descriptors, boolean crud, String xml_node_name)
 				throws Exception {
@@ -429,6 +429,80 @@ public class JavaCG {
 			}
 		}
 
+
+		private void generate_sql(String mode, Map<String, Object> context, String table_name, StringWriter sw) {
+
+			context.put("table_name", table_name);
+			context.put("mode", mode);
+
+			te.merge(context, sw);
+		}
+
+		@Override
+		public StringBuilder render_crud_create(String class_name, String method_name, String table_name,
+				String dto_class_name, boolean fetch_generated, String generated) throws Exception {
+
+			List<FieldInfo> ai_fields = new ArrayList<FieldInfo>();
+			List<FieldInfo> not_ai_fields = new ArrayList<FieldInfo>();
+
+			db_utils.get_crud_create_info(table_name, ai_fields, not_ai_fields, generated, dto_class_name,
+					jaxb_dto_classes);
+
+			String sql_str;
+			{
+				Map<String, Object> context = new HashMap<String, Object>();
+
+				List<String> sql_col_names = new ArrayList<String>();
+
+				for (FieldInfo fi : not_ai_fields) {
+					sql_col_names.add(fi.getColumnName()); // DB column name
+				}
+
+				context.put("col_names", sql_col_names);
+
+				StringWriter sw = new StringWriter();
+				generate_sql("crud_sql_create", context, table_name, sw);
+				StringBuilder jdbc_sql_buff = new StringBuilder();
+				jdbc_sql_buff.append(sw.getBuffer());
+				db_utils.validate_jdbc_sql(jdbc_sql_buff);
+				sql_str = SqlUtils.jdbc_sql_to_java_str(jdbc_sql_buff);
+			}
+
+			Map<String, Object> context = new HashMap<String, Object>();
+
+			context.put("method_type", "CREATE");
+			context.put("table_name", table_name);
+			context.put("class_name", class_name);
+			context.put("sql", sql_str);
+			context.put("method_name", method_name);
+			context.put("params", not_ai_fields);
+			context.put("dto_param", get_rendered_dto_class_name(dto_class_name));
+
+			if (fetch_generated && ai_fields.size() > 0) {
+
+				context.put("keys", ai_fields);
+				context.put("mode", "dao_create");
+
+			} else {
+
+				// Examples of situations when data table doesn't have
+				// auto-increment keys:
+				// 1) PK is the name or serial NO
+				// 2) PK == FK of 1:1 relation
+				// 2) unique PK is assigned by trigger
+				context.put("plain_params", true);
+				context.put("is_external_sql", false);
+				context.put("mode", "dao_exec_dml");
+			}
+
+			StringWriter sw = new StringWriter();
+			te.merge(context, sw);
+			StringBuilder buffer = new StringBuilder();
+			buffer.append(sw.getBuffer());
+
+			return buffer;
+		}
+		
 		@Override
 		public StringBuilder render_crud_read(String method_name, String table_name, String ret_dto_type,
 				boolean fetch_list) throws Exception {
@@ -477,78 +551,10 @@ public class JavaCG {
 
 			String[] param_descriptors_arr = desc.toArray(new String[desc.size()]);
 
-			render_element_query(buffer, jdbc_sql_buff.toString(), table_name, false, ret_dto_type, true, fetch_list,
+			render_query(buffer, jdbc_sql_buff.toString(), table_name, false, ret_dto_type, true, fetch_list,
 					method_name, "", param_descriptors_arr, true, null);
 
 			return buffer;
-		}
-
-		@Override
-		public StringBuilder render_crud_create(String class_name, String method_name, String table_name,
-				String dto_class_name, boolean fetch_generated, String generated) throws Exception {
-
-			List<FieldInfo> params = new ArrayList<FieldInfo>();
-			List<FieldInfo> keys = new ArrayList<FieldInfo>();
-			List<String> sql_col_names = new ArrayList<String>();
-
-			db_utils.get_crud_create_info(table_name, keys, sql_col_names, params, generated, dto_class_name,
-					jaxb_dto_classes);
-
-			String sql_str;
-			{
-				Map<String, Object> context = new HashMap<String, Object>();
-
-				context.put("col_names", sql_col_names);
-
-				StringWriter sw = new StringWriter();
-				generate_sql("crud_sql_create", context, table_name, sw);
-				StringBuilder jdbc_sql_buff = new StringBuilder();
-				jdbc_sql_buff.append(sw.getBuffer());
-				db_utils.validate_jdbc_sql(jdbc_sql_buff);
-				sql_str = SqlUtils.jdbc_sql_to_java_str(jdbc_sql_buff);
-			}
-
-			Map<String, Object> context = new HashMap<String, Object>();
-
-			context.put("method_type", "CREATE");
-			context.put("table_name", table_name);
-			context.put("class_name", class_name);
-			context.put("sql", sql_str);
-			context.put("method_name", method_name);
-			context.put("params", params);
-			context.put("dto_param", get_rendered_dto_class_name(dto_class_name));
-
-			if (fetch_generated && keys.size() > 0) {
-
-				context.put("keys", keys);
-				context.put("mode", "dao_create");
-
-			} else {
-
-				// Examples of situations when data table doesn't have
-				// auto-increment keys:
-				// 1) PK is the name or serial NO
-				// 2) PK == FK of 1:1 relation
-				// 2) unique PK is assigned by trigger
-				context.put("plain_params", true);
-				context.put("is_external_sql", false);
-				context.put("mode", "dao_exec_dml");
-			}
-
-			StringWriter sw = new StringWriter();
-			te.merge(context, sw);
-			StringBuilder buffer = new StringBuilder();
-			buffer.append(sw.getBuffer());
-
-			return buffer;
-		}
-
-		private void generate_sql(String mode, Map<String, Object> context, String table_name, StringWriter sw) {
-
-			context.put("table_name", table_name);
-			context.put("mode", mode);
-
-			te.merge(context, sw);
 		}
 
 		@Override

@@ -408,6 +408,11 @@ public class Helpers {
         }
     }
 
+    public static String get_ruby_type_name(String type) {
+    	
+    	return get_python_type_name(type);
+    }
+    
     public static String get_python_type_name(String type) {
 
         if (is_class_of(type, String.class)) {
