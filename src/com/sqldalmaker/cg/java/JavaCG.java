@@ -203,9 +203,9 @@ public class JavaCG {
 
 				StringBuilder buff = new StringBuilder();
 
-				render_query(buff, dao_jdbc_sql, mi.jaxb_ref, mi.jaxb_is_external_sql,
-						mi.jaxb_dto_or_return_type, mi.return_type_is_dto, mi.fetch_list, method_name, dto_param_type,
-						method_param_descriptors, false, xml_node_name);
+				render_query(buff, dao_jdbc_sql, mi.jaxb_ref, mi.jaxb_is_external_sql, mi.jaxb_dto_or_return_type,
+						mi.return_type_is_dto, mi.fetch_list, method_name, dto_param_type, method_param_descriptors,
+						false, xml_node_name);
 
 				return buff;
 
@@ -315,7 +315,7 @@ public class JavaCG {
 
 				StringBuilder buff = new StringBuilder();
 
-				render_element_exec_dml(buff, dao_jdbc_sql, is_external_sql, null, method_name, dto_param_type,
+				render_exec_dml(buff, dao_jdbc_sql, is_external_sql, null, method_name, dto_param_type,
 						method_param_descriptors, xml_node_name, ref);
 
 				return buff;
@@ -329,7 +329,7 @@ public class JavaCG {
 			}
 		}
 
-		private void render_element_exec_dml(StringBuilder buffer, String jdbc_dao_sql, boolean is_external_sql,
+		private void render_exec_dml(StringBuilder buffer, String jdbc_dao_sql, boolean is_external_sql,
 				String class_name, String method_name, String dto_param_type, String[] param_descriptors,
 				String xml_node_name, String sql_path) throws Exception {
 
@@ -429,7 +429,6 @@ public class JavaCG {
 			}
 		}
 
-
 		private void generate_sql(String mode, Map<String, Object> context, String table_name, StringWriter sw) {
 
 			context.put("table_name", table_name);
@@ -502,10 +501,10 @@ public class JavaCG {
 
 			return buffer;
 		}
-		
+
 		@Override
-		public StringBuilder render_crud_read(String method_name, String table_name, String ret_dto_type,
-				boolean fetch_list) throws Exception {
+		public StringBuilder render_crud_read(String method_name, String table_name, String explicit_primary_keys,
+				String ret_dto_type, boolean fetch_list) throws Exception {
 
 			StringBuilder buffer = new StringBuilder();
 
@@ -513,7 +512,7 @@ public class JavaCG {
 
 			if (!fetch_list) {
 
-				db_utils.get_crud_info(table_name, keys, null, ret_dto_type, jaxb_dto_classes);
+				db_utils.get_crud_info(table_name, explicit_primary_keys, keys, null, ret_dto_type, jaxb_dto_classes);
 
 				if (keys.isEmpty()) {
 
@@ -559,14 +558,14 @@ public class JavaCG {
 
 		@Override
 		public StringBuilder render_crud_update(String class_name, String method_name, String table_name,
-				String dto_class_name, boolean primitive_params) throws Exception {
+				String explicit_primary_keys, String dto_class_name, boolean primitive_params) throws Exception {
 
 			StringBuilder buffer = new StringBuilder();
 
 			List<FieldInfo> keys = new ArrayList<FieldInfo>();
 			List<FieldInfo> params = new ArrayList<FieldInfo>();
 
-			db_utils.get_crud_info(table_name, keys, params, dto_class_name, jaxb_dto_classes);
+			db_utils.get_crud_info(table_name, explicit_primary_keys, keys, params, dto_class_name, jaxb_dto_classes);
 
 			if (keys.isEmpty()) {
 
@@ -630,13 +629,13 @@ public class JavaCG {
 
 		@Override
 		public StringBuilder render_crud_delete(String class_name, String method_name, String table_name,
-				String dto_class_name) throws Exception {
+				String explicit_primary_keys, String dto_class_name) throws Exception {
 
 			StringBuilder buffer = new StringBuilder();
 
 			List<FieldInfo> keys = new ArrayList<FieldInfo>();
 
-			db_utils.get_crud_info(table_name, keys, null, dto_class_name, jaxb_dto_classes);
+			db_utils.get_crud_info(table_name, explicit_primary_keys, keys, null, dto_class_name, jaxb_dto_classes);
 
 			if (keys.isEmpty()) {
 
@@ -707,8 +706,7 @@ public class JavaCG {
 
 				process_dto_class_name(dto_package, dto_class_name);
 
-				StringBuilder code_buff = JaxbProcessor.process_jaxb_crud(this, false, jaxb_type_crud, dto_class_name,
-						table_attr);
+				StringBuilder code_buff = JaxbProcessor.process_jaxb_crud(this, false, jaxb_type_crud, dto_class_name);
 
 				return code_buff;
 

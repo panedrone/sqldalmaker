@@ -1,3 +1,11 @@
+2010-02-11
+
+	Added attribute 'pk' to define primary key manually in 'crud' and 'crud-auto': 
+	
+		<crud-auto dto="Ip2country" table="ip2country" pk="code" />
+		
+	Update XSD files.
+	
 2010-01-11
 
 	Fixes of <query... return-type="...".

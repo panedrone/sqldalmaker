@@ -201,9 +201,9 @@ public class PythonCG {
 
 				StringBuilder buff = new StringBuilder();
 
-				render_query(buff, jdbc_dao_sql, mi.jaxb_ref, mi.jaxb_is_external_sql,
-						mi.jaxb_dto_or_return_type, mi.return_type_is_dto, mi.fetch_list, method_name, dto_param_type,
-						method_param_descriptors, false);
+				render_query(buff, jdbc_dao_sql, mi.jaxb_ref, mi.jaxb_is_external_sql, mi.jaxb_dto_or_return_type,
+						mi.return_type_is_dto, mi.fetch_list, method_name, dto_param_type, method_param_descriptors,
+						false);
 
 				return buff;
 
@@ -492,8 +492,8 @@ public class PythonCG {
 		}
 
 		@Override
-		public StringBuilder render_crud_read(String method_name, String table_name, String ret_dto_type,
-				boolean fetch_list) throws Exception {
+		public StringBuilder render_crud_read(String method_name, String table_name, String explicit_primary_keys,
+				String ret_dto_type, boolean fetch_list) throws Exception {
 
 			StringBuilder buffer = new StringBuilder();
 
@@ -501,7 +501,7 @@ public class PythonCG {
 
 			if (!fetch_list) {
 
-				db_utils.get_crud_info(table_name, keys, null, ret_dto_type, jaxb_dto_classes);
+				db_utils.get_crud_info(table_name, explicit_primary_keys, keys, null, ret_dto_type, jaxb_dto_classes);
 
 				if (keys.isEmpty()) {
 
@@ -547,14 +547,14 @@ public class PythonCG {
 
 		@Override
 		public StringBuilder render_crud_update(String class_name, String method_name, String table_name,
-				String dto_class_name, boolean primitive_params) throws Exception {
+				String explicit_primary_keys, String dto_class_name, boolean primitive_params) throws Exception {
 
 			StringBuilder buffer = new StringBuilder();
 
 			List<FieldInfo> params = new ArrayList<FieldInfo>();
 			List<FieldInfo> keys = new ArrayList<FieldInfo>();
 
-			db_utils.get_crud_info(table_name, keys, params, dto_class_name, jaxb_dto_classes);
+			db_utils.get_crud_info(table_name, explicit_primary_keys, keys, params, dto_class_name, jaxb_dto_classes);
 
 			if (keys.isEmpty()) {
 
@@ -619,13 +619,13 @@ public class PythonCG {
 
 		@Override
 		public StringBuilder render_crud_delete(String class_name, String method_name, String table_name,
-				String dto_class_name) throws Exception {
+				String explicit_primary_keys, String dto_class_name) throws Exception {
 
 			StringBuilder buffer = new StringBuilder();
 
 			List<FieldInfo> keys = new ArrayList<FieldInfo>();
 
-			db_utils.get_crud_info(table_name, keys, null, dto_class_name, jaxb_dto_classes);
+			db_utils.get_crud_info(table_name, explicit_primary_keys, keys, null, dto_class_name, jaxb_dto_classes);
 
 			if (keys.isEmpty()) {
 
@@ -696,8 +696,7 @@ public class PythonCG {
 
 				process_dto_class_name(dto_class_name, false);
 
-				StringBuilder code_buff = JaxbProcessor.process_jaxb_crud(this, true, jaxb_type_crud, dto_class_name,
-						table_name);
+				StringBuilder code_buff = JaxbProcessor.process_jaxb_crud(this, true, jaxb_type_crud, dto_class_name);
 
 				return code_buff;
 

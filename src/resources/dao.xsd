@@ -34,8 +34,8 @@
 		<xs:sequence minOccurs="1">
 			<xs:element name="create" type="type-method" minOccurs="0"
 				maxOccurs="1" />
-			<xs:element name="read-all" type="type-method" minOccurs="0"
-				maxOccurs="1" />
+			<xs:element name="read-all" type="type-method"
+				minOccurs="0" maxOccurs="1" />
 			<xs:element name="read" type="type-method" minOccurs="0"
 				maxOccurs="1" />
 			<xs:element name="update" type="type-method" minOccurs="0"
@@ -44,10 +44,13 @@
 				maxOccurs="1" />
 		</xs:sequence>
 		<xs:attribute ref="dto" use="required" />
-		<xs:attribute name="table" type="xs:NCName" use="required" />
+		<xs:attribute name="table" type="xs:NCName"
+			use="required" />
+		<xs:attribute name="pk" type="xs:string" default="*" />
+		<xs:attribute name="generated" type="xs:string"
+			default="*" />
 		<xs:attribute name="fetch-generated" type="xs:boolean"
 			default="true" />
-		<xs:attribute name="generated" type="xs:string" default="*" />
 	</xs:complexType>
 
 	<xs:element name="crud-auto">
