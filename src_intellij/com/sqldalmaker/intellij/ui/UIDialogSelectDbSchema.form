@@ -111,7 +111,7 @@
                 </constraints>
                 <properties>
                   <selected value="true"/>
-                  <text value="Omit DTO that are already used in existing CRUD XML declarations" noi18n="true"/>
+                  <text value="Omit DTO that are already declared in 'dto.xml'" noi18n="true"/>
                 </properties>
               </component>
               <component id="efa9a" class="javax.swing.JCheckBox" binding="chk_singular">
@@ -230,6 +230,10 @@
     <group name="buttonGroup1">
       <member id="60116"/>
       <member id="e402b"/>
+    </group>
+    <group name="buttonGroup2">
+      <member id="82010"/>
+      <member id="ba71e"/>
     </group>
   </buttonGroups>
 </form>

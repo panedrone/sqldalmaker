@@ -326,7 +326,7 @@ public class UIDialogSelectDbSchema extends JDialog {
         scrollPane1.setViewportView(table);
         chk_omit = new JCheckBox();
         chk_omit.setSelected(true);
-        chk_omit.setText("Omit DTO that are already used in existing CRUD XML declarations");
+        chk_omit.setText("Omit DTO that are already declared in 'dto.xml'");
         panel5.add(chk_omit, new GridConstraints(3, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         chk_singular = new JCheckBox();
         chk_singular.setSelected(true);
@@ -374,9 +374,13 @@ public class UIDialogSelectDbSchema extends JDialog {
         buttonGroup = new ButtonGroup();
         buttonGroup.add(crudAutoRadioButton);
         buttonGroup.add(crudRadioButton);
+        buttonGroup = new ButtonGroup();
+        buttonGroup.add(radio_user_as_schema);
+        buttonGroup.add(radio_selected_schema);
     }
 
     /**
+     * @noinspection ALL
      */
     private Font $$$getFont$$$(String fontName, int style, int size, Font currentFont) {
         if (currentFont == null) return null;
@@ -395,6 +399,7 @@ public class UIDialogSelectDbSchema extends JDialog {
     }
 
     /**
+     * @noinspection ALL
      */
     public JComponent $$$getRootComponent$$$() {
         return contentPane;

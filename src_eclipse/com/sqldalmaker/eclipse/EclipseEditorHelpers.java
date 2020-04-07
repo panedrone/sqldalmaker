@@ -165,7 +165,25 @@ public class EclipseEditorHelpers {
 
 			out.flush();
 
-			open_editor_sync(out, "dto.xml", "_dto.xml"); // '%' throws URI exception in NB
+			String text = new String(out.toByteArray());
+
+			String[] parts = text.split("\\?>");
+
+			text = parts[0] + Const.COMMENT_GENERATED_DTO_XML + parts[1];
+
+			ByteArrayOutputStream out2 = new ByteArrayOutputStream();
+
+			for (int i = 0; i < text.length(); ++i)
+				out2.write(text.charAt(i));
+
+			try {
+
+				open_editor_sync(out2, "dto.xml", "_dto.xml"); // '%' throws URI exception in NB
+
+			} finally {
+
+				out2.close();
+			}
 
 		} finally {
 
@@ -186,7 +204,25 @@ public class EclipseEditorHelpers {
 
 			out.flush();
 
-			open_editor_sync(out, file_name, file_name);
+			String text = new String(out.toByteArray());
+
+			String[] parts = text.split("\\?>");
+
+			text = parts[0] + Const.COMMENT_GENERATED_DAO_XML + parts[1];
+
+			ByteArrayOutputStream out2 = new ByteArrayOutputStream();
+
+			for (int i = 0; i < text.length(); ++i)
+				out2.write(text.charAt(i));
+
+			try {
+
+				open_editor_sync(out2, file_name, file_name); // '%' throws URI exception in NB
+
+			} finally {
+
+				out2.close();
+			}
 
 		} finally {
 

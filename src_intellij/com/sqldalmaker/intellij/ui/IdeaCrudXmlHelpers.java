@@ -180,7 +180,7 @@ public class IdeaCrudXmlHelpers {
                         connection.close();
                     }
 
-                    open_dao_xml_in_editor(project, object_factory, "crud-dao.xml", root);
+                    IdeaEditorHelpers.open_dao_xml_in_editor(project, object_factory, "crud-dao.xml", root);
 
                 } catch (Exception e) {
 
@@ -233,7 +233,7 @@ public class IdeaCrudXmlHelpers {
                         connection.close();
                     }
 
-                    open_dao_xml_in_editor(project, object_factory, "fk-dao.xml", root);
+                    IdeaEditorHelpers.open_dao_xml_in_editor(project, object_factory, "fk-dao.xml", root);
 
                 } catch (Exception e) {
 
@@ -254,14 +254,5 @@ public class IdeaCrudXmlHelpers {
 
             IdeaMessageHelpers.show_error_in_ui_thread(e);
         }
-    }
-
-    private static void open_dao_xml_in_editor(Project project,
-                                               com.sqldalmaker.jaxb.dao.ObjectFactory object_factory,
-                                               String file_name, DaoClass root) throws Exception {
-
-        String text = XmlHelpers.get_dao_xml_text(object_factory, root, true);
-
-        IdeaEditorHelpers.open_text_in_new_editor(project, file_name, text);
     }
 }

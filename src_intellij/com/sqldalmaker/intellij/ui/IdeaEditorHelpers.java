@@ -15,6 +15,7 @@ import com.sqldalmaker.common.Const;
 import com.sqldalmaker.common.InternalException;
 import com.sqldalmaker.common.SdmUtils;
 import com.sqldalmaker.common.XmlHelpers;
+import com.sqldalmaker.jaxb.dao.DaoClass;
 import com.sqldalmaker.jaxb.dto.DtoClass;
 import com.sqldalmaker.jaxb.dto.DtoClasses;
 import com.sqldalmaker.jaxb.dto.ObjectFactory;
@@ -261,6 +262,23 @@ public class IdeaEditorHelpers {
 
         String text = XmlHelpers.get_dto_xml_text(object_factory, dto_classes, remove_java_lang);
 
+        String[] parts = text.split("\\?>");
+
+        text = parts[0] + Const.COMMENT_GENERATED_DTO_XML + parts[1];
+
         open_text_in_new_editor(project, "dto.xml", text);
+    }
+
+    public static void open_dao_xml_in_editor(Project project,
+                                              com.sqldalmaker.jaxb.dao.ObjectFactory object_factory,
+                                              String file_name, DaoClass root) throws Exception {
+
+        String text = XmlHelpers.get_dao_xml_text(object_factory, root, true);
+
+        String[] parts = text.split("\\?>");
+
+        text = parts[0] + Const.COMMENT_GENERATED_DAO_XML + parts[1];
+
+        IdeaEditorHelpers.open_text_in_new_editor(project, file_name, text);
     }
 }

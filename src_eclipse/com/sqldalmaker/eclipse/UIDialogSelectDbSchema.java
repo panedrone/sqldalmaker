@@ -255,7 +255,7 @@ public class UIDialogSelectDbSchema extends TitleAreaDialog {
 
 		chk_omit = new Button(container, SWT.CHECK);
 		chk_omit.setSelection(true);
-		chk_omit.setText("Omit DTO that are already used in existing CRUD XML declarations");
+		chk_omit.setText("Omit DTO that are already declared in 'dto.xml'");
 		skip = chk_omit.getSelection();
 
 		chk_views = new Button(container, SWT.CHECK);

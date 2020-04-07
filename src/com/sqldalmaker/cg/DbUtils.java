@@ -22,6 +22,7 @@ import java.util.Set;
 import com.sqldalmaker.jaxb.dto.DtoClass;
 import com.sqldalmaker.jaxb.dto.DtoClasses;
 import com.sqldalmaker.jaxb.settings.TypeMap;
+import java.util.Arrays;
 
 /**
  * @author sqldalmaker@gmail.com
@@ -421,10 +422,8 @@ public class DbUtils {
 
 			check_duplicates(gen_keys_arr);
 
-			for (String k : gen_keys_arr) {
-
-				pk_col_names.add(k/* .toLowerCase() */); // don't make lower case the explicit names of PK columns
-			}
+			// don't make lower case the explicit names of PK columns
+			pk_col_names.addAll(Arrays.asList(gen_keys_arr)); /* .toLowerCase() */ 
 		}
 
 		/*

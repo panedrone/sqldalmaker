@@ -181,7 +181,7 @@ public class NbpIdeEditorHelpers {
 
     private static void gen_tmp_field_tags(Connection con, ObjectFactory object_factory, DtoClass dto_class, String sql_root_abs_path) throws Exception {
 
-        DbUtils db_utils= new DbUtils(con, FieldNamesMode.AS_IS, null);
+        DbUtils db_utils = new DbUtils(con, FieldNamesMode.AS_IS, null);
 
         String jdbc_sql = SqlUtils.jdbc_sql_by_query_ref(dto_class.getRef(), sql_root_abs_path);
 
@@ -196,20 +196,6 @@ public class NbpIdeEditorHelpers {
             df.setJavaType(f.getType());
             dto_class.getField().add(df);
         }
-    }
-
-    public static void open_dto_in_editor_async(com.sqldalmaker.jaxb.dto.ObjectFactory object_factory, DtoClasses dto_classes, boolean remove_java_lang) throws Exception {
-
-        String text = XmlHelpers.get_dto_xml_text(object_factory, dto_classes, remove_java_lang);
-
-        open_text_in_editor_async("_dto.xml", text); // '%' throws URI exception in NB
-    }
-
-    private static void open_dao_in_editor_async(com.sqldalmaker.jaxb.dao.ObjectFactory object_factory, DaoClass dao_classes, String file_name) throws Exception {
-
-        String text = XmlHelpers.get_dao_xml_text(object_factory, dao_classes, true);
-
-        open_text_in_editor_async(file_name, text);
     }
 
     public static void open_dao_in_editor_async(com.sqldalmaker.jaxb.dao.ObjectFactory object_factory, DaoClass dao_classes) throws Exception {
@@ -238,5 +224,27 @@ public class NbpIdeEditorHelpers {
         NbpHelpers.write_file_content(file, text);
 
         open_in_editor_async(file);
+    }
+
+    public static void open_dto_in_editor_async(com.sqldalmaker.jaxb.dto.ObjectFactory object_factory, DtoClasses dto_classes, boolean remove_java_lang) throws Exception {
+
+        String text = XmlHelpers.get_dto_xml_text(object_factory, dto_classes, remove_java_lang);
+
+        String[] parts = text.split("\\?>");
+
+        text = parts[0] + Const.COMMENT_GENERATED_DTO_XML + parts[1];
+
+        open_text_in_editor_async("_dto.xml", text); // '%' throws URI exception in NB
+    }
+
+    private static void open_dao_in_editor_async(com.sqldalmaker.jaxb.dao.ObjectFactory object_factory, DaoClass dao_classes, String file_name) throws Exception {
+
+        String text = XmlHelpers.get_dao_xml_text(object_factory, dao_classes, true);
+
+        String[] parts = text.split("\\?>");
+
+        text = parts[0] + Const.COMMENT_GENERATED_DAO_XML + parts[1];
+
+        open_text_in_editor_async(file_name, text);
     }
 }
