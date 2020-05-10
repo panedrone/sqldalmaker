@@ -2,62 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1fb1c605-8c08-4b11-a01b-d42d0945087f" name="Default" comment="added option to exclude views in DTO/DAO assistants">
-      <change afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/JdbcUtils.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/org/apache/cayenne/dba/TypesMapping.README.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/org/apache/cayenne/dba/TypesMapping.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src_intellij/img/sqldalmaker.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src_intellij/img/sqldalmaker_13.gif" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/META-INF/MANIFEST.MF" beforeDir="false" afterPath="$PROJECT_DIR$/META-INF/MANIFEST.MF" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/META-INF/plugin.xml" beforeDir="false" afterPath="$PROJECT_DIR$/META-INF/plugin.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/manifest.mf" beforeDir="false" afterPath="$PROJECT_DIR$/manifest.mf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nbproject/private/private.xml" beforeDir="false" afterPath="$PROJECT_DIR$/nbproject/private/private.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/DbUtils.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/Helpers.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/Helpers.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/IDaoCG.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/IDaoCG.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/JaxbProcessor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/JaxbUtils.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/QueryMethodInfo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/QueryMethodInfo.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/SqlUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/SqlUtils.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/cpp/CppCG.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/cpp/CppCG.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/cpp/cpp.vm" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/cpp/cpp.vm" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/java/JavaCG.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/java/JavaCG.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/java/java.vm" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/java/java.vm" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/php/PhpCG.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/php/PhpCG.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/php/php.vm" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/php/php.vm" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/python/PythonCG.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/python/PythonCG.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/python/python.vm" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/python/python.vm" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/ruby/RubyCG.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/ruby/RubyCG.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/ruby/ruby.vm" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/ruby/ruby.vm" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/common/SdmUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/common/SdmUtils.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/Bundle.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/Bundle.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/NbpTargetLanguageHelpers.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/NbpTargetLanguageHelpers.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/recent_changes.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/recent_changes.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/DataStore.STL.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/DataStore.STL.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/DataStore.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/DataStore.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/DataStore.java_" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/DataStore.java_" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/DataStore.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/DataStore.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/DataStore1.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/DataStore1.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/DataStore2.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/DataStore2.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/DataStoreManagerAndroid.java_" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/DataStoreManagerAndroid.java_" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/DataStoreManagerDbUtils.java_" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/DataStoreManagerDbUtils.java_" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/DataStoreManagerSpring.java_" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/DataStoreManagerSpring.java_" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/DataStore_Qt5.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/DataStore_Qt5.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/PDODataStore.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/PDODataStore.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/data_store.rb" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/data_store.rb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/settings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/settings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/NbpCrudXmHelpers.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/NbpCrudXmHelpers.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/NbpIdeEditorHelpers.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/NbpIdeEditorHelpers.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/org/apache/cayenne/dba/TypesMapping.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/org/apache/cayenne/dba/TypesMapping.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src_eclipse/com/sqldalmaker/eclipse/EclipseCrudXmlHelpers.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_eclipse/com/sqldalmaker/eclipse/EclipseCrudXmlHelpers.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src_eclipse/com/sqldalmaker/eclipse/EclipseTargetLanguageHelpers.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_eclipse/com/sqldalmaker/eclipse/EclipseTargetLanguageHelpers.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src_eclipse/com/sqldalmaker/eclipse/UIDialogSelectDbSchema.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_eclipse/com/sqldalmaker/eclipse/UIDialogSelectDbSchema.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/SdmActionGroup.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/SdmActionGroup.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/SdmPluginRegistration.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/CompletionProviderSql.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/CompletionProviderSql.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/CompletionProviderTable.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/CompletionProviderTable.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/PsiReferenceSql.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/PsiReferenceSql.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaCrudXmlHelpers.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaCrudXmlHelpers.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaTargetLanguageHelpers.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaTargetLanguageHelpers.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UIDialogSelectDbSchema.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UIDialogSelectDbSchema.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabDTO.java" afterDir="false" />
     </list>
     <list id="0b913ed8-6e39-405f-b29b-9d52c75467b5" name="Failed commit: Default" comment="" />
     <option name="SHOW_DIALOG" value="false" />

@@ -24,9 +24,8 @@ import com.sqldalmaker.jaxb.dao.ObjectFactory;
 import com.sqldalmaker.jaxb.dto.DtoClasses;
 
 /**
- * The class to control
- * 
- * - DTO XML assistant - DAO XML assistant - FK access XML assistant
+ * The class to control 1) DTO XML assistant 2) DAO XML assistant 3) FK access
+ * XML assistant
  *
  * @author sqldalmaker@gmail.com
  *
@@ -161,9 +160,9 @@ public class EclipseCrudXmlHelpers {
 							in_use = new HashSet<String>();
 						}
 
-						root = SdmUtils.create_crud_xml_jaxb_dao_class(object_factory, connection, in_use, schema_in_xml,
-								selected_schema, include_views, use_crud_auto, add_fk_access, plural_to_singular,
-								underscores_needed);
+						root = SdmUtils.create_crud_xml_jaxb_dao_class(object_factory, connection, in_use,
+								schema_in_xml, selected_schema, include_views, use_crud_auto, add_fk_access,
+								plural_to_singular, underscores_needed);
 
 					} finally {
 

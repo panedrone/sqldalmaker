@@ -24,7 +24,7 @@
 #end
 #end
 #macro(sql_var $is_external_sql $sql)
-#if(${is_external_sql}==false)
+#if(!${is_external_sql})
 		${d}sql = "${sql}";
 
 #end

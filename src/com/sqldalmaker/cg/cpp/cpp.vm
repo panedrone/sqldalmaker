@@ -19,7 +19,7 @@
 #end
 #end
 #macro(sql_var $external_sql $sql)
-#if(${external_sql}==false)
+#if(!${external_sql})
 		DL_STR sql = DL_T(${sql});
 
 #end

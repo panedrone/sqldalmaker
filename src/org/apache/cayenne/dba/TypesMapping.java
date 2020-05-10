@@ -290,6 +290,7 @@ public class TypesMapping {
      * @return true if supplied type is a character type.
      * @since 4.0
      */
+    @Deprecated // === panedrone: to avoid NB compiler warning
     public static boolean isCharacter(int type) {
         return type == Types.CHAR || type == Types.NCHAR || type == Types.VARCHAR || type == Types.NVARCHAR
                 || type == Types.CLOB || type == Types.NCLOB || type == Types.LONGVARCHAR || type == Types.LONGNVARCHAR;

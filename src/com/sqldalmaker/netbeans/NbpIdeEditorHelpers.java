@@ -5,10 +5,9 @@
  */
 package com.sqldalmaker.netbeans;
 
-import com.sqldalmaker.cg.DbUtils;
+import com.sqldalmaker.cg.JdbcUtils;
 import com.sqldalmaker.cg.FieldInfo;
 import com.sqldalmaker.cg.FieldNamesMode;
-import com.sqldalmaker.cg.SqlUtils;
 import com.sqldalmaker.common.Const;
 import com.sqldalmaker.common.XmlHelpers;
 import com.sqldalmaker.jaxb.dao.DaoClass;
@@ -20,6 +19,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 import org.openide.cookies.OpenCookie;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileSystem;
@@ -181,13 +181,11 @@ public class NbpIdeEditorHelpers {
 
     private static void gen_tmp_field_tags(Connection con, ObjectFactory object_factory, DtoClass dto_class, String sql_root_abs_path) throws Exception {
 
-        DbUtils db_utils = new DbUtils(con, FieldNamesMode.AS_IS, null);
+        JdbcUtils db_utils = new JdbcUtils(con, FieldNamesMode.AS_IS, null);
 
-        String jdbc_sql = SqlUtils.jdbc_sql_by_query_ref(dto_class.getRef(), sql_root_abs_path);
+        List<FieldInfo> fields = new ArrayList<FieldInfo>();
 
-        ArrayList<FieldInfo> fields = new ArrayList<FieldInfo>();
-
-        db_utils.get_dto_field_info(jdbc_sql, dto_class, fields);
+        db_utils.get_dto_field_info(dto_class, sql_root_abs_path, fields);
 
         for (FieldInfo f : fields) {
 

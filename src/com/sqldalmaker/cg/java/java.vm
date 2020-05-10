@@ -18,7 +18,7 @@ String sql#if(${params.size()} > 0), #end
 #if($external_sql == true)String sql, #end
 #end
 #macro(sql_var $is_external_sql $sql)
-#if ($is_external_sql==false)
+#if (!${is_external_sql})
 
 		String sql = "${sql}";
 #end

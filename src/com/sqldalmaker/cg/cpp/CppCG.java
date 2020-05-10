@@ -105,8 +105,6 @@ public class CppCG {
 
         private final DtoClasses jaxb_dto_classes;
 
-        private final TypeMap type_map;
-
         private final Set<String> imports = new HashSet<String>();
 
         private final TemplateEngine te;
@@ -117,8 +115,6 @@ public class CppCG {
                    String class_prefix, String vm_file_system_dir) throws Exception {
 
             this.jaxb_dto_classes = jaxb_dto_classes;
-
-            this.type_map = type_map;
 
             this.sql_root_abs_path = sql_root_abs_path;
 
