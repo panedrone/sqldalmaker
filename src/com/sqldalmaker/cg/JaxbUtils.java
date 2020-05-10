@@ -1,3 +1,8 @@
+/*
+ * Copyright 2011-2020 sqldalmaker@gmail.com
+ * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
+ * Read LICENSE.txt in the root of this project/archive for details.
+ */
 package com.sqldalmaker.cg;
 
 import com.sqldalmaker.jaxb.dao.*;
@@ -5,9 +10,14 @@ import com.sqldalmaker.jaxb.dto.DtoClass;
 import com.sqldalmaker.jaxb.dto.DtoClasses;
 
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-public class JaxbProcessor {
+/**
+ * @author sqldalmaker@gmail.com
+ */
+public class JaxbUtils {
 
 	public static String get_jaxb_node_name(Object jaxb_node) {
 
@@ -32,11 +42,11 @@ public class JaxbProcessor {
 		return null;
 	}
 
-	public static DtoClass find_jaxb_dto_class(String dto_attr, DtoClasses jaxb_dto_classes) throws Exception {
+	public static DtoClass find_jaxb_dto_class(String dto_class_name, DtoClasses jaxb_dto_classes) throws Exception {
 
-		if (dto_attr == null || dto_attr.length() == 0) {
+		if (dto_class_name == null || dto_class_name.length() == 0) {
 
-			throw new Exception("Invalid name of DTO class: " + dto_attr);
+			throw new Exception("Invalid name of DTO class: " + dto_class_name);
 		}
 
 		DtoClass res = null;
@@ -47,7 +57,7 @@ public class JaxbProcessor {
 
 			String name = cls.getName();
 
-			if (name != null && name.equals(dto_attr)) {
+			if (name != null && name.equals(dto_class_name)) {
 
 				res = cls;
 
@@ -57,11 +67,11 @@ public class JaxbProcessor {
 
 		if (found == 0) {
 
-			throw new Exception("DTO XML element not found: '" + dto_attr + "'");
+			throw new Exception("DTO XML element not found: '" + dto_class_name + "'");
 
 		} else if (found > 1) {
 
-			throw new Exception("Duplicate DTO XML elements for name='" + dto_attr + "' found.");
+			throw new Exception("Duplicate DTO XML elements for name='" + dto_class_name + "' found.");
 		}
 
 		return res;
@@ -169,7 +179,7 @@ public class JaxbProcessor {
 			method_name = Helpers.camel_case_to_lower_under_scores(method_name);
 		}
 
-		StringBuilder tmp = dao_cg.render_crud_read(method_name, table_name, null, dto_class_name, true);
+		StringBuilder tmp = dao_cg.render_crud_read(method_name, table_name, dto_class_name,null, true);
 
 		code_buff.append(tmp);
 
@@ -177,7 +187,7 @@ public class JaxbProcessor {
 	}
 
 	private static boolean process_jaxb_crud_read(IDaoCG dao_cg, TypeCrud jaxb_type_crud, String dto_class_name,
-			String table_name, String explicit_primary_keys, boolean lower_under_scores, StringBuilder code_buff)
+			String table_name, String explicit_pk, boolean lower_under_scores, StringBuilder code_buff)
 			throws Exception {
 
 		String method_name = null;
@@ -204,8 +214,7 @@ public class JaxbProcessor {
 			method_name = Helpers.camel_case_to_lower_under_scores(method_name);
 		}
 
-		StringBuilder tmp = dao_cg.render_crud_read(method_name, table_name, explicit_primary_keys, dto_class_name,
-				false);
+		StringBuilder tmp = dao_cg.render_crud_read(method_name, table_name, dto_class_name, explicit_pk,false);
 
 		code_buff.append(tmp);
 
@@ -333,5 +342,33 @@ public class JaxbProcessor {
 		}
 
 		return code_buff;
+	}
+
+	public static void validate_jaxb_dto_class(DtoClass jaxb_dto_class) throws Exception {
+
+		List<DtoClass.Field> fields = jaxb_dto_class.getField();
+
+		Set<String> col_names = new HashSet<String>();
+
+		for (DtoClass.Field fe : fields) {
+
+			String java_class_name = fe.getJavaType();
+
+			Helpers.validate_java_type_name(java_class_name);
+
+			String col = fe.getColumn();
+
+			if (col == null || col.trim().length() == 0) {
+
+				throw new Exception("Invalid column name: null");
+			}
+
+			if (col_names.contains(col)) {
+
+				throw new Exception("Duplicate <field column='" + col + "'...");
+			}
+
+			col_names.add(col);
+		}
 	}
 }

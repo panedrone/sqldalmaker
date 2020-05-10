@@ -1,0 +1,3 @@
+copy-pasted from
+
+https://github.com/apache/cayenne/blob/master/cayenne-server/src/main/java/org/apache/cayenne/dba/TypesMapping.java

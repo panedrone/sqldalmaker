@@ -468,14 +468,14 @@ public class NbpTargetLanguageHelpers {
 
         } else if (RootFileName.PYTHON.equals(fn)) {
 
-            if (output_dir != null) {
+            String package_rel_path = settings.getFolders().getTarget();
 
-                String package_rel_path = settings.getFolders().getTarget();
+            if (output_dir != null) {
 
                 output_dir.append(package_rel_path);
             }
 
-            return new PythonCG.DAO(dto_classes, con, sql_root_abs_path, vm_file_system_path);
+            return new PythonCG.DAO(dto_classes, con, sql_root_abs_path, package_rel_path, vm_file_system_path);
 
         } else if (RootFileName.RUBY.equals(fn)) {
 

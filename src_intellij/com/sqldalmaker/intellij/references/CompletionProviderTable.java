@@ -20,7 +20,6 @@ import com.intellij.psi.xml.XmlAttributeValue;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
 import com.intellij.util.ProcessingContext;
-import com.sqldalmaker.cg.DbUtils;
 import com.sqldalmaker.cg.SqlUtils;
 import com.sqldalmaker.common.Const;
 import org.jetbrains.annotations.NotNull;

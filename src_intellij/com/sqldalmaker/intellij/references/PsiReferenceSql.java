@@ -12,7 +12,6 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.PsiReferenceBase;
 import com.intellij.util.ArrayUtil;
-import com.sqldalmaker.cg.DbUtils;
 import com.sqldalmaker.cg.SqlUtils;
 import com.sqldalmaker.common.FileSearchHelpers;
 import com.sqldalmaker.common.SdmUtils;

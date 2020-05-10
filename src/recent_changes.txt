@@ -1,28 +1,36 @@
-2010-02-11
+2020-05-05
 
-	Added attribute 'pk' to define primary key manually in 'crud' and 'crud-auto': 
+    New approach to map/correlate DTO fields and fetched records.
+
+2020-04-12
+
+    Package of DTO classes is taken into account in Python imports.
+
+2020-02-11
+
+   Added attribute 'pk' to define primary key manually in 'crud' and 'crud-auto': 
 	
-		<crud-auto dto="Ip2country" table="ip2country" pk="code" />
+       <crud-auto dto="Ip2country" table="ip2country" pk="code" />
 		
-	Update XSD files.
+   Update XSD files.
 	
-2010-01-11
+2020-01-11
 
-	Fixes of <query... return-type="...".
+    Fixes of <query... return-type="...".
 	
-2010-01-07
+2020-01-07
 
-	DTO fields may be declared in XML even they are missing in metadata. You calculate the values of such fields outside of RDBMS.
+    DTO fields may be declared in XML even they are missing in metadata. You calculate the values of such fields outside of RDBMS.
 
 2019-12-31
 	
-	Enabled <crud(-auto) table="my_schema.orders"...
+    Enabled <crud(-auto) table="my_schema.orders"...
 
 2019-09-30
 
-	Starting from plug-in v.1.90, you can generate and run PHP, Java, and Python code to call stored procedures and functions.
-	Review updated implementations of DataStore: 1) PHP + PDO, 2) Java + Apache DbUtils, 3) Python + MySQL Connector/Python.
-	Tested with MySQL, Oracle DB, and PostgreSQL. Visit project Website for details.
+    Starting from plug-in v.1.90, you can generate and run PHP, Java, and Python code to call stored procedures and functions.
+    Review updated implementations of DataStore: 1) PHP + PDO, 2) Java + Apache DbUtils, 3) Python + MySQL Connector/Python.
+    Tested with MySQL, Oracle DB, and PostgreSQL. Visit project Website for details.
 
 2019-08-17
 
@@ -76,7 +84,7 @@
 
 2018-02-12
 
-	Implemented generation of XML for reading data through FK-s.
+    Implemented generation of XML for reading data through FK-s.
 	
 2018-01-08
 

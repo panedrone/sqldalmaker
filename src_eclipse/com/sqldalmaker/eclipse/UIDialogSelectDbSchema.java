@@ -34,7 +34,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.wb.swt.ResourceManager;
 
-import com.sqldalmaker.cg.DbUtils;
+import com.sqldalmaker.cg.JdbcUtils;
 import com.sqldalmaker.common.ISelectDbSchemaCallback;
 import com.sqldalmaker.common.SdmUtils;
 import com.sqldalmaker.jaxb.settings.Settings;
@@ -111,7 +111,7 @@ public class UIDialogSelectDbSchema extends TitleAreaDialog {
 
 		try {
 
-			DbUtils.get_schema_names(con, schema_names);
+			JdbcUtils.get_schema_names(con, schema_names);
 
 		} finally {
 

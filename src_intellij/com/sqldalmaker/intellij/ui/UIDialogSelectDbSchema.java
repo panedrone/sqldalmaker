@@ -10,7 +10,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
-import com.sqldalmaker.cg.DbUtils;
+import com.sqldalmaker.cg.JdbcUtils;
 import com.sqldalmaker.common.ISelectDbSchemaCallback;
 import com.sqldalmaker.jaxb.settings.Settings;
 
@@ -233,7 +233,7 @@ public class UIDialogSelectDbSchema extends JDialog {
 
             try {
 
-                DbUtils.get_schema_names(con, items);
+                JdbcUtils.get_schema_names(con, items);
 
                 table.setModel(new AbstractTableModel() {
 

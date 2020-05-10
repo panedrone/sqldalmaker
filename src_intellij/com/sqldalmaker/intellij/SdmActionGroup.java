@@ -27,7 +27,7 @@ import java.util.List;
  */
 public class SdmActionGroup extends ActionGroup {
 
-    abstract class SdmAction extends AnAction {
+    abstract static class SdmAction extends AnAction {
 
         SdmAction(String text) {
 
@@ -35,8 +35,8 @@ public class SdmActionGroup extends ActionGroup {
         }
     }
 
-    private static void enum_root_files(Project project,
-                                        VirtualFile current_folder, List<String> rel_path_names) throws Exception {
+    private static void enum_root_files(
+            Project project, VirtualFile current_folder, List<String> rel_path_names) {
 
         VirtualFile[] children = current_folder.getChildren();
 
@@ -54,6 +54,7 @@ public class SdmActionGroup extends ActionGroup {
                 String path = IdeaTargetLanguageHelpers.get_root_file_relative_path(project, c);
 
                 if (path != null) {
+                    
                     rel_path_names.add(path);
                 }
             }
@@ -77,6 +78,11 @@ public class SdmActionGroup extends ActionGroup {
 
         try {
 
+            if (anActionEvent == null) {
+
+                return new AnAction[0];
+            }
+
             List<String> titles = get_root_file_titles(anActionEvent.getProject());
 
             List<SdmAction> res = new ArrayList<SdmAction>();
@@ -86,7 +92,7 @@ public class SdmActionGroup extends ActionGroup {
                 SdmAction action = new SdmAction(title) {
 
                     @Override
-                    public void actionPerformed(AnActionEvent anActionEvent) {
+                    public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
 
                         try {
 
@@ -106,7 +112,9 @@ public class SdmActionGroup extends ActionGroup {
                 res.add(action);
             }
 
-            return res.toArray(new AnAction[res.size()]);
+            AnAction[] arr = new AnAction[res.size()];
+
+            return res.toArray(arr);
 
         } catch (Exception e) {
 

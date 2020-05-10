@@ -27,10 +27,6 @@ String sql#if(${params.size()} > 0), #end
 #if ($mode == "crud_sql_create")
 INSERT INTO ${table_name} (#foreach ($col in ${col_names})#list_item(${velocityCount} ${col})#end)
 VALUES (#foreach ($col in ${col_names})#list_item(${velocityCount} "?")#end)
-#elseif ($mode == "crud_sql_read_all")
-SELECT * FROM ${table_name}
-#elseif ($mode == "crud_sql_read_single")
-SELECT * FROM ${table_name} WHERE #foreach ($key in ${keys})#list_item_base(${velocityCount} "${key.getColumnName()} = ?" " AND ")#end
 #elseif ($mode == "crud_sql_update")
 UPDATE ${table_name} SET
 	#foreach ($param in ${params})#list_item(${velocityCount} "${param.getColumnName()} = ?")#end
@@ -43,9 +39,8 @@ DELETE FROM ${table_name} WHERE #foreach ($key in ${keys})#list_item_base(${velo
 package ${package};
 
 /**
- *
- * ${class_name} is generated DTO class. Don't modify it manually.
- *
+ * ${class_name} is a generated DTO class. Don't modify it manually.
+ * Visit http://sqldalmaker.sourceforge.net/ for details.
  */
 public class ${class_name} ${implements} {
 
@@ -73,9 +68,8 @@ import ${imp};
 #end
 
 /**
- *
- * ${class_name} is generated DAO class. Don't modify it manually.
- *
+ * ${class_name} is a generated DAO class. Don't modify it manually.
+ * Visit http://sqldalmaker.sourceforge.net/ for details.
  */
 public class ${class_name} {
 
@@ -96,14 +90,14 @@ public class ${class_name} {
 	public int ${method_name}(${dto_param} p) throws Exception {
 #sql_var(false $sql)
 
-		String []genColNames = new String[] {#foreach ($key in ${keys})#list_item_str(${velocityCount} ${key.getColumnName()})#end};
-		Object []genValues = new Object[genColNames.length];
+		String []gen_col_nm = new String[] {#foreach ($key in ${keys})#list_item_str(${velocityCount} ${key.getColumnName()})#end};
+		Object []gen_values = new Object[gen_col_nm.length];
 
-		int res = ds.insert(sql, genColNames, genValues#foreach($param in ${params}), p.${param.getterMethod()}()#end);
+		int res = ds.insert(sql, gen_col_nm, gen_values#foreach($param in ${params}), p.${param.getterMethod()}()#end);
 
 #foreach ($key in ${keys})
 #set($i = ${velocityCount} - 1)
-		p.${key.setterMethod()}(ds.castGeneratedValue(${key.getType()}.class, genValues[${i}]));
+		p.${key.setterMethod()}(ds.castGeneratedValue(${key.getType()}.class, gen_values[${i}]));
 #end
 
 		return res;

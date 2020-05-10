@@ -4,7 +4,7 @@ from mysql import connector
 class DataStore:
     """
     SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
-    About DataStore: http://sqldalmaker.sourceforge.net/how-to-start.html
+    About DataStore: http://sqldalmaker.sourceforge.net/xml-meta-programming.html
     Contact: sqldalmaker@gmail.com
 
     This is an example of how to implement DataStore in Python + MySQL.

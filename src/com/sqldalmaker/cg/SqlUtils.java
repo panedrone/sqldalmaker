@@ -13,580 +13,640 @@ package com.sqldalmaker.cg;
  */
 public class SqlUtils {
 
-    public static String sql_to_cpp_str(StringBuilder sql_buff) {
+	public static String sql_to_cpp_str(StringBuilder sql_buff) {
 
-        return sql_to_cpp_str(sql_buff.toString());
-    }
+		return sql_to_cpp_str(sql_buff.toString());
+	}
 
-    public static String sql_to_cpp_str(String sql) {
+	public static String sql_to_cpp_str(String sql) {
 
-        String[] parts = sql.split("(\\n|\\r)+");
+		String[] parts = sql.split("(\\n|\\r)+");
 
-        String new_line = System.getProperty("line.separator");
+		String new_line = System.getProperty("line.separator");
 
-        String new_line_j = org.apache.commons.lang.StringEscapeUtils.escapeJava("\n");
+		String new_line_j = org.apache.commons.lang.StringEscapeUtils.escapeJava("\n");
 
-        StringBuilder res = new StringBuilder();
+		StringBuilder res = new StringBuilder();
 
-        res.append("\"");
+		res.append("\"");
 
-        for (int i = 0; i < parts.length; i++) {
+		for (int i = 0; i < parts.length; i++) {
 
-            String j_str = parts[i].replace('\t', ' ');
+			String j_str = parts[i].replace('\t', ' ');
 
-            // packed into Velocity JAR:
-            j_str = org.apache.commons.lang.StringEscapeUtils.escapeJava(j_str);
+			// packed into Velocity JAR:
+			j_str = org.apache.commons.lang.StringEscapeUtils.escapeJava(j_str);
 
-            // fix the bug in StringEscapeUtils:
-            // case '/':
-            // out.write('\\');
-            // out.write('/');
-            // break;
-            j_str = j_str.replace("\\/", "/");
+			// fix the bug in StringEscapeUtils:
+			// case '/':
+			// out.write('\\');
+			// out.write('/');
+			// break;
+			j_str = j_str.replace("\\/", "/");
 
-            res.append(j_str);
+			res.append(j_str);
 
-            if (i < parts.length - 1) {
+			if (i < parts.length - 1) {
 
-                res.append(" ");
-                res.append(new_line_j);
-                res.append("\\");
-                res.append(new_line);
-                // res.append("\t\t");
+				res.append(" ");
+				res.append(new_line_j);
+				res.append("\\");
+				res.append(new_line);
+				// res.append("\t\t");
 
-            } else {
+			} else {
 
-                res.append("\"");
-            }
-        }
+				res.append("\"");
+			}
+		}
 
-        return res.toString();
-    }
+		return res.toString();
+	}
 
-    public static String jdbc_sql_to_java_str(StringBuilder sql_buff) {
+	public static String jdbc_sql_to_java_str(StringBuilder sql_buff) {
 
-        return jdbc_sql_to_java_str(sql_buff.toString());
-    }
+		return jdbc_sql_to_java_str(sql_buff.toString());
+	}
 
-    public static String jdbc_sql_to_java_str(String jdbc_sql) {
+	public static String jdbc_sql_to_java_str(String jdbc_sql) {
 
-        String[] parts = jdbc_sql.split("(\\n|\\r)+");
+		String[] parts = jdbc_sql.split("(\\n|\\r)+");
 
-        // "\n" it is OK for Eclipse debugger window:
-        String new_line = "\n"; // System.getProperty("line.separator");
+		// "\n" it is OK for Eclipse debugger window:
+		String new_line = "\n"; // System.getProperty("line.separator");
 
-        StringBuilder res = new StringBuilder();
+		StringBuilder res = new StringBuilder();
 
-        for (int i = 0; i < parts.length; i++) {
+		for (int i = 0; i < parts.length; i++) {
 
-            String j_str = parts[i].replace('\t', ' ');
+			String j_str = parts[i].replace('\t', ' ');
 
-            // packed into Velocity JAR:
-            j_str = org.apache.commons.lang.StringEscapeUtils.escapeJava(j_str);
+			// packed into Velocity JAR:
+			j_str = org.apache.commons.lang.StringEscapeUtils.escapeJava(j_str);
 
-            // fix the bug in StringEscapeUtils:
-            // case '/':
-            // out.write('\\');
-            // out.write('/');
-            // break;
-            j_str = j_str.replace("\\/", "/");
+			// fix the bug in StringEscapeUtils:
+			// case '/':
+			// out.write('\\');
+			// out.write('/');
+			// break;
+			j_str = j_str.replace("\\/", "/");
 
-            res.append(j_str);
+			res.append(j_str);
 
-            if (i < parts.length - 1) {
+			if (i < parts.length - 1) {
 
-                String s = " \" " + new_line + "\t\t\t\t + \"";
+				String s = " \" " + new_line + "\t\t\t\t + \"";
 
-                res.append(s);
-            }
-        }
+				res.append(s);
+			}
+		}
 
-        return res.toString();
-    }
+		return res.toString();
+	}
 
-    public static String sql_to_php_str(StringBuilder sql_buff) {
+	public static String sql_to_php_str(StringBuilder sql_buff) {
 
-        return php_sql_to_php_str(sql_buff.toString());
-    }
+		return php_sql_to_php_str(sql_buff.toString());
+	}
 
-    public static String jdbc_sql_to_php_str(String jdbc_sql) throws Exception {
+	public static String jdbc_sql_to_php_str(String jdbc_sql) throws Exception {
 
-        boolean is_sp = is_jdbc_stored_proc_call(jdbc_sql);
+		boolean is_sp = is_jdbc_stored_proc_call(jdbc_sql);
 
-        String php_sql;
+		String php_sql;
 
-        if (is_sp) {
+		if (is_sp) {
 
-            php_sql = jdbc_sp_call_to_php_sp_call(jdbc_sql);
+			php_sql = jdbc_sp_call_to_php_sp_call(jdbc_sql);
 
-        } else {
+		} else {
 
-            php_sql = jdbc_sql;
-        }
+			php_sql = jdbc_sql;
+		}
 
-        return php_sql_to_php_str(php_sql);
-    }
+		return php_sql_to_php_str(php_sql);
+	}
 
-    private static String php_sql_to_php_str(String php_sql) {
+	private static String php_sql_to_php_str(String php_sql) {
 
-        String[] parts = php_sql.split("(\\n|\\r)+");
+		String[] parts = php_sql.split("(\\n|\\r)+");
 
-        String new_line = "\n"; // System.getProperty("line.separator");
+		String new_line = "\n"; // System.getProperty("line.separator");
 
-        StringBuilder res = new StringBuilder();
+		StringBuilder res = new StringBuilder();
 
-        for (int i = 0; i < parts.length; i++) {
+		for (int i = 0; i < parts.length; i++) {
 
-            String j_str = parts[i].replace('\t', ' ');
+			String j_str = parts[i].replace('\t', ' ');
 
-            // packed into Velocity JAR:
-            j_str = org.apache.commons.lang.StringEscapeUtils.escapeJava(j_str);
+			// packed into Velocity JAR:
+			j_str = org.apache.commons.lang.StringEscapeUtils.escapeJava(j_str);
 
-            // fix the bug in StringEscapeUtils:
-            // case '/':
-            // out.write('\\');
-            // out.write('/');
-            // break;
-            j_str = j_str.replace("\\/", "/");
+			// fix the bug in StringEscapeUtils:
+			// case '/':
+			// out.write('\\');
+			// out.write('/');
+			// break;
+			j_str = j_str.replace("\\/", "/");
 
-            res.append(j_str);
+			res.append(j_str);
 
-            if (i < parts.length - 1) {
+			if (i < parts.length - 1) {
 
-                String s = " \" " + new_line + "\t\t\t\t . \"";
+				String s = " \" " + new_line + "\t\t\t\t . \"";
 
-                res.append(s);
-            }
-        }
+				res.append(s);
+			}
+		}
 
-        return res.toString();
-    }
+		return res.toString();
+	}
 
-    public static String python_sql_to_python_string(StringBuilder sql_buff) throws Exception {
+	public static String python_sql_to_python_string(StringBuilder sql_buff) throws Exception {
 
-        return jdbc_sql_to_python_string(sql_buff.toString());
-    }
+		return jdbc_sql_to_python_string(sql_buff.toString());
+	}
 
-    public static String ruby_sql_to_ruby_string(StringBuilder sql_buff) throws Exception {
+	public static String ruby_sql_to_ruby_string(StringBuilder sql_buff) throws Exception {
 
-        return jdbc_sql_to_python_string(sql_buff.toString());
-    }
+		return jdbc_sql_to_python_string(sql_buff.toString());
+	}
 
-    public static String jdbc_sql_to_ruby_string(String jdbc_sql) throws Exception {
+	public static String jdbc_sql_to_ruby_string(String jdbc_sql) throws Exception {
 
-        return jdbc_sql_to_python_string(jdbc_sql);
-    }
+		return jdbc_sql_to_python_string(jdbc_sql);
+	}
 
-    public static String jdbc_sql_to_python_string(String jdbc_sql) throws Exception {
+	public static String jdbc_sql_to_python_string(String jdbc_sql) throws Exception {
 
-        boolean is_sp = is_jdbc_stored_proc_call(jdbc_sql);
+		boolean is_sp = is_jdbc_stored_proc_call(jdbc_sql);
 
-        String python_sql;
+		String python_sql;
 
-        if (is_sp) {
+		if (is_sp) {
 
-            python_sql = jdbc_sp_call_to_python_sp_call(jdbc_sql);
+			python_sql = jdbc_sp_call_to_python_sp_call(jdbc_sql);
 
-        } else {
+		} else {
 
-            python_sql = jdbc_sql;
-        }
+			python_sql = jdbc_sql;
+		}
 
-        return python_sql_to_python_string(python_sql);
-    }
+		return python_sql_to_python_string(python_sql);
+	}
 
-    private static String python_sql_to_python_string(String python_sql) {
+	private static String python_sql_to_python_string(String python_sql) {
 
-        String[] parts = python_sql.split("(\\n|\\r)+");
+		String[] parts = python_sql.split("(\\n|\\r)+");
 
-        String new_line = "\n"; // System.getProperty("line.separator");
+		String new_line = "\n"; // System.getProperty("line.separator");
 
-        StringBuilder res = new StringBuilder();
+		StringBuilder res = new StringBuilder();
 
-        for (int i = 0; i < parts.length; i++) {
+		for (int i = 0; i < parts.length; i++) {
 
-            String j_str = parts[i].replace('\t', ' ');
+			String j_str = parts[i].replace('\t', ' ');
 
-            // packed into Velocity JAR:
-            j_str = org.apache.commons.lang.StringEscapeUtils.escapeJava(j_str);
+			// packed into Velocity JAR:
+			j_str = org.apache.commons.lang.StringEscapeUtils.escapeJava(j_str);
 
-            // fix the bug in StringEscapeUtils:
-            // case '/':
-            // out.write('\\');
-            // out.write('/');
-            // break;
-            j_str = j_str.replace("\\/", "/");
+			// fix the bug in StringEscapeUtils:
+			// case '/':
+			// out.write('\\');
+			// out.write('/');
+			// break;
+			j_str = j_str.replace("\\/", "/");
 
-            res.append(j_str);
+			res.append(j_str);
 
-            if (i < parts.length - 1) { // python wants 4 spaces instead of 1 tab
+			if (i < parts.length - 1) { // python wants 4 spaces instead of 1 tab
 
-                String s = " " + new_line + "                ";
+				String s = " " + new_line + "                ";
 
-                res.append(s);
-            }
-        }
+				res.append(s);
+			}
+		}
 
-        return res.toString();
-    }
+		return res.toString();
+	}
 
-    public static void throw_if_select_sql(String jdbc_dao_sql) throws Exception {
+	public static void throw_if_select_sql(String jdbc_dao_sql) throws Exception {
 
-        String trimmed = jdbc_dao_sql.toLowerCase().trim();
+		String trimmed = jdbc_dao_sql.toLowerCase().trim();
 
-        String[] parts = trimmed.split("\\s+");
+		String[] parts = trimmed.split("\\s+");
 
-        if (parts.length > 0) {
+		if (parts.length > 0) {
 
-            if ("select".equals(parts[0])) {
+			if ("select".equals(parts[0])) {
 
-                throw new Exception("SELECT is not allowed here");
-            }
-        }
-    }
+				throw new Exception("SELECT is not allowed here");
+			}
+		}
+	}
 
-    public static String jdbc_sql_by_exec_dml_ref(String ref, String sql_root_abs_path) throws Exception {
+	public static String jdbc_sql_by_exec_dml_ref(String ref, String sql_root_abs_path) throws Exception {
 
-        if (is_jdbc_stored_proc_call(ref)) {
+		if (is_jdbc_stored_proc_call(ref)) {
 
-            return ref;
+			return ref;
 
-        } else if (is_stored_proc_call_shortcut(ref)) {
+		} else if (is_stored_proc_call_shortcut(ref)) {
 
-            return ref; // stored_proc_shortcut_to_jdbc_call(ref);
+			return ref; // stored_proc_shortcut_to_jdbc_call(ref);
 
-        } else if (is_sql_file_ref(ref)) {
+		} else if (is_sql_file_ref(ref)) {
 
-            String sql_file_path = Helpers.concat_path(sql_root_abs_path, ref);
+			String sql_file_path = Helpers.concat_path(sql_root_abs_path, ref);
 
-            return Helpers.load_text_from_file(sql_file_path);
+			return Helpers.load_text_from_file(sql_file_path);
 
-        } else {
+		} else {
 
-            throw new Exception("Invalid 'ref'': " + ref);
-        }
-    }
+			throw new Exception("Invalid ref: <exec_dml ref=\"" + ref + "\"");
+		}
+	}
 
-    public static String jdbc_sql_by_query_ref(String ref, String sql_root_abs_path) throws Exception {
+	static String jdbc_sql_by_dto_class_ref(String ref, String sql_root_abs_path) throws Exception {
 
-        String[] parts = ref.split(":");
+		String[] parts = ref.split(":");
 
-        String table_name = null;
+		String table_name = null;
 
-        if (parts.length >= 2) {
+		if (parts.length >= 2) {
 
-            if ("table".compareTo(parts[0].toLowerCase().trim()) == 0) {
+			if ("table".compareTo(parts[0].toLowerCase().trim()) == 0) {
 
-                table_name = ref.substring(parts[0].length() + 1);
-            }
+				table_name = ref.substring(parts[0].length() + 1);
+			}
 
-        } else if (is_jdbc_stored_proc_call(ref)) {
+		} else if (is_jdbc_stored_proc_call(ref)) {
 
-            return ref;
+			return ref;
 
-        } else if (is_stored_proc_call_shortcut(ref)) {
+		} else if (is_stored_proc_call_shortcut(ref)) {
 
-            return ref; // stored_proc_shortcut_to_jdbc_call(ref);
+			return ref;
 
-        } else if (is_stored_func_call_shortcut(ref)) {
+		} else if (is_stored_func_call_shortcut(ref)) {
 
-            return ref;
+			return ref;
 
-        } else if (is_sql_file_ref(ref)) {
+		} else if (is_sql_file_ref(ref)) {
 
-            String sql_file_path = Helpers.concat_path(sql_root_abs_path, ref);
+			String sql_file_path = Helpers.concat_path(sql_root_abs_path, ref);
 
-            return Helpers.load_text_from_file(sql_file_path);
+			return Helpers.load_text_from_file(sql_file_path);
 
-        } else if (is_sql_shortcut_ref(ref)) {
+		} else if (is_sql_shortcut_ref(ref)) {
 
-            String res = shortcut_ref_to_jdbc_sql(ref);
+			String res = shortcut_ref_to_jdbc_sql(ref);
 
-            return res;
+			return res;
 
-        } else if (is_table_ref(ref)) {
+		} else if (is_table_ref(ref)) {
 
-            table_name = ref;
+			table_name = ref;
 
-        } else if (/* ref == null || */ref.trim().length() == 0) {
+		} else {
 
-            return "";
+			throw new Exception("Invalid ref: <dto-class ref=\"" + ref + "\"");
+		}
 
-        } else {
+		return "SELECT * FROM " + table_name + " WHERE 1 = 0";
+	}
 
-            throw new Exception("Invalid 'ref'': " + ref);
-        }
+	/*
+	 * this method is allowed to call ONLY from JdbcUtils.get_dao_query_info
+	 * 
+	 */
+	static String jdbc_sql_by_dao_query_ref(String ref, String sql_root_abs_path) throws Exception {
 
-        return "SELECT * FROM " + table_name + " WHERE 1 = 0";
-    }
+		if (is_jdbc_stored_proc_call(ref)) {
 
-    //
-    // called from PsiReferenceSql
-    //
-    public static boolean is_sql_shortcut_ref(String ref) {
+			return ref;
 
-        if (is_sql_file_ref_base(ref)) {
+		} else if (is_stored_proc_call_shortcut(ref)) {
 
-            return false;
-        }
+			return ref;
 
-        return ref != null && ref.length() >= 4 && ref.contains("(") && ref.trim().endsWith(")");
-    }
+		} else if (is_stored_func_call_shortcut(ref)) {
 
-    public static boolean is_sql_file_ref(String ref) {
+			return ref;
 
-        if (is_sql_shortcut_ref(ref)) {
+		} else if (is_sql_file_ref(ref)) {
 
-            return false;
-        }
+			String sql_file_path = Helpers.concat_path(sql_root_abs_path, ref);
 
-        if (is_jdbc_stored_proc_call(ref)) {
+			return Helpers.load_text_from_file(sql_file_path);
 
-            return false;
-        }
+		} else if (is_sql_shortcut_ref(ref)) {
 
-        return is_sql_file_ref_base(ref);
-    }
+			String res = shortcut_ref_to_jdbc_sql(ref);
 
-    private static boolean is_sql_file_ref_base(String ref) {
+			return res;
+		}
 
-        return ref != null && ref.length() > 4 && ref.endsWith(".sql");
-    }
+		throw new Exception("Invalid ref: <quert... ref=\"" + ref + "\"");
+	}
 
-    //
-    // called from PsiReferenceSql
-    //
-    public static boolean is_table_ref(String ref) {
+	public static boolean is_sql_shortcut_ref(String ref) {
 
-        if (ref == null || ref.length() == 0) {
+		if (ref == null || ref.length() == 0) {
 
-            return false;
-        }
+			return false;
+		}
 
-        if (is_sql_shortcut_ref(ref)) {
+		if (is_sql_file_ref_base(ref)) {
 
-            return false;
-        }
+			return false;
+		}
 
-        if (is_jdbc_stored_proc_call(ref)) {
+		String[] parts;
 
-            return false;
-        }
+		try {
 
-        if (is_sql_file_ref(ref)) {
+			parts = parse_sql_shortcut_ref(ref);
 
-            return false;
-        }
+			String table_name = parts[0];
 
-        if (is_stored_proc_call_shortcut(ref)) {
+			if (!is_table_ref(table_name)) {
 
-            return false;
-        }
+				return false;
+			}
 
-        if (is_stored_func_call_shortcut(ref)) {
+			String inside_brackets = parts[1];
 
-            return false;
-        }
+			Helpers.get_listed_items(inside_brackets);
 
-        final char[] ILLEGAL_CHARACTERS = {'/', '\n', '\r', '\t', '\0', '\f', '`', '?', '*', '\\', '<', '>', '|',
-                '\"'/* , ':' */, ';', ','};
+		} catch (Throwable e) {
 
-        for (char c : ILLEGAL_CHARACTERS) {
+			return false;
+		}
 
-            if (ref.contains(Character.toString(c))) {
+		return true;
+	}
 
-                return false;
-            }
-        }
+	public static boolean is_sql_file_ref(String ref) {
 
-        // no empty strings separated by dots
-        //
-        String[] parts = ref.split("\\.", -1); // -1 to leave empty strings
+		if (is_sql_shortcut_ref(ref)) {
 
-        for (String s : parts) {
+			return false;
+		}
 
-            if (s.length() == 0) {
+		if (is_jdbc_stored_proc_call(ref)) {
 
-                return false;
-            }
-        }
+			return false;
+		}
 
-        return true;
-    }
+		return is_sql_file_ref_base(ref);
+	}
 
-    public static boolean is_jdbc_stored_proc_call(String jdbc_sql) {
+	private static boolean is_sql_file_ref_base(String ref) {
 
-        jdbc_sql = jdbc_sql.trim();
+		return ref != null && ref.length() > 4 && ref.endsWith(".sql");
+	}
 
-        if (jdbc_sql.startsWith("{") && jdbc_sql.endsWith("}")) {
+	public static boolean is_empty_ref(String ref) {
 
-            jdbc_sql = jdbc_sql.substring(1, jdbc_sql.length() - 1);
+		return ref == null || ref.trim().length() == 0;
+	}
 
-        } else if (jdbc_sql.startsWith("{") && !jdbc_sql.endsWith("}")
-                || !jdbc_sql.startsWith("{") && jdbc_sql.endsWith("}")) {
+	//
+	// called from PsiReferenceSql
+	//
+	public static boolean is_table_ref(String ref) {
 
-            // throw new Exception("Invalid JDBC call: " + jdbc_sql);
+		if (ref == null || ref.length() == 0) {
 
-            return false;
-        }
+			return false;
+		}
 
-        return is_stored_proc_call_shortcut(jdbc_sql);
-    }
+		if (is_sql_shortcut_ref(ref)) {
 
-    private static String get_jdbc_stored_proc_call(String jdbc_sql) throws Exception {
+			return false;
+		}
 
-        String res = jdbc_sql.trim();
+		if (is_jdbc_stored_proc_call(ref)) {
 
-        if (jdbc_sql.startsWith("{") && jdbc_sql.endsWith("}")) {
+			return false;
+		}
 
-            res = jdbc_sql.substring(1, jdbc_sql.length() - 1);
+		if (is_sql_file_ref(ref)) {
 
-        } else if (jdbc_sql.startsWith("{") && !jdbc_sql.endsWith("}")
-                || !jdbc_sql.startsWith("{") && jdbc_sql.endsWith("}")) {
+			return false;
+		}
 
-            throw new Exception("Invalid JDBC call: " + jdbc_sql);
-        }
+		if (is_stored_proc_call_shortcut(ref)) {
 
-        return res;
-    }
+			return false;
+		}
 
-    //
-    // called from PsiReferenceSql
-    //
-    public static boolean is_stored_proc_call_shortcut(String text) {
+		if (is_stored_func_call_shortcut(ref)) {
 
-        String[] parts = text.split("\\s+");
+			return false;
+		}
 
-        if (parts.length < 2) {
+		final char[] ILLEGAL_CHARACTERS = { '/', '\n', '\r', '\t', '\0', '\f', '`', '?', '*', '\\', '<', '>', '|',
+				'\"'/* , ':' */, ';', ',' };
 
-            return false;
-        }
+		for (char c : ILLEGAL_CHARACTERS) {
 
-        String call = parts[0];
+			if (ref.contains(Character.toString(c))) {
 
-        return call.compareToIgnoreCase("call") == 0;
-    }
+				return false;
+			}
+		}
 
-    //
-    // called from PsiReferenceSql
-    //
-    public static boolean is_stored_func_call_shortcut(String sql) {
+		// no empty strings separated by dots
+		//
+		String[] parts = ref.split("\\.", -1); // -1 to leave empty strings
 
-        String[] parts = sql.split("\\s+");
+		for (String s : parts) {
 
-        if (parts.length < 2) {
-            
-            return false;
-        }
+			if (s.length() == 0) {
 
-        String select = parts[0];
+				return false;
+			}
+		}
 
-        return select.compareToIgnoreCase("select") == 0;
-    }
+		return true;
+	}
 
-    private static String jdbc_sp_call_to_php_sp_call(final String jdbc_sql) throws java.lang.Exception {
+	public static boolean is_jdbc_stored_proc_call(String jdbc_sql) {
 
-        String sql = jdbc_sql.trim();
+		jdbc_sql = jdbc_sql.trim();
 
-        if (is_jdbc_stored_proc_call(sql)) { // confirms syntax {call sp_name(...)}
+		if (jdbc_sql.startsWith("{") && jdbc_sql.endsWith("}")) {
 
-            sql = sql.substring(1, sql.length() - 1).trim(); // converted to call sp_name(...)
+			jdbc_sql = jdbc_sql.substring(1, jdbc_sql.length() - 1);
 
-        } else if (is_stored_proc_call_shortcut(sql)) {
-            //
+		} else if (jdbc_sql.startsWith("{") && !jdbc_sql.endsWith("}")
+				|| !jdbc_sql.startsWith("{") && jdbc_sql.endsWith("}")) {
 
-        } else {
+			// throw new Exception("Invalid JDBC call: " + jdbc_sql);
 
-            throw new Exception("Unexpected syntax of CALL: " + jdbc_sql);
-        }
+			return false;
+		}
 
-        return sql;
-    }
+		return is_stored_proc_call_shortcut(jdbc_sql);
+	}
 
-    private static String jdbc_sp_call_to_python_sp_call(final String jdbc_sql) throws java.lang.Exception {
+	private static String get_jdbc_stored_proc_call(String jdbc_sql) throws Exception {
 
-        String sql = jdbc_sql.trim();
+		String res = jdbc_sql.trim();
 
-        if (is_jdbc_stored_proc_call(sql)) { // confirms syntax {call sp_name(...)}
+		if (jdbc_sql.startsWith("{") && jdbc_sql.endsWith("}")) {
 
-            sql = get_jdbc_stored_proc_call(sql); // converted to call sp_name(...)
+			res = jdbc_sql.substring(1, jdbc_sql.length() - 1);
 
-        } else if (is_stored_proc_call_shortcut(sql)) {
-            //
+		} else if (jdbc_sql.startsWith("{") && !jdbc_sql.endsWith("}")
+				|| !jdbc_sql.startsWith("{") && jdbc_sql.endsWith("}")) {
 
-        } else {
+			throw new Exception("Invalid JDBC call: " + jdbc_sql);
+		}
 
-            throw new Exception("Unexpected syntax of CALL: " + jdbc_sql);
-        }
+		return res;
+	}
 
-        if (sql.contains("(")) {
+	//
+	// called from PsiReferenceSql
+	//
+	public static boolean is_stored_proc_call_shortcut(String text) {
 
-            if (!sql.endsWith(")")) {
+		String[] parts = text.split("\\s+");
 
-                throw new Exception("Unexpected syntax of CALL: " + jdbc_sql);
-            }
+		if (parts.length < 2) {
 
-            String[] parts = sql.split("[(]");
+			return false;
+		}
 
-            sql = parts[0].trim();
-        }
+		String call = parts[0];
 
-        return sql;
-    }
+		return call.compareToIgnoreCase("call") == 0;
+	}
 
-    private static String[] parse_ref(String ref) throws Exception {
+	//
+	// called from PsiReferenceSql
+	//
+	public static boolean is_stored_func_call_shortcut(String sql) {
 
-        String before_brackets;
+		String[] parts = sql.split("\\s+");
 
-        String inside_brackets;
+		if (parts.length < 2) {
 
-        ref = ref.trim();
+			return false;
+		}
 
-        int pos = ref.indexOf('(');
+		String select = parts[0];
 
-        if (pos == -1) {
+		return select.compareToIgnoreCase("select") == 0;
+	}
 
-            throw new Exception("'(' expected in ref shortcut");
+	private static String jdbc_sp_call_to_php_sp_call(final String jdbc_sql) throws java.lang.Exception {
 
-        } else {
+		String sql = jdbc_sql.trim();
 
-            if (!ref.endsWith(")")) {
+		if (is_jdbc_stored_proc_call(sql)) { // confirms syntax {call sp_name(...)}
 
-                throw new Exception("')' expected in ref shortcut");
-            }
+			sql = sql.substring(1, sql.length() - 1).trim(); // converted to call sp_name(...)
 
-            before_brackets = ref.substring(0, pos);
+		} else if (is_stored_proc_call_shortcut(sql)) {
+			//
 
-            inside_brackets = ref.substring(before_brackets.length() + 1, ref.length() - 1);
-        }
+		} else {
 
-        return new String[]{before_brackets, inside_brackets};
-    }
+			throw new Exception("Unexpected syntax of CALL: " + jdbc_sql);
+		}
 
-    private static String shortcut_ref_to_jdbc_sql(String ref) throws Exception {
+		return sql;
+	}
 
-        String[] parts2 = parse_ref(ref);
+	private static String jdbc_sp_call_to_python_sp_call(final String jdbc_sql) throws java.lang.Exception {
 
-        String table_name = parts2[0];
+		String sql = jdbc_sql.trim();
 
-        // validate_table_name(table_name); // TODO: PostgreSQL JDBC prepareStatement passes wrong table names
+		if (is_jdbc_stored_proc_call(sql)) { // confirms syntax {call sp_name(...)}
 
-        String param_descriptors = parts2[1];
+			sql = get_jdbc_stored_proc_call(sql); // converted to call sp_name(...)
 
-        String[] param_arr = Helpers.get_listed_items(param_descriptors);
+		} else if (is_stored_proc_call_shortcut(sql)) {
+			//
 
-        if (param_arr.length < 1) {
+		} else {
 
-            throw new Exception("Not empty list of parameters expected in ref shortcut");
-        }
+			throw new Exception("Unexpected syntax of CALL: " + jdbc_sql);
+		}
 
-        String params = param_arr[0] + "=?";
+		if (sql.contains("(")) {
 
-        for (int i = 1; i < param_arr.length; i++) {
+			if (!sql.endsWith(")")) {
 
-            params += " AND " + param_arr[i] + "=?";
-        }
+				throw new Exception("Unexpected syntax of CALL: " + jdbc_sql);
+			}
 
-        return "SELECT * FROM " + table_name + " WHERE " + params;
-    }
+			String[] parts = sql.split("[(]");
+
+			sql = parts[0].trim();
+		}
+
+		return sql;
+	}
+
+	/* private !!! internal !!! */ static String[] parse_sql_shortcut_ref(String ref) throws Exception {
+
+		String before_brackets;
+
+		String inside_brackets;
+
+		ref = ref.trim();
+
+		int pos = ref.indexOf('(');
+
+		if (pos == -1) {
+
+			throw new Exception("'(' expected in ref shortcut");
+
+		} else {
+
+			if (!ref.endsWith(")")) {
+
+				throw new Exception("')' expected in ref shortcut");
+			}
+
+			before_brackets = ref.substring(0, pos);
+
+			inside_brackets = ref.substring(before_brackets.length() + 1, ref.length() - 1);
+		}
+
+		return new String[] { before_brackets, inside_brackets };
+	}
+
+	private static String shortcut_ref_to_jdbc_sql(String ref) throws Exception {
+
+		String[] parts2 = parse_sql_shortcut_ref(ref);
+
+		String table_name = parts2[0];
+
+		// validate_table_name(table_name); // TODO: PostgreSQL JDBC prepareStatement
+		// passes wrong table names
+
+		String param_descriptors = parts2[1];
+
+		String[] param_arr = Helpers.get_listed_items(param_descriptors);
+
+		if (param_arr.length < 1) {
+
+			throw new Exception("Not empty list of parameters expected in ref shortcut");
+		}
+
+		String params = param_arr[0] + " = ?";
+
+		for (int i = 1; i < param_arr.length; i++) {
+
+			params += " AND " + param_arr[i] + " = ?";
+		}
+
+		return "SELECT * FROM " + table_name + " WHERE " + params;
+	}
 }

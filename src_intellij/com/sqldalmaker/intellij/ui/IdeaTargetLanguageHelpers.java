@@ -530,15 +530,14 @@ public class IdeaTargetLanguageHelpers {
 
         } else if (RootFileName.PYTHON.equals(fn)) {
 
-            if (output_dir_rel_path != null) {
+            String package_rel_path = settings.getFolders().getTarget();
 
-                String package_rel_path = settings.getFolders().getTarget();
+            if (output_dir_rel_path != null) {
 
                 output_dir_rel_path.append(package_rel_path);
             }
 
-            return new PythonCG.DAO(dto_classes, con,
-                    sql_root_abs_path, vm_file_system_path);
+            return new PythonCG.DAO(dto_classes, con, sql_root_abs_path, package_rel_path, vm_file_system_path);
 
         } else if (RootFileName.RUBY.equals(fn)) {
 

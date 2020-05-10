@@ -65,7 +65,7 @@ public class QueryMethodInfo {
 
         } else {
 
-            String jaxb_node_name = JaxbProcessor.get_jaxb_node_name(jaxb_query);
+            String jaxb_node_name = JaxbUtils.get_jaxb_node_name(jaxb_query);
 
             throw new Exception("Unexpected JAXB node: " + jaxb_node_name);
         }

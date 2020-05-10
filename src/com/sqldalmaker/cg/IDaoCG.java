@@ -28,12 +28,12 @@ public interface IDaoCG {
 	StringBuilder render_crud_create(String class_name, String method_name, String table_name, String dto_class_name,
 			boolean fetch_generated, String generated) throws Exception;
 
-	StringBuilder render_crud_read(String method_name, String table_name, String ret_dto_type,
-			String explicit_primary_keys, boolean fetch_list) throws Exception;
+	StringBuilder render_crud_read(String method_name, String dao_table_name, String dto_class_name,
+			String explicit_pk, boolean fetch_list) throws Exception;
 
-	StringBuilder render_crud_update(String class_name, String method_name, String table_name,
-			String explicit_primary_keys, String dto_class_name, boolean primitive_params) throws Exception;
+	StringBuilder render_crud_update(String class_name, String method_name, String dao_table_name,
+			String explicit_pk, String dto_class_name, boolean primitive_params) throws Exception;
 
 	StringBuilder render_crud_delete(String class_name, String method_name, String table_name,
-			String explicit_primary_keys, String dto_class_name) throws Exception;
+			String explicit_pk, String dto_class_name) throws Exception;
 }

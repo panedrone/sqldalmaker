@@ -2,24 +2,62 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1fb1c605-8c08-4b11-a01b-d42d0945087f" name="Default" comment="added option to exclude views in DTO/DAO assistants">
+      <change afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/JdbcUtils.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/org/apache/cayenne/dba/TypesMapping.README.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/org/apache/cayenne/dba/TypesMapping.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src_intellij/img/sqldalmaker.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src_intellij/img/sqldalmaker_13.gif" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/META-INF/MANIFEST.MF" beforeDir="false" afterPath="$PROJECT_DIR$/META-INF/MANIFEST.MF" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/META-INF/plugin.xml" beforeDir="false" afterPath="$PROJECT_DIR$/META-INF/plugin.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nbproject/genfiles.properties" beforeDir="false" afterPath="$PROJECT_DIR$/nbproject/genfiles.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nbproject/private/platform-private.properties" beforeDir="false" afterPath="$PROJECT_DIR$/nbproject/private/platform-private.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/manifest.mf" beforeDir="false" afterPath="$PROJECT_DIR$/manifest.mf" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/nbproject/private/private.xml" beforeDir="false" afterPath="$PROJECT_DIR$/nbproject/private/private.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/DbUtils.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/Helpers.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/Helpers.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/IDaoCG.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/IDaoCG.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/JaxbProcessor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/JaxbUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/QueryMethodInfo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/QueryMethodInfo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/SqlUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/SqlUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/cpp/CppCG.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/cpp/CppCG.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/cpp/cpp.vm" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/cpp/cpp.vm" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/java/JavaCG.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/java/JavaCG.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/java/java.vm" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/java/java.vm" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/php/PhpCG.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/php/PhpCG.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/php/php.vm" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/php/php.vm" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/python/PythonCG.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/python/PythonCG.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/python/python.vm" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/python/python.vm" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/ruby/RubyCG.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/ruby/RubyCG.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/ruby/ruby.vm" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/ruby/ruby.vm" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/common/Const.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/common/Const.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/NbpIdeEditorHelpers.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/NbpIdeEditorHelpers.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src_eclipse/com/sqldalmaker/eclipse/EclipseEditorHelpers.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_eclipse/com/sqldalmaker/eclipse/EclipseEditorHelpers.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/common/SdmUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/common/SdmUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/Bundle.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/Bundle.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/NbpTargetLanguageHelpers.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/NbpTargetLanguageHelpers.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/recent_changes.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/recent_changes.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/DataStore.STL.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/DataStore.STL.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/DataStore.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/DataStore.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/DataStore.java_" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/DataStore.java_" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/DataStore.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/DataStore.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/DataStore1.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/DataStore1.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/DataStore2.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/DataStore2.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/DataStoreManagerAndroid.java_" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/DataStoreManagerAndroid.java_" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/DataStoreManagerDbUtils.java_" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/DataStoreManagerDbUtils.java_" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/DataStoreManagerSpring.java_" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/DataStoreManagerSpring.java_" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/DataStore_Qt5.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/DataStore_Qt5.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/PDODataStore.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/PDODataStore.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/data_store.rb" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/data_store.rb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/settings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/settings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src_eclipse/com/sqldalmaker/eclipse/EclipseCrudXmlHelpers.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_eclipse/com/sqldalmaker/eclipse/EclipseCrudXmlHelpers.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src_eclipse/com/sqldalmaker/eclipse/EclipseTargetLanguageHelpers.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_eclipse/com/sqldalmaker/eclipse/EclipseTargetLanguageHelpers.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src_eclipse/com/sqldalmaker/eclipse/UIDialogSelectDbSchema.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_eclipse/com/sqldalmaker/eclipse/UIDialogSelectDbSchema.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/SdmActionGroup.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/SdmActionGroup.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/SdmPluginRegistration.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/CompletionProviderSql.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/CompletionProviderSql.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/CompletionProviderTable.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/CompletionProviderTable.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/PsiReferenceSql.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/PsiReferenceSql.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaCrudXmlHelpers.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaCrudXmlHelpers.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaEditorHelpers.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaEditorHelpers.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UIDialogSelectDbSchema.form" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UIDialogSelectDbSchema.form" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaTargetLanguageHelpers.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaTargetLanguageHelpers.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UIDialogSelectDbSchema.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UIDialogSelectDbSchema.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabDTO.java" afterDir="false" />
     </list>
     <list id="0b913ed8-6e39-405f-b29b-9d52c75467b5" name="Failed commit: Default" comment="" />
     <option name="SHOW_DIALOG" value="false" />
@@ -32,9 +70,6 @@
   </component>
   <component name="DefaultGradleProjectSettings">
     <option name="isMigrated" value="true" />
-  </component>
-  <component name="FavoritesManager">
-    <favorites_list name="com.sqldalmaker.plugins" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -58,7 +93,6 @@
   </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
-    <option name="showExcludedFiles" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
@@ -70,6 +104,7 @@
     <property name="MemberChooser.copyJavadoc" value="false" />
     <property name="MemberChooser.showClasses" value="true" />
     <property name="MemberChooser.sorted" value="false" />
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="UI_DESIGNER_EDITOR_MODE.PaletteManager.STATE" value="ToolWindow" />
@@ -79,18 +114,20 @@
     <property name="aspect.path.notification.shown" value="true" />
     <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1549569056154" />
     <property name="dynamic.classpath" value="false" />
+    <property name="last_directory_selection" value="$PROJECT_DIR$/src" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="options.lastSelected" value="project.propVCSSupport.Mappings" />
     <property name="options.splitter.details.proportions" value="0.2" />
     <property name="options.splitter.main.proportions" value="0.3" />
-    <property name="project.structure.last.edited" value="Libraries" />
+    <property name="project.structure.last.edited" value="Project" />
     <property name="project.structure.proportion" value="0.15" />
-    <property name="project.structure.side.proportion" value="0.36551723" />
+    <property name="project.structure.side.proportion" value="0.23590332" />
     <property name="recentsLimit" value="5" />
     <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\work\sqldalmaker\sqldalmaker-plugins\src_intellij\img" />
       <recent name="D:\work\com.sqldalmaker\com.sqldalmaker.plugins\src_common" />
       <recent name="D:\work\com.sqldalmaker\com.sqldalmaker.plugins\src_intellij" />
       <recent name="D:\work\com.sqldalmaker\com.sqldalmaker.plugins\src_common\com\sqldalmaker" />
@@ -124,8 +161,6 @@
       <option name="SKIP_NOOP_APK_INSTALLATIONS" value="true" />
       <option name="FORCE_STOP_RUNNING_APP" value="true" />
       <option name="TARGET_SELECTION_MODE" value="EMULATOR" />
-      <option name="USE_LAST_SELECTED_DEVICE" value="false" />
-      <option name="PREFERRED_AVD" value="" />
       <option name="DEBUGGER_TYPE" value="Java" />
       <Java />
       <Profilers>
@@ -141,18 +176,17 @@
     </configuration>
     <configuration default="true" type="AndroidTestRunConfigurationType" factoryName="Android Instrumented Tests">
       <option name="TESTING_TYPE" value="0" />
-      <option name="INSTRUMENTATION_RUNNER_CLASS" value="" />
       <option name="METHOD_NAME" value="" />
       <option name="CLASS_NAME" value="" />
       <option name="PACKAGE_NAME" value="" />
+      <option name="INSTRUMENTATION_RUNNER_CLASS" value="" />
       <option name="EXTRA_OPTIONS" value="" />
+      <option name="INCLUDE_GRADLE_EXTRA_OPTIONS" value="true" />
       <option name="CLEAR_LOGCAT" value="false" />
       <option name="SHOW_LOGCAT_AUTOMATICALLY" value="true" />
       <option name="SKIP_NOOP_APK_INSTALLATIONS" value="true" />
       <option name="FORCE_STOP_RUNNING_APP" value="true" />
       <option name="TARGET_SELECTION_MODE" value="EMULATOR" />
-      <option name="USE_LAST_SELECTED_DEVICE" value="false" />
-      <option name="PREFERRED_AVD" value="" />
       <option name="DEBUGGER_TYPE" value="Java" />
       <Java />
       <Profilers>
@@ -182,7 +216,7 @@
       <option name="JAR_PATH" value="$PROJECT_DIR$/com.sqldalmaker.intellij.jar" />
       <method v="2" />
     </configuration>
-    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType" factoryName="Kotlin script">
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
       <option name="filePath" />
       <option name="vmParameters" />
       <option name="alternativeJrePath" />
@@ -249,18 +283,6 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-  </component>
-  <component name="ServiceViewManager">
-    <option name="viewStates">
-      <list>
-        <serviceView>
-          <treeState>
-            <expand />
-            <select />
-          </treeState>
-        </serviceView>
-      </list>
-    </option>
   </component>
   <component name="SvnConfiguration" cleanupOnStartRun="true">
     <configuration>C:\Users\dron\AppData\Roaming\Subversion</configuration>
@@ -869,13 +891,12 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State>
-              <option name="COLUMN_ORDER" />
-            </State>
+            <State />
           </value>
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="Vcs.Log.UiProperties">
     <option name="RECENTLY_FILTERED_USER_GROUPS">
@@ -914,82 +935,114 @@
     <option name="LAST_COMMIT_MESSAGE" value="added option to exclude views in DTO/DAO assistants" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="552" y="185" key="#Inspections" timestamp="1578266083669">
+    <state x="552" y="165" key="#Plugins" timestamp="1589073860202">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state x="552" y="185" key="#Inspections/0.0.1920.1050@0.0.1920.1050" timestamp="1578266083669" />
-    <state x="552" y="185" width="816" height="727" key="#Intentions" timestamp="1577815677612">
+    <state x="552" y="165" key="#Plugins/0.0.1920.1050@0.0.1920.1050" timestamp="1589073860202" />
+    <state x="440" y="98" key="#Project_Structure" timestamp="1586644279678">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state x="552" y="185" width="816" height="727" key="#Intentions/0.0.1920.1050@0.0.1920.1050" timestamp="1577815677612" />
-    <state x="765" y="233" key="#com.intellij.ide.util.MemberChooser" timestamp="1578939087861">
-      <screen x="0" y="0" width="1920" height="1050" />
-    </state>
-    <state x="765" y="233" key="#com.intellij.ide.util.MemberChooser/0.0.1920.1050@0.0.1920.1050" timestamp="1578939087861" />
+    <state x="440" y="98" key="#Project_Structure/0.0.1920.1050@0.0.1920.1050" timestamp="1586644279678" />
     <state x="640" y="255" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog" timestamp="1586107425220">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
     <state x="640" y="255" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/0.0.1920.1050@0.0.1920.1050" timestamp="1586107425220" />
-    <state x="501" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1577881858977">
+    <state x="433" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1588698805855">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state x="501" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.0.1920.1050@0.0.1920.1050" timestamp="1577881858977" />
-    <state width="987" height="466" key="DebuggerActiveHint" timestamp="1586185326252">
+    <state x="433" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.0.1920.1050@0.0.1920.1050" timestamp="1588698805855" />
+    <state x="690" y="271" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1589070280405">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="987" height="466" key="DebuggerActiveHint/0.0.1920.1050@0.0.1920.1050" timestamp="1586185326252" />
-    <state x="740" y="281" key="FileChooserDialogImpl" timestamp="1586240252837">
+    <state x="690" y="271" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1920.1050@0.0.1920.1050" timestamp="1589070280405" />
+    <state x="690" y="271" key="#com.intellij.refactoring.typeMigration.ui.FailedConversionsDialog" timestamp="1588822208484">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state x="740" y="281" key="FileChooserDialogImpl/0.0.1920.1050@0.0.1920.1050" timestamp="1586240252837" />
-    <state width="923" height="185" key="GridCell.Tab.0.bottom" timestamp="1586214368655">
+    <state x="690" y="271" key="#com.intellij.refactoring.typeMigration.ui.FailedConversionsDialog/0.0.1920.1050@0.0.1920.1050" timestamp="1588822208484" />
+    <state x="598" y="122" key="CommitChangelistDialog2" timestamp="1589071516566">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="923" height="185" key="GridCell.Tab.0.bottom/0.0.1920.1050@0.0.1920.1050" timestamp="1586214368655" />
-    <state width="923" height="185" key="GridCell.Tab.0.center" timestamp="1586214368655">
+    <state x="598" y="122" key="CommitChangelistDialog2/0.0.1920.1050@0.0.1920.1050" timestamp="1589071516566" />
+    <state width="987" height="466" key="DebuggerActiveHint" timestamp="1589040710153">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="923" height="185" key="GridCell.Tab.0.center/0.0.1920.1050@0.0.1920.1050" timestamp="1586214368655" />
-    <state width="923" height="185" key="GridCell.Tab.0.left" timestamp="1586214368655">
+    <state width="987" height="466" key="DebuggerActiveHint/0.0.1920.1050@0.0.1920.1050" timestamp="1589040710153" />
+    <state x="92" y="92" width="1736" height="866" key="DiffContextDialog" timestamp="1589071514826">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="923" height="185" key="GridCell.Tab.0.left/0.0.1920.1050@0.0.1920.1050" timestamp="1586214368655" />
-    <state width="923" height="185" key="GridCell.Tab.0.right" timestamp="1586214368655">
+    <state x="92" y="92" width="1736" height="866" key="DiffContextDialog/0.0.1920.1050@0.0.1920.1050" timestamp="1589071514826" />
+    <state x="740" y="281" key="FileChooserDialogImpl" timestamp="1589073820323">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="923" height="185" key="GridCell.Tab.0.right/0.0.1920.1050@0.0.1920.1050" timestamp="1586214368655" />
-    <state width="923" height="185" key="GridCell.Tab.1.bottom" timestamp="1586214368665">
+    <state x="740" y="281" key="FileChooserDialogImpl/0.0.1920.1050@0.0.1920.1050" timestamp="1589073820323" />
+    <state width="1112" height="268" key="GridCell.Tab.0.bottom" timestamp="1589072731667">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="923" height="185" key="GridCell.Tab.1.bottom/0.0.1920.1050@0.0.1920.1050" timestamp="1586214368665" />
-    <state width="923" height="185" key="GridCell.Tab.1.center" timestamp="1586214368655">
+    <state width="1112" height="268" key="GridCell.Tab.0.bottom/0.0.1920.1050@0.0.1920.1050" timestamp="1589072731667" />
+    <state width="1112" height="268" key="GridCell.Tab.0.center" timestamp="1589072731667">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="923" height="185" key="GridCell.Tab.1.center/0.0.1920.1050@0.0.1920.1050" timestamp="1586214368655" />
-    <state width="923" height="185" key="GridCell.Tab.1.left" timestamp="1586214368655">
+    <state width="1112" height="268" key="GridCell.Tab.0.center/0.0.1920.1050@0.0.1920.1050" timestamp="1589072731667" />
+    <state width="1112" height="268" key="GridCell.Tab.0.left" timestamp="1589072731667">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="923" height="185" key="GridCell.Tab.1.left/0.0.1920.1050@0.0.1920.1050" timestamp="1586214368655" />
-    <state width="923" height="185" key="GridCell.Tab.1.right" timestamp="1586214368655">
+    <state width="1112" height="268" key="GridCell.Tab.0.left/0.0.1920.1050@0.0.1920.1050" timestamp="1589072731667" />
+    <state width="1112" height="268" key="GridCell.Tab.0.right" timestamp="1589072731667">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="923" height="185" key="GridCell.Tab.1.right/0.0.1920.1050@0.0.1920.1050" timestamp="1586214368655" />
-    <state x="440" y="101" key="SettingsEditor" timestamp="1586240260567">
+    <state width="1112" height="268" key="GridCell.Tab.0.right/0.0.1920.1050@0.0.1920.1050" timestamp="1589072731667" />
+    <state width="1112" height="268" key="GridCell.Tab.1.bottom" timestamp="1589072731496">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state x="440" y="101" key="SettingsEditor/0.0.1920.1050@0.0.1920.1050" timestamp="1586240260567" />
-    <state x="732" y="418" key="com.intellij.uiDesigner.propertyInspector.editors.string.StringEditorDialog" timestamp="1578233560423">
+    <state width="1112" height="268" key="GridCell.Tab.1.bottom/0.0.1920.1050@0.0.1920.1050" timestamp="1589072731496" />
+    <state width="1112" height="268" key="GridCell.Tab.1.center" timestamp="1589072731496">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state x="732" y="418" key="com.intellij.uiDesigner.propertyInspector.editors.string.StringEditorDialog/0.0.1920.1050@0.0.1920.1050" timestamp="1578233560423" />
-    <state x="667" y="281" width="585" height="488" key="find.popup" timestamp="1586184780248">
+    <state width="1112" height="268" key="GridCell.Tab.1.center/0.0.1920.1050@0.0.1920.1050" timestamp="1589072731496" />
+    <state width="1112" height="268" key="GridCell.Tab.1.left" timestamp="1589072731496">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state x="667" y="281" width="585" height="488" key="find.popup/0.0.1920.1050@0.0.1920.1050" timestamp="1586184780248" />
-    <state x="616" y="237" key="run.anything.popup" timestamp="1586184745965">
+    <state width="1112" height="268" key="GridCell.Tab.1.left/0.0.1920.1050@0.0.1920.1050" timestamp="1589072731496" />
+    <state width="1112" height="268" key="GridCell.Tab.1.right" timestamp="1589072731496">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state x="616" y="237" key="run.anything.popup/0.0.1920.1050@0.0.1920.1050" timestamp="1586184745965" />
+    <state width="1112" height="268" key="GridCell.Tab.1.right/0.0.1920.1050@0.0.1920.1050" timestamp="1589072731496" />
+    <state x="540" y="259" width="1139" height="650" key="IDE.errors.dialog" timestamp="1589045887864">
+      <screen x="0" y="0" width="1920" height="1050" />
+    </state>
+    <state x="540" y="259" width="1139" height="650" key="IDE.errors.dialog/0.0.1920.1050@0.0.1920.1050" timestamp="1589045887864" />
+    <state x="693" y="226" key="RollbackChangesDialog" timestamp="1589069973298">
+      <screen x="0" y="0" width="1920" height="1050" />
+    </state>
+    <state x="693" y="226" key="RollbackChangesDialog/0.0.1920.1050@0.0.1920.1050" timestamp="1589069973298" />
+    <state x="440" y="101" key="SettingsEditor" timestamp="1589073825293">
+      <screen x="0" y="0" width="1920" height="1050" />
+    </state>
+    <state x="440" y="101" key="SettingsEditor/0.0.1920.1050@0.0.1920.1050" timestamp="1589073825293" />
+    <state x="776" y="302" key="chooseDestDirectoryDialog" timestamp="1588406446535">
+      <screen x="0" y="0" width="1920" height="1050" />
+    </state>
+    <state x="776" y="302" key="chooseDestDirectoryDialog/0.0.1920.1050@0.0.1920.1050" timestamp="1588406446535" />
+    <state x="92" y="92" width="1736" height="866" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1589070328329">
+      <screen x="0" y="0" width="1920" height="1050" />
+    </state>
+    <state x="92" y="92" width="1736" height="866" key="com.intellij.history.integration.ui.views.FileHistoryDialog/0.0.1920.1050@0.0.1920.1050" timestamp="1589070328329" />
+    <state x="609" y="138" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser" timestamp="1588695522378">
+      <screen x="0" y="0" width="1920" height="1050" />
+    </state>
+    <state x="609" y="138" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser/0.0.1920.1050@0.0.1920.1050" timestamp="1588695522378" />
+    <state x="746" y="219" width="998" height="767" key="find.popup" timestamp="1589071024137">
+      <screen x="0" y="0" width="1920" height="1050" />
+    </state>
+    <state x="746" y="219" width="998" height="767" key="find.popup/0.0.1920.1050@0.0.1920.1050" timestamp="1589071024137" />
+    <state x="342" y="144" key="new project wizard" timestamp="1589043165550">
+      <screen x="0" y="0" width="1920" height="1050" />
+    </state>
+    <state x="342" y="144" key="new project wizard/0.0.1920.1050@0.0.1920.1050" timestamp="1589043165550" />
+    <state x="616" y="237" key="run.anything.popup" timestamp="1588856734688">
+      <screen x="0" y="0" width="1920" height="1050" />
+    </state>
+    <state x="616" y="237" key="run.anything.popup/0.0.1920.1050@0.0.1920.1050" timestamp="1588856734688" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

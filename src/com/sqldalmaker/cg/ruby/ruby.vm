@@ -31,13 +31,6 @@
 #if ($mode == "crud_sql_create")
 INSERT INTO $table_name (#foreach ($col in $col_names)#list_item($velocityCount $col)#end)
 VALUES (#foreach ($col in $col_names)#list_item($velocityCount "?")#end)
-#elseif ($mode == "crud_sql_read_all")
-SELECT *
-FROM $table_name
-#elseif ($mode == "crud_sql_read_single")
-SELECT *
-FROM $table_name
-WHERE #foreach ($key in $keys)#list_item_base($velocityCount "$key.getColumnName() = ?" " AND ")#end
 #elseif ($mode == "crud_sql_update")
 UPDATE $table_name SET
     #foreach ($param in $params)#list_item($velocityCount "$param.getColumnName() = ?")#end
@@ -48,7 +41,8 @@ DELETE FROM $table_name
 WHERE #foreach ($key in $keys)#list_item_base($velocityCount "$key.getColumnName() = ?" " AND ")#end
 ## ====================================================================================================================
 #elseif($mode=="dto_class")
-# ${class_name} is generated DTO class. Don't modify it manually.
+# ${class_name} is a generated DTO class. Don't modify it manually.
+# Visit http://sqldalmaker.sourceforge.net/ for details.
 
 class $class_name
 
@@ -67,7 +61,8 @@ class $class_name
 end
 ## ====================================================================================================================
 #elseif($mode=="dao_class")
-# ${class_name} is generated DAO class. Don't modify it manually.
+# ${class_name} is a generated DAO class. Don't modify it manually.
+# Visit http://sqldalmaker.sourceforge.net/ for details.
 
 #foreach($imp in $imports)
 require_relative './${imp}'

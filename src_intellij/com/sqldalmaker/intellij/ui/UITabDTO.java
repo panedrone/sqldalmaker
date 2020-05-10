@@ -11,7 +11,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.JBColor;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
-import com.sqldalmaker.cg.DbUtils;
 import com.sqldalmaker.cg.IDtoCG;
 import com.sqldalmaker.cg.SqlUtils;
 import com.sqldalmaker.common.Const;

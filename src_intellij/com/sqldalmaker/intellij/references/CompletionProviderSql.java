@@ -19,7 +19,6 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.xml.XmlAttribute;
 import com.intellij.psi.xml.XmlAttributeValue;
 import com.intellij.util.ProcessingContext;
-import com.sqldalmaker.cg.DbUtils;
 import com.sqldalmaker.cg.SqlUtils;
 import com.sqldalmaker.common.SdmUtils;
 import com.sqldalmaker.intellij.ui.IdeaHelpers;

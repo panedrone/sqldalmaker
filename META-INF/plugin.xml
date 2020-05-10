@@ -2,7 +2,7 @@
     <id>dal-mpe</id>
     <name>SQL DAL Maker</name>
     <category>Database</category>
-    <version>1.96.20200407</version>
+    <version>1.99.20200510</version>
     <vendor email="sqldalmaker@gmail.com"/>
     <!-- please see http://confluence.intellij.net/display/IDEADEV/Build+Number+Ranges for description -->
     <idea-version since-build="133.1885"/>
@@ -15,12 +15,10 @@ SQL DAL Maker is a generator of DTO and DAO classes to access relational databas
 To generate the class, you declare it in XML meta-program.<br/>
     ]]></description>
 
-    <change-notes><![CDATA[Added attribute 'pk' to define primary key manually in 'crud' and 'crud-auto']]></change-notes>
+<!--    <change-notes>-->
+<!--        <![CDATA[Added attribute 'pk' to define primary key manually in 'crud' and 'crud-auto']]></change-notes>-->
 
     <application-components>
-        <component>
-            <implementation-class>com.sqldalmaker.intellij.SdmPluginRegistration</implementation-class>
-        </component>
     </application-components>
 
     <project-components>
@@ -32,8 +30,9 @@ To generate the class, you declare it in XML meta-program.<br/>
     <actions>
 
         <group class="com.sqldalmaker.intellij.SdmActionGroup" id="SdmActionGroup" text="SQL DAL Maker Root-Files"
-               description="SQL DAL Maker Root-Files" icon="/img/sqldalmaker.gif" popup="true">
-
+               description="SQL DAL Maker Root-Files" icon="/img/sqldalmaker.png" popup="true">
+            <add-to-group group-id="ToolbarFindGroup" anchor="first"/>
+            <add-to-group group-id="FindMenuGroup" anchor="first"/>
         </group>
 
     </actions>

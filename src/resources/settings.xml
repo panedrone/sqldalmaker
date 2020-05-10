@@ -2,10 +2,10 @@
 <settings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:noNamespaceSchemaLocation="settings.xsd">
 
-    <!-- target: base folder of generated files (relative to the project root); -->
+    <!-- target: base path to the folder/package of generated files (relative to the project root); ensure presence of __init__.py for Python; -->
     <!-- sql: base folder of SQL files (relative to the project root); -->
 
-    <folders target="src" sql="sqldalmaker/sql" />
+    <folders target="src" sql="sqldalmaker/sql"/>
 
     <!-- scope: (only Java and PHP) package name of DTO classes for Java or 
     namespace name of DTO classes for PHP; -->
@@ -15,23 +15,23 @@
     <!-- field-names-mode: (only Java) 0 - as column names; 1 - lowerCamelCase; 
     2 - lower_case_underscores; -->
 
-    <dto scope="com.mycom.myproject.dto" inheritance="" field-names-mode="0" />
+    <dto scope="com.mycom.myproject.dto" inheritance="" field-names-mode="0"/>
 
     <!-- scope: (only Java and PHP) package name of DAO classes for Java or 
     namespace name of DAO classes for PHP; -->
 
-    <dao scope="com.mycom.myproject.dao" />
+    <dao scope="com.mycom.myproject.dao"/>
 
     <!-- path: location of external VM file (relative to the project root); -->
 
-    <external-vm-file path="" />
-        
+    <external-vm-file path=""/>
+
     <!-- IDE integration -->
 
     <ide event-log="true"/>
 
     <!-- class-prefix: prefix of generated C++ classes -->
-    
+
     <cpp class-prefix=""/>
 
     <!-- jar: location of JDBC driver JAR file (relative to the project root); -->
@@ -40,17 +40,17 @@
     <!-- user: user name; -->
     <!-- pwd: password; -->
 
-    <jdbc jar="lib/mysql-connector-java-5.1.22-bin.jar" class="com.mysql.jdbc.Driver" 
-          url="jdbc:mysql://localhost/orders" user="root" pwd="root" />
+    <jdbc jar="lib/mysql-connector-java-5.1.22-bin.jar" class="com.mysql.jdbc.Driver"
+          url="jdbc:mysql://localhost/orders" user="root" pwd="root"/>
 
     <!-- At the moment, type-map is used only for C++. For other target languages, 
     it can be removed. Below is an example for C++ and SQLite. -->
 
     <type-map default="CValue">
-        <type java="java.lang.Long" target="CLong" />
-        <type java="java.lang.Double" target="CDouble" />
-        <type java="java.lang.String" target="CText" />
-        <type java="byte[]" target="CBlob" />
+        <type java="java.lang.Long" target="CLong"/>
+        <type java="java.lang.Double" target="CDouble"/>
+        <type java="java.lang.String" target="CText"/>
+        <type java="byte[]" target="CBlob"/>
     </type-map>
 
 </settings>

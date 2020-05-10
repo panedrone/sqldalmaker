@@ -161,7 +161,7 @@ public class EclipseCrudXmlHelpers {
 							in_use = new HashSet<String>();
 						}
 
-						root = SdmUtils.create_crud_xml_DaoClass(object_factory, connection, in_use, schema_in_xml,
+						root = SdmUtils.create_crud_xml_jaxb_dao_class(object_factory, connection, in_use, schema_in_xml,
 								selected_schema, include_views, use_crud_auto, add_fk_access, plural_to_singular,
 								underscores_needed);
 

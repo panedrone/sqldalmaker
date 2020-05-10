@@ -10,11 +10,10 @@ import com.sqldalmaker.jaxb.settings.Type;
 import com.sqldalmaker.jaxb.settings.TypeMap;
 
 import java.io.*;
+import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author sqldalmaker@gmail.com
@@ -526,12 +525,39 @@ public class Helpers {
 		return jaxb_type_map.getDefault();
 	}
 
+    public static StringBuilder get_only_pk_warning(String method_name) {
+
+        // if all values of the table are the parts of PK,
+        // SQL will be invalid like ''UPDATE term_groups SET WHERE g_id
+        // = ? AND t_id = ?'
+        // (missing assignments between SET and WHERE)
+        //
+        String msg = Helpers.get_only_pk_message(method_name);
+        StringBuilder buffer = new StringBuilder();
+        Helpers.build_warning_comment(buffer, msg);
+        return buffer;
+    }
+
+    public static StringBuilder get_no_pk_warning(String method_name) {
+
+        String msg = Helpers.get_no_pk_message(method_name);
+        StringBuilder buffer = new StringBuilder();
+        Helpers.build_warning_comment(buffer, msg);
+        return buffer;
+    }
+
     public static void build_warning_comment(StringBuilder buffer, String msg) {
 
         String ls = System.getProperty("line.separator");
         buffer.append(ls);
         buffer.append(msg);
         buffer.append(ls);
+    }
+
+    public static void build_no_pk_warning(StringBuilder buffer, String method_name) {
+
+        String msg = Helpers.get_no_pk_message(method_name);
+        Helpers.build_warning_comment(buffer, msg);
     }
 
     public static String get_no_pk_message(String method_name) {
@@ -547,5 +573,81 @@ public class Helpers {
     public static String get_error_message(String msg, Throwable e) {
 
         return msg + " " + e.getMessage();
+    }
+
+    static void validate_java_type_name(final String java_type_name) throws Exception {
+
+        String type;
+
+        String[] arr_parts = java_type_name.split("\\[");
+
+        if (arr_parts.length == 2 && "]".equals(arr_parts[1].trim())) {
+
+            type = arr_parts[0].trim();
+
+        } else {
+
+            type = java_type_name;
+        }
+
+        try {
+
+            Helpers.process_java_type_name(type);
+
+        } catch (ClassNotFoundException e) {
+
+            String java_class_name2 = "java.lang." + type;
+
+            try {
+
+                Helpers.process_java_type_name(java_class_name2);
+
+            } catch (ClassNotFoundException e1) {
+
+                throw new Exception("Invalid type name: " + java_type_name);
+            }
+        }
+    }
+
+    static String[] parse_param_descriptor(String param_descriptor) {
+
+        String param_type_name;
+
+        String param_name;
+
+        String[] parts = param_descriptor.split("\\s+");
+
+        if (parts.length > 1) {
+
+            param_name = parts[parts.length - 1];
+
+            param_type_name = param_descriptor.substring(0, param_descriptor.length() - 1 - param_name.length()).trim();
+
+        } else {
+
+            param_name = param_descriptor;
+
+            param_type_name = null;
+        }
+
+        return new String[]{param_type_name, param_name};
+    }
+
+    static void check_duplicates(String[] param_names) throws SQLException {
+
+        if (param_names != null) {
+
+            Set<String> set = new HashSet<String>();
+
+            for (String param_name : param_names) {
+
+                if (set.contains(param_name)) {
+
+                    throw new SQLException("Duplicated parameter names");
+                }
+
+                set.add(param_name);
+            }
+        }
     }
 }

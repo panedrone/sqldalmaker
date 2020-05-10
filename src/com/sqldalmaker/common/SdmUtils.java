@@ -6,11 +6,10 @@
  */
 package com.sqldalmaker.common;
 
-import com.sqldalmaker.cg.DbUtils;
+import com.sqldalmaker.cg.JdbcUtils;
 import com.sqldalmaker.cg.FieldInfo;
 import com.sqldalmaker.cg.FieldNamesMode;
 import com.sqldalmaker.cg.Helpers;
-import com.sqldalmaker.cg.SqlUtils;
 import com.sqldalmaker.jaxb.dao.*;
 import com.sqldalmaker.jaxb.dto.DtoClass;
 import com.sqldalmaker.jaxb.dto.DtoClasses;
@@ -288,10 +287,11 @@ public class SdmUtils {
         return word;
     }
 
-    public static DaoClass create_crud_xml_DaoClass(com.sqldalmaker.jaxb.dao.ObjectFactory object_factory,
-            Connection connection, Set<String> in_use, boolean schema_in_xml, String selected_schema,
-            boolean include_views, boolean crud_auto, boolean add_fk_access, boolean plural_to_singular,
-            boolean underscores_needed) throws SQLException {
+    public static DaoClass create_crud_xml_jaxb_dao_class(com.sqldalmaker.jaxb.dao.ObjectFactory object_factory,
+                                                          Connection connection, Set<String> in_use, boolean schema_in_xml, String selected_schema,
+                                                          boolean include_views, boolean crud_auto,
+                                                          boolean add_fk_access, boolean plural_to_singular,
+                                                          boolean underscores_needed) throws SQLException {
 
         DaoClass root = object_factory.createDaoClass();
 
@@ -299,7 +299,7 @@ public class SdmUtils {
 
         DatabaseMetaData db_info = connection.getMetaData();
 
-        ResultSet rs = DbUtils.get_tables(connection, db_info, selected_schema, include_views);
+        ResultSet rs = JdbcUtils.get_tables_rs(connection, db_info, selected_schema, include_views);
 
         try {
 
@@ -411,7 +411,7 @@ public class SdmUtils {
 
         DatabaseMetaData db_info = conn.getMetaData();
 
-        ResultSet rs = DbUtils.get_tables(conn, db_info, selected_schema, /* include_views */ false); // no FK in views
+        ResultSet rs = JdbcUtils.get_tables_rs(conn, db_info, selected_schema, /* include_views */ false); // no FK in views
 
         try {
 
@@ -439,7 +439,7 @@ public class SdmUtils {
 
         DatabaseMetaData db_info = con.getMetaData();
 
-        ResultSet rs = DbUtils.get_tables(con, db_info, selected_schema, include_views);
+        ResultSet rs = JdbcUtils.get_tables_rs(con, db_info, selected_schema, include_views);
 
         try {
 
@@ -485,15 +485,13 @@ public class SdmUtils {
     }
 
     public static void gen_tmp_field_tags(Connection connection, com.sqldalmaker.jaxb.dto.ObjectFactory object_factory,
-            DtoClass dto_class, String sql_root_folder_full_path) throws Exception {
+            DtoClass dto_class, String sql_root_abs_path) throws Exception {
 
-        DbUtils db_utils = new DbUtils(connection, FieldNamesMode.AS_IS, null);
-
-        String jdbc_sql = SqlUtils.jdbc_sql_by_query_ref(dto_class.getRef(), sql_root_folder_full_path);
+        JdbcUtils db_utils = new JdbcUtils(connection, FieldNamesMode.AS_IS, null);
 
         ArrayList<FieldInfo> fields = new ArrayList<FieldInfo>();
 
-        db_utils.get_dto_field_info(jdbc_sql, dto_class, fields);
+        db_utils.get_dto_field_info(dto_class, sql_root_abs_path, fields);
 
         for (FieldInfo f : fields) {
 

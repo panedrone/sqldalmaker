@@ -236,16 +236,16 @@ public class EclipseTargetLanguageHelpers {
 
 		} else if (RootFileName.PYTHON.equals(fn)) {
 
-			if (output_dir != null) {
+			String rel_path = settings.getFolders().getTarget();
 
-				String rel_path = settings.getFolders().getTarget();
+			if (output_dir != null) {
 
 				String abs_path = EclipseHelpers.get_absolute_dir_path_str(project, rel_path);
 
 				output_dir.append(abs_path);
 			}
 
-			PythonCG.DAO gen = new PythonCG.DAO(dto_classes, conn, sql_root_abs_path, vm_file_system_path);
+			PythonCG.DAO gen = new PythonCG.DAO(dto_classes, conn, sql_root_abs_path, rel_path, vm_file_system_path);
 
 			return gen;
 
