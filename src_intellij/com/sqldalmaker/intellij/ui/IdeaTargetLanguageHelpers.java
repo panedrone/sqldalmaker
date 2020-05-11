@@ -59,7 +59,7 @@ public class IdeaTargetLanguageHelpers {
         consumer.consume(file_type, new ExactFileNameMatcher(RootFileName.RUBY));
     }
 
-    private static String get_unknown_root_file_msg(String fn) {
+    private static String _get_unknown_root_file_msg(String fn) {
 
         return "Unknown root file: " + fn;
     }
@@ -93,7 +93,7 @@ public class IdeaTargetLanguageHelpers {
 
         } else {
 
-            throw new Exception(get_unknown_root_file_msg(fn));
+            throw new Exception(_get_unknown_root_file_msg(fn));
         }
 
         IdeaEditorHelpers.open_module_file_in_editor(project, rel_path);
@@ -128,7 +128,7 @@ public class IdeaTargetLanguageHelpers {
 
         } else {
 
-            throw new Exception(get_unknown_root_file_msg(fn));
+            throw new Exception(_get_unknown_root_file_msg(fn));
         }
 
         IdeaHelpers.GeneratedFileData gf = new IdeaHelpers.GeneratedFileData();
@@ -182,7 +182,7 @@ public class IdeaTargetLanguageHelpers {
 
         } else {
 
-            throw new Exception(get_unknown_root_file_msg(fn));
+            throw new Exception(_get_unknown_root_file_msg(fn));
         }
 
         ////////////////////////////////
@@ -250,7 +250,7 @@ public class IdeaTargetLanguageHelpers {
 
         } else {
 
-            throw new Exception(get_unknown_root_file_msg(fn));
+            throw new Exception(_get_unknown_root_file_msg(fn));
         }
 
         String old_text = Helpers.load_text_from_file(file_name);
@@ -428,7 +428,7 @@ public class IdeaTargetLanguageHelpers {
 
         } else {
 
-            throw new Exception(get_unknown_root_file_msg(fn));
+            throw new Exception(_get_unknown_root_file_msg(fn));
         }
     }
 
@@ -552,7 +552,7 @@ public class IdeaTargetLanguageHelpers {
 
         } else {
 
-            throw new Exception(get_unknown_root_file_msg(fn));
+            throw new Exception(_get_unknown_root_file_msg(fn));
         }
     }
 }

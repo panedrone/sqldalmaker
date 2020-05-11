@@ -27,19 +27,7 @@ self#if($external_sql), sql#end, #end
 #end
 #end
 ## ====================================================================================================================
-#if ($mode == "crud_sql_create")
-INSERT INTO $table_name (#foreach ($col in $col_names)#list_item($velocityCount $col)#end)
-VALUES (#foreach ($col in $col_names)#list_item($velocityCount "?")#end)
-#elseif ($mode == "crud_sql_update")
-UPDATE $table_name SET
-    #foreach ($param in $params)#list_item($velocityCount "$param.getColumnName() = ?")#end
-
-WHERE #foreach ($key in $keys)#list_item_base($velocityCount "$key.getColumnName() = ?" " AND ")#end
-#elseif ($mode == "crud_sql_delete")
-DELETE FROM $table_name
-WHERE #foreach ($key in $keys)#list_item_base($velocityCount "$key.getColumnName() = ?" " AND ")#end
-## ====================================================================================================================
-#elseif($mode=="dto_class")
+#if ($mode=="dto_class")
 """
  ${class_name} is a generated DTO class. Don't modify it manually.
  Visit http://sqldalmaker.sourceforge.net/ for details.

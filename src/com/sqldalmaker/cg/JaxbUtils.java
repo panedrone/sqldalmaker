@@ -26,22 +26,6 @@ public class JaxbUtils {
 		return attr.name();
 	}
 
-	public static String get_jaxb_field_type_name(DtoClass jaxb_dto_class, String col_name) {
-
-		if (jaxb_dto_class != null && jaxb_dto_class.getField() != null) {
-
-			for (DtoClass.Field c : jaxb_dto_class.getField()) {
-
-				if (col_name.equals(c.getColumn())) {
-
-					return c.getJavaType();
-				}
-			}
-		}
-
-		return null;
-	}
-
 	public static DtoClass find_jaxb_dto_class(String dto_class_name, DtoClasses jaxb_dto_classes) throws Exception {
 
 		if (dto_class_name == null || dto_class_name.length() == 0) {
@@ -258,7 +242,7 @@ public class JaxbUtils {
 	}
 
 	private static boolean process_jaxb_crud_delete(IDaoCG dao_cg, TypeCrud jaxb_type_crud, String dto_class_name,
-			String table_name, String explicit_primary_keys, boolean lower_under_scores, StringBuilder code_buff)
+			String table_name, String explicit_pk, boolean lower_under_scores, StringBuilder code_buff)
 			throws Exception {
 
 		String method_name = null;
@@ -285,8 +269,7 @@ public class JaxbUtils {
 			method_name = Helpers.camel_case_to_lower_under_scores(method_name);
 		}
 
-		StringBuilder tmp = dao_cg.render_crud_delete(null, method_name, table_name, explicit_primary_keys,
-				dto_class_name);
+		StringBuilder tmp = dao_cg.render_crud_delete(null, method_name, table_name, explicit_pk);
 
 		code_buff.append(tmp);
 

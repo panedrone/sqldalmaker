@@ -35,5 +35,5 @@ public interface IDaoCG {
 			String explicit_pk, String dto_class_name, boolean primitive_params) throws Exception;
 
 	StringBuilder render_crud_delete(String class_name, String method_name, String table_name,
-			String explicit_pk, String dto_class_name) throws Exception;
+			String explicit_pk) throws Exception;
 }

@@ -650,4 +650,12 @@ public class Helpers {
             }
         }
     }
+
+    public static void check_required_attr(String node_name, String method_name_attr) throws Exception {
+
+        if (method_name_attr == null || method_name_attr.length() == 0) {
+
+            throw new Exception("<" + node_name + "...\n'method' is not set.");
+        }
+    }
 }

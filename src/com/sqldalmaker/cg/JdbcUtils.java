@@ -18,1175 +18,1099 @@ import java.util.*;
  */
 public class JdbcUtils {
 
-    private final Connection conn;
+	private final Connection conn;
 
-    private final FieldNamesMode field_names_mode;
+	private final FieldNamesMode field_names_mode;
 
-    private final TypeMap type_map;
+	private final TypeMap type_map;
 
-    public JdbcUtils(Connection conn, FieldNamesMode field_names_mode, TypeMap type_map) {
+	public JdbcUtils(Connection conn, FieldNamesMode field_names_mode, TypeMap type_map) {
 
-        this.conn = conn;
+		this.conn = conn;
 
-        this.field_names_mode = field_names_mode;
+		this.field_names_mode = field_names_mode;
 
-        this.type_map = type_map;
-    }
+		this.type_map = type_map;
+	}
 
-    private static String _get_column_name(ResultSetMetaData meta, int col) throws Exception {
+	private static String _get_column_name(ResultSetMetaData meta, int col) throws Exception {
 
-        // H2: col. names are duplicated for SQL like'SELECT a as a1, a as a2 FROM...'
-        //
-        String column_name;
+		// H2: col. names are duplicated for SQL like'SELECT a as a1, a as a2 FROM...'
+		//
+		String column_name;
 
-        try {
+		try {
 
-            column_name = meta.getColumnLabel(col);
+			column_name = meta.getColumnLabel(col);
 
-        } catch (SQLException e) {
+		} catch (SQLException e) {
 
-            column_name = null;
-        }
+			column_name = null;
+		}
 
-        if (null == column_name || 0 == column_name.length()) {
+		if (null == column_name || 0 == column_name.length()) {
 
-            column_name = meta.getColumnName(col);
-        }
+			column_name = meta.getColumnName(col);
+		}
 
-        if (null == column_name || 0 == column_name.length()) {
+		if (null == column_name || 0 == column_name.length()) {
 
-            throw new Exception(
-                    "Column name cannot be detected. Try to specify column label. For example, 'SELECT COUNT(*) AS RES...'");
-        }
+			throw new Exception(
+					"Column name cannot be detected. Try to specify column label. For example, 'SELECT COUNT(*) AS RES...'");
+		}
 
-        return column_name;
-    }
+		return column_name;
+	}
 
-    public void validate_table_name(String table_name) throws SQLException {
+	public void validate_table_name(String table_name) throws SQLException {
 
-        DatabaseMetaData db_info = conn.getMetaData();
+		DatabaseMetaData db_info = conn.getMetaData();
 
-        String schema = null;
+		String schema = null;
 
-        if (table_name.contains(".")) {
+		if (table_name.contains(".")) {
 
-            String[] parts = table_name.split("\\.");
+			String[] parts = table_name.split("\\.");
 
-            if (parts.length != 2) {
+			if (parts.length != 2) {
 
-                throw new SQLException("Invalid table name: '" + table_name + "'");
-            }
+				throw new SQLException("Invalid table name: '" + table_name + "'");
+			}
 
-            schema = parts[0];
+			schema = parts[0];
 
-            table_name = parts[1];
-        }
+			table_name = parts[1];
+		}
 
-        ResultSet rs = db_info.getTables(null, schema, table_name, null);
+		ResultSet rs = db_info.getTables(null, schema, table_name, null);
 
-        try {
+		try {
 
-            if (rs.next()) {
+			if (rs.next()) {
 
-                return;
-            }
+				return;
+			}
 
-        } finally {
+		} finally {
 
-            rs.close();
-        }
+			rs.close();
+		}
 
-        throw new SQLException("Data table '" + table_name + "' not found. Table names may be case sensitive.");
-    }
+		throw new SQLException("Data table '" + table_name + "' not found. Table names may be case sensitive.");
+	}
 
-    public void validate_jdbc_sql(StringBuilder jdbc_sql_buf) throws SQLException {
+	public void validate_jdbc_sql(StringBuilder jdbc_sql_buf) throws SQLException {
 
-        // CDRU SQL statements cannot be generated for the tables where all
-        // columns are parts of PK
-        //
-        PreparedStatement s = _prepare_jdbc_sql(jdbc_sql_buf.toString());
+		// CDRU SQL statements cannot be generated for the tables where all
+		// columns are parts of PK
+		//
+		PreparedStatement s = _prepare_jdbc_sql(jdbc_sql_buf.toString());
 
-        s.close();
-    }
+		if (s != null) {
 
-    private PreparedStatement _prepare_by_table_name(String table_name) throws SQLException {
+			s.close();
+		}
+	}
 
-        return conn.prepareStatement("SELECT * FROM " + table_name + " WHERE 1 = 0");
-    }
+	private PreparedStatement _prepare_by_table_name(String table_name) throws SQLException {
 
-    private PreparedStatement _prepare_jdbc_sql(String jdbc_sql) throws SQLException {
+		return conn.prepareStatement("select * from " + table_name + " where 1 = 0");
+	}
 
-        boolean is_sp = SqlUtils.is_jdbc_stored_proc_call(jdbc_sql);
+	private PreparedStatement _prepare_jdbc_sql(String jdbc_sql) throws SQLException {
 
-        if (is_sp) {
+		boolean is_sp = SqlUtils.is_jdbc_stored_proc_call(jdbc_sql);
 
-            return conn.prepareCall(jdbc_sql);
+		if (is_sp) {
 
-        } else {
+			return conn.prepareCall(jdbc_sql);
 
-            // For MySQL, prepareStatement doesn't throw Exception for
-            // invalid SQL statements
-            // and doesn't return null as well
-            //
-            return conn.prepareStatement(jdbc_sql);
-        }
-    }
+		} else {
 
-    private static String _get_column_type_name(ResultSetMetaData rsmd, int i) {
+			// For MySQL, prepareStatement doesn't throw Exception for
+			// invalid SQL statements
+			// and doesn't return null as well
+			//
+			return conn.prepareStatement(jdbc_sql);
+		}
+	}
 
-        try {
+	private static String _get_column_type_name(ResultSetMetaData rsmd, int i) {
 
-            // sometime returns "[B":
-            // See comments for Class.getName() API
-            //
-            String java_class_name = rsmd.getColumnClassName(i);
+		try {
 
-            return Helpers.process_java_type_name(java_class_name);
+			// sometime returns "[B":
+			// See comments for Class.getName() API
+			//
+			String java_class_name = rsmd.getColumnClassName(i);
 
-        } catch (Exception ex) {
+			return Helpers.process_java_type_name(java_class_name);
 
-            return Object.class.getName();
-        }
-    }
+		} catch (Exception ex) {
 
-    private static String _get_param_type_name(ParameterMetaData pm, int i) {
+			return Object.class.getName();
+		}
+	}
 
-        String java_class_name;
+	private static String _get_param_type_name(ParameterMetaData pm, int i) {
 
-        try {
+		String java_class_name;
 
-            // getParameterClassName throws exception in
-            // mysql-connector-java-5.1.17-bin.jar:
-            // sometime returns "[B":
-            // See comments for Class.getName() API
-            //
-            java_class_name = pm.getParameterClassName(i + 1);
+		try {
 
-            java_class_name = Helpers.process_java_type_name(java_class_name);
+			// getParameterClassName throws exception in
+			// mysql-connector-java-5.1.17-bin.jar:
+			// sometime returns "[B":
+			// See comments for Class.getName() API
+			//
+			java_class_name = pm.getParameterClassName(i + 1);
 
-        } catch (Exception ex) {
+			java_class_name = Helpers.process_java_type_name(java_class_name);
 
-            java_class_name = Object.class.getName();
-        }
+		} catch (Exception ex) {
 
-        return java_class_name;
-    }
+			java_class_name = Object.class.getName();
+		}
 
-    public void _get_table_fields(
-            final String table_name, List<FieldInfo> all_fields,
-            List<FieldInfo> not_pk_fields, String explicit_pk, List<FieldInfo> pk_fields) throws Exception {
+		return java_class_name;
+	}
 
-        if (all_fields != null) {
-            all_fields.clear();
-        }
+	private Map<String, FieldInfo> _get_table_field_info(final String table_name, List<FieldInfo> fields_all,
+			List<FieldInfo> not_fields_pk, String explicit_pk, List<FieldInfo> fields_pk) throws Exception {
 
-        if (not_pk_fields != null) {
-            not_pk_fields.clear();
-        }
+		if (fields_all != null) {
 
-        if (pk_fields != null) {
-            pk_fields.clear();
-        }
+			fields_all.clear();
+		}
 
-        //////////////////////////////////////////////////////////
-        //
-        Set<String> pk_col_names_set_lower_case;
+		if (not_fields_pk != null) {
 
-        if ("*".equals(explicit_pk)) {
+			not_fields_pk.clear();
+		}
 
-            List<String> pk_col_names = new ArrayList<String>();
+		if (fields_pk != null) {
 
-            pk_col_names_set_lower_case = new HashSet<String>();
+			fields_pk.clear();
+		}
 
-            // DatabaseMetaData.getPrimaryKeys returns pk_col_names in lower case. For other
-            // JDBC drivers, it may differ. To ensure correct comparison of field names, do
-            // it always in lower case
-            //
-            DatabaseMetaData db_info = conn.getMetaData();
+		//////////////////////////////////////////////////////////
+		//
+		Set<String> pk_col_names_set_lower_case;
 
-            ResultSet rs;
+		if ("*".equals(explicit_pk)) {
 
-            if (table_name.contains(".")) {
+			List<String> pk_col_names = new ArrayList<String>();
 
-                String[] parts = table_name.split("\\.");
+			pk_col_names_set_lower_case = new HashSet<String>();
 
-                if (parts.length != 2) {
+			// DatabaseMetaData.getPrimaryKeys returns pk_col_names in lower case. For other
+			// JDBC drivers, it may differ. To ensure correct comparison of field names, do
+			// it always in lower case
+			//
+			DatabaseMetaData db_info = conn.getMetaData();
 
-                    throw new SQLException("Invalid table name: '" + table_name + "'");
-                }
+			ResultSet rs;
 
-                rs = db_info.getPrimaryKeys(null, parts[0], parts[1]);
+			if (table_name.contains(".")) {
 
-            } else {
+				String[] parts = table_name.split("\\.");
 
-                rs = db_info.getPrimaryKeys(null, null, table_name);
-            }
+				if (parts.length != 2) {
 
-            try {
+					throw new SQLException("Invalid table name: '" + table_name + "'");
+				}
 
-                while (rs.next()) {
+				rs = db_info.getPrimaryKeys(null, parts[0], parts[1]);
 
-                    pk_col_names.add(rs.getString("COLUMN_NAME"));
-                }
+			} else {
 
-            } finally {
+				rs = db_info.getPrimaryKeys(null, null, table_name);
+			}
 
-                rs.close();
-            }
+			try {
 
-            /*
-             * DatabaseMetaData.getPrimaryKeys may return pk_col_names in lower case
-             * (SQLite3). For other JDBC drivers, it may differ. To ensure correct
-             * comparison of field names, do it always in lower case
-             */
-            for (String pk_col_name : pk_col_names) {
+				while (rs.next()) {
 
-                // xerial SQLite3 returns pk_col_names in the format '[employeeid] asc'
-                // (compound PK)
-                //
-                pk_col_name = pk_col_name.toLowerCase();
+					pk_col_names.add(rs.getString("COLUMN_NAME"));
+				}
 
-                pk_col_name = pk_col_name.replace("[", "");
+			} finally {
 
-                pk_col_name = pk_col_name.replace("]", "");
+				rs.close();
+			}
 
-                if (pk_col_name.endsWith(" asc")) {
+			/*
+			 * DatabaseMetaData.getPrimaryKeys may return pk_col_names in lower case
+			 * (SQLite3). For other JDBC drivers, it may differ. To ensure correct
+			 * comparison of field names, do it always in lower case
+			 */
+			for (String pk_col_name : pk_col_names) {
 
-                    pk_col_name = pk_col_name.replace(" asc", "");
-                }
+				// xerial SQLite3 returns pk_col_names in the format '[employeeid] asc'
+				// (compound PK)
+				//
+				pk_col_name = pk_col_name.toLowerCase();
 
-                if (pk_col_name.endsWith(" desc")) {
+				pk_col_name = pk_col_name.replace("[", "");
 
-                    pk_col_name = pk_col_name.replace(" desc", "");
-                }
+				pk_col_name = pk_col_name.replace("]", "");
 
-                pk_col_name = pk_col_name.trim();
+				if (pk_col_name.endsWith(" asc")) {
 
-                pk_col_names_set_lower_case.add(pk_col_name);
-            }
+					pk_col_name = pk_col_name.replace(" asc", "");
+				}
 
-        } else { // if PK are specified explicitely, don't use getPrimaryKeys at all
+				if (pk_col_name.endsWith(" desc")) {
 
-            String[] gen_keys_arr = Helpers.get_listed_items(explicit_pk);
+					pk_col_name = pk_col_name.replace(" desc", "");
+				}
 
-            Helpers.check_duplicates(gen_keys_arr);
+				pk_col_name = pk_col_name.trim();
 
-            for (int i = 0; i < gen_keys_arr.length; i++) {
+				pk_col_names_set_lower_case.add(pk_col_name);
+			}
 
-                gen_keys_arr[i] = gen_keys_arr[i].toLowerCase();
-            }
+		} else { // if PK are specified explicitely, don't use getPrimaryKeys at all
 
-            pk_col_names_set_lower_case = new HashSet<String>(Arrays.asList(gen_keys_arr));
-        }
+			String[] gen_keys_arr = Helpers.get_listed_items(explicit_pk);
 
-        Map<String, FieldInfo> fields_map = new HashMap<String, FieldInfo>();
+			Helpers.check_duplicates(gen_keys_arr);
 
-        PreparedStatement ps = _prepare_by_table_name(table_name);
+			for (int i = 0; i < gen_keys_arr.length; i++) {
 
-        try {
+				gen_keys_arr[i] = gen_keys_arr[i].toLowerCase();
+			}
 
-            ResultSetMetaData meta = ps.getMetaData();
+			pk_col_names_set_lower_case = new HashSet<String>(Arrays.asList(gen_keys_arr));
+		}
 
-            if (meta == null) {
+		Map<String, FieldInfo> fields_map = new HashMap<String, FieldInfo>();
 
-                // jTDS returns null for invalid SQL
-                throw new SQLException("PreparedStatement.getMetaData returns null for '" + table_name + "");
-            }
+		PreparedStatement ps = _prepare_by_table_name(table_name);
 
-            int column_count = meta.getColumnCount();
+		try {
 
-            for (int i = 1; i <= column_count; i++) {
+			ResultSetMetaData meta = ps.getMetaData();
 
-                String col_name = _get_column_name(meta, i);
+			if (meta == null) {
 
-                String type_name = _get_column_type_name(meta, i);
+				// jTDS returns null for invalid SQL
+				throw new SQLException("PreparedStatement.getMetaData returns null for '" + table_name + "");
+			}
 
-                if (type_map != null) {
+			int column_count = meta.getColumnCount();
 
-                    type_name = Helpers.get_cpp_class_name_from_java_class_name(type_map, type_name);
-                }
+			for (int i = 1; i <= column_count; i++) {
 
-                FieldInfo fi = new FieldInfo(field_names_mode, type_name, col_name);
+				String col_name = _get_column_name(meta, i);
 
-                if (pk_col_names_set_lower_case.contains(col_name.toLowerCase())) {
+				String type_name = _get_column_type_name(meta, i);
 
-                    pk_fields.add(fi);
+				if (type_map != null) {
 
-                } else {
+					type_name = Helpers.get_cpp_class_name_from_java_class_name(type_map, type_name);
+				}
 
-                    if (not_pk_fields != null) {
+				FieldInfo fi = new FieldInfo(field_names_mode, type_name, col_name);
 
-                        not_pk_fields.add(fi);
-                    }
-                }
+				fi.setAutoIncrement(meta.isAutoIncrement(i));
 
-                if (all_fields != null) {
+				if (pk_col_names_set_lower_case.contains(col_name.toLowerCase())) {
 
-                    all_fields.add(fi);
-                }
+					if (fields_pk != null) {
 
-                fields_map.put(col_name, fi);
-            }
+						fields_pk.add(fi);
+					}
 
-        } finally {
+				} else {
 
-            ps.close();
-        }
+					if (not_fields_pk != null) {
 
-        _refine_fields_by_table_metadata(table_name, fields_map);
-    }
+						not_fields_pk.add(fi);
+					}
+				}
 
-    public void get_dao_crud_info(
-            final DtoClass jaxb_dto_class, final String dao_jdbc_sql, final String dao_table_name,
-            List<String> dao_table_key_col_names, List<FieldInfo> fields, List<FieldInfo> params) throws Exception {
+				if (fields_all != null) {
 
-        fields.clear();
+					fields_all.add(fi);
+				}
 
-        params.clear();
+				fields_map.put(col_name, fi);
+			}
 
-        // [col_name] -- [java-type]
-        Map<String, String> explicit_dto_col_types = new HashMap<String, String>();
+		} finally {
 
-        for (DtoClass.Field field : jaxb_dto_class.getField()) {
+			ps.close();
+		}
 
-            explicit_dto_col_types.put(field.getColumn(), field.getJavaType());
-        }
+		_refine_fields_by_table_metadata(table_name, fields_map);
 
-        List<String> dao_table_col_names = new ArrayList<String>();
+		return fields_map;
+	}
 
-        Map<String, String> dao_table_col_types = new HashMap<String, String>();
+	private void _get_fields_map_by_jdbc_sql(String jdbc_sql, Map<String, FieldInfo> fields_map, List<FieldInfo> fields)
+			throws Exception {
 
-        PreparedStatement ps = conn.prepareStatement(dao_jdbc_sql);
+		fields.clear();
 
-        try {
+		fields_map.clear();
 
-            ResultSetMetaData rsmd = ps.getMetaData();
+		PreparedStatement ps = _prepare_jdbc_sql(jdbc_sql);
 
-            int column_count = rsmd.getColumnCount();
+		try {
 
-            for (int i = 1; i <= column_count; i++) {
+			ResultSetMetaData rsmd = ps.getMetaData();
 
-                String col_name = rsmd.getColumnName(i);
+			int column_count = rsmd.getColumnCount();
 
-                dao_table_col_names.add(col_name);
+			for (int i = 1; i <= column_count; i++) {
 
-                dao_table_col_types.put(col_name, rsmd.getColumnClassName(i));
-            }
+				String col_name = _get_column_name(rsmd, i);
 
-        } finally {
+				// considers "[B", etc.
+				//
+				String java_type_name = _get_column_type_name(rsmd, i);
 
-            ps.close();
-        }
+				FieldInfo field = new FieldInfo(field_names_mode, java_type_name, col_name);
 
-        // [col_name] -- [java-type]
-        Map<String, String> final_col_types = new HashMap<String, String>();
+				if (rsmd.isAutoIncrement(i)) {
 
-        String[] parts = dao_table_name.split("\\.", -1); // -1 to leave empty strings
+					field.setAutoIncrement(true);
 
-        String schema_name = null;
+				} else {
 
-        String table_name;
+					field.setAutoIncrement(false);
+				}
 
-        if (parts.length == 1) {
+				fields_map.put(col_name, field);
 
-            table_name = dao_table_name;
+				fields.add(field);
+			}
 
-        } else {
+		} finally {
 
-            table_name = parts[parts.length - 1];
+			ps.close();
+		}
+	}
 
-            schema_name = dao_table_name.substring(0, dao_table_name.lastIndexOf('.'));
-        }
+	private Map<String, FieldInfo> _get_dto_class_field_info(DtoClass jaxb_dto_class, String sql_root_abs_path,
+			List<FieldInfo> fields) throws Exception {
 
-        DatabaseMetaData md = conn.getMetaData();
+		fields.clear();
 
-        // !!! DatabaseMetaData.getColumns may return system fields!!!
-        ResultSet rs_columns = md.getColumns(null, schema_name, table_name, "%");
+		Map<String, FieldInfo> fields_map = new HashMap<String, FieldInfo>();
 
-        try {
+		String dto_ref = jaxb_dto_class.getRef();
 
-            while (rs_columns.next()) {
+		if (!SqlUtils.is_empty_ref(dto_ref)) {
 
-                String col_name = rs_columns.getString("COLUMN_NAME");
+			String jdbc_sql = SqlUtils.jdbc_sql_by_dto_class_ref(dto_ref, sql_root_abs_path);
 
-                if (explicit_dto_col_types.containsKey(col_name)) {
+			_get_fields_map_by_jdbc_sql(jdbc_sql, fields_map, fields);
 
-                    String java_type_name = explicit_dto_col_types.get(col_name);
+			if (SqlUtils.is_table_ref(dto_ref)) {
 
-                    final_col_types.put(col_name, java_type_name);
+				_refine_fields_by_table_metadata(dto_ref, fields_map);
 
-                } else if (dao_table_col_types.containsKey(col_name)) {
+			} else if (SqlUtils.is_sql_shortcut_ref(dto_ref)) {
 
-                    int type = rs_columns.getInt("DATA_TYPE");
+				String[] parts = SqlUtils.parse_sql_shortcut_ref(dto_ref);
 
-                    String java_type_name = TypesMapping.getJavaBySqlType(type);
+				String table_name = parts[0];
 
-                    final_col_types.put(col_name, java_type_name);
-                }
-            }
+				// obtain fields the same way like in the case of table. params will be obtained
+				// from DAO SQL.
+				// params are obtained below (considering DAO SQL and method_param_descriptors)
+				//
+				_refine_fields_by_table_metadata(table_name, fields_map);
+			}
+		}
 
-            if (final_col_types.size() == 0) {
+		_refine_field_info_by_jaxb_explicit_fields(jaxb_dto_class.getField(), fields_map, fields);
 
-                throw new Exception("Cannnot detect columns for '" + dao_table_name
-                        + "'. Check the name of table (e.g. lower/upper case).");
-            }
+		if (type_map != null) {
 
-        } finally {
+			for (FieldInfo fi : fields) {
 
-            rs_columns.close();
-        }
+				fi.setType(Helpers.get_cpp_class_name_from_java_class_name(type_map, fi.getType()));
+			}
+		}
 
-        ////////////////////////////////////////////////
-        //
-        for (String col_name : dao_table_col_names) {
+		return fields_map;
+	}
 
-            String java_type_name = final_col_types.get(col_name);
+	private void _refine_field_info_by_jaxb_explicit_fields(List<DtoClass.Field> jaxb_explicit_fields,
+			Map<String, FieldInfo> fields_map, List<FieldInfo> fields) {
 
-            if (java_type_name == null) {
+		if (jaxb_explicit_fields == null) {
 
-                throw new Exception("Column '" + col_name + "' not found. Ensure lower/upper case.");
-            }
+			return;
+		}
 
-            fields.add(new FieldInfo(field_names_mode, java_type_name, col_name));
-        }
+		for (DtoClass.Field jaxb_explicit_field : jaxb_explicit_fields) {
 
-        for (String col_name : dao_table_key_col_names) {
+			String col_name = jaxb_explicit_field.getColumn();
 
-            String java_type_name = final_col_types.get(col_name);
+			String java_type_name = jaxb_explicit_field.getJavaType();
 
-            if (java_type_name == null) {
+			if (fields_map.containsKey(col_name)) {
 
-                throw new Exception("Key column '" + col_name + "' not found. Ensure lower/upper case.");
-            }
+				fields_map.get(col_name).setType(java_type_name);
 
-            params.add(new FieldInfo(field_names_mode, java_type_name, col_name));
-        }
-    }
+			} else {
 
-    private void _get_fields_map_by_jdbc_sql(String jdbc_sql, Map<String, FieldInfo> fields_map, List<FieldInfo> fields) throws Exception {
+				FieldInfo explicit_field = new FieldInfo(field_names_mode, java_type_name, col_name);
 
-        fields.clear();
+				fields.add(explicit_field);
 
-        fields_map.clear();
+				fields_map.put(col_name, explicit_field);
+			}
+		}
+	}
 
-        PreparedStatement ps = _prepare_jdbc_sql(jdbc_sql);
+	private void _refine_fields_by_table_metadata(final String table_name, Map<String, FieldInfo> fields_map)
+			throws Exception {
 
-        try {
+		if (!SqlUtils.is_table_ref(table_name)) {
 
-            ResultSetMetaData rsmd = ps.getMetaData();
+			throw new Exception("Table name expected: " + table_name);
+		}
 
-            int column_count = rsmd.getColumnCount();
+		DatabaseMetaData md = conn.getMetaData();
 
-            for (int i = 1; i <= column_count; i++) {
+		String[] parts = table_name.split("\\.", -1); // -1 to leave empty strings
 
-                String col_name = _get_column_name(rsmd, i);
+		ResultSet rs_columns;
 
-                // considers "[B", etc.
-                //
-                String java_type_name = _get_column_type_name(rsmd, i);
+		if (parts.length == 1) {
 
-                FieldInfo field = new FieldInfo(field_names_mode, java_type_name, col_name);
+			rs_columns = md.getColumns(null, null, table_name, "%");
 
-                if (rsmd.isAutoIncrement(i)) {
+		} else {
 
-                    field.setAutoIncrement(true);
+			String schema_nm = table_name.substring(0, table_name.lastIndexOf('.'));
 
-                } else {
+			String table_nm = parts[parts.length - 1];
 
-                    field.setAutoIncrement(false);
-                }
+			rs_columns = md.getColumns(null, schema_nm, table_nm, "%");
+		}
 
-                fields_map.put(col_name, field);
+		try {
 
-                fields.add(field);
-            }
+			while (rs_columns.next()) {
 
-        } finally {
+				String col_name = rs_columns.getString("COLUMN_NAME");
 
-            ps.close();
-        }
-    }
+				if (fields_map.containsKey(col_name)) {
 
-    private void _get_dto_class_field_info(
-            DtoClass jaxb_dto_class, String sql_root_abs_path,
-            Map<String, FieldInfo> fields_map, List<FieldInfo> fields) throws Exception {
+					int type = rs_columns.getInt("DATA_TYPE");
 
-        fields.clear();
+					String java_type_name = TypesMapping.getJavaBySqlType(type);
 
-        fields_map.clear();
+					fields_map.get(col_name).setType(java_type_name);
+				}
+			}
 
-        String dto_ref = jaxb_dto_class.getRef();
+		} finally {
 
-        if (!SqlUtils.is_empty_ref(dto_ref)) {
+			rs_columns.close();
+		}
+	}
 
-            String jdbc_sql = SqlUtils.jdbc_sql_by_dto_class_ref(dto_ref, sql_root_abs_path);
+	private void _get_fields_info(PreparedStatement ps, List<FieldInfo> fields) throws Exception {
 
-            _get_fields_map_by_jdbc_sql(jdbc_sql, fields_map, fields);
+		fields.clear();
 
-            if (SqlUtils.is_table_ref(dto_ref)) {
+		// PostgreSQL:
+		// Initial SQL is '{call get_tests(4)}'; ps is CallableStatement.
+		// ps.toString() returns something like 'select * from get_tests(4) as result'
+		// and ps.getMetaData() throws SQLException.
+		//
+		ResultSetMetaData rsmd;
 
-                _refine_fields_by_table_metadata(dto_ref, fields_map);
+		try {
 
-            } else if (SqlUtils.is_sql_shortcut_ref(dto_ref)) {
+			// String prepared = ps.toString();
+			//
+			rsmd = ps.getMetaData();
 
-                String[] parts = SqlUtils.parse_sql_shortcut_ref(dto_ref);
+		} catch (SQLException ex) {
 
-                String table_name = parts[0];
+			rsmd = null;
+		}
 
-                // obtain fields the same way like in the case of table. params will be obtained from DAO SQL.
-                // params are obtained below (considering DAO SQL and method_param_descriptors)
-                //
-                _refine_fields_by_table_metadata(table_name, fields_map);
-            }
-        }
+		// it is null if no columns or _prepare was called instead of _prepare_call for
+		// SP
+		//
+		if (rsmd == null) {
 
-        _refine_field_info_by_jaxb_explicit_fields(jaxb_dto_class.getField(), fields_map, fields);
+			return;
+		}
 
-        if (type_map != null) {
+		int col_count;
 
-            for (FieldInfo fi : fields) {
+		try {
 
-                fi.setType(Helpers.get_cpp_class_name_from_java_class_name(type_map, fi.getType()));
-            }
-        }
-    }
+			// Informix:
+			// ResultSetMetaData.getColumnCount() returns
+			// value > 0 for some DML statements, e.g. for 'update orders set
+			// dt_id = ? where o_id = ?' it considers that 'dt_id' is column.
+			// SQLite:
+			// throws java.sql.SQLException: column 1 out
+			// of bounds [1,0] if the statement is like INSERT
+			//
+			col_count = rsmd.getColumnCount();
 
-    private void _refine_field_info_by_jaxb_explicit_fields(
-            List<DtoClass.Field> jaxb_explicit_fields, Map<String, FieldInfo> fields_map, List<FieldInfo> fields) {
+		} catch (Exception e) {
 
-        if (jaxb_explicit_fields == null) {
+			col_count = 0;
+		}
 
-            return;
-        }
+		//
+		// PostgreSQL: query to function 'select * from fn_get_tests(?, ?)'
+		// returns ResultSet
+		//
+		if (col_count == 1) {
 
-        for (DtoClass.Field jaxb_explicit_field : jaxb_explicit_fields) {
+			String java_class_name = rsmd.getColumnClassName(1); // it starts from 1!
 
-            String col_name = jaxb_explicit_field.getColumn();
+			String rs_class_name = ResultSet.class.getName();
 
-            String java_type_name = jaxb_explicit_field.getJavaType();
+			if (java_class_name.equals(rs_class_name)) {
 
-            if (fields_map.containsKey(col_name)) {
+				return;
+			}
+		}
 
-                fields_map.get(col_name).setType(java_type_name);
+		for (int i = 1; i <= col_count; i++) {
 
-            } else {
+			String col_name = _get_column_name(rsmd, i);
 
-                FieldInfo explicit_field = new FieldInfo(field_names_mode, java_type_name, col_name);
+			String col_class_name = _get_column_type_name(rsmd, i);
 
-                fields.add(explicit_field);
+			if (type_map != null) {
 
-                fields_map.put(col_name, explicit_field);
-            }
-        }
-    }
+				col_class_name = Helpers.get_cpp_class_name_from_java_class_name(type_map, col_class_name);
+			}
 
-    private void _refine_fields_by_table_metadata(final String table_name, Map<String, FieldInfo> fields_map) throws Exception {
+			fields.add(new FieldInfo(field_names_mode, col_class_name, col_name));
+		}
+	}
 
-        if (!SqlUtils.is_table_ref(table_name)) {
+	private static void _get_params_info(PreparedStatement ps, FieldNamesMode param_names_mode, TypeMap type_map,
+			String[] method_param_descriptors, List<FieldInfo> params) {
 
-            throw new Exception("Table name expected: " + table_name);
-        }
+		params.clear();
 
-        DatabaseMetaData md = conn.getMetaData();
+		try {
 
-        String[] parts = table_name.split("\\.", -1); // -1 to leave empty strings
+			// Sybase ADS + adsjdbc.jar:
+			// ------------------------
+			// ps.getParameterMetaData() throws java.lang.AbstractMethodError for all
+			// statements
+			// SQL Server 2008 + sqljdbc4.jar:
+			// -------------------------------
+			// ps.getParameterMetaData() throws
+			// com.microsoft.sqlserver.jdbc.SQLServerException for
+			// some statements SQL with parameters like 'SELECT count(*) FROM orders o WHERE
+			// o_date BETWEEN ? AND ?'
+			// and for SQL statements without parameters
+			// PostgeSQL:
+			// ----------
+			// ps.getParameterMetaData() throws SQLException for both PreparedStatement and
+			// CallableStatement
+			//
+			ParameterMetaData pm = ps.getParameterMetaData();
 
-        ResultSet rs_columns;
+			int params_count;
 
-        if (parts.length == 1) {
+			try {
 
-            rs_columns = md.getColumns(null, null, table_name, "%");
+				params_count = pm.getParameterCount();
 
-        } else {
+			} catch (SQLException e) {
 
-            String schema_nm = table_name.substring(0, table_name.lastIndexOf('.'));
+				params_count = 0;
+			}
 
-            String table_nm = parts[parts.length - 1];
+			if (method_param_descriptors == null && params_count > 0) {
 
-            rs_columns = md.getColumns(null, schema_nm, table_nm, "%");
-        }
+				throw new SQLException("Specified parameters count: 0. Detected parameters count: " + params_count);
+			}
 
-        try {
+			if (method_param_descriptors != null && params_count != method_param_descriptors.length) {
 
-            while (rs_columns.next()) {
+				throw new SQLException("Specified parameters count: " + method_param_descriptors.length
+						+ ". Detected parameters count: " + params_count);
+			}
 
-                String col_name = rs_columns.getString("COLUMN_NAME");
+			if (method_param_descriptors == null) {
 
-                if (fields_map.containsKey(col_name)) {
+				return;
+			}
 
-                    int type = rs_columns.getInt("DATA_TYPE");
+			for (int i = 0; i < params_count; i++) {
 
-                    String java_type_name = TypesMapping.getJavaBySqlType(type);
+				String param_descriptor = method_param_descriptors[i];
 
-                    fields_map.get(col_name).setType(java_type_name);
-                }
-            }
+				String param_type_name;
 
-        } finally {
+				String param_name;
 
-            rs_columns.close();
-        }
-    }
+				String[] parts = Helpers.parse_param_descriptor(param_descriptor);
 
-    public void get_dto_field_info(DtoClass jaxb_dto_class, String sql_root_abs_path, List<FieldInfo> fields) throws Exception {
+				if (parts[0] == null) {
 
-        JaxbUtils.validate_jaxb_dto_class(jaxb_dto_class);
+					param_type_name = _get_param_type_name(pm, i);
 
-        fields.clear();
+					param_name = param_descriptor;
 
-        Map<String, FieldInfo> fields_map = new HashMap<String, FieldInfo>();
+				} else {
 
-        _get_dto_class_field_info(jaxb_dto_class, sql_root_abs_path, fields_map, fields);
-    }
+					param_type_name = parts[0];
 
-    private void _get_fields_info(PreparedStatement ps, List<FieldInfo> fields) throws Exception {
+					param_name = parts[1];
+				}
 
-        fields.clear();
+				if (type_map != null) {
 
-        // PostgreSQL:
-        // Initial SQL is '{call get_tests(4)}'; ps is CallableStatement.
-        // ps.toString() returns something like 'select * from get_tests(4) as result'
-        // and ps.getMetaData() throws SQLException.
-        //
-        ResultSetMetaData rsmd;
+					param_type_name = Helpers.get_cpp_class_name_from_java_class_name(type_map, param_type_name);
+				}
 
-        try {
+				params.add(new FieldInfo(param_names_mode, param_type_name, param_name));
+			}
 
-            // String prepared = ps.toString();
-            //
-            rsmd = ps.getMetaData();
+		} catch (Exception ex) {
 
-        } catch (SQLException ex) {
+			if (method_param_descriptors == null) {
 
-            rsmd = null;
-        }
+				return;
+			}
 
-        // it is null if no columns or _prepare was called instead of _prepare_call for SP
-        //
-        if (rsmd == null) {
+			for (String param_descriptor : method_param_descriptors) {
 
-            return;
-        }
+				String param_type_name;
 
-        int col_count;
+				String param_name;
 
-        try {
+				String[] parts = Helpers.parse_param_descriptor(param_descriptor);
 
-            // Informix:
-            // ResultSetMetaData.getColumnCount() returns
-            // value > 0 for some DML statements, e.g. for 'update orders set
-            // dt_id = ? where o_id = ?' it considers that 'dt_id' is column.
-            // SQLite:
-            // throws java.sql.SQLException: column 1 out
-            // of bounds [1,0] if the statement is like INSERT
-            //
-            col_count = rsmd.getColumnCount();
+				if (parts[0] == null) {
 
-        } catch (Exception e) {
+					param_type_name = Object.class.getName();
 
-            col_count = 0;
-        }
+					param_name = param_descriptor;
 
-        //
-        // PostgreSQL: query to function 'select * from fn_get_tests(?, ?)'
-        // returns ResultSet
-        //
-        if (col_count == 1) {
+				} else {
 
-            String java_class_name = rsmd.getColumnClassName(1); // it starts from 1!
+					param_type_name = parts[0];
 
-            String rs_class_name = ResultSet.class.getName();
+					param_name = parts[1];
+				}
 
-            if (java_class_name.equals(rs_class_name)) {
+				if (type_map != null) {
 
-                return;
-            }
-        }
+					param_type_name = Helpers.get_cpp_class_name_from_java_class_name(type_map, param_type_name);
+				}
 
-        for (int i = 1; i <= col_count; i++) {
+				params.add(new FieldInfo(param_names_mode, param_type_name, param_name));
+			}
+		}
+	}
 
-            String col_name = _get_column_name(rsmd, i);
+	private void _refine_dao_fields_by_dto_fields(DtoClass jaxb_dto_class, String sql_root_abs_path,
+			List<FieldInfo> dao_fields_all) throws Exception {
 
-            String col_class_name = _get_column_type_name(rsmd, i);
+		List<FieldInfo> dto_fields = new ArrayList<FieldInfo>();
 
-            if (type_map != null) {
+		Map<String, FieldInfo> dto_fields_map = _get_dto_class_field_info(jaxb_dto_class, sql_root_abs_path,
+				dto_fields);
 
-                col_class_name = Helpers.get_cpp_class_name_from_java_class_name(type_map, col_class_name);
-            }
+		////////////////////////////////////////////////
+		//
+		for (FieldInfo dao_fi : dao_fields_all) {
 
-            fields.add(new FieldInfo(field_names_mode, col_class_name, col_name));
-        }
-    }
+			String dao_col_name = dao_fi.getColumnName();
 
-    private static void _get_params_info(
-            PreparedStatement ps, FieldNamesMode param_names_mode, TypeMap type_map,
-            String[] method_param_descriptors, List<FieldInfo> params) {
+			if (dto_fields_map.containsKey(dao_col_name) == false) {
 
-        params.clear();
+				throw new Exception(
+						"Cannot map DTO and DAO. DAO column '" + dao_col_name + "'. Ensure lower/upper case.");
+			}
 
-        try {
+			FieldInfo dto_fi = dto_fields_map.get(dao_col_name);
 
-            // Sybase ADS + adsjdbc.jar:
-            // ------------------------
-            // ps.getParameterMetaData() throws java.lang.AbstractMethodError for all
-            // statements
-            // SQL Server 2008 + sqljdbc4.jar:
-            // -------------------------------
-            // ps.getParameterMetaData() throws
-            // com.microsoft.sqlserver.jdbc.SQLServerException for
-            // some statements SQL with parameters like 'SELECT count(*) FROM orders o WHERE
-            // o_date BETWEEN ? AND ?'
-            // and for SQL statements without parameters
-            // PostgeSQL:
-            // ----------
-            // ps.getParameterMetaData() throws SQLException for both PreparedStatement and
-            // CallableStatement
-            //
-            ParameterMetaData pm = ps.getParameterMetaData();
+			String dto_col_type_name = dto_fi.getType();
 
-            int params_count;
+			if (!dto_col_type_name.equals(Object.class.getTypeName())) {
 
-            try {
+				dao_fi.setType(dto_col_type_name);
+			}
+		}
+	}
 
-                params_count = pm.getParameterCount();
+	/////////////////////////////////////////////////////////////////////////////
+	//
+	// Utils
+	//
+	public static ResultSet get_tables_rs(Connection conn, DatabaseMetaData db_info, String schema_name,
+			boolean include_views) throws SQLException {
 
-            } catch (SQLException e) {
+		String[] types;
 
-                params_count = 0;
-            }
+		if (include_views) {
 
-            if (method_param_descriptors == null && params_count > 0) {
+			types = new String[] { "TABLE", "VIEW" };
 
-                throw new SQLException("Specified parameters count: 0. Detected parameters count: " + params_count);
-            }
+		} else {
 
-            if (method_param_descriptors != null && params_count != method_param_descriptors.length) {
+			types = new String[] { "TABLE" };
+		}
 
-                throw new SQLException("Specified parameters count: " + method_param_descriptors.length
-                        + ". Detected parameters count: " + params_count);
-            }
+		ResultSet rs_tables;
 
-            if (method_param_descriptors == null) {
+		String catalog = conn.getCatalog();
 
-                return;
-            }
+		rs_tables = db_info.getTables(catalog, schema_name, "%", types);
 
-            for (int i = 0; i < params_count; i++) {
+		return rs_tables;
+	}
 
-                String param_descriptor = method_param_descriptors[i];
+	public static void get_schema_names(Connection con, List<String> schema_names) throws SQLException {
 
-                String param_type_name;
+		DatabaseMetaData db_info = con.getMetaData();
 
-                String param_name;
+		ResultSet rs;
 
-                String[] parts = Helpers.parse_param_descriptor(param_descriptor);
+		rs = db_info.getSchemas();
 
-                if (parts[0] == null) {
+		try {
 
-                    param_type_name = _get_param_type_name(pm, i);
+			while (rs.next()) {
 
-                    param_name = param_descriptor;
+				schema_names.add(rs.getString("TABLE_SCHEM"));
+			}
 
-                } else {
+		} finally {
 
-                    param_type_name = parts[0];
+			rs.close();
+		}
+	}
 
-                    param_name = parts[1];
-                }
+	/////////////////////////////////////////////////////////////////////////////
+	//
+	// DTO
+	//
+	public void get_dto_field_info(DtoClass jaxb_dto_class, String sql_root_abs_path, List<FieldInfo> fields)
+			throws Exception {
 
-                if (type_map != null) {
+		JaxbUtils.validate_jaxb_dto_class(jaxb_dto_class);
 
-                    param_type_name = Helpers.get_cpp_class_name_from_java_class_name(type_map, param_type_name);
-                }
+		fields.clear();
 
-                params.add(new FieldInfo(param_names_mode, param_type_name, param_name));
-            }
+		_get_dto_class_field_info(jaxb_dto_class, sql_root_abs_path, fields);
+	}
 
-        } catch (Exception ex) {
+	/////////////////////////////////////////////////////////////////////////////
+	//
+	// DAO. Free-SQL
+	//
+	public String get_dao_query_info(String sql_root_abs_path, String dao_jaxb_ref, String dto_param_type,
+			String[] method_param_descriptors, String jaxb_dto_or_return_type, boolean jaxb_return_type_is_dto,
+			DtoClasses jaxb_dto_classes, List<FieldInfo> _fields, List<FieldInfo> _params) throws Exception {
 
-            if (method_param_descriptors == null) {
+		_fields.clear();
 
-                return;
-            }
+		_params.clear();
 
-            for (String param_descriptor : method_param_descriptors) {
+		Helpers.check_duplicates(method_param_descriptors);
 
-                String param_type_name;
+		if (SqlUtils.is_table_ref(dao_jaxb_ref)) {
 
-                String param_name;
+			throw new Exception("Specifying table name as a value 'ref' is not allowed in <query...");
+		}
 
-                String[] parts = Helpers.parse_param_descriptor(param_descriptor);
+		String dao_query_jdbc_sql = SqlUtils.jdbc_sql_by_dto_class_ref(dao_jaxb_ref, sql_root_abs_path);
 
-                if (parts[0] == null) {
+		PreparedStatement ps = _prepare_jdbc_sql(dao_query_jdbc_sql);
 
-                    param_type_name = Object.class.getName();
+		try {
 
-                    param_name = param_descriptor;
+			// For CALL statement, columns count is always 0. Even if the stored procedure
+			// returns ResultSet (MySQL).
+			// For statement 'select my_func(?)', columns count is also 0 (at least in
+			// PostgreSQL).
+			// Seems like Exception should be thrown only if columns cannot be detected
+			// neither from DAO nor from DTO.
+			//
+			if (jaxb_return_type_is_dto) {
 
-                } else {
+				List<FieldInfo> dto_fields = new ArrayList<FieldInfo>();
 
-                    param_type_name = parts[0];
+				DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(jaxb_dto_or_return_type, jaxb_dto_classes);
 
-                    param_name = parts[1];
-                }
+				Map<String, FieldInfo> dto_fields_map = _get_dto_class_field_info(jaxb_dto_class, sql_root_abs_path,
+						dto_fields);
 
-                if (type_map != null) {
+				////////////////////////////////////////////////
+				//
+				List<FieldInfo> dao_fields = new ArrayList<FieldInfo>();
 
-                    param_type_name = Helpers.get_cpp_class_name_from_java_class_name(type_map, param_type_name);
-                }
+				_get_fields_info(ps, dao_fields);
 
-                params.add(new FieldInfo(param_names_mode, param_type_name, param_name));
-            }
-        }
-    }
+				// no fields from DAO SQL (e.g. it may happen for CALL statement?). just use
+				// fields of DTO class
+				//
+				if (dao_fields.size() == 0) {
 
-    public static ResultSet get_tables_rs(
-            Connection conn, DatabaseMetaData db_info, String schema_name,
-            boolean include_views) throws SQLException {
+					_fields.addAll(dto_fields);
 
-        String[] types;
+				} else {
 
-        if (include_views) {
+					for (FieldInfo fi : dao_fields) {
 
-            types = new String[]{"TABLE", "VIEW"};
+						String dao_col_name = fi.getColumnName();
 
-        } else {
+						if (dto_fields_map.containsKey(dao_col_name)) {
 
-            types = new String[]{"TABLE"};
-        }
+							_fields.add(dto_fields_map.get(dao_col_name));
+						}
+					}
+				}
 
-        ResultSet rs_tables;
+				if (_fields.size() == 0) {
 
-        String catalog = conn.getCatalog();
+					throw new Exception("Columns count is 0. Is SQL statement valid?");
+				}
 
-        rs_tables = db_info.getTables(catalog, schema_name, "%", types);
+			} else { // jaxb_return_type_is_dto == false
 
-        return rs_tables;
-    }
+				_get_fields_info(ps, _fields);
 
-    public static void get_schema_names(Connection con, List<String> schema_names) throws SQLException {
+				String ret_type_name;
 
-        DatabaseMetaData db_info = con.getMetaData();
+				if (jaxb_dto_or_return_type != null && jaxb_dto_or_return_type.trim().length() > 0) {
 
-        ResultSet rs;
+					ret_type_name = jaxb_dto_or_return_type;
 
-        rs = db_info.getSchemas();
+				} else {
+					//
+					// fields.size() == 0 for SQL statement 'select inventory_in_stock(?)'
+					// from MySQL sakila example
+					//
+					if (_fields.size() == 0) {
 
-        try {
+						// throw new Exception("Columns count is < 1 . Is SQL statement valid?");
+						//
+						ret_type_name = Object.class.getName();
 
-            while (rs.next()) {
+					} else {
 
-                schema_names.add(rs.getString("TABLE_SCHEM"));
-            }
+						ret_type_name = _fields.get(0).getType();
+					}
+				}
 
-        } finally {
+				// add single field
+				if (_fields.isEmpty()) {
 
-            rs.close();
-        }
-    }
+					_fields.add(new FieldInfo(field_names_mode, ret_type_name, "ret_value"));
 
-    /////////////////////////////////////////////////////////////////////////////
-    //
-    // Free-SQL
-    public String get_dao_query_info(
-            String sql_root_abs_path, String dao_jaxb_ref, String dto_param_type,
-            String[] method_param_descriptors, String jaxb_dto_or_return_type, boolean jaxb_return_type_is_dto,
-            DtoClasses jaxb_dto_classes, List<FieldInfo> _fields, List<FieldInfo> _params) throws Exception {
+				} else {
 
-        _fields.clear();
+					_fields.get(0).setType(ret_type_name);
+				}
+			}
 
-        _params.clear();
+			if (type_map != null) {
 
-        Helpers.check_duplicates(method_param_descriptors);
+				for (FieldInfo fi : _fields) {
 
-        if (SqlUtils.is_table_ref(dao_jaxb_ref)) {
+					fi.setType(Helpers.get_cpp_class_name_from_java_class_name(type_map, fi.getType()));
+				}
+			}
 
-            throw new Exception("Specifying table name as a value 'ref' is not allowed in <query...");
-        }
+			/////////////////////////////
+			//
+			// if it is something like <query method="get_some_value(MyDTO(m_id, m_date))",
+			///////////////////////////// use field_names_mode (???)
+			//
+			FieldNamesMode param_names_mode = dto_param_type == null || dto_param_type.length() == 0
+					? FieldNamesMode.AS_IS
+					: field_names_mode;
 
-        String dao_query_jdbc_sql = SqlUtils.jdbc_sql_by_dto_class_ref(dao_jaxb_ref, sql_root_abs_path);
+			_get_params_info(ps, param_names_mode, type_map, method_param_descriptors, _params);
 
-        PreparedStatement ps = _prepare_jdbc_sql(dao_query_jdbc_sql);
+		} finally {
 
-        try {
+			ps.close();
+		}
 
-            // For CALL statement, columns count is always 0. Even if the stored procedure
-            // returns ResultSet (MySQL).
-            // For statement 'select my_func(?)', columns count is also 0 (at least in
-            // PostgreSQL).
-            // Seems like Exception should be thrown only if columns cannot be detected
-            // neither from DAO nor from DTO.
-            if (jaxb_return_type_is_dto) {
+		return dao_query_jdbc_sql;
+	}
 
-                List<FieldInfo> dto_fields = new ArrayList<FieldInfo>();
+	public void get_dao_exec_dml_info(String dao_jdbc_sql, String dto_param_type, String[] method_param_descriptors,
+			List<FieldInfo> params) throws Exception {
 
-                Map<String, FieldInfo> dto_fields_map = new HashMap<String, FieldInfo>();
+		Helpers.check_duplicates(method_param_descriptors);
 
-                DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(jaxb_dto_or_return_type, jaxb_dto_classes);
+		PreparedStatement ps = _prepare_jdbc_sql(dao_jdbc_sql);
 
-                _get_dto_class_field_info(jaxb_dto_class, sql_root_abs_path, dto_fields_map, dto_fields);
+		try {
 
-                ////////////////////////////////////////////////
-                List<FieldInfo> dao_fields = new ArrayList<FieldInfo>();
+			/////////////////////////////
+			//
+			// if it is something like <query method="get_some_value(MyDTO(m_id, m_date))",
+			///////////////////////////// use field_names_mode (???)
+			//
+			FieldNamesMode param_names_mode = dto_param_type == null || dto_param_type.length() == 0
+					? FieldNamesMode.AS_IS
+					: field_names_mode;
 
-                _get_fields_info(ps, dao_fields);
+			_get_params_info(ps, param_names_mode, type_map, method_param_descriptors, params);
 
-                // no fields from DAO SQL (e.g. it may happen for CALL statement?). just use fields of DTO class
-                //
-                if (dao_fields.size() == 0) {
+		} finally {
 
-                    _fields.addAll(dto_fields);
+			ps.close();
+		}
+	}
 
-                } else {
+	/////////////////////////////////////////////////////////////////////////////
+	//
+	// DAO. CRUD
+	//
+	public String get_dao_crud_create_info(DtoClass jaxb_dto_class, String sql_root_abs_path, String dao_table_name,
+			String dao_crud_generated, List<FieldInfo> dao_fields_not_ai, List<FieldInfo> dao_fields_ai)
+			throws Exception {
 
-                    for (FieldInfo fi : dao_fields) {
+		dao_fields_not_ai.clear();
 
-                        String dao_col_name = fi.getColumnName();
+		dao_fields_ai.clear();
 
-                        if (dto_fields_map.containsKey(dao_col_name)) {
+		/////////////////////////////////////////
+		//
+		HashSet<String> dao_crud_generated_set = new HashSet<String>();
 
-                            _fields.add(dto_fields_map.get(dao_col_name));
-                        }
-                    }
-                }
+		if (!("*".equals(dao_crud_generated))) {
 
-                if (_fields.size() == 0) {
+			String[] gen_keys_arr = Helpers.get_listed_items(dao_crud_generated);
 
-                    throw new Exception("Columns count is 0. Is SQL statement valid?");
-                }
+			Helpers.check_duplicates(gen_keys_arr);
 
-            } else { // jaxb_return_type_is_dto == false
+			for (String k : gen_keys_arr) {
 
-                _get_fields_info(ps, _fields);
+				dao_crud_generated_set.add(k.toLowerCase());
+			}
+		}
 
-                String ret_type_name;
+		/////////////////////////////////////////
+		//
+		List<FieldInfo> dto_fields = new ArrayList<FieldInfo>();
 
-                if (jaxb_dto_or_return_type != null && jaxb_dto_or_return_type.trim().length() > 0) {
+		Map<String, FieldInfo> dto_fields_map = _get_dto_class_field_info(jaxb_dto_class, sql_root_abs_path,
+				dto_fields);
 
-                    ret_type_name = jaxb_dto_or_return_type;
+		/////////////////////////////////////////
+		//
+		List<FieldInfo> dao_fields_all = new ArrayList<FieldInfo>();
 
-                } else {
-                    //
-                    // fields.size() == 0 for SQL statement 'select inventory_in_stock(?)'
-                    // from MySQL sakila example
-                    //
-                    if (_fields.size() == 0) {
+		_get_table_field_info(dao_table_name, dao_fields_all, null, "", null);
 
-                        // throw new Exception("Columns count is < 1 . Is SQL statement valid?");
-                        //
-                        ret_type_name = Object.class.getName();
+		for (FieldInfo dao_field : dao_fields_all) {
 
-                    } else {
+			String dao_col_name = dao_field.getColumnName();
 
-                        ret_type_name = _fields.get(0).getType();
-                    }
-                }
+			if (dto_fields_map.containsKey(dao_col_name) == false) {
 
-                // add single field
-                if (_fields.isEmpty()) {
+				throw new Exception(
+						"Cannot map DTO and DAO. DAO column '" + dao_col_name + "'. Ensure lower/upper case.");
+			}
 
-                    _fields.add(new FieldInfo(field_names_mode, ret_type_name, "ret_value"));
+			dao_field.setType(dto_fields_map.get(dao_col_name).getType());
 
-                } else {
+			String gen_dao_col_name = dao_col_name.toLowerCase();
 
-                    _fields.get(0).setType(ret_type_name);
-                }
-            }
+			if (dao_crud_generated_set.contains(gen_dao_col_name)) {
 
-            if (type_map != null) {
+				dao_field.setAutoIncrement(true);
 
-                for (FieldInfo fi : _fields) {
+				dao_fields_ai.add(dao_field);
 
-                    fi.setType(Helpers.get_cpp_class_name_from_java_class_name(type_map, fi.getType()));
-                }
-            }
+				dao_crud_generated_set.remove(gen_dao_col_name); // it must become empty in the end
 
-            /////////////////////////////
-            //
-            // if it is something like <query method="get_some_value(MyDTO(m_id, m_date))", use field_names_mode (???)
-            //
-            FieldNamesMode param_names_mode = dto_param_type == null || dto_param_type.length() == 0 ? FieldNamesMode.AS_IS : field_names_mode;
+			} else {
 
-            _get_params_info(ps, param_names_mode, type_map, method_param_descriptors, _params);
+				if (dao_field.isAutoIncrement()) {
 
-        } finally {
+					dao_fields_ai.add(dao_field);
 
-            ps.close();
-        }
+				} else {
 
-        return dao_query_jdbc_sql;
-    }
+					dao_fields_not_ai.add(dao_field);
+				}
+			}
+		}
 
-    public void get_dao_exec_dml_info(
-            String dao_jdbc_sql, String dto_param_type,
-            String[] method_param_descriptors, List<FieldInfo> params) throws Exception {
+		if (dao_crud_generated_set.size() > 0) { // not processed column names remain!
 
-        Helpers.check_duplicates(method_param_descriptors);
+			throw new SQLException("Unknown columns are listed as 'generated': " + dao_crud_generated_set.toString());
+		}
 
-        PreparedStatement ps = _prepare_jdbc_sql(dao_jdbc_sql);
+		return SqlUtils.create_crud_create_sql(dao_table_name, dao_fields_not_ai);
+	}
 
-        try {
+	public String get_dao_crud_read_info(boolean fetch_list, DtoClass jaxb_dto_class, String sql_root_abs_path,
+			String dao_table_name, String explicit_pk, List<FieldInfo> fields_all, List<FieldInfo> fields_pk)
+			throws Exception {
 
-            /////////////////////////////
-            //
-            // if it is something like <query method="get_some_value(MyDTO(m_id, m_date))", use field_names_mode (???)
-            //
-            FieldNamesMode param_names_mode = dto_param_type == null || dto_param_type.length() == 0 ? FieldNamesMode.AS_IS : field_names_mode;
+		fields_all.clear();
 
-            _get_params_info(ps, param_names_mode, type_map, method_param_descriptors, params);
+		fields_pk.clear();
 
-        } finally {
+		_get_table_field_info(dao_table_name, fields_all, null, explicit_pk, fields_pk);
 
-            ps.close();
-        }
-    }
+		_refine_dao_fields_by_dto_fields(jaxb_dto_class, sql_root_abs_path, fields_all);
 
-    /////////////////////////////////////////////////////////////////////////////
-    //
-    // CRUD
-    public void get_dao_crud_create_info(
-            DtoClass jaxb_dto_class, String sql_root_abs_path, String dao_crud_table_name, String dao_crud_generated,
-            List<FieldInfo> not_ai_fields, List<FieldInfo> ai_fields) throws Exception {
+		return SqlUtils.create_crud_read_sql(dao_table_name, fields_pk, fetch_list);
+	}
 
-        ai_fields.clear();
+	public String get_dao_crud_update_info(String dao_table_name, List<FieldInfo> not_fields_pk, String explicit_pk,
+			List<FieldInfo> fields_pk, DtoClass jaxb_dto_class, String sql_root_abs_path) throws Exception {
 
-        not_ai_fields.clear();
+		not_fields_pk.clear();
 
-        HashSet<String> dao_crud_generated_set = new HashSet<String>();
+		fields_pk.clear();
 
-        if (!("*".equals(dao_crud_generated))) {
+		List<FieldInfo> fields_all = new ArrayList<FieldInfo>();
 
-            String[] gen_keys_arr = Helpers.get_listed_items(dao_crud_generated);
+		_get_table_field_info(dao_table_name, fields_all, not_fields_pk, explicit_pk, fields_pk);
 
-            Helpers.check_duplicates(gen_keys_arr);
+		if (not_fields_pk.isEmpty()) {
 
-            for (String k : gen_keys_arr) {
+			return null; // just render info comment instead of method
+		}
 
-                dao_crud_generated_set.add(k.toLowerCase());
-            }
-        }
+		if (fields_pk.isEmpty()) {
 
-        /////////////////////////////////////////
-        List<FieldInfo> dto_fields = new ArrayList<FieldInfo>();
+			return null; // just render info comment instead of method
+		}
 
-        Map<String, FieldInfo> dto_fields_map = new HashMap<String, FieldInfo>();
+		_refine_dao_fields_by_dto_fields(jaxb_dto_class, sql_root_abs_path, fields_all);
 
-        _get_dto_class_field_info(jaxb_dto_class, sql_root_abs_path, dto_fields_map, dto_fields);
+		return SqlUtils.create_crud_update_sql(dao_table_name, not_fields_pk, fields_pk);
+	}
 
-        /////////////////////////////////////////
-        List<FieldInfo> dao_fields = new ArrayList<FieldInfo>();
-        {
-            String jdbc_sql = SqlUtils.jdbc_sql_by_dto_class_ref(dao_crud_table_name, sql_root_abs_path);
+	public String get_dao_crud_delete_info(String dao_table_name, String explicit_pk, List<FieldInfo> fields_pk)
+			throws Exception {
 
-            Map<String, FieldInfo> dao_fields_map = new HashMap<String, FieldInfo>();
+		fields_pk.clear();
 
-            _get_fields_map_by_jdbc_sql(jdbc_sql, dao_fields_map, dao_fields);
+		_get_table_field_info(dao_table_name, null, null, explicit_pk, fields_pk);
 
-            _refine_fields_by_table_metadata(dao_crud_table_name, dao_fields_map);
-        }
+		if (fields_pk.isEmpty()) {
 
-        /////////////////////////////////////////
-        for (FieldInfo dao_field : dao_fields) {
+			return null; // just render info comment instead of method
+		}
 
-            String dao_col_name = dao_field.getColumnName();
-
-            if (dto_fields_map.containsKey(dao_col_name) == false) {
-
-                throw new Exception("DTO column '" + dao_col_name + "' not found");
-            }
-
-            dao_field.setType(dto_fields_map.get(dao_col_name).getType());
-
-            String gen_dao_col_name = dao_col_name.toLowerCase();
-
-            if (dao_crud_generated_set.contains(gen_dao_col_name)) {
-
-                dao_field.setAutoIncrement(true);
-
-                ai_fields.add(dao_field);
-
-                dao_crud_generated_set.remove(gen_dao_col_name); // it must become empty in the end
-
-            } else {
-
-                if (dao_field.isAutoIncrement()) {
-
-                    ai_fields.add(dao_field);
-
-                } else {
-
-                    not_ai_fields.add(dao_field);
-                }
-            }
-        }
-
-        if (dao_crud_generated_set.size() > 0) { // not processed column names remain!
-
-            throw new SQLException("Unknown columns are listed as 'generated': " + dao_crud_generated_set.toString());
-        }
-    }
-
-    public String get_dao_crud_read_sql(
-            String dao_table_name, boolean fetch_list, String explicit_pk,
-            List<String> pk_col_names) throws Exception {
-
-        String dao_jdbc_sql = "select * from " + dao_table_name;
-
-        if (!fetch_list) {
-
-            List<FieldInfo> pk_fields = new ArrayList<FieldInfo>();
-
-            _get_table_fields(dao_table_name, null, null, explicit_pk, pk_fields);
-
-            if (pk_fields.isEmpty()) {
-
-                return null;
-
-            } else {
-
-                for (FieldInfo fi : pk_fields) {
-
-                    pk_col_names.add(fi.getColumnName());
-                }
-            }
-
-            dao_jdbc_sql += " where " + pk_col_names.get(0) + " = ?";
-
-            for (int i = 1; i < pk_col_names.size(); i++) {
-
-                dao_jdbc_sql += " and " + pk_col_names.get(i) + " = ?";
-            }
-        }
-
-        return dao_jdbc_sql;
-    }
-
-    public void get_dao_crud_update_info(
-            String dao_table_name,
-            List<FieldInfo> not_pk_fields, String explicit_pk, List<FieldInfo> pk_fields,
-            String dto_class_name, DtoClasses jaxb_dto_classes) throws Exception {
-
-        not_pk_fields.clear();
-
-        pk_fields.clear();
-
-        _get_table_fields(dao_table_name, null, not_pk_fields, explicit_pk, pk_fields);
-
-        /////////////////////////////////////////////////////////////
-        // TODO: refine
-        // DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
-    }
-
-    public void get_dao_crud_delete_info(
-            String dao_table_name, String explicit_pk, List<FieldInfo> pk_fields,
-            String dto_class_name, DtoClasses jaxb_dto_classes) throws Exception {
-
-        pk_fields.clear();
-
-        _get_table_fields(dao_table_name, null, null, explicit_pk, pk_fields);
-
-        /////////////////////////////////////////////////////////////
-        // TODO: refine
-        // DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
-    }
+		return SqlUtils.create_crud_delete_sql(dao_table_name, fields_pk);
+	}
 }
