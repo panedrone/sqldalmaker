@@ -13,11 +13,6 @@ import java.util.List;
  */
 public class SqlUtils {
 
-    public static String jdbc_sql_to_cpp_str(StringBuilder sql_buff) {
-
-        return jdbc_sql_to_cpp_str(sql_buff.toString());
-    }
-
     public static String jdbc_sql_to_cpp_str(String sql) {
 
         String[] parts = sql.split("(\\n|\\r)+");
@@ -63,11 +58,6 @@ public class SqlUtils {
         return res.toString();
     }
 
-    public static String jdbc_sql_to_java_str(StringBuilder sql_buff) {
-
-        return jdbc_sql_to_java_str(sql_buff.toString());
-    }
-
     public static String jdbc_sql_to_java_str(String jdbc_sql) {
 
         String[] parts = jdbc_sql.split("(\\n|\\r)+");
@@ -102,11 +92,6 @@ public class SqlUtils {
         }
 
         return res.toString();
-    }
-
-    public static String sql_to_php_str(StringBuilder sql_buff) {
-
-        return php_sql_to_php_str(sql_buff.toString());
     }
 
     public static String jdbc_sql_to_php_str(String jdbc_sql) throws Exception {
@@ -160,16 +145,6 @@ public class SqlUtils {
         }
 
         return res.toString();
-    }
-
-    public static String python_sql_to_python_string(StringBuilder sql_buff) throws Exception {
-
-        return jdbc_sql_to_python_string(sql_buff.toString());
-    }
-
-    public static String ruby_sql_to_ruby_string(StringBuilder sql_buff) throws Exception {
-
-        return jdbc_sql_to_python_string(sql_buff.toString());
     }
 
     public static String jdbc_sql_to_ruby_string(String jdbc_sql) throws Exception {
@@ -245,28 +220,6 @@ public class SqlUtils {
         }
     }
 
-    public static String jdbc_sql_by_exec_dml_ref(String ref, String sql_root_abs_path) throws Exception {
-
-        if (is_jdbc_stored_proc_call(ref)) {
-
-            return ref;
-
-        } else if (is_stored_proc_call_shortcut(ref)) {
-
-            return ref; // stored_proc_shortcut_to_jdbc_call(ref);
-
-        } else if (is_sql_file_ref(ref)) {
-
-            String sql_file_path = Helpers.concat_path(sql_root_abs_path, ref);
-
-            return Helpers.load_text_from_file(sql_file_path);
-
-        } else {
-
-            throw new Exception("Invalid ref: <exec_dml ref=\"" + ref + "\"");
-        }
-    }
-
     static String jdbc_sql_by_dto_class_ref(String ref, String sql_root_abs_path) throws Exception {
 
         String[] parts = ref.split(":");
@@ -314,6 +267,76 @@ public class SqlUtils {
         }
 
         return "select * from " + table_name + " where 1 = 0";
+    }
+
+    static String jdbc_sql_by_query_ref(String ref, String sql_root_abs_path) throws Exception {
+
+        /*if (is_jdbc_stored_proc_call(ref)) {
+
+            return ref;
+
+        } else if (is_stored_proc_call_shortcut(ref)) {
+
+            return ref;
+
+        } else if (is_stored_func_call_shortcut(ref)) {
+
+            return ref;
+
+        } else */ if (is_sql_file_ref(ref)) {
+
+            String sql_file_path = Helpers.concat_path(sql_root_abs_path, ref);
+
+            return Helpers.load_text_from_file(sql_file_path);
+
+        } else if (is_sql_shortcut_ref(ref)) {
+
+            String res = shortcut_ref_to_jdbc_sql(ref);
+
+            return res;
+
+        } /*else if (is_table_ref(ref)) { // is_table_ref returns true for 'select * from my_table'
+
+            throw new Exception("Table names are not allowed here: ref=\"" + ref + "\"");
+
+        } */ else {
+
+            return ref;
+        }
+    }
+
+    public static String jdbc_sql_by_exec_dml_ref(String ref, String sql_root_abs_path) throws Exception {
+
+        /*if (is_jdbc_stored_proc_call(ref)) {
+
+            return ref;
+
+        } else if (is_stored_proc_call_shortcut(ref)) {
+
+            return ref;
+
+        } else if (is_stored_func_call_shortcut(ref)) {
+
+            return ref;
+
+        } else */ if (is_sql_file_ref(ref)) {
+
+            String sql_file_path = Helpers.concat_path(sql_root_abs_path, ref);
+
+            return Helpers.load_text_from_file(sql_file_path);
+
+        } else if (is_sql_shortcut_ref(ref)) {
+
+            throw new Exception("SQL-shortcuts are not allowed here: ref=\"" + ref + "\"");
+
+        } /* else if (is_table_ref(ref)) {  // is_table_ref returns true for 'delete from my_table'
+
+            throw new Exception("Table names are not allowed here: ref=\"" + ref + "\"");
+
+        } */ else {
+
+            return ref;
+        }
     }
 
     public static boolean is_sql_shortcut_ref(String ref) {
@@ -414,7 +437,7 @@ public class SqlUtils {
         }
 
         final char[] ILLEGAL_CHARACTERS = {'/', '\n', '\r', '\t', '\0', '\f', '`', '?', '*', '\\', '<', '>', '|',
-                '\"'/* , ':' */, ';', ','};
+            '\"'/* , ':' */, ';', ','};
 
         for (char c : ILLEGAL_CHARACTERS) {
 
@@ -451,7 +474,6 @@ public class SqlUtils {
                 || !jdbc_sql.startsWith("{") && jdbc_sql.endsWith("}")) {
 
             // throw new Exception("Invalid JDBC call: " + jdbc_sql);
-
             return false;
         }
 
@@ -509,23 +531,22 @@ public class SqlUtils {
         return select.compareToIgnoreCase("select") == 0;
     }
 
-    private static String jdbc_sp_call_to_php_sp_call(final String jdbc_sql) throws java.lang.Exception {
+    private static String jdbc_sp_call_to_php_sp_call( String jdbc_sql) throws java.lang.Exception {
 
-        String sql = jdbc_sql.trim();
+        jdbc_sql = jdbc_sql.trim();
 
-        if (is_jdbc_stored_proc_call(sql)) { // confirms syntax {call sp_name(...)}
+        if (is_jdbc_stored_proc_call(jdbc_sql)) { // confirms syntax {call sp_name(...)}
 
-            sql = sql.substring(1, sql.length() - 1).trim(); // converted to call sp_name(...)
+            return jdbc_sql.substring(1, jdbc_sql.length() - 1).trim(); // converted to call sp_name(...)
 
-        } else if (is_stored_proc_call_shortcut(sql)) {
-            //
+        } else if (is_stored_proc_call_shortcut(jdbc_sql)) {
+
+            return jdbc_sql;
 
         } else {
 
             throw new Exception("Unexpected syntax of CALL: " + jdbc_sql);
         }
-
-        return sql;
     }
 
     private static String jdbc_sp_call_to_python_sp_call(final String jdbc_sql) throws java.lang.Exception {
@@ -597,7 +618,6 @@ public class SqlUtils {
 
         // validate_table_name(table_name); // TODO: PostgreSQL JDBC prepareStatement
         // passes wrong table names
-
         String param_descriptors = parts2[1];
 
         String[] param_arr = Helpers.get_listed_items(param_descriptors);
