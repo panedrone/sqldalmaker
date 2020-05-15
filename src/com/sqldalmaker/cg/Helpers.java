@@ -408,10 +408,10 @@ public class Helpers {
     }
 
     public static String get_ruby_type_name(String type) {
-    	
-    	return get_python_type_name(type);
+
+        return get_python_type_name(type);
     }
-    
+
     public static String get_python_type_name(String type) {
 
         if (is_class_of(type, String.class)) {
@@ -470,60 +470,60 @@ public class Helpers {
 
     }
 
-	private static String get_qualified_name(String java_class_name) {
+    private static String get_qualified_name(String java_class_name) {
 
-		java_class_name = java_class_name.replaceAll("\\s+", "");
+        java_class_name = java_class_name.replaceAll("\\s+", "");
 
-		String element_name;
+        String element_name;
 
-		boolean is_array;
+        boolean is_array;
 
-		if (java_class_name.contains("[")) {
+        if (java_class_name.contains("[")) {
 
-			element_name = java_class_name.replace('[', ' ').replace(']', ' ').trim();
+            element_name = java_class_name.replace('[', ' ').replace(']', ' ').trim();
 
-			is_array = true;
+            is_array = true;
 
-		} else {
+        } else {
 
-			is_array = false;
+            is_array = false;
 
-			element_name = java_class_name;
-		}
+            element_name = java_class_name;
+        }
 
-		boolean is_primitive = Helpers.PRIMITIVE_CLASSES.containsKey(element_name);
+        boolean is_primitive = Helpers.PRIMITIVE_CLASSES.containsKey(element_name);
 
-		if (!is_primitive && !java_class_name.contains(".")) {
+        if (!is_primitive && !java_class_name.contains(".")) {
 
-			element_name = "java.lang." + element_name;
-		}
+            element_name = "java.lang." + element_name;
+        }
 
-		java_class_name = element_name;
+        java_class_name = element_name;
 
-		if (is_array) {
+        if (is_array) {
 
-			java_class_name += " []";
-		}
+            java_class_name += " []";
+        }
 
-		return java_class_name;
-	}
+        return java_class_name;
+    }
 
-	public static String get_cpp_class_name_from_java_class_name(TypeMap jaxb_type_map, String java_class_name) {
+    public static String get_cpp_class_name_from_java_class_name(TypeMap jaxb_type_map, String java_class_name) {
 
-		String s1 = get_qualified_name(java_class_name);
+        String s1 = get_qualified_name(java_class_name);
 
-		for (Type t : jaxb_type_map.getType()) {
+        for (Type t : jaxb_type_map.getType()) {
 
-			String s2 = get_qualified_name(t.getJava());
+            String s2 = get_qualified_name(t.getJava());
 
-			if (s2.equals(s1)) {
+            if (s2.equals(s1)) {
 
-				return t.getTarget();
-			}
-		}
+                return t.getTarget();
+            }
+        }
 
-		return jaxb_type_map.getDefault();
-	}
+        return jaxb_type_map.getDefault();
+    }
 
     public static StringBuilder get_only_pk_warning(String method_name) {
 

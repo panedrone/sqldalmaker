@@ -48,11 +48,6 @@ public class PsiReferenceSql extends PsiReferenceBase<PsiElement> {
             return null;
         }
 
-        if (!SqlUtils.is_sql_file_ref(canonical_text)) {
-
-            return null;
-        }
-
         PsiFile containing_file = myElement.getContainingFile();
 
         if (containing_file == null) {
@@ -149,47 +144,22 @@ public class PsiReferenceSql extends PsiReferenceBase<PsiElement> {
 
                 return true; // ref is empty
             }
-            // Allowed in DTO: empty string, table name, path to sql-file
-            // only path to sql-file must be highlighted in red if invalid
-            //
-            if (SqlUtils.is_table_ref(canonical_text)) {
 
-                return true;
+            if (SqlUtils.is_sql_file_ref(canonical_text)) {
+
+                return false;
             }
 
-            // if stored function returns table, then meta-data about columns of this table
-            // may be obtained using 'ref' like 'select * from get_test_table_by_rating(?)'
-
-            if (SqlUtils.is_stored_func_call_shortcut(canonical_text)) {
-
-                return true;
-            }
+            return true;
 
         } else if (FileSearchHelpers.is_dao_xml(name)) {
 
-            // Allowed in DAO: ONLY path to sql-file. So, everything must be checked
-            //
-            if (SqlUtils.is_sql_shortcut_ref(canonical_text)) {
+            if (SqlUtils.is_sql_file_ref(canonical_text)) {
 
-                return true;
+                return false;
             }
 
-            if (SqlUtils.is_jdbc_stored_proc_call(canonical_text)) {
-
-                return true;
-            }
-
-            if (SqlUtils.is_stored_proc_call_shortcut(canonical_text)) {
-
-                return true;
-            }
-
-            if (SqlUtils.is_stored_func_call_shortcut(canonical_text)) {
-
-                return true;
-            }
-
-            return false;
+            return true;
         }
 
         return false;

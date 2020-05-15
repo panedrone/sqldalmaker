@@ -898,7 +898,7 @@ public class JdbcUtils {
                     // fields.size() == 0 for SQL statement 'select inventory_in_stock(?)'
                     // from MySQL sakila example
                     //
-                    if (_fields.size() == 0) {
+                    if (_fields.isEmpty()) {
 
                         // throw new Exception("Columns count is < 1 . Is SQL statement valid?");
                         //
