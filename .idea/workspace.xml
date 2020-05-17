@@ -5,10 +5,7 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/META-INF/plugin.xml" beforeDir="false" afterPath="$PROJECT_DIR$/META-INF/plugin.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/nbproject/private/private.xml" beforeDir="false" afterPath="$PROJECT_DIR$/nbproject/private/private.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/Helpers.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/Helpers.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/JaxbUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/JaxbUtils.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/JdbcUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/JdbcUtils.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/PsiReferenceSql.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/PsiReferenceSql.java" afterDir="false" />
     </list>
     <list id="0b913ed8-6e39-405f-b29b-9d52c75467b5" name="Failed commit: Default" comment="" />
     <option name="SHOW_DIALOG" value="false" />

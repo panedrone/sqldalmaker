@@ -33,7 +33,7 @@ public class JdbcUtils {
         this.type_map = type_map;
     }
 
-    private static String _get_column_name(ResultSetMetaData meta, int col) throws Exception {
+    private static String _get_jdbc_column_name(ResultSetMetaData rsmd, int col) throws Exception {
 
         // H2: col. names are duplicated for SQL like'SELECT a as a1, a as a2 FROM...'
         //
@@ -41,7 +41,7 @@ public class JdbcUtils {
 
         try {
 
-            column_name = meta.getColumnLabel(col);
+            column_name = rsmd.getColumnLabel(col);
 
         } catch (SQLException e) {
 
@@ -50,7 +50,7 @@ public class JdbcUtils {
 
         if (null == column_name || 0 == column_name.length()) {
 
-            column_name = meta.getColumnName(col);
+            column_name = rsmd.getColumnName(col);
         }
 
         if (null == column_name || 0 == column_name.length()) {
@@ -135,7 +135,7 @@ public class JdbcUtils {
         }
     }
 
-    private static String _get_column_type_name(ResultSetMetaData rsmd, int i) {
+    private static String _get_jdbc_column_type_name(ResultSetMetaData rsmd, int i) {
 
         try {
 
@@ -152,7 +152,7 @@ public class JdbcUtils {
         }
     }
 
-    private static String _get_param_type_name(ParameterMetaData pm, int i) {
+    private static String _get_jdbc_param_type_name(ParameterMetaData pm, int i) {
 
         String java_class_name;
 
@@ -239,11 +239,10 @@ public class JdbcUtils {
                 rs.close();
             }
 
-            /*
-			 * DatabaseMetaData.getPrimaryKeys may return pk_col_names in lower case
-			 * (SQLite3). For other JDBC drivers, it may differ. To ensure correct
-			 * comparison of field names, do it always in lower case
-             */
+            // DatabaseMetaData.getPrimaryKeys may return pk_col_names in lower case
+            // (SQLite3). For other JDBC drivers, it may differ. To ensure correct
+            // comparison of field names, do it always in lower case
+            //
             for (String pk_col_name : pk_col_names) {
 
                 // xerial SQLite3 returns pk_col_names in the format '[employeeid] asc'
@@ -290,21 +289,21 @@ public class JdbcUtils {
 
         try {
 
-            ResultSetMetaData meta = ps.getMetaData();
+            ResultSetMetaData rsmd = ps.getMetaData();
 
-            if (meta == null) {
+            if (rsmd == null) {
 
                 // jTDS returns null for invalid SQL
-                throw new SQLException("PreparedStatement.getMetaData returns null for '" + table_name + "");
+                throw new Exception("PreparedStatement.getMetaData returns null for '" + table_name + "");
             }
 
-            int column_count = meta.getColumnCount();
+            int column_count = rsmd.getColumnCount();
 
             for (int i = 1; i <= column_count; i++) {
 
-                String col_name = _get_column_name(meta, i);
+                String col_name = _get_jdbc_column_name(rsmd, i);
 
-                String type_name = _get_column_type_name(meta, i);
+                String type_name = _get_jdbc_column_type_name(rsmd, i);
 
                 if (type_map != null) {
 
@@ -313,7 +312,7 @@ public class JdbcUtils {
 
                 FieldInfo fi = new FieldInfo(field_names_mode, type_name, col_name);
 
-                fi.setAutoIncrement(meta.isAutoIncrement(i));
+                fi.setAutoIncrement(rsmd.isAutoIncrement(i));
 
                 if (pk_col_names_set_lower_case.contains(col_name.toLowerCase())) {
 
@@ -365,11 +364,11 @@ public class JdbcUtils {
 
             for (int i = 1; i <= column_count; i++) {
 
-                String col_name = _get_column_name(rsmd, i);
+                String col_name = _get_jdbc_column_name(rsmd, i);
 
                 // considers "[B", etc.
                 //
-                String java_type_name = _get_column_type_name(rsmd, i);
+                String java_type_name = _get_jdbc_column_type_name(rsmd, i);
 
                 FieldInfo field = new FieldInfo(field_names_mode, java_type_name, col_name);
 
@@ -584,9 +583,9 @@ public class JdbcUtils {
 
         for (int i = 1; i <= col_count; i++) {
 
-            String col_name = _get_column_name(rsmd, i);
+            String col_name = _get_jdbc_column_name(rsmd, i);
 
-            String col_class_name = _get_column_type_name(rsmd, i);
+            String col_class_name = _get_jdbc_column_type_name(rsmd, i);
 
             if (type_map != null) {
 
@@ -597,125 +596,113 @@ public class JdbcUtils {
         }
     }
 
-    private static void _get_params_info(PreparedStatement ps, FieldNamesMode param_names_mode, TypeMap type_map,
-            String[] method_param_descriptors, List<FieldInfo> params) {
+    //
+    // _get_free_sql_params_info should not be used for CRUD
+    //
+    private static void _get_free_sql_params_info(PreparedStatement ps, FieldNamesMode param_names_mode, TypeMap type_map,
+            String[] method_param_descriptors, List<FieldInfo> params) throws Exception {
+
+        if (method_param_descriptors == null) {
+
+            method_param_descriptors = new String[]{};
+        }
 
         params.clear();
 
+        // Sybase ADS + adsjdbc.jar:
+        // ------------------------
+        // ps.getParameterMetaData() throws java.lang.AbstractMethodError for all
+        // statements
+        //
+        // SQL Server 2008 + sqljdbc4.jar:
+        // -------------------------------
+        // ps.getParameterMetaData() throws
+        // com.microsoft.sqlserver.jdbc.SQLServerException for
+        // some statements SQL with parameters like 'SELECT count(*) FROM orders o WHERE
+        // o_date BETWEEN ? AND ?'
+        // and for SQL statements without parameters
+        //
+        // PostgeSQL:
+        // ----------
+        // ps.getParameterMetaData() throws SQLException for both PreparedStatement and
+        // CallableStatement
+        //
+        ParameterMetaData pm = ps.getParameterMetaData();
+
+        int params_count;
+
         try {
 
-            // Sybase ADS + adsjdbc.jar:
-            // ------------------------
-            // ps.getParameterMetaData() throws java.lang.AbstractMethodError for all
-            // statements
-            // SQL Server 2008 + sqljdbc4.jar:
-            // -------------------------------
-            // ps.getParameterMetaData() throws
-            // com.microsoft.sqlserver.jdbc.SQLServerException for
-            // some statements SQL with parameters like 'SELECT count(*) FROM orders o WHERE
-            // o_date BETWEEN ? AND ?'
-            // and for SQL statements without parameters
-            // PostgeSQL:
-            // ----------
-            // ps.getParameterMetaData() throws SQLException for both PreparedStatement and
-            // CallableStatement
-            //
-            ParameterMetaData pm = ps.getParameterMetaData();
+            params_count = pm.getParameterCount();
 
-            int params_count;
+        } catch (Throwable e) { // including AbstractMethodError, SQLServerException, etc.
 
-            try {
+            _get_params_info_by_descriptors(param_names_mode, type_map,
+                    method_param_descriptors, params);
 
-                params_count = pm.getParameterCount();
-
-            } catch (SQLException e) {
-
-                params_count = 0;
-            }
-
-            if (method_param_descriptors == null && params_count > 0) {
-
-                throw new SQLException("Specified parameters count: 0. Detected parameters count: " + params_count);
-            }
-
-            if (method_param_descriptors != null && params_count != method_param_descriptors.length) {
-
-                throw new SQLException("Specified parameters count: " + method_param_descriptors.length
-                        + ". Detected parameters count: " + params_count);
-            }
-
-            if (method_param_descriptors == null) {
-
-                return;
-            }
-
-            for (int i = 0; i < params_count; i++) {
-
-                String param_descriptor = method_param_descriptors[i];
-
-                String param_type_name;
-
-                String param_name;
-
-                String[] parts = Helpers.parse_param_descriptor(param_descriptor);
-
-                if (parts[0] == null) {
-
-                    param_type_name = _get_param_type_name(pm, i);
-
-                    param_name = param_descriptor;
-
-                } else {
-
-                    param_type_name = parts[0];
-
-                    param_name = parts[1];
-                }
-
-                if (type_map != null) {
-
-                    param_type_name = Helpers.get_cpp_class_name_from_java_class_name(type_map, param_type_name);
-                }
-
-                params.add(new FieldInfo(param_names_mode, param_type_name, param_name));
-            }
-
-        } catch (Exception ex) {
-
-            if (method_param_descriptors == null) {
-
-                return;
-            }
-
-            for (String param_descriptor : method_param_descriptors) {
-
-                String param_type_name;
-
-                String param_name;
-
-                String[] parts = Helpers.parse_param_descriptor(param_descriptor);
-
-                if (parts[0] == null) {
-
-                    param_type_name = Object.class.getName();
-
-                    param_name = param_descriptor;
-
-                } else {
-
-                    param_type_name = parts[0];
-
-                    param_name = parts[1];
-                }
-
-                if (type_map != null) {
-
-                    param_type_name = Helpers.get_cpp_class_name_from_java_class_name(type_map, param_type_name);
-                }
-
-                params.add(new FieldInfo(param_names_mode, param_type_name, param_name));
-            }
+            return;
         }
+
+        if (params_count != method_param_descriptors.length) {
+
+            throw new Exception("Parameters count expected: " + method_param_descriptors.length
+                    + ", detected: " + params_count);
+        }
+
+        for (int i = 0; i < method_param_descriptors.length; i++) {
+
+            String param_descriptor = method_param_descriptors[i];
+
+            String default_param_type_name = _get_jdbc_param_type_name(pm, i);
+
+            FieldInfo pi = _create_param_info(param_names_mode, type_map, param_descriptor, default_param_type_name);
+
+            params.add(pi);
+        }
+    }
+
+    private static void _get_params_info_by_descriptors(FieldNamesMode param_names_mode, TypeMap type_map,
+            String[] method_param_descriptors, List<FieldInfo> params) {
+
+        for (int i = 0; i < method_param_descriptors.length; i++) {
+
+            String param_descriptor = method_param_descriptors[i];
+
+            FieldInfo pi = _create_param_info(param_names_mode, type_map, param_descriptor, Object.class.getName());
+
+            params.add(pi);
+        }
+    }
+
+    private static FieldInfo _create_param_info(
+            FieldNamesMode param_names_mode, TypeMap type_map,
+            String param_descriptor, String default_param_type_name) {
+
+        String param_type_name;
+
+        String param_name;
+
+        String[] parts = Helpers.parse_param_descriptor(param_descriptor);
+
+        if (parts[0] == null) {
+
+            param_type_name = default_param_type_name;
+
+            param_name = param_descriptor;
+
+        } else {
+
+            param_type_name = parts[0];
+
+            param_name = parts[1];
+        }
+
+        if (type_map != null) {
+
+            param_type_name = Helpers.get_cpp_class_name_from_java_class_name(type_map, param_type_name);
+        }
+
+        return new FieldInfo(param_names_mode, param_type_name, param_name);
     }
 
     private void _refine_dao_fields_by_dto_fields(DtoClass jaxb_dto_class, String sql_root_abs_path,
@@ -880,7 +867,22 @@ public class JdbcUtils {
 
                 if (_fields.isEmpty()) {
 
-                    throw new Exception("Columns count is 0. Is SQL statement valid?");
+                    List<String> dao_col_names = new ArrayList<String>();
+
+                    for (FieldInfo fi : dao_fields) {
+
+                        dao_col_names.add(fi.getColumnName());
+                    }
+
+                    List<String> dto_col_names = new ArrayList<String>();
+
+                    for (FieldInfo fi : dto_fields) {
+
+                        dto_col_names.add(fi.getColumnName());
+                    }
+
+                    throw new Exception("DAO columns [" + String.join(", ", dao_col_names) + "] were not found among DTO columns ["
+                            + String.join(", ", dto_col_names) + "]. Is SQL statement valid?");
                 }
 
             } else { // jaxb_return_type_is_dto == false
@@ -938,7 +940,7 @@ public class JdbcUtils {
                     ? FieldNamesMode.AS_IS
                     : field_names_mode;
 
-            _get_params_info(ps, param_names_mode, type_map, method_param_descriptors, _params);
+            _get_free_sql_params_info(ps, param_names_mode, type_map, method_param_descriptors, _params);
 
         } finally {
 
@@ -966,7 +968,7 @@ public class JdbcUtils {
                     ? FieldNamesMode.AS_IS
                     : field_names_mode;
 
-            _get_params_info(ps, param_names_mode, type_map, method_param_descriptors, params);
+            _get_free_sql_params_info(ps, param_names_mode, type_map, method_param_descriptors, params);
 
         } finally {
 
