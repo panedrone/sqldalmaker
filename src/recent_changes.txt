@@ -1,6 +1,10 @@
+2020-05-19
+
+    Improvements of type-detection for SQL-shortcuts.
+
 2020-05-05
 
-    New approach to map/correlate DTO fields and fetched records.
+    New approach to map/correlate DTO <==> fetched records.
 
 2020-04-12
 
