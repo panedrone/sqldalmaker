@@ -358,7 +358,23 @@ public class JdbcUtils {
 
         try {
 
-            ResultSetMetaData rsmd = ps.getMetaData();
+            ResultSetMetaData rsmd;
+
+            try {
+
+                rsmd = ps.getMetaData();
+
+            } catch (Throwable th) {
+
+                return; // === panedrone: just to avoid interruption and allow to obtain column info in other way
+            }
+
+            // === panedrone: it may return null for CALL in MySQL
+
+            if (rsmd == null) {
+
+                return;
+            }
 
             int column_count = rsmd.getColumnCount();
 
@@ -516,83 +532,21 @@ public class JdbcUtils {
         }
     }
 
-    private void _get_fields_info(PreparedStatement ps, List<FieldInfo> fields) throws Exception {
+    private void _get_free_sql_params_info(
+            String dao_jdbc_sql, FieldNamesMode param_names_mode,
+            String[] method_param_descriptors, List<FieldInfo> params) throws Exception {
 
-        fields.clear();
+        Helpers.check_duplicates(method_param_descriptors);
 
-        // PostgreSQL:
-        // Initial SQL is '{call get_tests(4)}'; ps is CallableStatement.
-        // ps.toString() returns something like 'select * from get_tests(4) as result'
-        // and ps.getMetaData() throws SQLException.
-        //
-        ResultSetMetaData rsmd;
+        PreparedStatement ps = _prepare_jdbc_sql(dao_jdbc_sql);
 
         try {
 
-            // String prepared = ps.toString();
-            //
-            rsmd = ps.getMetaData();
+            _get_free_sql_params_info(ps, param_names_mode, type_map, method_param_descriptors, params);
 
-        } catch (SQLException ex) {
+        } finally {
 
-            rsmd = null;
-        }
-
-        // it is null if no columns or _prepare was called instead of _prepare_call for
-        // SP
-        //
-        if (rsmd == null) {
-
-            return;
-        }
-
-        int col_count;
-
-        try {
-
-            // Informix:
-            // ResultSetMetaData.getColumnCount() returns
-            // value > 0 for some DML statements, e.g. for 'update orders set
-            // dt_id = ? where o_id = ?' it considers that 'dt_id' is column.
-            // SQLite:
-            // throws java.sql.SQLException: column 1 out
-            // of bounds [1,0] if the statement is like INSERT
-            //
-            col_count = rsmd.getColumnCount();
-
-        } catch (Exception e) {
-
-            col_count = 0;
-        }
-
-        //
-        // PostgreSQL: query to function 'select * from fn_get_tests(?, ?)'
-        // returns ResultSet
-        //
-        if (col_count == 1) {
-
-            String java_class_name = rsmd.getColumnClassName(1); // it starts from 1!
-
-            String rs_class_name = ResultSet.class.getName();
-
-            if (java_class_name.equals(rs_class_name)) {
-
-                return;
-            }
-        }
-
-        for (int i = 1; i <= col_count; i++) {
-
-            String col_name = _get_jdbc_column_name(rsmd, i);
-
-            String col_class_name = _get_jdbc_column_type_name(rsmd, i);
-
-            if (type_map != null) {
-
-                col_class_name = Helpers.get_cpp_class_name_from_java_class_name(type_map, col_class_name);
-            }
-
-            fields.add(new FieldInfo(field_names_mode, col_class_name, col_name));
+            ps.close();
         }
     }
 
@@ -827,44 +781,63 @@ public class JdbcUtils {
 
             throw new Exception("Table name as a value of 'ref' is not allowed in <query...");
 
-        } else if (SqlUtils.is_sql_shortcut_ref(dao_jaxb_ref) && jaxb_return_type_is_dto) {
+        } else if (SqlUtils.is_sql_shortcut_ref(dao_jaxb_ref)) {
 
             String[] parts = SqlUtils.parse_sql_shortcut_ref(dao_jaxb_ref);
 
             String dao_table_name = parts[0];
 
-            String explicit_pk = parts[1];
+            String explicit_keys = parts[1];
 
-            List<FieldInfo> fields_pk = new ArrayList<>();
+            List<FieldInfo> dao_fields = new ArrayList<FieldInfo>();
 
-            _get_table_field_info(dao_table_name, _fields, null, explicit_pk, fields_pk);
+            List<FieldInfo> dao_key_fields = new ArrayList<>();
 
-            DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(jaxb_dto_or_return_type, jaxb_dto_classes);
+            _get_table_field_info(dao_table_name, dao_fields, null, explicit_keys, dao_key_fields);
 
-            _refine_dao_fields_by_dto_fields(jaxb_dto_class, sql_root_abs_path, _fields);
+            /////////////////////////////////////////////////
+            // assign param types from table!! without dto-refinement!!!
+            //
+            if (method_param_descriptors.length != dao_key_fields.size()) {
 
-            if (method_param_descriptors.length != fields_pk.size()) {
-
-                throw new Exception("Invalid SQL-shortcut. Keys declared: " + method_param_descriptors.length + ", keys expected: " + fields_pk.size());
+                throw new Exception("Invalid SQL-shortcut. Keys declared: " + method_param_descriptors.length + ", keys expected: " + dao_key_fields.size());
             }
 
             for (int i = 0; i < method_param_descriptors.length; i++) {
 
                 String param_descriptor = method_param_descriptors[i];
 
-                String default_param_type_name = fields_pk.get(i).getType();
+                String default_param_type_name = dao_key_fields.get(i).getType();
 
                 FieldInfo pi = _create_param_info(param_names_mode, type_map, param_descriptor, default_param_type_name);
 
                 _params.add(pi);
             }
 
-            return dao_query_jdbc_sql;
-        }
+            /////////////////////////////////////////////////
+            //
+            if (jaxb_return_type_is_dto) {
 
-        PreparedStatement ps = _prepare_jdbc_sql(dao_query_jdbc_sql);
+                DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(jaxb_dto_or_return_type, jaxb_dto_classes);
 
-        try {
+                _refine_dao_fields_by_dto_fields(jaxb_dto_class, sql_root_abs_path, dao_fields);
+
+                _fields.addAll(dao_fields);
+
+            } else {
+
+                String ret_type_name = _get_scalar_ret_type(jaxb_dto_or_return_type, dao_fields);
+
+                _fields.add(new FieldInfo(field_names_mode, ret_type_name, "ret_value"));
+            }
+
+        } else {
+
+            Map<String, FieldInfo> fields_map = new HashMap<String, FieldInfo>();
+
+            List<FieldInfo> dao_fields = new ArrayList<FieldInfo>();
+
+            _get_fields_map_by_jdbc_sql(dao_query_jdbc_sql, fields_map, dao_fields);
 
             // For CALL statement, columns count is always 0. Even if the stored procedure
             // returns ResultSet (MySQL).
@@ -881,12 +854,6 @@ public class JdbcUtils {
 
                 Map<String, FieldInfo> dto_fields_map = _get_dto_class_field_info(jaxb_dto_class, sql_root_abs_path,
                         dto_fields);
-
-                ////////////////////////////////////////////////
-                //
-                List<FieldInfo> dao_fields = new ArrayList<FieldInfo>();
-
-                _get_fields_info(ps, dao_fields);
 
                 // no fields from DAO SQL (e.g. it may happen for CALL statement?). just use
                 // fields of DTO class
@@ -930,86 +897,68 @@ public class JdbcUtils {
 
             } else { // jaxb_return_type_is_dto == false
 
-                _get_fields_info(ps, _fields);
+                String ret_type_name = _get_scalar_ret_type(jaxb_dto_or_return_type, dao_fields);
 
-                String ret_type_name;
-
-                if (jaxb_dto_or_return_type != null && jaxb_dto_or_return_type.trim().length() > 0) {
-
-                    ret_type_name = jaxb_dto_or_return_type;
-
-                } else {
-                    //
-                    // fields.size() == 0 for SQL statement 'select inventory_in_stock(?)'
-                    // from MySQL sakila example
-                    //
-                    if (_fields.isEmpty()) {
-
-                        // throw new Exception("Columns count is < 1 . Is SQL statement valid?");
-                        //
-                        ret_type_name = Object.class.getName();
-
-                    } else {
-
-                        ret_type_name = _fields.get(0).getType();
-                    }
-                }
-
-                // add single field
-                if (_fields.isEmpty()) {
-
-                    _fields.add(new FieldInfo(field_names_mode, ret_type_name, "ret_value"));
-
-                } else {
-
-                    _fields.get(0).setType(ret_type_name);
-                }
-            }
-
-            if (type_map != null) {
-
-                for (FieldInfo fi : _fields) {
-
-                    fi.setType(Helpers.get_cpp_class_name_from_java_class_name(type_map, fi.getType()));
-                }
+                _fields.add(new FieldInfo(field_names_mode, ret_type_name, "ret_value"));
             }
 
             /////////////////////////////
 
-            _get_free_sql_params_info(ps, param_names_mode, type_map, method_param_descriptors, _params);
+            _get_free_sql_params_info(dao_query_jdbc_sql, param_names_mode, method_param_descriptors, _params);
+        }
 
-        } finally {
+        if (type_map != null) {
 
-            ps.close();
+            for (FieldInfo fi : _fields) {
+
+                fi.setType(Helpers.get_cpp_class_name_from_java_class_name(type_map, fi.getType()));
+            }
         }
 
         return dao_query_jdbc_sql;
     }
 
-    public void get_dao_exec_dml_info(String dao_jdbc_sql, String dto_param_type, String[] method_param_descriptors,
-                                      List<FieldInfo> params) throws Exception {
+    private static String _get_scalar_ret_type(String exlicit_ret_type, List<FieldInfo> dao_fields) {
 
-        Helpers.check_duplicates(method_param_descriptors);
+        String ret_type_name;
 
-        PreparedStatement ps = _prepare_jdbc_sql(dao_jdbc_sql);
+        if (exlicit_ret_type != null && exlicit_ret_type.trim().length() > 0) {
 
-        try {
+            ret_type_name = exlicit_ret_type;
 
-            /////////////////////////////
+        } else {
             //
-            // if it is something like <query method="get_some_value(MyDTO(m_id, m_date))",
-            ///////////////////////////// use field_names_mode (???)
+            // fields.size() == 0 for SQL statement 'select inventory_in_stock(?)'
+            // from MySQL sakila example
             //
-            FieldNamesMode param_names_mode = dto_param_type == null || dto_param_type.length() == 0
-                    ? FieldNamesMode.AS_IS
-                    : field_names_mode;
+            if (dao_fields.isEmpty()) {
 
-            _get_free_sql_params_info(ps, param_names_mode, type_map, method_param_descriptors, params);
+                // throw new Exception("Columns count is < 1 . Is SQL statement valid?");
+                //
+                ret_type_name = Object.class.getName();
 
-        } finally {
+            } else {
 
-            ps.close();
+                ret_type_name = dao_fields.get(0).getType();
+            }
         }
+
+        return ret_type_name;
+    }
+
+    public void get_dao_exec_dml_info(String dao_jdbc_sql, String dto_param_type, String[] method_param_descriptors,
+                                      List<FieldInfo> _params) throws Exception {
+
+        /////////////////////////////
+        //
+        // if it is something like <query method="get_some_value(MyDTO(m_id, m_date))",
+        ///////////////////////////// use field_names_mode (???)
+        //
+        FieldNamesMode param_names_mode = dto_param_type == null || dto_param_type.length() == 0
+                ? FieldNamesMode.AS_IS
+                : field_names_mode;
+
+        _get_free_sql_params_info(dao_jdbc_sql, param_names_mode, method_param_descriptors, _params);
     }
 
     /////////////////////////////////////////////////////////////////////////////

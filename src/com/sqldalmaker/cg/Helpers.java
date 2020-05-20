@@ -633,7 +633,7 @@ public class Helpers {
         return new String[]{param_type_name, param_name};
     }
 
-    static void check_duplicates(String[] param_names) throws SQLException {
+    static void check_duplicates(String[] param_names) throws Exception {
 
         if (param_names != null) {
 
