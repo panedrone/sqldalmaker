@@ -48,15 +48,20 @@ public class JdbcUtils {
             column_name = null;
         }
 
-        if (null == column_name || 0 == column_name.length()) {
+        if (column_name == null || column_name.length() == 0) {
 
             column_name = rsmd.getColumnName(col);
         }
 
-        if (null == column_name || 0 == column_name.length()) {
+        if (column_name == null) {
 
             throw new Exception(
                     "Column name cannot be detected. Try to specify column label. For example, 'SELECT COUNT(*) AS RES...'");
+        }
+
+        if (column_name.length() == 0) {
+
+            column_name = "col_" + col; // MS SQL Server: column_name == "" for  'select dbo.ufnLeadingZeros(?)'
         }
 
         return column_name;
@@ -153,6 +158,11 @@ public class JdbcUtils {
     }
 
     private static String _get_jdbc_param_type_name(ParameterMetaData pm, int i) {
+
+        if (pm == null) {
+
+            return Object.class.getName();
+        }
 
         String java_class_name;
 
@@ -580,20 +590,31 @@ public class JdbcUtils {
         // ps.getParameterMetaData() throws SQLException for both PreparedStatement and
         // CallableStatement
         //
-        ParameterMetaData pm = ps.getParameterMetaData();
-
         int params_count;
+
+        ParameterMetaData pm = null;
 
         try {
 
-            params_count = pm.getParameterCount();
+            // MS SQL Server: getParameterMetaData throws exception for SF without params
+            //
+            pm = ps.getParameterMetaData();
 
+            try {
+
+                params_count = pm.getParameterCount();
+
+            } catch (Throwable e) { // including AbstractMethodError, SQLServerException, etc.
+
+                _get_params_info_by_descriptors(param_names_mode, type_map,
+                        method_param_descriptors, params);
+
+                return;
+            }
+            
         } catch (Throwable e) { // including AbstractMethodError, SQLServerException, etc.
 
-            _get_params_info_by_descriptors(param_names_mode, type_map,
-                    method_param_descriptors, params);
-
-            return;
+            params_count = 0;
         }
 
         if (params_count != method_param_descriptors.length) {
@@ -701,7 +722,7 @@ public class JdbcUtils {
 
             if (dao_fields.isEmpty()) {
                 //
-                // MySQL sakila example: dao_fields.isEmpty() for SQL statement 'select inventory_in_stock(?)'
+                // MySQL sakila example: dao_fields.isEmpty() for 'select inventory_in_stock(?)'
                 //
                 ret_type_name = Object.class.getName();
 
@@ -715,7 +736,7 @@ public class JdbcUtils {
 
         if (dao_fields.isEmpty()) {
             //
-            // MySQL sakila example: dao_fields.isEmpty() for SQL statement 'select inventory_in_stock(?)'
+            // MySQL sakila example: dao_fields.isEmpty() for 'select inventory_in_stock(?)'
             //
             ret_col_name = "ret_value";
 
@@ -936,6 +957,7 @@ public class JdbcUtils {
             }
 
             /////////////////////////////
+            //
             _get_free_sql_params_info(dao_query_jdbc_sql, param_names_mode, method_param_descriptors, _params);
         }
 
