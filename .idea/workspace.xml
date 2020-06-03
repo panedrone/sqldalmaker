@@ -5,7 +5,6 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/META-INF/plugin.xml" beforeDir="false" afterPath="$PROJECT_DIR$/META-INF/plugin.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/nbproject/private/private.xml" beforeDir="false" afterPath="$PROJECT_DIR$/nbproject/private/private.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/JdbcUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/JdbcUtils.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/Bundle.properties" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/NbpCrudXmHelpers.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/NbpHelpers.java" beforeDir="false" />
@@ -36,17 +35,8 @@
       <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/sqldalmaker.gif" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/sqldalmaker_24.png" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/recent_changes.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/recent_changes.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/DataStore.STL.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/DataStore.STL.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/DataStore.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/DataStore.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/DataStore.java_" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/DataStore.java_" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/DataStore.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/DataStore.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/DataStore1.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/DataStore1.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/resources/DataStore2.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/DataStore2.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/DataStoreManagerAndroid.java_" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/DataStoreManagerAndroid.java_" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/DataStoreManagerDbUtils.java_" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/DataStoreManagerDbUtils.java_" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/DataStoreManagerSpring.java_" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/DataStoreManagerSpring.java_" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/DataStore_Qt5.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/DataStore_Qt5.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/PDODataStore.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/PDODataStore.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabAdmin.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabAdmin.java" afterDir="false" />
     </list>
     <list id="0b913ed8-6e39-405f-b29b-9d52c75467b5" name="Failed commit: Default" comment="" />
     <option name="SHOW_DIALOG" value="false" />
@@ -968,26 +958,26 @@
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
     <state x="92" y="92" width="1736" height="866" key="DiffContextDialog/0.0.1920.1050@0.0.1920.1050" timestamp="1590003467353" />
-    <state x="740" y="281" key="FileChooserDialogImpl" timestamp="1590854137879">
+    <state x="740" y="281" key="FileChooserDialogImpl" timestamp="1591195113396">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state x="740" y="281" key="FileChooserDialogImpl/0.0.1920.1050@0.0.1920.1050" timestamp="1590854137879" />
-    <state width="1104" height="208" key="GridCell.Tab.0.bottom" timestamp="1590003467273">
+    <state x="740" y="281" key="FileChooserDialogImpl/0.0.1920.1050@0.0.1920.1050" timestamp="1591195113396" />
+    <state width="924" height="87" key="GridCell.Tab.0.bottom" timestamp="1591193675830">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="1104" height="208" key="GridCell.Tab.0.bottom/0.0.1920.1050@0.0.1920.1050" timestamp="1590003467273" />
-    <state width="1104" height="208" key="GridCell.Tab.0.center" timestamp="1590003467273">
+    <state width="924" height="87" key="GridCell.Tab.0.bottom/0.0.1920.1050@0.0.1920.1050" timestamp="1591193675830" />
+    <state width="924" height="87" key="GridCell.Tab.0.center" timestamp="1591193675830">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="1104" height="208" key="GridCell.Tab.0.center/0.0.1920.1050@0.0.1920.1050" timestamp="1590003467273" />
-    <state width="1104" height="208" key="GridCell.Tab.0.left" timestamp="1590003467273">
+    <state width="924" height="87" key="GridCell.Tab.0.center/0.0.1920.1050@0.0.1920.1050" timestamp="1591193675830" />
+    <state width="924" height="87" key="GridCell.Tab.0.left" timestamp="1591193675830">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="1104" height="208" key="GridCell.Tab.0.left/0.0.1920.1050@0.0.1920.1050" timestamp="1590003467273" />
-    <state width="1104" height="208" key="GridCell.Tab.0.right" timestamp="1590003467273">
+    <state width="924" height="87" key="GridCell.Tab.0.left/0.0.1920.1050@0.0.1920.1050" timestamp="1591193675830" />
+    <state width="924" height="87" key="GridCell.Tab.0.right" timestamp="1591193675830">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="1104" height="208" key="GridCell.Tab.0.right/0.0.1920.1050@0.0.1920.1050" timestamp="1590003467273" />
+    <state width="924" height="87" key="GridCell.Tab.0.right/0.0.1920.1050@0.0.1920.1050" timestamp="1591193675830" />
     <state width="1104" height="208" key="GridCell.Tab.1.bottom" timestamp="1590003467273">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
@@ -1012,10 +1002,10 @@
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
     <state x="693" y="226" key="RollbackChangesDialog/0.0.1920.1050@0.0.1920.1050" timestamp="1589819515181" />
-    <state x="440" y="101" key="SettingsEditor" timestamp="1590854140691">
+    <state x="440" y="101" key="SettingsEditor" timestamp="1591195115986">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state x="440" y="101" key="SettingsEditor/0.0.1920.1050@0.0.1920.1050" timestamp="1590854140691" />
+    <state x="440" y="101" key="SettingsEditor/0.0.1920.1050@0.0.1920.1050" timestamp="1591195115986" />
     <state x="776" y="302" key="chooseDestDirectoryDialog" timestamp="1588406446535">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
@@ -1028,10 +1018,10 @@
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
     <state x="609" y="138" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser/0.0.1920.1050@0.0.1920.1050" timestamp="1588695522378" />
-    <state x="746" y="218" width="998" height="767" key="find.popup" timestamp="1589208836395">
+    <state x="746" y="218" width="998" height="767" key="find.popup" timestamp="1591193499221">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state x="746" y="218" width="998" height="767" key="find.popup/0.0.1920.1050@0.0.1920.1050" timestamp="1589208836395" />
+    <state x="746" y="218" width="998" height="767" key="find.popup/0.0.1920.1050@0.0.1920.1050" timestamp="1591193499221" />
     <state x="342" y="144" key="new project wizard" timestamp="1589043165550">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>

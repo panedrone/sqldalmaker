@@ -31,13 +31,6 @@ class DataStore:
     def rollback(self):
         self.connection.rollback()
 
-    @staticmethod
-    def prepare_sql(sql):
-        """
-        @rtype : str
-        """
-        return sql.replace("?", "%s")
-
     def insert_row(self, sql, params, ai_values):
         """
         Returns:
@@ -49,37 +42,18 @@ class DataStore:
         Raises:
             Exception: if no rows inserted.
         """
-        sql = self.prepare_sql(sql)
+        sql = _prepare_sql(sql)
 
         cursor = self.connection.cursor()
 
         try:
-
             cursor.execute(sql, params)
-
             if len(ai_values) > 0:
                 ai_values[0][1] = cursor.lastrowid
-
             if cursor.rowcount == 0:
                 raise Exception('No rows inserted')
-
         finally:
             cursor.close()
-
-    @staticmethod
-    def get_sp_name(sql):
-
-        parts = sql.split()
-
-        if len(parts) >= 2 and parts[0].lower() == "call":
-            name = parts[1]
-            end = name.find("(")
-            if end == -1:
-                return name
-            else:
-                return name[0:end]
-
-        return None
 
     def exec_dml(self, sql, params):
         """
@@ -89,21 +63,18 @@ class DataStore:
         Returns:
             Number of updated rows.
         """
-        sql = self.prepare_sql(sql)
+        sql = _prepare_sql(sql)
 
         cursor = self.connection.cursor()
 
         try:
-
-            sp = self.get_sp_name(sql)
-
+            sp = _get_sp_name(sql)
             if sp is None:
                 cursor.execute(sql, params)
                 return cursor.rowcount
             else:
                 cursor.callproc(sp, params)
                 return 0
-
         finally:
             cursor.close()
 
@@ -138,15 +109,14 @@ class DataStore:
             sql (string): SQL statement.
             params (array, optional): Values of SQL parameters if needed.
         """
-        sql = self.prepare_sql(sql)
+        sql = _prepare_sql(sql)
 
         res = []
 
         cursor = self.connection.cursor()
 
         try:
-
-            sp = self.get_sp_name(sql)
+            sp = _get_sp_name(sql)
 
             if sp is None:
                 cursor.execute(sql, params)
@@ -158,9 +128,9 @@ class DataStore:
                 # http://www.mysqltutorial.org/calling-mysql-stored-procedures-python/
                 cursor.callproc(sp, params)
                 for result in cursor.stored_results():
-                    row = result.fetchall()
-                    res.append(row[0])
-
+                    # fetchall() in here because it may break on None value in the first element of array (DBNull)
+                    for row_values in result.fetchall():
+                        res.append(row_values[0])
         finally:
             cursor.close()
 
@@ -200,7 +170,7 @@ class DataStore:
             params (array, optional): Values of SQL parameters if needed.
             callback
         """
-        sql = self.prepare_sql(sql)
+        sql = _prepare_sql(sql)
 
         # http://geert.vanderkelen.org/connectorpython-custom-cursors/
         # Fetching rows as dictionaries with MySQL Connector/Python
@@ -213,8 +183,7 @@ class DataStore:
         cursor = self.connection.cursor(dictionary=True)
 
         try:
-
-            sp = self.get_sp_name(sql)
+            sp = _get_sp_name(sql)
 
             if sp is None:
                 cursor.execute(sql, params)
@@ -225,23 +194,42 @@ class DataStore:
             else:
                 # http://www.mysqltutorial.org/calling-mysql-stored-procedures-python/
                 cursor.callproc(sp, params)
-
                 for result in cursor.stored_results():
-                    # cursor(dictionary=True) does not work here. workarounds:
+                    # cursor(dictionary=True) does not help in here. workarounds:
                     # https://stackoverflow.com/questions/34030020/mysql-python-connector-get-columns-names-from-select-statement-in-stored-procedu
                     # https://kadler.github.io/2018/01/08/fetching-python-database-cursors-by-column-name.html#
-
-                    row_values = result.fetchall()
-                    row = {}
-                    i = 0
-
-                    for d in result.description:
-                        col_name = d[0]
-                        value = row_values[0][i]
-                        row[col_name] = value
-                        i = i + 1
-
-                    callback(row)
-
+                    for row_values in result.fetchall():
+                        row = {}
+                        i = 0
+                        for d in result.description:
+                            col_name = d[0]
+                            value = row_values[i]
+                            row[col_name] = value
+                            i = i + 1
+                        callback(row)
         finally:
             cursor.close()
+
+
+def _prepare_sql(sql):
+    """
+    @rtype : str
+    """
+    return sql.replace("?", "%s")
+
+
+def _get_sp_name(sql):
+    """
+    @rtype : str
+    """
+    parts = sql.split()
+
+    if len(parts) >= 2 and parts[0].lower() == "call":
+        name = parts[1]
+        end = name.find("(")
+        if end == -1:
+            return name
+        else:
+            return name[0:end]
+
+    return None

@@ -287,13 +287,13 @@ public class UITabAdmin {
         dataStorePySQLite3Button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "DataStore1.py", "DataStore.py");
+                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "DataStore1.py", "DataStore_SQLite3.py");
             }
         });
         dataStorePyMySQLButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "DataStore2.py", "DataStore.py");
+                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "DataStore2.py", "DataStore_MySQL.py");
             }
         });
         dataStoreRUBYDBIButton.addActionListener(new ActionListener() {
