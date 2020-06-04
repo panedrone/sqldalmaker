@@ -509,7 +509,7 @@ public class SqlUtils {
             return false;
         }
 
-        String call = parts[0];
+        String call = parts[0].trim();
 
         return call.compareToIgnoreCase("call") == 0;
     }
@@ -531,13 +531,20 @@ public class SqlUtils {
         return select.compareToIgnoreCase("select") == 0;
     }
 
-    private static String jdbc_sp_call_to_php_sp_call( String jdbc_sql) throws java.lang.Exception {
+    private static String jdbc_sp_call_to_php_sp_call(String jdbc_sql) throws java.lang.Exception {
 
         jdbc_sql = jdbc_sql.trim();
 
         if (is_jdbc_stored_proc_call(jdbc_sql)) { // confirms syntax {call sp_name(...)}
 
-            return jdbc_sql.substring(1, jdbc_sql.length() - 1).trim(); // converted to call sp_name(...)
+            if (jdbc_sql.startsWith("{") && jdbc_sql.endsWith("}")) {
+                
+                return jdbc_sql.substring(1, jdbc_sql.length() - 1).trim(); // converted to call sp_name(...)
+                
+            } else {
+
+                return jdbc_sql;
+            }
 
         } else if (is_stored_proc_call_shortcut(jdbc_sql)) {
 

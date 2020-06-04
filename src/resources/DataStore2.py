@@ -115,21 +115,21 @@ class DataStore:
 
         cursor = self.connection.cursor()
 
-        try:
-            sp = _get_sp_name(sql)
+        sp = _get_sp_name(sql)
 
+        try:
             if sp is None:
                 cursor.execute(sql, params)
-                row = cursor.fetchone()
-                while row is not None:
+                # fetchone() in here throws 'Unread result found' in cursor.close()
+                # fetchall() in here because it may break on None value in the first element of array (DBNull)
+                for row in cursor: # .fetchall():
                     res.append(row[0])
-                    row = cursor.fetchone()
             else:
                 # http://www.mysqltutorial.org/calling-mysql-stored-procedures-python/
                 cursor.callproc(sp, params)
                 for result in cursor.stored_results():
                     # fetchall() in here because it may break on None value in the first element of array (DBNull)
-                    for row_values in result.fetchall():
+                    for row_values in result: # .fetchall():
                         res.append(row_values[0])
         finally:
             cursor.close()
@@ -172,11 +172,6 @@ class DataStore:
         """
         sql = _prepare_sql(sql)
 
-        # http://geert.vanderkelen.org/connectorpython-custom-cursors/
-        # Fetching rows as dictionaries with MySQL Connector/Python
-
-        # cursor = self.connection.cursor(cursor_class=MySQLCursorDict)
-
         # How to retrieve SQL result column value using column name in Python?
         # https://stackoverflow.com/questions/10195139/how-to-retrieve-sql-result-column-value-using-column-name-in-python
 
@@ -187,10 +182,9 @@ class DataStore:
 
             if sp is None:
                 cursor.execute(sql, params)
-                row = cursor.fetchone()
-                while row is not None:
+                # fetchone() in here throws 'Undead data' in cursor.close()
+                for row in cursor: # .fetchall():
                     callback(row)
-                    row = cursor.fetchone()
             else:
                 # http://www.mysqltutorial.org/calling-mysql-stored-procedures-python/
                 cursor.callproc(sp, params)
@@ -198,7 +192,7 @@ class DataStore:
                     # cursor(dictionary=True) does not help in here. workarounds:
                     # https://stackoverflow.com/questions/34030020/mysql-python-connector-get-columns-names-from-select-statement-in-stored-procedu
                     # https://kadler.github.io/2018/01/08/fetching-python-database-cursors-by-column-name.html#
-                    for row_values in result.fetchall():
+                    for row_values in result: # .fetchall():
                         row = {}
                         i = 0
                         for d in result.description:
@@ -224,7 +218,7 @@ def _get_sp_name(sql):
     """
     parts = sql.split()
 
-    if len(parts) >= 2 and parts[0].lower() == "call":
+    if len(parts) >= 2 and parts[0].strip().lower() == "call":
         name = parts[1]
         end = name.find("(")
         if end == -1:
