@@ -59,6 +59,7 @@ public class UITabAdmin {
     private JTextField vTextField;
     private JButton referenceSettingsXmlButton;
     private JScrollPane scroll_pane;
+    private JButton datastore_pyodbc;
 
     private Project project;
     private VirtualFile propFile;
@@ -321,6 +322,12 @@ public class UITabAdmin {
                 IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, Const.SETTINGS_XML, Const.SETTINGS_XML);
             }
         });
+        datastore_pyodbc.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "DataStore_pyodbc.py", "DataStore_pyodbc.py");
+            }
+        });
     }
 
     private void testConnection() {
@@ -443,6 +450,9 @@ public class UITabAdmin {
         dataStoreJavaSpringButton = new JButton();
         dataStoreJavaSpringButton.setText("DataStoreManager.java (Spring JDBC)");
         panel4.add(dataStoreJavaSpringButton, new GridConstraints(1, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        datastore_pyodbc = new JButton();
+        datastore_pyodbc.setText("DataStore.py (pyodbc)");
+        panel4.add(datastore_pyodbc, new GridConstraints(3, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JPanel panel5 = new JPanel();
         panel5.setLayout(new GridLayoutManager(1, 5, new Insets(10, 0, 0, 0), 1, -1));
         panel1.add(panel5, new GridConstraints(3, 0, 1, 1, GridConstraints.ANCHOR_NORTHWEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));

@@ -55,7 +55,6 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         jTextField1.setBorder(javax.swing.BorderFactory.createEmptyBorder());
 
         ////////////////////////////////////////
-        
         jTextPane1.setEditable(false);
         jTextPane1.setContentType("text/html");
 
@@ -70,7 +69,7 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         }
 
         jTextPane1.addHyperlinkListener(new HyperlinkListener() {
-            
+
             @Override
             public void hyperlinkUpdate(HyperlinkEvent hle) {
                 if (HyperlinkEvent.EventType.ACTIVATED.equals(hle.getEventType())) {
@@ -142,10 +141,10 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         jButton24 = new javax.swing.JButton();
         jButton12 = new javax.swing.JButton();
         jButton14 = new javax.swing.JButton();
-        jLabel7 = new javax.swing.JLabel();
-        jButton16 = new javax.swing.JButton();
-        jButton15 = new javax.swing.JButton();
         jLabel4 = new javax.swing.JLabel();
+        jButton15 = new javax.swing.JButton();
+        jButton16 = new javax.swing.JButton();
+        jButton9 = new javax.swing.JButton();
         jLabel5 = new javax.swing.JLabel();
         jButton18 = new javax.swing.JButton();
         jLabel6 = new javax.swing.JLabel();
@@ -345,8 +344,17 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         });
         jPanel5.add(jButton14);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel7, org.openide.util.NbBundle.getMessage(SdmTabAdmin.class, "SdmTabAdmin.jLabel7.text")); // NOI18N
-        jPanel5.add(jLabel7);
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel4, org.openide.util.NbBundle.getMessage(SdmTabAdmin.class, "SdmTabAdmin.jLabel4.text")); // NOI18N
+        jPanel5.add(jLabel4);
+
+        org.openide.awt.Mnemonics.setLocalizedText(jButton15, org.openide.util.NbBundle.getMessage(SdmTabAdmin.class, "SdmTabAdmin.jButton15.text")); // NOI18N
+        jButton15.setFocusPainted(false);
+        jButton15.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton15ActionPerformed(evt);
+            }
+        });
+        jPanel5.add(jButton15);
 
         org.openide.awt.Mnemonics.setLocalizedText(jButton16, org.openide.util.NbBundle.getMessage(SdmTabAdmin.class, "SdmTabAdmin.jButton16.text")); // NOI18N
         jButton16.setToolTipText(org.openide.util.NbBundle.getMessage(SdmTabAdmin.class, "SdmTabAdmin.jButton16.toolTipText")); // NOI18N
@@ -358,17 +366,13 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         });
         jPanel5.add(jButton16);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jButton15, org.openide.util.NbBundle.getMessage(SdmTabAdmin.class, "SdmTabAdmin.jButton15.text")); // NOI18N
-        jButton15.setFocusPainted(false);
-        jButton15.addActionListener(new java.awt.event.ActionListener() {
+        org.openide.awt.Mnemonics.setLocalizedText(jButton9, org.openide.util.NbBundle.getMessage(SdmTabAdmin.class, "SdmTabAdmin.jButton9.text")); // NOI18N
+        jButton9.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton15ActionPerformed(evt);
+                jButton9ActionPerformed(evt);
             }
         });
-        jPanel5.add(jButton15);
-
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel4, org.openide.util.NbBundle.getMessage(SdmTabAdmin.class, "SdmTabAdmin.jLabel4.text")); // NOI18N
-        jPanel5.add(jLabel4);
+        jPanel5.add(jButton9);
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel5, org.openide.util.NbBundle.getMessage(SdmTabAdmin.class, "SdmTabAdmin.jLabel5.text")); // NOI18N
         jPanel5.add(jLabel5);
@@ -551,10 +555,10 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
     }//GEN-LAST:event_jButton10ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        
-        int dialogResult = JOptionPane.showConfirmDialog(null, 
+
+        int dialogResult = JOptionPane.showConfirmDialog(null,
                 "This action creates/overwrites 'dto.xml' in the folder of XML meta-program. Continue?",
-            "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 
         if (dialogResult == JOptionPane.YES_OPTION) {
 
@@ -565,7 +569,7 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
 
         int dialogResult = JOptionPane.showConfirmDialog(null, "This action creates/overwrites 'settings.xml' in the folder of XML meta-program. Continue?",
-            "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 
         if (dialogResult == JOptionPane.YES_OPTION) {
 
@@ -576,7 +580,7 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
 
         int dialogResult = JOptionPane.showConfirmDialog(null, "This action creates/overwrites XSD files in the folder of XML meta-program. Continue?",
-            "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 
         if (dialogResult == JOptionPane.YES_OPTION) {
 
@@ -599,6 +603,10 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
         editSettingsXml();
     }//GEN-LAST:event_jButton5ActionPerformed
+
+    private void jButton9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton9ActionPerformed
+        NbpIdeEditorHelpers.open_resource_file_in_editor_async("DataStore_pyodbc.py", "DataStore_pyodbc.py");
+    }//GEN-LAST:event_jButton9ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
@@ -625,13 +633,13 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
     private javax.swing.JButton jButton6;
     private javax.swing.JButton jButton7;
     private javax.swing.JButton jButton8;
+    private javax.swing.JButton jButton9;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
