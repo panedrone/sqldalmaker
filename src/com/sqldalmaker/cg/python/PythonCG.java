@@ -201,6 +201,19 @@ public class PythonCG {
 
                 String[] method_param_descriptors = Helpers.get_listed_items(param_descriptors);
 
+                boolean out_params;
+
+                if (method_param_descriptors.length > 0 && "out_params".equals(method_param_descriptors[method_param_descriptors.length - 1])) {
+
+                    out_params = true;
+
+                    method_param_descriptors = Arrays.copyOf(method_param_descriptors, method_param_descriptors.length -1);
+
+                } else {
+
+                    out_params = false;
+                }
+
                 List<FieldInfo> fields = new ArrayList<FieldInfo>();
                 List<FieldInfo> params = new ArrayList<FieldInfo>();
 
@@ -210,7 +223,7 @@ public class PythonCG {
 
                 return _render_query(dao_query_jdbc_sql, mi.jaxb_is_external_sql,
                         mi.jaxb_dto_or_return_type, mi.return_type_is_dto, mi.fetch_list,
-                        method_name, dto_param_type, null, fields, params);
+                        method_name, dto_param_type, null, fields, params, out_params);
 
             } catch (Throwable e) {
 
@@ -230,7 +243,7 @@ public class PythonCG {
                 String dao_query_jdbc_sql, boolean is_external_sql,
                 String jaxb_dto_or_return_type, boolean jaxb_return_type_is_dto, boolean fetch_list,
                 String method_name, String dto_param_type, String crud_table,
-                List<FieldInfo> fields_all, List<FieldInfo> fields_pk) throws Exception {
+                List<FieldInfo> fields_all, List<FieldInfo> fields_pk, boolean out_params) throws Exception {
 
             if (dao_query_jdbc_sql == null) {
 
@@ -259,10 +272,14 @@ public class PythonCG {
             context.put("ref", crud_table);
             context.put("sql", python_sql_str);
             context.put("use_dto", jaxb_return_type_is_dto);
+            if (!jaxb_return_type_is_dto) {
+                returned_type_name = Helpers.get_python_type_name (returned_type_name);
+            }
             context.put("returned_type_name", returned_type_name);
             context.put("fetch_list", fetch_list);
             context.put("imports", imports);
             context.put("is_external_sql", is_external_sql);
+            context.put("out_params", out_params);
 
             _assign_params(fields_pk, dto_param_type, context);
 
@@ -313,7 +330,7 @@ public class PythonCG {
 
                 StringBuilder buff = new StringBuilder();
 
-                _render_exec_dml(buff, dao_jdbc_sql, is_external_sql, null, method_name, dto_param_type,
+                _render_exec_dml(buff, dao_jdbc_sql, is_external_sql, method_name, dto_param_type,
                         method_param_descriptors, xml_node_name, ref);
 
                 return buff;
@@ -328,7 +345,7 @@ public class PythonCG {
         }
 
         private void _render_exec_dml(StringBuilder buffer, String jdbc_dao_sql, boolean is_external_sql,
-                                      String class_name, String method_name, String dto_param_type, String[] param_descriptors,
+                                      String method_name, String dto_param_type, String[] param_descriptors,
                                       String xml_node_name, String sql_path) throws Exception {
 
             SqlUtils.throw_if_select_sql(jdbc_dao_sql);
@@ -344,7 +361,6 @@ public class PythonCG {
             _assign_params(params, dto_param_type, context);
 
             context.put("dto_param", dto_param_type);
-            context.put("class_name", class_name);
             context.put("method_name", method_name);
             context.put("sql", sql_str);
             context.put("xml_node_name", xml_node_name);
@@ -474,7 +490,7 @@ public class PythonCG {
                     dao_table_name, explicit_pk, fields_all, fields_pk);
 
             return _render_query(dao_jdbc_sql, false, dto_class_name, true, fetch_list,
-                    method_name, "", dao_table_name, fields_all, fields_pk);
+                    method_name, "", dao_table_name, fields_all, fields_pk, false);
         }
 
         @Override

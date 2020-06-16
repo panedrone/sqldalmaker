@@ -23,7 +23,7 @@ import org.openide.util.NbBundle.Messages;
  *
  */
 @Messages({
-    "LBL_Sdm_LOADER=Files of Sdm"
+    "LBL_Sdm_LOADER=DAL Files"
 })
 @MIMEResolver.ExtensionRegistration(
         displayName = "#LBL_Sdm_LOADER",

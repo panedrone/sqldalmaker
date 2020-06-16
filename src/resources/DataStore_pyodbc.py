@@ -1,6 +1,10 @@
 import pyodbc
 
 
+class OutParams:
+    pass
+
+
 class DataStore:
     """
     SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
@@ -9,93 +13,92 @@ class DataStore:
     This is an example of how to implement DataStore in Python + pyodbc.
     Copy-paste this code to your project and change it for your needs.
     """
-
-    def __init__(self):
-        self.connection = None
+    conn = None
 
     def open(self):
-        self.connection = pyodbc.connect('Driver={SQL Server};'
-                                         'Server=localhost\\SQLEXPRESS;'
-                                         'Database=AdventureWorks2014;'
-                                         'Trusted_Connection=yes;')
+        # self.conn = pyodbc.connect('Driver={Oracle in OraDB12Home1};uid=ORDERS;pwd=sa')
+
+        # self.conn = pyodbc.connect('DRIVER={CData ODBC Driver for PostgreSQL};'
+        #                            'User=postgres;Password=sa;Database=test;Server=127.0.0.1;Port=5432')
+
+        # self.conn = pyodbc.connect('DRIVER={PostgreSQL Unicode};'
+        #                            'UID=postgres;PWD=sa;DATABASE=test;Server=127.0.0.1;Port=5432')
+
+        # self.conn = pyodbc.connect('Driver={SQL Server};Server=localhost\\SQLEXPRESS;'
+        #                            'Database=AdventureWorks2014;Trusted_Connection=yes;')
+
+        self.conn = pyodbc.connect('Driver={SQL Server Native Client 11.0};Server=localhost\\SQLEXPRESS;'
+                                   'Database=AdventureWorks2014;Trusted_Connection=yes;')
 
     def close(self):
-        if self.connection:
-            self.connection.close()
+        if self.conn:
+            self.conn.close()
+            self.conn = None
 
     def start_transaction(self):
-        # https://stackoverflow.com/questions/6477992/using-begin-transaction-rollback-commit-over-various-cursors-connections
-        self.connection.begin()
+        self.conn.begin()
 
     def commit(self):
-        self.connection.commit()
+        self.conn.commit()
 
     def rollback(self):
-        self.connection.rollback()
+        self.conn.rollback()
 
     def insert_row(self, sql, params, ai_values):
         """
         Returns:
             Nothing.
         Arguments:
-            sql (string): SQL statement.
-            params (array, optional): Values of SQL parameters.
-            ai_values (array, optional): Array like [["o_id", 1], ...] for auto-increment values.
+            sql: SQL statement.
+            params: Values of SQL parameters.
+            ai_values: Array like [["o_id", 1], ...] for auto-increment values.
         Raises:
             Exception: if no rows inserted.
         """
-        cursor = self.connection.cursor()
-
+        cursor = self.conn.cursor()
         try:
-
-            result = cursor.execute(sql, params)
-
+            cursor.execute(sql, params)
             if len(ai_values) > 0:
                 # https://www.reddit.com/r/learnpython/comments/1h78gi/pyodbc_get_last_inserted_id/
                 ai_values[0][1] = cursor.execute('SELECT @@IDENTITY AS id;').fetchone()[0]
                 # ai_values[0][1] = result.fetchone()[0]
-
             if cursor.rowcount == 0:
                 raise Exception('No rows inserted')
-
         finally:
             cursor.close()
 
-    def exec_dml(self, sql, params):
+    def exec_dml(self, sql, in_params):
         """
         Arguments:
-            sql (string): SQL statement.
-            params (array, optional): Values of SQL parameters.
+            sql: SQL statement.
+            in_params: Values of SQL parameters.
         Returns:
             Number of updated rows.
         """
-        cursor = self.connection.cursor()
+        sp_sql = _get_sp_sql(sql, in_params)
 
+        if sp_sql is not None:
+            sql = sp_sql
+
+        cursor = self.conn.cursor()
         try:
-
-            sp_sql = _get_sp_sql(sql, params)
-
-            if sp_sql is not None:
-                sql = sp_sql
-
-            cursor.execute(sql, params)
-
+            cursor.execute(sql, in_params)
             return cursor.rowcount
-
         finally:
             cursor.close()
 
-    def query_scalar(self, sql, params):
+    def query_scalar(self, sql, in_params, out_params=None):
         """
         Returns:
             Single scalar value.
         Arguments:
-            sql (string): SQL statement.
-            params (array, optional): Values of SQL parameters if needed.
+            sql: SQL statement.
+            in_params: Values of SQL parameters if needed.
+            out_params: OutParams
         Raises:
             Exception: if amount of rows != 1.
         """
-        rows = self.query_scalar_array(sql, params)
+        rows = self.query_scalar_array(sql, in_params, out_params)
 
         if len(rows) == 0:
             raise Exception('No rows')
@@ -108,39 +111,53 @@ class DataStore:
         else:
             return rows[0]  # 'select get_test_rating(?)' returns just scalar value, not array of arrays
 
-    def query_scalar_array(self, sql, params):
+    def query_scalar_array(self, sql, in_params, out_params=None):
         """
         Returns:
             array of scalar values
         Arguments:
-            sql (string): SQL statement.
-            params (array, optional): Values of SQL parameters if needed.
+            sql: SQL statement.
+            in_params: Values of SQL parameters if needed.
+            out_params: OutParams
         """
-        sp_sql = _get_sp_sql(sql, params)
+        sp_sql = _get_sp_sql(sql, in_params)
 
         if sp_sql is not None:
             sql = sp_sql
 
         res = []
 
-        cursor = self.connection.cursor()
-
+        # https://github.com/mkleehammer/pyodbc/wiki/Calling-Stored-Procedures
+        cursor = self.conn.cursor()
         try:
-            cursor.execute(sql, params)
-            for row in cursor.fetchall():
-                res.append(row[0])
+            cursor.execute(sql, in_params)
+            rows = cursor.fetchall()
+            while rows:
+                columns = [column[0] for column in cursor.description]
+                for r in rows:
+                    for ci in range(len(columns)):
+                        if hasattr(out_params, columns[ci]):
+                            setattr(out_params, columns[ci], r[ci])
+                        else:
+                            if ci == 0:
+                                res.append(r[0])
+                if cursor.nextset():
+                    rows = cursor.fetchall()
+                else:
+                    rows = None
         finally:
             cursor.close()
 
         return res
 
-    def query_single_row(self, sql, params):
+    def query_single_row(self, sql, in_params, out_params=None):
         """
         Returns:
             Single row
         Arguments:
-            sql (string): SQL statement.
-            params (array, optional): Values of SQL parameters if needed.
+            sql: SQL statement.
+            in_params: Values of SQL parameters if needed.
+            out_params: OutParams
         Raises:
             Exception: if amount of rows != 1.
         """
@@ -149,7 +166,7 @@ class DataStore:
         def callback(row):
             rows.append(row)
 
-        self.query_all_rows(sql, params, callback)
+        self.query_all_rows(sql, in_params, callback, out_params)
 
         if len(rows) == 0:
             raise Exception('No rows')
@@ -159,30 +176,41 @@ class DataStore:
 
         return rows[0]
 
-    def query_all_rows(self, sql, params, callback):
+    def query_all_rows(self, sql, in_params, callback, out_params=None):
         """
         Returns:
             None
         Arguments:
-            sql (string): SQL statement.
-            params (array, optional): Values of SQL parameters if needed.
+            sql: SQL statement.
+            in_params: Values of SQL parameters if needed.
             callback
+            out_params: OutParams
         """
-        sp_sql = _get_sp_sql(sql, params)
+        sp_sql = _get_sp_sql(sql, in_params)
 
         if sp_sql is not None:
             sql = sp_sql
 
-        cursor = self.connection.cursor()
-
+        # https://github.com/mkleehammer/pyodbc/wiki/Calling-Stored-Procedures
+        cursor = self.conn.cursor()
         try:
-            cursor.execute(sql, params)
-            columns = [column[0] for column in cursor.description]
-            for row in cursor.fetchall():
-                row2 = {}
-                for i in range(len(columns)):
-                    row2[columns[i]] = row[i]
-                callback(row2)
+            cursor.execute(sql, in_params)
+            rows = cursor.fetchall()
+            while rows:
+                columns = [column[0] for column in cursor.description]
+                for r in rows:
+                    row_dict = {}
+                    for ci in range(len(columns)):
+                        if hasattr(out_params, columns[ci]):
+                            setattr(out_params, columns[ci], r[ci])
+                        else:
+                            row_dict[columns[ci]] = r[ci]
+                    if len(row_dict) > 0:
+                        callback(row_dict)
+                if cursor.nextset():
+                    rows = cursor.fetchall()
+                else:
+                    rows = None
         finally:
             cursor.close()
 

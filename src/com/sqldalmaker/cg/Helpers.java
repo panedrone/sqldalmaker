@@ -416,7 +416,7 @@ public class Helpers {
 
         if (is_class_of(type, String.class)) {
 
-            return "basestring";
+            return "str";
         }
 
         if (is_class_of(type, Boolean.class)) {
@@ -426,7 +426,7 @@ public class Helpers {
 
         if (is_class_of(type, java.util.Date.class)) {
 
-            return "basestring"; // built-in, datetime.datetime can be used instead
+            return "str"; // built-in, datetime.datetime can be used instead
         }
 
         if (is_class_of(type, Float.class)) {
@@ -445,6 +445,11 @@ public class Helpers {
         }
 
         if (is_class_of(type, Integer.class)) {
+
+            return "int"; // built-in
+        }
+
+        if (is_class_of(type, Short.class)) {
 
             return "int"; // built-in
         }

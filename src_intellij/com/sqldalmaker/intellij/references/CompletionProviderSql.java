@@ -113,7 +113,7 @@ public class CompletionProviderSql extends CompletionProvider<CompletionParamete
 
         if (sql_base_dir == null) {
 
-            IdeaMessageHelpers.add_error_to_ide_log(this.getClass().getName(), "File not found: " + sql_root_rel_path);
+            //  IdeaMessageHelpers.add_error_to_ide_log(this.getClass().getName(), "File not found: " + sql_root_rel_path);
 
             return;
         }

@@ -65,7 +65,7 @@ from $imp import $imp
 class $class_name:
 
     def __init__(self, ds):
-        self._ds = ds
+        self.ds = ds
 #foreach($method in $methods)$method#end
 ## ====================================================================================================================
 #elseif($mode=="dao_create")
@@ -82,7 +82,7 @@ class $class_name:
         params = [#foreach ($param in $params)#set($p="p."+${param.getName()})#list_item($velocityCount $p)#end]
         ai_values = [#foreach ($key in $keys)#set($p='["'+${key.getColumnName()} +'", None]')#list_item($velocityCount $p)#end]
 
-        self._ds.insert_row(sql, params, ai_values)
+        self.ds.insert_row(sql, params, ai_values)
 
 #foreach ($key in $keys)
 #set($i = $velocityCount - 1)
@@ -92,7 +92,7 @@ class $class_name:
 #elseif($mode=="dao_query")
 
 #if($fetch_list)
-    def $method_name(#if($dto_param != "")#param_decls_dto($is_external_sql)p#else#param_decls($is_external_sql $params)#end):
+    def $method_name(#if($dto_param != "")#param_decls_dto($is_external_sql)p#else#param_decls($is_external_sql $params)#end#if($out_params), out_params#end):
         """
 #if($crud)
         CRUD-Read-All. The table '$ref'.
@@ -105,6 +105,9 @@ class $class_name:
 #else
 #foreach($param in $params)
         @type $param.getName(): $param.getType()
+#end
+#if($out_params)
+        @type out_params: OutParams
 #end
 #end
         @rtype: list[$returned_type_name]
@@ -121,15 +124,15 @@ class $class_name:
 #end
             res.append(obj)
 
-        self._ds.query_all_rows(sql, params, callback)
+        self.ds.query_all_rows(sql, params, callback#if($out_params), out_params#end)
 
         return res
 #else
 
-        return self._ds.query_scalar_array(sql, params)
+        return self.ds.query_scalar_array(sql, params#if($out_params), out_params#end)
 #end
 #else
-    def $method_name(#if($dto_param != "")#param_decls_dto($is_external_sql)p, obj#else#param_decls($is_external_sql $params)#if($use_dto), obj#end#end):
+    def $method_name(#if($dto_param != "")#param_decls_dto($is_external_sql)p, obj#else#param_decls($is_external_sql $params)#if($use_dto), obj#end#end#if($out_params), out_params#end):
         """
 #if($crud)
         CRUD-Read. The table '$ref'.
@@ -146,8 +149,14 @@ class $class_name:
 #end
 #if($use_dto)
         @type obj: $returned_type_name
+#if($out_params)
+        @type out_params: OutParams
+#end
         @rtype: None
 #else
+#if($out_params)
+        @type out_params: OutParams
+#end
         @rtype: $returned_type_name
 #end
         @raise: Exception if amount of returned rows != 1.
@@ -156,13 +165,13 @@ class $class_name:
 #param_array($dto_param $params)
 
 #if($use_dto)
-        row = self._ds.query_single_row(sql, params)
+        row = self.ds.query_single_row(sql, params#if($out_params), out_params#end)
         
 #foreach($field in ${fields})
         obj.${field.getName()} = row["${field.getColumnName()}"]
 #end
 #else
-        return self._ds.query_scalar(sql, params)
+        return self.ds.query_scalar(sql, params#if($out_params), out_params#end)
 #end
 #end
 ## ====================================================================================================================
@@ -194,5 +203,5 @@ class $class_name:
 #sql_var(false $sql)
 #param_array($dto_param $params)
 
-        return self._ds.exec_dml(sql, params)
+        return self.ds.exec_dml(sql, params)
 #end

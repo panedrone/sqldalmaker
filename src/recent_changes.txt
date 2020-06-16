@@ -1,3 +1,7 @@
+2020-06-16
+
+    Enabled OUT params of SP in Python: pyodbc, Oracle, PostgreSQL, SQL Server.
+
 2020-06-04
 
     Fixes of Python + MySQL example.
