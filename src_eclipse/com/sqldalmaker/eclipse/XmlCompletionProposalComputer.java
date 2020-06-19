@@ -265,7 +265,8 @@ public class XmlCompletionProposalComputer implements ICompletionProposalCompute
 			e.printStackTrace();
 
 			// EclipseConsoleHelpers.init_console();
-			EclipseConsoleHelpers.add_error_msg(this.getClass().getName(), e.getMessage());
+			// EclipseConsoleHelpers.add_error_msg(this.getClass().getName(),
+			// e.getMessage());
 
 			return NONE;
 		}
@@ -342,6 +343,11 @@ public class XmlCompletionProposalComputer implements ICompletionProposalCompute
 	}
 
 	private static void enum_sql_files(IFolder dir, List<String> res, String sql_root_rel_path) throws Exception {
+
+		if (dir.exists() == false) { // e.g. incorrect value in settings.xml
+			
+			return;
+		}
 
 		IResource[] members = dir.members();
 

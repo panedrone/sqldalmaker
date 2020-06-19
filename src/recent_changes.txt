@@ -1,6 +1,10 @@
+2020-06-19
+
+    Adapted for PostgreSQL UDF returning REFCURSOR.
+
 2020-06-16
 
-    Enabled OUT params of SP in Python: pyodbc, Oracle, PostgreSQL, SQL Server.
+    Enabled OUT params of SP in pyodbc + SQL Server.
 
 2020-06-04
 

@@ -186,7 +186,7 @@ public class JdbcUtils {
     }
 
     private Map<String, FieldInfo> _get_table_field_info(final String table_name, List<FieldInfo> fields_all,
-            List<FieldInfo> not_fields_pk, String explicit_pk, List<FieldInfo> fields_pk) throws Exception {
+                                                         List<FieldInfo> not_fields_pk, String explicit_pk, List<FieldInfo> fields_pk) throws Exception {
 
         if (fields_all != null) {
 
@@ -418,7 +418,7 @@ public class JdbcUtils {
     }
 
     private Map<String, FieldInfo> _get_dto_class_field_info(DtoClass jaxb_dto_class, String sql_root_abs_path,
-            List<FieldInfo> fields) throws Exception {
+                                                             List<FieldInfo> fields) throws Exception {
 
         fields.clear();
 
@@ -464,7 +464,7 @@ public class JdbcUtils {
     }
 
     private void _refine_field_info_by_jaxb_explicit_fields(List<DtoClass.Field> jaxb_explicit_fields,
-            Map<String, FieldInfo> fields_map, List<FieldInfo> fields) {
+                                                            Map<String, FieldInfo> fields_map, List<FieldInfo> fields) {
 
         if (jaxb_explicit_fields == null) {
 
@@ -563,7 +563,7 @@ public class JdbcUtils {
     // _get_free_sql_params_info should not be used for CRUD
     //
     private static void _get_free_sql_params_info(PreparedStatement ps, FieldNamesMode param_names_mode, TypeMap type_map,
-            String[] method_param_descriptors, List<FieldInfo> params) throws Exception {
+                                                  String[] method_param_descriptors, List<FieldInfo> params) throws Exception {
 
         if (method_param_descriptors == null) {
 
@@ -611,7 +611,7 @@ public class JdbcUtils {
 
                 return;
             }
-            
+
         } catch (Throwable e) { // including AbstractMethodError, SQLServerException, etc.
 
             params_count = 0;
@@ -636,7 +636,7 @@ public class JdbcUtils {
     }
 
     private static void _get_params_info_by_descriptors(FieldNamesMode param_names_mode, TypeMap type_map,
-            String[] method_param_descriptors, List<FieldInfo> params) {
+                                                        String[] method_param_descriptors, List<FieldInfo> params) {
 
         for (int i = 0; i < method_param_descriptors.length; i++) {
 
@@ -680,7 +680,7 @@ public class JdbcUtils {
     }
 
     private void _refine_dao_fields_by_dto_fields(DtoClass jaxb_dto_class, String sql_root_abs_path,
-            List<FieldInfo> dao_fields_all) throws Exception {
+                                                  List<FieldInfo> dao_fields_all) throws Exception {
 
         List<FieldInfo> dto_fields = new ArrayList<FieldInfo>();
 
@@ -753,7 +753,7 @@ public class JdbcUtils {
     // Utils
     //
     public static ResultSet get_tables_rs(Connection conn, DatabaseMetaData db_info, String schema_name,
-            boolean include_views) throws SQLException {
+                                          boolean include_views) throws SQLException {
 
         String[] types;
 
@@ -815,8 +815,8 @@ public class JdbcUtils {
     // DAO. Free-SQL
     //
     public String get_dao_query_info(String sql_root_abs_path, String dao_jaxb_ref, String dto_param_type,
-            String[] method_param_descriptors, String jaxb_dto_or_return_type, boolean jaxb_return_type_is_dto,
-            DtoClasses jaxb_dto_classes, List<FieldInfo> _fields, List<FieldInfo> _params) throws Exception {
+                                     String[] method_param_descriptors, String jaxb_dto_or_return_type, boolean jaxb_return_type_is_dto,
+                                     DtoClasses jaxb_dto_classes, List<FieldInfo> _fields, List<FieldInfo> _params) throws Exception {
 
         _fields.clear();
 
@@ -920,13 +920,23 @@ public class JdbcUtils {
 
                 } else {
 
-                    for (FieldInfo fi : dao_fields) {
+                    if (ResultSet.class.getName() == dao_fields.get(0).getType()) {
 
-                        String dao_col_name = fi.getColumnName();
+                        // the story about PostgreSQL and queries like 'select * from get_tests_by_rating_rc(?)'
+                        // where get_tests_by_rating_rc is UDF returning REFCURSOR
 
-                        if (dto_fields_map.containsKey(dao_col_name)) {
+                        _fields.addAll(dto_fields);
 
-                            _fields.add(dto_fields_map.get(dao_col_name));
+                    } else {
+
+                        for (FieldInfo fi : dao_fields) {
+
+                            String dao_col_name = fi.getColumnName();
+
+                            if (dto_fields_map.containsKey(dao_col_name)) {
+
+                                _fields.add(dto_fields_map.get(dao_col_name));
+                            }
                         }
                     }
                 }
@@ -973,7 +983,7 @@ public class JdbcUtils {
     }
 
     public void get_dao_exec_dml_info(String dao_jdbc_sql, String dto_param_type, String[] method_param_descriptors,
-            List<FieldInfo> _params) throws Exception {
+                                      List<FieldInfo> _params) throws Exception {
 
         /////////////////////////////
         //
@@ -992,7 +1002,7 @@ public class JdbcUtils {
     // DAO. CRUD
     //
     public String get_dao_crud_create_info(DtoClass jaxb_dto_class, String sql_root_abs_path, String dao_table_name,
-            String dao_crud_generated, List<FieldInfo> dao_fields_not_ai, List<FieldInfo> dao_fields_ai)
+                                           String dao_crud_generated, List<FieldInfo> dao_fields_not_ai, List<FieldInfo> dao_fields_ai)
             throws Exception {
 
         dao_fields_not_ai.clear();
@@ -1072,7 +1082,7 @@ public class JdbcUtils {
     }
 
     public String get_dao_crud_read_info(boolean fetch_list, DtoClass jaxb_dto_class, String sql_root_abs_path,
-            String dao_table_name, String explicit_pk, List<FieldInfo> fields_all, List<FieldInfo> fields_pk)
+                                         String dao_table_name, String explicit_pk, List<FieldInfo> fields_all, List<FieldInfo> fields_pk)
             throws Exception {
 
         fields_all.clear();
@@ -1087,7 +1097,7 @@ public class JdbcUtils {
     }
 
     public String get_dao_crud_update_info(String dao_table_name, List<FieldInfo> not_fields_pk, String explicit_pk,
-            List<FieldInfo> fields_pk, DtoClass jaxb_dto_class, String sql_root_abs_path) throws Exception {
+                                           List<FieldInfo> fields_pk, DtoClass jaxb_dto_class, String sql_root_abs_path) throws Exception {
 
         not_fields_pk.clear();
 
