@@ -2,14 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1fb1c605-8c08-4b11-a01b-d42d0945087f" name="Default" comment="added option to exclude views in DTO/DAO assistants">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/resources/DataStore_psycopg2.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/META-INF/plugin.xml" beforeDir="false" afterPath="$PROJECT_DIR$/META-INF/plugin.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nbproject/private/platform-private.properties" beforeDir="false" afterPath="$PROJECT_DIR$/nbproject/private/platform-private.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nbproject/private/private.xml" beforeDir="false" afterPath="$PROJECT_DIR$/nbproject/private/private.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/JdbcUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/JdbcUtils.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/recent_changes.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/recent_changes.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src_eclipse/com/sqldalmaker/eclipse/XmlCompletionProposalComputer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_eclipse/com/sqldalmaker/eclipse/XmlCompletionProposalComputer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabAdmin.form" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabAdmin.form" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabAdmin.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabAdmin.java" afterDir="false" />
     </list>
     <list id="0b913ed8-6e39-405f-b29b-9d52c75467b5" name="Failed commit: Default" comment="" />
     <option name="SHOW_DIALOG" value="false" />
@@ -75,7 +72,7 @@
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.23590332" />
     <property name="recentsLimit" value="5" />
-    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
+    <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
@@ -903,10 +900,10 @@
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
     <state x="767" y="184" key="#com.intellij.ide.ui.customization.CustomizableActionsPanel.FindAvailableActionsDialog/0.0.1920.1050@0.0.1920.1050" timestamp="1589123523937" />
-    <state x="765" y="230" key="#com.intellij.ide.util.MemberChooser" timestamp="1591299305111">
+    <state x="765" y="230" key="#com.intellij.ide.util.MemberChooser" timestamp="1592582884659">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state x="765" y="230" key="#com.intellij.ide.util.MemberChooser/0.0.1920.1050@0.0.1920.1050" timestamp="1591299305111" />
+    <state x="765" y="230" key="#com.intellij.ide.util.MemberChooser/0.0.1920.1050@0.0.1920.1050" timestamp="1592582884659" />
     <state x="640" y="255" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog" timestamp="1586107425220">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
@@ -939,22 +936,22 @@
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
     <state x="740" y="281" key="FileChooserDialogImpl/0.0.1920.1050@0.0.1920.1050" timestamp="1592304019583" />
-    <state width="1096" height="215" key="GridCell.Tab.0.bottom" timestamp="1592550689081">
+    <state width="924" height="204" key="GridCell.Tab.0.bottom" timestamp="1592583233668">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="1096" height="215" key="GridCell.Tab.0.bottom/0.0.1920.1050@0.0.1920.1050" timestamp="1592550689081" />
-    <state width="1096" height="215" key="GridCell.Tab.0.center" timestamp="1592550689081">
+    <state width="924" height="204" key="GridCell.Tab.0.bottom/0.0.1920.1050@0.0.1920.1050" timestamp="1592583233668" />
+    <state width="924" height="204" key="GridCell.Tab.0.center" timestamp="1592583233668">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="1096" height="215" key="GridCell.Tab.0.center/0.0.1920.1050@0.0.1920.1050" timestamp="1592550689081" />
-    <state width="1096" height="215" key="GridCell.Tab.0.left" timestamp="1592550689081">
+    <state width="924" height="204" key="GridCell.Tab.0.center/0.0.1920.1050@0.0.1920.1050" timestamp="1592583233668" />
+    <state width="924" height="204" key="GridCell.Tab.0.left" timestamp="1592583233668">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="1096" height="215" key="GridCell.Tab.0.left/0.0.1920.1050@0.0.1920.1050" timestamp="1592550689081" />
-    <state width="1096" height="215" key="GridCell.Tab.0.right" timestamp="1592550689081">
+    <state width="924" height="204" key="GridCell.Tab.0.left/0.0.1920.1050@0.0.1920.1050" timestamp="1592583233668" />
+    <state width="924" height="204" key="GridCell.Tab.0.right" timestamp="1592583233668">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="1096" height="215" key="GridCell.Tab.0.right/0.0.1920.1050@0.0.1920.1050" timestamp="1592550689081" />
+    <state width="924" height="204" key="GridCell.Tab.0.right/0.0.1920.1050@0.0.1920.1050" timestamp="1592583233668" />
     <state width="1096" height="215" key="GridCell.Tab.1.bottom" timestamp="1592550689081">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
@@ -979,10 +976,10 @@
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
     <state x="693" y="226" key="RollbackChangesDialog/0.0.1920.1050@0.0.1920.1050" timestamp="1589819515181" />
-    <state x="440" y="101" width="1421" height="853" key="SettingsEditor" timestamp="1592548773312">
+    <state x="200" y="93" width="1421" height="853" key="SettingsEditor" timestamp="1592582696369">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state x="440" y="101" width="1421" height="853" key="SettingsEditor/0.0.1920.1050@0.0.1920.1050" timestamp="1592548773312" />
+    <state x="200" y="93" width="1421" height="853" key="SettingsEditor/0.0.1920.1050@0.0.1920.1050" timestamp="1592582696369" />
     <state x="776" y="302" key="chooseDestDirectoryDialog" timestamp="1588406446535">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>

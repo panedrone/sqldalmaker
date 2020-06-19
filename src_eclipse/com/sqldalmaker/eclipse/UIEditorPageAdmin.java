@@ -307,7 +307,17 @@ public class UIEditorPageAdmin extends Composite {
 		btnNewButton_7_1.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		btnNewButton_7_1.setText("DataStore.py (pyodbc)");
 		toolkit.adapt(btnNewButton_7_1, true, true);
-		new Label(composite_2, SWT.NONE);
+		
+		Button btnNewButton_7_1_1 = new Button(composite_2, SWT.NONE);
+		btnNewButton_7_1_1.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore_psycopg2.py", "DataStore_psycopg2.py");
+			}
+		});
+		btnNewButton_7_1_1.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+		btnNewButton_7_1_1.setText("DataStore.py (psycopg2)");
+		toolkit.adapt(btnNewButton_7_1_1, true, true);
 
 		Button btnNewButton_8 = new Button(composite_2, SWT.NONE);
 		btnNewButton_8.addSelectionListener(new SelectionAdapter() {

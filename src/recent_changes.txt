@@ -1,6 +1,6 @@
 2020-06-19
 
-    Adapted for PostgreSQL UDF returning REFCURSOR.
+    Added DataStore based on psycopg2.
 
 2020-06-16
 

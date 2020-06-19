@@ -60,6 +60,7 @@ public class UITabAdmin {
     private JButton referenceSettingsXmlButton;
     private JScrollPane scroll_pane;
     private JButton datastore_pyodbc;
+    private JButton dataStorePsycopg2Button;
 
     private Project project;
     private VirtualFile propFile;
@@ -328,6 +329,12 @@ public class UITabAdmin {
                 IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "DataStore_pyodbc.py", "DataStore_pyodbc.py");
             }
         });
+        dataStorePsycopg2Button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "DataStore_psycopg2.py", "DataStore_psycopg2.py");
+            }
+        });
     }
 
     private void testConnection() {
@@ -453,6 +460,9 @@ public class UITabAdmin {
         datastore_pyodbc = new JButton();
         datastore_pyodbc.setText("DataStore.py (pyodbc)");
         panel4.add(datastore_pyodbc, new GridConstraints(3, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        dataStorePsycopg2Button = new JButton();
+        dataStorePsycopg2Button.setText("DataStore (psycopg2)");
+        panel4.add(dataStorePsycopg2Button, new GridConstraints(3, 3, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JPanel panel5 = new JPanel();
         panel5.setLayout(new GridLayoutManager(1, 5, new Insets(10, 0, 0, 0), 1, -1));
         panel1.add(panel5, new GridConstraints(3, 0, 1, 1, GridConstraints.ANCHOR_NORTHWEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
