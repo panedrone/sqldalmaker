@@ -214,11 +214,11 @@ def _get_sp_sql(sql, params):
     if len(parts) >= 2 and parts[0].strip().lower() == "call":
         sp_name = parts[1].strip()
         if len(params) == 0:
-            return '{call ' + sp_name + '}'
+            return 'call ' + sp_name
         else:
             pp = ['?' for _ in range(len(params))]
             pp = ', '.join(pp)
-            return '{call ' + sp_name + '(' + pp + ')}'
+            return 'call ' + sp_name + '(' + pp + ')'
 
     return None
 

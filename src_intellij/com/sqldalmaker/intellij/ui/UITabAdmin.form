@@ -230,6 +230,14 @@
                       <text value="DataStore (psycopg2)"/>
                     </properties>
                   </component>
+                  <component id="d5492" class="javax.swing.JButton" binding="btn_php_pg">
+                    <constraints>
+                      <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties>
+                      <text value="DataStore.php (PDO, PostgeSQL)"/>
+                    </properties>
+                  </component>
                 </children>
               </grid>
               <grid id="4187c" layout-manager="GridLayoutManager" row-count="1" column-count="5" same-size-horizontally="false" same-size-vertically="false" hgap="1" vgap="-1">

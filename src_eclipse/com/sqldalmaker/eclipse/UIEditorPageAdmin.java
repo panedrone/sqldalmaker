@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 sqldalmaker@gmail.com
+ * Copyright 2011-2020 sqldalmaker@gmail.com
  * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
  * Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -185,7 +185,18 @@ public class UIEditorPageAdmin extends Composite {
 		btnNewButton_12.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		toolkit.adapt(btnNewButton_12, true, true);
 		btnNewButton_12.setText("DataStore.php (PDO)");
-		new Label(composite_2, SWT.NONE);
+
+		Button btnDatastorephppdoPostgresql = new Button(composite_2, SWT.NONE);
+		btnDatastorephppdoPostgresql.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+		btnDatastorephppdoPostgresql.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore_PDO_PostgreSQL.php",
+						"DataStore_PDO_PostgreSQL.php");
+			}
+		});
+		btnDatastorephppdoPostgresql.setText("DataStore.php (PDO, PostgreSQL)");
+		toolkit.adapt(btnDatastorephppdoPostgresql, true, true);
 		new Label(composite_2, SWT.NONE);
 
 		Button btnDatastorejava = new Button(composite_2, SWT.NONE);
@@ -296,23 +307,25 @@ public class UIEditorPageAdmin extends Composite {
 		btnNewButton_7.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		toolkit.adapt(btnNewButton_7, true, true);
 		btnNewButton_7.setText("DataStore.py (MySQL)");
-		
+
 		Button btnNewButton_7_1 = new Button(composite_2, SWT.NONE);
 		btnNewButton_7_1.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore_pyodbc.py", "DataStore_pyodbc.py");
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore_pyodbc.py",
+						"DataStore_pyodbc.py");
 			}
 		});
 		btnNewButton_7_1.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		btnNewButton_7_1.setText("DataStore.py (pyodbc)");
 		toolkit.adapt(btnNewButton_7_1, true, true);
-		
+
 		Button btnNewButton_7_1_1 = new Button(composite_2, SWT.NONE);
 		btnNewButton_7_1_1.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore_psycopg2.py", "DataStore_psycopg2.py");
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore_psycopg2.py",
+						"DataStore_psycopg2.py");
 			}
 		});
 		btnNewButton_7_1_1.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
@@ -340,8 +353,7 @@ public class UIEditorPageAdmin extends Composite {
 		btnRecentChanges.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				EclipseResourceEditorHelpers.open_resource_file_in_editor("recent_changes.txt",
-						"recent_changes.txt");
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("recent_changes.txt", "recent_changes.txt");
 			}
 		});
 		toolkit.adapt(btnRecentChanges, true, true);
