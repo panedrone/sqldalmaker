@@ -17,7 +17,7 @@ import java.util.List;
     SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
     Contact: sqldalmaker@gmail.com
 
-    This is an example of how to implement DataStore in Java using Apache DbUtils.
+    This is an example of how to implement DataStore in Java + Apache DbUtils.
     Copy-paste this code to your project and change it for your needs.
 */
 public class DataStoreManager {
@@ -26,10 +26,11 @@ public class DataStoreManager {
 
     public void open() throws Exception {
 
-        // connection = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:orcl", "ORDERS", "sa");
+        connection = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:orcl", "ORDERS", "sa");
         // connection = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:XE", "ORDERS", "root");
         // connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/orders", "postgres", "root");
-        connection = DriverManager.getConnection("jdbc:mysql://localhost/sakila", "root", "root");
+        // connection = DriverManager.getConnection("jdbc:mysql://localhost/sakila", "root", "root");
+        // connection = DriverManager.getConnection("jdbc:sqlserver://localhost\\SQLEXPRESS;databaseName=AdventureWorks2014", "sa", "root");
         connection.setAutoCommit(false);
     }
 
@@ -67,10 +68,6 @@ public class DataStoreManager {
     // //////////////////////////////////////////////////
 
     private final MyDataStore ds = new MyDataStore();
-
-//    public TestDao createTestDao() {
-//        return new TestDao(ds);
-//    }
 
     private class MyDataStore extends DataStore {
 
@@ -161,14 +158,14 @@ public class DataStoreManager {
                 super(pmdKnownBroken);
             }
 
-            public <T> T queryCall(Connection conn, String sql, ResultSetHandler<T> rsh, Object... params)
+            public <T> void queryCall(Connection conn, String sql, ResultSetHandler<T> rsh, Object... params)
                     throws SQLException {
 
                 CallableStatement stmt = conn.prepareCall(sql);
 
                 try {
 
-                    boolean query_cursors = false;
+                    boolean query_out_cursors = false;
 
                     List<Object> call_params = new ArrayList<Object>();
 
@@ -177,13 +174,16 @@ public class DataStoreManager {
                         if (params[i] instanceof CursorOutParam) {
 
                             CursorOutParam cp = (CursorOutParam) params[i];
+
                             call_params.add(new OutParameter(cp.getSqlType(), Object.class));
-                            query_cursors = true;
+
+                            query_out_cursors = true;
 
                         } else if (params[i] instanceof OutParam) {
 
                             OutParam cp = (OutParam) params[i];
-                            call_params.add(new OutParameter(cp.getSqlType(), cp.getClass()));
+
+                            call_params.add(new OutParameter(cp.getSqlType(), cp.getClass(), cp.getValue()));
 
                         } else {
 
@@ -191,11 +191,9 @@ public class DataStoreManager {
                         }
                     }
 
-                    // call_params.add(new OutParameter(OracleTypes.CURSOR, Object.class));
-
                     super.fillStatement(stmt, call_params.toArray());
 
-                    if (query_cursors) {
+                    if (query_out_cursors) {
 
                         // Using Ref Cursors To Return Recordsets
                         // https://oracle-base.com/articles/misc/using-ref-cursors-to-return-recordsets
@@ -204,16 +202,13 @@ public class DataStoreManager {
 
                         for (int i = 0; i < params.length; i++) {
 
-                            // Object out_value = stmt.getObject(i + 1);  // not here! it may be in-param
-
                             if (params[i] instanceof CursorOutParam) {
 
-                                Object out_value = stmt.getObject(i + 1);
-                                ResultSet rs = (ResultSet) out_value;
+                                ResultSet rs = (ResultSet) stmt.getObject(i + 1);;
 
                                 try {
 
-                                    return rsh.handle(rs);
+                                    rsh.handle(rs);
 
                                 } finally {
 
@@ -222,12 +217,7 @@ public class DataStoreManager {
 
                             } else if (params[i] instanceof OutParam) {
 
-                                // TODO implement out params
-
-                                OutParam op = (OutParam) params[i];
-                                // op.setValue(op.getJavaType().cast(out_value));
-                                OutParameter op1 = (OutParameter) call_params.get(i);
-                                op.setValue(op1.getValue());
+                                readOutParam(stmt, i, params);
                             }
                         }
 
@@ -239,7 +229,7 @@ public class DataStoreManager {
 
                         // https://en.it1352.com/article/8242caae4610471d962d4b45c13ae070.html
                         //
-                        // unlike executeQuery(), it works in both MySQL record-set SP and Oracle implicit SYS_REFCURSOR
+                        // unlike executeQuery, it works in both MySQL record-set SP and Oracle implicit SYS_REFCURSOR
                         //
 
                         while (stmt.getMoreResults()) {
@@ -248,21 +238,15 @@ public class DataStoreManager {
 
                             try {
 
-                                // ResultSetMetaData meta = rs.getMetaData();
-
-//                                    while (rs.next()) {
-//                                        for (int j = 1; j <= meta.getColumnCount(); j++) {
-//                                            System.out.println(meta.getColumnName(j)); // rs.getObject(j)
-//                                        }
-//                                    }
-
-                                /*return*/ rsh.handle(rs);
+                                rsh.handle(rs);
 
                             } finally {
 
                                 DbUtils.close(rs);
                             }
                         }
+
+                        readOutParams(stmt, params);
                     }
 
                 } catch (SQLException e) {
@@ -273,23 +257,43 @@ public class DataStoreManager {
 
                     DbUtils.close(stmt);
                 }
-
-                return null; // just to suppress compiler error
             }
 
-            public int executeCall(Connection conn, String sql, Object... params) throws SQLException {
+            public int executeCall(Connection conn, String sql, Object... params) throws Exception {
 
                 CallableStatement stmt = conn.prepareCall(sql);
 
                 try {
 
-                    super.fillStatement(stmt, params);
+                    List<Object> call_params = new ArrayList<Object>();
+
+                    for (int i = 0; i < params.length; i++) {
+
+                        if (params[i] instanceof CursorOutParam) {
+
+                            throw new Exception(CursorOutParam.class.getName() + " is not allowed in executeCall");
+
+                        } else if (params[i] instanceof OutParam) {
+
+                            OutParam cp = (OutParam) params[i];
+
+                            call_params.add(new OutParameter(cp.getSqlType(), cp.getClass(), cp.getValue()));
+
+                        } else {
+
+                            call_params.add(params[i]);
+                        }
+                    }
+
+                    super.fillStatement(stmt, call_params.toArray());
 
                     // Returns:
                     // true if the first result is a ResultSet object; false if the first result is
                     // an update count or there is no result
 
                     stmt.execute();
+
+                    readOutParams(stmt, params);
 
                 } catch (SQLException e) {
 
@@ -301,6 +305,26 @@ public class DataStoreManager {
                 }
 
                 return 0;
+            }
+
+            private void readOutParams(CallableStatement stmt, Object... params) throws SQLException {
+
+                for (int i = 0; i < params.length; i++) {
+
+                    readOutParam(stmt, i, params);
+                }
+            }
+
+            private void readOutParam(CallableStatement stmt, int zero_index, Object... params) throws SQLException {
+
+                if (params[zero_index] instanceof OutParam) {
+
+                    Object out_value = stmt.getObject(zero_index + 1);
+
+                    OutParam op = (OutParam) params[zero_index];
+
+                    op.setValue(op.getJavaType().cast(out_value));
+                }
             }
 
             public int insert(String sql, String[] genColNames, Object[] genValues, Object... params)
@@ -658,7 +682,7 @@ public class DataStoreManager {
             return res;
         }
 
-        private <T> T query(String sql, ResultSetHandler<T> rsh, Object... params) throws SQLException {
+        private <T> void query(String sql, ResultSetHandler<T> rsh, Object... params) throws SQLException {
 
             MyQueryRunner queryRunner = new MyQueryRunner();
 
@@ -668,11 +692,11 @@ public class DataStoreManager {
 
             if (sp) {
 
-                return queryRunner.queryCall(connection, sql, rsh, params);
+                queryRunner.queryCall(connection, sql, rsh, params);
 
             } else {
 
-                return queryRunner.query(connection, sql, rsh, params);
+                queryRunner.query(connection, sql, rsh, params);
             }
         }
     }

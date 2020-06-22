@@ -1,6 +1,7 @@
 2020-06-22
 
-    DataStore.java and DataStoreManager.java for Apache DbUtils adapted to Oracle SYS_REFCURSOR.
+    - DataStore.java and DataStoreManager.java for Apache DbUtils adapted to Oracle SYS_REFCURSOR.
+    - DataStoreManager.java for Apache DbUtils adapted to use OUT and INOUT parameters of SP.
 
 2020-06-21
 
