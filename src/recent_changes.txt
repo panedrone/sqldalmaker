@@ -1,3 +1,7 @@
+2020-06-22
+
+    DataStore.java and DataStoreManager.java for Apache DbUtils adapted to Oracle SYS_REFCURSOR.
+
 2020-06-21
 
     Added PHP/PDO DataStore adapted to use with PostgreSQL.

@@ -461,7 +461,7 @@ public class Helpers {
 
         // last chance for PythonRuby types specified in XML: datetime.datetime,
         // decimal.Decimal, etc.
-        // (bool, int, long, float, basestring are processed by previous code)
+        // (bool, int, long, float, str are processed by previous code)
         //
         if (!is_java_type(type)) {
 

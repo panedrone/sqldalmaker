@@ -154,20 +154,7 @@ public class SqlUtils {
 
     public static String jdbc_sql_to_python_string(String jdbc_sql) throws Exception {
 
-        boolean is_sp = is_jdbc_stored_proc_call(jdbc_sql);
-
-        String python_sql;
-
-        if (is_sp) {
-
-            python_sql = jdbc_sp_call_to_python_sp_call(jdbc_sql);
-
-        } else {
-
-            python_sql = jdbc_sql;
-        }
-
-        return python_sql_to_python_string(python_sql);
+        return python_sql_to_python_string(jdbc_sql);
     }
 
     private static String python_sql_to_python_string(String python_sql) {
@@ -554,37 +541,6 @@ public class SqlUtils {
 
             throw new Exception("Unexpected syntax of CALL: " + jdbc_sql);
         }
-    }
-
-    private static String jdbc_sp_call_to_python_sp_call(final String jdbc_sql) throws java.lang.Exception {
-
-        String sql = jdbc_sql.trim();
-
-        if (is_jdbc_stored_proc_call(sql)) { // confirms syntax {call sp_name(...)}
-
-            sql = get_jdbc_stored_proc_call(sql); // converted to call sp_name(...)
-
-        } else if (is_stored_proc_call_shortcut(sql)) {
-            //
-
-        } else {
-
-            throw new Exception("Unexpected syntax of CALL: " + jdbc_sql);
-        }
-
-        if (sql.contains("(")) {
-
-            if (!sql.endsWith(")")) {
-
-                throw new Exception("Unexpected syntax of CALL: " + jdbc_sql);
-            }
-
-            String[] parts = sql.split("[(]");
-
-            sql = parts[0].trim();
-        }
-
-        return sql;
     }
 
     /* private !!! internal !!! */
