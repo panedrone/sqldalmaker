@@ -1,6 +1,10 @@
 from mysql import connector
 
 
+class OutParam:
+    value = None
+
+
 class DataStore:
     """
     SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
@@ -73,7 +77,10 @@ class DataStore:
                 cursor.execute(sql, params)
                 return cursor.rowcount
             else:
-                cursor.callproc(sp, params)
+                call_params = _get_call_params(params)
+                # result_args: https://pynative.com/python-mysql-execute-stored-procedure/
+                result_args = cursor.callproc(sp, call_params)
+                _assign_out_params(params, result_args)
                 return 0
         finally:
             cursor.close()
@@ -122,15 +129,18 @@ class DataStore:
                 cursor.execute(sql, params)
                 # fetchone() in here throws 'Unread result found' in cursor.close()
                 # fetchall() in here because it may break on None value in the first element of array (DBNull)
-                for row in cursor: # .fetchall():
+                for row in cursor:  # .fetchall():
                     res.append(row[0])
             else:
+                call_params = _get_call_params(params)
+                # result_args: https://pynative.com/python-mysql-execute-stored-procedure/
+                result_args = cursor.callproc(sp, call_params)
                 # http://www.mysqltutorial.org/calling-mysql-stored-procedures-python/
-                cursor.callproc(sp, params)
                 for result in cursor.stored_results():
                     # fetchall() in here because it may break on None value in the first element of array (DBNull)
-                    for row_values in result: # .fetchall():
+                    for row_values in result:  # .fetchall():
                         res.append(row_values[0])
+                _assign_out_params(params, result_args)
         finally:
             cursor.close()
 
@@ -179,20 +189,21 @@ class DataStore:
 
         try:
             sp = _get_sp_name(sql)
-
             if sp is None:
                 cursor.execute(sql, params)
                 # fetchone() in here throws 'Undead data' in cursor.close()
-                for row in cursor: # .fetchall():
+                for row in cursor:  # .fetchall():
                     callback(row)
             else:
+                call_params = _get_call_params(params)
+                # result_args: https://pynative.com/python-mysql-execute-stored-procedure/
+                result_args = cursor.callproc(sp, call_params)
                 # http://www.mysqltutorial.org/calling-mysql-stored-procedures-python/
-                cursor.callproc(sp, params)
                 for result in cursor.stored_results():
                     # cursor(dictionary=True) does not help in here. workarounds:
                     # https://stackoverflow.com/questions/34030020/mysql-python-connector-get-columns-names-from-select-statement-in-stored-procedu
                     # https://kadler.github.io/2018/01/08/fetching-python-database-cursors-by-column-name.html#
-                    for row_values in result: # .fetchall():
+                    for row_values in result:  # .fetchall():
                         row = {}
                         i = 0
                         for d in result.description:
@@ -201,6 +212,7 @@ class DataStore:
                             row[col_name] = value
                             i = i + 1
                         callback(row)
+                _assign_out_params(params, result_args)
         finally:
             cursor.close()
 
@@ -227,3 +239,19 @@ def _get_sp_name(sql):
             return name[0:end]
 
     return None
+
+
+def _get_call_params(params):
+    call_params = []
+    for p in params:
+        if isinstance(p, OutParam):
+            call_params.append(p.value)
+        else:
+            call_params.append(p)
+    return call_params
+
+
+def _assign_out_params(params, result_args):
+    for i in range(len(params)):
+        if isinstance(params[i], OutParam):
+            params[i].value = result_args[i]

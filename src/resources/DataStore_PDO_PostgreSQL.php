@@ -142,15 +142,15 @@ class DataStore {
             }
             $res_array = array();
             $row = $stmt->fetch(PDO::FETCH_ASSOC); // ---- (1)
-            $cusror_name = array_values($row)[0];
-            if ($this->startsWith($cusror_name, '<unnamed portal ')) {
-                $stmt_cursor = $this->db->query("FETCH ALL FROM \"$cusror_name\"");
+            $cursor_name = array_values($row)[0];
+            if ($this->startsWith($cursor_name, '<unnamed portal ')) {
+                $stmt_cursor = $this->db->query("FETCH ALL FROM \"$cursor_name\"");
                 try {
                     while ($val = $stmt_cursor->fetchColumn()) {
                         array_push($res_array, $val);
                     }
                 } finally {
-                    $this->db->query("CLOSE \"$cusror_name\"");
+                    $this->db->query("CLOSE \"$cursor_name\"");
                     $stmt_cursor->closeCursor();
                 }
             } else {
@@ -204,15 +204,15 @@ class DataStore {
                 return FALSE;
             }
             $row = $stmt->fetch(PDO::FETCH_ASSOC); // ---- (1)
-            $cusror_name = array_values($row)[0];
-            if ($this->startsWith($cusror_name, '<unnamed portal ')) {
-                $stmt_cursor = $this->db->query("FETCH ALL FROM \"$cusror_name\"");
+            $cursor_name = array_values($row)[0];
+            if ($this->startsWith($cursor_name, '<unnamed portal ')) {
+                $stmt_cursor = $this->db->query("FETCH ALL FROM \"$cursor_name\"");
                 try {
                     while ($row = $stmt_cursor->fetch(PDO::FETCH_ASSOC)) {
                         $callback($row);
                     }
                 } finally {
-                    $this->db->query("CLOSE \"$cusror_name\"");
+                    $this->db->query("CLOSE \"$cursor_name\"");
                     $stmt_cursor->closeCursor();
                 }
             } else {
