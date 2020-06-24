@@ -252,6 +252,14 @@ def _get_call_params(params):
 
 
 def _assign_out_params(params, result_args):
+    """
+    COMMENT FROM SOURCES OF MySQL Connector => cursor.py:
+
+    For OUT and INOUT parameters the user should provide the
+    type of the parameter as well. The argument should be a
+    tuple with first item as the value of the parameter to pass
+    and second argument the type of the argument.
+    """
     for i in range(len(params)):
         if isinstance(params[i], OutParam):
             params[i].value = result_args[i]

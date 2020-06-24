@@ -1,6 +1,14 @@
 import psycopg2
 
 
+class OutParam:
+    def __init__(self):
+        self.value = None
+
+    def __init__(self, value):
+        self.value = value
+
+
 class DataStore:
     """
     SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
@@ -13,6 +21,7 @@ class DataStore:
 
     def open(self):
         self.conn = psycopg2.connect(host="localhost", database="test", user="postgres", password="sa")
+        # print(self.conn.autocommit)
 
     def close(self):
         if self.conn:
@@ -44,7 +53,6 @@ class DataStore:
         # http://zetcode.com/python/psycopg2/
         if len(ai_values) > 0:
             sql += ' RETURNING ' + ai_values[0][0]
-
         cursor = self.conn.cursor()
         try:
             cursor.execute(sql, params)
@@ -55,40 +63,52 @@ class DataStore:
         finally:
             cursor.close()
 
-    def exec_dml(self, sql, in_params):
+    def exec_dml(self, sql, params):
         """
         Arguments:
             sql: SQL statement.
-            in_params: Values of SQL parameters.
+            params: Values of SQL parameters.
         Returns:
             Number of updated rows.
         """
-        sp_sql = _get_sp_sql(sql, in_params)
-
+        sp_sql = _get_sp_sql(sql, params)
         if sp_sql is not None:
             sql = sp_sql
-
         sql = _format_sql(sql)
-
         cursor = self.conn.cursor()
         try:
-            cursor.execute(sql, in_params)
-            return cursor.rowcount
+            if sp_sql is None:
+                cursor.execute(sql, params)
+                return cursor.rowcount
+            else:
+                out_params = []
+                call_params = []
+                for p in params:
+                    if isinstance(p, OutParam):
+                        call_params.append(p.value)
+                        out_params.append(p)
+                    else:
+                        call_params.append(p)
+                    cursor.execute(sql, call_params)
+                    row0 = cursor.fetchone()
+                    i = 0
+                    for value in row0:
+                        out_params[i].value = value
+                        i += 1
         finally:
             cursor.close()
 
-    def query_scalar(self, sql, in_params, out_params=None):
+    def query_scalar(self, sql, params):
         """
         Returns:
             Single scalar value.
         Arguments:
             sql: SQL statement.
-            in_params: Values of SQL parameters if needed.
-            out_params: OutParams
+            params: Values of SQL parameters if needed.
         Raises:
             Exception: if amount of rows != 1.
         """
-        rows = self.query_scalar_array(sql, in_params, out_params)
+        rows = self.query_scalar_array(sql, params)
 
         if len(rows) == 0:
             raise Exception('No rows')
@@ -101,50 +121,38 @@ class DataStore:
         else:
             return rows[0]  # 'select get_test_rating(?)' returns just scalar value, not array of arrays
 
-    def query_scalar_array(self, sql, in_params, out_params=None):
+    def query_scalar_array(self, sql, params):
         """
         Returns:
             array of scalar values
         Arguments:
             sql: SQL statement.
-            in_params: Values of SQL parameters if needed.
-            out_params: OutParams
+            params: Values of SQL parameters if needed.
         """
-        sp_sql = _get_sp_sql(sql, in_params)
-
+        sp_sql = _get_sp_sql(sql, params)
         if sp_sql is not None:
             sql = sp_sql
-
         sql = _format_sql(sql)
-
         res = []
-
         cursor = self.conn.cursor()
-        ret_cursor = None
         try:
-            cursor.execute(sql, in_params)
+            cursor.execute(sql, params)
             rows = cursor.fetchall()
-            if _is_ref_cursor(rows):
-                ret_cursor = self.conn.cursor(rows[0][0])
-                rows = ret_cursor.fetchall()
             for r in rows:
                 res.append(r[0])
         finally:
             cursor.close()
-            if ret_cursor:
-                ret_cursor.close()
 
         return res
 
-    def query_single_row(self, sql, in_params, out_params=None):
+    def query_single_row(self, sql, params):
 
         """
         Returns:
             Single row
         Arguments:
             sql: SQL statement.
-            in_params: Values of SQL parameters if needed.
-            out_params: OutParams
+            params: Values of SQL parameters if needed.
         Raises:
             Exception: if amount of rows != 1.
         """
@@ -153,7 +161,7 @@ class DataStore:
         def callback(row):
             rows.append(row)
 
-        self.query_all_rows(sql, in_params, callback, out_params)
+        self.query_all_rows(sql, params, callback)
 
         if len(rows) == 0:
             raise Exception('No rows')
@@ -163,63 +171,38 @@ class DataStore:
 
         return rows[0]
 
-    def query_all_rows(self, sql, in_params, callback, out_params=None):
+    def query_all_rows(self, sql, params, callback):
         """
         Returns:
             None
         Arguments:
             sql: SQL statement.
-            in_params: Values of SQL parameters if needed.
+            params: Values of SQL parameters if needed.
             callback
-            out_params: OutParams
         """
-        sp_sql = _get_sp_sql(sql, in_params)
-
+        sp_sql = _get_sp_sql(sql, params)
         if sp_sql is not None:
             sql = sp_sql
-
         sql = _format_sql(sql)
-
         cursor = self.conn.cursor()
-        ret_cursor = None
         try:
-            cursor.execute(sql, in_params)
-            columns = None
+            cursor.execute(sql, params)
             rows = cursor.fetchall()
-            if _is_ref_cursor(rows):
-                ret_cursor = self.conn.cursor(rows[0][0])
-                rows = ret_cursor.fetchall()
-                columns = [column[0] for column in ret_cursor.description]
-            else:
-                columns = [column[0] for column in cursor.description]
+            columns = [column[0] for column in cursor.description]
             for r in rows:
                 row_dict = {}
                 for ci in range(len(columns)):
                     row_dict[columns[ci]] = r[ci]
                 callback(row_dict)
-            # if cursor.nextset(): # psycopg2.NotSupportedError: not supported by PostgreSQL
+        # if cursor.nextset(): # psycopg2.NotSupportedError: not supported by PostgreSQL
         finally:
             cursor.close()
-            if ret_cursor:
-                ret_cursor.close()
-
-
-def _is_ref_cursor(rows):
-    return len(rows) > 0 and isinstance(rows[0][0], type('')) and rows[0][0].startswith('<unnamed portal ')
 
 
 def _get_sp_sql(sql, params):
     parts = sql.split()
-
     if len(parts) >= 2 and parts[0].strip().lower() == "call":
-        sp_name = parts[1].strip()
-        if len(params) == 0:
-            return 'call ' + sp_name
-        else:
-            pp = ['?' for _ in range(len(params))]
-            pp = ', '.join(pp)
-            return 'call ' + sp_name + '(' + pp + ')'
-
+        return sql
     return None
 
 

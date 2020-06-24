@@ -1,23 +1,17 @@
 <?php
 
+// include_once 'DataStore.php'; // uncomment if you need inheritance
+
 /*
-  SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
-  Contact: sqldalmaker@gmail.com
+    SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
+    Contact: sqldalmaker@gmail.com
 
-  This is an example of how to implement DataStore in PHP + PDO
-  considering some features of PostgreSQL (e.g. Returning Unanamed REFCURSOR).
-
-  Some features described in here
-  http://www.sqlines.com/postgresql/how-to/return_result_set_from_stored_procedure
-  are not supported so far.
-
-  OUT and INOUT parameters are not supported so far too.
-
-  Copy-paste this code to your project and change it for your needs.
-
+    This is an example of how to implement DataStore in PHP + PDO + PostgreSQL.
+    Copy-paste this code to your project and change it for your needs.
  */
 
-class DataStore {
+// class PDODataStore implements DataStore 
+class DataStore { // no inheritance is also OK
 
     private $db;
 
@@ -73,11 +67,6 @@ class DataStore {
         $this->db = null;
     }
 
-    private static function startsWith($string, $startString) {
-        $len = strlen($startString);
-        return (substr($string, 0, $len) === $startString);
-    }
-
     public function insert($sql, array $params, array &$ai_values) {
 
         if (count($ai_values) > 0) {
@@ -108,123 +97,55 @@ class DataStore {
         return $stmt->execute($params);
     }
 
-    /*
-     * While using stored procedure that 'RETURNS REFCURSOR',
-     * ensure execution of this method inside transaction.
-     */
-
     public function query($sql, array $params) {
 
-        $res_array = $this->queryList($sql, $params);
+        $stmt = $this->db->prepare($sql);
 
-        if (count($res_array) == 0) {
-            throw new Exception('No rows');
-        }
+        $stmt->execute($params);
 
-        if (count($res_array) > 1) {
-            throw new Exception('More than 1 row exists');
-        }
-
-        return $res_array[0];
+        return $stmt->fetchColumn();
     }
-
-    /*
-     * While using stored procedure that 'RETURNS REFCURSOR',
-     * ensure execution of this method inside transaction.
-     */
 
     public function queryList($sql, array $params) {
 
         $stmt = $this->db->prepare($sql);
-        try {
-            if (!$stmt->execute($params)) {
-                return FALSE;
-            }
-            $res_array = array();
-            $row = $stmt->fetch(PDO::FETCH_ASSOC); // ---- (1)
-            $cursor_name = array_values($row)[0];
-            if ($this->startsWith($cursor_name, '<unnamed portal ')) {
-                $stmt_cursor = $this->db->query("FETCH ALL FROM \"$cursor_name\"");
-                try {
-                    while ($val = $stmt_cursor->fetchColumn()) {
-                        array_push($res_array, $val);
-                    }
-                } finally {
-                    $this->db->query("CLOSE \"$cursor_name\"");
-                    $stmt_cursor->closeCursor();
-                }
-            } else {
-                array_push($res_array, array_values($row)[0]); // ---- (1)
-                while ($val = $stmt->fetchColumn()) {
-                    array_push($res_array, $val);
-                }
-            }
-            return $res_array;
-        } finally {
-            $stmt->closeCursor();
-        }
-    }
 
-    /*
-     * While using stored procedure that 'RETURNS REFCURSOR',
-     * ensure execution of this method inside transaction.
-     */
+        $stmt->execute($params);
+
+        $res = array();
+
+        while ($val = $stmt->fetchColumn()) {
+            array_push($res, $val);
+        }
+
+        return $res;
+    }
 
     public function queryDto($sql, array $params) {
 
-        $res_array = array();
+        $stmt = $this->db->prepare($sql);
 
-        $callback = function($row) use(&$res_array) {
-            array_push($res_array, $row);
-        };
+        $stmt->execute($params);
 
-        $this->queryDtoList($sql, $params, $callback);
-
-        if (count($res_array) == 0) {
-            throw new Exception('No rows');
-        }
-
-        if (count($res_array) > 1) {
-            throw new Exception('More than 1 row exists');
-        }
-
-        return $res_array[0];
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
-
-    /*
-     * While using stored procedure that 'RETURNS REFCURSOR',
-     * ensure execution of this method inside transaction.
-     */
 
     public function queryDtoList($sql, array $params, $callback) {
 
         $stmt = $this->db->prepare($sql);
-        try {
-            if (!$stmt->execute($params)) {
-                return FALSE;
-            }
-            $row = $stmt->fetch(PDO::FETCH_ASSOC); // ---- (1)
-            $cursor_name = array_values($row)[0];
-            if ($this->startsWith($cursor_name, '<unnamed portal ')) {
-                $stmt_cursor = $this->db->query("FETCH ALL FROM \"$cursor_name\"");
-                try {
-                    while ($row = $stmt_cursor->fetch(PDO::FETCH_ASSOC)) {
-                        $callback($row);
-                    }
-                } finally {
-                    $this->db->query("CLOSE \"$cursor_name\"");
-                    $stmt_cursor->closeCursor();
-                }
-            } else {
-                $callback($row); // ---- (1)
-                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                    $callback($row);
-                }
-            }
-            return TRUE;
-        } finally {
-            $stmt->closeCursor();
+
+        $res = $stmt->execute($params);
+
+        if (!$res) {
+            return FALSE;
         }
+
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            // http://php.net/manual/en/functions.anonymous.php
+            $callback($row);
+        }
+
+        return TRUE;
     }
 
 }

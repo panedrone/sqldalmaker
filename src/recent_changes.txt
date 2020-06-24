@@ -1,6 +1,10 @@
 2020-06-23
 
-	Updated DataStore.py for MySQL to support OUT parameters of SP.
+	Updated DataStore.py for psycopg2 to support OUT parameters.
+	
+2020-06-23
+
+	Updated DataStore.py for MySQL to support OUT parameters.
 
 2020-06-22
 
