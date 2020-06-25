@@ -132,8 +132,8 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         jPanel5 = new javax.swing.JPanel();
         jButton10 = new javax.swing.JButton();
         jButton11 = new javax.swing.JButton();
+        jButton28 = new javax.swing.JButton();
         jButton26 = new javax.swing.JButton();
-        jLabel9 = new javax.swing.JLabel();
         jButton4 = new javax.swing.JButton();
         jButton8 = new javax.swing.JButton();
         jButton7 = new javax.swing.JButton();
@@ -272,6 +272,14 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         });
         jPanel5.add(jButton11);
 
+        org.openide.awt.Mnemonics.setLocalizedText(jButton28, org.openide.util.NbBundle.getMessage(SdmTabAdmin.class, "SdmTabAdmin.jButton28.text")); // NOI18N
+        jButton28.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton28ActionPerformed(evt);
+            }
+        });
+        jPanel5.add(jButton28);
+
         org.openide.awt.Mnemonics.setLocalizedText(jButton26, org.openide.util.NbBundle.getMessage(SdmTabAdmin.class, "SdmTabAdmin.jButton26.text")); // NOI18N
         jButton26.setFocusPainted(false);
         jButton26.addActionListener(new java.awt.event.ActionListener() {
@@ -280,9 +288,6 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
             }
         });
         jPanel5.add(jButton26);
-
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel9, org.openide.util.NbBundle.getMessage(SdmTabAdmin.class, "SdmTabAdmin.jLabel9.text")); // NOI18N
-        jPanel5.add(jLabel9);
 
         org.openide.awt.Mnemonics.setLocalizedText(jButton4, org.openide.util.NbBundle.getMessage(SdmTabAdmin.class, "SdmTabAdmin.jButton4.text")); // NOI18N
         jButton4.setFocusPainted(false);
@@ -618,6 +623,10 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         NbpIdeEditorHelpers.open_resource_file_in_editor_async("DataStore_psycopg2.py", "DataStore_psycopg2.py");
     }//GEN-LAST:event_jButton27ActionPerformed
 
+    private void jButton28ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton28ActionPerformed
+        NbpIdeEditorHelpers.open_resource_file_in_editor_async("DataStore_PDO_MySQL.php", "DataStore_PDO_MySQL.php");
+    }//GEN-LAST:event_jButton28ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton10;
@@ -639,6 +648,7 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
     private javax.swing.JButton jButton25;
     private javax.swing.JButton jButton26;
     private javax.swing.JButton jButton27;
+    private javax.swing.JButton jButton28;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
@@ -648,7 +658,6 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
     private javax.swing.JButton jButton9;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;

@@ -186,6 +186,18 @@ public class UIEditorPageAdmin extends Composite {
 		toolkit.adapt(btnNewButton_12, true, true);
 		btnNewButton_12.setText("DataStore.php (PDO)");
 
+		Button btnDatastorephppdoMysql = new Button(composite_2, SWT.NONE);
+		btnDatastorephppdoMysql.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore_PDO_MySQL.php",
+						"DataStore_PDO_MySQL.php");
+			}
+		});
+		btnDatastorephppdoMysql.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+		btnDatastorephppdoMysql.setText("DataStore.php (PDO, MySQL)");
+		toolkit.adapt(btnDatastorephppdoMysql, true, true);
+
 		Button btnDatastorephppdoPostgresql = new Button(composite_2, SWT.NONE);
 		btnDatastorephppdoPostgresql.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		btnDatastorephppdoPostgresql.addSelectionListener(new SelectionAdapter() {
@@ -197,7 +209,6 @@ public class UIEditorPageAdmin extends Composite {
 		});
 		btnDatastorephppdoPostgresql.setText("DataStore.php (PDO, PostgreSQL)");
 		toolkit.adapt(btnDatastorephppdoPostgresql, true, true);
-		new Label(composite_2, SWT.NONE);
 
 		Button btnDatastorejava = new Button(composite_2, SWT.NONE);
 		btnDatastorejava.addSelectionListener(new SelectionAdapter() {
