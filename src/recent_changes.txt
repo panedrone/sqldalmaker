@@ -1,3 +1,7 @@
+2020-06-27
+
+	Updated DataStore.java + Apache DbUtils for basic support of PostgreSQL UDF that RETURNS SETOF REFCURSOR.
+
 2020-06-25
 
 	Updated DataStore.php for MySQL to support OUT and INOUT parameters.

@@ -194,17 +194,19 @@ public class SqlUtils {
 
     public static void throw_if_select_sql(String jdbc_dao_sql) throws Exception {
 
-        String trimmed = jdbc_dao_sql.toLowerCase().trim();
+        // allow to execute SELECT in exec-dml
 
-        String[] parts = trimmed.split("\\s+");
-
-        if (parts.length > 0) {
-
-            if ("select".equals(parts[0])) {
-
-                throw new Exception("SELECT is not allowed here");
-            }
-        }
+//        String trimmed = jdbc_dao_sql.toLowerCase().trim();
+//
+//        String[] parts = trimmed.split("\\s+");
+//
+//        if (parts.length > 0) {
+//
+//            if ("select".equals(parts[0])) {
+//
+//                throw new Exception("SELECT is not allowed here");
+//            }
+//        }
     }
 
     static String jdbc_sql_by_dto_class_ref(String ref, String sql_root_abs_path) throws Exception {
@@ -467,22 +469,22 @@ public class SqlUtils {
         return is_stored_proc_call_shortcut(jdbc_sql);
     }
 
-    private static String get_jdbc_stored_proc_call(String jdbc_sql) throws Exception {
-
-        String res = jdbc_sql.trim();
-
-        if (jdbc_sql.startsWith("{") && jdbc_sql.endsWith("}")) {
-
-            res = jdbc_sql.substring(1, jdbc_sql.length() - 1);
-
-        } else if (jdbc_sql.startsWith("{") && !jdbc_sql.endsWith("}")
-                || !jdbc_sql.startsWith("{") && jdbc_sql.endsWith("}")) {
-
-            throw new Exception("Invalid JDBC call: " + jdbc_sql);
-        }
-
-        return res;
-    }
+//    private static String get_jdbc_stored_proc_call(String jdbc_sql) throws Exception {
+//
+//        String res = jdbc_sql.trim();
+//
+//        if (jdbc_sql.startsWith("{") && jdbc_sql.endsWith("}")) {
+//
+//            res = jdbc_sql.substring(1, jdbc_sql.length() - 1);
+//
+//        } else if (jdbc_sql.startsWith("{") && !jdbc_sql.endsWith("}")
+//                || !jdbc_sql.startsWith("{") && jdbc_sql.endsWith("}")) {
+//
+//            throw new Exception("Invalid JDBC call: " + jdbc_sql);
+//        }
+//
+//        return res;
+//    }
 
     //
     // called from PsiReferenceSql
