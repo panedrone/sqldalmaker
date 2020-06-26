@@ -2,12 +2,29 @@
 
 // include_once 'DataStore.php'; // uncomment if you need inheritance
 
-/*
-    SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
-    Contact: sqldalmaker@gmail.com
+// pgAdmin4:
+//  
+// ERROR: procedures cannot have OUT arguments
+// HINT: INOUT arguments are permitted.
+//
+class InOutParam {
 
-    This is an example of how to implement DataStore in PHP + PDO + PostgreSQL.
-    Copy-paste this code to your project and change it for your needs.
+    public $type;
+    public $value;
+
+    function __construct($type, $value=null) {
+        $this->type = $type;
+        $this->value = $value;
+    }
+
+}
+
+/*
+  SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
+  Contact: sqldalmaker@gmail.com
+
+  This is an example of how to implement DataStore in PHP + PDO + PostgreSQL.
+  Copy-paste this code to your project and change it for your needs.
  */
 
 // class PDODataStore implements DataStore 
@@ -62,8 +79,6 @@ class DataStore { // no inheritance is also OK
             $sql = $sql . ' RETURNING ' . array_keys($ai_values)[0];
         }
         $stmt = $this->db->prepare($sql);
-        // http://stackoverflow.com/questions/10699543/pdo-prepared-statement-in-php-using-associative-arrays-yields-wrong-results
-        // use the optional parameter of execute instead of explicitly binding the parameters:
         $res = $stmt->execute($params);
         if (count($ai_values) > 0) {
             $ai = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -71,15 +86,69 @@ class DataStore { // no inheritance is also OK
                 $ai_values[$key] = $value;
             }
         }
-        $stmt->closeCursor();
         return $res;
     }
 
+    private function get_sp_name($sql_src) {
+        $sql = trim($sql_src);
+        $pos = strpos($sql, '{');
+        if ($pos === 0) {
+            if (strpos($sql, '}') === strlen($sql) - 1) {
+                $sql = substr($sql, 1, strlen($sql) - 1);
+            }
+        }
+        $sql_parts = explode('(', $sql);
+        if (count($sql_parts) < 2) {
+            return null;
+        }
+        $parts = preg_split('/\s+/', $sql_parts[0]);
+        if (count($parts) < 2) {
+            return null;
+        }
+        if (strcmp(strtolower($parts[0]), 'call') === 0) {
+            return $parts[1];
+        }
+        return null;
+    }
+
+    private function bind_params($stmt, &$params) {
+        for ($i = 0; $i < count($params); $i++) {
+            if ($params[$i] instanceof InOutParam) {
+                $stmt->bindParam($i + 1, $params[$i]->value, $params[$i]->type | PDO::PARAM_INPUT_OUTPUT);
+            } else {
+                $stmt->bindParam($i + 1, $params[$i]);
+            }
+        }
+    }
+
+    private function fetch_out_params($stmt, &$params) {
+        $fetch_bound = false;
+        for ($i = 0; $i < count($params); $i++) {
+            if ($params[$i] instanceof InOutParam) {
+                $stmt->bindColumn($i + 1, $params[$i]->value, $params[$i]->type);
+                $fetch_bound = true;
+            }
+        }
+        if ($fetch_bound) {
+            // https://stackoverflow.com/questions/13382922/calling-stored-procedure-with-out-parameter-using-pdo
+            $stmt->fetch(PDO::FETCH_BOUND);
+        }
+    }
+
     public function execDML($sql, array $params) {
-        $stmt = $this->db->prepare($sql);
-        $res = $stmt->execute($params);
-        $stmt->closeCursor();
-        return $res;
+        $sp_name = $this->get_sp_name($sql);
+        if ($sp_name != null) {
+            $stmt = $this->db->prepare($sql);
+            $this->bind_params($stmt, $params);
+            $res = $stmt->execute();
+            $this->fetch_out_params($stmt, $params);
+            return $res;
+        } else {
+            $stmt = $this->db->prepare($sql);
+            $res = $stmt->execute($params);
+            $stmt->closeCursor();
+            return $res;
+        }
     }
 
     public function query($sql, array $params) {
@@ -114,7 +183,6 @@ class DataStore { // no inheritance is also OK
         $res = $stmt->execute($params);
         if ($res) {
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                // http://php.net/manual/en/functions.anonymous.php
                 $callback($row);
             }
         }
