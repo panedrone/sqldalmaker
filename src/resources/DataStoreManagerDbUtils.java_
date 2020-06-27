@@ -26,12 +26,16 @@ public class DataStoreManager {
 
     public void open() throws Exception {
         // conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:orcl", "ORDERS", "sa");
-        // conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:XE", "ORDERS", "root");
+        // connn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:XE", "ORDERS", "root");
         conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/test", "postgres", "sa");
         // conn = DriverManager.getConnection("jdbc:mysql://localhost/sakila", "root", "root");
         // conn = DriverManager.getConnection("jdbc:sqlserver://localhost\\SQLEXPRESS;databaseName=AdventureWorks2014", "sa", "root");
         // conn = DriverManager.getConnection("jdbc:h2:todo_list", "", "");
         // conn = DriverManager.getConnection("jdbc:sqlite:thesaurus.sqlite", "", "");
+        conn.setAutoCommit(false);
+    }
+
+    public void begin() throws Exception {
         conn.setAutoCommit(false);
     }
 
@@ -337,8 +341,20 @@ public class DataStoreManager {
 
         @Override
         public <T> List<T> queryList(final Class<T> type, String sql, Object... params) throws Exception {
+
             final List<T> res = new ArrayList<T>();
-            ResultSetHandler<Void> h = new ResultSetHandler<Void>() {
+            if (type == Void.class) {
+                ResultSetHandler<Void> rsh = new ResultSetHandler<Void>() {
+                    @Override
+                    public Void handle(final ResultSet rs) throws SQLException {
+                        return null;
+                    }
+                };
+                query(sql, rsh, params);
+                res.add(null); // to prevent exception while 'query' instead of 'query-list'
+                return res;
+            }
+            ResultSetHandler<Void> rsh = new ResultSetHandler<Void>() {
                 @Override
                 public Void handle(final ResultSet rs) throws SQLException {
                     if (!rs.next()) {
@@ -377,7 +393,7 @@ public class DataStoreManager {
                     return null;
                 }
             };
-            query(sql, h, params);
+            query(sql, rsh, params);
             return res;
         }
 
