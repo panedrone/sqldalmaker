@@ -1,6 +1,8 @@
 2020-06-27
 
-	Updated DataStore.java + Apache DbUtils for basic support of PostgreSQL UDF that RETURNS SETOF REFCURSOR.
+	- Updated DataStore.java + Apache DbUtils for basic support of PostgreSQL UDF that RETURNS SETOF REFCURSOR.
+	- Fix in DataStore_psycopg2.py => exec_dml(...)
+	- Fix in DataStore_PDO_PostgreSQL.php => execDml(...)
 
 2020-06-25
 

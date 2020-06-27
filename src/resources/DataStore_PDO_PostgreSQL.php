@@ -111,10 +111,11 @@ class DataStore { // no inheritance is also OK
         return null;
     }
 
-    private function bind_params($stmt, &$params) {
+    private function bind_params($stmt, &$params, &$out_params) {
         for ($i = 0; $i < count($params); $i++) {
             if ($params[$i] instanceof InOutParam) {
                 $stmt->bindParam($i + 1, $params[$i]->value, $params[$i]->type | PDO::PARAM_INPUT_OUTPUT);
+                array_push($out_params, $params[$i]);
             } else {
                 $stmt->bindParam($i + 1, $params[$i]);
             }
@@ -139,9 +140,10 @@ class DataStore { // no inheritance is also OK
         $sp_name = $this->get_sp_name($sql);
         if ($sp_name != null) {
             $stmt = $this->db->prepare($sql);
-            $this->bind_params($stmt, $params);
+            $out_params = array();
+            $this->bind_params($stmt, $params, $out_params);
             $res = $stmt->execute();
-            $this->fetch_out_params($stmt, $params);
+            $this->fetch_out_params($stmt, $out_params);
             return $res;
         } else {
             $stmt = $this->db->prepare($sql);

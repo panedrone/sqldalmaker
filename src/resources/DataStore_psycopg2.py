@@ -89,12 +89,12 @@ class DataStore:
                         out_params.append(p)
                     else:
                         call_params.append(p)
-                    cursor.execute(sql, call_params)
-                    row0 = cursor.fetchone()
-                    i = 0
-                    for value in row0:
-                        out_params[i].value = value
-                        i += 1
+                cursor.execute(sql, call_params)
+                row0 = cursor.fetchone()
+                i = 0
+                for value in row0:
+                    out_params[i].value = value
+                    i += 1
         finally:
             cursor.close()
 
