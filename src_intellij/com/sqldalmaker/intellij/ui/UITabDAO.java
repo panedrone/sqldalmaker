@@ -140,13 +140,22 @@ public class UITabDAO {
 
         Cursor wc = new Cursor(Cursor.HAND_CURSOR);
 
+        tool_panel.setOpaque(false);
         for (Component c : tool_panel.getComponents()) {
             if (c instanceof JButton) {
                 JButton b = (JButton) c;
                 b.setCursor(wc);
-                b.setBorder(BorderFactory.createEmptyBorder(2, 4, 2, 4));
-                b.setOpaque(false);
+                // b.setBorder(BorderFactory.createEmptyBorder(2, 4, 2, 4));
+                //b.setOpaque(false);
                 b.setFocusPainted(false);
+                // https://stackoverflow.com/questions/4585867/transparent-jbutton
+                b.setOpaque(false);
+                b.setContentAreaFilled(false);
+                b.setBorderPainted(false);
+                // https://coderanch.com/t/336633/java/transparent-jbuttons
+                b.setBorder(null);
+//                b.setOpaque(true);
+//                b.setBackground(tool_panel.getBackground());
             }
         }
 
@@ -554,12 +563,15 @@ public class UITabDAO {
         scrollPane1.setViewportView(table);
         top_panel_1 = new JPanel();
         top_panel_1.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
+        top_panel_1.setOpaque(false);
         rootPanel.add(top_panel_1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         tool_panel = new JPanel();
         tool_panel.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
+        tool_panel.setOpaque(false);
         top_panel_1.add(tool_panel);
         btn_NewXML = new JButton();
         btn_NewXML.setBorderPainted(false);
+        btn_NewXML.setContentAreaFilled(false);
         btn_NewXML.setIcon(new ImageIcon(getClass().getResource("/img/new_xml.gif")));
         btn_NewXML.setMargin(new Insets(0, 0, 0, 0));
         btn_NewXML.setMaximumSize(new Dimension(32, 32));
@@ -571,6 +583,7 @@ public class UITabDAO {
         tool_panel.add(btn_NewXML);
         btn_OpenXML = new JButton();
         btn_OpenXML.setBorderPainted(false);
+        btn_OpenXML.setContentAreaFilled(false);
         btn_OpenXML.setIcon(new ImageIcon(getClass().getResource("/img/xmldoc.gif")));
         btn_OpenXML.setMargin(new Insets(0, 0, 0, 0));
         btn_OpenXML.setMaximumSize(new Dimension(32, 32));
@@ -582,6 +595,7 @@ public class UITabDAO {
         tool_panel.add(btn_OpenXML);
         btn_OpenJava = new JButton();
         btn_OpenJava.setBorderPainted(false);
+        btn_OpenJava.setContentAreaFilled(false);
         btn_OpenJava.setIcon(new ImageIcon(getClass().getResource("/img/GeneratedFile.gif")));
         btn_OpenJava.setMargin(new Insets(0, 0, 0, 0));
         btn_OpenJava.setMaximumSize(new Dimension(32, 32));
@@ -593,6 +607,7 @@ public class UITabDAO {
         tool_panel.add(btn_OpenJava);
         btn_CrudDao = new JButton();
         btn_CrudDao.setBorderPainted(false);
+        btn_CrudDao.setContentAreaFilled(false);
         btn_CrudDao.setIcon(new ImageIcon(getClass().getResource("/img/180.png")));
         btn_CrudDao.setMargin(new Insets(0, 0, 0, 0));
         btn_CrudDao.setMaximumSize(new Dimension(32, 32));
@@ -604,6 +619,7 @@ public class UITabDAO {
         tool_panel.add(btn_CrudDao);
         button_fk_assistant = new JButton();
         button_fk_assistant.setBorderPainted(false);
+        button_fk_assistant.setContentAreaFilled(false);
         button_fk_assistant.setIcon(new ImageIcon(getClass().getResource("/img/FK.gif")));
         button_fk_assistant.setMargin(new Insets(0, 0, 0, 0));
         button_fk_assistant.setMaximumSize(new Dimension(32, 32));
@@ -615,6 +631,7 @@ public class UITabDAO {
         tool_panel.add(button_fk_assistant);
         btn_Refresh = new JButton();
         btn_Refresh.setBorderPainted(false);
+        btn_Refresh.setContentAreaFilled(false);
         btn_Refresh.setIcon(new ImageIcon(getClass().getResource("/img/arrow-circle-double-135.png")));
         btn_Refresh.setMargin(new Insets(0, 0, 0, 0));
         btn_Refresh.setMaximumSize(new Dimension(32, 32));
@@ -648,6 +665,7 @@ public class UITabDAO {
         tool_panel.add(btn_SelAll);
         btn_Generate = new JButton();
         btn_Generate.setBorderPainted(false);
+        btn_Generate.setContentAreaFilled(false);
         btn_Generate.setIcon(new ImageIcon(getClass().getResource("/img/compile-warning.png")));
         btn_Generate.setMargin(new Insets(0, 0, 0, 0));
         btn_Generate.setMaximumSize(new Dimension(32, 32));
@@ -659,6 +677,7 @@ public class UITabDAO {
         tool_panel.add(btn_Generate);
         btn_Validate = new JButton();
         btn_Validate.setBorderPainted(false);
+        btn_Validate.setContentAreaFilled(false);
         btn_Validate.setIcon(new ImageIcon(getClass().getResource("/img/validate.gif")));
         btn_Validate.setMargin(new Insets(0, 0, 0, 0));
         btn_Validate.setMaximumSize(new Dimension(32, 32));

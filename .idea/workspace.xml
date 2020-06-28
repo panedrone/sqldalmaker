@@ -2,10 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1fb1c605-8c08-4b11-a01b-d42d0945087f" name="Default" comment="added option to exclude views in DTO/DAO assistants">
-      <change afterPath="$PROJECT_DIR$/build.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/META-INF/MANIFEST.MF" beforeDir="false" afterPath="$PROJECT_DIR$/META-INF/MANIFEST.MF" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/META-INF/plugin.xml" beforeDir="false" afterPath="$PROJECT_DIR$/META-INF/plugin.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/nbproject/private/private.xml" beforeDir="false" afterPath="$PROJECT_DIR$/nbproject/private/private.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/JdbcUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/JdbcUtils.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/Bundle.properties" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/NbpCrudXmHelpers.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/NbpHelpers.java" beforeDir="false" />
@@ -36,6 +37,10 @@
       <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/sqldalmaker.gif" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/sqldalmaker_24.png" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/resources/DataStoreManagerDbUtils.java_" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/DataStoreManagerDbUtils.java_" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabDAO.form" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabDAO.form" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabDTO.form" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabDTO.form" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabDTO.java" afterDir="false" />
     </list>
     <list id="0b913ed8-6e39-405f-b29b-9d52c75467b5" name="Failed commit: Default" comment="" />
     <option name="SHOW_DIALOG" value="false" />
@@ -965,38 +970,38 @@
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
     <state x="740" y="281" width="434" height="654" key="FileChooserDialogImpl/0.0.1920.1050@0.0.1920.1050" timestamp="1593282643910" />
-    <state width="1876" height="203" key="GridCell.Tab.0.bottom" timestamp="1593282530177">
+    <state width="1090" height="215" key="GridCell.Tab.0.bottom" timestamp="1593337160307">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="1876" height="203" key="GridCell.Tab.0.bottom/0.0.1920.1050@0.0.1920.1050" timestamp="1593282530177" />
-    <state width="1876" height="203" key="GridCell.Tab.0.center" timestamp="1593282530177">
+    <state width="1090" height="215" key="GridCell.Tab.0.bottom/0.0.1920.1050@0.0.1920.1050" timestamp="1593337160307" />
+    <state width="1090" height="215" key="GridCell.Tab.0.center" timestamp="1593337160307">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="1876" height="203" key="GridCell.Tab.0.center/0.0.1920.1050@0.0.1920.1050" timestamp="1593282530177" />
-    <state width="1876" height="203" key="GridCell.Tab.0.left" timestamp="1593282530177">
+    <state width="1090" height="215" key="GridCell.Tab.0.center/0.0.1920.1050@0.0.1920.1050" timestamp="1593337160307" />
+    <state width="1090" height="215" key="GridCell.Tab.0.left" timestamp="1593337160307">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="1876" height="203" key="GridCell.Tab.0.left/0.0.1920.1050@0.0.1920.1050" timestamp="1593282530177" />
-    <state width="1876" height="203" key="GridCell.Tab.0.right" timestamp="1593282530177">
+    <state width="1090" height="215" key="GridCell.Tab.0.left/0.0.1920.1050@0.0.1920.1050" timestamp="1593337160307" />
+    <state width="1090" height="215" key="GridCell.Tab.0.right" timestamp="1593337160307">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="1876" height="203" key="GridCell.Tab.0.right/0.0.1920.1050@0.0.1920.1050" timestamp="1593282530177" />
-    <state width="1876" height="215" key="GridCell.Tab.1.bottom" timestamp="1593201495641">
+    <state width="1090" height="215" key="GridCell.Tab.0.right/0.0.1920.1050@0.0.1920.1050" timestamp="1593337160307" />
+    <state width="1090" height="215" key="GridCell.Tab.1.bottom" timestamp="1593337160308">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="1876" height="215" key="GridCell.Tab.1.bottom/0.0.1920.1050@0.0.1920.1050" timestamp="1593201495641" />
-    <state width="1876" height="215" key="GridCell.Tab.1.center" timestamp="1593201495640">
+    <state width="1090" height="215" key="GridCell.Tab.1.bottom/0.0.1920.1050@0.0.1920.1050" timestamp="1593337160308" />
+    <state width="1090" height="215" key="GridCell.Tab.1.center" timestamp="1593337160308">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="1876" height="215" key="GridCell.Tab.1.center/0.0.1920.1050@0.0.1920.1050" timestamp="1593201495640" />
-    <state width="1876" height="215" key="GridCell.Tab.1.left" timestamp="1593201495640">
+    <state width="1090" height="215" key="GridCell.Tab.1.center/0.0.1920.1050@0.0.1920.1050" timestamp="1593337160308" />
+    <state width="1090" height="215" key="GridCell.Tab.1.left" timestamp="1593337160308">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="1876" height="215" key="GridCell.Tab.1.left/0.0.1920.1050@0.0.1920.1050" timestamp="1593201495640" />
-    <state width="1876" height="215" key="GridCell.Tab.1.right" timestamp="1593201495640">
+    <state width="1090" height="215" key="GridCell.Tab.1.left/0.0.1920.1050@0.0.1920.1050" timestamp="1593337160308" />
+    <state width="1090" height="215" key="GridCell.Tab.1.right" timestamp="1593337160308">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="1876" height="215" key="GridCell.Tab.1.right/0.0.1920.1050@0.0.1920.1050" timestamp="1593201495640" />
+    <state width="1090" height="215" key="GridCell.Tab.1.right/0.0.1920.1050@0.0.1920.1050" timestamp="1593337160308" />
     <state x="540" y="259" width="1139" height="650" key="IDE.errors.dialog" timestamp="1589045887864">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
@@ -1021,10 +1026,10 @@
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
     <state x="609" y="138" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser/0.0.1920.1050@0.0.1920.1050" timestamp="1588695522378" />
-    <state x="746" y="218" width="998" height="767" key="find.popup" timestamp="1593197409326">
+    <state x="746" y="218" width="998" height="767" key="find.popup" timestamp="1593332233885">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state x="746" y="218" width="998" height="767" key="find.popup/0.0.1920.1050@0.0.1920.1050" timestamp="1593197409326" />
+    <state x="746" y="218" width="998" height="767" key="find.popup/0.0.1920.1050@0.0.1920.1050" timestamp="1593332233885" />
     <state x="342" y="144" key="new project wizard" timestamp="1589043165550">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>

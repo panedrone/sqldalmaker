@@ -36,18 +36,24 @@
         <constraints>
           <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="0" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
         </constraints>
-        <properties/>
+        <properties>
+          <autoscrolls value="false"/>
+          <opaque value="true"/>
+        </properties>
         <border type="none"/>
         <children>
           <grid id="9c38a" binding="tool_panel" layout-manager="FlowLayout" hgap="0" vgap="0" flow-align="1">
             <constraints/>
-            <properties/>
+            <properties>
+              <opaque value="false"/>
+            </properties>
             <border type="none"/>
             <children>
               <component id="d0a91" class="javax.swing.JButton" binding="btn_OpenXML">
                 <constraints/>
                 <properties>
                   <borderPainted value="false"/>
+                  <contentAreaFilled value="false"/>
                   <icon value="img/xmldoc.gif"/>
                   <margin top="0" left="0" bottom="0" right="0"/>
                   <maximumSize width="32" height="32"/>
@@ -62,6 +68,7 @@
                 <constraints/>
                 <properties>
                   <borderPainted value="false"/>
+                  <contentAreaFilled value="false"/>
                   <icon value="img/qrydoc.gif"/>
                   <margin top="0" left="0" bottom="0" right="0"/>
                   <maximumSize width="32" height="32"/>

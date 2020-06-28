@@ -25,11 +25,11 @@ public class DataStoreManager {
     private Connection conn;
 
     public void open() throws Exception {
-        // connection = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:orcl", "ORDERS", "sa");
-        // connection = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:XE", "ORDERS", "root");
+        // conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:orcl", "ORDERS", "sa");
+        // conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:XE", "ORDERS", "root");
         conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/test", "postgres", "sa");
-        // connection = DriverManager.getConnection("jdbc:mysql://localhost/sakila", "root", "root");
-        // connection = DriverManager.getConnection("jdbc:sqlserver://localhost\\SQLEXPRESS;databaseName=AdventureWorks2014", "sa", "root");
+        // conn = DriverManager.getConnection("jdbc:mysql://localhost/sakila", "root", "root");
+        // conn = DriverManager.getConnection("jdbc:sqlserver://localhost\\SQLEXPRESS;databaseName=AdventureWorks2014", "sa", "root");
         // conn = DriverManager.getConnection("jdbc:h2:todo_list", "", "");
         // conn = DriverManager.getConnection("jdbc:sqlite:thesaurus.sqlite", "", "");
         conn.setAutoCommit(false);
@@ -132,14 +132,17 @@ public class DataStoreManager {
                 super(pmdKnownBroken);
             }
 
-            private boolean prepare_call_params(Object[] params, List<Object> call_params) throws SQLException {
+            private boolean prepare_call_params(boolean allow_cursor_params, Object[] params, List<Object> call_params) throws SQLException {
                 boolean query_out_cursors = false;
                 for (int i = 0; i < params.length; i++) {
                     if (params[i] instanceof CursorOutParam) {
-                        CursorOutParam cp = (CursorOutParam) params[i];
-                        call_params.add(new OutParameter(cp.getSqlType(), Object.class));
-                        query_out_cursors = true;
-                        // throw new SQLException("Parameters of this type are not supported in PostgreSQL:" + CursorOutParam.class.getName());
+                        if (allow_cursor_params) {
+                            CursorOutParam cp = (CursorOutParam) params[i];
+                            call_params.add(new OutParameter(cp.getSqlType(), Object.class));
+                            query_out_cursors = true;
+                        } else {
+                            throw new SQLException(CursorOutParam.class.getName() + " are not allowed here");
+                        }
                     } else if (params[i] instanceof OutParam) {
                         OutParam cp = (OutParam) params[i];
                         Object param_value = cp.getValue();
@@ -157,7 +160,7 @@ public class DataStoreManager {
                 CallableStatement stmt = conn.prepareCall(sql);
                 try {
                     List<Object> call_params = new ArrayList<Object>();
-                    boolean query_out_cursors = prepare_call_params(params, call_params);
+                    boolean query_out_cursors = prepare_call_params(true, params, call_params);
                     super.fillStatement(stmt, call_params.toArray());
                     if (query_out_cursors) {
                         // Using Ref Cursors To Return Recordsets
@@ -202,7 +205,7 @@ public class DataStoreManager {
                 CallableStatement stmt = conn.prepareCall(sql);
                 try {
                     List<Object> call_params = new ArrayList<Object>();
-                    prepare_call_params(params, call_params);
+                    prepare_call_params(false, params, call_params);
                     super.fillStatement(stmt, call_params.toArray());
                     // Returns:
                     // true if the first result is a ResultSet object; false if the first result is
@@ -342,7 +345,6 @@ public class DataStoreManager {
 
         @Override
         public <T> List<T> queryList(final Class<T> type, String sql, Object... params) throws Exception {
-
             final List<T> res = new ArrayList<T>();
             if (type == Void.class) {
                 ResultSetHandler<Void> rsh = new ResultSetHandler<Void>() {

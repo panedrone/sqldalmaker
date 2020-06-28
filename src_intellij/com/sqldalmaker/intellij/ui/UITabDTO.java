@@ -156,13 +156,20 @@ public class UITabDTO {
 
         Cursor wc = new Cursor(Cursor.HAND_CURSOR);
 
+        tool_panel.setOpaque(false);
         for (Component c : tool_panel.getComponents()) {
             if (c instanceof JButton) {
                 JButton b = (JButton) c;
                 b.setCursor(wc);
-                b.setBorder(BorderFactory.createEmptyBorder(2, 4, 2, 4));
-                b.setOpaque(false);
+                // b.setBorder(BorderFactory.createEmptyBorder(2, 4, 2, 4));
+                //b.setOpaque(false);
                 b.setFocusPainted(false);
+                // https://stackoverflow.com/questions/4585867/transparent-jbutton
+                b.setOpaque(false);
+                b.setContentAreaFilled(false);
+                b.setBorderPainted(false);
+                // https://coderanch.com/t/336633/java/transparent-jbuttons
+                b.setBorder(null);
             }
         }
     }
@@ -208,12 +215,16 @@ public class UITabDTO {
         scrollPane1.setViewportView(table);
         top_panel_1 = new JPanel();
         top_panel_1.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
+        top_panel_1.setAutoscrolls(false);
+        top_panel_1.setOpaque(true);
         rootPanel.add(top_panel_1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         tool_panel = new JPanel();
         tool_panel.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
+        tool_panel.setOpaque(false);
         top_panel_1.add(tool_panel);
         btn_OpenXML = new JButton();
         btn_OpenXML.setBorderPainted(false);
+        btn_OpenXML.setContentAreaFilled(false);
         btn_OpenXML.setIcon(new ImageIcon(getClass().getResource("/img/xmldoc.gif")));
         btn_OpenXML.setMargin(new Insets(0, 0, 0, 0));
         btn_OpenXML.setMaximumSize(new Dimension(32, 32));
@@ -225,6 +236,7 @@ public class UITabDTO {
         tool_panel.add(btn_OpenXML);
         btn_OpenSQL = new JButton();
         btn_OpenSQL.setBorderPainted(false);
+        btn_OpenSQL.setContentAreaFilled(false);
         btn_OpenSQL.setIcon(new ImageIcon(getClass().getResource("/img/qrydoc.gif")));
         btn_OpenSQL.setMargin(new Insets(0, 0, 0, 0));
         btn_OpenSQL.setMaximumSize(new Dimension(32, 32));

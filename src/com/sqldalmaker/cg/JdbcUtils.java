@@ -835,11 +835,12 @@ public class JdbcUtils {
                 ? FieldNamesMode.AS_IS
                 : field_names_mode;
 
-        if (SqlUtils.is_table_ref(dao_jaxb_ref)) {
+        /*if (SqlUtils.is_table_ref(dao_jaxb_ref)) { // to enable 'fetch all from ref_1' in ref
 
             throw new Exception("Table name as a value of 'ref' is not allowed in <query...");
 
-        } else if (SqlUtils.is_sql_shortcut_ref(dao_jaxb_ref)) {
+        } else*/
+        if (SqlUtils.is_sql_shortcut_ref(dao_jaxb_ref)) {
 
             String[] parts = SqlUtils.parse_sql_shortcut_ref(dao_jaxb_ref);
 

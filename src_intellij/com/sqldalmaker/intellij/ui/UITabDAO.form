@@ -36,18 +36,23 @@
         <constraints>
           <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
         </constraints>
-        <properties/>
+        <properties>
+          <opaque value="false"/>
+        </properties>
         <border type="none"/>
         <children>
           <grid id="18b6b" binding="tool_panel" layout-manager="FlowLayout" hgap="0" vgap="0" flow-align="1">
             <constraints/>
-            <properties/>
+            <properties>
+              <opaque value="false"/>
+            </properties>
             <border type="none"/>
             <children>
               <component id="ca7e1" class="javax.swing.JButton" binding="btn_NewXML">
                 <constraints/>
                 <properties>
                   <borderPainted value="false"/>
+                  <contentAreaFilled value="false"/>
                   <icon value="img/new_xml.gif"/>
                   <margin top="0" left="0" bottom="0" right="0"/>
                   <maximumSize width="32" height="32"/>
@@ -62,6 +67,7 @@
                 <constraints/>
                 <properties>
                   <borderPainted value="false"/>
+                  <contentAreaFilled value="false"/>
                   <icon value="img/xmldoc.gif"/>
                   <margin top="0" left="0" bottom="0" right="0"/>
                   <maximumSize width="32" height="32"/>
@@ -76,6 +82,7 @@
                 <constraints/>
                 <properties>
                   <borderPainted value="false"/>
+                  <contentAreaFilled value="false"/>
                   <icon value="img/GeneratedFile.gif"/>
                   <margin top="0" left="0" bottom="0" right="0"/>
                   <maximumSize width="32" height="32"/>
@@ -90,6 +97,7 @@
                 <constraints/>
                 <properties>
                   <borderPainted value="false"/>
+                  <contentAreaFilled value="false"/>
                   <icon value="img/180.png"/>
                   <margin top="0" left="0" bottom="0" right="0"/>
                   <maximumSize width="32" height="32"/>
@@ -104,6 +112,7 @@
                 <constraints/>
                 <properties>
                   <borderPainted value="false"/>
+                  <contentAreaFilled value="false"/>
                   <icon value="img/FK.gif"/>
                   <margin top="0" left="0" bottom="0" right="0"/>
                   <maximumSize width="32" height="32"/>
@@ -118,6 +127,7 @@
                 <constraints/>
                 <properties>
                   <borderPainted value="false"/>
+                  <contentAreaFilled value="false"/>
                   <icon value="img/arrow-circle-double-135.png"/>
                   <margin top="0" left="0" bottom="0" right="0"/>
                   <maximumSize width="32" height="32"/>
@@ -160,6 +170,7 @@
                 <constraints/>
                 <properties>
                   <borderPainted value="false"/>
+                  <contentAreaFilled value="false"/>
                   <icon value="img/compile-warning.png"/>
                   <margin top="0" left="0" bottom="0" right="0"/>
                   <maximumSize width="32" height="32"/>
@@ -174,6 +185,7 @@
                 <constraints/>
                 <properties>
                   <borderPainted value="false"/>
+                  <contentAreaFilled value="false"/>
                   <icon value="img/validate.gif"/>
                   <margin top="0" left="0" bottom="0" right="0"/>
                   <maximumSize width="32" height="32"/>
