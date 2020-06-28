@@ -2,12 +2,40 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1fb1c605-8c08-4b11-a01b-d42d0945087f" name="Default" comment="added option to exclude views in DTO/DAO assistants">
+      <change afterPath="$PROJECT_DIR$/build.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/META-INF/plugin.xml" beforeDir="false" afterPath="$PROJECT_DIR$/META-INF/plugin.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/manifest.mf" beforeDir="false" afterPath="$PROJECT_DIR$/manifest.mf" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/nbproject/private/private.xml" beforeDir="false" afterPath="$PROJECT_DIR$/nbproject/private/private.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/recent_changes.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/recent_changes.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/DataStore_psycopg2.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/DataStore_psycopg2.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/Bundle.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/NbpCrudXmHelpers.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/NbpHelpers.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/NbpIdeConsoleUtil.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/NbpIdeEditorHelpers.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/NbpIdeMessageHelpers.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/NbpMetaProgramInitHelpers.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/NbpPathHelpers.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/NbpTargetLanguageHelpers.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/SdmAction.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/SdmDataObject.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/SdmMultiViewCloneableEditor.form" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/SdmMultiViewCloneableEditor.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/SdmTabAdmin.form" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/SdmTabAdmin.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/SdmTabDAO.form" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/SdmTabDAO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/SdmTabDTO.form" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/SdmTabDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/UIDialogSelectDbSchema.form" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/UIDialogSelectDbSchema.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/XmlEditorCompletionItem.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/XmlEditorCompletionProvider.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/XmlEditorHyperlinkProvider.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/XmlEditorUtil.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/__build_plugins_README.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/package-info.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/sqldalmaker.gif" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/sqldalmaker_24.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/DataStoreManagerDbUtils.java_" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/DataStoreManagerDbUtils.java_" afterDir="false" />
     </list>
     <list id="0b913ed8-6e39-405f-b29b-9d52c75467b5" name="Failed commit: Default" comment="" />
     <option name="SHOW_DIALOG" value="false" />

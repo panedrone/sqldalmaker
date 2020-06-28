@@ -25,11 +25,11 @@ public class DataStoreManager {
     private Connection conn;
 
     public void open() throws Exception {
-        // conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:orcl", "ORDERS", "sa");
-        // connn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:XE", "ORDERS", "root");
+        // connection = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:orcl", "ORDERS", "sa");
+        // connection = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:XE", "ORDERS", "root");
         conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/test", "postgres", "sa");
-        // conn = DriverManager.getConnection("jdbc:mysql://localhost/sakila", "root", "root");
-        // conn = DriverManager.getConnection("jdbc:sqlserver://localhost\\SQLEXPRESS;databaseName=AdventureWorks2014", "sa", "root");
+        // connection = DriverManager.getConnection("jdbc:mysql://localhost/sakila", "root", "root");
+        // connection = DriverManager.getConnection("jdbc:sqlserver://localhost\\SQLEXPRESS;databaseName=AdventureWorks2014", "sa", "root");
         // conn = DriverManager.getConnection("jdbc:h2:todo_list", "", "");
         // conn = DriverManager.getConnection("jdbc:sqlite:thesaurus.sqlite", "", "");
         conn.setAutoCommit(false);
@@ -99,7 +99,7 @@ public class DataStoreManager {
             if (jdbc_sql.startsWith("{") & jdbc_sql.endsWith("}")) {
                 jdbc_sql = jdbc_sql.substring(1, jdbc_sql.length() - 1);
             }
-            String []parts = jdbc_sql.split("\\s+");
+            String[] parts = jdbc_sql.split("\\s+");
             if (parts.length < 2) {
                 return false;
             }
@@ -132,24 +132,32 @@ public class DataStoreManager {
                 super(pmdKnownBroken);
             }
 
+            private boolean prepare_call_params(Object[] params, List<Object> call_params) throws SQLException {
+                boolean query_out_cursors = false;
+                for (int i = 0; i < params.length; i++) {
+                    if (params[i] instanceof CursorOutParam) {
+                        CursorOutParam cp = (CursorOutParam) params[i];
+                        call_params.add(new OutParameter(cp.getSqlType(), Object.class));
+                        query_out_cursors = true;
+                        // throw new SQLException("Parameters of this type are not supported in PostgreSQL:" + CursorOutParam.class.getName());
+                    } else if (params[i] instanceof OutParam) {
+                        OutParam cp = (OutParam) params[i];
+                        Object param_value = cp.getValue();
+                        call_params.add(new OutParameter(cp.getSqlType(), cp.getJavaType(), cp.getValue()));
+                        // call_params.add(param_value);
+                    } else {
+                        call_params.add(params[i]);
+                    }
+                }
+                return query_out_cursors;
+            }
+
             public <T> void query_call(Connection conn, String sql, ResultSetHandler<T> rsh, Object... params)
                     throws SQLException {
                 CallableStatement stmt = conn.prepareCall(sql);
                 try {
-                    boolean query_out_cursors = false;
                     List<Object> call_params = new ArrayList<Object>();
-                    for (int i = 0; i < params.length; i++) {
-                        if (params[i] instanceof CursorOutParam) {
-                            CursorOutParam cp = (CursorOutParam) params[i];
-                            call_params.add(new OutParameter(cp.getSqlType(), Object.class));
-                            query_out_cursors = true;
-                        } else if (params[i] instanceof OutParam) {
-                            OutParam cp = (OutParam) params[i];
-                            call_params.add(new OutParameter(cp.getSqlType(), cp.getClass(), cp.getValue()));
-                        } else {
-                            call_params.add(params[i]);
-                        }
-                    }
+                    boolean query_out_cursors = prepare_call_params(params, call_params);
                     super.fillStatement(stmt, call_params.toArray());
                     if (query_out_cursors) {
                         // Using Ref Cursors To Return Recordsets
@@ -182,8 +190,9 @@ public class DataStoreManager {
                         }
                         read_out_params(stmt, params);
                     }
-                } catch (SQLException e) {
-                    super.rethrow(e, sql, params);
+                    // need to see real type of exception
+//                } catch (SQLException e) {
+//                    super.rethrow(e, sql, params);
                 } finally {
                     DbUtils.close(stmt);
                 }
@@ -193,24 +202,16 @@ public class DataStoreManager {
                 CallableStatement stmt = conn.prepareCall(sql);
                 try {
                     List<Object> call_params = new ArrayList<Object>();
-                    for (int i = 0; i < params.length; i++) {
-                        if (params[i] instanceof CursorOutParam) {
-                            throw new Exception(CursorOutParam.class.getName() + " is not allowed in executeCall");
-                        } else if (params[i] instanceof OutParam) {
-                            OutParam cp = (OutParam) params[i];
-                            call_params.add(new OutParameter(cp.getSqlType(), cp.getClass(), cp.getValue()));
-                        } else {
-                            call_params.add(params[i]);
-                        }
-                    }
+                    prepare_call_params(params, call_params);
                     super.fillStatement(stmt, call_params.toArray());
                     // Returns:
                     // true if the first result is a ResultSet object; false if the first result is
                     // an update count or there is no result
                     stmt.execute();
                     read_out_params(stmt, params);
-                } catch (SQLException e) {
-                    super.rethrow(e, sql, params);
+                    // need to see real type of exception
+//                } catch (SQLException e) {
+//                    super.rethrow(e, sql, call_params.toArray());
                 } finally {
                     DbUtils.close(stmt);
                 }
