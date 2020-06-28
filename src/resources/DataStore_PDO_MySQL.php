@@ -67,20 +67,24 @@ class DataStore { // no inheritance is also OK
 
     public function insert($sql, array $params, array &$ai_values) {
         $stmt = $this->db->prepare($sql);
-        // http://stackoverflow.com/questions/10699543/pdo-prepared-statement-in-php-using-associative-arrays-yields-wrong-results
-        // use the optional parameter of execute instead of explicitly binding the parameters:
-        $res = $stmt->execute($params);
-        // http://www.php.net/manual/en/pdo.lastinsertid.php
-        // Returns the ID of the last inserted row, or the last value from a sequence object,
-        // depending on the underlying driver. For example, PDO_PGSQL requires you to specify the name
-        // of a sequence object for the name parameter.
-        // This method may not return a meaningful or consistent result across different PDO drivers,
-        // because the underlying database may not even support the notion of auto-increment fields or sequences.
-        foreach (array_keys($ai_values) as $key) {
-            $id = $this->db->lastInsertId($key);
-            $ai_values[$key] = $id;
+        try {
+           // http://stackoverflow.com/questions/10699543/pdo-prepared-statement-in-php-using-associative-arrays-yields-wrong-results
+           // use the optional parameter of execute instead of explicitly binding the parameters:
+           $res = $stmt->execute($params);
+           // http://www.php.net/manual/en/pdo.lastinsertid.php
+           // Returns the ID of the last inserted row, or the last value from a sequence object,
+           // depending on the underlying driver. For example, PDO_PGSQL requires you to specify the name
+           // of a sequence object for the name parameter.
+           // This method may not return a meaningful or consistent result across different PDO drivers,
+           // because the underlying database may not even support the notion of auto-increment fields or sequences.
+           foreach (array_keys($ai_values) as $key) {
+               $id = $this->db->lastInsertId($key);
+               $ai_values[$key] = $id;
+           }
+           return $res;
+        } finally {
+           $stmt->closeCursor();
         }
-        return $res;
     }
 
     private function get_sp_name($sql_src) {
@@ -198,7 +202,6 @@ class DataStore { // no inheritance is also OK
         $res = $stmt->execute($params);
         if ($res) {
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                // http://php.net/manual/en/functions.anonymous.php
                 $callback($row);
             }
         }

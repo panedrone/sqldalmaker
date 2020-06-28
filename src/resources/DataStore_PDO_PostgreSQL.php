@@ -79,14 +79,18 @@ class DataStore { // no inheritance is also OK
             $sql = $sql . ' RETURNING ' . array_keys($ai_values)[0];
         }
         $stmt = $this->db->prepare($sql);
-        $res = $stmt->execute($params);
-        if (count($ai_values) > 0) {
-            $ai = $stmt->fetch(PDO::FETCH_ASSOC);
-            foreach ($ai as $key => $value) {
-                $ai_values[$key] = $value;
+        try {
+            $res = $stmt->execute($params);
+            if (count($ai_values) > 0) {
+                $ai = $stmt->fetch(PDO::FETCH_ASSOC);
+                foreach ($ai as $key => $value) {
+                    $ai_values[$key] = $value;
+                }
             }
+            return $res;
+        } finally {
+           $stmt->closeCursor();
         }
-        return $res;
     }
 
     private function get_sp_name($sql_src) {
@@ -144,6 +148,7 @@ class DataStore { // no inheritance is also OK
             $this->bind_params($stmt, $params, $out_params);
             $res = $stmt->execute();
             $this->fetch_out_params($stmt, $out_params);
+            $stmt->closeCursor();
             return $res;
         } else {
             $stmt = $this->db->prepare($sql);
