@@ -185,6 +185,8 @@ public class UIEditorPageAdmin extends Composite {
 		btnNewButton_12.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		toolkit.adapt(btnNewButton_12, true, true);
 		btnNewButton_12.setText("DataStore.php (PDO)");
+		new Label(composite_2, SWT.NONE);
+		new Label(composite_2, SWT.NONE);
 
 		Button btnDatastorephppdoMysql = new Button(composite_2, SWT.NONE);
 		btnDatastorephppdoMysql.addSelectionListener(new SelectionAdapter() {
@@ -198,6 +200,18 @@ public class UIEditorPageAdmin extends Composite {
 		btnDatastorephppdoMysql.setText("DataStore.php (PDO, MySQL)");
 		toolkit.adapt(btnDatastorephppdoMysql, true, true);
 
+		Button btnDatastorephppdoOracle = new Button(composite_2, SWT.NONE);
+		btnDatastorephppdoOracle.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore_PDO_Oracle.php",
+						"DataStore_PDO_Oracle.php");
+			}
+		});
+		btnDatastorephppdoOracle.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1));
+		btnDatastorephppdoOracle.setText("DataStore.php (PDO, Oracle)");
+		toolkit.adapt(btnDatastorephppdoOracle, true, true);
+
 		Button btnDatastorephppdoPostgresql = new Button(composite_2, SWT.NONE);
 		btnDatastorephppdoPostgresql.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		btnDatastorephppdoPostgresql.addSelectionListener(new SelectionAdapter() {
@@ -209,6 +223,17 @@ public class UIEditorPageAdmin extends Composite {
 		});
 		btnDatastorephppdoPostgresql.setText("DataStore.php (PDO, PostgreSQL)");
 		toolkit.adapt(btnDatastorephppdoPostgresql, true, true);
+
+		Button btnDatastorephppdoSql = new Button(composite_2, SWT.NONE);
+		btnDatastorephppdoSql.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore_PDO_SQL_Server.php",
+						"DataStore_PDO_SQL_Server.php");
+			}
+		});
+		btnDatastorephppdoSql.setText("DataStore.php (PDO, SQL Server)");
+		toolkit.adapt(btnDatastorephppdoSql, true, true);
 
 		Button btnDatastorejava = new Button(composite_2, SWT.NONE);
 		btnDatastorejava.addSelectionListener(new SelectionAdapter() {

@@ -18,15 +18,14 @@
 #end
 #macro(param_array $dto_param $params)
 #if ($dto_param != "")
-		${d}params = array(#foreach ($param in ${params})#set($p=${d}+"p->"+$param.getterMethod()+"()")#list_item(${velocityCount} $p)#end);
+        ${d}params = array(#foreach ($param in ${params})#set($p=${d}+"p->"+$param.getterMethod()+"()")#list_item(${velocityCount} $p)#end);
 #else
-		${d}params = array(#foreach ($param in ${params})#set($p=${d}+$param.getName())#list_item(${velocityCount} $p)#end);
+        ${d}params = array(#foreach ($param in ${params})#set($p=${d}+$param.getName())#list_item(${velocityCount} $p)#end);
 #end
 #end
 #macro(sql_var $is_external_sql $sql)
 #if(!${is_external_sql})
-		${d}sql = "${sql}";
-
+        ${d}sql = "${sql}";
 #end
 #end
 ## ====================================================================================================================
@@ -39,28 +38,26 @@ namespace ${namespace};
  * ${class_name} is a generated DTO class. Don't modify it manually.
  * Visit http://sqldalmaker.sourceforge.net/ for details.
  */
-class ${class_name}
-{
+class ${class_name} {
+
 #foreach($field in ${fields})
-	private ${d}${field.getName()}; // ${field.getType()}
+    private ${d}${field.getName()}; // ${field.getType()}
 #end
 #foreach($field in ${fields})
 
-	/**
-	 * @return ($field.getType())
-	 */
-	public function ${field.getterMethod()}()
-	{
-		return ${d}this->$field.getName();
-	}
+    /**
+     * @return ($field.getType())
+     */
+    public function ${field.getterMethod()}() {
+        return ${d}this->$field.getName();
+    }
 
-	/**
-	 * @param ($field.getType()) ${d}$field.getName()
-	 */
-	public function ${field.setterMethod()}(${d}$field.getName())
-	{
-		${d}this->$field.getName() = ${d}$field.getName();
-	}
+    /**
+     * @param ($field.getType()) ${d}$field.getName()
+     */
+    public function ${field.setterMethod()}(${d}$field.getName()) {
+        ${d}this->$field.getName() = ${d}$field.getName();
+    }
 #end
 }## ====================================================================================================================
 #elseif($mode=="dao_class")
@@ -83,146 +80,129 @@ use ${u};
  * ${class_name} is a generated DAO class. Don't modify it manually.
  * Visit http://sqldalmaker.sourceforge.net/ for details.
  */
-class ${class_name}
-{
-	protected ${d}ds;
+class ${class_name} {
+        
+    protected ${d}ds;
 
-	public function __construct(\DataStore $ds)
-	{
-		${d}this->ds = ${d}ds;
-	}
+    public function __construct(\DataStore $ds) {
+        ${d}this->ds = ${d}ds;
+    }
 #foreach($method in ${methods})${method}#end
 }## ====================================================================================================================
 #elseif($mode=="dao_create")
 
-	/**
-	 * CRUD-Create. The table '${table_name}'.
-	 * Auto-generated values are assigned to related fields of DTO.
-	 * @param ${dto_param} ${d}p
-	 * @return TRUE on success or FALSE on failure
-	 */
-	public function ${method_name}(${dto_param} ${d}p)
-	{
+    /**
+     * CRUD-Create. The table '${table_name}'.
+     * Auto-generated values are assigned to related fields of DTO.
+     * @param ${dto_param} ${d}p
+     * @return TRUE on success or FALSE on failure
+     */
+    public function ${method_name}(${dto_param} ${d}p) {
 #sql_var(false $sql)
-		${d}params = array(#foreach ($param in ${params})#set($p=${d}+"p->"+${param.getterMethod()}+"()")#list_item(${velocityCount} $p)#end);
-		${d}ai_values = array(#foreach ($key in ${keys})#set($p='"'+${key.getColumnName()}+'"'+" => null")#list_item(${velocityCount} $p)#end);
-
-		${d}res = ${d}this->ds->insert(${d}sql, ${d}params, ${d}ai_values);
-
+        ${d}params = array(#foreach ($param in ${params})#set($p=${d}+"p->"+${param.getterMethod()}+"()")#list_item(${velocityCount} $p)#end);
+        ${d}ai_values = array(#foreach ($key in ${keys})#set($p='"'+${key.getColumnName()}+'"'+" => null")#list_item(${velocityCount} $p)#end);
+        ${d}res = ${d}this->ds->insert(${d}sql, ${d}params, ${d}ai_values);
 #foreach ($key in ${keys})
 #set($i = ${velocityCount})
-		${d}p->${key.setterMethod()}(${d}ai_values["$key.getName()"]);
+        ${d}p->${key.setterMethod()}(${d}ai_values["$key.getName()"]);
 #end
-
-		return ${d}res;
-	}
+            return ${d}res;
+    }
 ## ====================================================================================================================
 #elseif($mode=="dao_query")
 
-	/**
+    /**
 #if($crud)
-	 * CRUD-Read. The table '${ref}'.
+     * CRUD-Read. The table '${ref}'.
 #end
 #if(${is_external_sql})
-	 * @param string ${d}sql: external SQL statement
+     * @param string ${d}sql external SQL statement
 #end
 #if(${dto_param} != "")
-	 * @param ${dto_param} ${d}p
+     * @param ${dto_param} ${d}p
 #else
 #foreach($param in ${params})
-	 * @param (${param.getType()}) ${d}${param.getName()}
+     * @param (${param.getType()}) ${d}${param.getName()}
 #end
 #end
 #if($fetch_list)
 #if($use_dto)
-	 * @return ${returned_type_name}[] or FALSE on failure
+     * @return ${returned_type_name}[] or FALSE on failure
 #else
-	 * @return array of (${returned_type_name}) ${fields.get(0).getColumnName()}
+     * @return array of (${returned_type_name}) ${fields.get(0).getColumnName()}
 #end
 #else
 #if($use_dto)
-	 * @return ${returned_type_name} or FALSE on failure
+     * @return ${returned_type_name} or FALSE on failure
 #else
-	 * @return mixed: (${returned_type_name}) ${fields.get(0).getColumnName()} or FALSE on failure
+     * @return mixed: (${returned_type_name}) ${fields.get(0).getColumnName()} or FALSE on failure
 #end
 #end
-	 */
+     */
 #if($fetch_list)
-	public function ${method_name}(#if(${dto_param} != "")#param_decls_dto($is_external_sql)${dto_param} ${d}p#else#param_decls($is_external_sql $params)#end)
-	{
+    public function ${method_name}(#if(${dto_param} != "")#param_decls_dto($is_external_sql)${dto_param} ${d}p#else#param_decls($is_external_sql $params)#end) {
 #sql_var(${is_external_sql} $sql)
 #param_array($dto_param $params)
-
 #if($use_dto)
-		${d}res = array();
-
-		${d}callback = function(${d}row) use(&${d}res) {
-			${d}obj = new ${returned_type_name}();
+        ${d}res = array();
+        ${d}callback = function(${d}row) use(&${d}res) {
+            ${d}obj = new ${returned_type_name}();
 #foreach($f in ${fields})
-			${d}obj->${f.setterMethod()}(${d}row["${f.getColumnName()}"]);
+            ${d}obj->${f.setterMethod()}(${d}row["${f.getColumnName()}"]);
 #end
-			array_push(${d}res, ${d}obj);
-		};
-
-		${d}this->ds->queryDtoList(${d}sql, ${d}params, ${d}callback);
-
-		return ${d}res;
+            array_push(${d}res, ${d}obj);
+        };
+        ${d}this->ds->queryDtoList(${d}sql, ${d}params, ${d}callback);
+        return ${d}res;
 #else
-		return ${d}this->ds->queryList(${d}sql, ${d}params);
+        return ${d}this->ds->queryList(${d}sql, ${d}params);
 #end
-	}
+    }
 #else
-	public function ${method_name}(#if(${dto_param} != "")#param_decls_dto($is_external_sql)${dto_param} ${d}p#else#param_decls($is_external_sql $params)#end)
-	{
+    public function ${method_name}(#if(${dto_param} != "")#param_decls_dto($is_external_sql)${dto_param} ${d}p#else#param_decls($is_external_sql $params)#end) {
 #sql_var(${is_external_sql} $sql)
 #param_array($dto_param $params)
-
 #if($use_dto)
-		${d}obj = new ${returned_type_name};
-
-		${d}row = ${d}this->ds->queryDto(${d}sql, ${d}params);
-		
-		if ($row) {
+        ${d}obj = new ${returned_type_name};
+        ${d}row = ${d}this->ds->queryDto(${d}sql, ${d}params);
+        if ($row) {
 #foreach($f in ${fields})
-			${d}obj->${f.setterMethod()}(${d}row["${f.getColumnName()}"]);
+            ${d}obj->${f.setterMethod()}(${d}row["${f.getColumnName()}"]);
 #end
-			return $obj;
-		}
-		
-		return FALSE;
+            return $obj;
+        }
+        return FALSE;
 #else
-		return ${d}this->ds->query(${d}sql, ${d}params);
+        return ${d}this->ds->query(${d}sql, ${d}params);
 #end
-	}
+    }
 #end
 ## ====================================================================================================================
 #elseif($mode=="dao_exec_dml")
 
-	/**
+    /**
 #if ($crud == "create")
-	 * CRUD-Create. The table '${table_name}'.
+     * CRUD-Create. The table '${table_name}'.
 #elseif ($crud == "update")
-	 * CRUD-Update. The table '${table_name}'.
+     * CRUD-Update. The table '${table_name}'.
 #elseif ($crud == "delete")
-	 * CRUD-Delete. The table '${table_name}'.
+     * CRUD-Delete. The table '${table_name}'.
 #end
 #if(${is_external_sql})
-	 * @param string ${d}sql: external SQL statement
+     * @param string ${d}sql external SQL statement
 #end
 #if(${dto_param} != "")
-	 * @param ${dto_param} ${d}p
+     * @param ${dto_param} ${d}p
 #else
 #foreach($param in ${params})
-	 * @param (${param.getType()}) ${d}${param.getName()}
+     * @param (${param.getType()}) ${d}${param.getName()}
 #end
 #end
-	 * @return TRUE on success or FALSE on failure
-	 */
-	public function ${method_name}(#if(${dto_param} != "")#param_decls_dto($is_external_sql)${dto_param} ${d}p#else#param_decls($is_external_sql $params)#end)
-	{
+     * @return TRUE on success or FALSE on failure
+     */
+    public function ${method_name}(#if(${dto_param} != "")#param_decls_dto($is_external_sql)${dto_param} ${d}p#else#param_decls($is_external_sql $params)#end) {
 #sql_var(${is_external_sql} $sql)
 #param_array($dto_param $params)
-
-		return ${d}this->ds->execDML(${d}sql, ${d}params);
-	}
+        return ${d}this->ds->execDML(${d}sql, ${d}params);
+    }
 #end

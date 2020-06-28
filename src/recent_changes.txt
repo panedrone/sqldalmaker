@@ -1,3 +1,8 @@
+2020-06-28
+
+	- Added DataStore_PDO_SQL_Server.php
+        - Added DataStore_PDO_Oracle.php
+
 2020-06-27
 
 	- Updated DataStore.java + Apache DbUtils for basic support of PostgreSQL UDF that RETURNS SETOF REFCURSOR.

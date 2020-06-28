@@ -23,7 +23,6 @@ self#if($external_sql), sql#end, #end
 #macro(sql_var $is_external_sql $sql)
 #if (!${is_external_sql})
         sql = """$sql"""
-
 #end
 #end
 ## ====================================================================================================================
@@ -81,9 +80,7 @@ class $class_name:
 #sql_var(false $sql)
         params = [#foreach ($param in $params)#set($p="p."+${param.getName()})#list_item($velocityCount $p)#end]
         ai_values = [#foreach ($key in $keys)#set($p='["'+${key.getColumnName()} +'", None]')#list_item($velocityCount $p)#end]
-
         self.ds.insert_row(sql, params, ai_values)
-
 #foreach ($key in $keys)
 #set($i = $velocityCount - 1)
         p.$key.getName() = ai_values[$i][1]
@@ -125,10 +122,8 @@ class $class_name:
             res.append(obj)
 
         self.ds.query_all_rows(sql, params, callback#if($out_params), out_params#end)
-
         return res
 #else
-
         return self.ds.query_scalar_array(sql, params#if($out_params), out_params#end)
 #end
 #else
@@ -202,6 +197,5 @@ class $class_name:
         """
 #sql_var($is_external_sql $sql)
 #param_array($dto_param $params)
-
         return self.ds.exec_dml(sql, params)
 #end
