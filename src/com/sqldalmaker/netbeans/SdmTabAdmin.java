@@ -475,6 +475,7 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         });
         jPanel7.add(jButton23);
 
+        jTextPane1.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
         jTextPane1.setAutoscrolls(false);
         jTextPane1.setMargin(new java.awt.Insets(3, 10, 3, 3));
 
@@ -502,7 +503,7 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jTextPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 260, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jTextPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 276, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 

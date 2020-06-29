@@ -1,7 +1,6 @@
 <?php
 
 // include_once 'DataStore.php'; // uncomment if you need inheritance
-
 // pgAdmin4:
 //  
 // ERROR: procedures cannot have OUT arguments
@@ -12,7 +11,7 @@ class InOutParam {
     public $type;
     public $value;
 
-    function __construct($type, $value=null) {
+    function __construct($type, $value = null) {
         $this->type = $type;
         $this->value = $value;
     }
@@ -89,7 +88,7 @@ class DataStore { // no inheritance is also OK
             }
             return $res;
         } finally {
-           $stmt->closeCursor();
+            $stmt->closeCursor();
         }
     }
 
@@ -144,57 +143,75 @@ class DataStore { // no inheritance is also OK
         $sp_name = $this->get_sp_name($sql);
         if ($sp_name != null) {
             $stmt = $this->db->prepare($sql);
-            $out_params = array();
-            $this->bind_params($stmt, $params, $out_params);
-            $res = $stmt->execute();
-            $this->fetch_out_params($stmt, $out_params);
-            $stmt->closeCursor();
+            try {
+                $out_params = array();
+                $this->bind_params($stmt, $params, $out_params);
+                $res = $stmt->execute();
+                $this->fetch_out_params($stmt, $out_params);
+            } finally {
+                $stmt->closeCursor();
+            }
             return $res;
         } else {
             $stmt = $this->db->prepare($sql);
-            $res = $stmt->execute($params);
-            $stmt->closeCursor();
+            try {
+                $res = $stmt->execute($params);
+            } finally {
+                $stmt->closeCursor();
+            }
             return $res;
         }
     }
 
     public function query($sql, array $params) {
         $stmt = $this->db->prepare($sql);
-        $stmt->execute($params);
-        $res = $stmt->fetchColumn();
-        $stmt->closeCursor();
-        return $res;
+        try {
+            $stmt->execute($params);
+            $res = $stmt->fetchColumn();
+            return $res;
+        } finally {
+            $stmt->closeCursor();
+        }
     }
 
     public function queryList($sql, array $params) {
         $stmt = $this->db->prepare($sql);
-        $stmt->execute($params);
-        $res = array();
-        while ($val = $stmt->fetchColumn()) {
-            array_push($res, $val);
+        try {
+            $stmt->execute($params);
+            $res_arr = array();
+            while ($val = $stmt->fetchColumn()) {
+                array_push($res_arr, $val);
+            }
+            return $res_arr;
+        } finally {
+            $stmt->closeCursor();
         }
-        $stmt->closeCursor();
-        return $res;
     }
 
     public function queryDto($sql, array $params) {
         $stmt = $this->db->prepare($sql);
-        $stmt->execute($params);
-        $res = $stmt->fetch(PDO::FETCH_ASSOC);
-        $stmt->closeCursor();
-        return $res;
+        try {
+            $stmt->execute($params);
+            $res = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $res;
+        } finally {
+            $stmt->closeCursor();
+        }
     }
 
     public function queryDtoList($sql, array $params, $callback) {
         $stmt = $this->db->prepare($sql);
-        $res = $stmt->execute($params);
-        if ($res) {
-            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                $callback($row);
+        try {
+            $res = $stmt->execute($params);
+            if ($res) {
+                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                    $callback($row);
+                }
             }
+            return $res;
+        } finally {
+            $stmt->closeCursor();
         }
-        $stmt->closeCursor();
-        return $res;
     }
 
 }

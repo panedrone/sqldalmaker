@@ -68,22 +68,22 @@ class DataStore { // no inheritance is also OK
     public function insert($sql, array $params, array &$ai_values) {
         $stmt = $this->db->prepare($sql);
         try {
-           // http://stackoverflow.com/questions/10699543/pdo-prepared-statement-in-php-using-associative-arrays-yields-wrong-results
-           // use the optional parameter of execute instead of explicitly binding the parameters:
-           $res = $stmt->execute($params);
-           // http://www.php.net/manual/en/pdo.lastinsertid.php
-           // Returns the ID of the last inserted row, or the last value from a sequence object,
-           // depending on the underlying driver. For example, PDO_PGSQL requires you to specify the name
-           // of a sequence object for the name parameter.
-           // This method may not return a meaningful or consistent result across different PDO drivers,
-           // because the underlying database may not even support the notion of auto-increment fields or sequences.
-           foreach (array_keys($ai_values) as $key) {
-               $id = $this->db->lastInsertId($key);
-               $ai_values[$key] = $id;
-           }
-           return $res;
+            // http://stackoverflow.com/questions/10699543/pdo-prepared-statement-in-php-using-associative-arrays-yields-wrong-results
+            // use the optional parameter of execute instead of explicitly binding the parameters:
+            $res = $stmt->execute($params);
+            // http://www.php.net/manual/en/pdo.lastinsertid.php
+            // Returns the ID of the last inserted row, or the last value from a sequence object,
+            // depending on the underlying driver. For example, PDO_PGSQL requires you to specify the name
+            // of a sequence object for the name parameter.
+            // This method may not return a meaningful or consistent result across different PDO drivers,
+            // because the underlying database may not even support the notion of auto-increment fields or sequences.
+            foreach (array_keys($ai_values) as $key) {
+                $id = $this->db->lastInsertId($key);
+                $ai_values[$key] = $id;
+            }
+            return $res;
         } finally {
-           $stmt->closeCursor();
+            $stmt->closeCursor();
         }
     }
 
@@ -157,56 +157,74 @@ class DataStore { // no inheritance is also OK
             $call_params = array();
             $sql = $this->get_call_info($sp_name, $params, $in_params, $call_params);
             $stmt = $this->db->prepare($sql);
-            $this->init_call_params($stmt, $in_params);
-            $res = $stmt->execute();
-            $stmt->closeCursor();
+            try {
+                $this->init_call_params($stmt, $in_params);
+                $res = $stmt->execute();
+            } finally {
+                $stmt->closeCursor();
+            }
             $this->fetch_out_params($call_params);
             return $res;
         } else {
             $stmt = $this->db->prepare($sql);
-            $res = $stmt->execute($params);
-            $stmt->closeCursor();
+            try {
+                $res = $stmt->execute($params);
+            } finally {
+                $stmt->closeCursor();
+            }
             return $res;
         }
     }
 
     public function query($sql, array $params) {
         $stmt = $this->db->prepare($sql);
-        $stmt->execute($params);
-        $value = $stmt->fetchColumn();
-        $stmt->closeCursor();
-        return $value;
+        try {
+            $stmt->execute($params);
+            $res = $stmt->fetchColumn();
+            return $res;
+        } finally {
+            $stmt->closeCursor();
+        }
     }
 
     public function queryList($sql, array $params) {
         $stmt = $this->db->prepare($sql);
-        $stmt->execute($params);
-        $res = array();
-        while ($val = $stmt->fetchColumn()) {
-            array_push($res, $val);
+        try {
+            $stmt->execute($params);
+            $res_arr = array();
+            while ($val = $stmt->fetchColumn()) {
+                array_push($res_arr, $val);
+            }
+            return $res_arr;
+        } finally {
+            $stmt->closeCursor();
         }
-        $stmt->closeCursor();
-        return $res;
     }
 
     public function queryDto($sql, array $params) {
         $stmt = $this->db->prepare($sql);
-        $stmt->execute($params);
-        $res = $stmt->fetch(PDO::FETCH_ASSOC);
-        $stmt->closeCursor();
-        return $res;
+        try {
+            $stmt->execute($params);
+            $res = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $res;
+        } finally {
+            $stmt->closeCursor();
+        }
     }
 
     public function queryDtoList($sql, array $params, $callback) {
         $stmt = $this->db->prepare($sql);
-        $res = $stmt->execute($params);
-        if ($res) {
-            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                $callback($row);
+        try {
+            $res = $stmt->execute($params);
+            if ($res) {
+                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                    $callback($row);
+                }
             }
+            return $res;
+        } finally {
+            $stmt->closeCursor();
         }
-        $stmt->closeCursor();
-        return $res;
     }
 
 }

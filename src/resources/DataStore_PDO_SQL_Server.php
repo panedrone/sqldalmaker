@@ -1,7 +1,6 @@
 <?php
 
 // include_once 'DataStore.php'; // uncomment if you need inheritance
-
 // If you declare a parameter as OUTPUT, it acts as Both Input and OUTPUT.
 // https://stackoverflow.com/questions/49129536/how-to-declare-input-output-parameters-in-sql-server-stored-procedure-function
 //
@@ -25,7 +24,7 @@ class InOutParam {
   Copy-paste this code to your project and change it for your needs.
  */
 
-// class PDODataStore implements DataStore
+// class PDODataStore implements DataStore 
 class DataStore { // no inheritance is also OK
 
     private $db;
@@ -39,12 +38,23 @@ class DataStore { // no inheritance is also OK
         if (!is_null($this->db)) {
             throw new Exception("Already open");
         }
+        // SQL Server
+        //
         $serverName = "(local)\sqlexpress";
         $this->db = new PDO("sqlsrv:server=$serverName ; Database=AdventureWorks2014", "sa", "root");
         // http://stackoverflow.com/questions/15058129/php-pdo-inserting-data
         // By default, PDO does not throw exceptions. To make it throw exceptions on error, call
         $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         // $this->db->setAttribute(PDO::ATTR_PERSISTENT , true);
+//        // Oracle
+//        //
+//        $conn_username = "ORDERS";
+//        $conn_password = "sa";
+//        $opt = [
+//            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+//            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+//        ];
+//        $this->db = new PDO("oci:dbname=//localhost:1521/orcl", $conn_username, $conn_password, $opt);
     }
 
     public function beginTransaction() {
@@ -85,7 +95,7 @@ class DataStore { // no inheritance is also OK
             }
             return $res;
         } finally {
-           $stmt->closeCursor();
+            $stmt->closeCursor();
         }
     }
 
@@ -111,14 +121,27 @@ class DataStore { // no inheritance is also OK
         return null;
     }
 
-    private function bind_params($stmt, &$params, &$out_params) {
+    private function bind_call_params($stmt, &$params, &$out_params) {
         for ($i = 0; $i < count($params); $i++) {
             if ($params[$i] instanceof InOutParam) {
+                //
+                // Errors wile using ODBC syntax:
+                // 
                 // Uncaught PDOException: SQLSTATE[IMSSP]: Invalid direction specified for parameter 1. Input/output parameters must have a length
                 // $stmt->bindParam($i + 1, $params[$i]->value, $params[$i]->type | PDO::PARAM_INPUT_OUTPUT);
+                // 
                 // Uncaught PDOException: SQLSTATE[42000]: [Microsoft][ODBC Driver 11 for SQL Server][SQL Server]Incorrect syntax near 'OUTPUT'
-                // $stmt->bindParam($i + 1, $params[$i]->value, $params[$i]->type | PDO::PARAM_INPUT_OUTPUT, 4000);
-                $stmt->bindParam($i + 1, $params[$i]->value, $params[$i]->type); // this one is OK
+                // $stmt->bindParam($i + 1, $params[$i]->value, $params[$i]->type | PDO::PARAM_INPUT_OUTPUT, 256);
+                // 
+                // This one is OK wile using ODBC syntax:
+                // 
+                // $stmt->bindParam($i + 1, $params[$i]->value, $params[$i]->type);
+                // 
+                // This one is OK wile using something like {CALL [dbo].[sp_test_inout_params](?)}:
+                //
+                $stmt->bindParam($i + 1, $params[$i]->value, $params[$i]->type | PDO::PARAM_INPUT_OUTPUT, 256);
+                // ^^ seems like allocating memery requires using $Param1 = new InOutParam(PDO::PARAM_STR, "10");
+                // ^^ PDO::PARAM_INPUT_OUTPUT is mandatory.
                 array_push($out_params, $params[$i]);
             } else {
                 $stmt->bindParam($i + 1, $params[$i]);
@@ -126,80 +149,100 @@ class DataStore { // no inheritance is also OK
         }
     }
 
-    private function fetch_out_params($stmt, &$params) {
-        $fetch_bound = false;
-        for ($i = 0; $i < count($params); $i++) {
-            if ($params[$i] instanceof InOutParam) {
-                $stmt->bindColumn($i + 1, $params[$i]->value, $params[$i]->type);
-                $fetch_bound = true;
-            }
-        }
-        if ($fetch_bound) {
-            // https://stackoverflow.com/questions/13382922/calling-stored-procedure-with-out-parameter-using-pdo
-            $stmt->fetch(PDO::FETCH_BOUND);
-        }
-    }
+    // It works while using ODBC syntax:
+    // 
+//    private function fetch_out_params($stmt, &$params) {
+//        $fetch_bound = false;
+//        for ($i = 0; $i < count($params); $i++) {
+//            if ($params[$i] instanceof InOutParam) {
+//                $stmt->bindColumn($i + 1, $params[$i]->value, $params[$i]->type);
+//                $fetch_bound = true;
+//            }
+//        }
+//        if ($fetch_bound) {
+//            // https://stackoverflow.com/questions/13382922/calling-stored-procedure-with-out-parameter-using-pdo
+//            $stmt->fetch(PDO::FETCH_BOUND);
+//        }
+//    }
 
     public function execDML($sql, array $params) {
         // TODO:
         // It allows also ODBC syntax like
-        // DECLARE @in_out int = ?;
-        // EXEC [dbo].[sp_test_inout_params] @in_out OUT;
-        // SELECT @in_out AS result;
+        // DECLARE @res = ?;
+        // EXEC [dbo].[sp_test_inout_params] @res;
+        // SELECT @res AS res;
         $sp_name = $this->get_sp_name($sql);
         if ($sp_name != null) {
             $stmt = $this->db->prepare($sql);
-            $out_params = array();
-            $this->bind_params($stmt, $params, $out_params);
-            $res = $stmt->execute();
-            $this->fetch_out_params($stmt, $out_params);
-            $stmt->closeCursor();
-            return $res;
+            try {
+                $out_params = array();
+                $this->bind_call_params($stmt, $params, $out_params);
+                $res = $stmt->execute();
+                // $this->fetch_out_params($stmt, $out_params);
+                return $res;
+            } finally {
+                $stmt->closeCursor();
+            }
         } else {
             $stmt = $this->db->prepare($sql);
-            $res = $stmt->execute($params);
-            $stmt->closeCursor();
+            try {
+                $res = $stmt->execute($params);
+            } finally {
+                $stmt->closeCursor();
+            }
             return $res;
         }
     }
 
     public function query($sql, array $params) {
         $stmt = $this->db->prepare($sql);
-        $stmt->execute($params);
-        $value = $stmt->fetchColumn();
-        $stmt->closeCursor();
-        return $value;
+        try {
+            $stmt->execute($params);
+            $res = $stmt->fetchColumn();
+            return $res;
+        } finally {
+            $stmt->closeCursor();
+        }
     }
 
     public function queryList($sql, array $params) {
         $stmt = $this->db->prepare($sql);
-        $stmt->execute($params);
-        $res = array();
-        while ($val = $stmt->fetchColumn()) {
-            array_push($res, $val);
+        try {
+            $stmt->execute($params);
+            $res_arr = array();
+            while ($val = $stmt->fetchColumn()) {
+                array_push($res_arr, $val);
+            }
+            return $res_arr;
+        } finally {
+            $stmt->closeCursor();
         }
-        $stmt->closeCursor();
-        return $res;
     }
 
     public function queryDto($sql, array $params) {
         $stmt = $this->db->prepare($sql);
-        $stmt->execute($params);
-        $res = $stmt->fetch(PDO::FETCH_ASSOC);
-        $stmt->closeCursor();
-        return $res;
+        try {
+            $stmt->execute($params);
+            $res = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $res;
+        } finally {
+            $stmt->closeCursor();
+        }
     }
 
     public function queryDtoList($sql, array $params, $callback) {
         $stmt = $this->db->prepare($sql);
-        $res = $stmt->execute($params);
-        if ($res) {
-            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                $callback($row);
+        try {
+            $res = $stmt->execute($params);
+            if ($res) {
+                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                    $callback($row);
+                }
             }
+            return $res;
+        } finally {
+            $stmt->closeCursor();
         }
-        $stmt->closeCursor();
-        return $res;
     }
 
 }
