@@ -194,7 +194,7 @@ public class UITabAdmin {
         editSettingsXmlButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                IdeaEditorHelpers.open_settings_xml(project, propFile);
+                IdeaEditorHelpers.open_settings_xml_sync(project, propFile);
             }
         });
         testConnectionButton.addActionListener(new ActionListener() {

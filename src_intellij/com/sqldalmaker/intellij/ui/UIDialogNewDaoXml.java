@@ -124,7 +124,7 @@ public class UIDialogNewDaoXml extends JDialog {
                     f.setBinaryContent(xml.getBytes());
 
                     IdeaHelpers.start_write_action_from_ui_thread_and_refresh_folder_sync(dir);
-                    IdeaEditorHelpers.open_local_file_in_editor(project, f);
+                    IdeaEditorHelpers.open_local_file_in_editor_sync(project, f);
 
                     success = true;
 

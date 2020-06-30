@@ -247,7 +247,7 @@ public class UITabDAO {
 
             String relDirPath = (String) table.getValueAt(selectedRows[0], 0);
 
-            IdeaEditorHelpers.open_local_file_in_editor(project, propFile, relDirPath);
+            IdeaEditorHelpers.open_local_file_in_editor_sync(project, propFile, relDirPath);
 
         } catch (Exception e) {
             e.printStackTrace();

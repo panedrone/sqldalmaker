@@ -2,19 +2,21 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1fb1c605-8c08-4b11-a01b-d42d0945087f" name="Default" comment="added option to exclude views in DTO/DAO assistants">
+      <change afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaCG.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/META-INF/plugin.xml" beforeDir="false" afterPath="$PROJECT_DIR$/META-INF/plugin.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/manifest.mf" beforeDir="false" afterPath="$PROJECT_DIR$/manifest.mf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nbproject/private/private.xml" beforeDir="false" afterPath="$PROJECT_DIR$/nbproject/private/private.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ABOUT.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/ABOUT.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/SqlUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/SqlUtils.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/SdmTabAdmin.form" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/SdmTabAdmin.form" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/SdmTabAdmin.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/SdmTabAdmin.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/DataStore_PDO_MySQL.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/DataStore_PDO_MySQL.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/DataStore_PDO_Oracle.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/DataStore_PDO_Oracle.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/DataStore_PDO_PostgreSQL.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/DataStore_PDO_PostgreSQL.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/DataStore_PDO_SQL_Server.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/DataStore_PDO_SQL_Server.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/PDODataStore.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/PDODataStore.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/recent_changes.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/recent_changes.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/SdmActionGroup.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/SdmActionGroup.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaEditorHelpers.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaEditorHelpers.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaMessageHelpers.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaMessageHelpers.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaTargetLanguageHelpers.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaTargetLanguageHelpers.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/RootFileEditor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/RootFileEditor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UIDialogNewDaoXml.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UIDialogNewDaoXml.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UIProfileEditor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UIProfileEditor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabAdmin.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabAdmin.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabDTO.java" afterDir="false" />
     </list>
     <list id="0b913ed8-6e39-405f-b29b-9d52c75467b5" name="Failed commit: Default" comment="" />
     <option name="SHOW_DIALOG" value="false" />
@@ -908,18 +910,18 @@
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
     <state x="767" y="184" key="#com.intellij.ide.ui.customization.CustomizableActionsPanel.FindAvailableActionsDialog/0.0.1920.1050@0.0.1920.1050" timestamp="1589123523937" />
-    <state x="765" y="230" key="#com.intellij.ide.util.MemberChooser" timestamp="1593376204903">
+    <state x="765" y="230" key="#com.intellij.ide.util.MemberChooser" timestamp="1593452369131">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state x="765" y="230" key="#com.intellij.ide.util.MemberChooser/0.0.1920.1050@0.0.1920.1050" timestamp="1593376204903" />
+    <state x="765" y="230" key="#com.intellij.ide.util.MemberChooser/0.0.1920.1050@0.0.1920.1050" timestamp="1593452369131" />
     <state x="640" y="255" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog" timestamp="1586107425220">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
     <state x="640" y="255" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/0.0.1920.1050@0.0.1920.1050" timestamp="1586107425220" />
-    <state x="433" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1589183800511">
+    <state x="433" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1593543291807">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state x="433" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.0.1920.1050@0.0.1920.1050" timestamp="1589183800511" />
+    <state x="433" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.0.1920.1050@0.0.1920.1050" timestamp="1593543291807" />
     <state x="690" y="271" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1589070280405">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
@@ -928,54 +930,54 @@
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
     <state x="690" y="271" key="#com.intellij.refactoring.typeMigration.ui.FailedConversionsDialog/0.0.1920.1050@0.0.1920.1050" timestamp="1588822208484" />
-    <state x="598" y="122" key="CommitChangelistDialog2" timestamp="1589071516566">
+    <state x="598" y="122" key="CommitChangelistDialog2" timestamp="1593451284994">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state x="598" y="122" key="CommitChangelistDialog2/0.0.1920.1050@0.0.1920.1050" timestamp="1589071516566" />
-    <state width="987" height="466" key="DebuggerActiveHint" timestamp="1592549664127">
+    <state x="598" y="122" key="CommitChangelistDialog2/0.0.1920.1050@0.0.1920.1050" timestamp="1593451284994" />
+    <state width="987" height="466" key="DebuggerActiveHint" timestamp="1593462444227">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="987" height="466" key="DebuggerActiveHint/0.0.1920.1050@0.0.1920.1050" timestamp="1592549664127" />
-    <state x="92" y="92" width="1736" height="866" key="DiffContextDialog" timestamp="1590003467353">
+    <state width="987" height="466" key="DebuggerActiveHint/0.0.1920.1050@0.0.1920.1050" timestamp="1593462444227" />
+    <state x="92" y="92" width="1736" height="866" key="DiffContextDialog" timestamp="1593542102705">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state x="92" y="92" width="1736" height="866" key="DiffContextDialog/0.0.1920.1050@0.0.1920.1050" timestamp="1590003467353" />
-    <state x="740" y="281" width="434" height="654" key="FileChooserDialogImpl" timestamp="1593339764707">
+    <state x="92" y="92" width="1736" height="866" key="DiffContextDialog/0.0.1920.1050@0.0.1920.1050" timestamp="1593542102705" />
+    <state x="740" y="281" width="434" height="654" key="FileChooserDialogImpl" timestamp="1593549302396">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state x="740" y="281" width="434" height="654" key="FileChooserDialogImpl/0.0.1920.1050@0.0.1920.1050" timestamp="1593339764707" />
-    <state width="1010" height="203" key="GridCell.Tab.0.bottom" timestamp="1593363461310">
+    <state x="740" y="281" width="434" height="654" key="FileChooserDialogImpl/0.0.1920.1050@0.0.1920.1050" timestamp="1593549302396" />
+    <state width="1876" height="279" key="GridCell.Tab.0.bottom" timestamp="1593549200631">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="1010" height="203" key="GridCell.Tab.0.bottom/0.0.1920.1050@0.0.1920.1050" timestamp="1593363461310" />
-    <state width="1010" height="203" key="GridCell.Tab.0.center" timestamp="1593363461310">
+    <state width="1876" height="279" key="GridCell.Tab.0.bottom/0.0.1920.1050@0.0.1920.1050" timestamp="1593549200631" />
+    <state width="1876" height="279" key="GridCell.Tab.0.center" timestamp="1593549200631">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="1010" height="203" key="GridCell.Tab.0.center/0.0.1920.1050@0.0.1920.1050" timestamp="1593363461310" />
-    <state width="1010" height="203" key="GridCell.Tab.0.left" timestamp="1593363461310">
+    <state width="1876" height="279" key="GridCell.Tab.0.center/0.0.1920.1050@0.0.1920.1050" timestamp="1593549200631" />
+    <state width="1876" height="279" key="GridCell.Tab.0.left" timestamp="1593549200631">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="1010" height="203" key="GridCell.Tab.0.left/0.0.1920.1050@0.0.1920.1050" timestamp="1593363461310" />
-    <state width="1010" height="203" key="GridCell.Tab.0.right" timestamp="1593363461310">
+    <state width="1876" height="279" key="GridCell.Tab.0.left/0.0.1920.1050@0.0.1920.1050" timestamp="1593549200631" />
+    <state width="1876" height="279" key="GridCell.Tab.0.right" timestamp="1593549200631">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="1010" height="203" key="GridCell.Tab.0.right/0.0.1920.1050@0.0.1920.1050" timestamp="1593363461310" />
-    <state width="1090" height="215" key="GridCell.Tab.1.bottom" timestamp="1593337160308">
+    <state width="1876" height="279" key="GridCell.Tab.0.right/0.0.1920.1050@0.0.1920.1050" timestamp="1593549200631" />
+    <state width="1876" height="279" key="GridCell.Tab.1.bottom" timestamp="1593549200631">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="1090" height="215" key="GridCell.Tab.1.bottom/0.0.1920.1050@0.0.1920.1050" timestamp="1593337160308" />
-    <state width="1090" height="215" key="GridCell.Tab.1.center" timestamp="1593337160308">
+    <state width="1876" height="279" key="GridCell.Tab.1.bottom/0.0.1920.1050@0.0.1920.1050" timestamp="1593549200631" />
+    <state width="1876" height="279" key="GridCell.Tab.1.center" timestamp="1593549200631">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="1090" height="215" key="GridCell.Tab.1.center/0.0.1920.1050@0.0.1920.1050" timestamp="1593337160308" />
-    <state width="1090" height="215" key="GridCell.Tab.1.left" timestamp="1593337160308">
+    <state width="1876" height="279" key="GridCell.Tab.1.center/0.0.1920.1050@0.0.1920.1050" timestamp="1593549200631" />
+    <state width="1876" height="279" key="GridCell.Tab.1.left" timestamp="1593549200631">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="1090" height="215" key="GridCell.Tab.1.left/0.0.1920.1050@0.0.1920.1050" timestamp="1593337160308" />
-    <state width="1090" height="215" key="GridCell.Tab.1.right" timestamp="1593337160308">
+    <state width="1876" height="279" key="GridCell.Tab.1.left/0.0.1920.1050@0.0.1920.1050" timestamp="1593549200631" />
+    <state width="1876" height="279" key="GridCell.Tab.1.right" timestamp="1593549200631">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="1090" height="215" key="GridCell.Tab.1.right/0.0.1920.1050@0.0.1920.1050" timestamp="1593337160308" />
+    <state width="1876" height="279" key="GridCell.Tab.1.right/0.0.1920.1050@0.0.1920.1050" timestamp="1593549200631" />
     <state x="540" y="259" width="1139" height="650" key="IDE.errors.dialog" timestamp="1589045887864">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
@@ -984,10 +986,10 @@
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
     <state x="693" y="226" key="RollbackChangesDialog/0.0.1920.1050@0.0.1920.1050" timestamp="1589819515181" />
-    <state x="200" y="93" width="1421" height="853" key="SettingsEditor" timestamp="1593282647446">
+    <state x="200" y="93" width="1421" height="853" key="SettingsEditor" timestamp="1593549304018">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state x="200" y="93" width="1421" height="853" key="SettingsEditor/0.0.1920.1050@0.0.1920.1050" timestamp="1593282647446" />
+    <state x="200" y="93" width="1421" height="853" key="SettingsEditor/0.0.1920.1050@0.0.1920.1050" timestamp="1593549304018" />
     <state x="776" y="302" key="chooseDestDirectoryDialog" timestamp="1588406446535">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
@@ -1012,6 +1014,10 @@
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
     <state x="616" y="237" key="run.anything.popup/0.0.1920.1050@0.0.1920.1050" timestamp="1588856734688" />
+    <state x="623" y="227" width="672" height="678" key="search.everywhere.popup" timestamp="1593533869458">
+      <screen x="0" y="0" width="1920" height="1050" />
+    </state>
+    <state x="623" y="227" width="672" height="678" key="search.everywhere.popup/0.0.1920.1050@0.0.1920.1050" timestamp="1593533869458" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

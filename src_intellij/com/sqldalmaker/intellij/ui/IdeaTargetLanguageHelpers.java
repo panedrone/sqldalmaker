@@ -28,6 +28,7 @@ import com.sqldalmaker.jaxb.settings.Settings;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -36,6 +37,32 @@ import java.util.List;
  * Date: 21.06.12
  */
 public class IdeaTargetLanguageHelpers {
+
+    public static List<VirtualFile> find_root_files(VirtualFile xml_metaprogram_dir) {
+        List<VirtualFile> root_files = new ArrayList<VirtualFile>();
+        VirtualFile root_file;
+        root_file = xml_metaprogram_dir.findFileByRelativePath(RootFileName.PHP);
+        if (root_file != null) {
+            root_files.add(root_file);
+        }
+        root_file = xml_metaprogram_dir.findFileByRelativePath(RootFileName.JAVA);
+        if (root_file != null) {
+            root_files.add(root_file);
+        }
+        root_file = xml_metaprogram_dir.findFileByRelativePath(RootFileName.CPP);
+        if (root_file != null) {
+            root_files.add(root_file);
+        }
+        root_file = xml_metaprogram_dir.findFileByRelativePath(RootFileName.PYTHON);
+        if (root_file != null) {
+            root_files.add(root_file);
+        }
+        root_file = xml_metaprogram_dir.findFileByRelativePath(RootFileName.RUBY);
+        if (root_file != null) {
+            root_files.add(root_file);
+        }
+        return root_files;
+    }
 
     public static boolean underscores_needed(VirtualFile root_file) {
 
@@ -96,7 +123,7 @@ public class IdeaTargetLanguageHelpers {
             throw new Exception(_get_unknown_root_file_msg(fn));
         }
 
-        IdeaEditorHelpers.open_module_file_in_editor(project, rel_path);
+        IdeaEditorHelpers.open_project_file_in_editor_sync(project, rel_path);
     }
 
     public static void prepare_generated_file_data(VirtualFile root_file, String class_name, String[] file_content,

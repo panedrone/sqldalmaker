@@ -15,6 +15,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.UserDataHolderBase;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.beans.PropertyChangeListener;
@@ -31,8 +32,15 @@ public class RootFileEditor extends UserDataHolderBase implements FileEditor {
     private VirtualFile file;
 
     RootFileEditor(@NotNull Project project, @NotNull VirtualFile file) {
+        super();
         this.project = project;
         this.file = file;
+    }
+
+    @Nullable
+    @Override
+    public VirtualFile getFile() {
+        return file;
     }
 
     @NotNull
@@ -110,5 +118,13 @@ public class RootFileEditor extends UserDataHolderBase implements FileEditor {
 
     @Override
     public void dispose() {
+    }
+
+    public void openDTO() {
+        form.openDTO();
+    }
+
+    public void openDAO() {
+        form.openDAO();
     }
 }

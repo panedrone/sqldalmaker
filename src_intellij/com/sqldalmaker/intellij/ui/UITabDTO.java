@@ -176,7 +176,7 @@ public class UITabDTO {
 
     private void openDtoXML() {
 
-        IdeaEditorHelpers.open_dto_xml(project, propFile);
+        IdeaEditorHelpers.open_dto_xml_sync(project, propFile);
     }
 
     private void navigateToDtoClassDeclaration() {
@@ -498,7 +498,7 @@ public class UITabDTO {
 
             String relPath = settings.getFolders().getSql() + "/" + ref;
 
-            IdeaEditorHelpers.open_module_file_in_editor(project, relPath);
+            IdeaEditorHelpers.open_project_file_in_editor_sync(project, relPath);
 
         } catch (Exception e) {
             IdeaMessageHelpers.show_error_in_ui_thread(e);

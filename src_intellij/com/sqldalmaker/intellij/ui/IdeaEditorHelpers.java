@@ -30,14 +30,14 @@ import java.sql.Connection;
  */
 public class IdeaEditorHelpers {
 
-    private static void open_in_editor(Project project, VirtualFile file) {
+    public static void open_in_editor_sync(Project project, VirtualFile file) {
 
         FileEditorManager fem = FileEditorManager.getInstance(project);
 
         fem.openFile(file, true, true);
     }
 
-    public static void open_local_file_in_editor(Project project, VirtualFile root_file, String rel_path) throws Exception {
+    public static void open_local_file_in_editor_sync(Project project, VirtualFile root_file, String rel_path) throws Exception {
 
         VirtualFile file = root_file.getParent().findFileByRelativePath(rel_path);
 
@@ -46,15 +46,15 @@ public class IdeaEditorHelpers {
             throw new Exception("Not found: " + rel_path);
         }
 
-        open_in_editor(project, file);
+        open_in_editor_sync(project, file);
     }
 
-    public static void open_local_file_in_editor(Project project, VirtualFile file) {
+    public static void open_local_file_in_editor_sync(Project project, VirtualFile file) {
 
-        open_in_editor(project, file);
+        open_in_editor_sync(project, file);
     }
 
-    public static void open_module_file_in_editor(Project project, String rel_path) throws Exception {
+    public static void open_project_file_in_editor_sync(Project project, String rel_path) throws Exception {
 
         VirtualFile project_dir = IdeaHelpers.get_project_base_dir(project);
 
@@ -65,7 +65,7 @@ public class IdeaEditorHelpers {
             throw new Exception("Not found: " + rel_path);
         }
 
-        open_in_editor(project, file);
+        open_in_editor_sync(project, file);
     }
 
     public static void open_text_in_new_editor(Project project, String file_name, String text) {
@@ -181,7 +181,7 @@ public class IdeaEditorHelpers {
         }
     }
 
-    public static void open_dto_xml(Project project, VirtualFile root_file) {
+    public static void open_dto_xml_sync(Project project, VirtualFile root_file) {
 
         try {
 
@@ -192,7 +192,7 @@ public class IdeaEditorHelpers {
                 throw new InternalException("File '" + Const.DTO_XML + "' not found");
             }
 
-            open_in_editor(project, dto_xml);
+            open_in_editor_sync(project, dto_xml);
 
         } catch (Exception e) {
 
@@ -202,7 +202,7 @@ public class IdeaEditorHelpers {
         }
     }
 
-    public static void open_settings_xml(Project project, VirtualFile root_file) {
+    public static void open_settings_xml_sync(Project project, VirtualFile root_file) {
 
         try {
 
@@ -213,7 +213,7 @@ public class IdeaEditorHelpers {
                 throw new InternalException("File '" + Const.SETTINGS_XML + "' not found");
             }
 
-            open_in_editor(project, dto_xml);
+            open_in_editor_sync(project, dto_xml);
 
         } catch (Exception e) {
 

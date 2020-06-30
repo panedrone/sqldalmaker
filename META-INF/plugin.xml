@@ -2,7 +2,7 @@
     <id>dal-mpe</id>
     <name>SQL DAL Maker</name>
     <category>Database</category>
-    <version>1.116.2020-06-29</version>
+    <version>1.118.2020-06-30</version>
     <vendor email="sqldalmaker@gmail.com"/>
     <!-- please see http://confluence.intellij.net/display/IDEADEV/Build+Number+Ranges for description -->
     <idea-version since-build="133.1885"/>
@@ -29,10 +29,10 @@ To generate the class, you declare it in XML meta-program.<br/>
 
     <actions>
 
-        <group class="com.sqldalmaker.intellij.SdmActionGroup" id="SdmActionGroup" text="Goto '*.dal'"
-               description="Goto '*.dal'" icon="/img/sqldalmaker.png" popup="true">
-            <add-to-group group-id="ToolbarFindGroup" anchor="first"/>
-            <add-to-group group-id="FindMenuGroup" anchor="first"/>
+        <group class="com.sqldalmaker.intellij.SdmActionGroup" id="SdmActionGroup" text="SDM"
+               description="SDM" icon="/img/sqldalmaker.png" popup="true">
+            <add-to-group group-id="FileMainSettingsGroup" anchor="last"/>
+            <add-to-group group-id="MainToolBarSettings" anchor="last"/>
         </group>
 
     </actions>

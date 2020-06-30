@@ -7,6 +7,7 @@ package com.sqldalmaker.intellij.ui;
 
 import com.intellij.notification.*;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.sqldalmaker.common.InternalException;
@@ -29,14 +30,26 @@ public class IdeaMessageHelpers {
     public static final NotificationGroup GROUP_DISPLAY_ID_INFO =
             new NotificationGroup("sqldalmaker", NotificationDisplayType.NONE, true);
 
-    public static void add_error_to_ide_log(final String clazz, String msg) {
+//    public static void add_error_to_ide_log(String msg) {
+//        Notifications.Bus.notify(GROUP_DISPLAY_ID_INFO.createNotification(msg, MessageType.ERROR));
+//    }
+
+    public static void add_warning_to_ide_log(String msg) {
+        Notifications.Bus.notify(GROUP_DISPLAY_ID_INFO.createNotification(msg, MessageType.WARNING));
+    }
+
+    public static void add_info_to_ide_log(String msg) {
+        Notifications.Bus.notify(GROUP_DISPLAY_ID_INFO.createNotification(msg, MessageType.INFO));
+    }
+
+    public static void add_error_to_ide_log(final String title, String msg) {
 
         NotificationListener listener = new NotificationListener.Adapter() {
 
             @Override
             protected void hyperlinkActivated(@NotNull Notification notification, @NotNull HyperlinkEvent hyperlinkEvent) {
 
-                notification.expire();
+                // notification.expire();
 
                 // notification.setTitle("");
 
@@ -44,7 +57,7 @@ public class IdeaMessageHelpers {
             }
         };
 
-        Notifications.Bus.notify(GROUP_DISPLAY_ID_INFO.createNotification(clazz, msg, NotificationType.ERROR, listener));
+        Notifications.Bus.notify(GROUP_DISPLAY_ID_INFO.createNotification(title, msg, NotificationType.ERROR, listener));
     }
 
     public static void add_dto_error_message(Settings settings, final Project project,
@@ -126,7 +139,7 @@ public class IdeaMessageHelpers {
 
                 try {
 
-                    IdeaEditorHelpers.open_local_file_in_editor(project, root_file, dao_xml_rel_path);
+                    IdeaEditorHelpers.open_local_file_in_editor_sync(project, root_file, dao_xml_rel_path);
 
                 } catch (Exception e) {
 

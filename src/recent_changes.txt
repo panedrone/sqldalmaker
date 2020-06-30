@@ -1,7 +1,11 @@
+2020-06-30
+
+    New actions 'Generate' and 'Validate' in IDE tool-bar button
+    
 2020-06-28
 
-	- Added DataStore_PDO_SQL_Server.php
-        - Added DataStore_PDO_Oracle.php
+    - Added DataStore_PDO_SQL_Server.php
+    - Added DataStore_PDO_Oracle.php
 
 2020-06-27
 
