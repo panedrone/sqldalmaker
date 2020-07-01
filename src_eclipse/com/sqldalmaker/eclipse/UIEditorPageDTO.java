@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 sqldalmaker@gmail.com
+ * Copyright 2011-2020 sqldalmaker@gmail.com
  * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
  * Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -143,14 +143,14 @@ public class UIEditorPageDTO extends Composite {
 		text.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
-				updateFilter();
+				update_filter();
 			}
 		});
 
 		tableViewer = new TableViewer(this, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER);
 		tableViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(SelectionChangedEvent evt) {
-				doOnSelectionChanged();
+				do_on_selection_changed();
 			}
 		});
 
@@ -163,12 +163,11 @@ public class UIEditorPageDTO extends Composite {
 		table.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseDoubleClick(MouseEvent e) {
-
 				// http://git.eclipse.org/c/platform/eclipse.platform.swt.git/tree/examples/org.eclipse.swt.snippets/src/org/eclipse/swt/snippets/Snippet3.java
 				Point pt = new Point(e.x, e.y);
 				TableItem item = table.getItem(pt);
 				if (item == null) {
-					openXML();
+					open_xml();
 					return;
 				}
 				int clicked_column_index = -1;
@@ -180,11 +179,11 @@ public class UIEditorPageDTO extends Composite {
 					}
 				}
 				if (clicked_column_index == 0) {
-					openXML();
+					open_xml();
 				} else if (clicked_column_index == 1) {
-					openSQL();
+					open_sql();
 				} else {
-					openGeneratedSourceFile();
+					open_generated_source_file();
 				}
 			}
 		});
@@ -220,7 +219,7 @@ public class UIEditorPageDTO extends Composite {
 			action_refresh = new Action("") {
 				@Override
 				public void run() {
-					reloadTable(true);
+					reload_table(true);
 				}
 			};
 			action_refresh.setToolTipText("Refesh");
@@ -232,7 +231,7 @@ public class UIEditorPageDTO extends Composite {
 				@Override
 				public void run() {
 					table.selectAll();
-					doOnSelectionChanged();
+					do_on_selection_changed();
 				}
 			};
 			action_selAll.setToolTipText("Select all");
@@ -256,7 +255,7 @@ public class UIEditorPageDTO extends Composite {
 				@Override
 				public void run() {
 					table.deselectAll();
-					doOnSelectionChanged();
+					do_on_selection_changed();
 				}
 			};
 			action_unselAll.setToolTipText("Deselect all");
@@ -278,11 +277,8 @@ public class UIEditorPageDTO extends Composite {
 			action_validate = new Action("") {
 				@Override
 				public void run() {
-
 					try {
-
 						validate();
-
 					} catch (Throwable e) {
 						e.printStackTrace();
 						EclipseMessageHelpers.show_error(e);
@@ -297,7 +293,7 @@ public class UIEditorPageDTO extends Composite {
 			action_openSQL = new Action("") {
 				@Override
 				public void run() {
-					openSQL();
+					open_sql();
 				}
 			};
 			action_openSQL.setToolTipText("Open SQL file");
@@ -308,7 +304,7 @@ public class UIEditorPageDTO extends Composite {
 			action_openXml = new Action("") {
 				@Override
 				public void run() {
-					openXML();
+					open_xml();
 				}
 			};
 			action_openXml.setToolTipText("Open XML file");
@@ -319,7 +315,7 @@ public class UIEditorPageDTO extends Composite {
 			action_openJava = new Action("") {
 				@Override
 				public void run() {
-					openGeneratedSourceFile();
+					open_generated_source_file();
 				}
 			};
 			action_openJava.setImageDescriptor(
@@ -330,7 +326,7 @@ public class UIEditorPageDTO extends Composite {
 			action_genTmpFieldTags = new Action("") {
 				@Override
 				public void run() {
-					genTmpFieldTags();
+					gen_tmp_field_tags();
 				}
 			};
 			action_genTmpFieldTags
@@ -339,33 +335,24 @@ public class UIEditorPageDTO extends Composite {
 		}
 	}
 
-	protected void genTmpFieldTags() {
+	protected void gen_tmp_field_tags() {
 		try {
-
 			List<Item> items = prepareSelectedItems();
-
 			if (items == null) {
 				return;
 			}
-
 			String class_name = items.get(0).get_name();
 			String ref = items.get(0).getRef();
-
 			EclipseEditorHelpers.open_tmp_field_tags_sync(class_name, ref, editor2.get_project(), editor2);
-
 		} catch (Throwable e) {
 			e.printStackTrace();
 			EclipseMessageHelpers.show_error(e);
 		}
-
 	}
 
 	protected void generate_crud_dto_xml() {
-
 		try {
-
 			EclipseCrudXmlHelpers.get_crud_dto_xml(getShell(), editor2);
-
 		} catch (Throwable e) {
 			e.printStackTrace();
 			EclipseMessageHelpers.show_error(e);
@@ -373,100 +360,67 @@ public class UIEditorPageDTO extends Composite {
 	}
 
 	protected void validate() throws Exception {
-
-		final List<Item> items = reloadTable();
-
+		final List<Item> items = reload_table();
 		EclipseSyncAction action = new EclipseSyncAction() {
-
 			@Override
 			public int get_total_work() {
 				return items.size();
 			}
-
 			@Override
 			public String get_name() {
 				return "Validation...";
 			}
-
 			@Override
 			public void run_with_progress(IProgressMonitor monitor) throws Exception {
-
 				monitor.subTask("Connecting...");
-
 				Connection con = EclipseHelpers.get_connection(editor2);
-
 				monitor.subTask("Connected.");
-
 				try {
-
 					EclipseConsoleHelpers.init_console();
-
 					Settings settings = EclipseHelpers.load_settings(editor2);
-
 					StringBuilder output_dir = new StringBuilder();
 					// !!!! after 'try'
 					IDtoCG gen = EclipseTargetLanguageHelpers.create_dto_cg(con, editor2, settings, output_dir);
-
 					for (int i = 0; i < items.size(); i++) {
-
 						if (monitor.isCanceled()) {
 							return;
 						}
-
 						String dto_class_name = items.get(i).get_name();
-
 						monitor.subTask(dto_class_name);
-
 						try {
-
-							StringBuilder validationBuff = new StringBuilder();
-
-							String fileContent[] = gen.translate(dto_class_name);
-
-							String fileName = EclipseTargetLanguageHelpers.get_rel_path(editor2, output_dir, dto_class_name);
-
-							String oldText = Helpers.load_text_from_file(fileName);
-
-							if (oldText == null) {
-								validationBuff.append("Generated file is missing");
+							String file_content[] = gen.translate(dto_class_name);
+							String file_name = EclipseTargetLanguageHelpers.get_rel_path(editor2, output_dir,
+									dto_class_name);
+							String old_text = Helpers.load_text_from_file(file_name);
+							StringBuilder validation_buff = new StringBuilder();
+							if (old_text == null) {
+								validation_buff.append("Generated file is missing");
 							} else {
-								String text = fileContent[0];
-								if (!oldText.equals(text)) {
-									validationBuff.append("Generated file is out of date");
+								String text = file_content[0];
+								if (!old_text.equals(text)) {
+									validation_buff.append("Generated file is out of date");
 								}
 							}
-
-							String status = validationBuff.toString();
-
+							String status = validation_buff.toString();
 							if (status.length() == 0) {
 								items.get(i).setStatus(STATUS_OK);
 							} else {
 								items.get(i).setStatus(status);
-								EclipseConsoleHelpers.add_error_msg(dto_class_name, status);
+								EclipseConsoleHelpers.add_error_msg(dto_class_name + ": " + status);
 							}
-
 						} catch (Throwable ex) {
-
 							// ex.printStackTrace();
-
 							String msg = ex.getMessage();
-
 							if (msg == null) {
 								msg = "???";
 							}
-
 							items.get(i).setStatus(msg);
-
-							EclipseConsoleHelpers.add_error_msg(dto_class_name, msg);
+							EclipseConsoleHelpers.add_error_msg(dto_class_name + ": " + msg);
 						}
-
 						monitor.worked(1);
 					}
-
 				} finally {
-
 					con.close();
-
 					Display.getDefault().asyncExec(new Runnable() {
 						public void run() {
 							tableViewer.refresh();
@@ -475,60 +429,43 @@ public class UIEditorPageDTO extends Composite {
 				}
 			}
 		};
-
 		EclipseSyncActionHelper.run_with_progress(getShell(), action);
 	}
 
 	private List<Item> prepareSelectedItems() {
-
 		@SuppressWarnings("unchecked")
 		List<Item> items = (List<Item>) tableViewer.getInput();
-
 		if (items == null || items.size() == 0) {
 			return null;
 		}
-
 		List<Item> res = new ArrayList<Item>();
-
 		if (items.size() == 1) {
 			Item item = items.get(0);
 			item.setStatus("");
 			res.add(item);
 			return res;
 		}
-
 		int[] indexes = table.getSelectionIndices();
-
 		if (indexes.length == 0) {
-
 			// InternalHelpers.showError("Select DAO configurations");
-
 			return null;
 		}
-
 		for (int row : indexes) {
 			Item item = items.get(row);
 			item.setStatus("");
 			res.add(item);
 		}
-
 		return res;
 	}
 
 	private void generate() {
-
 		final List<Item> items = prepareSelectedItems();
-
 		if (items == null) {
 			return;
 		}
-
 		tableViewer.refresh();
-
 		// //////////////////////////////////
-
 		EclipseSyncAction action = new EclipseSyncAction() {
-
 			@Override
 			public int get_total_work() {
 				return items.size();
@@ -541,84 +478,52 @@ public class UIEditorPageDTO extends Composite {
 
 			@Override
 			public void run_with_progress(IProgressMonitor monitor) throws Exception {
-
 				boolean generated = false;
-
 				monitor.subTask("Connecting...");
-
 				Connection con = EclipseHelpers.get_connection(editor2);
-
 				monitor.subTask("Connected.");
-
 				try {
-
 					EclipseConsoleHelpers.init_console();
-
 					Settings settings = EclipseHelpers.load_settings(editor2);
-
 					StringBuilder output_dir = new StringBuilder();
 					// !!!! after 'try'
 					IDtoCG gen = EclipseTargetLanguageHelpers.create_dto_cg(con, editor2, settings, output_dir);
-
 					for (Item item : items) {
-
 						if (monitor.isCanceled()) {
 							return;
 						}
-
 						String dto_class_name = item.get_name();
-
 						monitor.subTask(dto_class_name);
-
 						try {
-
 							String fileContent[] = gen.translate(dto_class_name);
-
-							String fileName = EclipseTargetLanguageHelpers.get_rel_path(editor2, output_dir, dto_class_name);
-
+							String fileName = EclipseTargetLanguageHelpers.get_rel_path(editor2, output_dir,
+									dto_class_name);
 							EclipseHelpers.save_text_to_file(fileName, fileContent[0]);
-
 							item.setStatus(STATUS_GENERATED);
-
 							generated = true;
-
 						} catch (Throwable ex) {
-
 							String msg = ex.getMessage();
-
 							if (msg == null) {
 								msg = "???";
 							}
-
 							item.setStatus(msg);
-
 							// throw ex; // outer 'catch' cannot read the
 							// message
-
 							// !!!! not Internal_Exception to show Exception
 							// class
-
 							// throw new Exception(ex);
-
-							EclipseConsoleHelpers.add_error_msg(dto_class_name, msg);
+							EclipseConsoleHelpers.add_error_msg(dto_class_name + ": " + msg);
 						}
-
 						monitor.worked(1);
 					}
-
 				} finally {
-
 					con.close();
-
 					if (generated) {
 						EclipseHelpers.refresh_project(editor2.get_project());
 					}
-
 					// Exception can occur at 3rd line (for example):
 					// refresh first 3 lines
-
 					// error lines are not generated but update them too
-
 					Display.getDefault().asyncExec(new Runnable() {
 						public void run() {
 							tableViewer.refresh();
@@ -627,107 +532,68 @@ public class UIEditorPageDTO extends Composite {
 				}
 			}
 		};
-
 		EclipseSyncActionHelper.run_with_progress(getShell(), action);
 	}
 
-	protected void openSQL() {
+	protected void open_sql() {
 		try {
-
 			List<Item> items = prepareSelectedItems();
-
 			if (items == null) {
 				return;
 			}
-
 			String relative = items.get(0).getRef();
-
 			if (relative == null || relative.trim().length() == 0) {
-				
 				return;
 			}
-			
 			if (SqlUtils.is_sql_file_ref(relative) == false) {
-				
 				return;
 			}
-
 			Settings settings = EclipseHelpers.load_settings(editor2);
-
 			String sql_root_folder_relative_path = settings.getFolders().getSql();
-
 			IFolder folder = editor2.get_project().getFolder(sql_root_folder_relative_path);
-
 			if (folder == null) {
 				throw new Exception("Folder does not exist: " + sql_root_folder_relative_path);
 			}
-
 			IFile file = folder.getFile(relative);
-
 			EclipseEditorHelpers.open_editor_sync(getShell(), file, true);
-
 		} catch (Throwable e) {
-
 			e.printStackTrace();
-
 			EclipseMessageHelpers.show_error(e);
 		}
 	}
 
-	protected void openXML() {
-
+	protected void open_xml() {
 		try {
-
 			IFile file = editor2.find_dto_xml();
-			
 			if (file == null) {
-				
 				throw new InternalException("File not found: " + Const.DTO_XML);
 			}
-
 			final List<Item> items = prepareSelectedItems();
-
 			if (items == null || items.size() == 0) {
-				
 				EclipseEditorHelpers.open_editor_sync(getShell(), file, false);
-				
 				return;
 			}
-			
 			EclipseXmlUtils.goto_dto_class_declaration(getShell(), file, items.get(0).get_name());
-			
 		} catch (Throwable e) {
-
 			e.printStackTrace();
-
 			EclipseMessageHelpers.show_error(e);
 		}
 	}
 
-	protected void openGeneratedSourceFile() {
+	protected void open_generated_source_file() {
 		try {
-
 			List<Item> items = prepareSelectedItems();
-
 			if (items == null) {
 				return;
 			}
-
 			IFile file = null;
-
 			String value = items.get(0).get_name();
-
 			Settings settings = EclipseHelpers.load_settings(editor2);
-
 			file = EclipseTargetLanguageHelpers.find_source_file_in_project_tree(editor2.get_project(), settings, value,
 					settings.getDto().getScope(), editor2.get_root_file_name());
-
 			EclipseEditorHelpers.open_editor_sync(getShell(), file, false);
-
 		} catch (Throwable e) {
-
 			e.printStackTrace();
-
 			EclipseMessageHelpers.show_error(e);
 		}
 	}
@@ -832,7 +698,7 @@ public class UIEditorPageDTO extends Composite {
 		}
 	}
 
-	protected void updateFilter() {
+	protected void update_filter() {
 		filter.setSearchText(text.getText());
 		tableViewer.refresh(); // fires selectionChanged
 	}
@@ -842,85 +708,55 @@ public class UIEditorPageDTO extends Composite {
 		// Disable the check that prevents subclassing of SWT components
 	}
 
-	private ArrayList<Item> reloadTable() throws Exception {
-
+	private ArrayList<Item> reload_table() throws Exception {
 		ArrayList<Item> items = new ArrayList<Item>();
-
 		try {
-
 			String fileName = editor2.get_dto_xml_abs_path();
-
 			InputStream fs = new FileInputStream(fileName);
-
 			try {
-
 				String dto_xml_abs_path = editor2.get_dto_xml_abs_path();
 				String dto_xsd_abs_path = editor2.get_dto_xsd_abs_path();
-
 				List<DtoClass> list = SdmUtils.get_dto_classes(dto_xml_abs_path, dto_xsd_abs_path);
-
 				for (DtoClass cls : list) {
-
 					Item item = new Item();
 					item.setName(cls.getName());
 					item.setRef(cls.getRef());
 					items.add(item);
 				}
-
 			} finally {
-
 				fs.close();
 			}
-
 		} finally {
-
 			tableViewer.setInput(items); // assign anyway
-
 			// tableViewer.refresh();
-
-			doOnSelectionChanged();
-
+			do_on_selection_changed();
 			boolean enable = items.size() > 0;
 			action_validate.setEnabled(enable);
 		}
-
 		return items;
 	}
 
-	public void reloadTable(boolean showErrorMsg) {
-
+	public void reload_table(boolean showErrorMsg) {
 		try {
-
-			reloadTable();
-
+			reload_table();
 		} catch (Throwable e) {
-
 			if (showErrorMsg) {
-
 				e.printStackTrace();
-
 				EclipseMessageHelpers.show_error(e);
 			}
 		}
 	}
 
-	private void doOnSelectionChanged() {
-
+	private void do_on_selection_changed() {
 		@SuppressWarnings("unchecked")
 		List<Item> items = (List<Item>) tableViewer.getInput();
-
 		boolean enabled;
-
 		if (items.size() == 1) {
-
 			enabled = true;
-
 		} else {
-
 			int[] indexes = table.getSelectionIndices();
 			enabled = indexes.length > 0;
 		}
-
 		action_generate.setEnabled(enabled);
 		action_openSQL.setEnabled(enabled);
 		action_openJava.setEnabled(enabled);

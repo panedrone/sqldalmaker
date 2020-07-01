@@ -328,8 +328,8 @@ public class Editor2 extends EditorPart implements IEditor2 {
 
 		Display.getDefault().asyncExec(new Runnable() {
 			public void run() {
-				editor_page_dto.reloadTable(false);
-				editor_page_dao.reloadTable(false);
+				editor_page_dto.reload_table(false);
+				editor_page_dao.reload_table(false);
 				// editorPageQueries.reloadTable(false);
 				// editorPageConfiguration.loadDataInUIThreadSync();
 			}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 sqldalmaker@gmail.com
+ * Copyright 2011-2020 sqldalmaker@gmail.com
  * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
  * Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -151,7 +151,7 @@ public class UIEditorPageDAO extends Composite {
 		tableViewer = new TableViewer(this, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER);
 		tableViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(SelectionChangedEvent event) {
-				doOnSelectionChanged();
+				do_on_selection_changed();
 			}
 		});
 		table = tableViewer.getTable();
@@ -175,9 +175,9 @@ public class UIEditorPageDAO extends Composite {
 					}
 				}
 				if (clicked_column_index == 0) {
-					openXML();
+					open_xml();
 				} else {
-					openGeneratedSourceFile();
+					open_generated_source_file();
 				}
 			}
 		});
@@ -209,7 +209,7 @@ public class UIEditorPageDAO extends Composite {
 			action_refresh = new Action("") {
 				@Override
 				public void run() {
-					reloadTable(true);
+					reload_table(true);
 				}
 			};
 			action_refresh.setToolTipText("Refesh");
@@ -221,7 +221,7 @@ public class UIEditorPageDAO extends Composite {
 				@Override
 				public void run() {
 					table.selectAll();
-					doOnSelectionChanged();
+					do_on_selection_changed();
 				}
 			};
 			action_selAll.setToolTipText("Select all");
@@ -245,7 +245,7 @@ public class UIEditorPageDAO extends Composite {
 				@Override
 				public void run() {
 					table.deselectAll();
-					doOnSelectionChanged();
+					do_on_selection_changed();
 				}
 			};
 			action_unselAll.setToolTipText("Deselect all");
@@ -267,15 +267,10 @@ public class UIEditorPageDAO extends Composite {
 			action_validate = new Action("") {
 				@Override
 				public void run() {
-
 					try {
-
 						validate();
-
 					} catch (Throwable e) {
-
 						e.printStackTrace();
-
 						EclipseMessageHelpers.show_error(e);
 					}
 				}
@@ -288,7 +283,7 @@ public class UIEditorPageDAO extends Composite {
 			action_newXml = new Action("") {
 				@Override
 				public void run() {
-					createXmlFile();
+					create_xml_file();
 				}
 			};
 			action_newXml.setToolTipText("New XML file");
@@ -299,7 +294,7 @@ public class UIEditorPageDAO extends Composite {
 			action_openXml = new Action("") {
 				@Override
 				public void run() {
-					openXML();
+					open_xml();
 				}
 			};
 			action_openXml.setToolTipText("Open XML file");
@@ -310,7 +305,7 @@ public class UIEditorPageDAO extends Composite {
 			action_open_java = new Action("") {
 				@Override
 				public void run() {
-					openGeneratedSourceFile();
+					open_generated_source_file();
 				}
 			};
 			action_open_java.setImageDescriptor(
@@ -321,15 +316,10 @@ public class UIEditorPageDAO extends Composite {
 			action_FK = new Action("") {
 				@Override
 				public void run() {
-
 					try {
-
 						EclipseCrudXmlHelpers.get_fk_access_xml(getShell(), editor2);
-
 					} catch (Throwable e) {
-
 						e.printStackTrace();
-
 						EclipseMessageHelpers.show_error(e);
 					}
 				}
@@ -339,155 +329,103 @@ public class UIEditorPageDAO extends Composite {
 		}
 	}
 
-	protected void openGeneratedSourceFile() {
-
+	protected void open_generated_source_file() {
 		try {
-
-			List<Item> items = prepareSelectedItems();
-
+			List<Item> items = prepare_selected_items();
 			if (items == null) {
 				return;
 			}
-
 			IFile file = null;
-
 			String rel = items.get(0).getRelativePath();
 			String dao_class_name = Helpers.get_dao_class_name(rel);
-
 			Settings settings = EclipseHelpers.load_settings(editor2);
-
-			file = EclipseTargetLanguageHelpers.find_source_file_in_project_tree(editor2.get_project(), settings, dao_class_name,
-					settings.getDao().getScope(), editor2.get_root_file_name());
-
+			file = EclipseTargetLanguageHelpers.find_source_file_in_project_tree(editor2.get_project(), settings,
+					dao_class_name, settings.getDao().getScope(), editor2.get_root_file_name());
 			EclipseEditorHelpers.open_editor_sync(getShell(), file, false);
-
 		} catch (Throwable e) {
-
 			e.printStackTrace();
-
 			EclipseMessageHelpers.show_error(e);
 		}
 	}
 
-	protected void openXML() {
+	protected void open_xml() {
 		try {
-
-			List<Item> items = prepareSelectedItems();
-
+			List<Item> items = prepare_selected_items();
 			if (items == null) {
 				return;
 			}
-
 			String relative = items.get(0).getRelativePath();
-
 			IFile file = editor2.find_metaprogram_file(relative);
-
 			EclipseEditorHelpers.open_editor_sync(getShell(), file, true);
-
 		} catch (Throwable e) {
-
 			e.printStackTrace();
-
 			EclipseMessageHelpers.show_error(e);
 		}
 	}
 
 	protected void generate_crud_dao_xml() {
-
 		try {
-
 			EclipseCrudXmlHelpers.get_crud_dao_xml(getShell(), editor2);
-
 		} catch (Throwable e) {
-
 			e.printStackTrace();
-
 			EclipseMessageHelpers.show_error(e);
 		}
 	}
 
-	protected void createXmlFile() {
-
+	protected void create_xml_file() {
 		try {
-
 			IFile file = UIDialogNewDaoXmlFile.open(getShell(), editor2);
-
 			if (file != null) {
-
 				try {
-
-					reloadTable(true);
-
+					reload_table(true);
 					EclipseEditorHelpers.open_editor_sync(getShell(), file, true);
 
 				} catch (Throwable e1) {
-
 					e1.printStackTrace();
-
 					EclipseMessageHelpers.show_error(e1);
 				}
 			}
-
 		} catch (Throwable e) {
-
 			e.printStackTrace();
-
 			EclipseMessageHelpers.show_error(e);
 		}
 	}
 
-	private List<Item> prepareSelectedItems() {
-
+	private List<Item> prepare_selected_items() {
 		@SuppressWarnings("unchecked")
 		List<Item> items = (List<Item>) tableViewer.getInput();
-
 		if (items == null || items.size() == 0) {
 			return null;
 		}
-
 		List<Item> res = new ArrayList<Item>();
-
 		if (items.size() == 1) {
 			Item item = items.get(0);
 			item.setStatus("");
 			res.add(item);
 			return res;
 		}
-
 		int[] indexes = table.getSelectionIndices();
-
 		if (indexes.length == 0) {
-
 			// InternalHelpers.showError("Select DAO configurations");
-
 			return null;
 		}
-
 		for (int row : indexes) {
 			Item item = items.get(row);
 			item.setStatus("");
 			res.add(item);
 		}
-
 		return res;
 	}
 
 	private void generate() {
-
-		final List<Item> items = prepareSelectedItems();
-
+		final List<Item> items = prepare_selected_items();
 		if (items == null) {
 			return;
 		}
-
 		// //////////////////////////////////////////
-
 		tableViewer.refresh();
-
 		// //////////////////////////////////////////
-
 		EclipseSyncAction action = new EclipseSyncAction() {
-
 			@Override
 			public int get_total_work() {
 				return items.size();
@@ -500,95 +438,59 @@ public class UIEditorPageDAO extends Composite {
 
 			@Override
 			public void run_with_progress(IProgressMonitor monitor) throws Exception {
-
 				boolean generated = false;
-
 				monitor.subTask("Connecting...");
-
-				Connection con = EclipseHelpers.get_connection(editor2);
-
+				Connection conn = EclipseHelpers.get_connection(editor2);
 				monitor.subTask("Connected.");
-
 				try {
-
 					EclipseConsoleHelpers.init_console();
-
 					Settings settings = EclipseHelpers.load_settings(editor2);
-
 					StringBuilder output_dir = new StringBuilder();
 					// !!!! after 'try'
-					IDaoCG gen = EclipseTargetLanguageHelpers.create_dao_cg(con, editor2.get_project(), editor2, settings, output_dir);
-
-					String daoXsdFileName = editor2.get_dao_xsd_abs_path();
-
+					IDaoCG gen = EclipseTargetLanguageHelpers.create_dao_cg(conn, editor2.get_project(), editor2,
+							settings, output_dir);
+					String dao_xsd_abs_path = editor2.get_dao_xsd_abs_path();
 					String contextPath = DaoClass.class.getPackage().getName();
-					XmlParser daoXml_Parser = new XmlParser(contextPath, daoXsdFileName);
-
+					XmlParser dao_xml_parser = new XmlParser(contextPath, dao_xsd_abs_path);
 					for (Item item : items) {
-
 						if (monitor.isCanceled()) {
 							return;
 						}
-
-						String daoXmlRelPath = item.getRelativePath();
-
-						monitor.subTask(daoXmlRelPath);
-
+						String dao_xml_rel_path = item.getRelativePath();
+						monitor.subTask(dao_xml_rel_path);
 						try {
-
-							String dao_class_name = Helpers.get_dao_class_name(daoXmlRelPath);
-
-							String daoXmlAbsPath = editor2.get_metaprogram_file_abs_path(daoXmlRelPath);
-
-							DaoClass dao_class = daoXml_Parser.unmarshal(daoXmlAbsPath);
-
+							String dao_class_name = Helpers.get_dao_class_name(dao_xml_rel_path);
+							String dao_xml_abs_path = editor2.get_metaprogram_file_abs_path(dao_xml_rel_path);
+							DaoClass dao_class = dao_xml_parser.unmarshal(dao_xml_abs_path);
 							String[] fileContent = gen.translate(dao_class_name, dao_class);
-
-							String fileName = EclipseTargetLanguageHelpers.get_rel_path(editor2, output_dir, dao_class_name);
-
+							String fileName = EclipseTargetLanguageHelpers.get_rel_path(editor2, output_dir,
+									dao_class_name);
 							EclipseHelpers.save_text_to_file(fileName, fileContent[0]);
-
 							item.setStatus(STATUS_GENERATED);
-
 							generated = true;
-
 						} catch (Throwable ex) {
-
 							String msg = ex.getMessage();
-
 							if (msg == null) {
 								msg = "???";
 							}
-
 							item.setStatus(msg);
-
 							// throw ex; // outer 'catch' cannot read the
 							// message
-
 							// !!!! not Internal_Exception to show Exception
 							// class
-
 							// throw new Exception(ex);
-
-							EclipseConsoleHelpers.add_error_msg(daoXmlRelPath, msg);
+							EclipseConsoleHelpers.add_error_msg(dao_xml_rel_path + ": " + msg);
 						}
-
 						monitor.worked(1);
 					}
-
 				} finally {
-
-					con.close();
-
+					conn.close();
 					if (generated) {
 						EclipseHelpers.refresh_project(editor2.get_project());
 					}
-
 					// Exception can occur at 3rd line (for example):
 					// refresh first 3 lines
-
 					// error lines are not generated but update them too
-
 					Display.getDefault().asyncExec(new Runnable() {
 						public void run() {
 							tableViewer.refresh();
@@ -597,117 +499,79 @@ public class UIEditorPageDAO extends Composite {
 				}
 			}
 		};
-
 		EclipseSyncActionHelper.run_with_progress(getShell(), action);
 	}
 
 	protected void validate() throws Exception {
-
-		final List<Item> items = reloadTable();
-
+		final List<Item> items = reload_table();
 		// ///////////////////////////////////////
-
 		EclipseSyncAction action = new EclipseSyncAction() {
-
 			@Override
 			public int get_total_work() {
 				return items.size();
 			}
-
 			@Override
 			public String get_name() {
 				return "Validation...";
 			}
-
 			@Override
 			public void run_with_progress(IProgressMonitor monitor) throws Exception {
-
 				monitor.subTask("Connecting...");
-
 				Connection con = EclipseHelpers.get_connection(editor2);
-
 				monitor.subTask("Connected.");
-
 				try {
 
 					EclipseConsoleHelpers.init_console();
-
 					Settings settings = EclipseHelpers.load_settings(editor2);
-
 					StringBuilder output_dir = new StringBuilder();
 					// !!!! after 'try'
-					IDaoCG gen = EclipseTargetLanguageHelpers.create_dao_cg(con, editor2.get_project(), editor2, settings, output_dir);
-
+					IDaoCG gen = EclipseTargetLanguageHelpers.create_dao_cg(con, editor2.get_project(), editor2,
+							settings, output_dir);
 					String daoXsdFileName = editor2.get_dao_xsd_abs_path();
-
 					String contextPath = DaoClass.class.getPackage().getName();
 					XmlParser daoXml_Parser = new XmlParser(contextPath, daoXsdFileName);
-
 					for (int i = 0; i < items.size(); i++) {
-
 						if (monitor.isCanceled()) {
 							return;
 						}
-
-						String daoXmlRelPath = items.get(i).getRelativePath();
-
-						monitor.subTask(daoXmlRelPath);
-
+						String dao_xml_rel_path = items.get(i).getRelativePath();
+						monitor.subTask(dao_xml_rel_path);
 						try {
-
-							StringBuilder validationBuff = new StringBuilder();
-
-							String dao_class_name = Helpers.get_dao_class_name(daoXmlRelPath);
-
-							String daoXmlAbsPath = editor2.get_metaprogram_file_abs_path(daoXmlRelPath);
-
-							DaoClass dao_class = daoXml_Parser.unmarshal(daoXmlAbsPath);
-
-							String[] fileContent = gen.translate(dao_class_name, dao_class);
-
-							String fileName = EclipseTargetLanguageHelpers.get_rel_path(editor2, output_dir, dao_class_name);
-
-							String oldText = Helpers.load_text_from_file(fileName);
-
+							String dao_class_name = Helpers.get_dao_class_name(dao_xml_rel_path);
+							String dao_xml_abs_path = editor2.get_metaprogram_file_abs_path(dao_xml_rel_path);
+							DaoClass dao_class = daoXml_Parser.unmarshal(dao_xml_abs_path);
+							String[] file_content = gen.translate(dao_class_name, dao_class);
+							String file_name = EclipseTargetLanguageHelpers.get_rel_path(editor2, output_dir,
+									dao_class_name);
+							StringBuilder validation_buff = new StringBuilder();
+							String oldText = Helpers.load_text_from_file(file_name);
 							if (oldText == null) {
-								validationBuff.append("Generated file is missing");
+								validation_buff.append("Generated file is missing");
 							} else {
-								String text = fileContent[0];
+								String text = file_content[0];
 								if (!oldText.equals(text)) {
-									validationBuff.append("Generated file is out of date");
+									validation_buff.append("Generated file is out of date");
 								}
 							}
-
-							String status = validationBuff.toString();
-
+							String status = validation_buff.toString();
 							if (status.length() == 0) {
-
 								items.get(i).setStatus(STATUS_OK);
-
 							} else {
-
 								items.get(i).setStatus(status);
-								EclipseConsoleHelpers.add_error_msg(daoXmlRelPath, status);
+								EclipseConsoleHelpers.add_error_msg(dao_xml_rel_path + ": " + status);
 							}
 
 						} catch (Throwable ex) {
-
 							ex.printStackTrace();
-
 							String msg = ex.getMessage();
-
 							items.get(i).setStatus(msg);
-
-							EclipseConsoleHelpers.add_error_msg(daoXmlRelPath, msg);
+							EclipseConsoleHelpers.add_error_msg(dao_xml_rel_path + ": " + msg);
 						}
-
 						monitor.worked(1);
 					}
 
 				} finally {
-
 					con.close();
-
 					Display.getDefault().asyncExec(new Runnable() {
 						public void run() {
 							tableViewer.refresh();
@@ -716,7 +580,6 @@ public class UIEditorPageDAO extends Composite {
 				}
 			}
 		};
-
 		EclipseSyncActionHelper.run_with_progress(getShell(), action);
 	}
 
@@ -788,31 +651,27 @@ public class UIEditorPageDAO extends Composite {
 		public void setRelativePath(String relativePath) {
 			this.relativePath = relativePath;
 		}
-
 	}
 
 	private class Filter extends ViewerFilter {
 
 		@Override
 		public boolean select(Viewer viewer, Object parentElement, Object element) {
-
-			if (searchString == null || searchString.length() == 0) {
+			if (search_string == null || search_string.length() == 0) {
 				return true;
 			}
-
 			Item item = (Item) element;
-			if (item.getRelativePath().matches(searchString)) {
+			if (item.getRelativePath().matches(search_string)) {
 				return true;
 			}
-
 			return false;
 		}
 
-		private String searchString;
+		private String search_string;
 
 		public void setSearchText(String s) {
 			// Search must be a substring of the existing value
-			this.searchString = ".*" + s + ".*";
+			this.search_string = ".*" + s + ".*";
 		}
 	}
 
@@ -826,76 +685,50 @@ public class UIEditorPageDAO extends Composite {
 		// Disable the check that prevents subclassing of SWT components
 	}
 
-	private ArrayList<Item> reloadTable() throws Exception {
-
+	private ArrayList<Item> reload_table() throws Exception {
 		final ArrayList<Item> items = new ArrayList<Item>();
-
 		try {
-
 			FileSearchHelpers.IFile_List fileList = new FileSearchHelpers.IFile_List() {
-
 				@Override
 				public void add(String fileName) {
-
 					Item item = new Item();
-
 					item.setRelativePath(fileName);
-
 					items.add(item);
 				}
 			};
-
 			FileSearchHelpers.enum_dao_xml_file_names(editor2.get_metaprogram_folder_abs_path(), fileList);
-
 		} finally {
-
 			tableViewer.setInput(items);
 			tableViewer.refresh();
-
 			// tableViewer.refresh(); NOT REQUIRED
-			doOnSelectionChanged();
-
+			do_on_selection_changed();
 			boolean enable = items.size() > 0;
 			action_validate.setEnabled(enable);
 		}
-
 		return items;
 	}
 
-	public void reloadTable(boolean showErrorMsg) {
-
+	public void reload_table(boolean showErrorMsg) {
 		try {
-
-			reloadTable();
-
+			reload_table();
 		} catch (Throwable e) {
-
 			if (showErrorMsg) {
-
 				e.printStackTrace();
-
 				EclipseMessageHelpers.show_error(e);
 			}
 		}
 	}
 
-	private void doOnSelectionChanged() {
-
+	private void do_on_selection_changed() {
 		@SuppressWarnings("unchecked")
 		List<Item> items = (List<Item>) tableViewer.getInput();
-
 		boolean enabled;
-
 		if (items.size() == 1) {
-
 			enabled = true;
-
 		} else {
-
 			int[] indexes = table.getSelectionIndices();
 			enabled = indexes.length > 0;
 		}
-
 		action_generate.setEnabled(enabled);
 		action_openXml.setEnabled(enabled);
 		action_open_java.setEnabled(enabled);

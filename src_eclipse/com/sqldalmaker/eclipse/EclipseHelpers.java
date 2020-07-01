@@ -100,6 +100,13 @@ public class EclipseHelpers {
 
 		Settings sett = load_settings(ed);
 
+		Connection con = get_connection(ed.get_project(), sett);
+
+		return con;
+	}
+
+	public static Connection get_connection(IProject project, Settings sett) throws Exception {
+
 		String driver_jar = sett.getJdbc().getJar();
 
 		String driver_class_name = sett.getJdbc().getClazz();
@@ -110,13 +117,13 @@ public class EclipseHelpers {
 
 		String password = sett.getJdbc().getPwd();
 
-		String project_abs_path = ed.get_project().getLocation().toPortableString();
+		String project_abs_path = project.getLocation().toPortableString();
 
 		Connection con = get_connection(project_abs_path, driver_jar, driver_class_name, url, user_name, password);
 
 		return con;
 	}
-
+	
 	public static Connection get_connection(String project_abs_path, String driver_jar, String driver_class_name,
 			String url, String user_name, String password) throws Exception {
 

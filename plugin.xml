@@ -6,7 +6,7 @@
          point="org.eclipse.ui.editors">
       <editor
       		default="true"
-            name="SQL DAL Maker"
+            name="SDM"
             icon="icons/sqldalmaker.gif"
             filenames="php.dal, java.dal, cpp.dal, python.dal, ruby.dal"
             class="com.sqldalmaker.eclipse.Editor2"
@@ -20,7 +20,7 @@
             activate="true"
             class="com.sqldalmaker.eclipse.ProjectFileHyperlinkDetector"
             id="com.sqldalmaker.eclipse.projectFileHyperlinkDetector"
-            name="SQL DAL Maker SQL Resources Hyperlinks Detector"
+            name="SQL DAL Maker SQL Hyperlinks Detector"
             targetId="org.eclipse.core.runtime.xml">
       </hyperlinkDetector>
    </extension>
@@ -31,7 +31,7 @@
       
   <proposalCategory
            id="com.sqldalmaker.xml.completionProposal.category"
-           name="SQL DAL Maker proposals">
+           name="SQL DAL Maker Completion Proposals">
   </proposalCategory>
  
   <proposalComputer
@@ -48,12 +48,12 @@
         point="org.eclipse.ui.commands">
      <category
            id="com.sqldalmaker.commands.category"
-           name="DAL Category">
+           name="SDM Category">
      </category>
      <command
            categoryId="com.sqldalmaker.commands.category"
            id="com.sqldalmaker.open_dal_file.command_id"
-           name="DAL Command"
+           name="SDM Command"
            defaultHandler="com.sqldalmaker.eclipse.MyToolbarActionHandler">
      </command>
   </extension>
@@ -78,7 +78,7 @@
                  icon="icons/sqldalmaker.gif"
                  id="com.sqldalmaker.toolbar.command_id"
                  style="pulldown"
-                 tooltip="SQL DAL Maker Root-Files">
+                 tooltip="SDM">
            </command>
       
 </toolbar>

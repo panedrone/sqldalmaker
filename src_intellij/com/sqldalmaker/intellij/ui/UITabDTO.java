@@ -638,7 +638,7 @@ public class UITabDTO {
         final StringBuilder output_dir = new StringBuilder();
 
         // 1. open connection
-        // 2. create the list of generated java
+        // 2. create the list of generated text
         // 3. close connection
         // 4. update the files from the list
 

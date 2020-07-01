@@ -1,4 +1,4 @@
-2020-06-30
+2020-07-02
 
     New actions 'Generate' and 'Validate' in IDE tool-bar button
     
