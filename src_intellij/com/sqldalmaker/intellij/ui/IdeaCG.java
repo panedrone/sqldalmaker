@@ -67,7 +67,8 @@ public class IdeaCG {
                             }
                         }
                         if (!error) {
-                            IdeaMessageHelpers.add_info_to_ide_log("All DTO classes are OK");
+                            String xml_file_rel_path = IdeaHelpers.get_relative_path(project, xml_file);
+                            IdeaMessageHelpers.add_info_to_ide_log(xml_file_rel_path + " -> OK");
                         }
                     } finally {
                         con.close();
@@ -140,9 +141,10 @@ public class IdeaCG {
         ProgressManager.getInstance().runProcessWithProgressSynchronously(runnable, "Code Generation", false, project);
         try { // outside of Runnable
             if (list.size() > 0) {
+                String xml_file_rel_path = IdeaHelpers.get_relative_path(project, xml_file);
                 IdeaHelpers.run_write_action_to_generate_source_file(output_dir.toString(), list, project);
                 if (!error.happend) {
-                    IdeaMessageHelpers.add_info_to_ide_log("Generation of DTO classes completed successfully");
+                    IdeaMessageHelpers.add_info_to_ide_log(xml_file_rel_path + " -> Generated successfully");
                 }
             }
         } catch (Exception e) {
@@ -188,7 +190,8 @@ public class IdeaCG {
                     IdeaTargetLanguageHelpers.validate_dao(project, root_file, settings, dao_class_name, file_content, validationBuff);
                     String status = validationBuff.toString();
                     if (status.length() == 0) {
-                        IdeaMessageHelpers.add_info_to_ide_log(xml_file.getNameWithoutExtension() + " is OK");
+                        String xml_file_rel_path = IdeaHelpers.get_relative_path(project, xml_file);
+                        IdeaMessageHelpers.add_info_to_ide_log(xml_file_rel_path + " -> OK");
                     } else {
                         IdeaMessageHelpers.add_error_to_ide_log("ERROR", " " + xml_file.getNameWithoutExtension() + ". " + status);
                     }
@@ -253,7 +256,8 @@ public class IdeaCG {
                 if (list.size() > 0) {
                     IdeaHelpers.run_write_action_to_generate_source_file(output_dir.toString(), list, project);
                     if (!error) {
-                        IdeaMessageHelpers.add_info_to_ide_log("Generation of " + xml_file.getNameWithoutExtension() + " completed successfully");
+                        String xml_file_rel_path = IdeaHelpers.get_relative_path(project, xml_file);
+                        IdeaMessageHelpers.add_info_to_ide_log(xml_file_rel_path + " -> Generated successfully");
                     }
                 }
             } catch (Exception e) {

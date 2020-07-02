@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 sqldalmaker@gmail.com
+ * Copyright 2011-2020 sqldalmaker@gmail.com
  * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
  * Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -29,31 +29,21 @@ public class EclipseConsoleHelpers {
 	private static final String CONSOLE_NAME = "SQL DAL Maker";
 
 	private static MessageConsole find_console(IConsoleManager con_man) {
-
 		IConsole[] existing = con_man.getConsoles();
-
 		for (int i = 0; i < existing.length; i++) {
-
 			if (CONSOLE_NAME.equals(existing[i].getName())) {
-
 				return (MessageConsole) existing[i];
 			}
 		}
-
 		return null;
 	}
 
 	public static void init_console() {
-
 		ConsolePlugin plugin = ConsolePlugin.getDefault();
-
 		IConsoleManager con_man = plugin.getConsoleManager();
-
 		// https://stackoverflow.com/questions/720963/writing-to-the-eclipse-console
 		MessageConsole my_console = find_console(con_man);
-
 		if (my_console != null) {
-
 			my_console.clearConsole();
 		}
 	}

@@ -58,15 +58,15 @@ public class MyDynamicMenu extends ContributionItem {
 		if (dal_file_titles.isEmpty()) {
 			add_item_no_items(menu);
 		} else {
-			IWorkbenchWindow win = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-			IWorkbenchPage page = win.getActivePage();
+			final IWorkbenchWindow win = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+			final IWorkbenchPage page = win.getActivePage();
 			if (page != null) {
-				IEditorPart editor = page.getActiveEditor();
-				if (editor != null) {
-					IEditorInput input = editor.getEditorInput();
+				final IEditorPart editor_part = page.getActiveEditor();
+				if (editor_part != null) {
+					final IEditorInput input = editor_part.getEditorInput();
 					if (input != null) {
-						IFile input_file = ResourceUtil.getFile(input);
-						IContainer xml_mp_folder = input_file.getParent();
+						final IFile input_file = ResourceUtil.getFile(input);
+						final IContainer xml_mp_folder = input_file.getParent();
 						if (!(xml_mp_folder instanceof IFolder)) {
 							return;
 						}
@@ -80,7 +80,7 @@ public class MyDynamicMenu extends ContributionItem {
 						if (root_files.size() != 1) {
 							return;
 						}
-						IFile root_file = root_files.get(0);
+						final IFile root_file = root_files.get(0);
 						boolean is_dto_xml = FileSearchHelpers.is_dto_xml(input_file.getName());
 						boolean is_dao_xml = FileSearchHelpers.is_dao_xml(input_file.getName());
 						String path = input_file.getFullPath().toPortableString();
@@ -93,6 +93,7 @@ public class MyDynamicMenu extends ContributionItem {
 							menuItem.setText(current_xml_file_rel_path + " -> Generate All");
 							menuItem.addSelectionListener(new SelectionAdapter() {
 								public void widgetSelected(SelectionEvent e) {
+									editor_part.setFocus(); // to make working ${project_loc}
 									EclipseCG.generate_all_dto(root_file, input_file);
 								}
 							});
@@ -100,6 +101,7 @@ public class MyDynamicMenu extends ContributionItem {
 							menuItem.setText(current_xml_file_rel_path + " -> Validate All");
 							menuItem.addSelectionListener(new SelectionAdapter() {
 								public void widgetSelected(SelectionEvent e) {
+									editor_part.setFocus(); // to make working ${project_loc}
 									EclipseCG.validate_all_dto(root_file, input_file);
 								}
 							});
@@ -108,6 +110,7 @@ public class MyDynamicMenu extends ContributionItem {
 							menuItem.setText(current_xml_file_rel_path + " -> Generate");
 							menuItem.addSelectionListener(new SelectionAdapter() {
 								public void widgetSelected(SelectionEvent e) {
+									editor_part.setFocus(); // to make working ${project_loc}
 									EclipseCG.generate_dao(root_file, input_file);
 								}
 							});
@@ -115,6 +118,7 @@ public class MyDynamicMenu extends ContributionItem {
 							menuItem.setText(current_xml_file_rel_path + " -> Validate");
 							menuItem.addSelectionListener(new SelectionAdapter() {
 								public void widgetSelected(SelectionEvent e) {
+									editor_part.setFocus(); // to make working ${project_loc}
 									EclipseCG.validate_dao(root_file, input_file);
 								}
 							});

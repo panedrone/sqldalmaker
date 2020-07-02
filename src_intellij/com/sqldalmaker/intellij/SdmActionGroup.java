@@ -118,38 +118,17 @@ public class SdmActionGroup extends ActionGroup {
                             //////////////////////////////////////////
                             if (FileSearchHelpers.is_dto_xml(name) || FileSearchHelpers.is_dao_xml(name)) {
                                 String root_file_rel_path = IdeaHelpers.get_relative_path(project, root_files.get(0));
-                                SdmAction action_dto = new SdmAction(root_file_rel_path + " -> DTO") {
+                                SdmAction action = new SdmAction(root_file_rel_path) {
                                     @Override
                                     public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
                                         try {
                                             IdeaEditorHelpers.open_project_file_in_editor_sync(anActionEvent.getProject(), root_file_rel_path);
-                                            FileEditor editor = FileEditorManager.getInstance(project).getSelectedEditor(); // @Nullable
-                                            if (editor instanceof RootFileEditor) {
-                                                RootFileEditor rfe = (RootFileEditor) editor;
-                                                rfe.openDTO();
-                                            }
                                         } catch (Exception e) {
                                             IdeaMessageHelpers.add_error_to_ide_log("ERROR", e.getMessage());
                                         }
                                     }
                                 };
-                                drop_down_actions_list.add(action_dto);
-                                SdmAction action_dao = new SdmAction(root_file_rel_path + " -> DAO") {
-                                    @Override
-                                    public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
-                                        try {
-                                            IdeaEditorHelpers.open_project_file_in_editor_sync(anActionEvent.getProject(), root_file_rel_path);
-                                            FileEditor editor = FileEditorManager.getInstance(project).getSelectedEditor(); // @Nullable
-                                            if (editor instanceof RootFileEditor) {
-                                                RootFileEditor rfe = (RootFileEditor) editor;
-                                                rfe.openDAO();
-                                            }
-                                        } catch (Exception e) {
-                                            IdeaMessageHelpers.add_error_to_ide_log("ERROR", e.getMessage());
-                                        }
-                                    }
-                                };
-                                drop_down_actions_list.add(action_dao);
+                                drop_down_actions_list.add(action);
                                 drop_down_actions_list.add(Separator.create());
                             }
                         }
