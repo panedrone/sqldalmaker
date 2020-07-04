@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 sqldalmaker@gmail.com
+ * Copyright 2011-2020 sqldalmaker@gmail.com
  * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
  * Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -25,7 +25,7 @@ public class RootFileTypeFactory extends FileTypeFactory {
 
     public static final class MyFileType implements FileType {
 
-        private static Icon icon = IconLoader.getIcon("/img/sqldalmaker.gif");
+        private static final Icon icon = IconLoader.getIcon("/img/sqldalmaker.gif");
 
         @NotNull
         @Override

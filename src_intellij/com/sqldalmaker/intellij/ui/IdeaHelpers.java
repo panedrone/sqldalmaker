@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 sqldalmaker@gmail.com
+ * Copyright 2011-2020 sqldalmaker@gmail.com
  * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
  * Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -46,70 +46,45 @@ public class IdeaHelpers {
 
     @NotNull // or exception
     public static VirtualFile get_project_base_dir(final Project project) throws Exception {
-
         // VirtualFile res = project.getBaseDir(); // deprecated
-
         String path = project.getBasePath();
-
         if (path == null) {
-
             throw new Exception("Cannot detect the project base path");
         }
-
         //https://intellij-support.jetbrains.com/hc/en-us/community/posts/206144389-Create-virtual-file-from-file-path
-
         VirtualFile res = LocalFileSystem.getInstance().findFileByPath(path);
-
         if (res == null) {
-
             throw new Exception("Cannot find project base path in local file system");
         }
-
         return res;
     }
 
     public static String get_relative_path(Project project, VirtualFile file) throws Exception {
 
         String base_abs_path = project.getBasePath();
-
         if (base_abs_path == null) {
-
             throw new Exception("Cannot detect the project base path");
         }
-
         String file_abs_path = file.getPath();
-
         return get_relative_path(base_abs_path, file_abs_path);
     }
 
     public static String get_relative_path(String base_abs_path, String file_abs_path) {
-
         // http://stackoverflow.com/questions/204784/how-to-construct-a-relative-path-in-java-from-two-absolute-paths-or-urls
-
         String base = base_abs_path.replace('\\', '/');
-
         String path = file_abs_path.replace('\\', '/');
-
         URI base_uri = new File(base).toURI();
-
         URI path_uri = new File(path).toURI();
-
         String relative = base_uri.relativize(path_uri).getPath();
-
         // bug: sometimes, relative is returned as /C:/idea/project/java.sqldalmaker
-
         if (relative.length() > base.length()) {
-
             relative = path.substring(base.length() + 1);
         }
-
         return relative;
     }
 
     public static Settings load_settings(VirtualFile root_file) throws Exception {
-
         String xml_meraprogram_folder_full_path = root_file.getParent().getPath();
-
         return SdmUtils.load_settings(xml_meraprogram_folder_full_path);
     }
 
@@ -117,7 +92,6 @@ public class IdeaHelpers {
      * Must be called only from DispatchThread
      */
     public static void start_write_action_from_ui_thread_and_refresh_folder_sync(VirtualFile folder) {
-
         start_write_action_from_ui_thread_and_refresh_folder(folder);
     }
 
@@ -125,91 +99,62 @@ public class IdeaHelpers {
      * Must be called only from DispatchThread
      */
     private static void start_write_action_from_ui_thread_and_refresh_folder(final VirtualFile folder) {
-
         // com.intellij.openapi.vfs.VirtualFile
         // public void refresh(boolean asynchronous, boolean recursive) {
         // This method should be only called within write-action.
-
         ApplicationManager.getApplication().runWriteAction(new Runnable() {
-
             @Override
             public void run() {
-
                 try {
-
                     folder.refresh(/*asynchronous*/ false, /*recursive*/ true);
-
                 } catch (Throwable e) {
-
                     e.printStackTrace();
-
                     throw new RuntimeException(e);
                 }
             }
-
         });
     }
 
     // http://www.devdaily.com/blog/post/java/read-text-file-from-jar-file
-
     public static String read_from_jar_file(String res_name) throws Exception {
-
         return read_from_jar_file("resources", res_name);
     }
 
     public static String read_from_jar_file(String path, String res_name) throws Exception {
-
         InputStream is = get_resource_as_stream(path, res_name);
-
         try {
-
             InputStreamReader reader = new InputStreamReader(is);
-
             try {
-
                 return Helpers.load_text(reader);
-
             } finally {
-
                 reader.close();
             }
-
         } finally {
-
             is.close();
         }
     }
 
     private static InputStream get_resource_as_stream(String path, String res_name)
             throws InternalException {
-
         // swing app wants 'resources/' but plug-in wants '/resources/' WHY?
         ClassLoader cl = IdeaHelpers.class.getClassLoader();
-
         InputStream is = cl.getResourceAsStream(path + "/" + res_name);
-
         if (is == null) {
-
             is = cl.getResourceAsStream("/" + path + "/" + res_name);
         }
-
         if (is == null) {
-
             throw new InternalException("Resource not found: " + res_name);
         }
-
         return is;
     }
 
     public static Connection get_connection(Project project,
                                      Settings settings) throws Exception {
-
         String driver_jar = settings.getJdbc().getJar();
         String driver_class_name = settings.getJdbc().getClazz();
         String url = settings.getJdbc().getUrl();
         String user_name = settings.getJdbc().getUser();
         String password = settings.getJdbc().getPwd();
-
         return get_connection(project, driver_jar, driver_class_name,
                 url, user_name, password);
     }
@@ -220,61 +165,37 @@ public class IdeaHelpers {
                                             String user_name, String password) throws Exception {
 
         url = url.replace("${project_loc}", "$PROJECT_DIR$"); // for compatibility with Eclipse
-
         ProjectPathMacroManager pPmm = new ProjectPathMacroManager(project);
-
         url = pPmm.expandPath(url);
-
         VirtualFile project_dir = get_project_base_dir(project);
-
         VirtualFile driver_file = project_dir.findFileByRelativePath(driver_jar);
-
         if (driver_file == null) {
-
             throw new Exception("JDBC driver file not found");
         }
-
         driver_jar = driver_file.getPath();
-
         Class<?> cl;
-
         if (!"".equals(driver_jar)) {
-
             ClassLoader loader = new URLClassLoader(new URL[]{new File(
                     driver_jar).toURI().toURL()});
-
             cl = Class.forName(driver_class_name, true, loader);
-
         } else {
-
             cl = Class.forName(driver_class_name);
         }
-
         // https://stackoverflow.com/questions/46393863/what-to-use-instead-of-class-newinstance
         Driver driver = (Driver) cl.getDeclaredConstructor().newInstance();
-
         Connection con;
-
         Properties props = new Properties();
-
         if (user_name != null) {
-
             props.put("user", user_name);
             props.put("password", password);
         }
-
         con = driver.connect(url, props);
-
         // connect javadocs:
-
         // The driver should return "null" if it realizes it is the
         // wrong kind of driver to connect to the given URL.
-
         if (con == null) {
-
             throw new InternalException("Invalid URL");
         }
-
         return con;
     }
 
@@ -294,44 +215,29 @@ public class IdeaHelpers {
         private static void writeFile(VirtualFile dir, GeneratedFileData gf) throws Exception {
 
             VirtualFile file = dir.findFileByRelativePath(gf.file_name);
-
             if (file == null) {
-
                 // createChildData may show dialog and throw
                 // java.lang.IllegalStateException: The DialogWrapper can be used only on event dispatch thread.
                 // if it is called outside of WriteAction
-
                 file = dir.createChildData(null, gf.file_name);
             }
-
             file.setBinaryContent(gf.file_content.getBytes());
         }
 
         @Override
         public void run() {
-
             try {
-
                 VirtualFile project_dir = IdeaHelpers.get_project_base_dir(project);
-
                 VirtualFile output_dir = project_dir.findFileByRelativePath(output_dir_module_relative_path);
-
                 if (output_dir != null && !output_dir.isDirectory()) {
-
                     throw new Exception("This is not a dir: " + output_dir_module_relative_path);
                 }
-
                 output_dir = ensure_dir(project_dir, output_dir_module_relative_path);
-
                 for (GeneratedFileData gf : generated_file_data_list) {
-
                     writeFile(output_dir, gf);
                 }
-
                 error = null;
-
             } catch (Throwable e) {
-
                 error = e;
             }
         }
@@ -341,17 +247,12 @@ public class IdeaHelpers {
                                                                 final Project project) throws Exception {
 
         GenerateSourceFileWriteAction write_action = new GenerateSourceFileWriteAction();
-
         write_action.generated_file_data_list = generated_file_data_list;
         write_action.project = project;
         write_action.output_dir_module_relative_path = output_dir_module_relative_path;
-
         ApplicationManager.getApplication().runWriteAction(write_action);
-
         // writeAction.run();
-
         if (write_action.error != null) {
-
             throw new Exception(write_action.error);
         }
     }
@@ -359,80 +260,53 @@ public class IdeaHelpers {
     private static VirtualFile ensure_dir(VirtualFile root_dir, String rel_path) throws IOException {
 
         rel_path = rel_path.replace('\\', '/');
-
         VirtualFile virtual_dir = root_dir.findFileByRelativePath(rel_path);
-
         if (virtual_dir == null) {
-
             String[] parts = rel_path.split("/");
-
             VirtualFile tmp = root_dir;
-
             for (String p : parts) {
-
                 // createChildDirectory may show dialog and throw
                 // java.lang.IllegalStateException: The DialogWrapper can be used only on event dispatch thread.
                 // if it is called outside of WriteAction
-
                 VirtualFile dir = tmp.findFileByRelativePath(p);
-
                 if (dir == null) {
-
                     tmp = tmp.createChildDirectory(null, p);
-
                 } else {
-
                     tmp = dir;
                 }
             }
-
             virtual_dir = tmp;
         }
-
         return virtual_dir;
     }
 
-    private static Throwable _save_text_file_error;
-
     public static void run_write_action_to_save_text_file(final VirtualFile root_file,
                                                    final String file_name, final String text) throws IOException {
-
-        _save_text_file_error = null;
-
+        class Error {
+            public Throwable exception = null;
+        }
+        Error error = new Error();
         Runnable writeAction = new Runnable() {
-
             @Override
             public void run() {
-
                 try {
-
                     VirtualFile parent_dir = root_file.getParent();
-
                     VirtualFile file = parent_dir.findFileByRelativePath(file_name);
-
                     if (file == null) {
-
                         // createChildData may show dialog and throw
                         // java.lang.IllegalStateException: The DialogWrapper can be used only on event dispatch thread.
                         // if it is called outside of WriteAction
-
                         file = parent_dir.createChildData(null, file_name);
                     }
-
                     file.setBinaryContent(text.getBytes());
-
                 } catch (Throwable e) {
-
-                    _save_text_file_error = e;
+                    error.exception = e;
                 }
             }
         };
-
         ApplicationManager.getApplication().runWriteAction(writeAction);
-
-        if (_save_text_file_error != null) {
-
-            throw new IOException(_save_text_file_error);
+        if (error.exception != null) {
+            throw new IOException(error.exception);
         }
     }
 
@@ -440,22 +314,14 @@ public class IdeaHelpers {
     private static void navigate_to_source(@NotNull Project project, @NotNull PsiElement psi_element) {
 
         PsiFile containing_file = psi_element.getContainingFile();
-
         // VirtualFile virtual_file = containingFile.find_virtual_file();
         VirtualFile virtual_file = IdeaReferenceCompletion.find_virtual_file(containing_file);
-
         if (virtual_file != null) {
-
             FileEditorManager manager = FileEditorManager.getInstance(project);
-
             FileEditor[] file_editors = manager.openFile(virtual_file, true);
-
             if (file_editors.length > 0) {
-
                 FileEditor file_editor = file_editors[0];
-
                 if (file_editor instanceof NavigatableFileEditor) {
-
                     NavigatableFileEditor navigatableFileEditor = (NavigatableFileEditor) file_editor;
                     Navigatable descriptor = new OpenFileDescriptor(project, virtual_file, psi_element.getTextOffset());
                     navigatableFileEditor.navigateTo(descriptor);
@@ -467,28 +333,18 @@ public class IdeaHelpers {
     public static void navigate_to_dto_class_declaration(@NotNull Project project,
                                                          @NotNull VirtualFile root_file,
                                                          @NotNull String dto_class_name) throws Exception {
-
         VirtualFile xml_file_dir = root_file.getParent();
-
         if (xml_file_dir == null) {
-
             throw new Exception("Cannot get parent folder for " + root_file.getName());
         }
-
         VirtualFile dto_xml_file = xml_file_dir.findFileByRelativePath(Const.DTO_XML);
-
         if (dto_xml_file == null) {
-
             throw new Exception(Const.DTO_XML + " not found");
         }
-
         PsiElement psi_element = IdeaReferenceCompletion.find_dto_class_xml_tag(project, dto_xml_file, dto_class_name);
-
         if (psi_element == null) {
-
             throw new Exception(dto_class_name + ": declaration not found");
         }
-
         navigate_to_source(project, psi_element);
     }
 }

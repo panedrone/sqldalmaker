@@ -68,27 +68,33 @@ namespace ${dao_namespace};
 
 include_once 'DataStore.php';
 
+#if (${imports.size()} > 0)
 #foreach($imp in ${imports})
 include_once '${imp}.php';
 #end
 
+#end
+#if (${uses.size()} > 0)
 #foreach($u in ${uses})
 use ${u};
 #end
 
+#end
 /**
  * ${class_name} is a generated DAO class. Don't modify it manually.
  * Visit http://sqldalmaker.sourceforge.net/ for details.
  */
 class ${class_name} {
-        
+
     protected ${d}ds;
 
     public function __construct(\DataStore $ds) {
         ${d}this->ds = ${d}ds;
     }
 #foreach($method in ${methods})${method}#end
-}## ====================================================================================================================
+
+}
+## ====================================================================================================================
 #elseif($mode=="dao_create")
 
     /**
@@ -106,7 +112,7 @@ class ${class_name} {
 #set($i = ${velocityCount})
         ${d}p->${key.setterMethod()}(${d}ai_values["$key.getName()"]);
 #end
-            return ${d}res;
+        return ${d}res;
     }
 ## ====================================================================================================================
 #elseif($mode=="dao_query")

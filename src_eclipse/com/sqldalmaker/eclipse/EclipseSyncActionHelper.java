@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 sqldalmaker@gmail.com
+ * Copyright 2011-2020 sqldalmaker@gmail.com
  * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
  * Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -25,44 +25,27 @@ public class EclipseSyncActionHelper {
 	public static void run_with_progress(Shell shell, final EclipseSyncAction action) {
 
 		IRunnableWithProgress op = new IRunnableWithProgress() {
-
 			@Override
 			public void run(IProgressMonitor monitor) throws InvocationTargetException {
-
 				monitor.beginTask(action.get_name(), action.get_total_work());
-
 				try {
-
 					action.run_with_progress(monitor);
-
 				} catch (Throwable ex) {
-
 					throw new InvocationTargetException(ex, ex.getMessage());
-
 				} finally {
-
 					monitor.done();
 				}
 			}
 		};
-
 		// Use the progress service to execute the runnable
 		IProgressService service = PlatformUI.getWorkbench().getProgressService();
-
 		try {
-
 			// see javadocs for IRunnableContext.run
-
 			service.run(true, true, op);
-
 		} catch (InvocationTargetException e) {
-
 			e.printStackTrace();
-
 			EclipseMessageHelpers.show_error(e);
-
 		} catch (InterruptedException e) {
-
 			// do nothing
 		}
 	}

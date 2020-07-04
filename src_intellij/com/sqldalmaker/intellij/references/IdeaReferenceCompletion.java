@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 sqldalmaker@gmail.com
+ * Copyright 2011-2020 sqldalmaker@gmail.com
  * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
  * Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -27,7 +27,7 @@ public class IdeaReferenceCompletion {
     public static final String[] DAO_TAGS_USING_DTO = new String[]{"crud", "crud-auto", "query-dto", "query-dto-list"};
     public static final String[] DAO_TAGS_USING_REF = new String[]{"query", "query-list", "query-dto", "query-dto-list", "exec-dml"};
 
-    public class ATTRIBUTE {
+    public static class ATTRIBUTE {
 
         public static final String DTO = "dto";
         public static final String REF = "ref";
@@ -35,7 +35,7 @@ public class IdeaReferenceCompletion {
         public static final String TABLE = "table";
     }
 
-    public class ELEMENT {
+    public static class ELEMENT {
 
         public static final String DTO_CLASS = "dto-class";
         public static final String DAO_CLASS = "dao-class";
@@ -45,19 +45,13 @@ public class IdeaReferenceCompletion {
     VirtualFile find_virtual_file(@NotNull PsiFile psi_file) {
 
         VirtualFile res = psi_file.getVirtualFile();
-
         if (res == null) { // ---: res == null happens during code completion
-
             PsiFile original_file = psi_file.getOriginalFile(); // @NotNull
-
             res = original_file.getVirtualFile();
-
             if (res == null) {
-
                 return null;
             }
         }
-
         return res;
     }
 
@@ -67,59 +61,34 @@ public class IdeaReferenceCompletion {
                                       @NotNull String dto_class_name) {
 
         PsiElement res = PsiManager.getInstance(project).findFile(dto_xml_file);// @Nullable
-
         if (!(res instanceof XmlFile)) {
-
             return null;
         }
-
         XmlFile xml_file = (XmlFile) res;
-
         XmlTag root;
-
         try {
-
             root = xml_file.getRootTag();
-
         } catch (Throwable th) {
-
             return null;
         }
-
         if (root == null) {
-
             return null;
         }
-
         PsiElement[] tags;
-
         try {
-
             tags = root.getChildren(); // notnull;
-
         } catch (Throwable th) {
-
             return null;
         }
-
         for (PsiElement el : tags) {
-
             if (el instanceof XmlTag) {
-
                 XmlTag t = (XmlTag) el;
-
                 if (t.getName().equals(ELEMENT.DTO_CLASS)) {
-
                     XmlAttribute a = t.getAttribute(ATTRIBUTE.NAME);
-
                     if (a != null) {
-
                         String v = a.getValue();
-
                         if (v != null && !v.isEmpty()) {
-
                             if (dto_class_name.equals(v)) {
-
                                 return el;
                             }
                         }
@@ -127,7 +96,6 @@ public class IdeaReferenceCompletion {
                 }
             }
         }
-
         return null;
     }
 }

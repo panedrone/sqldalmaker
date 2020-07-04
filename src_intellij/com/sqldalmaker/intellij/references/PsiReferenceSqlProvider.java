@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 sqldalmaker@gmail.com
+ * Copyright 2011-2020 sqldalmaker@gmail.com
  * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
  * Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -27,17 +27,12 @@ import java.util.Set;
  */
 public class PsiReferenceSqlProvider extends PsiReferenceProvider {
 
-    private Set<String> dao_tag_names = new HashSet<String>();
+    private final Set<String> dao_tag_names = new HashSet<String>();
 
     public PsiReferenceSqlProvider() {
 
         List<String> list = Arrays.asList(IdeaReferenceCompletion.DAO_TAGS_USING_REF);
-
-        for (String s : list) {
-
-            dao_tag_names.add(s);
-        }
-
+        dao_tag_names.addAll(list);
         dao_tag_names.add(IdeaReferenceCompletion.ELEMENT.DTO_CLASS);
     }
 
@@ -46,30 +41,20 @@ public class PsiReferenceSqlProvider extends PsiReferenceProvider {
     public PsiReference[] getReferencesByElement(@NotNull PsiElement element, @NotNull ProcessingContext context) {
 
         if (element instanceof XmlAttributeValue) {
-
             PsiElement attr_element = element.getParent();
-
             if (attr_element instanceof XmlAttribute) {
-
                 final String attr_name = ((XmlAttribute) attr_element).getName();
-
                 if (IdeaReferenceCompletion.ATTRIBUTE.REF.equals(attr_name)) {
-
                     PsiElement parent_tag = attr_element.getParent();
-
                     if (parent_tag instanceof XmlTag) {
-
                         final String tag_name = ((XmlTag) parent_tag).getName();
-
                         if (dao_tag_names.contains(tag_name)) {
-
                             return new PsiReference[]{new PsiReferenceSql(element/*, element.getTextRange()*/)};
                         }
                     }
                 }
             }
         }
-
         return PsiReference.EMPTY_ARRAY;
     }
 }

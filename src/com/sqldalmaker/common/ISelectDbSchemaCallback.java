@@ -7,9 +7,7 @@
 package com.sqldalmaker.common;
 
 /**
- *
  * @author sqldalmaker@gmail.com
- *
  */
 public interface ISelectDbSchemaCallback {
 

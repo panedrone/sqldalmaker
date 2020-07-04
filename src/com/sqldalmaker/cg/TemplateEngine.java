@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 sqldalmaker@gmail.com
+ * Copyright 2011-2020 sqldalmaker@gmail.com
  * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
  * Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -17,27 +17,20 @@ import org.apache.velocity.runtime.RuntimeServices;
 import org.apache.velocity.runtime.parser.node.SimpleNode;
 
 /**
- *
  * @author sqldalmaker@gmail.com
- *
  */
 public class TemplateEngine {
 
-    private Template template;
+    private final Template template;
 
     public TemplateEngine(String vm_path, boolean is_file_system) throws Exception {
 
         String template_text;
-
         if (is_file_system) {
-
             template_text = Helpers.load_text_from_file(vm_path);
-
         } else {
-
             template_text = Helpers.read_from_jar_file_2(vm_path);
         }
-
         // Velocity loads ResourceManager in this way:
         // ClassLoader loader = Thread.currentThread().getContextClassLoader();
         // return Class.forName(clazz, true, loader);
@@ -58,9 +51,7 @@ public class TemplateEngine {
         Thread thread = Thread.currentThread();
         ClassLoader loader = thread.getContextClassLoader();
         thread.setContextClassLoader(this.getClass().getClassLoader());
-
         try {
-
             // How to use String as Velocity Template?
             // http://stackoverflow.com/questions/1432468/how-to-use-string-as-velocity-template
             // In this case, I share the same instance with JetBrains:
@@ -72,7 +63,6 @@ public class TemplateEngine {
             // I create new instance all the time instead to avoid problems of
             // caching.
             RuntimeServices runtime_services = new RuntimeInstance();
-
             // // VM_PERM_ALLOW_INLINE_REPLACE_GLOBAL is responsible for global
             // // caching of macros by name
             // //
@@ -86,7 +76,6 @@ public class TemplateEngine {
             // ========= REQUIRED FOR INTELLIJ PLUG-IN ==============
             runtime_services.setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS,
                     org.apache.velocity.runtime.log.NullLogChute.class.getName());
-
             // {
             // // properties to prevent sharing macros between vm templates for
             // different languages.
@@ -101,14 +90,11 @@ public class TemplateEngine {
             // }
             StringReader reader = new StringReader(template_text);
             SimpleNode node = runtime_services.parse(reader, vm_path);
-
             template = new Template();
             template.setRuntimeServices(runtime_services);
             template.setData(node);
             template.initDocument();
-
         } finally {
-
             thread.setContextClassLoader(loader);
         }
     }
@@ -116,12 +102,9 @@ public class TemplateEngine {
     public void merge(Map<String, Object> values, StringWriter sw) {
 
         VelocityContext context = new VelocityContext();
-
         for (String key : values.keySet()) {
-
             context.put(key, values.get(key));
         }
-
         template.merge(context, sw);
     }
 }

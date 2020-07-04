@@ -37,6 +37,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 import org.netbeans.core.spi.multiview.MultiViewElement;
 import org.openide.filesystems.FileObject;
+import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle.Messages;
 import org.openide.util.RequestProcessor;
@@ -66,28 +67,19 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
     private TableRowSorter<AbstractTableModel> sorter;
 
     public SdmTabDTO(Lookup lookup) {
-
         super(lookup);
-
         initComponents();
-
         Cursor wc = new Cursor(Cursor.HAND_CURSOR);
-
         for (Component c : jToolBar1.getComponents()) {
-
             if (c instanceof JButton) {
-             
                 JButton b = (JButton) c;
-
                 b.setCursor(wc);
-
                 b.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 4, 0, 4));
             }
         }
-
         jTextField1.getDocument().addDocumentListener(new DocumentListener() {
             private void updateFilter() {
-                setFilter();
+                set_filter();
             }
 
             @Override
@@ -107,10 +99,8 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
         });
 
         myTableModel = new MyTableModel();
-
         createUIComponents();
-
-        reloadTable(false); // dto.xml is missing at beginning
+        reload_table(false); // dto.xml is missing at beginning
     }
 
     @Override
@@ -118,78 +108,59 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
         return jToolBar1;
     }
 
-    private void reloadTable() throws Exception {
-
+    private void reload_table() throws Exception {
         try {
-
             final ArrayList<String[]> list = myTableModel.getList();
             list.clear();
-
             List<DtoClass> res = NbpHelpers.get_dto_classes(obj);
-
             for (DtoClass cls : res) {
-
                 String[] item = new String[3];
                 item[0] = cls.getName();
                 item[1] = cls.getRef();
                 list.add(item);
             }
-
         } finally {
-
             myTableModel.refresh(); // table.updateUI();
         }
     }
 
-    public void reloadTable(boolean showErrorMsg) {
-
+    public void reload_table(boolean showErrorMsg) {
         try {
-
-            reloadTable();
-
+            reload_table();
         } catch (Exception e) {
-
             if (showErrorMsg) {
-                //e.printStackTrace();
+                Exceptions.printStackTrace(e);
                 NbpIdeMessageHelpers.show_error_in_ui_thread(e);
             }
         }
     }
 
-    private void setFilter() {
+    private void set_filter() {
         try {
-
             RowFilter<AbstractTableModel, Object> rf = RowFilter.regexFilter(jTextField1.getText(), 0);
             sorter.setRowFilter(rf);
-
         } catch (PatternSyntaxException e) {
-
             sorter.setRowFilter(null); // don't filter
         }
     }
 
-    private void selectAll() {
+    private void select_all() {
         ListSelectionModel selectionModel = table.getSelectionModel();
         selectionModel.setSelectionInterval(0, table.getRowCount() - 1);
     }
 
-    private void deselectAll() {
+    private void deselect_all() {
         table.clearSelection();
     }
 
     private void generate() throws Exception {
-
         final Settings settings = NbpHelpers.load_settings(obj);
-
-        final int[] selectedRows = getSelection();
-
+        final int[] selectedRows = get_selection();
         for (int row : selectedRows) {
             table.setValueAt("", row, 2);
         }
-
         // myTableModel.refresh(); cleares selection
         table.updateUI();
-
         // 1. open connection
         // 2. create the list of generated java
         // 3. close connection
@@ -200,51 +171,34 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
         RequestProcessor.Task task = RP.create(new Runnable() {
             @Override
             public void run() {
-
                 // ph.start();
                 if (selectedRows.length == 0) {
                     return;
                 }
-
-                NbpIdeConsoleUtil err_log = new NbpIdeConsoleUtil(settings, obj);
-
+                NbpIdeConsoleUtil ide_log = new NbpIdeConsoleUtil(settings, obj);
                 try {
-
                     //ph.progress("Connecting...");
                     Connection con = NbpHelpers.get_connection(obj); // !!! inside try/finally to ensure ph.finish()!!!
-
                     //ph.progress("Connected");
                     try {
-
                         StringBuilder output_dir = new StringBuilder();
                         // !!!! after 'try'
                         IDtoCG gen = NbpTargetLanguageHelpers.create_dto_cg(con, obj, settings, output_dir);
-
                         String output_dir_rel_path = output_dir.toString();
-
                         for (int row : selectedRows) {
-
-                            String dtoClassName = (String) table.getValueAt(row, 0);
-
+                            String dto_class_name = (String) table.getValueAt(row, 0);
                             // ph.progress(dtoClassName);
                             try {
-
-                                String fileContent[] = gen.translate(dtoClassName);
-
-                                String fileName = NbpTargetLanguageHelpers.get_dao_xml_file_name(obj, dtoClassName);
-
-                                NbpHelpers.save_text_to_file(obj, output_dir_rel_path, fileName, fileContent[0]);
-
+                                String fileContent[] = gen.translate(dto_class_name);
+                                String file_name = NbpTargetLanguageHelpers.get_target_file_name(obj, dto_class_name);
+                                NbpHelpers.save_text_to_file(obj, output_dir_rel_path, file_name, fileContent[0]);
+                                ide_log.add_success_message(dto_class_name + " -> " + STATUS_GENERATED);
                                 table.setValueAt(STATUS_GENERATED, row, 2);
-
                                 try {
-                                    
                                     Thread.sleep(50);
-                                    
                                 } catch (InterruptedException e) {
                                     // e.printStackTrace();
                                 }
-
                                 // myTableModel.refresh(); cleares selection
                                 // table.updateUI();       throws NullPointerException without SwingUtilities.invokeLater 
                                 SwingUtilities.invokeLater(new Runnable() {
@@ -253,17 +207,12 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
                                         table.updateUI();
                                     }
                                 });
-
                             } catch (Exception ex) {
-
                                 String msg = ex.getMessage();
-
                                 if (msg == null) {
                                     msg = "???";
                                 }
-
                                 table.setValueAt(msg, row, 2);
-
                                 // throw ex; // outer 'catch' cannot read the
                                 // message
                                 // !!!! not Internal_Exception to show Exception
@@ -272,14 +221,11 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
                                 // ex.printStackTrace();
 //                                MyNbHelpers.showErrorInUIThread(ex);
 //                                return;
-                                err_log.add_error_message(dtoClassName, msg);
+                                ide_log.add_error_message("[" + ex.getMessage() + "]" + dto_class_name + " -> " + msg);
                             }
                         }
-
                     } finally {
-
                         con.close();
-
                         // Exception can occur at 3rd line (for example):
                         // refresh first 3 lines
                         // error lines are not generated but update them too
@@ -290,62 +236,43 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
                             }
                         });
                     }
-
                 } catch (Exception ex) {
-
-                    err_log.add_error_message(ex);
-
+                    ide_log.add_error_message(ex);
                     // ex.printStackTrace();
                     NbpIdeMessageHelpers.show_error_in_ui_thread(ex);
-
                 } finally {
-
                     // ph.finish();
                     // errLog.close();
                 }
             }
         });
-
         //////////////////////////////////////////////////////
-        //
         if (selectedRows.length > 0) {
-
             task.schedule(0);
         }
     }
 
     private void generate2() {
-
         try {
-
             generate();
-
         } catch (Exception e) {
-
             // e.printStackTrace();
             NbpIdeMessageHelpers.show_error_in_ui_thread(e);
         }
     }
 
-    private void validateAll2() {
-
+    private void validate_all2() {
         try {
-
-            validateAll();
-
+            validate_all();
         } catch (Exception e) {
-
             // e.printStackTrace();
             NbpIdeMessageHelpers.show_error_in_ui_thread(e);
         }
     }
 
-    private void validateAll() throws Exception {
-
+    private void validate_all() throws Exception {
         final Settings settings = NbpHelpers.load_settings(obj);
-
-        reloadTable();
-
+        reload_table();
         // 1. open connection
         // 2. create the list of generated java
         // 3. close connection
@@ -356,52 +283,36 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
         RequestProcessor.Task task = RP.create(new Runnable() {
             @Override
             public void run() {
-
                 // ph.start();
-                NbpIdeConsoleUtil err_log = new NbpIdeConsoleUtil(settings, obj);
-
+                NbpIdeConsoleUtil ide_log = new NbpIdeConsoleUtil(settings, obj);
                 try {
-
                     // ph.progress("Connecting...");
                     Connection con = NbpHelpers.get_connection(obj); // !!! inside try/finally to ensure ph.finish()!!!
-
                     // ph.progress("Connected");
                     try {
-
                         StringBuilder output_dir = new StringBuilder();
                         // !!!! after 'try'
                         IDtoCG gen = NbpTargetLanguageHelpers.create_dto_cg(con, obj, settings, output_dir);
-
                         for (int i = 0; i < myTableModel.getRowCount(); i++) {
-
-                            String dtoClassName = (String) table.getValueAt(i, 0);
-
+                            String dto_class_name = (String) table.getValueAt(i, 0);
                             // ph.progress(dtoClassName);
                             try {
-
-                                String fileContent[] = gen.translate(dtoClassName);
-
+                                String fileContent[] = gen.translate(dto_class_name);
                                 StringBuilder validationBuff = new StringBuilder();
-
-                                NbpTargetLanguageHelpers.validate_dto(obj, settings, dtoClassName, fileContent, validationBuff);
-
+                                NbpTargetLanguageHelpers.validate_dto(obj, settings, dto_class_name, fileContent, validationBuff);
                                 String status = validationBuff.toString();
-
                                 if (status.length() == 0) {
                                     table.setValueAt(STATUS_OK, i, 2);
+                                    ide_log.add_success_message(dto_class_name + " -> " + STATUS_OK);
                                 } else {
                                     table.setValueAt(status, i, 2);
-                                    err_log.add_error_message(dtoClassName, status);
+                                    ide_log.add_error_message(dto_class_name + " -> " + status);
                                 }
-
                                 try {
-                                    
                                     Thread.sleep(50);
-                                    
                                 } catch (InterruptedException e) {
                                     // e.printStackTrace();
                                 }
-
                                 // myTableModel.refresh(); cleares selection
                                 // table.updateUI();       throws NullPointerException without SwingUtilities.invokeLater 
                                 SwingUtilities.invokeLater(new Runnable() {
@@ -412,15 +323,11 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
                                 });
 
                             } catch (Exception ex) {
-
                                 String msg = ex.getMessage();
-
                                 if (msg == null) {
                                     msg = "???";
                                 }
-
                                 table.setValueAt(msg, i, 2);
-
                                 // throw ex; // outer 'catch' cannot read the
                                 // message
                                 // !!!! not Internal_Exception to show Exception
@@ -429,14 +336,11 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
                                 // ex.printStackTrace();
                                 //MyNbHelpers.showErrorInUIThread(ex);
                                 //return;
-                                err_log.add_error_message(dtoClassName, msg);
+                                ide_log.add_error_message("[" + ex.getMessage() + "] " + dto_class_name + " -> " + msg);
                             }
                         }
-
                     } finally {
-
                         con.close();
-
                         // Exception can occur at 3rd line (for example):
                         // refresh first 3 lines
                         // error lines are not generated but update them too
@@ -447,16 +351,11 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
                             }
                         });
                     }
-
                 } catch (Exception ex) {
-
-                    err_log.add_error_message(ex);
-
+                    ide_log.add_error_message(ex);
                     // ex.printStackTrace();
                     NbpIdeMessageHelpers.show_error_in_ui_thread(ex);
-
                 } finally {
-
                     // ph.finish();
                     // errLog.close();
                 }
@@ -466,16 +365,11 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
     }
 
     private void genTmpFieldTags() {
-
         try {
-
-            int[] selectedRows = getSelection();
-
+            int[] selectedRows = get_selection();
             String className = (String) table.getValueAt(selectedRows[0], 0);
             String ref = (String) table.getValueAt(selectedRows[0], 1);
-
             NbpIdeEditorHelpers.generate_tmp_field_tags_and_open_in_editor_async(obj, className, ref);
-
         } catch (Exception e) {
             //e.printStackTrace();
             NbpIdeMessageHelpers.show_error_in_ui_thread(e);
@@ -497,9 +391,7 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
 
         @Override
         public String getColumnName(int col) {
-
             switch (col) {
-
                 case 0:
                     return "Class";
                 case 1:
@@ -507,7 +399,6 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
                 case 2:
                     return "State";
             }
-
             return "";
         }
 
@@ -538,28 +429,18 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
         public Component getTableCellRendererComponent(JTable table,
                 Object value, boolean isSelected, boolean hasFocus, int row,
                 int column) {
-
             Component c = super.getTableCellRendererComponent(table, value,
                     isSelected, hasFocus, row, column);
-
             String sValue = (String) value;
-
             setText(sValue);
-
             if (isSelected || STATUS_OK.equals(sValue) || STATUS_GENERATED.equals(sValue)) {
-
                 TableCellRenderer r = table.getCellRenderer(row, column);
-
                 Component c_0 = r.getTableCellRendererComponent(table, value,
                         isSelected, hasFocus, row, 0);
-
                 c.setForeground(c_0.getForeground());
-
             } else {
-
                 c.setForeground(Color.RED);
             }
-
             return c;
         }
     }
@@ -567,14 +448,10 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
     private JTable table;
 
     private void createUIComponents() {
-
         final ColorTableCellRenderer colorRenderer = new ColorTableCellRenderer();
-
         table = new javax.swing.JTable();
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-
         table = new JTable() {
-
             @Override
             public TableCellRenderer getCellRenderer(int row, int column) {
                 if (column == 2) {
@@ -583,14 +460,10 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
                 return super.getCellRenderer(row, column);
             }
         };
-
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-
         jScrollPane1.setViewportView(table);
-
         table.setModel(myTableModel);
         table.getTableHeader().setReorderingAllowed(false);
-
         sorter = new TableRowSorter<AbstractTableModel>(myTableModel);
         table.setRowSorter(sorter);
         // table.setRowHeight(24);
@@ -604,17 +477,16 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
                         if (col == 0) {
                             goto_dto_class_declaration_async();
                         } else if (col == 1) {
-                            openSQL();
+                            open_sql();
                         } else {
-                            openGeneratedSourceFile();
+                            open_generated_source_file();
                         }
                     } else {
-                        openDtoXML();
+                        open_dto_xml();
                     }
                 }
             }
         });
-
         {
             TableColumn col = table.getColumnModel().getColumn(0);
             col.setPreferredWidth(260);
@@ -630,92 +502,61 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
     }
 
     private void goto_dto_class_declaration_async() {
-
         try {
-
             FileObject this_doc_file = obj.getPrimaryFile();
-
             if (this_doc_file == null) {
-
                 return;
             }
-
-            final int[] selected_rows = getSelection();
-
+            final int[] selected_rows = get_selection();
             if (selected_rows.length == 1) {
-
                 FileObject folder = this_doc_file.getParent();
-
                 String dto_class_name = (String) table.getValueAt(selected_rows[0], 0);
-
                 XmlEditorUtil.goto_dto_class_declaration_async(folder, dto_class_name);
             }
-
         } catch (Exception ex) {
             // ex.printStackTrace();
-            //
             NbpIdeMessageHelpers.show_error_in_ui_thread(ex);
         }
     }
 
-    private int[] getSelection() throws Exception {
-
+    private int[] get_selection() throws Exception {
         int rc = table.getModel().getRowCount();
-
         if (rc == 1) {
             return new int[]{0};
         }
-
         int[] selectedRows = table.getSelectedRows();
-
         if (selectedRows.length == 0) {
-
             throw new InternalException("Selection is empty.");
         }
-
         return selectedRows;
     }
 
-    private void openSQL() {
-
+    private void open_sql() {
         try {
-            
-            int[] selectedRows = getSelection();
-
+            int[] selectedRows = get_selection();
             String ref = (String) table.getValueAt(selectedRows[0], 1);
-
             if (SqlUtils.is_sql_file_ref(ref) == false) {
-                
                 return;
             }
-
             Settings settings = NbpHelpers.load_settings(obj);
-
             String relPath = settings.getFolders().getSql() + "/" + ref;
-
             NbpIdeEditorHelpers.open_project_file_in_editor_async(obj, relPath);
-
         } catch (Exception ex) {
             // ex.printStackTrace();
             NbpIdeMessageHelpers.show_error_in_ui_thread(ex);
         }
     }
 
-    private void openDtoXML() {
+    private void open_dto_xml() {
         NbpIdeEditorHelpers.open_metaprogram_file_async(obj, Const.DTO_XML);
     }
 
-    protected void openGeneratedSourceFile() {
+    protected void open_generated_source_file() {
         try {
-
-            int[] selectedRows = getSelection();
-
+            int[] selectedRows = get_selection();
             Settings settings = NbpHelpers.load_settings(obj);
-
             String value = (String) table.getValueAt(selectedRows[0], 0);
-
             NbpTargetLanguageHelpers.open_in_editor(obj, value, settings, settings.getDto().getScope());
-
         } catch (Exception e) {
             // e.printStackTrace();
             NbpIdeMessageHelpers.show_error_in_ui_thread(e);
@@ -894,23 +735,23 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
-        reloadTable(true);
+        reload_table(true);
     }//GEN-LAST:event_jButton6ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        openDtoXML();
+        open_dto_xml();
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
-        deselectAll();
+        deselect_all();
     }//GEN-LAST:event_jButton7ActionPerformed
 
     private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
-        selectAll();
+        select_all();
     }//GEN-LAST:event_jButton8ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        openGeneratedSourceFile();
+        open_generated_source_file();
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton9ActionPerformed
@@ -918,11 +759,11 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
     }//GEN-LAST:event_jButton9ActionPerformed
 
     private void jButton10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton10ActionPerformed
-        validateAll2();
+        validate_all2();
     }//GEN-LAST:event_jButton10ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        openSQL();
+        open_sql();
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed

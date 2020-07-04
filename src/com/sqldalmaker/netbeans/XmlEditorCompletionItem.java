@@ -42,25 +42,19 @@ public class XmlEditorCompletionItem implements CompletionItem {
     private final int end_offset;
 
     XmlEditorCompletionItem(String text, int start_offset, int end_offset) {
-        
         this.text = text;
-        
         this.start_offset = start_offset;
-        
         this.end_offset = end_offset;
     }
 
     @Override
     public void defaultAction(JTextComponent jtc) {
-
         try {
-
             Document doc = jtc.getDocument();
             doc.remove(start_offset, end_offset - start_offset);
             doc.insertString(start_offset, text, null);
             //This statement will close the code completion box: 
             Completion.get().hideAll();
-
         } catch (BadLocationException ex) {
             // ex.printStackTrace();
         }
@@ -72,49 +66,41 @@ public class XmlEditorCompletionItem implements CompletionItem {
 
     @Override
     public int getPreferredWidth(Graphics graphics, Font font) {
-
         return CompletionUtilities.getPreferredWidth(text, null, graphics, font);
     }
 
     @Override
     public void render(Graphics g, Font defaultFont, Color defaultColor, Color backgroundColor, int width, int height, boolean selected) {
-
         CompletionUtilities.renderHtml(/*fieldIcon*/null, text, null, g, defaultFont, (selected ? Color.white : FIELD_COLOR), width, height, selected);
     }
 
     @Override
     public CompletionTask createDocumentationTask() {
-
         return null;
     }
 
     @Override
     public CompletionTask createToolTipTask() {
-
         return null;
     }
 
     @Override
     public boolean instantSubstitution(JTextComponent jtc) {
-
         return false;
     }
 
     @Override
     public int getSortPriority() {
-
         return 0;
     }
 
     @Override
     public CharSequence getSortText() {
-        
         return text;
     }
 
     @Override
     public CharSequence getInsertPrefix() {
-
         return text;
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 sqldalmaker@gmail.com
+ * Copyright 2011-2020 sqldalmaker@gmail.com
  * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
  * Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -22,29 +22,20 @@ public class EclipseMessageHelpers {
 	public static void show_error(Throwable e) {
 
 		Shell active_shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-
 		MessageBox box = new MessageBox(active_shell, SWT.ICON_ERROR);
-
 		box.setText("Error");
-
 		String msg = "";
-
 		if ((e instanceof InternalException) == false) {
-
 			msg += e.getClass().getName() + ":\n";
 		}
-
 		msg += e.getMessage();
-
 		box.setMessage(msg);
-
 		box.open();
 	}
 
 	public static void show_info(String msg) {
 
 		Shell active_shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-
 		MessageBox box = new MessageBox(active_shell, SWT.ICON_INFORMATION);
 		box.setText("Info");
 		box.setMessage(msg);
@@ -54,12 +45,10 @@ public class EclipseMessageHelpers {
 	public static boolean show_confirmation(String msg) {
 
 		Shell active_shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-
 		MessageBox box = new MessageBox(active_shell, SWT.ICON_QUESTION | SWT.YES | SWT.NO);
 		box.setText("");
 		box.setMessage(msg);
 		int res = box.open();
-
 		return res == SWT.YES;
 	}
 }

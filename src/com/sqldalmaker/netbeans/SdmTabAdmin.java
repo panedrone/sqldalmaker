@@ -40,36 +40,23 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
     private final JToolBar toolBar = new JToolBar();
 
     public SdmTabAdmin(Lookup lookup) {
-
         super(lookup);
         initComponents();
-
         ModuleInfo m = Modules.getDefault().ownerOf(this.getClass());
-
         String v = m.getSpecificationVersion().toString();
-
         String jv = System.getProperty("java.version");
-
         jTextField1.setText("v. " + v + " on Java " + jv);
-
         jTextField1.setBorder(javax.swing.BorderFactory.createEmptyBorder());
-
         ////////////////////////////////////////
         jTextPane1.setEditable(false);
         jTextPane1.setContentType("text/html");
-
         try {
-
             String text = NbpHelpers.read_from_jar_file("", "ABOUT.html");
-
             jTextPane1.setText(text);
-
         } catch (Exception ex) {
-            ex.printStackTrace();
+            // ex.printStackTrace();
         }
-
         jTextPane1.addHyperlinkListener(new HyperlinkListener() {
-
             @Override
             public void hyperlinkUpdate(HyperlinkEvent hle) {
                 if (HyperlinkEvent.EventType.ACTIVATED.equals(hle.getEventType())) {
@@ -79,19 +66,17 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
                             Desktop desktop = Desktop.getDesktop();
                             desktop.browse(hle.getURL().toURI());
                         } catch (Throwable ex) {
-                            ex.printStackTrace();
+                            // ex.printStackTrace();
                         }
                     }
                 }
             }
         });
-
         ///////////////////////////////////////////////////////////////////
         //
         // https://stackoverflow.com/questions/291115/java-swing-using-jscrollpane-and-having-it-scroll-back-to-top
         //
         jScrollPane1.getVerticalScrollBar().setValue(0);
-
         ///////////////////////////////////////////////////////////////////
         //
         // https://stackoverflow.com/questions/5583495/how-do-i-speed-up-the-scroll-speed-in-a-jscrollpane-when-using-the-mouse-wheel

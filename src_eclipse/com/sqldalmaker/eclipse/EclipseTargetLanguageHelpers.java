@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 sqldalmaker@gmail.com
+ * Copyright 2011-2020 sqldalmaker@gmail.com
  * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
  * Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -40,12 +40,9 @@ public class EclipseTargetLanguageHelpers {
 	public static boolean underscores_needed(IEditor2 editor2) {
 
 		String root_fn = editor2.get_root_file_name();
-
 		if (RootFileName.RUBY.equals(root_fn) || RootFileName.PYTHON.equals(root_fn)) {
-
 			return true;
 		}
-
 		return false;
 	}
 
@@ -80,7 +77,6 @@ public class EclipseTargetLanguageHelpers {
 	}
 
 	private static String get_unknown_root_file_msg(String fn) {
-
 		return "Unknown root file: " + fn;
 	}
 
@@ -253,109 +249,69 @@ public class EclipseTargetLanguageHelpers {
 			String java_package, String root_fn) throws Exception {
 
 		if (RootFileName.JAVA.equals(root_fn)) {
-
 			String path = SdmUtils.get_package_relative_path(settings, java_package) + "/" + class_name + ".java";
-
 			return project.getFile(path);
 
 		} else if (RootFileName.PHP.equals(root_fn)) {
-
 			String path = settings.getFolders().getTarget() + "/" + class_name + ".php";
-
 			return project.getFile(path);
-
 		} else if (RootFileName.CPP.equals(root_fn)) {
-
 			String path = settings.getFolders().getTarget() + "/" + class_name + ".h";
-
 			return project.getFile(path);
-
 		} else if (RootFileName.PYTHON.equals(root_fn)) {
-
 			String path = settings.getFolders().getTarget() + "/" + class_name + ".py";
-
 			return project.getFile(path);
-
 		} else if (RootFileName.RUBY.equals(root_fn)) {
-
 			String path = settings.getFolders().getTarget() + "/" + Helpers.convert_to_ruby_file_name(class_name);
-
 			return project.getFile(path);
 		}
-
 		throw new Exception(get_unknown_root_file_msg(root_fn));
 	}
 
 	public static IResource find_root_file(IContainer meta_program_location) throws Exception {
 
 		IResource res = meta_program_location.findMember(RootFileName.PHP);
-
 		if (res instanceof IFile) {
-
 			return res;
 		}
-
 		res = meta_program_location.findMember(RootFileName.JAVA);
-
 		if (res instanceof IFile) {
-
 			return res;
 		}
-
 		res = meta_program_location.findMember(RootFileName.CPP);
-
 		if (res instanceof IFile) {
-
 			return res;
 		}
-
 		res = meta_program_location.findMember(RootFileName.PYTHON);
-
 		if (res instanceof IFile) {
-
 			return res;
 		}
-
 		res = meta_program_location.findMember(RootFileName.RUBY);
-
 		if (res instanceof IFile) {
-
 			return res;
 		}
-
 		throw new Exception("Root file not found");
 	}
 
 	public static String get_rel_path(IEditor2 editor2, StringBuilder output_dir, String class_name) {
 
 		String fn = editor2.get_root_file_name();
-
 		return get_rel_path(fn, output_dir, class_name);
 	}
 
 	public static String get_rel_path(String fn, StringBuilder output_dir, String class_name) {
 
 		if (RootFileName.RUBY.equals(fn)) {
-
 			return output_dir + "/" + Helpers.convert_to_ruby_file_name(class_name);
-
 		} else if (RootFileName.PYTHON.equals(fn)) {
-
 			return output_dir + "/" + class_name + ".py";
-
 		} else if (RootFileName.PHP.equals(fn)) {
-
 			return output_dir + "/" + class_name + ".php";
-
 		} else if (RootFileName.JAVA.equals(fn)) {
-
 			return output_dir + "/" + class_name + ".java";
-
 		} else if (RootFileName.CPP.equals(fn)) {
-
 			return output_dir + "/" + class_name + ".h";
 		}
-
 		return null;
 	}
 
@@ -367,20 +323,14 @@ public class EclipseTargetLanguageHelpers {
 	public static String get_root_file_relative_path(final IFile file) {
 
 		String fn = file.getName();
-
 		if (RootFileName.JAVA.equals(fn) || RootFileName.CPP.equals(fn) || // ProfileNames.OBJC.equals(fn) ||
 				RootFileName.PHP.equals(fn) || RootFileName.PYTHON.equals(fn) || RootFileName.RUBY.equals(fn)) {
-
 			try {
-
 				return file.getFullPath().toPortableString();
-
 			} catch (Exception e) {
-
 				e.printStackTrace();
 			}
 		}
-
 		return null;
 	}
 }

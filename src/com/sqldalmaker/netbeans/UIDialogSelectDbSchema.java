@@ -95,52 +95,42 @@ public final class UIDialogSelectDbSchema extends JDialog {
 
 // call onCancel() on ESCAPE
         jPanel1.registerKeyboardAction(new ActionListener() {
-
             @Override
             public void actionPerformed(ActionEvent e) {
-
                 onCancel();
             }
 
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
         if (dto || fk) {
-
             this.radio_crud.setVisible(false);
             this.radio_crud_auto.setVisible(false);
-
             chk_add_fk_access.setVisible(false);
         }
 
         if (fk) {
-
             chk_omit_used.setVisible(false);
             chk_including_views.setVisible(false);
         }
 
         jTable1.setModel(new AbstractTableModel() { // before refresh_schemas();
-
             @Override
             public Object getValueAt(int rowIndex, int columnIndex) {
-
                 return schemas.get(rowIndex);
             }
 
             @Override
             public int getColumnCount() {
-
                 return 1;
             }
 
             @Override
             public String getColumnName(int column) {
-
                 return "Schema";
             }
 
             @Override
             public int getRowCount() {
-
                 return schemas.size();
             }
         });
@@ -159,23 +149,15 @@ public final class UIDialogSelectDbSchema extends JDialog {
 //        });
 //
         jTable1.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-
             // https://stackoverflow.com/questions/375265/jtable-selection-change-event-handling-find-the-source-table-dynamically
-            //
             @Override
             public void valueChanged(ListSelectionEvent lse) {
-
                 on_selection_changed();
-
-//                if (!lse.getValueIsAdjusting()) {
-//                    System.out.println("Selection Changed");
-//                }
             }
         });
     }
 
     public static void open(SdmDataObject obj, ISelectDbSchemaCallback callback, boolean dto, boolean fk) throws Exception {
-
         UIDialogSelectDbSchema dlg = new UIDialogSelectDbSchema(obj, callback, dto, fk);
         dlg.setPreferredSize(new Dimension(520, 480));
         dlg.pack(); // after setPreferredSize
@@ -184,135 +166,85 @@ public final class UIDialogSelectDbSchema extends JDialog {
     }
 
     private int[] getSelection() {
-
         int rc = jTable1.getModel().getRowCount();
-
         if (rc == 1) {
-
             return new int[]{0};
         }
-
         int[] selected_rows = jTable1.getSelectedRows();
-
         return selected_rows;
     }
 
     private void onOK() {
-
         callback.process_ok(chk_schema_in_xml.isSelected(), selected_schema,
                 chk_omit_used.isSelected(), chk_including_views.isSelected(), chk_singular.isSelected(),
                 radio_crud_auto.isSelected(), chk_add_fk_access.isSelected());
-
         dispose();
     }
 
     private void onCancel() {
-
         dispose();
     }
 
     private void refresh_schemas() {
-
         try {
-
             schemas.clear();
-
             Connection con = NbpHelpers.get_connection(obj);
-
             try {
-
                 DatabaseMetaData db_info = con.getMetaData();
-
                 ResultSet rs;
-
                 rs = db_info.getSchemas();
-
                 try {
-
                     while (rs.next()) {
-
                         schemas.add(rs.getString("TABLE_SCHEM"));
                     }
-
                 } finally {
-
                     rs.close();
                 }
-
             } finally {
-
                 con.close();
             }
 
             if (schemas.size() == 0) {
-
                 lbl_hint.setText("This database doesn't have schemas. Just provide options.");
                 radio_selected_schema.setText("Without schema");
-
             } else {
-
                 lbl_hint.setText("Select schema or click 'DB user name as schema'. Provide options.");
                 radio_selected_schema.setText("Use selected schema");
                 chk_schema_in_xml.setSelected(true);
             }
-
             on_selection_changed();
-
         } catch (Exception e) {
-
             NbpIdeMessageHelpers.show_error_in_ui_thread(e);
         }
     }
 
     private void on_selection_changed() {
-
         boolean enabled = false;
-
         if (radio_user_as_schema.isSelected()) {
-
             enabled = true;
-
             chk_schema_in_xml.setEnabled(true);
-
             String user = settings.getJdbc().getUser();
-
             selected_schema = user;
-
         } else if (radio_selected_schema.isSelected()) {
-
             if (jTable1.getRowCount() == 0) {
-
                 chk_schema_in_xml.setSelected(false);
                 chk_schema_in_xml.setEnabled(false);
-
                 enabled = true;
-
                 selected_schema = null;
-
             } else {
-
                 chk_schema_in_xml.setEnabled(true);
-
                 if (jTable1.getRowCount() == 1) {
-
                     enabled = true;
-
                     selected_schema = null;
-
                 } else {
-
                     int[] indexes = getSelection();
-
                     enabled = indexes.length == 1;
-
                     if (enabled) {
-
                         selected_schema = (String) jTable1.getModel().getValueAt(indexes[0], 0);
                     }
                 }
             }
         }
-
         button_ok.setEnabled(enabled);
     }
 

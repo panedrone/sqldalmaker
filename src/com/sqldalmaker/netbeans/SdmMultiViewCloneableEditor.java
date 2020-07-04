@@ -140,13 +140,10 @@ public class SdmMultiViewCloneableEditor extends CloneableEditor implements Mult
 
     @Override
     public void updateName() {
-
         if (obj == null) { // updateName() is called by base constructor when obj is null
-
             // super.updateName();
             return; // it will be assigned in this.componentShowing()
         }
-
         // this is copy-paste from CloneableEditor.updateName()
         // custom values are assigned instead of defaults:
         Mutex.EVENT.writeAccess(
@@ -174,7 +171,6 @@ public class SdmMultiViewCloneableEditor extends CloneableEditor implements Mult
                     }
                 }
         );
-
         updateDisplayText();
     }
 

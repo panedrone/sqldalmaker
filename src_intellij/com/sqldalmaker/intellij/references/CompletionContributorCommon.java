@@ -15,7 +15,7 @@ import com.sqldalmaker.common.Const;
 /**
  * implementation is based on com.intellij.codeInsight.completion.XmlCompletionContributor
  * and https://confluence.jetbrains.com/display/IntelliJIDEA/Completion+Contributor
- *
+ * <p>
  * Created with IntelliJ IDEA.
  * User: sqldalmaker@gmail.com
  */

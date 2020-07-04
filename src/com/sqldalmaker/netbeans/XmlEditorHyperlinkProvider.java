@@ -28,7 +28,6 @@ import org.openide.loaders.DataObject;
  */
 @MimeRegistration(mimeType = "text/xml", service = HyperlinkProviderExt.class)
 public class XmlEditorHyperlinkProvider implements HyperlinkProviderExt {
-
     // Google: netbeans platform xml navigation api
     // basic link for NetBeans IDE version version 6.1 or version 6.0
     // https://platform.netbeans.org/tutorials/60/nbm-hyperlink.html
@@ -50,18 +49,14 @@ public class XmlEditorHyperlinkProvider implements HyperlinkProviderExt {
     // 
     private int start_offset;
     private int end_offset;
-
     private String attribute_value;
     private String attribute_name;
 
     private boolean update_state(Document doc, int offset) {
-
         start_offset = 0;
         end_offset = 0;
-
         attribute_value = "";
         attribute_name = "";
-
         //////////////////////////////////////////////////////
         // Google: swing document get file name java -JFileChooser
         // -->
@@ -69,61 +64,36 @@ public class XmlEditorHyperlinkProvider implements HyperlinkProviderExt {
         // http://www.programcreek.com/java-api-examples/index.php?api=javax.swing.text.Document
         //
         DataObject data_object = NbEditorUtilities.getDataObject(doc);
-
         if (data_object == null) {
-
             return false;
         }
-
         FileObject this_file_object = data_object.getPrimaryFile();
-
         if (this_file_object == null) {
-
             return false;
         }
-
         String doc_name = this_file_object.getNameExt();
-
         if (!FileSearchHelpers.is_dto_xml(doc_name) && !FileSearchHelpers.is_dao_xml(doc_name)) {
-
             return false;
         }
-
         XmlEditorUtil checker = new XmlEditorUtil();
-
         attribute_name = checker.verify_state(doc, offset);
-
         if (XmlEditorUtil.ATTRIBUTE.REF.equals(attribute_name)) {
-
             String ref_value = checker.get_attribute_value();
-
             if (ref_value.endsWith(".sql")) {
-
                 start_offset = checker.get_start_offset() + 1;
-
                 end_offset = checker.get_end_offset() + 1;
-
                 attribute_value = ref_value;
-
                 return true;
             }
-
         } else if (XmlEditorUtil.ATTRIBUTE.DTO.equals(attribute_name)) {
-
             if (FileSearchHelpers.is_dao_xml(doc_name)) {
-
                 start_offset = checker.get_start_offset() + 1;
-
                 end_offset = checker.get_end_offset() + 1;
-
                 attribute_value = checker.get_attribute_value();
-
                 return true;
             }
         }
-
         attribute_name = "";
-
         return false;
     }
 
@@ -134,94 +104,60 @@ public class XmlEditorHyperlinkProvider implements HyperlinkProviderExt {
 
     @Override
     public boolean isHyperlinkPoint(Document doc, int offset, HyperlinkType type) {
-
         boolean is_link = update_state(doc, offset);
-
         // === panedrone: if it returns false, performClickAction is never called
-        //
         return is_link;
     }
 
     @Override
     public int[] getHyperlinkSpan(Document doc, int offset, HyperlinkType type) {
-
         if (update_state(doc, offset)) {
-
             return new int[]{start_offset, end_offset};
-
         } else {
-
             return null;
         }
     }
 
     @Override
     public void performClickAction(Document doc, int offset, HyperlinkType type) {
-
         // === panedrone: update it anyway. attributes 'ref' and 'table' are processed 
-        //
         if (!update_state(doc, offset)) {
-
             return;
         }
-
         if (attribute_name == null || attribute_name.length() == 0) {
-
             return;
         }
-
         if (attribute_value == null || attribute_value.length() == 0) {
-
             return;
         }
-
         DataObject data_object = NbEditorUtilities.getDataObject(doc);
-
         if (data_object == null) {
-
             return;
         }
-
         FileObject this_doc_file = data_object.getPrimaryFile();
-
         if (this_doc_file == null) {
-
             return;
         }
-
         if (XmlEditorUtil.ATTRIBUTE.REF.equals(attribute_name)) {
-
             if (!attribute_value.endsWith(".sql")) {
-
                 return;
             }
-
             try {
-
                 Settings settings = NbpHelpers.load_settings(this_doc_file);
-
                 String rel_path = settings.getFolders().getSql() + "/" + attribute_value;
-
                 NbpIdeEditorHelpers.open_project_file_in_editor_async(this_doc_file, rel_path);
-
             } catch (Exception ex) {
-
                 // ex.printStackTrace();
-                //
                 NbpIdeMessageHelpers.show_error_in_ui_thread(ex);
             }
-
         } else if (XmlEditorUtil.ATTRIBUTE.DTO.equals(attribute_name)) {
-
             FileObject folder = this_doc_file.getParent();
-
             XmlEditorUtil.goto_dto_class_declaration_async(folder, attribute_value);
         }
     }
 
     @Override
     public String getTooltipText(Document doc, int offset, HyperlinkType type) {
-
         return "Go to...";
     }
 }

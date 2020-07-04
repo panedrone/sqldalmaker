@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 sqldalmaker@gmail.com
+ * Copyright 2011-2020 sqldalmaker@gmail.com
  * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
  * Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -31,109 +31,67 @@ public class CompletionProviderDtoClass extends CompletionProvider<CompletionPar
 
     @Override
     protected void addCompletions(@NotNull CompletionParameters completionParameters,
-                                  ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
+                                  @NotNull ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
 
         final XmlAttributeValue attribute_value = PsiTreeUtil.getParentOfType(completionParameters.getPosition(), XmlAttributeValue.class, false);
-
         if (attribute_value == null) {
             // we are injected, only getContext() returns attribute value
             return;
         }
-
         PsiElement attr_element = attribute_value.getParent();
-
         if (!(attr_element instanceof XmlAttribute)) {
-
             return;
         }
-
         final PsiFile containing_file = attr_element.getContainingFile();
-
         if (containing_file == null) {
-
             return;
         }
-
         VirtualFile this_xml_file = IdeaReferenceCompletion.find_virtual_file(containing_file);
-
         if (this_xml_file == null) {
-
             return;
         }
-
         VirtualFile xml_file_dir = this_xml_file.getParent();
-
         if (xml_file_dir == null) {
-
             return;
         }
-
         // the same folder as root-file
         //
         VirtualFile dto_xml_file = xml_file_dir.findFileByRelativePath(Const.DTO_XML);
-
         if (dto_xml_file == null) {
-
             return;
         }
-
         Project project = containing_file.getProject();
 //        if (project == null) {
 //            return null; // ---- it is @NotNull
 //        }
-
         PsiElement res = PsiManager.getInstance(project).findFile(dto_xml_file);// @Nullable
-
         if (!(res instanceof XmlFile)) {
-
             return;
         }
-
         XmlFile xml_file = (XmlFile) res;
-
         XmlTag root;
-
         try {
-
             root = xml_file.getRootTag();
-
         } catch (Throwable th) {
-
             return;
         }
-
         if (root == null) {
-
             return;
         }
-
         PsiElement[] tags;
-
         try {
-
             tags = root.getChildren(); // notnull;
-
         } catch (Throwable th) {
-
             return;
         }
-
         for (PsiElement el : tags) {
-
             if (el instanceof XmlTag) {
-
                 XmlTag t = (XmlTag) el;
-
                 if (IdeaReferenceCompletion.ELEMENT.DTO_CLASS.equals(t.getName())) {
-
                     XmlAttribute a = t.getAttribute(IdeaReferenceCompletion.ATTRIBUTE.NAME);
-
                     if (a != null) {
-
                         String v = a.getValue();
-
                         if (v != null && !v.isEmpty()) {
-
                             completionResultSet.addElement(LookupElementBuilder.create(v));
                         }
                     }

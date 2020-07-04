@@ -74,19 +74,13 @@ public final class SdmTabDAO extends SdmMultiViewCloneableEditor {
         initComponents();
 
         Cursor wc = new Cursor(Cursor.HAND_CURSOR);
-
         for (Component c : jToolBar1.getComponents()) {
-
             if (c instanceof JButton) {
-             
                 JButton b = (JButton) c;
-
                 b.setCursor(wc);
-
                 b.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 4, 0, 4));
             }
         }
-        
         jTextField1.getDocument().addDocumentListener(new DocumentListener() {
             private void updateFilter() {
                 setFilter();
@@ -109,34 +103,26 @@ public final class SdmTabDAO extends SdmMultiViewCloneableEditor {
         });
 
         createUIComponents();
-
         reloadTable(true);
     }
 
     private void setFilter() {
         try {
-
             RowFilter<AbstractTableModel, Object> rf = RowFilter.regexFilter(jTextField1.getText(), 0);
             sorter.setRowFilter(rf);
-
         } catch (PatternSyntaxException e) {
-
             sorter.setRowFilter(null); // don't filter
         }
     }
 
     private void createUIComponents() {
-
         final ColorRenderer colorRenderer = new ColorRenderer();
-
         table = new JTable() {
-
             @Override
             public TableCellRenderer getCellRenderer(int row, int column) {
                 if (column == 1) {
                     return colorRenderer;
                 }
-
                 return super.getCellRenderer(row, column);
             }
         };
@@ -180,32 +166,22 @@ public final class SdmTabDAO extends SdmMultiViewCloneableEditor {
     }
 
     private int[] getSelection() throws Exception {
-
         int rc = table.getModel().getRowCount();
-
         if (rc == 1) {
             return new int[]{0};
         }
-
         int[] selectedRows = table.getSelectedRows();
-
         if (selectedRows.length == 0) {
-
             throw new InternalException("Selection is empty.");
         }
-
         return selectedRows;
     }
 
     private void openXML() {
         try {
-
             int[] selectedRows = getSelection();
-
             String ref = (String) table.getValueAt(selectedRows[0], 0);
-
             NbpIdeEditorHelpers.open_metaprogram_file_async(obj, ref);
-
         } catch (Throwable ex) {
             // ex.printStackTrace();
             NbpIdeMessageHelpers.show_error_in_ui_thread(ex);
@@ -213,19 +189,12 @@ public final class SdmTabDAO extends SdmMultiViewCloneableEditor {
     }
 
     private void openGeneratedSourceFile() {
-        
         try {
-
             int[] selectedRows = getSelection();
-
             Settings settings = NbpHelpers.load_settings(obj);
-
             String v = (String) table.getValueAt(selectedRows[0], 0);
-
             String value = Helpers.get_dao_class_name(v);
-
             NbpTargetLanguageHelpers.open_in_editor(obj, value, settings, settings.getDao().getScope());
-
         } catch (Exception e) {
             // e.printStackTrace();
             NbpIdeMessageHelpers.show_error_in_ui_thread(e);
@@ -247,30 +216,20 @@ public final class SdmTabDAO extends SdmMultiViewCloneableEditor {
         public Component getTableCellRendererComponent(JTable table,
                 Object value, boolean isSelected, boolean hasFocus, int row,
                 int column) {
-
             Component c = super.getTableCellRendererComponent(table, value,
                     isSelected, hasFocus, row, column);
-
             String sValue = (String) value;
-
             setText(sValue);
-
             // it seems like 'c' is always the same, 
             // so c.setForeground must be called in any case
             if (isSelected || STATUS_OK.equals(sValue) || STATUS_GENERATED.equals(sValue)) {
-
                 TableCellRenderer r = table.getCellRenderer(row, column);
-
                 Component c_0 = r.getTableCellRendererComponent(table, value,
                         isSelected, hasFocus, row, 0);
-
                 c.setForeground(c_0.getForeground());
-
             } else {
-
                 c.setForeground(Color.RED);
             }
-
             return c;
         }
     }
@@ -315,14 +274,10 @@ public final class SdmTabDAO extends SdmMultiViewCloneableEditor {
     }
 
     private void reloadTable() {
-
         try {
-
             final ArrayList<String[]> list = tableModel.getList();
             list.clear();
-
             FileSearchHelpers.IFile_List fileList = new FileSearchHelpers.IFile_List() {
-
                 @Override
                 public void add(String fileName) {
 
@@ -336,27 +291,18 @@ public final class SdmTabDAO extends SdmMultiViewCloneableEditor {
                     list.add(item);
                 }
             };
-
             FileObject folder = obj.getPrimaryFile().getParent();
-
             String xml_configs_folder_full_path = folder.getPath();
-
             FileSearchHelpers.enum_dao_xml_file_names(xml_configs_folder_full_path, fileList);
-
         } finally {
-
             tableModel.refresh(); // table.updateUI();
         }
     }
 
     public void reloadTable(boolean showErrorMsg) {
-
         try {
-
             reloadTable();
-
         } catch (Throwable e) {
-
             if (showErrorMsg) {
                 // e.printStackTrace();
                 NbpIdeMessageHelpers.show_error_in_ui_thread(e);
@@ -371,29 +317,21 @@ public final class SdmTabDAO extends SdmMultiViewCloneableEditor {
 
     private void generate2() {
         try {
-
             generate();
-
         } catch (Throwable e) {
-
             // e.printStackTrace();
             NbpIdeMessageHelpers.show_error_in_ui_thread(e);
         }
     }
 
     private void generate() throws Exception {
-
         final Settings settings = NbpHelpers.load_settings(obj);
-
         final int[] selectedRows = getSelection();
-
         for (int row : selectedRows) {
             tableModel.setValueAt("", row, 1);
         }
-
         // myTableModel.refresh(); cleares selection
         table.updateUI();
-
         // 1. open connection
         // 2. create the list of generated java
         // 3. close connection
@@ -402,214 +340,41 @@ public final class SdmTabDAO extends SdmMultiViewCloneableEditor {
         RequestProcessor RP = new RequestProcessor("Generate DAO classes RP");
         // final ProgressHandle ph = ProgressHandle.createHandle("Generate DAO class(es)");
         RequestProcessor.Task task = RP.create(new Runnable() {
-
             @Override
             public void run() {
-
                 // ph.start();
                 if (selectedRows.length == 0) {
                     return;
                 }
-
-                NbpIdeConsoleUtil err_log = new NbpIdeConsoleUtil(settings, obj);
-
+                NbpIdeConsoleUtil ide_log = new NbpIdeConsoleUtil(settings, obj);
                 try {
-
                     // ph.progress("Connecting...");
                     Connection con = NbpHelpers.get_connection(obj); // !!! inside try/finally to ensure ph.finish()!!!
-
                     // ph.progress("Connected");
                     try {
-
                         final StringBuilder output_dir = new StringBuilder();
-
                         IDaoCG gen = NbpTargetLanguageHelpers.create_dao_cg(con, obj, settings, output_dir);
-
                         String metaprogram_abs_path = NbpPathHelpers.get_metaprogram_abs_path(obj);
-
                         String output_dir_rel_path = output_dir.toString();
-
                         String context_path = DaoClass.class.getPackage().getName();
-
                         XmlParser xml_parser = new XmlParser(context_path, Helpers.concat_path(metaprogram_abs_path, Const.DAO_XSD));
-
                         for (int row : selectedRows) {
-
                             String dao_xml_rel_path = (String) table.getValueAt(row, 0);
-
                             try {
-
                                 // ph.progress(daoXmlRelPath);
                                 String dao_class_name = Helpers.get_dao_class_name(dao_xml_rel_path);
-
                                 String dao_xml_abs_path = Helpers.concat_path(metaprogram_abs_path, dao_xml_rel_path);
-
                                 DaoClass dao_class = xml_parser.unmarshal(dao_xml_abs_path);
-
                                 String[] file_content = gen.translate(dao_class_name, dao_class);
-
-                                String file_name = NbpTargetLanguageHelpers.get_dao_xml_file_name(obj, dao_class_name);
-
+                                String file_name = NbpTargetLanguageHelpers.get_target_file_name(obj, dao_class_name);
                                 NbpHelpers.save_text_to_file(obj, output_dir_rel_path, file_name, file_content[0]);
-
+                                ide_log.add_success_message(dao_xml_rel_path + " -> " + STATUS_GENERATED);
                                 tableModel.setValueAt(STATUS_GENERATED, row, 1);
-
                                 try {
                                     Thread.sleep(50);
                                 } catch (InterruptedException e) {
-                                    e.printStackTrace();
+                                    // e.printStackTrace();
                                 }
-
-                                // myTableModel.refresh(); cleares selection
-                                // table.updateUI();       throws NullPointerException without SwingUtilities.invokeLater 
-                                SwingUtilities.invokeLater(new Runnable() {
-                                    public void run() {
-                                        table.updateUI();
-                                    }
-                                });
-
-                            } catch (Throwable ex) {
-
-                                String msg = ex.getMessage();
-
-                                if (msg == null) {
-                                    msg = "???";
-                                }
-
-                                tableModel.setValueAt(msg, row, 1);
-
-                                // throw ex; // outer 'catch' cannot read the
-                                // message
-                                // !!!! not Internal_Exception to show Exception
-                                // class
-                                // throw new Exception(ex);
-                                // ex.printStackTrace();
-                                // MyNbHelpers.showErrorInUIThread(ex);
-                                // return;
-                                err_log.add_error_message(dao_xml_rel_path, msg);
-                            }
-
-                            // monitor.worked(1);
-                            // monitor.worked(1);
-                        }
-
-                    } finally {
-
-                        con.close();
-
-                        // Exception can occur at 3rd line (for example):
-                        // refresh first 3 lines
-                        // error lines are not generated but update them too
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                table.updateUI();
-                            }
-                        });
-                    }
-
-                } catch (Throwable ex) {
-
-                    err_log.add_error_message(ex);
-
-                    // ex.printStackTrace();
-                    NbpIdeMessageHelpers.show_error_in_ui_thread(ex);
-
-                } finally {
-
-                    // ph.finish();
-                }
-            }
-        });
-
-        ///////////////////////////////////////////
-        if (selectedRows.length > 0) {
-
-            task.schedule(0);
-        }
-    }
-
-    private void validateAll2() {
-
-        try {
-
-            validateAll();
-
-        } catch (Throwable e) {
-
-            // e.printStackTrace();
-            NbpIdeMessageHelpers.show_error_in_ui_thread(e);
-        }
-    }
-
-    private void validateAll() throws Exception {
-
-        final Settings settings = NbpHelpers.load_settings(obj);
-
-        reloadTable();
-
-        // 1. open connection
-        // 2. create the list of generated java
-        // 3. close connection
-        // 4. update the files from the list
-        // http://stackoverflow.com/questions/22326822/netbeans-platform-progress-bar
-        RequestProcessor RP = new RequestProcessor("Validate DAO classes RP");
-        // final ProgressHandle ph = ProgressHandle.createHandle("Validate DAO classes");
-        RequestProcessor.Task task = RP.create(new Runnable() {
-            @Override
-            public void run() {
-
-                // ph.start();
-                NbpIdeConsoleUtil err_log = new NbpIdeConsoleUtil(settings, obj);
-
-                try {
-
-                    // ph.progress("Connecting...");
-                    Connection con = NbpHelpers.get_connection(obj); // !!! inside try/finally to ensure ph.finish()!!!
-
-                    // ph.progress("Connected");
-                    try {
-
-                        final StringBuilder output_dir = new StringBuilder();
-                        IDaoCG gen = NbpTargetLanguageHelpers.create_dao_cg(con, obj, settings, output_dir);
-
-                        String metaprogram_abs_path = NbpPathHelpers.get_metaprogram_abs_path(obj);
-
-                        String contextPath = DaoClass.class.getPackage().getName();
-                        XmlParser xml_Parser = new XmlParser(contextPath, Helpers.concat_path(metaprogram_abs_path, Const.DAO_XSD));
-
-                        for (int i = 0; i < tableModel.getRowCount(); i++) {
-
-                            String daoXmlRelPath = (String) table.getValueAt(i, 0);
-
-                            try {
-                                // ph.progress(daoXmlRelPath);
-                                String daoClassName = Helpers.get_dao_class_name(daoXmlRelPath);
-
-                                String daoXmlAbsPath = Helpers.concat_path(metaprogram_abs_path, daoXmlRelPath);
-                                DaoClass daoClass = xml_Parser.unmarshal(daoXmlAbsPath);
-
-                                String[] fileContent = gen.translate(daoClassName, daoClass);
-
-                                StringBuilder validationBuff = new StringBuilder();
-
-                                NbpTargetLanguageHelpers.validate_dao(obj, settings, daoClassName, fileContent,
-                                        validationBuff);
-
-                                String status = validationBuff.toString();
-
-                                if (status.length() == 0) {
-                                    tableModel.setValueAt(STATUS_OK, i, 1);
-                                } else {
-                                    tableModel.setValueAt(status, i, 1);
-                                    err_log.add_error_message(daoXmlRelPath, status);
-                                }
-
-                                try {
-                                    Thread.sleep(50);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-
                                 // myTableModel.refresh(); cleares selection
                                 // table.updateUI();       throws NullPointerException without SwingUtilities.invokeLater 
                                 SwingUtilities.invokeLater(new Runnable() {
@@ -618,36 +383,27 @@ public final class SdmTabDAO extends SdmMultiViewCloneableEditor {
                                         table.updateUI();
                                     }
                                 });
-
                             } catch (Throwable ex) {
-
                                 String msg = ex.getMessage();
-
                                 if (msg == null) {
                                     msg = "???";
                                 }
-
-                                tableModel.setValueAt(msg, i, 1);
-
+                                tableModel.setValueAt(msg, row, 1);
                                 // throw ex; // outer 'catch' cannot read the
                                 // message
                                 // !!!! not Internal_Exception to show Exception
                                 // class
                                 // throw new Exception(ex);
                                 // ex.printStackTrace();
-                                //NetbeansHelpers.showErrorInUIThread(ex);
+                                // MyNbHelpers.showErrorInUIThread(ex);
                                 // return;
-                                err_log.add_error_message(daoXmlRelPath, msg);
+                                ide_log.add_error_message("[" + ex.getMessage() + "] " + dao_xml_rel_path + " -> " + msg);
                             }
-
                             // monitor.worked(1);
                             // monitor.worked(1);
                         }
-
                     } finally {
-
                         con.close();
-
                         // Exception can occur at 3rd line (for example):
                         // refresh first 3 lines
                         // error lines are not generated but update them too
@@ -658,22 +414,127 @@ public final class SdmTabDAO extends SdmMultiViewCloneableEditor {
                             }
                         });
                     }
-
                 } catch (Throwable ex) {
-
-                    err_log.add_error_message(ex);
-
+                    ide_log.add_error_message(ex);
                     // ex.printStackTrace();
                     NbpIdeMessageHelpers.show_error_in_ui_thread(ex);
-
                 } finally {
-
                     // ph.finish();
                 }
             }
+        });
+        ///////////////////////////////////////////
+        if (selectedRows.length > 0) {
+            task.schedule(0);
         }
-        );
+    }
 
+    private void validateAll2() {
+        try {
+            validateAll();
+        } catch (Throwable e) {
+            // e.printStackTrace();
+            NbpIdeMessageHelpers.show_error_in_ui_thread(e);
+        }
+    }
+
+    private void validateAll() throws Exception {
+        final Settings settings = NbpHelpers.load_settings(obj);
+        reloadTable();
+        // 1. open connection
+        // 2. create the list of generated java
+        // 3. close connection
+        // 4. update the files from the list
+        // http://stackoverflow.com/questions/22326822/netbeans-platform-progress-bar
+        RequestProcessor RP = new RequestProcessor("Validate DAO classes RP");
+        // final ProgressHandle ph = ProgressHandle.createHandle("Validate DAO classes");
+        RequestProcessor.Task task = RP.create(new Runnable() {
+            @Override
+            public void run() {
+                // ph.start();
+                NbpIdeConsoleUtil ide_log = new NbpIdeConsoleUtil(settings, obj);
+                try {
+                    // ph.progress("Connecting...");
+                    Connection con = NbpHelpers.get_connection(obj); // !!! inside try/finally to ensure ph.finish()!!!
+                    // ph.progress("Connected");
+                    try {
+                        final StringBuilder output_dir = new StringBuilder();
+                        IDaoCG gen = NbpTargetLanguageHelpers.create_dao_cg(con, obj, settings, output_dir);
+                        String metaprogram_abs_path = NbpPathHelpers.get_metaprogram_abs_path(obj);
+                        String contextPath = DaoClass.class.getPackage().getName();
+                        XmlParser xml_Parser = new XmlParser(contextPath, Helpers.concat_path(metaprogram_abs_path, Const.DAO_XSD));
+                        for (int i = 0; i < tableModel.getRowCount(); i++) {
+                            String dao_xml_rel_path = (String) table.getValueAt(i, 0);
+                            try {
+                                // ph.progress(daoXmlRelPath);
+                                String daoClassName = Helpers.get_dao_class_name(dao_xml_rel_path);
+                                String daoXmlAbsPath = Helpers.concat_path(metaprogram_abs_path, dao_xml_rel_path);
+                                DaoClass daoClass = xml_Parser.unmarshal(daoXmlAbsPath);
+                                String[] fileContent = gen.translate(daoClassName, daoClass);
+                                StringBuilder validationBuff = new StringBuilder();
+                                NbpTargetLanguageHelpers.validate_dao(obj, settings, daoClassName, fileContent,
+                                        validationBuff);
+                                String status = validationBuff.toString();
+                                if (status.length() == 0) {
+                                    tableModel.setValueAt(STATUS_OK, i, 1);
+                                    ide_log.add_success_message(dao_xml_rel_path + " -> " + STATUS_OK);
+                                } else {
+                                    tableModel.setValueAt(status, i, 1);
+                                    ide_log.add_error_message(dao_xml_rel_path + " -> " + status);
+                                }
+                                try {
+                                    Thread.sleep(50);
+                                } catch (InterruptedException e) {
+                                    // e.printStackTrace();
+                                }
+                                // myTableModel.refresh(); cleares selection
+                                // table.updateUI();       throws NullPointerException without SwingUtilities.invokeLater 
+                                SwingUtilities.invokeLater(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        table.updateUI();
+                                    }
+                                });
+                            } catch (Throwable ex) {
+                                String msg = ex.getMessage();
+                                if (msg == null) {
+                                    msg = "???";
+                                }
+                                tableModel.setValueAt(msg, i, 1);
+                                // throw ex; // outer 'catch' cannot read the
+                                // message
+                                // !!!! not Internal_Exception to show Exception
+                                // class
+                                // throw new Exception(ex);
+                                // ex.printStackTrace();
+                                //NetbeansHelpers.showErrorInUIThread(ex);
+                                // return;
+                                ide_log.add_error_message("[" + ex.getMessage() + "] " + dao_xml_rel_path + " -> " + msg);
+                            }
+                            // monitor.worked(1);
+                            // monitor.worked(1);
+                        }
+                    } finally {
+                        con.close();
+                        // Exception can occur at 3rd line (for example):
+                        // refresh first 3 lines
+                        // error lines are not generated but update them too
+                        SwingUtilities.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                table.updateUI();
+                            }
+                        });
+                    }
+                } catch (Throwable ex) {
+                    ide_log.add_error_message(ex);
+                    // ex.printStackTrace();
+                    NbpIdeMessageHelpers.show_error_in_ui_thread(ex);
+                } finally {
+                    // ph.finish();
+                }
+            }
+        });
         ////////////////////////////////////////////////////
         task.schedule(0);
     }
