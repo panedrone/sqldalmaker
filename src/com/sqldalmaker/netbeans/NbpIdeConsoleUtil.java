@@ -8,7 +8,6 @@ package com.sqldalmaker.netbeans;
 
 import com.sqldalmaker.jaxb.settings.Ide;
 import com.sqldalmaker.jaxb.settings.Settings;
-import java.io.IOException;
 import org.netbeans.api.io.IOProvider;
 import org.netbeans.api.io.InputOutput;
 import org.netbeans.api.io.OutputColor;
@@ -47,7 +46,7 @@ public class NbpIdeConsoleUtil {
             display_name = info.getDisplayName() + " (" + NbpPathHelpers.get_path_relative_to_root_folder(obj) + ")";
         } catch (Exception ex) {
             Exceptions.printStackTrace(ex);
-            display_name = "sqldalmaker";
+            display_name = "SDM";
         }
         // https://bits.netbeans.org/dev/javadoc/org-netbeans-api-io/org/netbeans/api/io/OutputColor.html
         // returns (org.netbeans.core.output2.NbIOProvider) org.netbeans.core.output2.NbIOProvider
@@ -64,7 +63,24 @@ public class NbpIdeConsoleUtil {
         // the tab doesn't appear if it was closed by user.
         // 
         io = prov.getIO(display_name, false); // === ^^ false adds new tab everytime!!!
-        io.reset(); // clears all messages
+        // === panedrone: https://netbeans.org/download/5_5/org-openide-io/index.html?org/openide/windows/OutputWriter.html
+        // Clear the output pane. Expect this method to be deprecated in a future release and an equivalent created in InputOutput. 
+        // It is ambiguous what it means to reset stdout but not stderr, etc. For the current implementation, reset should be called on the stdout. 
+        // ... but it is missing in org.netbeans.api.io
+        // io.getErr().reset(); 
+        
+        // === panedrone: they print then reset to clear:
+        // http://bits.netbeans.org/dev/javadoc/org-netbeans-api-io/architecture-summary.html
+//        io.getOut().print("...");
+//        io.getErr().println("...");
+        io.reset(); // === panedrone:  clear all messages not working on linux + NB11
+
+//        io.getOut().flush();
+//        io.getOut().close();
+//        io.getErr().flush();
+//        io.getErr().close();
+
+        io.show();
         
         // 
         // https://netbeans.org/download/5_5/javadoc/org-openide-io/org/openide/windows/InputOutput.html

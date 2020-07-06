@@ -37,16 +37,22 @@ public class NbpCG {
         if (xml_mp_dir == null) {
             return;
         }
+        final String xml_metaprogram_abs_path = xml_mp_dir.getPath();
+        final Settings settings;
+        try {
+            settings = SdmUtils.load_settings(xml_mp_dir.getPath());
+        } catch (Exception ex) {
+            Exceptions.printStackTrace(ex);
+            return;
+        }
+        final NbpIdeConsoleUtil err_log = new NbpIdeConsoleUtil(settings, root_data_object);
         RequestProcessor RP = new RequestProcessor("Generate DTO classes RP");
         // final ProgressHandle ph = ProgressHandle.createHandle("Generate DTO class(es)");
         RequestProcessor.Task task = RP.create(new Runnable() {
             @Override
             public void run() {
                 try {
-                    Settings settings = SdmUtils.load_settings(xml_mp_dir.getPath());
-                    NbpIdeConsoleUtil err_log = new NbpIdeConsoleUtil(settings, root_data_object);
                     StringBuilder output_dir = new StringBuilder();
-                    String xml_metaprogram_abs_path = xml_mp_dir.getPath();
                     Connection conn = NbpHelpers.get_connection(root_data_object);
                     try {
                         IDtoCG gen = NbpTargetLanguageHelpers.create_dto_cg(conn, root_data_object, settings, output_dir);

@@ -65,6 +65,7 @@ public class UITabAdmin {
     private JButton btn_mysql;
     private JButton dataStorePhpPDOSQLButton;
     private JButton btn_php_oracle;
+    private JButton button_pyodbc_oracle;
 
     private Project project;
     private VirtualFile propFile;
@@ -363,6 +364,12 @@ public class UITabAdmin {
                 IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "DataStore_PDO_Oracle.php", "DataStore_PDO_Oracle.php");
             }
         });
+        button_pyodbc_oracle.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "DataStore_pyodbc_Oracle.py", "DataStore_pyodbc_Oracle.py");
+            }
+        });
     }
 
     private void testConnection() {
@@ -447,7 +454,7 @@ public class UITabAdmin {
         createOverwriteDtoXmlButton.setText("Create/Overwrite dto.xml");
         panel3.add(createOverwriteDtoXmlButton, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         final JPanel panel4 = new JPanel();
-        panel4.setLayout(new GridLayoutManager(6, 4, new Insets(10, 0, 0, 0), 1, -1));
+        panel4.setLayout(new GridLayoutManager(6, 5, new Insets(10, 0, 0, 0), 1, -1));
         panel1.add(panel4, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_NORTHWEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         dataStorePyMySQLButton = new JButton();
         dataStorePyMySQLButton.setText("DataStore.py (MySQL)");
@@ -467,9 +474,6 @@ public class UITabAdmin {
         dataStoreCSTLButton = new JButton();
         dataStoreCSTLButton.setText("DataStore, C++ (STL, , SQLite3)");
         panel4.add(dataStoreCSTLButton, new GridConstraints(3, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        dataStoreJavaAndroidButton = new JButton();
-        dataStoreJavaAndroidButton.setText("DataStoreManager.java (Android)");
-        panel4.add(dataStoreJavaAndroidButton, new GridConstraints(2, 3, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         dataStoreJavaButton = new JButton();
         dataStoreJavaButton.setText("DataStore.java");
         panel4.add(dataStoreJavaButton, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
@@ -485,24 +489,30 @@ public class UITabAdmin {
         dataStoreJavaSpringButton = new JButton();
         dataStoreJavaSpringButton.setText("DataStoreManager.java (Spring JDBC)");
         panel4.add(dataStoreJavaSpringButton, new GridConstraints(2, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        datastore_pyodbc = new JButton();
-        datastore_pyodbc.setText("DataStore.py (pyodbc)");
-        panel4.add(datastore_pyodbc, new GridConstraints(4, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         dataStorePsycopg2Button = new JButton();
         dataStorePsycopg2Button.setText("DataStore (psycopg2)");
-        panel4.add(dataStorePsycopg2Button, new GridConstraints(4, 3, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panel4.add(dataStorePsycopg2Button, new GridConstraints(4, 4, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         btn_mysql = new JButton();
         btn_mysql.setText("DataStore.php (PDO, MySQL)");
         panel4.add(btn_mysql, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        dataStorePhpPDOSQLButton = new JButton();
-        dataStorePhpPDOSQLButton.setText("DataStore.php (PDO, SQL Server)");
-        panel4.add(dataStorePhpPDOSQLButton, new GridConstraints(1, 3, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         btn_php_pg = new JButton();
         btn_php_pg.setText("DataStore.php (PDO, PostgeSQL)");
         panel4.add(btn_php_pg, new GridConstraints(1, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         btn_php_oracle = new JButton();
         btn_php_oracle.setText("DataStore.php (PDO, Oracle)");
         panel4.add(btn_php_oracle, new GridConstraints(1, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        dataStorePhpPDOSQLButton = new JButton();
+        dataStorePhpPDOSQLButton.setText("DataStore.php (PDO, SQL Server)");
+        panel4.add(dataStorePhpPDOSQLButton, new GridConstraints(1, 3, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        dataStoreJavaAndroidButton = new JButton();
+        dataStoreJavaAndroidButton.setText("DataStoreManager.java (Android)");
+        panel4.add(dataStoreJavaAndroidButton, new GridConstraints(2, 3, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        button_pyodbc_oracle = new JButton();
+        button_pyodbc_oracle.setText("DataStore.py (pyodbc, Oracle)");
+        panel4.add(button_pyodbc_oracle, new GridConstraints(4, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        datastore_pyodbc = new JButton();
+        datastore_pyodbc.setText("DataStore.py (pyodbc, SQL Server)");
+        panel4.add(datastore_pyodbc, new GridConstraints(4, 3, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JPanel panel5 = new JPanel();
         panel5.setLayout(new GridLayoutManager(1, 5, new Insets(10, 0, 0, 0), 1, -1));
         panel1.add(panel5, new GridConstraints(3, 0, 1, 1, GridConstraints.ANCHOR_NORTHWEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
@@ -529,7 +539,7 @@ public class UITabAdmin {
         text1.setEditable(false);
         text1.setMargin(new Insets(0, 15, 15, 5));
         text1.setText("");
-        panel6.add(text1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_NORTHWEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_WANT_GROW, new Dimension(920, -1), new Dimension(150, 50), null, 0, false));
+        panel6.add(text1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_NORTHWEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_WANT_GROW, new Dimension(1040, -1), new Dimension(1040, 50), null, 0, false));
         final Spacer spacer1 = new Spacer();
         panel1.add(spacer1, new GridConstraints(5, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
     }
