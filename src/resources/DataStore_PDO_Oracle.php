@@ -1,11 +1,27 @@
 <?php
 
-// include_once 'DataStore.php'; // uncomment if you need inheritance
-// 
-// 
-// In PDO + Oracle Database, PDO::PARAM_INPUT_OUTPUT is OK for both OUT and INOUT
-//
-class InOutParam {
+/*
+  SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
+  Contact: sqldalmaker@gmail.com
+
+  This is an example of how to implement DataStore in PHP + PDO + ORACLE.
+  Copy-paste this code to your project and change it for your needs.
+
+  Known issues:
+
+  - Obtaining generated Keys after INSERT
+  - UDF returning SYS_REFCURSOR
+  - SYS_REFCURSOR-s as OUT params
+  - Implicit SYS_REFCURSOR-s
+
+ */
+
+// include_once 'DataStore.php';
+
+/**
+ * The class to work with both OUT and INOUT parameters
+ */
+class OutParam {
 
     public $type;
     public $value;
@@ -17,21 +33,12 @@ class InOutParam {
 
 }
 
-/*
-  SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
-  Contact: sqldalmaker@gmail.com
-
-  This is an example of how to implement DataStore in PHP + PDO + Oracle Database.
-  Copy-paste this code to your project and change it for your needs.
- */
-
 // class PDODataStore implements DataStore 
 class DataStore { // no inheritance is also OK
 
     private $db;
 
     function __destruct() {
-        // close connections when the object is destroyed
         $this->db = null;
     }
 
@@ -62,7 +69,6 @@ class DataStore { // no inheritance is also OK
         if (is_null($this->db)) {
             throw new Exception("Already closed");
         }
-        /*         * * close the database connection ** */
         $this->db = null;
     }
 
@@ -112,16 +118,12 @@ class DataStore { // no inheritance is also OK
 
     private function bind_params($stmt, &$params, &$out_params) {
         for ($i = 0; $i < count($params); $i++) {
-            if ($params[$i] instanceof InOutParam) {
-                //
+            if ($params[$i] instanceof OutParam) {
                 // $stmt->bindParam($i + 1, $params[$i]->value, $params[$i]->type | PDO::PARAM_INPUT_OUTPUT);
                 // => OCIStmtFetch: ORA-24374: define not done before fetch or execute and fetch
-                // 
                 // $stmt->bindParam($i + 1, $params[$i]->value, $params[$i]->type);
                 // => OCIStmtFetch: ORA-24374: define not done before fetch or execute and fetch
-                // 
-                // this one is OK for both OUT and INOUT:
-                //
+                // This one is OK for both OUT and INOUT:
                 $stmt->bindParam($i + 1, $params[$i]->value, $params[$i]->type | PDO::PARAM_INPUT_OUTPUT, 256);
                 array_push($out_params, $params[$i]);
             } else {
@@ -129,29 +131,6 @@ class DataStore { // no inheritance is also OK
             }
         }
     }
-
-    // private function fetch_out_params($stmt, &$params) {
-    //
-    // No bindColumn, no fetch:
-    // 
-    // Example #3 Call a stored procedure with an INOUT parameter
-    // https://www.php.net/manual/en/pdostatement.bindparam.php
-    // 
-    //        $fetch_bound = false;
-    //        for ($i = 0; $i < count($params); $i++) {
-    //            if ($params[$i] instanceof InOutParam) {
-    //                $stmt->bindColumn($i + 1, $params[$i]->value, $params[$i]->type);
-    //                $fetch_bound = true;
-    //            }
-    //        }
-    //        
-    // $stmt->fetch(PDO::FETCH_BOUND) is required for SQL Server, but it throws Exception with Oracle.
-    // 
-    //        if ($fetch_bound) {
-    //            // https://stackoverflow.com/questions/13382922/calling-stored-procedure-with-out-parameter-using-pdo
-    //            $stmt->fetch(PDO::FETCH_BOUND);
-    //        }
-    // }
 
     public function execDML($sql, array $params) {
         $sp_name = $this->get_sp_name($sql);
@@ -161,6 +140,7 @@ class DataStore { // no inheritance is also OK
                 $out_params = array();
                 $this->bind_params($stmt, $params, $out_params);
                 $res = $stmt->execute();
+                // PG logic bindColumn --> fetch(PDO::FETCH_BOUND) didn't work with ORACLE:
                 //$this->fetch_out_params($stmt, $out_params);
                 return $res;
             } finally {

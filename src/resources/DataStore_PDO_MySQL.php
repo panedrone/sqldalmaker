@@ -1,6 +1,15 @@
 <?php
 
-// include_once 'DataStore.php'; // uncomment if you need inheritance
+/*
+  SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
+  Contact: sqldalmaker@gmail.com
+
+  This is an example of how to implement DataStore in PHP + PDO + MySQL.
+  Copy-paste this code to your project and change it for your needs.
+
+ */
+
+// include_once 'DataStore.php';
 
 class OutParam {
 
@@ -18,21 +27,12 @@ class InOutParam {
 
 }
 
-/*
-  SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
-  Contact: sqldalmaker@gmail.com
-
-  This is an example of how to implement DataStore in PHP + PDO + MySQL.
-  Copy-paste this code to your project and change it for your needs.
- */
-
 // class PDODataStore implements DataStore
 class DataStore { // no inheritance is also OK
 
     private $db;
 
     function __destruct() {
-        // close connections when the object is destroyed
         $this->db = null;
     }
 
@@ -61,7 +61,6 @@ class DataStore { // no inheritance is also OK
         if (is_null($this->db)) {
             throw new Exception("Already closed");
         }
-        /*         * * close the database connection ** */
         $this->db = null;
     }
 

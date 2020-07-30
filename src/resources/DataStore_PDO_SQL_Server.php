@@ -1,10 +1,23 @@
 <?php
 
-// include_once 'DataStore.php'; // uncomment if you need inheritance
-// If you declare a parameter as OUTPUT, it acts as Both Input and OUTPUT.
-// https://stackoverflow.com/questions/49129536/how-to-declare-input-output-parameters-in-sql-server-stored-procedure-function
-//
-class InOutParam {
+/*
+  SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
+  Contact: sqldalmaker@gmail.com
+
+  This is an example of how to implement DataStore in PHP + PDO + SQL Server.
+  Copy-paste this code to your project and change it for your needs.
+
+ */
+
+// include_once 'DataStore.php';
+
+/**
+ * The class to work with both OUT and INOUT parameters
+ */
+class OutParam {
+
+    // If you declare a parameter as OUTPUT, it acts as Both Input and OUTPUT.
+    // https://stackoverflow.com/questions/49129536/how-to-declare-input-output-parameters-in-sql-server-stored-procedure-function
 
     public $type;
     public $value;
@@ -16,21 +29,12 @@ class InOutParam {
 
 }
 
-/*
-  SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
-  Contact: sqldalmaker@gmail.com
-
-  This is an example of how to implement DataStore in PHP + PDO + SQL Server.
-  Copy-paste this code to your project and change it for your needs.
- */
-
 // class PDODataStore implements DataStore 
 class DataStore { // no inheritance is also OK
 
     private $db;
 
     function __destruct() {
-        // close connections when the object is destroyed
         $this->db = null;
     }
 
@@ -38,23 +42,9 @@ class DataStore { // no inheritance is also OK
         if (!is_null($this->db)) {
             throw new Exception("Already open");
         }
-        // SQL Server
-        //
         $serverName = "(local)\sqlexpress";
         $this->db = new PDO("sqlsrv:server=$serverName ; Database=AdventureWorks2014", "sa", "root");
-        // http://stackoverflow.com/questions/15058129/php-pdo-inserting-data
-        // By default, PDO does not throw exceptions. To make it throw exceptions on error, call
         $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        // $this->db->setAttribute(PDO::ATTR_PERSISTENT , true);
-//        // Oracle
-//        //
-//        $conn_username = "ORDERS";
-//        $conn_password = "sa";
-//        $opt = [
-//            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-//            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-//        ];
-//        $this->db = new PDO("oci:dbname=//localhost:1521/orcl", $conn_username, $conn_password, $opt);
     }
 
     public function beginTransaction() {
@@ -73,7 +63,6 @@ class DataStore { // no inheritance is also OK
         if (is_null($this->db)) {
             throw new Exception("Already closed");
         }
-        /*         * * close the database connection ** */
         $this->db = null;
     }
 
@@ -123,24 +112,17 @@ class DataStore { // no inheritance is also OK
 
     private function bind_call_params($stmt, &$params, &$out_params) {
         for ($i = 0; $i < count($params); $i++) {
-            if ($params[$i] instanceof InOutParam) {
-                //
+            if ($params[$i] instanceof OutParam) {
                 // Errors wile using ODBC syntax:
-                // 
                 // Uncaught PDOException: SQLSTATE[IMSSP]: Invalid direction specified for parameter 1. Input/output parameters must have a length
                 // $stmt->bindParam($i + 1, $params[$i]->value, $params[$i]->type | PDO::PARAM_INPUT_OUTPUT);
-                // 
                 // Uncaught PDOException: SQLSTATE[42000]: [Microsoft][ODBC Driver 11 for SQL Server][SQL Server]Incorrect syntax near 'OUTPUT'
                 // $stmt->bindParam($i + 1, $params[$i]->value, $params[$i]->type | PDO::PARAM_INPUT_OUTPUT, 256);
-                // 
                 // This one is OK wile using ODBC syntax:
-                // 
                 // $stmt->bindParam($i + 1, $params[$i]->value, $params[$i]->type);
-                // 
                 // This one is OK wile using something like {CALL [dbo].[sp_test_inout_params](?)}:
-                //
                 $stmt->bindParam($i + 1, $params[$i]->value, $params[$i]->type | PDO::PARAM_INPUT_OUTPUT, 256);
-                // ^^ seems like allocating memery requires using $Param1 = new InOutParam(PDO::PARAM_STR, "10");
+                // ^^ seems like allocating memery requires using $Param1 = new OutParam(PDO::PARAM_STR, "10");
                 // ^^ PDO::PARAM_INPUT_OUTPUT is mandatory.
                 array_push($out_params, $params[$i]);
             } else {
@@ -149,12 +131,12 @@ class DataStore { // no inheritance is also OK
         }
     }
 
-    // It works while using ODBC syntax:
-    // 
+// It works while using ODBC syntax:
+// 
 //    private function fetch_out_params($stmt, &$params) {
 //        $fetch_bound = false;
 //        for ($i = 0; $i < count($params); $i++) {
-//            if ($params[$i] instanceof InOutParam) {
+//            if ($params[$i] instanceof OutParam) {
 //                $stmt->bindColumn($i + 1, $params[$i]->value, $params[$i]->type);
 //                $fetch_bound = true;
 //            }

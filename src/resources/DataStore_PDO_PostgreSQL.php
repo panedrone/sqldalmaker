@@ -1,13 +1,25 @@
 <?php
 
-// include_once 'DataStore.php'; // uncomment if you need inheritance
-// pgAdmin4:
-//  
-// ERROR: procedures cannot have OUT arguments
-// HINT: INOUT arguments are permitted.
-//
-class InOutParam {
+/*
+  SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
+  Contact: sqldalmaker@gmail.com
 
+  This is an example of how to implement DataStore in PHP + PDO + PostgreSQL.
+  Copy-paste this code to your project and change it for your needs.
+
+ */
+
+// include_once 'DataStore.php';
+
+/**
+ * The class to work with both OUT and INOUT parameters
+ */
+class OutParam {
+
+    // pgAdmin4:  
+    // ERROR: procedures cannot have OUT arguments
+    // HINT: INOUT arguments are permitted.
+    //
     public $type;
     public $value;
 
@@ -18,21 +30,12 @@ class InOutParam {
 
 }
 
-/*
-  SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
-  Contact: sqldalmaker@gmail.com
-
-  This is an example of how to implement DataStore in PHP + PDO + PostgreSQL.
-  Copy-paste this code to your project and change it for your needs.
- */
-
 // class PDODataStore implements DataStore 
 class DataStore { // no inheritance is also OK
 
     private $db;
 
     function __destruct() {
-        // close connections when the object is destroyed
         $this->db = null;
     }
 
@@ -46,7 +49,7 @@ class DataStore { // no inheritance is also OK
                 'test',
                 'postgres',
                 'sa');
-        $this->db = new \PDO($conStr);
+        $this->db = new PDO($conStr);
         // http://stackoverflow.com/questions/15058129/php-pdo-inserting-data
         // By default, PDO does not throw exceptions. To make it throw exceptions on error, call
         $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -69,7 +72,6 @@ class DataStore { // no inheritance is also OK
         if (is_null($this->db)) {
             throw new Exception("Already closed");
         }
-        /* close the database connection (?) */
         $this->db = null;
     }
 
@@ -116,7 +118,7 @@ class DataStore { // no inheritance is also OK
 
     private function bind_params($stmt, &$params, &$out_params) {
         for ($i = 0; $i < count($params); $i++) {
-            if ($params[$i] instanceof InOutParam) {
+            if ($params[$i] instanceof OutParam) {
                 $stmt->bindParam($i + 1, $params[$i]->value, $params[$i]->type | PDO::PARAM_INPUT_OUTPUT);
                 array_push($out_params, $params[$i]);
             } else {
@@ -128,7 +130,7 @@ class DataStore { // no inheritance is also OK
     private function fetch_out_params($stmt, &$params) {
         $fetch_bound = false;
         for ($i = 0; $i < count($params); $i++) {
-            if ($params[$i] instanceof InOutParam) {
+            if ($params[$i] instanceof OutParam) {
                 $stmt->bindColumn($i + 1, $params[$i]->value, $params[$i]->type);
                 $fetch_bound = true;
             }
@@ -207,6 +209,7 @@ class DataStore { // no inheritance is also OK
                 while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                     $callback($row);
                 }
+                // TODO: PDOStatement::nextRowset() ?
             }
             return $res;
         } finally {

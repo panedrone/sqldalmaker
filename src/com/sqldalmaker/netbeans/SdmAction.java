@@ -44,7 +44,7 @@ import org.openide.util.actions.Presenter;
  *
  */
 @ActionID(
-        category = "File",
+        category = "Tools",
         id = "com.sqldalmaker.netbeans.SdmAction"
 )
 @ActionRegistration(
@@ -53,7 +53,7 @@ import org.openide.util.actions.Presenter;
         displayName = "#CTL_SdmAction" // works for toolbar, not for button
 //         displayName = "NOT-USED"
 )
-@ActionReference(path = "Toolbars/File", position = 1000)
+@ActionReference(path = "Toolbars/Database", position = 1000)
 @Messages("CTL_SdmAction=SDM")
 public final class SdmAction extends AbstractAction implements Presenter.Toolbar {
 
