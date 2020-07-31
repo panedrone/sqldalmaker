@@ -7,9 +7,8 @@
   This is an example of how to implement DataStore in PHP + PDO + ORACLE.
   Copy-paste this code to your project and change it for your needs.
 
-  Known issues:
+  Known Issues:
 
-  - Obtaining generated Keys after INSERT
   - UDF returning SYS_REFCURSOR
   - SYS_REFCURSOR-s as OUT params
   - Implicit SYS_REFCURSOR-s
@@ -66,31 +65,42 @@ class DataStore { // no inheritance is also OK
     }
 
     public function close() {
-        if (is_null($this->db)) {
-            throw new Exception("Already closed");
-        }
         $this->db = null;
     }
 
     public function insert($sql, array $params, array &$ai_values) {
-        $stmt = $this->db->prepare($sql);
-        try {
-            // http://stackoverflow.com/questions/10699543/pdo-prepared-statement-in-php-using-associative-arrays-yields-wrong-results
-            // use the optional parameter of execute instead of explicitly binding the parameters:
-            $res = $stmt->execute($params);
-            // http://www.php.net/manual/en/pdo.lastinsertid.php
-            // Returns the ID of the last inserted row, or the last value from a sequence object,
-            // depending on the underlying driver. For example, PDO_PGSQL requires you to specify the name
-            // of a sequence object for the name parameter.
-            // This method may not return a meaningful or consistent result across different PDO drivers,
-            // because the underlying database may not even support the notion of auto-increment fields or sequences.
-            foreach ($ai_values as $key) {
-                $id = $this->db->lastInsertId($key);
-                $ai_values[$key] = $id;
+        if (count($ai_values) > 0) {
+            if (count($ai_values) > 1) {
+                throw new Exception("Multiple generated keys are not supported");
             }
-            return $res;
-        } finally {
-            $stmt->closeCursor();
+            $gen_key = array_keys($ai_values)[0];
+            $sql = $sql . ' RETURN ' . $gen_key . ' INTO ?';
+            $stmt = $this->db->prepare($sql);
+            try {
+                $i = 1;
+                for (; $i <= count($params); $i++) {
+                    $stmt->bindParam($i, $params[$i - 1]);
+                }
+                // PDO::PARAM_INT does not work
+                $id = ''; // initializing with integer instead of '' kills process
+                $stmt->bindParam($i, $id, PDO::PARAM_STR | PDO::PARAM_INPUT_OUTPUT, 256);
+                // ^^ specifying the length (256) means OUT parameter
+                $res = $stmt->execute();
+                if ($res) {
+                    $ai_values[$gen_key] = $id;
+                }
+                return $res;
+            } finally {
+                $stmt->closeCursor();
+            }
+        } else {
+            $stmt = $this->db->prepare($sql);
+            try {
+                $res = $stmt->execute($params);
+                return $res;
+            } finally {
+                $stmt->closeCursor();
+            }
         }
     }
 
@@ -125,6 +135,7 @@ class DataStore { // no inheritance is also OK
                 // => OCIStmtFetch: ORA-24374: define not done before fetch or execute and fetch
                 // This one is OK for both OUT and INOUT:
                 $stmt->bindParam($i + 1, $params[$i]->value, $params[$i]->type | PDO::PARAM_INPUT_OUTPUT, 256);
+                // ^^ specifying the length (256) means OUT parameter
                 array_push($out_params, $params[$i]);
             } else {
                 $stmt->bindParam($i + 1, $params[$i]);
