@@ -5,4 +5,6 @@ To generate the class, you declare it in XML meta-program.
 
 Implemented as plug-ins for Eclipse IDE, IntelliJ Platform, and NetBeans.
 
+![SQL DAL Maker](sqldalmaker-NB.png)
+
 All the details are here: [sqldalmaker.sourceforge.net](sqldalmaker.sourceforge.net)
