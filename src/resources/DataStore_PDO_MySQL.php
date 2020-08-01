@@ -4,26 +4,24 @@
   SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
   Contact: sqldalmaker@gmail.com
 
-  This is an example of how to implement DataStore in PHP + PDO + SQL Server.
+  This is an example of how to implement DataStore in PHP + PDO + MySQL.
   Copy-paste this code to your project and change it for your needs.
 
  */
 
 // include_once 'DataStore.php';
 
-/**
- * The class to work with both OUT and INOUT parameters
- */
 class OutParam {
 
-    // If you declare a parameter as OUTPUT, it acts as Both Input and OUTPUT.
-    // https://stackoverflow.com/questions/49129536/how-to-declare-input-output-parameters-in-sql-server-stored-procedure-function
-
-    public $type;
     public $value;
 
-    function __construct($type, $value = null) {
-        $this->type = $type;
+}
+
+class InOutParam {
+
+    public $value;
+
+    function __construct($value) {
         $this->value = $value;
     }
 
@@ -42,9 +40,9 @@ class DataStore { // no inheritance is also OK
         if (!is_null($this->db)) {
             throw new Exception("Already open");
         }
-        $serverName = "(local)\sqlexpress";
-        $this->db = new PDO("sqlsrv:server=$serverName ; Database=AdventureWorks2014", "sa", "root");
+        $this->db = new PDO('mysql:host=localhost;dbname=sakila', 'root', 'root');
         $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        // $this->db->setAttribute(PDO::ATTR_PERSISTENT , true);
     }
 
     public function beginTransaction() {
@@ -60,22 +58,32 @@ class DataStore { // no inheritance is also OK
     }
 
     public function close() {
+        if (is_null($this->db)) {
+            throw new Exception("Already closed");
+        }
         $this->db = null;
     }
 
     public function insert($sql, array $params, array &$ai_values) {
         $stmt = $this->db->prepare($sql);
-        $res = $stmt->execute($params);
-        if (count($ai_values) > 0) {
-            if (count($ai_values) > 1) {
-                throw new Exception("Multiple AI PK are not allowed");
+        try {
+            // http://stackoverflow.com/questions/10699543/pdo-prepared-statement-in-php-using-associative-arrays-yields-wrong-results
+            // use the optional parameter of execute instead of explicitly binding the parameters:
+            $res = $stmt->execute($params);
+            // http://www.php.net/manual/en/pdo.lastinsertid.php
+            // Returns the ID of the last inserted row, or the last value from a sequence object,
+            // depending on the underlying driver. For example, PDO_PGSQL requires you to specify the name
+            // of a sequence object for the name parameter.
+            // This method may not return a meaningful or consistent result across different PDO drivers,
+            // because the underlying database may not even support the notion of auto-increment fields or sequences.
+            foreach (array_keys($ai_values) as $key) {
+                $id = $this->db->lastInsertId($key);
+                $ai_values[$key] = $id;
             }
-            $key = array_keys($ai_values)[0];
-            // lastInsertId($key) returns '(string)'
-            $id = $this->db->lastInsertId(null);
-            $ai_values[$key] = $id;
+            return $res;
+        } finally {
+            $stmt->closeCursor();
         }
-        return $res;
     }
 
     private function get_sp_name($sql_src) {
@@ -100,61 +108,62 @@ class DataStore { // no inheritance is also OK
         return null;
     }
 
-    private function bind_call_params($stmt, &$params, &$out_params) {
-        for ($i = 0; $i < count($params); $i++) {
-            if ($params[$i] instanceof OutParam) {
-                // Errors wile using ODBC syntax:
-                // Uncaught PDOException: SQLSTATE[IMSSP]: Invalid direction specified for parameter 1. Input/output parameters must have a length
-                // $stmt->bindParam($i + 1, $params[$i]->value, $params[$i]->type | PDO::PARAM_INPUT_OUTPUT);
-                // Uncaught PDOException: SQLSTATE[42000]: [Microsoft][ODBC Driver 11 for SQL Server][SQL Server]Incorrect syntax near 'OUTPUT'
-                // $stmt->bindParam($i + 1, $params[$i]->value, $params[$i]->type | PDO::PARAM_INPUT_OUTPUT, 256);
-                // This one is OK wile using ODBC syntax:
-                // $stmt->bindParam($i + 1, $params[$i]->value, $params[$i]->type);
-                // This one is OK wile using something like {CALL [dbo].[sp_test_inout_params](?)}:
-                $stmt->bindParam($i + 1, $params[$i]->value, $params[$i]->type | PDO::PARAM_INPUT_OUTPUT, 256);
-                // ^^ seems like allocating memery requires using $Param1 = new OutParam(PDO::PARAM_STR, "10");
-                // ^^ PDO::PARAM_INPUT_OUTPUT is mandatory.
-                array_push($out_params, $params[$i]);
-            } else {
-                $stmt->bindParam($i + 1, $params[$i]);
+    private function fetch_out_params($call_params) {
+        foreach ($call_params as $key => $value) {
+            if (strpos($key, '@') === 0) {
+                $row = $this->db->query("select $key")->fetch(PDO::FETCH_ASSOC);
+                if ($row) {
+                    $value->value = $row !== false ? $row[$key] : null;
+                }
             }
         }
     }
 
-// It works while using ODBC syntax:
-//
-//    private function fetch_out_params($stmt, &$params) {
-//        $fetch_bound = false;
-//        for ($i = 0; $i < count($params); $i++) {
-//            if ($params[$i] instanceof OutParam) {
-//                $stmt->bindColumn($i + 1, $params[$i]->value, $params[$i]->type);
-//                $fetch_bound = true;
-//            }
-//        }
-//        if ($fetch_bound) {
-//            // https://stackoverflow.com/questions/13382922/calling-stored-procedure-with-out-parameter-using-pdo
-//            $stmt->fetch(PDO::FETCH_BOUND);
-//        }
-//    }
+    private function get_call_info($sp_name, $params, &$in_params, &$call_params) {
+        for ($i = 0; $i < count($params); $i++) {
+            if ($params[$i] instanceof OutParam) {
+                $name = "@out_param_$i";
+                $call_params[$name] = $params[$i];
+            } else if ($params[$i] instanceof InOutParam) {
+                $name = "@inout_param_$i";
+                $call_params[$name] = $params[$i];
+                $in_params[$name] = $params[$i]->value;
+            } else {
+                $name = ":in_param_$i";
+                $call_params[$name] = null;
+                $in_params[$name] = $params[$i];
+            }
+        }
+        $params_str = join(', ', array_keys($call_params));
+        $sql = "call $sp_name($params_str)";
+        return $sql;
+    }
+
+    private function init_call_params($stmt, $in_params) {
+        foreach ($in_params as $key => $value) {
+            if (strpos($key, '@') === 0) {
+                $this->db->query("set $key = $value");
+            } else {
+                $stmt->bindParam($key, $value); // PDO::PARAM_INT | PDO::PARAM_INPUT_OUTPUT
+            }
+        }
+    }
 
     public function execDML($sql, array $params) {
-        // TODO:
-        // It allows also ODBC syntax like
-        // DECLARE @res = ?;
-        // EXEC [dbo].[sp_test_inout_params] @res;
-        // SELECT @res AS res;
         $sp_name = $this->get_sp_name($sql);
         if ($sp_name != null) {
+            $in_params = array();
+            $call_params = array();
+            $sql = $this->get_call_info($sp_name, $params, $in_params, $call_params);
             $stmt = $this->db->prepare($sql);
             try {
-                $out_params = array();
-                $this->bind_call_params($stmt, $params, $out_params);
+                $this->init_call_params($stmt, $in_params);
                 $res = $stmt->execute();
-                // $this->fetch_out_params($stmt, $out_params);
-                return $res;
             } finally {
                 $stmt->closeCursor();
             }
+            $this->fetch_out_params($call_params);
+            return $res;
         } else {
             $stmt = $this->db->prepare($sql);
             try {

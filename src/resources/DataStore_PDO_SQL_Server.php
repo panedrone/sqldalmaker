@@ -4,14 +4,8 @@
   SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
   Contact: sqldalmaker@gmail.com
 
-  This is an example of how to implement DataStore in PHP + PDO + ORACLE.
+  This is an example of how to implement DataStore in PHP + PDO + SQL Server.
   Copy-paste this code to your project and change it for your needs.
-
-  Known Issues:
-
-  - UDF returning SYS_REFCURSOR
-  - SYS_REFCURSOR-s as OUT params
-  - Implicit SYS_REFCURSOR-s
 
  */
 
@@ -21,6 +15,9 @@
  * The class to work with both OUT and INOUT parameters
  */
 class OutParam {
+
+    // If you declare a parameter as OUTPUT, it acts as Both Input and OUTPUT.
+    // https://stackoverflow.com/questions/49129536/how-to-declare-input-output-parameters-in-sql-server-stored-procedure-function
 
     public $type;
     public $value;
@@ -32,7 +29,7 @@ class OutParam {
 
 }
 
-// class PDODataStore implements DataStore 
+// class PDODataStore implements DataStore
 class DataStore { // no inheritance is also OK
 
     private $db;
@@ -45,11 +42,9 @@ class DataStore { // no inheritance is also OK
         if (!is_null($this->db)) {
             throw new Exception("Already open");
         }
-        $opt = [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        ];
-        $this->db = new PDO("oci:dbname=//localhost:1521/orcl", "ORDERS", "sa", $opt);
+        $serverName = "(local)\sqlexpress";
+        $this->db = new PDO("sqlsrv:server=$serverName ; Database=AdventureWorks2014", "sa", "root");
+        $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     }
 
     public function beginTransaction() {
@@ -69,39 +64,18 @@ class DataStore { // no inheritance is also OK
     }
 
     public function insert($sql, array $params, array &$ai_values) {
+        $stmt = $this->db->prepare($sql);
+        $res = $stmt->execute($params);
         if (count($ai_values) > 0) {
             if (count($ai_values) > 1) {
-                throw new Exception("Multiple generated keys are not supported");
+                throw new Exception("Multiple AI PK are not allowed");
             }
-            $gen_key = array_keys($ai_values)[0];
-            $sql = $sql . ' RETURN ' . $gen_key . ' INTO ?';
-            $stmt = $this->db->prepare($sql);
-            try {
-                $i = 1;
-                for (; $i <= count($params); $i++) {
-                    $stmt->bindParam($i, $params[$i - 1]);
-                }
-                // PDO::PARAM_INT does not work
-                $id = ''; // initializing with integer instead of '' kills process
-                $stmt->bindParam($i, $id, PDO::PARAM_STR | PDO::PARAM_INPUT_OUTPUT, 256);
-                // ^^ specifying the length (256) means OUT parameter
-                $res = $stmt->execute();
-                if ($res) {
-                    $ai_values[$gen_key] = $id;
-                }
-                return $res;
-            } finally {
-                $stmt->closeCursor();
-            }
-        } else {
-            $stmt = $this->db->prepare($sql);
-            try {
-                $res = $stmt->execute($params);
-                return $res;
-            } finally {
-                $stmt->closeCursor();
-            }
+            $key = array_keys($ai_values)[0];
+            // lastInsertId($key) returns '(string)'
+            $id = $this->db->lastInsertId(null);
+            $ai_values[$key] = $id;
         }
+        return $res;
     }
 
     private function get_sp_name($sql_src) {
@@ -126,16 +100,20 @@ class DataStore { // no inheritance is also OK
         return null;
     }
 
-    private function bind_params($stmt, &$params, &$out_params) {
+    private function bind_call_params($stmt, &$params, &$out_params) {
         for ($i = 0; $i < count($params); $i++) {
             if ($params[$i] instanceof OutParam) {
+                // Errors wile using ODBC syntax:
+                // Uncaught PDOException: SQLSTATE[IMSSP]: Invalid direction specified for parameter 1. Input/output parameters must have a length
                 // $stmt->bindParam($i + 1, $params[$i]->value, $params[$i]->type | PDO::PARAM_INPUT_OUTPUT);
-                // => OCIStmtFetch: ORA-24374: define not done before fetch or execute and fetch
+                // Uncaught PDOException: SQLSTATE[42000]: [Microsoft][ODBC Driver 11 for SQL Server][SQL Server]Incorrect syntax near 'OUTPUT'
+                // $stmt->bindParam($i + 1, $params[$i]->value, $params[$i]->type | PDO::PARAM_INPUT_OUTPUT, 256);
+                // This one is OK wile using ODBC syntax:
                 // $stmt->bindParam($i + 1, $params[$i]->value, $params[$i]->type);
-                // => OCIStmtFetch: ORA-24374: define not done before fetch or execute and fetch
-                // This one is OK for both OUT and INOUT:
+                // This one is OK wile using something like {CALL [dbo].[sp_test_inout_params](?)}:
                 $stmt->bindParam($i + 1, $params[$i]->value, $params[$i]->type | PDO::PARAM_INPUT_OUTPUT, 256);
-                // ^^ specifying the length (256) means OUT parameter
+                // ^^ seems like allocating memery requires using $Param1 = new OutParam(PDO::PARAM_STR, "10");
+                // ^^ PDO::PARAM_INPUT_OUTPUT is mandatory.
                 array_push($out_params, $params[$i]);
             } else {
                 $stmt->bindParam($i + 1, $params[$i]);
@@ -143,16 +121,36 @@ class DataStore { // no inheritance is also OK
         }
     }
 
+// It works while using ODBC syntax:
+//
+//    private function fetch_out_params($stmt, &$params) {
+//        $fetch_bound = false;
+//        for ($i = 0; $i < count($params); $i++) {
+//            if ($params[$i] instanceof OutParam) {
+//                $stmt->bindColumn($i + 1, $params[$i]->value, $params[$i]->type);
+//                $fetch_bound = true;
+//            }
+//        }
+//        if ($fetch_bound) {
+//            // https://stackoverflow.com/questions/13382922/calling-stored-procedure-with-out-parameter-using-pdo
+//            $stmt->fetch(PDO::FETCH_BOUND);
+//        }
+//    }
+
     public function execDML($sql, array $params) {
+        // TODO:
+        // It allows also ODBC syntax like
+        // DECLARE @res = ?;
+        // EXEC [dbo].[sp_test_inout_params] @res;
+        // SELECT @res AS res;
         $sp_name = $this->get_sp_name($sql);
         if ($sp_name != null) {
             $stmt = $this->db->prepare($sql);
             try {
                 $out_params = array();
-                $this->bind_params($stmt, $params, $out_params);
+                $this->bind_call_params($stmt, $params, $out_params);
                 $res = $stmt->execute();
-                // PG logic bindColumn --> fetch(PDO::FETCH_BOUND) didn't work with ORACLE:
-                //$this->fetch_out_params($stmt, $out_params);
+                // $this->fetch_out_params($stmt, $out_params);
                 return $res;
             } finally {
                 $stmt->closeCursor();
