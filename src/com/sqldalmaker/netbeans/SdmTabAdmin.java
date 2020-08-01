@@ -135,6 +135,10 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         jButton16 = new javax.swing.JButton();
         jButton9 = new javax.swing.JButton();
         jButton27 = new javax.swing.JButton();
+        jButton31 = new javax.swing.JButton();
+        jButton32 = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
         jButton18 = new javax.swing.JButton();
         jPanel7 = new javax.swing.JPanel();
         jButton19 = new javax.swing.JButton();
@@ -240,7 +244,7 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         jPanel5.setMaximumSize(new java.awt.Dimension(1100, 130));
         jPanel5.setMinimumSize(new java.awt.Dimension(1100, 130));
         jPanel5.setPreferredSize(new java.awt.Dimension(1030, 130));
-        jPanel5.setLayout(new java.awt.GridLayout(6, 4));
+        jPanel5.setLayout(new java.awt.GridLayout(7, 4));
 
         org.openide.awt.Mnemonics.setLocalizedText(jButton10, org.openide.util.NbBundle.getMessage(SdmTabAdmin.class, "SdmTabAdmin.jButton10.text")); // NOI18N
         jButton10.setFocusPainted(false);
@@ -386,6 +390,7 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         jPanel5.add(jButton16);
 
         org.openide.awt.Mnemonics.setLocalizedText(jButton9, org.openide.util.NbBundle.getMessage(SdmTabAdmin.class, "SdmTabAdmin.jButton9.text")); // NOI18N
+        jButton9.setActionCommand(org.openide.util.NbBundle.getMessage(SdmTabAdmin.class, "SdmTabAdmin.jButton9.actionCommand")); // NOI18N
         jButton9.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton9ActionPerformed(evt);
@@ -400,6 +405,28 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
             }
         });
         jPanel5.add(jButton27);
+
+        org.openide.awt.Mnemonics.setLocalizedText(jButton31, org.openide.util.NbBundle.getMessage(SdmTabAdmin.class, "SdmTabAdmin.jButton31.text")); // NOI18N
+        jButton31.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton31ActionPerformed(evt);
+            }
+        });
+        jPanel5.add(jButton31);
+
+        org.openide.awt.Mnemonics.setLocalizedText(jButton32, org.openide.util.NbBundle.getMessage(SdmTabAdmin.class, "SdmTabAdmin.jButton32.text")); // NOI18N
+        jButton32.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton32ActionPerformed(evt);
+            }
+        });
+        jPanel5.add(jButton32);
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(SdmTabAdmin.class, "SdmTabAdmin.jLabel1.text")); // NOI18N
+        jPanel5.add(jLabel1);
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel4, org.openide.util.NbBundle.getMessage(SdmTabAdmin.class, "SdmTabAdmin.jLabel4.text")); // NOI18N
+        jPanel5.add(jLabel4);
 
         org.openide.awt.Mnemonics.setLocalizedText(jButton18, org.openide.util.NbBundle.getMessage(SdmTabAdmin.class, "SdmTabAdmin.jButton18.text")); // NOI18N
         jButton18.setToolTipText(org.openide.util.NbBundle.getMessage(SdmTabAdmin.class, "SdmTabAdmin.jButton18.toolTipText")); // NOI18N
@@ -484,11 +511,11 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, 185, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jTextPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 276, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jTextPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 235, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
@@ -644,6 +671,14 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         NbpIdeEditorHelpers.open_resource_file_in_editor_async("DataStore_PDO_SQL_Server.php", "DataStore_PDO_SQL_Server.php");
     }//GEN-LAST:event_jButton30ActionPerformed
 
+    private void jButton31ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton31ActionPerformed
+        NbpIdeEditorHelpers.open_resource_file_in_editor_async("DataStore_pyodbc_Oracle.py", "DataStore_pyodbc_Oracle.py");
+    }//GEN-LAST:event_jButton31ActionPerformed
+
+    private void jButton32ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton32ActionPerformed
+        NbpIdeEditorHelpers.open_resource_file_in_editor_async("DataStore_cx_Oracle.py", "DataStore_cx_Oracle.py");
+    }//GEN-LAST:event_jButton32ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton10;
@@ -669,14 +704,18 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
     private javax.swing.JButton jButton29;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton30;
+    private javax.swing.JButton jButton31;
+    private javax.swing.JButton jButton32;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton6;
     private javax.swing.JButton jButton7;
     private javax.swing.JButton jButton8;
     private javax.swing.JButton jButton9;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;

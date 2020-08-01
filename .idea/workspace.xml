@@ -1,15 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="1fb1c605-8c08-4b11-a01b-d42d0945087f" name="Default" comment="added option to exclude views in DTO/DAO assistants">
-      <change afterPath="$PROJECT_DIR$/build.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/resources/DataStore_cx_Oracle.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/META-INF/plugin.xml" beforeDir="false" afterPath="$PROJECT_DIR$/META-INF/plugin.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/DataStore_psycopg2.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/DataStore_psycopg2.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabAdmin.form" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabAdmin.form" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabAdmin.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabAdmin.java" afterDir="false" />
-    </list>
+    <list default="true" id="1fb1c605-8c08-4b11-a01b-d42d0945087f" name="Default" comment="added option to exclude views in DTO/DAO assistants" />
     <list id="0b913ed8-6e39-405f-b29b-9d52c75467b5" name="Failed commit: Default" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -235,6 +227,7 @@
       </method>
     </configuration>
   </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="project-level" UseSingleDictionary="true" transferred="true" />
   <component name="SvnConfiguration" cleanupOnStartRun="true">
     <configuration>C:\Users\dron\AppData\Roaming\Subversion</configuration>
     <supportedVersion>125</supportedVersion>
@@ -936,10 +929,10 @@
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
     <state x="92" y="92" width="1736" height="866" key="DiffContextDialog/0.0.1920.1050@0.0.1920.1050" timestamp="1593542102705" />
-    <state x="740" y="281" width="434" height="654" key="FileChooserDialogImpl" timestamp="1596240293883">
+    <state x="740" y="281" width="434" height="654" key="FileChooserDialogImpl" timestamp="1596285060981">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state x="740" y="281" width="434" height="654" key="FileChooserDialogImpl/0.0.1920.1050@0.0.1920.1050" timestamp="1596240293883" />
+    <state x="740" y="281" width="434" height="654" key="FileChooserDialogImpl/0.0.1920.1050@0.0.1920.1050" timestamp="1596285060981" />
     <state width="1876" height="197" key="GridCell.Tab.0.bottom" timestamp="1594016701527">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
@@ -980,10 +973,10 @@
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
     <state x="693" y="226" key="RollbackChangesDialog/0.0.1920.1050@0.0.1920.1050" timestamp="1589819515181" />
-    <state x="200" y="93" width="1421" height="853" key="SettingsEditor" timestamp="1596240296995">
+    <state x="200" y="93" width="1421" height="853" key="SettingsEditor" timestamp="1596285062141">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state x="200" y="93" width="1421" height="853" key="SettingsEditor/0.0.1920.1050@0.0.1920.1050" timestamp="1596240296995" />
+    <state x="200" y="93" width="1421" height="853" key="SettingsEditor/0.0.1920.1050@0.0.1920.1050" timestamp="1596285062141" />
     <state x="776" y="302" key="chooseDestDirectoryDialog" timestamp="1588406446535">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
