@@ -7,4 +7,4 @@ Implemented as plug-ins for Eclipse IDE, IntelliJ Platform, and NetBeans.
 
 All the details are here: [sqldalmaker.sourceforge.net](sqldalmaker.sourceforge.net)
 
-![SQL DAL Maker](sqldalmaker-idea.jpg)
+![SQL DAL Maker](sqldalmaker-idea.bmp)
