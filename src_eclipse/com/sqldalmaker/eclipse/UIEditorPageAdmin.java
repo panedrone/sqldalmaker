@@ -344,18 +344,6 @@ public class UIEditorPageAdmin extends Composite {
 		toolkit.adapt(btnNewButton_7, true, true);
 		btnNewButton_7.setText("DataStore.py (MySQL)");
 
-		Button btnNewButton_7_1 = new Button(composite_2, SWT.NONE);
-		btnNewButton_7_1.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore_pyodbc.py",
-						"DataStore_pyodbc.py");
-			}
-		});
-		btnNewButton_7_1.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-		btnNewButton_7_1.setText("DataStore.py (pyodbc)");
-		toolkit.adapt(btnNewButton_7_1, true, true);
-
 		Button btnNewButton_7_1_1 = new Button(composite_2, SWT.NONE);
 		btnNewButton_7_1_1.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -367,6 +355,43 @@ public class UIEditorPageAdmin extends Composite {
 		btnNewButton_7_1_1.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		btnNewButton_7_1_1.setText("DataStore.py (psycopg2)");
 		toolkit.adapt(btnNewButton_7_1_1, true, true);
+
+		Button btnNewButton_7_1 = new Button(composite_2, SWT.NONE);
+		btnNewButton_7_1.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore_pyodbc.py",
+						"DataStore_pyodbc.py");
+			}
+		});
+		btnNewButton_7_1.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+		btnNewButton_7_1.setText("DataStore.py (pyodbc, SQL Server)");
+		toolkit.adapt(btnNewButton_7_1, true, true);
+
+		Button btnDatastorepypyodbcOracle = new Button(composite_2, SWT.NONE);
+		btnDatastorepypyodbcOracle.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore_pyodbc_Oracle.py",
+						"DataStore_pyodbc_Oracle.py");
+			}
+		});
+		btnDatastorepypyodbcOracle.setText("DataStore.py (pyodbc, Oracle)");
+		toolkit.adapt(btnDatastorepypyodbcOracle, true, true);
+
+		Button btnDatastorepycxoracle = new Button(composite_2, SWT.NONE);
+		btnDatastorepycxoracle.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore_cx_Oracle.py",
+						"DataStore_cx_Oracle.py");
+			}
+		});
+		btnDatastorepycxoracle.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1));
+		btnDatastorepycxoracle.setText("DataStore.py (cx_Oracle)");
+		toolkit.adapt(btnDatastorepycxoracle, true, true);
+		new Label(composite_2, SWT.NONE);
+		new Label(composite_2, SWT.NONE);
 
 		Button btnNewButton_8 = new Button(composite_2, SWT.NONE);
 		btnNewButton_8.addSelectionListener(new SelectionAdapter() {
