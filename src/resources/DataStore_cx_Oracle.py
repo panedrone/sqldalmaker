@@ -1,4 +1,4 @@
-import psycopg2
+import cx_Oracle
 
 
 class OutParam:
@@ -15,13 +15,13 @@ class DataStore:
     SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
     Contact: sqldalmaker@gmail.com
 
-    This is an example of how to implement DataStore in Python + psycopg2.
+    This is an example of how to implement DataStore in Python + cx_Oracle.
     Copy-paste this code to your project and change it for your needs.
     """
     conn = None
 
     def open(self):
-        self.conn = psycopg2.connect(host="localhost", database="test", user="postgres", password="sa")
+        self.conn = cx_Oracle.connect('ORDERS', 'sa', 'localhost:1521/orcl', encoding='UTF-8')
         # print(self.conn.autocommit)
 
     def close(self):
@@ -45,15 +45,15 @@ class DataStore:
         Arguments:
             sql: SQL statement.
             params: Values of SQL parameters.
-            ai_values: Array like [["o_id", 1], ...] for auto-increment values.
+            ai_values: an array like [["o_id", 1], ...] for generated keys.
         Raises:
             Exception: if no rows inserted.
         """
         sql = _format_sql(sql)
-
-        # http://zetcode.com/python/psycopg2/
         if len(ai_values) > 0:
-            sql += ' RETURNING ' + ai_values[0][0]
+            if len(ai_values) > 1:
+                raise Exception('Multiple generated keys are not allowed')
+            sql += ' RETURN ' + ai_values[0][0]
         cursor = self.conn.cursor()
         try:
             cursor.execute(sql, params)
@@ -147,7 +147,6 @@ class DataStore:
         return res
 
     def query_single_row(self, sql, params):
-
         """
         Returns:
             Single row
@@ -195,7 +194,7 @@ class DataStore:
                 for ci in range(len(columns)):
                     row_dict[columns[ci]] = r[ci]
                 callback(row_dict)
-        # if cursor.nextset(): # psycopg2.NotSupportedError: not supported by PostgreSQL
+        # if cursor.nextset() ???
         finally:
             cursor.close()
 
@@ -208,4 +207,13 @@ def _get_sp_sql(sql, params):
 
 
 def _format_sql(sql):
-    return sql.replace('?', '%s')
+    i = 1
+    while True:
+        pos = sql.find('?')
+        if pos == -1:
+            break
+        str1 = sql[0:pos]
+        str2 = sql[pos + 1:]
+        sql = str1 + ':' + str(i) + str2
+        i += 1
+    return sql

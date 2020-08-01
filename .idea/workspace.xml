@@ -2,8 +2,13 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1fb1c605-8c08-4b11-a01b-d42d0945087f" name="Default" comment="added option to exclude views in DTO/DAO assistants">
+      <change afterPath="$PROJECT_DIR$/build.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/resources/DataStore_cx_Oracle.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/DataStore_PDO_SQL_Server.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/DataStore_PDO_SQL_Server.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/META-INF/plugin.xml" beforeDir="false" afterPath="$PROJECT_DIR$/META-INF/plugin.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/resources/DataStore_psycopg2.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/DataStore_psycopg2.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabAdmin.form" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabAdmin.form" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabAdmin.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabAdmin.java" afterDir="false" />
     </list>
     <list id="0b913ed8-6e39-405f-b29b-9d52c75467b5" name="Failed commit: Default" comment="" />
     <option name="SHOW_DIALOG" value="false" />
@@ -61,7 +66,7 @@
     <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1549569056154" />
     <property name="dynamic.classpath" value="false" />
     <property name="last_directory_selection" value="$PROJECT_DIR$/src" />
-    <property name="last_opened_file_path" value="C:/xampp/htdocs/sdm_log" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/resources" />
     <property name="options.lastSelected" value="project.propVCSSupport.Mappings" />
     <property name="options.splitter.details.proportions" value="0.2" />
     <property name="options.splitter.main.proportions" value="0.3" />
@@ -72,18 +77,18 @@
     <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
   <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\work\sqldalmaker\sqldalmaker-plugins\src_intellij\img" />
+      <recent name="D:\work\com.sqldalmaker\com.sqldalmaker.plugins\src_common" />
+      <recent name="D:\work\com.sqldalmaker\com.sqldalmaker.plugins\src_intellij" />
+      <recent name="D:\work\com.sqldalmaker\com.sqldalmaker.plugins\src_common\com\sqldalmaker" />
+    </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\work\sqldalmaker\sqldalmaker-plugins\src\resources" />
       <recent name="D:\work\com.sqldalmaker\com.sqldalmaker.plugins" />
       <recent name="D:\work\com.sqldalmaker\com.sqldalmaker.plugins\src_intellij" />
       <recent name="D:\work\com.sqldalmaker\com.sqldalmaker.plugins\sqldalmaker-lib\src" />
       <recent name="D:\work\com.sqldalmaker\com.sqldalmaker.plugins\src_common\resources" />
-    </key>
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="D:\work\sqldalmaker\sqldalmaker-plugins\src_intellij\img" />
-      <recent name="D:\work\com.sqldalmaker\com.sqldalmaker.plugins\src_common" />
-      <recent name="D:\work\com.sqldalmaker\com.sqldalmaker.plugins\src_intellij" />
-      <recent name="D:\work\com.sqldalmaker\com.sqldalmaker.plugins\src_common\com\sqldalmaker" />
     </key>
   </component>
   <component name="RunManager">
@@ -903,10 +908,10 @@
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
     <state x="767" y="184" key="#com.intellij.ide.ui.customization.CustomizableActionsPanel.FindAvailableActionsDialog/0.0.1920.1050@0.0.1920.1050" timestamp="1589123523937" />
-    <state x="765" y="230" key="#com.intellij.ide.util.MemberChooser" timestamp="1594015710548">
+    <state x="765" y="230" key="#com.intellij.ide.util.MemberChooser" timestamp="1596279985550">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state x="765" y="230" key="#com.intellij.ide.util.MemberChooser/0.0.1920.1050@0.0.1920.1050" timestamp="1594015710548" />
+    <state x="765" y="230" key="#com.intellij.ide.util.MemberChooser/0.0.1920.1050@0.0.1920.1050" timestamp="1596279985550" />
     <state x="433" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1593543291807">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
@@ -931,10 +936,10 @@
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
     <state x="92" y="92" width="1736" height="866" key="DiffContextDialog/0.0.1920.1050@0.0.1920.1050" timestamp="1593542102705" />
-    <state x="740" y="281" width="434" height="654" key="FileChooserDialogImpl" timestamp="1596239586581">
+    <state x="740" y="281" width="434" height="654" key="FileChooserDialogImpl" timestamp="1596240293883">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state x="740" y="281" width="434" height="654" key="FileChooserDialogImpl/0.0.1920.1050@0.0.1920.1050" timestamp="1596239586581" />
+    <state x="740" y="281" width="434" height="654" key="FileChooserDialogImpl/0.0.1920.1050@0.0.1920.1050" timestamp="1596240293883" />
     <state width="1876" height="197" key="GridCell.Tab.0.bottom" timestamp="1594016701527">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
@@ -975,10 +980,10 @@
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
     <state x="693" y="226" key="RollbackChangesDialog/0.0.1920.1050@0.0.1920.1050" timestamp="1589819515181" />
-    <state x="200" y="93" width="1421" height="853" key="SettingsEditor" timestamp="1596239587953">
+    <state x="200" y="93" width="1421" height="853" key="SettingsEditor" timestamp="1596240296995">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state x="200" y="93" width="1421" height="853" key="SettingsEditor/0.0.1920.1050@0.0.1920.1050" timestamp="1596239587953" />
+    <state x="200" y="93" width="1421" height="853" key="SettingsEditor/0.0.1920.1050@0.0.1920.1050" timestamp="1596240296995" />
     <state x="776" y="302" key="chooseDestDirectoryDialog" timestamp="1588406446535">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
