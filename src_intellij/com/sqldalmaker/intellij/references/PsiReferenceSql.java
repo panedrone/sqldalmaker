@@ -20,9 +20,6 @@ import com.sqldalmaker.jaxb.settings.Settings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-import java.util.Collections;
-
 /**
  * usage of PsiReferenceBase<PsiElement> is based on
  * https://confluence.jetbrains.com/display/IntelliJIDEA/Reference+Contributor
@@ -30,7 +27,6 @@ import java.util.Collections;
  * Created with IntelliJ IDEA.
  * User: sqldalmaker@gmail.com
  */
-@SuppressWarnings("unchecked")
 public class PsiReferenceSql extends PsiReferenceBase<PsiElement> {
 
     public PsiReferenceSql(PsiElement element) {
@@ -46,6 +42,9 @@ public class PsiReferenceSql extends PsiReferenceBase<PsiElement> {
         }
         PsiFile containing_file = myElement.getContainingFile();
         if (containing_file == null) {
+            return null;
+        }
+        if (SqlUtils.is_sql_file_ref_base(canonical_text) == false) {
             return null;
         }
         VirtualFile this_xml_file = IdeaReferenceCompletion.find_virtual_file(containing_file);
@@ -78,7 +77,11 @@ public class PsiReferenceSql extends PsiReferenceBase<PsiElement> {
             return null;
         }
         // http://confluence.jetbrains.net/display/IDEADEV/IntelliJ+IDEA+Architectural+Overview
-        return PsiManager.getInstance(project).findFile(sql_file); // @Nullable;
+        PsiElement res = PsiManager.getInstance(project).findFile(sql_file); // @Nullable;
+        if (res == null) {
+            return null; // just to debug
+        }
+        return res;
     }
 
     @NotNull
@@ -101,12 +104,15 @@ public class PsiReferenceSql extends PsiReferenceBase<PsiElement> {
             if (/*canonical_text == null ||*/ canonical_text.trim().length() == 0) {
                 return true; // ref is empty
             }
-            if (SqlUtils.is_sql_file_ref(canonical_text)) {
+            if (SqlUtils.is_sql_file_ref_base(canonical_text)) {
                 return false;
             }
             return true;
         } else if (FileSearchHelpers.is_dao_xml(name)) {
-            if (SqlUtils.is_sql_file_ref(canonical_text)) {
+            if (/*canonical_text == null ||*/ canonical_text.trim().length() == 0) {
+                return true; // ref is empty is OK if externel-sql=true
+            }
+            if (SqlUtils.is_sql_file_ref_base(canonical_text)) {
                 return false;
             }
             return true;
@@ -114,11 +120,13 @@ public class PsiReferenceSql extends PsiReferenceBase<PsiElement> {
         return false;
     }
 
-    @SuppressWarnings("rawtypes")
-    @NotNull
-    @Override
-    public Collection resolveReference() {
-        // --- panedrone: implementation to compile and work with IDEA 13...2019. @SuppressWarnings("unchecked") is needed before class declaration.
-        return Collections.emptyList();
-    }
+//      === panedrone: 1) marked as @Experimental 2) supresses links in idea 2020
+
+//    @SuppressWarnings("rawtypes")
+//    @NotNull
+//    @Override
+//    public Collection resolveReference() {
+//        // --- panedrone: implementation to compile and work with IDEA 13...2019. @SuppressWarnings("unchecked") is needed before class declaration.
+//        return Collections.emptyList();
+//    }
 }

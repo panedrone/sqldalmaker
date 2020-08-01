@@ -99,7 +99,7 @@ public class CompletionProviderSql extends CompletionProvider<CompletionParamete
             public boolean visitFile(@NotNull VirtualFile file) {
                 if (!file.isDirectory()) {
                     String path = file.getPath();
-                    if (SqlUtils.is_sql_file_ref(path)) {
+                    if (SqlUtils.is_sql_file_ref_base(path)) {
                         res.add(path);
                     }
                 }

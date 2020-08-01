@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 sqldalmaker@gmail.com
+ * Copyright 2011-2020 sqldalmaker@gmail.com
  * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
  * Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -117,19 +117,21 @@ public class SdmActionGroup extends ActionGroup {
                             }
                             //////////////////////////////////////////
                             if (FileSearchHelpers.is_dto_xml(name) || FileSearchHelpers.is_dao_xml(name)) {
-                                String root_file_rel_path = IdeaHelpers.get_relative_path(project, root_files.get(0));
-                                SdmAction action = new SdmAction(root_file_rel_path) {
-                                    @Override
-                                    public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
-                                        try {
-                                            IdeaEditorHelpers.open_project_file_in_editor_sync(anActionEvent.getProject(), root_file_rel_path);
-                                        } catch (Exception e) {
-                                            IdeaMessageHelpers.add_error_to_ide_log("ERROR", e.getMessage());
+                                if (titles.size() > 1) {
+                                    String root_file_rel_path = IdeaHelpers.get_relative_path(project, root_files.get(0));
+                                    SdmAction action = new SdmAction(root_file_rel_path) {
+                                        @Override
+                                        public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
+                                            try {
+                                                IdeaEditorHelpers.open_project_file_in_editor_sync(anActionEvent.getProject(), root_file_rel_path);
+                                            } catch (Exception e) {
+                                                IdeaMessageHelpers.add_error_to_ide_log("ERROR", e.getMessage());
+                                            }
                                         }
-                                    }
-                                };
-                                drop_down_actions_list.add(action);
-                                drop_down_actions_list.add(Separator.create());
+                                    };
+                                    drop_down_actions_list.add(action);
+                                    drop_down_actions_list.add(Separator.create());
+                                }
                             }
                         }
                     }

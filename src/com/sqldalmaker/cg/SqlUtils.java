@@ -248,7 +248,7 @@ public class SqlUtils {
         return is_sql_file_ref_base(ref);
     }
 
-    private static boolean is_sql_file_ref_base(String ref) {
+    public static boolean is_sql_file_ref_base(String ref) {
         return ref != null && ref.length() > 4 && ref.endsWith(".sql");
     }
 
