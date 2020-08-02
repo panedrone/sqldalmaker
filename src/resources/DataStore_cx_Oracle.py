@@ -6,8 +6,9 @@ class OutParam:
     The class to work with both OUT and INOUT parameters
     """
 
-    def __init__(self, value=None):
-        self.value = value
+    def __init__(self, ptype, pvalue=None):
+        self.ptype = ptype
+        self.pvalue = pvalue
 
 
 class DataStore:
@@ -25,7 +26,7 @@ class DataStore:
         # print(self.conn.autocommit)
 
     def close(self):
-        if self.conn:
+        if self.conn is not None:
             self.conn.close()
             self.conn = None
 
@@ -49,16 +50,21 @@ class DataStore:
         Raises:
             Exception: if no rows inserted.
         """
-        sql = _format_sql(sql)
-        if len(ai_values) > 0:
-            if len(ai_values) > 1:
-                raise Exception('Multiple generated keys are not allowed')
-            sql += ' RETURN ' + ai_values[0][0]
         cursor = self.conn.cursor()
         try:
-            cursor.execute(sql, params)
+            sql = _format_sql(sql)
+            gen_col_name = None
+            gen_col_param = None
             if len(ai_values) > 0:
-                ai_values[0][1] = cursor.fetchone()[0]
+                if len(ai_values) > 1:
+                    raise Exception('Multiple generated keys are not allowed')
+                gen_col_param = cursor.var(int)
+                params.append(gen_col_param)
+                gen_col_name = ai_values[0][0]
+                sql += ' returning ' + gen_col_name + ' into :' + gen_col_name
+            cursor.execute(sql, params)
+            if gen_col_param is not None:
+                ai_values[0][1] = gen_col_param.getvalue()[0]
             if cursor.rowcount == 0:
                 raise Exception('No rows inserted')
         finally:
@@ -82,19 +88,20 @@ class DataStore:
                 cursor.execute(sql, params)
                 return cursor.rowcount
             else:
-                out_params = []
                 call_params = []
                 for p in params:
                     if isinstance(p, OutParam):
-                        call_params.append(p.value)
-                        out_params.append(p)
+                        cp = cursor.var(p.ptype)
+                        cp.setvalue(0, p.pvalue)
+                        call_params.append(cp)
                     else:
                         call_params.append(p)
                 cursor.execute(sql, call_params)
-                row0 = cursor.fetchone()
                 i = 0
-                for value in row0:
-                    out_params[i].value = value
+                for p in params:
+                    if isinstance(p, OutParam):
+                        cp = call_params[i]
+                        p.pvalue = cp.getvalue()
                     i += 1
         finally:
             cursor.close()
@@ -110,13 +117,10 @@ class DataStore:
             Exception: if amount of rows != 1.
         """
         rows = self.query_scalar_array(sql, params)
-
         if len(rows) == 0:
             raise Exception('No rows')
-
         if len(rows) > 1:
             raise Exception('More than 1 row exists')
-
         if isinstance(rows[0], list):
             return rows[0][0]
         else:
@@ -143,7 +147,6 @@ class DataStore:
                 res.append(r[0])
         finally:
             cursor.close()
-
         return res
 
     def query_single_row(self, sql, params):
@@ -162,13 +165,10 @@ class DataStore:
             rows.append(row)
 
         self.query_all_rows(sql, params, callback)
-
         if len(rows) == 0:
             raise Exception('No rows')
-
         if len(rows) > 1:
             raise Exception('More than 1 row exists')
-
         return rows[0]
 
     def query_all_rows(self, sql, params, callback):
@@ -201,7 +201,7 @@ class DataStore:
 
 def _get_sp_sql(sql, params):
     parts = sql.split()
-    if len(parts) >= 2 and parts[0].strip().lower() == "call":
+    if len(parts) >= 2 and parts[0].strip().lower() == "begin":
         return sql
     return None
 
