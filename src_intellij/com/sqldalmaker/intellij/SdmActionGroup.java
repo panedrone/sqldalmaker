@@ -37,6 +37,7 @@ public class SdmActionGroup extends ActionGroup {
     }
 
     private static void enum_root_files(Project project, VirtualFile current_folder, List<String> rel_path_names) {
+        @SuppressWarnings("UnsafeVfsRecursion")
         VirtualFile[] children = current_folder.getChildren();
         for (VirtualFile c : children) {
             if (c.isDirectory()) {
@@ -59,6 +60,60 @@ public class SdmActionGroup extends ActionGroup {
         return rel_path_names;
     }
 
+    private void add_dto_actions(Project project, List<AnAction> drop_down_actions_list, VirtualFile xml_file) throws Exception {
+        String xml_file_rel_path = IdeaHelpers.get_relative_path(project, xml_file);
+        SdmAction action_generate = new SdmAction(xml_file_rel_path + " -> Generate All") {
+            @Override
+            public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
+                IdeaCG.generate_all_dto(project, xml_file);
+            }
+        };
+        drop_down_actions_list.add(action_generate);
+        SdmAction action_validate = new SdmAction(xml_file_rel_path + " -> Validate All") {
+            @Override
+            public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
+                IdeaCG.validate_all_dto(project, xml_file);
+            }
+        };
+        drop_down_actions_list.add(action_validate);
+        drop_down_actions_list.add(Separator.create());
+    }
+
+    private void add_dao_actions(Project project, List<AnAction> drop_down_actions_list, VirtualFile xml_file) throws Exception {
+        String xml_file_rel_path = IdeaHelpers.get_relative_path(project, xml_file);
+        SdmAction action_generate = new SdmAction(xml_file_rel_path + " -> Generate") {
+            @Override
+            public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
+                IdeaCG.generate_dao(project, xml_file);
+            }
+        };
+        drop_down_actions_list.add(action_generate);
+        SdmAction action_validate = new SdmAction(xml_file_rel_path + " -> Validate") {
+            @Override
+            public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
+                IdeaCG.validate_dao(project, xml_file);
+            }
+        };
+        drop_down_actions_list.add(action_validate);
+        drop_down_actions_list.add(Separator.create());
+    }
+
+    private void add_common_actions(Project project, List<AnAction> drop_down_actions_list, List<VirtualFile> root_files) throws Exception {
+        String root_file_rel_path = IdeaHelpers.get_relative_path(project, root_files.get(0));
+        SdmAction action = new SdmAction(root_file_rel_path) {
+            @Override
+            public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
+                try {
+                    IdeaEditorHelpers.open_project_file_in_editor_sync(anActionEvent.getProject(), root_file_rel_path);
+                } catch (Exception e) {
+                    IdeaMessageHelpers.add_error_to_ide_log("ERROR", e.getMessage());
+                }
+            }
+        };
+        drop_down_actions_list.add(action);
+        drop_down_actions_list.add(Separator.create());
+    }
+
     @NotNull
     @Override
     public AnAction[] getChildren(@Nullable AnActionEvent anActionEvent) {
@@ -66,71 +121,32 @@ public class SdmActionGroup extends ActionGroup {
             if (anActionEvent == null) {
                 return new AnAction[0];
             }
-            List<String> titles = get_root_file_titles(anActionEvent.getProject());
-            List<AnAction> drop_down_actions_list = new ArrayList<AnAction>();
             Project project = anActionEvent.getProject(); // @Nullable
-            if (project != null) {
-                FileEditor editor = FileEditorManager.getInstance(project).getSelectedEditor(); // @Nullable
-                /*if (editor instanceof RootFileEditor) {
-                    //
-                } else */
-                if (editor instanceof TextEditor) {
-                    VirtualFile xml_file = editor.getFile();
+            if (project == null) {
+                return new AnAction[0];
+            }
+            List<String> titles = get_root_file_titles(project);
+            if (titles.isEmpty()) {
+                return new AnAction[0];
+            }
+            List<AnAction> drop_down_actions_list = new ArrayList<AnAction>();
+            FileEditor editor = FileEditorManager.getInstance(project).getSelectedEditor(); // @Nullable
+            if (editor instanceof TextEditor) {
+                VirtualFile xml_file = editor.getFile(); // @Nullable
+                if (xml_file != null) {
                     VirtualFile xml_file_dir = xml_file.getParent();
                     if (xml_file_dir != null) {
                         List<VirtualFile> root_files = IdeaTargetLanguageHelpers.find_root_files(xml_file_dir);
                         if (root_files.size() == 1) {
-                            String xml_file_rel_path = IdeaHelpers.get_relative_path(project, xml_file);
                             String name = xml_file.getName();
                             if (FileSearchHelpers.is_dto_xml(name)) {
-                                SdmAction action_generate = new SdmAction(xml_file_rel_path + " -> Generate All") {
-                                    @Override
-                                    public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
-                                        IdeaCG.generate_all_dto(project, xml_file);
-                                    }
-                                };
-                                drop_down_actions_list.add(action_generate);
-                                SdmAction action_validate = new SdmAction(xml_file_rel_path + " -> Validate All") {
-                                    @Override
-                                    public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
-                                        IdeaCG.validate_all_dto(project, xml_file);
-                                    }
-                                };
-                                drop_down_actions_list.add(action_validate);
-                                drop_down_actions_list.add(Separator.create());
+                                add_dto_actions(project, drop_down_actions_list, xml_file);
                             } else if (FileSearchHelpers.is_dao_xml(name)) {
-                                SdmAction action_generate = new SdmAction(xml_file_rel_path + " -> Generate") {
-                                    @Override
-                                    public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
-                                        IdeaCG.generate_dao(project, xml_file);
-                                    }
-                                };
-                                drop_down_actions_list.add(action_generate);
-                                SdmAction action_validate = new SdmAction(xml_file_rel_path + " -> Validate") {
-                                    @Override
-                                    public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
-                                        IdeaCG.validate_dao(project, xml_file);
-                                    }
-                                };
-                                drop_down_actions_list.add(action_validate);
-                                drop_down_actions_list.add(Separator.create());
+                                add_dao_actions(project, drop_down_actions_list, xml_file);
                             }
-                            //////////////////////////////////////////
                             if (FileSearchHelpers.is_dto_xml(name) || FileSearchHelpers.is_dao_xml(name)) {
                                 if (titles.size() > 1) {
-                                    String root_file_rel_path = IdeaHelpers.get_relative_path(project, root_files.get(0));
-                                    SdmAction action = new SdmAction(root_file_rel_path) {
-                                        @Override
-                                        public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
-                                            try {
-                                                IdeaEditorHelpers.open_project_file_in_editor_sync(anActionEvent.getProject(), root_file_rel_path);
-                                            } catch (Exception e) {
-                                                IdeaMessageHelpers.add_error_to_ide_log("ERROR", e.getMessage());
-                                            }
-                                        }
-                                    };
-                                    drop_down_actions_list.add(action);
-                                    drop_down_actions_list.add(Separator.create());
+                                    add_common_actions(project, drop_down_actions_list, root_files);
                                 }
                             }
                         }
@@ -156,7 +172,8 @@ public class SdmActionGroup extends ActionGroup {
             }
             AnAction[] arr = new AnAction[drop_down_actions_list.size()];
             return drop_down_actions_list.toArray(arr);
-        } catch (Exception e) {
+        } catch (/*Exception*/ Throwable e) {
+            IdeaMessageHelpers.add_error_to_ide_log("ERROR", e.getMessage());
             e.printStackTrace();
             return new AnAction[0];
         }

@@ -12,7 +12,8 @@ import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.NavigatableFileEditor;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.roots.ProjectRootManager;
+import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.pom.Navigatable;
 import com.intellij.psi.PsiElement;
@@ -47,14 +48,33 @@ public class IdeaHelpers {
     @NotNull // or exception
     public static VirtualFile get_project_base_dir(final Project project) throws Exception {
         // VirtualFile res = project.getBaseDir(); // deprecated
-        String path = project.getBasePath();
-        if (path == null) {
+        String project_path = project.getBasePath();
+        if (project_path == null) {
             throw new Exception("Cannot detect the project base path");
         }
-        //https://intellij-support.jetbrains.com/hc/en-us/community/posts/206144389-Create-virtual-file-from-file-path
-        VirtualFile res = LocalFileSystem.getInstance().findFileByPath(path);
+        // D:/work/runtime-EclipseApplication/mysql_sakila_python/.idea/misc.xml
+        // String cp = project.getProjectFilePath();
+        // VirtualFile f = project.getProjectFile(); // null
+        // String pu = project.getPresentableUrl(); // the same as getBasePath()
+        // String project_name = project.getName(); // it may differ of project_path last segment
+        boolean found = false;
+        String content_root_list = "";
+        // https://jetbrains.org/intellij/sdk/docs/reference_guide/project_model/project.html
+        List<String> content_roots = ProjectRootManager.getInstance(project).getContentRootUrls();
+        for (String content_root_path : content_roots) {
+            if (content_root_path.endsWith(project_path)) {
+                found = true;
+            }
+            content_root_list += "[" + content_root_path + "]";
+        }
+        if (!found) {
+            throw new Exception("Something is wrong with project structure.\r\nProject base path '" + project_path + "' not found besides content roots:\r\n" + content_root_list);
+        }
+        File file = new File(project_path);
+        // https://intellij-support.jetbrains.com/hc/en-us/community/posts/360001957360-Get-file-from-path-to-have-a-virtual-file
+        VirtualFile res = VfsUtil.findFileByIoFile(file, true);
         if (res == null) {
-            throw new Exception("Cannot find project base path in local file system");
+            throw new Exception("Cannot find project directory in virtual file system");
         }
         return res;
     }
@@ -149,7 +169,7 @@ public class IdeaHelpers {
     }
 
     public static Connection get_connection(Project project,
-                                     Settings settings) throws Exception {
+                                            Settings settings) throws Exception {
         String driver_jar = settings.getJdbc().getJar();
         String driver_class_name = settings.getJdbc().getClazz();
         String url = settings.getJdbc().getUrl();
@@ -170,7 +190,7 @@ public class IdeaHelpers {
         VirtualFile project_dir = get_project_base_dir(project);
         VirtualFile driver_file = project_dir.findFileByRelativePath(driver_jar);
         if (driver_file == null) {
-            throw new Exception("JDBC driver file not found");
+            throw new Exception("Cannot find '" + driver_jar + "' in '" + project_dir.getPath() + "'");
         }
         driver_jar = driver_file.getPath();
         Class<?> cl;
@@ -281,7 +301,7 @@ public class IdeaHelpers {
     }
 
     public static void run_write_action_to_save_text_file(final VirtualFile root_file,
-                                                   final String file_name, final String text) throws IOException {
+                                                          final String file_name, final String text) throws IOException {
         class Error {
             public Throwable exception = null;
         }

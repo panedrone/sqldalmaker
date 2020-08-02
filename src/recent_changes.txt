@@ -1,3 +1,7 @@
+2020-08-02
+
+    Added DataStore_cx_Oracle.py
+
 2020-07-06
 
     Added DataStore_pyodbc_Oracle.py
