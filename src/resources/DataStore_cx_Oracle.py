@@ -184,19 +184,26 @@ class DataStore:
         if sp_sql is not None:
             sql = sp_sql
         sql = _format_sql(sql)
-        cursor = self.conn.cursor()
-        try:
+        with self.conn.cursor() as cursor:
             cursor.execute(sql, params)
-            rows = cursor.fetchall()
-            columns = [column[0] for column in cursor.description]
-            for r in rows:
-                row_dict = {}
-                for ci in range(len(columns)):
-                    row_dict[columns[ci]] = r[ci]
-                callback(row_dict)
-        # if cursor.nextset() ???
-        finally:
-            cursor.close()
+            if sp_sql is None:
+                rows = cursor.fetchall()
+                columns = [column[0] for column in cursor.description]
+                for r in rows:
+                    row_dict = {}
+                    for ci in range(len(columns)):
+                        row_dict[columns[ci]] = r[ci]
+                    callback(row_dict)
+            else: # implicit cursor (if no cursors in 'params')
+                # https://cx-oracle.readthedocs.io/en/latest/user_guide/plsql_execution.html
+                # TODO: 1) out sys_refcursors 2) sys_refcursors returned by UDF
+                for implicitCursor in cursor.getimplicitresults():
+                    columns = [column[0] for column in implicitCursor.description]
+                    for r in implicitCursor:
+                        row_dict = {}
+                        for ci in range(len(columns)):
+                            row_dict[columns[ci]] = r[ci]
+                        callback(row_dict)
 
 
 def _get_sp_sql(sql, params):
