@@ -5,6 +5,7 @@ class OutParam:
     """
     The class to work with both OUT and INOUT parameters
     """
+    cursor = 'cursor'
 
     def __init__(self, ptype, pvalue=None):
         self.ptype = ptype
@@ -185,25 +186,46 @@ class DataStore:
             sql = sp_sql
         sql = _format_sql(sql)
         with self.conn.cursor() as cursor:
-            cursor.execute(sql, params)
             if sp_sql is None:
-                rows = cursor.fetchall()
-                columns = [column[0] for column in cursor.description]
-                for r in rows:
-                    row_dict = {}
-                    for ci in range(len(columns)):
-                        row_dict[columns[ci]] = r[ci]
-                    callback(row_dict)
-            else: # implicit cursor (if no cursors in 'params')
+                cursor.execute(sql, params)
+                _fetch_all(cursor, callback)
+            else:
                 # https://cx-oracle.readthedocs.io/en/latest/user_guide/plsql_execution.html
-                # TODO: 1) out sys_refcursors 2) sys_refcursors returned by UDF
-                for implicitCursor in cursor.getimplicitresults():
-                    columns = [column[0] for column in implicitCursor.description]
-                    for r in implicitCursor:
-                        row_dict = {}
-                        for ci in range(len(columns)):
-                            row_dict[columns[ci]] = r[ci]
-                        callback(row_dict)
+                out_cursors = False
+                call_params = []
+                for p in params:
+                    if isinstance(p, OutParam):
+                        cp = None
+                        if p.ptype == OutParam.cursor:
+                            cp = self.conn.cursor()
+                            out_cursors = True
+                        else:
+                            cp = cursor.var(p.ptype)
+                            cp.setvalue(0, p.pvalue)
+                        call_params.append(cp)
+                    else:
+                        call_params.append(p)
+                cursor.execute(sql, call_params)
+                if out_cursors:
+                    i = 0
+                    for p in params:
+                        if isinstance(p, OutParam):
+                            cp = call_params[i]
+                            if p.ptype == OutParam.cursor:
+                                _fetch_all(cp, callback)
+                                cp.close()
+                            else:
+                                p.pvalue = cp.getvalue()
+                        i += 1
+                else: # implicit cursor if no cursors in 'params'
+                    for implicit_cursor in cursor.getimplicitresults():
+                        _fetch_all(implicit_cursor, callback)
+                    i = 0
+                    for p in params:
+                        if isinstance(p, OutParam):
+                            cp = call_params[i]
+                            p.pvalue = cp.getvalue()
+                        i += 1
 
 
 def _get_sp_sql(sql, params):
@@ -224,3 +246,12 @@ def _format_sql(sql):
         sql = str1 + ':' + str(i) + str2
         i += 1
     return sql
+
+
+def _fetch_all(cursor, callback):
+    columns = [column[0] for column in cursor.description]
+    for r in cursor:
+        row_dict = {}
+        for ci in range(len(columns)):
+            row_dict[columns[ci]] = r[ci]
+        callback(row_dict)
