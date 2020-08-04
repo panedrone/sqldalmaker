@@ -29,7 +29,7 @@ class OutParam {
 
 }
 
-// class PDODataStore implements DataStore 
+// class OciDataStore implements DataStore 
 class DataStore { // no inheritance is also OK
 
     private $conn;
@@ -77,6 +77,7 @@ class DataStore { // no inheritance is also OK
 
     public function insert($_sql, array $params, array &$ai_values) {
         $sql = self::format_sql($_sql);
+        $gen_key = null;
         if (count($ai_values) > 0) {
             if (count($ai_values) > 1) {
                 throw new Exception("Multiple generated keys are not supported");
