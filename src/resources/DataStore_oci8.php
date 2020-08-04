@@ -265,8 +265,14 @@ class DataStore { // no inheritance is also OK
                             }
                         }
                     }
-                } else { // implicit cursors if no cursors in 'params'
-                    throw new Exception("Implicit SYS_REFCURSOR-s are not allowed yet");
+                } else { // implicit cursors if no out ref cursors
+                    // https://blogs.oracle.com/opal/using-php-and-oracle-database-12c-implicit-result-sets
+                    while (($imprcid = oci_get_implicit_resultset($stid))) {
+                        while ($row = oci_fetch_array($imprcid, OCI_ASSOC + OCI_RETURN_NULLS)) {
+                            $callback($row);
+                        }
+                        oci_free_statement($imprcid); // missing in blog
+                    }
                 }
             }
         } finally {
