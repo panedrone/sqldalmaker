@@ -8,7 +8,7 @@
 
   Improvements are welcome: sqldalmaker@gmail.com
 
- *  */
+ */
 
 // include_once 'DataStore.php';
 
@@ -18,13 +18,13 @@
 class OutParam {
 
     public $type;
-    public $size;
     public $value;
+    public $size;
 
     function __construct($type = SQLT_CHR, $value = null, $size = -1) {
         $this->type = $type;
-        $this->size = $size;
         $this->value = $value;
+        $this->size = $size;
     }
 
 }
@@ -44,15 +44,10 @@ class DataStore { // no inheritance is also OK
             throw new Exception("Already open");
         }
         $this->conn = oci_connect('ORDERS', 'sa', 'localhost:1521/orcl');
-        if (!$this->conn) {
+        if (!$this->conn) { // FALSE on error
             $this->trigger_oci_error();
         }
         $this->commit_mode = OCI_NO_AUTO_COMMIT;
-    }
-
-    private function trigger_oci_error() {
-        $e = oci_error();
-        trigger_error(htmlentities($e['message'], ENT_QUOTES), E_USER_ERROR);
     }
 
     // https://www.php.net/manual/en/function.oci-commit.php
@@ -88,82 +83,26 @@ class DataStore { // no inheritance is also OK
             }
             $gen_key = array_keys($ai_values)[0];
             $sql = $sql . ' returning ' . $gen_key . ' into :' . $gen_key;
-            $stid = oci_parse($this->conn, $sql);
-            try {
-                $bind_names = SqlBindNames::getSqlBindNames($sql);
-                $this->bind_params($stid, true, $bind_names, $params);
-                $id = 0;
-                oci_bind_by_name($stid, ':' . $gen_key, $id, -1, SQLT_INT);
-                $r = oci_execute($stid, $this->commit_mode);
-                if (!$r) {
-                    self::trigger_oci_error();
-                }
-                $ai_values[$gen_key] = $id;
-                return $r;
-            } finally {
-                oci_free_statement($stid);
+        }
+        $stid = oci_parse($this->conn, $sql);
+        try {
+            $bind_names = SqlBindNames::getSqlBindNames($sql);
+            $this->bind_params($stid, true, $bind_names, $params);
+            $gen_value = 0;
+            if (count($ai_values) > 0) {
+                oci_bind_by_name($stid, ':' . $gen_key, $gen_value, -1, SQLT_INT);
             }
-        } else {
-            $stid = oci_parse($this->conn, $sql);
-            try {
-                $bind_names = SqlBindNames::getSqlBindNames($sql);
-                $this->bind_params($stid, true, $bind_names, $params);
-                $r = oci_execute($stid, $this->commit_mode);
-                if (!$r) {
-                    self::trigger_oci_error();
-                }
-                return $r;
-            } finally {
-                oci_free_statement($stid);
+            $r = oci_execute($stid, $this->commit_mode);
+            if (!$r) {
+                self::trigger_oci_error();
             }
-        }
-    }
-
-    private function get_sp_name($sql_src) {
-        $sql = trim($sql_src);
-        $pos = strpos($sql, '{');
-        if ($pos === 0) {
-            if (strpos($sql, '}') === strlen($sql) - 1) {
-                $sql = substr($sql, 1, strlen($sql) - 1);
+            if (count($ai_values) > 0) {
+                $ai_values[$gen_key] = $gen_value;
             }
+            return $r;
+        } finally {
+            oci_free_statement($stid);
         }
-        $sql_parts = explode('(', $sql);
-        if (count($sql_parts) < 2) {
-            return null;
-        }
-        $parts = preg_split('/\s+/', $sql_parts[0]);
-        if (count($parts) < 2) {
-            return null;
-        }
-        if (strcmp(strtolower($parts[0]), 'begin') === 0) {
-            return $parts[1];
-        }
-        return null;
-    }
-
-    private function bind_params($stid, $throw_on_ref_cursors, $bind_names, &$params) {
-        $ref_cursors = false;
-        for ($i = 0; $i < count($params); $i++) {
-            if ($params[$i] instanceof OutParam) {
-                $param_name = ':' . $bind_names[$i];
-                $type = $params[$i]->type;
-                if ($type == SQLT_RSET || $type == OCI_B_CURSOR) {
-                    if ($throw_on_ref_cursors) {
-                        throw new Exception("SYS_REFCURSOR-s are allowed only in 'queryDto' and 'queryDtoList'");
-                    }
-                    $rcid = oci_new_cursor($this->conn);
-                    oci_bind_by_name($stid, $param_name, $rcid, -1, OCI_B_CURSOR);
-                    $params[$i]->value = $rcid;
-                    $ref_cursors = true;
-                } else {
-                    $size = $params[$i]->size;
-                    oci_bind_by_name($stid, $param_name, $params[$i]->value, $size, $type);
-                }
-            } else {
-                oci_bind_by_name($stid, ':' . $bind_names[$i], $params[$i]);
-            }
-        }
-        return $ref_cursors;
     }
 
     public function execDML($_sql, array $params) {
@@ -278,6 +217,52 @@ class DataStore { // no inheritance is also OK
         } finally {
             oci_free_statement($stid);
         }
+    }
+
+    private function trigger_oci_error() {
+        $e = oci_error();
+        trigger_error(htmlentities($e['message'], ENT_QUOTES), E_USER_ERROR);
+    }
+
+    private function bind_params($stid, $throw_on_ref_cursors, &$bind_names, &$params) {
+        $ref_cursors = false;
+        for ($i = 0; $i < count($params); $i++) {
+            if ($params[$i] instanceof OutParam) {
+                $param_name = ':' . $bind_names[$i];
+                $type = $params[$i]->type;
+                if ($type == SQLT_RSET || $type == OCI_B_CURSOR) {
+                    if ($throw_on_ref_cursors) {
+                        throw new Exception("SYS_REFCURSOR-s are not allowed");
+                    }
+                    $rcid = oci_new_cursor($this->conn);
+                    oci_bind_by_name($stid, $param_name, $rcid, -1, OCI_B_CURSOR);
+                    $params[$i]->value = $rcid;
+                    $ref_cursors = true;
+                } else {
+                    $size = $params[$i]->size;
+                    oci_bind_by_name($stid, $param_name, $params[$i]->value, $size, $type);
+                }
+            } else {
+                oci_bind_by_name($stid, ':' . $bind_names[$i], $params[$i]);
+            }
+        }
+        return $ref_cursors;
+    }
+
+    private function get_sp_name($sql_src) {
+        $sql = trim($sql_src);
+        $sql_parts = explode('(', $sql);
+        if (count($sql_parts) < 2) {
+            return null;
+        }
+        $parts = preg_split('/\s+/', $sql_parts[0]);
+        if (count($parts) < 2) {
+            return null;
+        }
+        if (strcmp(strtolower($parts[0]), 'begin') === 0) {
+            return $parts[1];
+        }
+        return null;
     }
 
     private function format_sql($sql) {
