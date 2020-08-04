@@ -3,10 +3,11 @@
 
 /*
     SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
-    Contact: sqldalmaker@gmail.com
 
-    This is an example of how to implement DataStore in C++, SQLite C Library, and STL.
+    This is an example of how to implement DataStore in C++, SQLite3 C Library, and STL.
     Copy-paste this code to your project and change it for your needs.
+
+    Improvements are welcome: sqldalmaker@gmail.com
 */
 
 #include <string>

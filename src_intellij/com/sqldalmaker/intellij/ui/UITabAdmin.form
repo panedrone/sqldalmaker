@@ -2,7 +2,7 @@
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="com.sqldalmaker.intellij.ui.UITabAdmin">
   <grid id="27dc6" binding="rootPanel" layout-manager="BorderLayout" hgap="0" vgap="0">
     <constraints>
-      <xy x="20" y="20" width="1091" height="448"/>
+      <xy x="20" y="20" width="771" height="567"/>
     </constraints>
     <properties/>
     <border type="none">
@@ -110,7 +110,7 @@
                   </component>
                 </children>
               </grid>
-              <grid id="c482d" layout-manager="GridLayoutManager" row-count="7" column-count="4" same-size-horizontally="false" same-size-vertically="false" hgap="1" vgap="-1">
+              <grid id="c482d" layout-manager="GridLayoutManager" row-count="9" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="1" vgap="-1">
                 <margin top="10" left="0" bottom="0" right="0"/>
                 <constraints>
                   <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="9" fill="0" indent="0" use-parent-layout="false"/>
@@ -118,25 +118,9 @@
                 <properties/>
                 <border type="none"/>
                 <children>
-                  <component id="816bb" class="javax.swing.JButton" binding="dataStorePyMySQLButton" default-binding="true">
-                    <constraints>
-                      <grid row="4" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                    </constraints>
-                    <properties>
-                      <text value="DataStore.py (MySQL)"/>
-                    </properties>
-                  </component>
-                  <component id="83e2c" class="javax.swing.JButton" binding="dataStorePySQLite3Button" default-binding="true">
-                    <constraints>
-                      <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                    </constraints>
-                    <properties>
-                      <text value="DataStore.py (SQLite3)"/>
-                    </properties>
-                  </component>
                   <component id="660" class="javax.swing.JButton" binding="dataStoreCATLButton" default-binding="true">
                     <constraints>
-                      <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                      <grid row="5" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                     </constraints>
                     <properties>
                       <text value="DataStore, C++ (ATL, , SQLite3)"/>
@@ -144,7 +128,7 @@
                   </component>
                   <component id="6a2a4" class="javax.swing.JButton" binding="dataStoreRUBYDBIButton" default-binding="true">
                     <constraints>
-                      <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                      <grid row="8" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                     </constraints>
                     <properties>
                       <text value="data_store.rb (DBI)"/>
@@ -152,23 +136,15 @@
                   </component>
                   <component id="7efb0" class="javax.swing.JButton" binding="dataStoreQt5CButton" default-binding="true">
                     <constraints>
-                      <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                      <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                     </constraints>
                     <properties>
                       <text value="DataStore, C++ (Qt5, Qt5Sql)"/>
                     </properties>
                   </component>
-                  <component id="ac058" class="javax.swing.JButton" binding="dataStoreCSTLButton" default-binding="true">
-                    <constraints>
-                      <grid row="3" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                    </constraints>
-                    <properties>
-                      <text value="DataStore, C++ (STL, , SQLite3)"/>
-                    </properties>
-                  </component>
                   <component id="d85b8" class="javax.swing.JButton" binding="dataStoreJavaButton" default-binding="true">
                     <constraints>
-                      <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                      <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                     </constraints>
                     <properties>
                       <text value="DataStore.java"/>
@@ -182,44 +158,12 @@
                       <text value="DataStore.php"/>
                     </properties>
                   </component>
-                  <component id="ca4d1" class="javax.swing.JButton" binding="PDODataStorePhpButton" default-binding="true">
-                    <constraints>
-                      <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                    </constraints>
-                    <properties>
-                      <text value="DataStore.php (PDO, SQLite3)"/>
-                    </properties>
-                  </component>
-                  <component id="a585c" class="javax.swing.JButton" binding="dataStoreJavaDbUtilsButton" default-binding="true">
-                    <constraints>
-                      <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                    </constraints>
-                    <properties>
-                      <text value="DataStoreManager.java (Apache DbUtils)"/>
-                    </properties>
-                  </component>
-                  <component id="87f30" class="javax.swing.JButton" binding="dataStoreJavaSpringButton" default-binding="true">
-                    <constraints>
-                      <grid row="2" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                    </constraints>
-                    <properties>
-                      <text value="DataStoreManager.java (Spring JDBC)"/>
-                    </properties>
-                  </component>
                   <component id="64c00" class="javax.swing.JButton" binding="btn_mysql">
                     <constraints>
                       <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                     </constraints>
                     <properties>
                       <text value="DataStore.php (PDO, MySQL)"/>
-                    </properties>
-                  </component>
-                  <component id="d5492" class="javax.swing.JButton" binding="btn_php_pg">
-                    <constraints>
-                      <grid row="1" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                    </constraints>
-                    <properties>
-                      <text value="DataStore.php (PDO, PostgeSQL)"/>
                     </properties>
                   </component>
                   <component id="45f42" class="javax.swing.JButton" binding="btn_php_oracle">
@@ -230,33 +174,89 @@
                       <text value="DataStore.php (PDO, Oracle)"/>
                     </properties>
                   </component>
+                  <component id="aff6" class="javax.swing.JButton" binding="dataStorePhpOCI8Button" default-binding="true">
+                    <constraints>
+                      <grid row="1" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties>
+                      <text value="DataStore.php (OCI8)"/>
+                    </properties>
+                  </component>
+                  <component id="d5492" class="javax.swing.JButton" binding="btn_php_pg">
+                    <constraints>
+                      <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties>
+                      <text value="DataStore.php (PDO, PostgeSQL)"/>
+                    </properties>
+                  </component>
                   <component id="cc5cf" class="javax.swing.JButton" binding="dataStorePhpPDOSQLButton" default-binding="true">
                     <constraints>
-                      <grid row="1" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                      <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                     </constraints>
                     <properties>
                       <text value="DataStore.php (PDO, SQL Server)"/>
                     </properties>
                   </component>
+                  <component id="ca4d1" class="javax.swing.JButton" binding="PDODataStorePhpButton" default-binding="true">
+                    <constraints>
+                      <grid row="2" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties>
+                      <text value="DataStore.php (PDO, SQLite3)"/>
+                    </properties>
+                  </component>
+                  <component id="a585c" class="javax.swing.JButton" binding="dataStoreJavaDbUtilsButton" default-binding="true">
+                    <constraints>
+                      <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties>
+                      <text value="DataStoreManager.java (Apache DbUtils)"/>
+                    </properties>
+                  </component>
+                  <component id="87f30" class="javax.swing.JButton" binding="dataStoreJavaSpringButton" default-binding="true">
+                    <constraints>
+                      <grid row="4" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties>
+                      <text value="DataStoreManager.java (Spring JDBC)"/>
+                    </properties>
+                  </component>
                   <component id="ffbb4" class="javax.swing.JButton" binding="dataStoreJavaAndroidButton" default-binding="true">
                     <constraints>
-                      <grid row="2" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                      <grid row="4" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                     </constraints>
                     <properties>
                       <text value="DataStoreManager.java (Android)"/>
                     </properties>
                   </component>
-                  <component id="f94b3" class="javax.swing.JButton" binding="datastore_pyodbc">
+                  <component id="ac058" class="javax.swing.JButton" binding="dataStoreCSTLButton" default-binding="true">
                     <constraints>
-                      <grid row="4" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                      <grid row="5" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                     </constraints>
                     <properties>
-                      <text value="DataStore.py (pyodbc, SQL Server)"/>
+                      <text value="DataStore, C++ (STL, , SQLite3)"/>
+                    </properties>
+                  </component>
+                  <component id="df46c" class="javax.swing.JButton" binding="btn_cx_Oracle">
+                    <constraints>
+                      <grid row="6" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties>
+                      <text value="DataStore.py (cx_Oracle)"/>
+                    </properties>
+                  </component>
+                  <component id="816bb" class="javax.swing.JButton" binding="dataStorePyMySQLButton" default-binding="true">
+                    <constraints>
+                      <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties>
+                      <text value="DataStore.py (MySQL)"/>
                     </properties>
                   </component>
                   <component id="12afc" class="javax.swing.JButton" binding="button_pyodbc_oracle">
                     <constraints>
-                      <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                      <grid row="6" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                     </constraints>
                     <properties>
                       <text value="DataStore.py (pyodbc, Oracle)"/>
@@ -264,18 +264,26 @@
                   </component>
                   <component id="7e9ab" class="javax.swing.JButton" binding="dataStorePsycopg2Button" default-binding="true">
                     <constraints>
-                      <grid row="4" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                      <grid row="7" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                     </constraints>
                     <properties>
                       <text value="DataStore (psycopg2)"/>
                     </properties>
                   </component>
-                  <component id="df46c" class="javax.swing.JButton" binding="btn_cx_Oracle">
+                  <component id="83e2c" class="javax.swing.JButton" binding="dataStorePySQLite3Button" default-binding="true">
                     <constraints>
-                      <grid row="5" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                      <grid row="7" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                     </constraints>
                     <properties>
-                      <text value="DataStore.py (cx_Oracle)"/>
+                      <text value="DataStore.py (SQLite3)"/>
+                    </properties>
+                  </component>
+                  <component id="f94b3" class="javax.swing.JButton" binding="datastore_pyodbc">
+                    <constraints>
+                      <grid row="7" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties>
+                      <text value="DataStore.py (pyodbc, SQL Server)"/>
                     </properties>
                   </component>
                 </children>
@@ -341,8 +349,8 @@
                   <component id="c733b" class="javax.swing.JTextPane" binding="text1">
                     <constraints>
                       <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="0" anchor="9" fill="0" indent="0" use-parent-layout="false">
-                        <minimum-size width="1040" height="-1"/>
-                        <preferred-size width="1040" height="50"/>
+                        <minimum-size width="720" height="-1"/>
+                        <preferred-size width="720" height="50"/>
                       </grid>
                     </constraints>
                     <properties>

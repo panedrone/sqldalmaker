@@ -2,10 +2,11 @@
 
 /*
     SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
-    Contact: sqldalmaker@gmail.com
 
-    This is an example of how to implement DataStore in C++, SQLite C Library, and ATL/MFC.
+    This is an example of how to implement DataStore in C++, SQLite3 C Library, and ATL/MFC.
     Copy-paste this code to your project and change it for your needs.
+
+    Improvements are welcome: sqldalmaker@gmail.com
 */
 
 enum ValueType

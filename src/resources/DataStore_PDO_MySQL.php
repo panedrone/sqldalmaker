@@ -2,10 +2,11 @@
 
 /*
   SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
-  Contact: sqldalmaker@gmail.com
 
   This is an example of how to implement DataStore in PHP + PDO + MySQL.
   Copy-paste this code to your project and change it for your needs.
+
+  Improvements are welcome: sqldalmaker@gmail.com
 
  */
 
