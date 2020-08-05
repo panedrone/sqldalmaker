@@ -104,7 +104,7 @@ class ${class_name} {
     public function ${method_name}(${dto_param} ${d}p) {
 #sql_var(false $sql)
         ${d}ai_values = array(#foreach ($key in ${keys})#set($p='"'+${key.getColumnName()}+'"'+" => null")#list_item(${velocityCount} $p)#end);
-        ${d}res = ${d}this->ds->insert(${d}sql, array(#foreach ($param in ${params})#set($p=${d}+"p->"+${param.getterMethod()}+"()")#list_item(${velocityCount} $p)#end), ${d}ai_values);
+        ${d}res = ${d}this->ds->insert(${d}sql, #param_array($dto_param), ${d}ai_values);
 #foreach ($key in ${keys})
 #set($i = ${velocityCount})
         ${d}p->${key.setterMethod()}(${d}ai_values["$key.getName()"]);
@@ -157,7 +157,7 @@ class ${class_name} {
         ${d}this->ds->queryDtoList(${d}sql, #param_array($dto_param), ${d}cb);
         return ${d}res;
 #else
-        return ${d}this->ds->queryList(${d}sql, ${d}params);
+        return ${d}this->ds->queryList(${d}sql, #param_array($dto_param));
 #end
     }
 #else
@@ -174,7 +174,7 @@ class ${class_name} {
         }
         return FALSE;
 #else
-        return ${d}this->ds->query(${d}sql, ${d}params);
+        return ${d}this->ds->query(${d}sql, #param_array($dto_param));
 #end
     }
 #end
