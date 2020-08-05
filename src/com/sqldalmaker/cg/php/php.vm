@@ -16,12 +16,10 @@
 #macro(param_decls_dto $external_sql)
 #if($external_sql == true)${d}sql, #end
 #end
-#macro(param_array $dto_param $params)
+#macro(param_array $dto_param)
 #if ($dto_param != "")
-        ${d}params = array(#foreach ($param in ${params})#set($p=${d}+"p->"+$param.getterMethod()+"()")#list_item(${velocityCount} $p)#end);
-#else
-        ${d}params = array(#foreach ($param in ${params})#set($p=${d}+$param.getName())#list_item(${velocityCount} $p)#end);
-#end
+array(#foreach ($param in ${params})#set($p=${d}+"p->"+$param.getterMethod()+"()")#list_item(${velocityCount} $p)#end)#else
+array(#foreach ($param in ${params})#set($p=${d}+$param.getName())#list_item(${velocityCount} $p)#end)#end
 #end
 #macro(sql_var $is_external_sql $sql)
 #if(!${is_external_sql})
@@ -105,9 +103,8 @@ class ${class_name} {
      */
     public function ${method_name}(${dto_param} ${d}p) {
 #sql_var(false $sql)
-        ${d}params = array(#foreach ($param in ${params})#set($p=${d}+"p->"+${param.getterMethod()}+"()")#list_item(${velocityCount} $p)#end);
         ${d}ai_values = array(#foreach ($key in ${keys})#set($p='"'+${key.getColumnName()}+'"'+" => null")#list_item(${velocityCount} $p)#end);
-        ${d}res = ${d}this->ds->insert(${d}sql, ${d}params, ${d}ai_values);
+        ${d}res = ${d}this->ds->insert(${d}sql, array(#foreach ($param in ${params})#set($p=${d}+"p->"+${param.getterMethod()}+"()")#list_item(${velocityCount} $p)#end), ${d}ai_values);
 #foreach ($key in ${keys})
 #set($i = ${velocityCount})
         ${d}p->${key.setterMethod()}(${d}ai_values["$key.getName()"]);
@@ -148,17 +145,16 @@ class ${class_name} {
 #if($fetch_list)
     public function ${method_name}(#if(${dto_param} != "")#param_decls_dto($is_external_sql)${dto_param} ${d}p#else#param_decls($is_external_sql $params)#end) {
 #sql_var(${is_external_sql} $sql)
-#param_array($dto_param $params)
 #if($use_dto)
         ${d}res = array();
-        ${d}callback = function(${d}row) use(&${d}res) {
+        ${d}cb = function(${d}row) use(&${d}res) {
             ${d}obj = new ${returned_type_name}();
 #foreach($f in ${fields})
             ${d}obj->${f.setterMethod()}(${d}row["${f.getColumnName()}"]);
 #end
             array_push(${d}res, ${d}obj);
         };
-        ${d}this->ds->queryDtoList(${d}sql, ${d}params, ${d}callback);
+        ${d}this->ds->queryDtoList(${d}sql, #param_array($dto_param), ${d}cb);
         return ${d}res;
 #else
         return ${d}this->ds->queryList(${d}sql, ${d}params);
@@ -167,10 +163,9 @@ class ${class_name} {
 #else
     public function ${method_name}(#if(${dto_param} != "")#param_decls_dto($is_external_sql)${dto_param} ${d}p#else#param_decls($is_external_sql $params)#end) {
 #sql_var(${is_external_sql} $sql)
-#param_array($dto_param $params)
 #if($use_dto)
         ${d}obj = new ${returned_type_name};
-        ${d}row = ${d}this->ds->queryDto(${d}sql, ${d}params);
+        ${d}row = ${d}this->ds->queryDto(${d}sql, #param_array($dto_param));
         if ($row) {
 #foreach($f in ${fields})
             ${d}obj->${f.setterMethod()}(${d}row["${f.getColumnName()}"]);
@@ -208,7 +203,6 @@ class ${class_name} {
      */
     public function ${method_name}(#if(${dto_param} != "")#param_decls_dto($is_external_sql)${dto_param} ${d}p#else#param_decls($is_external_sql $params)#end) {
 #sql_var(${is_external_sql} $sql)
-#param_array($dto_param $params)
-        return ${d}this->ds->execDML(${d}sql, ${d}params);
+        return ${d}this->ds->execDML(${d}sql, #param_array($dto_param));
     }
 #end

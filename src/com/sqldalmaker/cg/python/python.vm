@@ -13,12 +13,10 @@ self#if($external_sql), sql#end#foreach($param in ${params}), ${param.getName()}
 #end
 #macro(param_decls_dto $external_sql)
 self#if($external_sql), sql#end, #end
-#macro(param_array $dto_param $params)
+#macro(param_array $dto_param)
 #if ($dto_param != "")
-        params = [#foreach ($param in $params)#set($p="p."+$param.getName())#list_item($velocityCount $p)#end]
-#else
-        params = [#foreach ($param in $params)#set($p=$param.getName())#list_item($velocityCount $p)#end]
-#end
+[#foreach ($param in $params)#set($p="p."+$param.getName())#list_item($velocityCount $p)#end]#else
+[#foreach ($param in $params)#set($p=$param.getName())#list_item($velocityCount $p)#end]#end
 #end
 #macro(sql_var $is_external_sql $sql)
 #if (!${is_external_sql})
@@ -78,9 +76,8 @@ class $class_name:
         @raise: Exception if no rows inserted.
         """
 #sql_var(false $sql)
-        params = [#foreach ($param in $params)#set($p="p."+${param.getName()})#list_item($velocityCount $p)#end]
         ai_values = [#foreach ($key in $keys)#set($p='["'+${key.getColumnName()} +'", None]')#list_item($velocityCount $p)#end]
-        self.ds.insert_row(sql, params, ai_values)
+        self.ds.insert_row(sql, [#foreach ($param in $params)#set($p="p."+${param.getName()})#list_item($velocityCount $p)#end], ai_values)
 #foreach ($key in $keys)
 #set($i = $velocityCount - 1)
         p.$key.getName() = ai_values[$i][1]
@@ -110,21 +107,20 @@ class $class_name:
         @rtype: list[$returned_type_name]
         """
 #sql_var($is_external_sql $sql)
-#param_array($dto_param $params)
 #if($use_dto)
         res = []
 
-        def callback(row):
+        def cb(row):
             obj = ${returned_type_name}()
 #foreach($field in ${fields})
             obj.${field.getName()} = row["${field.getColumnName()}"]
 #end
             res.append(obj)
 
-        self.ds.query_all_rows(sql, params, callback#if($out_params), out_params#end)
+        self.ds.query_all_rows(sql, #param_array($dto_param), cb#if($out_params), out_params#end)
         return res
 #else
-        return self.ds.query_scalar_array(sql, params#if($out_params), out_params#end)
+        return self.ds.query_scalar_array(sql, #param_array($dto_param)#if($out_params), out_params#end)
 #end
 #else
     def $method_name(#if($dto_param != "")#param_decls_dto($is_external_sql)p, obj#else#param_decls($is_external_sql $params)#if($use_dto), obj#end#end#if($out_params), out_params#end):
@@ -157,16 +153,15 @@ class $class_name:
         @raise: Exception if amount of returned rows != 1.
         """
 #sql_var($is_external_sql $sql)
-#param_array($dto_param $params)
 
 #if($use_dto)
-        row = self.ds.query_single_row(sql, params#if($out_params), out_params#end)
+        row = self.ds.query_single_row(sql, #param_array($dto_param)#if($out_params), out_params#end)
         
 #foreach($field in ${fields})
         obj.${field.getName()} = row["${field.getColumnName()}"]
 #end
 #else
-        return self.ds.query_scalar(sql, params#if($out_params), out_params#end)
+        return self.ds.query_scalar(sql, #param_array($dto_param)#if($out_params), out_params#end)
 #end
 #end
 ## ====================================================================================================================
@@ -196,6 +191,5 @@ class $class_name:
         @rtype: int
         """
 #sql_var($is_external_sql $sql)
-#param_array($dto_param $params)
-        return self.ds.exec_dml(sql, params)
+        return self.ds.exec_dml(sql, #param_array($dto_param))
 #end
