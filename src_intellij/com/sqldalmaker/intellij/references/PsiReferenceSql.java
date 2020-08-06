@@ -36,14 +36,15 @@ public class PsiReferenceSql extends PsiReferenceBase<PsiElement> {
     @Nullable
     @Override
     public PsiElement resolve() {
-        String canonical_text = getCanonicalText();
-        if (canonical_text.length() == 0) {
-            return null;
-        }
         PsiFile containing_file = myElement.getContainingFile();
         if (containing_file == null) {
             return null;
         }
+        String file_name = containing_file.getName();
+        if (!FileSearchHelpers.is_dto_xml(file_name) && ! FileSearchHelpers.is_dao_xml(file_name)) {
+            return null;
+        }
+        String canonical_text = getCanonicalText(); // @NotNull
         if (SqlUtils.is_sql_file_ref_base(canonical_text) == false) {
             return null;
         }
@@ -99,19 +100,16 @@ public class PsiReferenceSql extends PsiReferenceBase<PsiElement> {
             return false;
         }
         String canonical_text = getCanonicalText(); // @NotNull
-        String name = containing_file.getName();
-        if (FileSearchHelpers.is_dto_xml(name)) {
-            if (/*canonical_text == null ||*/ canonical_text.trim().length() == 0) {
-                return true; // ref is empty
-            }
+        String file_name = containing_file.getName();
+        if (canonical_text.trim().length() == 0) {
+            return true; // ref is empty
+        }
+        if (FileSearchHelpers.is_dto_xml(file_name)) {
             if (SqlUtils.is_sql_file_ref_base(canonical_text)) {
                 return false;
             }
             return true;
-        } else if (FileSearchHelpers.is_dao_xml(name)) {
-            if (/*canonical_text == null ||*/ canonical_text.trim().length() == 0) {
-                return true; // ref is empty is OK if externel-sql=true
-            }
+        } else if (FileSearchHelpers.is_dao_xml(file_name)) {
             if (SqlUtils.is_sql_file_ref_base(canonical_text)) {
                 return false;
             }

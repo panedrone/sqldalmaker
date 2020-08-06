@@ -5,11 +5,17 @@ class OutParam:
     """
     The class to work with both OUT and INOUT parameters
     """
-    cursor = 'cursor'
 
     def __init__(self, ptype, pvalue=None):
         self.ptype = ptype
         self.pvalue = pvalue
+
+
+class RefCursor:
+    """
+    The class to work with SYS_REFCURSOR parameters
+    """
+    pass
 
 
 class DataStore:
@@ -52,8 +58,7 @@ class DataStore:
         Raises:
             Exception: if no rows inserted.
         """
-        cursor = self.conn.cursor()
-        try:
+        with self.conn.cursor() as cursor:
             sql = _format_sql(sql)
             gen_col_name = None
             gen_col_param = None
@@ -69,8 +74,6 @@ class DataStore:
                 ai_values[0][1] = gen_col_param.getvalue()[0]
             if cursor.rowcount == 0:
                 raise Exception('No rows inserted')
-        finally:
-            cursor.close()
 
     def exec_dml(self, sql, params):
         """
@@ -84,8 +87,7 @@ class DataStore:
         if sp_sql is not None:
             sql = sp_sql
         sql = _format_sql(sql)
-        cursor = self.conn.cursor()
-        try:
+        with self.conn.cursor() as cursor:
             if sp_sql is None:
                 cursor.execute(sql, params)
                 return cursor.rowcount
@@ -96,6 +98,8 @@ class DataStore:
                         cp = cursor.var(p.ptype)
                         cp.setvalue(0, p.pvalue)
                         call_params.append(cp)
+                    elif isinstance(p, RefCursor):
+                        raise Exception("RefCursor-s are not enabled in exec_dml so far.")
                     else:
                         call_params.append(p)
                 cursor.execute(sql, call_params)
@@ -105,8 +109,6 @@ class DataStore:
                         cp = call_params[i]
                         p.pvalue = cp.getvalue()
                     i += 1
-        finally:
-            cursor.close()
 
     def query_scalar(self, sql, params):
         """
@@ -126,7 +128,7 @@ class DataStore:
         if isinstance(rows[0], list):
             return rows[0][0]
         else:
-            return rows[0]  # 'select get_test_rating(?)' returns just scalar value, not array of arrays
+            return rows[0]
 
     def query_scalar_array(self, sql, params):
         """
@@ -141,14 +143,11 @@ class DataStore:
             sql = sp_sql
         sql = _format_sql(sql)
         res = []
-        cursor = self.conn.cursor()
-        try:
+        with self.conn.cursor() as cursor:
             cursor.execute(sql, params)
             rows = cursor.fetchall()
             for r in rows:
                 res.append(r[0])
-        finally:
-            cursor.close()
         return res
 
     def query_single_row(self, sql, params):
@@ -196,13 +195,12 @@ class DataStore:
                 call_params = []
                 for p in params:
                     if isinstance(p, OutParam):
-                        cp = None
-                        if p.ptype == OutParam.cursor:
-                            cp = self.conn.cursor()
-                            out_cursors = True
-                        else:
-                            cp = cursor.var(p.ptype)
-                            cp.setvalue(0, p.pvalue)
+                        cp = cursor.var(p.ptype)
+                        cp.setvalue(0, p.pvalue)
+                        call_params.append(cp)
+                    elif isinstance(p, RefCursor):
+                        cp = self.conn.cursor()
+                        out_cursors = True
                         call_params.append(cp)
                     else:
                         call_params.append(p)
@@ -212,11 +210,11 @@ class DataStore:
                     for p in params:
                         if isinstance(p, OutParam):
                             cp = call_params[i]
-                            if p.ptype == OutParam.cursor:
-                                _fetch_all(cp, callback)
-                                cp.close()
-                            else:
-                                p.pvalue = cp.getvalue()
+                            p.pvalue = cp.getvalue()
+                        elif isinstance(p, RefCursor):
+                            cp = call_params[i]
+                            _fetch_all(cp, callback)
+                            cp.close()
                         i += 1
                 else: # implicit cursor if no cursors in 'params'
                     for implicit_cursor in cursor.getimplicitresults():

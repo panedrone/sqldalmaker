@@ -38,7 +38,7 @@ public class PsiReferenceDtoClass extends PsiReferenceBase<PsiElement> {
     public PsiElement resolve() {
 
         String canonical_text = getCanonicalText();
-        if (canonical_text == null || canonical_text.length() == 0) {
+        if (canonical_text == null || canonical_text.trim().length() == 0) {
             return null;
         }
         final PsiFile containing_file = myElement.getContainingFile();
@@ -57,10 +57,7 @@ public class PsiReferenceDtoClass extends PsiReferenceBase<PsiElement> {
         if (dto_xml_file == null) {
             return null;
         }
-        Project project = containing_file.getProject();
-//        if (project == null) {
-//            return null; // ---- it is @NotNull
-//        }
+        Project project = containing_file.getProject(); // @NotNull
         return IdeaReferenceCompletion.find_dto_class_xml_tag(project, dto_xml_file, canonical_text);
     }
 
@@ -82,10 +79,12 @@ public class PsiReferenceDtoClass extends PsiReferenceBase<PsiElement> {
         return FileSearchHelpers.is_dto_xml(name);
     }
 
-    @NotNull
-    // @Override
-    public Collection resolveReference() {
-        // --- panedrone: implementation to compile and work with IDEA 13...2019. @SuppressWarnings("unchecked") is needed before class declaration.
-        return Collections.emptyList();
-    }
+//      === panedrone: 1) marked as @Experimental 2) supresses links in idea 2020
+//
+//    @NotNull
+//    // @Override
+//    public Collection resolveReference() {
+//        // --- panedrone: implementation to compile and work with IDEA 13...2019. @SuppressWarnings("unchecked") is needed before class declaration.
+//        return Collections.emptyList();
+//    }
 }

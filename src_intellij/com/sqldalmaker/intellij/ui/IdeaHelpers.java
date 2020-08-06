@@ -190,7 +190,9 @@ public class IdeaHelpers {
         VirtualFile project_dir = get_project_base_dir(project);
         VirtualFile driver_file = project_dir.findFileByRelativePath(driver_jar);
         if (driver_file == null) {
-            throw new Exception("Cannot find '" + driver_jar + "' in '" + project_dir.getPath() + "'");
+            File base_directory = new File(project_dir.getPath());
+            File jar_path = new File(base_directory, driver_jar);
+            throw new Exception("Cannot find '" + jar_path + "'");
         }
         driver_jar = driver_file.getPath();
         Class<?> cl;

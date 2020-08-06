@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 sqldalmaker@gmail.com
+ * Copyright 2011-2020 sqldalmaker@gmail.com
  * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
  * Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -65,7 +65,6 @@ public class UITabAdmin {
     private JButton btn_mysql;
     private JButton dataStorePhpPDOSQLButton;
     private JButton btn_php_oracle;
-    private JButton button_pyodbc_oracle;
     private JButton btn_cx_Oracle;
     private JButton dataStorePhpOCI8Button;
 
@@ -91,25 +90,15 @@ public class UITabAdmin {
 
                 // @Nullable
                 IdeaPluginDescriptor ds = PluginManager.getPlugin(id);
-
                 if (ds != null) {
-
                     String jv = System.getProperty("java.version");
                     vTextField.setText(ds.getVersion() + " on Java " + jv);
                 }
 
                 vTextField.setBorder(BorderFactory.createEmptyBorder());
-
-                ///////////////////////////////////////////////////////////////////
-                //
                 // https://stackoverflow.com/questions/291115/java-swing-using-jscrollpane-and-having-it-scroll-back-to-top
-                //
                 scroll_pane.getVerticalScrollBar().setValue(0);
-
-                ///////////////////////////////////////////////////////////////////
-                //
                 // https://stackoverflow.com/questions/5583495/how-do-i-speed-up-the-scroll-speed-in-a-jscrollpane-when-using-the-mouse-wheel
-                //
                 scroll_pane.getVerticalScrollBar().setUnitIncrement(20);
             }
         });
@@ -160,11 +149,9 @@ public class UITabAdmin {
         createOverwriteXSDFilesButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
                 int dialogResult = JOptionPane.showConfirmDialog(null,
                         "This action creates/overwrites XSD files in the folder of XML meta-program. Continue?",
                         "Warning", JOptionPane.YES_NO_OPTION);
-
                 if (dialogResult == JOptionPane.YES_OPTION) {
                     IdeaMetaProgramInitHelpers.create_xsd(propFile);
                 }
@@ -175,9 +162,7 @@ public class UITabAdmin {
             public void actionPerformed(ActionEvent e) {
                 int dialogResult = JOptionPane.showConfirmDialog(null, "This action creates/overwrites settings.xml in the folder of XML meta-program. Continue?",
                         "Warning", JOptionPane.YES_NO_OPTION);
-
                 if (dialogResult == JOptionPane.YES_OPTION) {
-
                     IdeaMetaProgramInitHelpers.create_settings_xml(propFile);
                 }
             }
@@ -187,9 +172,7 @@ public class UITabAdmin {
             public void actionPerformed(ActionEvent e) {
                 int dialogResult = JOptionPane.showConfirmDialog(null, "This action creates/overwrites dto.xml in the folder of XML meta-program. Continue?",
                         "Warning", JOptionPane.YES_NO_OPTION);
-
                 if (dialogResult == JOptionPane.YES_OPTION) {
-
                     IdeaMetaProgramInitHelpers.create_dto_xml(propFile);
                 }
             }
@@ -203,7 +186,6 @@ public class UITabAdmin {
         testConnectionButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
                 testConnection();
             }
         });
@@ -366,12 +348,6 @@ public class UITabAdmin {
                 IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "DataStore_PDO_Oracle.php", "DataStore_PDO_Oracle.php");
             }
         });
-        button_pyodbc_oracle.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "DataStore_pyodbc_Oracle.py", "DataStore_pyodbc_Oracle.py");
-            }
-        });
         btn_cx_Oracle.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -391,10 +367,8 @@ public class UITabAdmin {
             Settings prof = IdeaHelpers.load_settings(propFile);
             Connection con = IdeaHelpers.get_connection(project, prof);
             con.close();
-
             IdeaMessageHelpers.show_info_in_ui_thread("Test connection succeeded.");
-
-        } catch (Exception ex) {
+        } catch (/*Exception*/ Throwable ex) {
             IdeaMessageHelpers.show_error_in_ui_thread(ex);
             ex.printStackTrace();
         }
@@ -515,17 +489,11 @@ public class UITabAdmin {
         dataStoreCSTLButton = new JButton();
         dataStoreCSTLButton.setText("DataStore, C++ (STL, , SQLite3)");
         panel4.add(dataStoreCSTLButton, new GridConstraints(5, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        btn_cx_Oracle = new JButton();
-        btn_cx_Oracle.setText("DataStore.py (cx_Oracle)");
-        panel4.add(btn_cx_Oracle, new GridConstraints(6, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         dataStorePyMySQLButton = new JButton();
         dataStorePyMySQLButton.setText("DataStore.py (MySQL)");
         panel4.add(dataStorePyMySQLButton, new GridConstraints(6, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        button_pyodbc_oracle = new JButton();
-        button_pyodbc_oracle.setText("DataStore.py (pyodbc, Oracle)");
-        panel4.add(button_pyodbc_oracle, new GridConstraints(6, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         dataStorePsycopg2Button = new JButton();
-        dataStorePsycopg2Button.setText("DataStore (psycopg2)");
+        dataStorePsycopg2Button.setText("DataStore.py (psycopg2)");
         panel4.add(dataStorePsycopg2Button, new GridConstraints(7, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         dataStorePySQLite3Button = new JButton();
         dataStorePySQLite3Button.setText("DataStore.py (SQLite3)");
@@ -533,6 +501,9 @@ public class UITabAdmin {
         datastore_pyodbc = new JButton();
         datastore_pyodbc.setText("DataStore.py (pyodbc, SQL Server)");
         panel4.add(datastore_pyodbc, new GridConstraints(7, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        btn_cx_Oracle = new JButton();
+        btn_cx_Oracle.setText("DataStore.py (cx_Oracle)");
+        panel4.add(btn_cx_Oracle, new GridConstraints(6, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JPanel panel5 = new JPanel();
         panel5.setLayout(new GridLayoutManager(1, 5, new Insets(10, 0, 0, 0), 1, -1));
         panel1.add(panel5, new GridConstraints(3, 0, 1, 1, GridConstraints.ANCHOR_NORTHWEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));

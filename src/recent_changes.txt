@@ -1,3 +1,8 @@
+2020-08-06
+
+    - Fix of 'ref' links in IntelliJ
+    - Fix of 'Test Connection' in IntelliJ
+
 2020-08-04
 
     Added DataStore_oci8.php
