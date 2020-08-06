@@ -5,7 +5,6 @@ class OutParam:
     """
     The class to work with both OUT and INOUT parameters
     """
-
     def __init__(self, ptype, pvalue=None):
         self.ptype = ptype
         self.pvalue = pvalue
@@ -13,7 +12,7 @@ class OutParam:
 
 class RefCursor:
     """
-    The class to work with SYS_REFCURSOR parameters
+    The class to work with SYS_REFCURSOR
     """
     pass
 

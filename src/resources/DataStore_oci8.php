@@ -29,10 +29,19 @@ class OutParam {
 
 }
 
+/**
+ * The class to work with SYS_REFCURSOR
+ */
+class RefCursor {
+
+    public $rcid;
+
+}
+
 // class OciDataStore implements DataStore 
 class DataStore { // no inheritance is also OK
 
-    private $conn;
+    private $conn = null;
     private $commit_mode;
 
     function __destruct() {
@@ -192,17 +201,14 @@ class DataStore { // no inheritance is also OK
                 }
                 if ($ref_cursors) {
                     for ($i = 0; $i < count($params); $i++) {
-                        if ($params[$i] instanceof OutParam) {
-                            $type = $params[$i]->type;
-                            if ($type == SQLT_RSET || $type == OCI_B_CURSOR) {
-                                $rcid = $params[$i]->value;
-                                // https://www.php.net/manual/en/function.oci-new-cursor.php
-                                oci_execute($rcid, OCI_DEFAULT);  // Execute the REF CURSOR like a normal statement id
-                                while (($row = oci_fetch_array($rcid, OCI_ASSOC + OCI_RETURN_NULLS))) {
-                                    $callback($row);
-                                }
-                                oci_free_statement($rcid);
+                        if ($params[$i] instanceof RefCursor) {
+                            $rcid = $params[$i]->rcid;
+                            // https://www.php.net/manual/en/function.oci-new-cursor.php
+                            oci_execute($rcid, OCI_DEFAULT);  // Execute the REF CURSOR like a normal statement id
+                            while (($row = oci_fetch_array($rcid, OCI_ASSOC + OCI_RETURN_NULLS))) {
+                                $callback($row);
                             }
+                            oci_free_statement($rcid);
                         }
                     }
                 } else { // implicit cursors if no out ref cursors
@@ -229,20 +235,23 @@ class DataStore { // no inheritance is also OK
         $ref_cursors = false;
         for ($i = 0; $i < count($params); $i++) {
             if ($params[$i] instanceof OutParam) {
-                $param_name = ':' . $bind_names[$i];
                 $type = $params[$i]->type;
                 if ($type == SQLT_RSET || $type == OCI_B_CURSOR) {
-                    if ($throw_on_ref_cursors) {
-                        throw new Exception("SYS_REFCURSOR-s are not allowed");
-                    }
-                    $rcid = oci_new_cursor($this->conn);
-                    oci_bind_by_name($stid, $param_name, $rcid, -1, OCI_B_CURSOR);
-                    $params[$i]->value = $rcid;
-                    $ref_cursors = true;
+                    throw new Exception("SQLT_RSET and OCI_B_CURSOR are not allowed, use RefCursor instead.");
                 } else {
                     $size = $params[$i]->size;
+                    $param_name = ':' . $bind_names[$i];
                     oci_bind_by_name($stid, $param_name, $params[$i]->value, $size, $type);
                 }
+            } else if ($params[$i] instanceof RefCursor) {
+                if ($throw_on_ref_cursors) {
+                    throw new Exception("RefCursor is not allowed in this method.");
+                }
+                $rcid = oci_new_cursor($this->conn);
+                $param_name = ':' . $bind_names[$i];
+                oci_bind_by_name($stid, $param_name, $rcid, -1, OCI_B_CURSOR);
+                $params[$i]->rcid = $rcid;
+                $ref_cursors = true;
             } else {
                 oci_bind_by_name($stid, ':' . $bind_names[$i], $params[$i]);
             }
