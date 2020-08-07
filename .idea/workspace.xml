@@ -4,18 +4,6 @@
     <list default="true" id="1fb1c605-8c08-4b11-a01b-d42d0945087f" name="Default" comment="added option to exclude views in DTO/DAO assistants">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/META-INF/plugin.xml" beforeDir="false" afterPath="$PROJECT_DIR$/META-INF/plugin.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/manifest.mf" beforeDir="false" afterPath="$PROJECT_DIR$/manifest.mf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nbproject/private/private.xml" beforeDir="false" afterPath="$PROJECT_DIR$/nbproject/private/private.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/Bundle.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/Bundle.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/SdmTabAdmin.form" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/SdmTabAdmin.form" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/SdmTabAdmin.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/SdmTabAdmin.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/recent_changes.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/recent_changes.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/resources/DataStore_cx_Oracle.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/resources/DataStore_cx_Oracle.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/PsiReferenceDtoClass.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/PsiReferenceDtoClass.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/PsiReferenceSql.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/references/PsiReferenceSql.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaHelpers.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/IdeaHelpers.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabAdmin.form" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabAdmin.form" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabAdmin.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabAdmin.java" afterDir="false" />
     </list>
     <list id="0b913ed8-6e39-405f-b29b-9d52c75467b5" name="Failed commit: Default" comment="" />
     <option name="SHOW_DIALOG" value="false" />

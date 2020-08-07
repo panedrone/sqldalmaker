@@ -2,7 +2,7 @@
     <id>dal-mpe</id>
     <name>SQL DAL Maker</name>
     <category>Database</category>
-    <version>1.126.2020-08-06</version>
+    <version>1.126.2020-08-07</version>
     <vendor email="sqldalmaker@gmail.com"/>
     <!-- please see http://confluence.intellij.net/display/IDEADEV/Build+Number+Ranges for description -->
     <idea-version since-build="133.1885"/>
@@ -15,8 +15,13 @@ SQL DAL Maker is a generator of DTO and DAO classes to access relational databas
 To generate the class, you declare it in XML meta-program.<br/>
     ]]></description>
 
-<!--    <change-notes>-->
-<!--        <![CDATA[Added attribute 'pk' to define primary key manually in 'crud' and 'crud-auto']]></change-notes>-->
+    <change-notes>
+        <![CDATA[
+<ul>
+<li>improved RefCursor logic for python + cx_oracle</li>
+<li>improved RefCursor logic for php + oci8</li>
+<li>enabled last insert id for php + oci8</li>
+</ul>]]></change-notes>
 
     <application-components>
     </application-components>
