@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="sqldalmaker-intellij:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/sqldalmaker_intellij_jar</output-path>
+    <root id="archive" name="sqldalmaker-intellij.jar">
+      <element id="module-output" name="sqldalmaker-intellij" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/velocity-1.7-dep.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>

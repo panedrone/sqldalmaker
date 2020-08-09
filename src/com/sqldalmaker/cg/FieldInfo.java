@@ -11,48 +11,57 @@ package com.sqldalmaker.cg;
  */
 public class FieldInfo {
 
-    private String field_type;
+    private String field_type_name;
     private String field_name;
     private String name_prefix = "";
     private final String db_col_name; // original name in database without conversions to lower/camel case etc.
     private boolean is_auto_increment;
+    private String comment;
 
-    public FieldInfo(FieldNamesMode field_names_mode, String field_type_name, String col_name) {
-
-        db_col_name = col_name;
-        field_type = field_type_name;
+    public FieldInfo(FieldNamesMode field_names_mode, String field_type_name, String db_col_name, String comment) {
+        this.db_col_name = db_col_name;
+        this.field_type_name = field_type_name;
         field_name = db_col_name;
-        field_name = field_name.replace(" ", "_"); // for mysql!
-        field_name = field_name.replace(".", "_"); // [OrderDetails].OrderID
-        field_name = field_name.replace(":", "_"); // CustomerID:1 -- for latest xenian SQLite3
+        this.field_name = this.field_name.replace(" ", "_"); // for mysql!
+        this.field_name = this.field_name.replace(".", "_"); // [OrderDetails].OrderID
+        this.field_name = this.field_name.replace(":", "_"); // CustomerID:1 -- for latest xenian SQLite3
         if (FieldNamesMode.TO_LOWER_CASE.equals(field_names_mode)) {
-            field_name = field_name.toLowerCase();
+            this.field_name = this.field_name.toLowerCase();
         } else if (FieldNamesMode.TO_LOWER_CAMEL_CASE.equals(field_names_mode)) {
-            field_name = toLowerCamelCase(field_name);
+            this.field_name = toLowerCamelCase(this.field_name);
         } else if (FieldNamesMode.PYTHON_RUBY.equals(field_names_mode)) {
-            field_name = Helpers.camel_case_to_lower_under_scores(field_name);
-            name_prefix = "_";
+            this.field_name = Helpers.camel_case_to_lower_under_scores(this.field_name);
+            this.name_prefix = "_";
         }
+        this.comment = comment;
+    }
+
+    public String getComment() {
+        return this.comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 
     public String getType() {
-        return field_type;
+        return this.field_type_name;
     }
 
-    public void setType(String type) {
-        this.field_type = type;
+    public void setType(String field_type_name) {
+        this.field_type_name = field_type_name;
     }
 
     public String getName() {
-        return field_name;
+        return this.field_name;
     }
 
     public String getColumnName() {
-        return db_col_name;
+        return this.db_col_name;
     }
 
     public boolean isAutoIncrement() {
-        return is_auto_increment;
+        return this.is_auto_increment;
     }
 
     public void setAutoIncrement(boolean isAutoIncrement) {
@@ -61,14 +70,14 @@ public class FieldInfo {
 
     // called from Velocity script
     public String getterMethod() { // NO_UCD (unused code)
-        String s = name_prefix + field_name;
+        String s = this.name_prefix + this.field_name;
         String X = Helpers.replace_char_at(s, 0, Character.toUpperCase(s.charAt(0)));
         return "get" + X;
     }
 
     // called from Velocity script
     public String setterMethod() { // NO_UCD (unused code)
-        String s = name_prefix + field_name;
+        String s = this.name_prefix + this.field_name;
         String X = Helpers.replace_char_at(s, 0, Character.toUpperCase(s.charAt(0)));
         return "set" + X;
     }

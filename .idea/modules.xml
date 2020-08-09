@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/com.sqldalmaker.intellij.iml" filepath="$PROJECT_DIR$/com.sqldalmaker.intellij.iml" />
+      <module fileurl="file://$PROJECT_DIR$/sqldalmaker-intellij.iml" filepath="$PROJECT_DIR$/sqldalmaker-intellij.iml" />
     </modules>
   </component>
 </project>

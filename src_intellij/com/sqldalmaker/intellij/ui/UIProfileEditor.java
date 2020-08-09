@@ -73,7 +73,7 @@ public class UIProfileEditor {
             panel_1.remove(toolbar);
         }
 
-        toolbar = tabDTO1.getToolBar();
+        toolbar = tabDTO1.get_tool_bar();
         panel_1.add(toolbar);
         panel_1.updateUI();
     }
@@ -90,7 +90,7 @@ public class UIProfileEditor {
             panel_1.remove(toolbar);
         }
 
-        toolbar = tabDAO1.getToolBar();
+        toolbar = tabDAO1.get_tool_bar();
         panel_1.add(toolbar);
         panel_1.updateUI();
     }
@@ -167,16 +167,16 @@ public class UIProfileEditor {
         try {
 
             tabDTO1 = new UITabDTO();
-            cards1.add(tabDTO1.getRootPanel(), DTO);
-            tabDTO1.setProject(project);
-            tabDTO1.setFile(file);
-            tabDTO1.reloadTable(false);
+            cards1.add(tabDTO1.get_root_panel(), DTO);
+            tabDTO1.set_project(project);
+            tabDTO1.set_file(file);
+            tabDTO1.reload_table(false);
 
             tabDAO1 = new UITabDAO();
-            cards1.add(tabDAO1.getRootPanel(), DAO);
-            tabDAO1.setProject(project);
-            tabDAO1.setFile(file);
-            tabDAO1.reloadTable(false);
+            cards1.add(tabDAO1.get_root_panel(), DAO);
+            tabDAO1.set_project(project);
+            tabDAO1.set_file(file);
+            tabDAO1.reload_table(false);
 
             tabAdmin = new UITabAdmin();
             cards1.add(tabAdmin.getRootPanel(), Admin);
@@ -184,7 +184,7 @@ public class UIProfileEditor {
             tabAdmin.setFile(file);
             tabAdmin.init_runtime();
 
-            toolbar = tabDTO1.getToolBar();
+            toolbar = tabDTO1.get_tool_bar();
             panel_1.add(toolbar);
 
         } catch (Exception e) {

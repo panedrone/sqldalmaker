@@ -26,26 +26,26 @@ self#if($external_sql), sql#end, #end
 ## ====================================================================================================================
 #if ($mode=="dto_class")
 """
- ${class_name} is a generated DTO class. Don't modify it manually.
+ This is a generated DTO class. Don't modify it manually.
  Visit http://sqldalmaker.sourceforge.net/ for details.
 """
 
 
 class $class_name:
     """
-#foreach($field in $fields)
-    @type $field.getName(): $field.getType() | None
+#foreach($f in $fields)
+    @type $f.getName(): $f.getType() | None
 #end
     """
 
     def __init__(self):
-#foreach($field in $fields)
-        self.$field.getName() = None
+#foreach($f in $fields)
+        self.$f.getName() = None  # $f.getComment()
 #end
 ## ====================================================================================================================
 #elseif($mode=="dao_class")
 """
- ${class_name} is a generated DAO class. Don't modify it manually.
+ This is a generated DAO class. Don't modify it manually.
  Visit http://sqldalmaker.sourceforge.net/ for details.
 """
 
@@ -112,8 +112,8 @@ class $class_name:
 
         def cb(row):
             obj = ${returned_type_name}()
-#foreach($field in ${fields})
-            obj.${field.getName()} = row["${field.getColumnName()}"]
+#foreach($f in ${fields})
+            obj.${f.getName()} = row["${f.getColumnName()}"]  # ${f.getComment()}
 #end
             res.append(obj)
 
@@ -153,12 +153,10 @@ class $class_name:
         @raise: Exception if amount of returned rows != 1.
         """
 #sql_var($is_external_sql $sql)
-
 #if($use_dto)
         row = self.ds.query_single_row(sql, #param_array($dto_param)#if($out_params), out_params#end)
-        
-#foreach($field in ${fields})
-        obj.${field.getName()} = row["${field.getColumnName()}"]
+#foreach($f in ${fields})
+        obj.${f.getName()} = row["${f.getColumnName()}"]  # ${f.getComment()}
 #end
 #else
         return self.ds.query_scalar(sql, #param_array($dto_param)#if($out_params), out_params#end)

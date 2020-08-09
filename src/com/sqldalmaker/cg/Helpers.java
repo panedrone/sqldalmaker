@@ -385,11 +385,11 @@ public class Helpers {
 //    }
 
     public static String get_no_pk_message(String method_name) {
-        return "\t// INFO: " + method_name + " is omitted because PK is not detected.";
+        return "    // INFO: " + method_name + " is omitted because PK is not detected.";
     }
 
     public static String get_only_pk_message(String method_name) {
-        return "\t// INFO: " + method_name + " is omitted because all columns are part of PK.";
+        return "    // INFO: " + method_name + " is omitted because all columns are part of PK.";
     }
 
     public static String get_error_message(String msg, Throwable e) {

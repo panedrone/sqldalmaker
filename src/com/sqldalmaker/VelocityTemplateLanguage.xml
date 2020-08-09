@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<filetype binary="false" description="Velocity Template Language" name="Velocity Template Language">
+    <highlighting>
+        <options>
+            <option name="LINE_COMMENT" value="##" />
+            <option name="COMMENT_START" value="#*" />
+            <option name="COMMENT_END" value="*#" />
+            <option name="HEX_PREFIX" value="" />
+            <option name="NUM_POSTFIXES" value="" />
+            <option name="HAS_BRACES" value="false" />
+            <option name="HAS_BRACKETS" value="false" />
+            <option name="HAS_PARENS" value="true" />
+        </options>
+        <keywords ignore_case="false">
+            <keyword name="#else" />
+            <keyword name="#elseif" />
+            <keyword name="#end" />
+            <keyword name="#foreach" />
+            <keyword name="#if" />
+            <keyword name="#include" />
+            <keyword name="#macro" />
+            <keyword name="#parse" />
+            <keyword name="#set" />
+            <keyword name="#stop" />
+        </keywords>
+        <keywords2>
+            <keyword name="in" />
+        </keywords2>
+        <keywords3 />
+        <keywords4 />
+    </highlighting>
+</filetype>
+

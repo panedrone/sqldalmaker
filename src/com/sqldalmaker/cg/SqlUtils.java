@@ -60,7 +60,7 @@ public class SqlUtils {
             j_str = j_str.replace("\\/", "/");
             res.append(j_str);
             if (i < parts.length - 1) {
-                String s = " \" " + new_line + "\t\t\t\t + \"";
+                String s = " \" " + new_line + "                + \"";
                 res.append(s);
             }
         }

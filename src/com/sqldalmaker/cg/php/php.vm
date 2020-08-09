@@ -33,28 +33,28 @@ array(#foreach ($param in ${params})#set($p=${d}+$param.getName())#list_item(${v
 namespace ${namespace};
 #end
 /**
- * ${class_name} is a generated DTO class. Don't modify it manually.
+ * This is a generated DTO class. Don't modify it manually.
  * Visit http://sqldalmaker.sourceforge.net/ for details.
  */
 class ${class_name} {
 
-#foreach($field in ${fields})
-    private ${d}${field.getName()}; // ${field.getType()}
+#foreach($f in ${fields})
+    private ${d}${f.getName()}; // ${f.getType()} ${f.getComment()}
 #end
-#foreach($field in ${fields})
+#foreach($f in ${fields})
 
     /**
-     * @return ($field.getType())
+     * @return ($f.getType())
      */
     public function ${field.getterMethod()}() {
-        return ${d}this->$field.getName();
+        return ${d}this->$f.getName();
     }
 
     /**
      * @param ($field.getType()) ${d}$field.getName()
      */
-    public function ${field.setterMethod()}(${d}$field.getName()) {
-        ${d}this->$field.getName() = ${d}$field.getName();
+    public function ${f.setterMethod()}(${d}$f.getName()) {
+        ${d}this->$f.getName() = ${d}$f.getName();
     }
 #end
 }## ====================================================================================================================
@@ -150,7 +150,7 @@ class ${class_name} {
         ${d}cb = function(${d}row) use(&${d}res) {
             ${d}obj = new ${returned_type_name}();
 #foreach($f in ${fields})
-            ${d}obj->${f.setterMethod()}(${d}row["${f.getColumnName()}"]);
+            ${d}obj->${f.setterMethod()}(${d}row["${f.getColumnName()}"]); // ${f.getComment()}
 #end
             array_push(${d}res, ${d}obj);
         };
@@ -168,7 +168,7 @@ class ${class_name} {
         ${d}row = ${d}this->ds->queryDto(${d}sql, #param_array($dto_param));
         if ($row) {
 #foreach($f in ${fields})
-            ${d}obj->${f.setterMethod()}(${d}row["${f.getColumnName()}"]);
+            ${d}obj->${f.setterMethod()}(${d}row["${f.getColumnName()}"]); // ${f.getComment()}
 #end
             return $obj;
         }

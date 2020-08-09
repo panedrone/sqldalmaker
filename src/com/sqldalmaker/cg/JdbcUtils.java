@@ -212,7 +212,7 @@ public class JdbcUtils {
                 if (type_map != null) {
                     type_name = Helpers.get_cpp_class_name_from_java_class_name(type_map, type_name);
                 }
-                FieldInfo fi = new FieldInfo(field_names_mode, type_name, col_name);
+                FieldInfo fi = new FieldInfo(field_names_mode, type_name, col_name, "f <- t(c)");
                 fi.setAutoIncrement(rsmd.isAutoIncrement(i));
                 if (pk_col_names_set_lower_case.contains(col_name.toLowerCase())) {
                     if (fields_pk != null) {
@@ -257,7 +257,7 @@ public class JdbcUtils {
                 String col_name = _get_jdbc_column_name(rsmd, i);
                 // considers "[B", etc.
                 String java_type_name = _get_jdbc_column_type_name(rsmd, i);
-                FieldInfo field = new FieldInfo(field_names_mode, java_type_name, col_name);
+                FieldInfo field = new FieldInfo(field_names_mode, java_type_name, col_name, "f <- q(c)");
                 if (rsmd.isAutoIncrement(i)) {
                     field.setAutoIncrement(true);
                 } else {
@@ -310,7 +310,7 @@ public class JdbcUtils {
             if (fields_map.containsKey(col_name)) {
                 fields_map.get(col_name).setType(java_type_name);
             } else {
-                FieldInfo explicit_field = new FieldInfo(field_names_mode, java_type_name, col_name);
+                FieldInfo explicit_field = new FieldInfo(field_names_mode, java_type_name, col_name, "f <- xml(f)");
                 fields.add(explicit_field);
                 fields_map.put(col_name, explicit_field);
             }
@@ -442,7 +442,7 @@ public class JdbcUtils {
         if (type_map != null) {
             param_type_name = Helpers.get_cpp_class_name_from_java_class_name(type_map, param_type_name);
         }
-        return new FieldInfo(param_names_mode, param_type_name, param_name);
+        return new FieldInfo(param_names_mode, param_type_name, param_name, "parameter");
     }
 
     private void _refine_dao_fields_by_dto_fields(DtoClass jaxb_dto_class, String sql_root_abs_path,
@@ -486,7 +486,7 @@ public class JdbcUtils {
         } else {
             ret_col_name = dao_fields.get(0).getName();
         }
-        return new FieldInfo(field_names_mode, ret_type_name, ret_col_name);
+        return new FieldInfo(field_names_mode, ret_type_name, ret_col_name, "ret-value");
     }
 
     /////////////////////////////////////////////////////////////////////////////

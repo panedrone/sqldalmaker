@@ -45,7 +45,7 @@ public class NbpCG {
             Exceptions.printStackTrace(ex);
             return;
         }
-        final NbpIdeConsoleUtil err_log = new NbpIdeConsoleUtil(settings, root_data_object);
+        final NbpIdeConsoleUtil ide_log = new NbpIdeConsoleUtil(settings, root_data_object);
         RequestProcessor RP = new RequestProcessor("Generate DTO classes RP");
         // final ProgressHandle ph = ProgressHandle.createHandle("Generate DTO class(es)");
         RequestProcessor.Task task = RP.create(new Runnable() {
@@ -60,7 +60,7 @@ public class NbpCG {
                         String dto_xml_abs_path = xml_file.getPath();
                         String dto_xsd_abs_path = Helpers.concat_path(xml_metaprogram_abs_path, Const.DTO_XSD);
                         List<DtoClass> dto_classes = SdmUtils.get_dto_classes(dto_xml_abs_path, dto_xsd_abs_path);
-                        err_log.add_debug_message("STARTED...");
+                        ide_log.add_debug_message("STARTED...");
                         try {
                             Thread.sleep(200);
                         } catch (InterruptedException e) {
@@ -75,13 +75,13 @@ public class NbpCG {
                             } catch (Exception e) {
                                 // Exceptions.printStackTrace(e); // === panedrone: it shows banner!!!
                                 error = true;
-                                err_log.add_error_message(e);
+                                ide_log.add_error_message(e);
                             }
                         }
                         if (!error) {
-                            err_log.add_success_message(xml_file_title + " -> Generated successfully");
+                            ide_log.add_success_message(xml_file_title + " -> Generated successfully");
                         }
-                        err_log.add_debug_message("COMPLETED");
+                        ide_log.add_debug_message("COMPLETED.");
                     } finally {
                         conn.close();
                     }
@@ -148,7 +148,7 @@ public class NbpCG {
                         }
                     } finally {
                         conn.close();
-                        ide_log.add_debug_message("COMPLETED");
+                        ide_log.add_debug_message("COMPLETED.");
                     }
                 } catch (Exception e) {
                     NbpIdeMessageHelpers.show_error_in_ui_thread(e);
@@ -208,7 +208,7 @@ public class NbpCG {
                         }
                     } finally {
                         conn.close();
-                        ide_log.add_debug_message("COMPLETED");
+                        ide_log.add_debug_message("COMPLETED.");
                     }
                 } catch (Exception e) {
                     NbpIdeMessageHelpers.show_error_in_ui_thread(e);
@@ -271,7 +271,7 @@ public class NbpCG {
                         }
                     } finally {
                         conn.close();
-                        ide_log.add_debug_message("COMPLETED");
+                        ide_log.add_debug_message("COMPLETED.");
                     }
                 } catch (Exception e) {
                     NbpIdeMessageHelpers.show_error_in_ui_thread(e);

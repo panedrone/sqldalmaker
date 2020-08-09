@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 sqldalmaker@gmail.com
+ * Copyright 2011-2020 sqldalmaker@gmail.com
  * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
  * Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -51,41 +51,31 @@ public class UITabDAO {
 
     private TableRowSorter<AbstractTableModel> sorter;
     private Project project;
-    private VirtualFile propFile;
+    private VirtualFile root_file;
+    private MyTableModel my_table_model;
 
-    private MyTableModel tableModel;
-
-    public JComponent getToolBar() {
+    public JComponent get_tool_bar() {
         return tool_panel;
     }
 
     public UITabDAO() {
         $$$setupUI$$$();
-
         rootPanel.remove(top_panel_1);
-
         textField1.getDocument().addDocumentListener(new DocumentListener() {
-            private void updateFilter() {
-                setFilter();
-            }
-
             public void changedUpdate(DocumentEvent e) {
-                updateFilter();
+                set_filter();
             }
-
             public void removeUpdate(DocumentEvent e) {
-                updateFilter();
+                set_filter();
             }
-
             public void insertUpdate(DocumentEvent e) {
-                updateFilter();
+                set_filter();
             }
         });
-
         btn_Refresh.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                reloadTable(true);
+                reload_table(true);
             }
         });
         btn_SelAll.addActionListener(new ActionListener() {
@@ -116,30 +106,28 @@ public class UITabDAO {
         btn_OpenXML.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                openXML();
+                open_xml();
             }
         });
         btn_OpenJava.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                openGeneratedSourceFile();
+                open_generated_source_file();
             }
         });
         btn_NewXML.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                newDaoXml();
+                new_dao_xml();
             }
         });
         btn_CrudDao.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                generateCrudDao();
+                generate_crud_dao();
             }
         });
-
         Cursor wc = new Cursor(Cursor.HAND_CURSOR);
-
         tool_panel.setOpaque(false);
         for (Component c : tool_panel.getComponents()) {
             if (c instanceof JButton) {
@@ -158,38 +146,31 @@ public class UITabDAO {
 //                b.setBackground(tool_panel.getBackground());
             }
         }
-
         button_fk_assistant.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                IdeaCrudXmlHelpers.get_fk_access_xml(project, propFile);
+                IdeaCrudXmlHelpers.get_fk_access_xml(project, root_file);
             }
         });
     }
 
     private void createUIComponents() {
-
         final ColorRenderer colorRenderer = new ColorRenderer();
-
         table = new JTable() {
-
             public TableCellRenderer getCellRenderer(int row, int column) {
                 if (column == 1) {
                     return colorRenderer;
                 }
-
                 return super.getCellRenderer(row, column);
             }
         };
-
         // createUIComponents() is called before constructors
-        tableModel = new MyTableModel();
-        table.setModel(tableModel);
+        my_table_model = new MyTableModel();
+        table.setModel(my_table_model);
         table.getTableHeader().setReorderingAllowed(false);
 
-        sorter = new TableRowSorter<AbstractTableModel>(tableModel);
+        sorter = new TableRowSorter<AbstractTableModel>(my_table_model);
         table.setRowSorter(sorter);
-
         table.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
@@ -197,15 +178,14 @@ public class UITabDAO {
                     int row = table.rowAtPoint(new Point(e.getX(), e.getY()));
                     if (row >= 0) {
                         if (col == 0) {
-                            openXML();
+                            open_xml();
                         } else if (col == 1) {
-                            openGeneratedSourceFile();
+                            open_generated_source_file();
                         }
                     }
                 }
             }
         });
-
         {
             TableColumn col = table.getColumnModel().getColumn(0);
             col.setPreferredWidth(416);
@@ -216,21 +196,20 @@ public class UITabDAO {
         }
     }
 
-    private void generateCrudDao() {
-        IdeaCrudXmlHelpers.get_crud_dao_xml(project, propFile);
+    private void generate_crud_dao() {
+        IdeaCrudXmlHelpers.get_crud_dao_xml(project, root_file);
     }
 
-    private void newDaoXml() {
-        final UIDialogNewDaoXml d = new UIDialogNewDaoXml(project, propFile);
+    private void new_dao_xml() {
+        final UIDialogNewDaoXml d = new UIDialogNewDaoXml(project, root_file);
         d.pack();
         d.setLocationRelativeTo(null);  // after pack!!!
         d.addWindowListener(new WindowAdapter() {
             public void windowClosed(WindowEvent e) {
                 if (d.isSuccess()) {
-                    reloadTable(true);
+                    reload_table(true);
                 }
             }
-
 //            public void windowClosing(WindowEvent e)
 //            {
 //                System.out.println("jdialog window closing");
@@ -239,64 +218,46 @@ public class UITabDAO {
         d.setVisible(true);
     }
 
-    protected void openXML() {
-
+    protected void open_xml() {
         try {
-
-            int[] selectedRows = getSelection();
-
+            int[] selectedRows = get_selection();
             String relDirPath = (String) table.getValueAt(selectedRows[0], 0);
-
-            IdeaEditorHelpers.open_local_file_in_editor_sync(project, propFile, relDirPath);
-
+            IdeaEditorHelpers.open_local_file_in_editor_sync(project, root_file, relDirPath);
         } catch (Exception e) {
             e.printStackTrace();
             IdeaMessageHelpers.show_error_in_ui_thread(e);
         }
     }
 
-    protected void openGeneratedSourceFile() {
-
+    protected void open_generated_source_file() {
         try {
-
-            int[] selectedRows = getSelection();
-
-            final Settings settings = IdeaHelpers.load_settings(propFile);
-
+            int[] selectedRows = get_selection();
+            final Settings settings = IdeaHelpers.load_settings(root_file);
             String v = (String) table.getValueAt(selectedRows[0], 0);
-
             String value = Helpers.get_dao_class_name(v);
-
-            IdeaTargetLanguageHelpers.open_editor(project, propFile, value, settings, settings.getDao().getScope());
-
+            IdeaTargetLanguageHelpers.open_editor(project, root_file, value, settings, settings.getDao().getScope());
         } catch (Exception e) {
             e.printStackTrace();
             IdeaMessageHelpers.show_error_in_ui_thread(e);
         }
     }
-
-    private Throwable _error;
 
     protected void generate() {
-
         final java.util.List<IdeaHelpers.GeneratedFileData> list = new ArrayList<IdeaHelpers.GeneratedFileData>();
         final StringBuilder output_dir = new StringBuilder();
-
+        class Error {
+            public Throwable error = null;
+        }
+        Error error = new Error();
         final Runnable runnable = new Runnable() {
             @Override
             public void run() {
-
-                _error = null;
-
                 try {
-                    final Settings settings = IdeaHelpers.load_settings(propFile);
-
-                    final int[] selectedRows = getSelection();
-
+                    final Settings settings = IdeaHelpers.load_settings(root_file);
+                    final int[] selectedRows = get_selection();
                     for (int row : selectedRows) {
                         table.setValueAt("", row, 1);
                     }
-
                     // to prevent:
                     // WARN - tellij.ide.HackyRepaintManager
                     SwingUtilities.invokeLater(new Runnable() {
@@ -304,149 +265,103 @@ public class UITabDAO {
                             table.updateUI();
                         }
                     });
-
                     // tableViewer.refresh();
-
                     Connection con = IdeaHelpers.get_connection(project, settings);
-
                     try {
-
                         // !!!! after 'try'
-                        IDaoCG gen = IdeaTargetLanguageHelpers.create_dao_cg(con, project, propFile, settings, output_dir);
-
-                        String local_abs_path = propFile.getParent().getPath();
-
+                        IDaoCG gen = IdeaTargetLanguageHelpers.create_dao_cg(con, project, root_file, settings, output_dir);
+                        String local_abs_path = root_file.getParent().getPath();
                         String contextPath = DaoClass.class.getPackage().getName();
                         XmlParser xml_parser = new XmlParser(contextPath, Helpers.concat_path(local_abs_path, Const.DAO_XSD));
-
                         for (int row : selectedRows) {
-
                             String daoXmlRelPath = (String) table.getValueAt(row, 0);
-
                             try {
-
                                 ProgressManager.progress(daoXmlRelPath);
-
                                 String dao_class_name = Helpers.get_dao_class_name(daoXmlRelPath);
-
                                 String daoXmlAbsPath = Helpers.concat_path(local_abs_path, daoXmlRelPath);
                                 DaoClass dao_class = xml_parser.unmarshal(daoXmlAbsPath);
-
                                 String[] fileContent = gen.translate(dao_class_name, dao_class);
-
-                                IdeaTargetLanguageHelpers.prepare_generated_file_data(propFile, dao_class_name, fileContent, list);
-
+                                IdeaTargetLanguageHelpers.prepare_generated_file_data(root_file, dao_class_name, fileContent, list);
                                 table.setValueAt(Const.STATUS_GENERATED, row, 1);
-
                                 try {
                                     Thread.sleep(50);
                                 } catch (InterruptedException e) {
                                     e.printStackTrace();
                                 }
-
                                 // to prevent:
                                 // WARN - intellij.ide.HackyRepaintManager
-
                                 SwingUtilities.invokeLater(new Runnable() {
                                     public void run() {
                                         table.updateUI();
                                     }
                                 });
-
                             } catch (Throwable e) {
-
                                 String msg = e.getMessage();
-
                                 table.setValueAt(msg, row, 1);
-
-                                IdeaMessageHelpers.add_dao_error_message(settings, project, propFile, daoXmlRelPath, msg);
-
+                                IdeaMessageHelpers.add_dao_error_message(settings, project, root_file, daoXmlRelPath, msg);
                                 // _error = e;
-
                                 // break; // exit the loop
                             }
                         }
-
                     } finally {
                         con.close();
                     }
-
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                             table.updateUI();
                         }
                     });
-
                 } catch (Throwable e) {
-
-                    _error = e;
+                    error.error = e;
                 }
             }
         };
-
-        ProgressManager.getInstance().runProcessWithProgressSynchronously(runnable,
-                "Code Generation", false, project);
-
+        ProgressManager.getInstance().runProcessWithProgressSynchronously(runnable, "Code Generation", false, project);
         // write only the generated files
         // writeActions can show their own dialogs
-
         try {
-
             IdeaHelpers.run_write_action_to_generate_source_file(output_dir.toString(), list, project);
-
         } catch (Exception e) {
             e.printStackTrace();
             IdeaMessageHelpers.show_error_in_ui_thread(e);
         }
-
-        if (_error != null) {
-
-            _error.printStackTrace();
-            IdeaMessageHelpers.show_error_in_ui_thread(_error);
+        if (error.error != null) {
+            error.error.printStackTrace();
+            IdeaMessageHelpers.show_error_in_ui_thread(error.error);
         }
-
         table.updateUI();
     }
 
-    private int[] getSelection() throws Exception {
-
+    private int[] get_selection() throws Exception {
         int rc = table.getModel().getRowCount();
-
         if (rc == 1) {
             return new int[]{0};
         }
-
-        int[] selectedRows = table.getSelectedRows();
-
-        if (selectedRows.length == 0) {
-
-            throw new InternalException("Selection is empty.");
+        int[] selected_rows = table.getSelectedRows();
+        if (selected_rows.length == 0) {
+            selected_rows = new int[rc];
+            for (int i = 0; i < rc; i++) {
+                selected_rows[i] = i;
+            }
         }
-
-        return selectedRows;
+        if (selected_rows.length == 0) {
+            throw new InternalException("Selection is empty");
+        }
+        return selected_rows;
     }
 
     private void validate() {
-
         try {
-
-            reloadTable();
-
-            Settings profile = IdeaHelpers.load_settings(propFile);
-
+            reload_table();
+            Settings profile = IdeaHelpers.load_settings(root_file);
             Connection con = IdeaHelpers.get_connection(project, profile);
-
             try {
-
                 // !!!! after 'try'
-                IDaoCG gen = IdeaTargetLanguageHelpers.create_dao_cg(con, project, propFile, profile, null);
-
-                validateAsync(gen, tableModel, profile);
-
+                IDaoCG gen = IdeaTargetLanguageHelpers.create_dao_cg(con, project, root_file, profile, null);
+                validateAsync(gen, my_table_model, profile);
             } finally {
                 con.close();
             }
-
         } catch (Throwable e) {
             e.printStackTrace();
             IdeaMessageHelpers.show_error_in_ui_thread(e);
@@ -454,92 +369,67 @@ public class UITabDAO {
     }
 
     private void validateAsync(final IDaoCG gen, final TableModel model, final Settings settings) {
-
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
-
                 try {
-
-                    String local_abs_path = propFile.getParent().getPath();
-
+                    String local_abs_path = root_file.getParent().getPath();
                     String contextPath = DaoClass.class.getPackage().getName();
                     XmlParser xml_parser = new XmlParser(contextPath, Helpers.concat_path(local_abs_path, Const.DAO_XSD));
-
                     for (int i = 0; i < model.getRowCount(); i++) {
-
                         String daoXmlRelPath = (String) model.getValueAt(i, 0);
-
                         try {
-
                             ProgressManager.progress(daoXmlRelPath);
-
                             String dao_class_name = Helpers.get_dao_class_name(daoXmlRelPath);
-
                             String daoXmlAbsPath = Helpers.concat_path(local_abs_path, daoXmlRelPath);
                             DaoClass dao_class = xml_parser.unmarshal(daoXmlAbsPath);
-
                             String[] fileContent = gen.translate(dao_class_name, dao_class);
-
                             StringBuilder validationBuff = new StringBuilder();
-
-                            IdeaTargetLanguageHelpers.validate_dao(project, propFile, settings, dao_class_name, fileContent,
+                            IdeaTargetLanguageHelpers.validate_dao(project, root_file, settings, dao_class_name, fileContent,
                                     validationBuff);
-
                             String status = validationBuff.toString();
-
                             if (status.length() == 0) {
                                 model.setValueAt(Const.STATUS_OK, i, 1);
                             } else {
                                 model.setValueAt(status, i, 1);
-                                IdeaMessageHelpers.add_dao_error_message(settings, project, propFile, daoXmlRelPath, status);
+                                IdeaMessageHelpers.add_dao_error_message(settings, project, root_file, daoXmlRelPath, status);
                             }
-
                         } catch (Throwable ex) {
-
                             // ex.printStackTrace();
-
                             String msg = ex.getMessage();
-
                             model.setValueAt(msg, i, 1);
-
-                            IdeaMessageHelpers.add_dao_error_message(settings, project, propFile, daoXmlRelPath, msg);
+                            IdeaMessageHelpers.add_dao_error_message(settings, project, root_file, daoXmlRelPath, msg);
                         }
-
                         try {
                             Thread.sleep(50);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
-
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
                                 table.updateUI();
                             }
                         });
                     }
-
                 } catch (Throwable e) {
-
                     e.printStackTrace();
                     IdeaMessageHelpers.show_info_in_ui_thread(e.getMessage());
                 }
             }
         };
-
         ProgressManager.getInstance().runProcessWithProgressSynchronously(runnable,
                 "Validation", false, project);
     }
 
-    public void setProject(Project project) {
+    public void set_project(Project project) {
         this.project = project;
     }
 
-    public void setFile(VirtualFile propFile) {
-        this.propFile = propFile;
+    public void set_file(VirtualFile propFile) {
+        this.root_file = propFile;
     }
 
-    public JComponent getRootPanel() {
+    public JComponent get_root_panel() {
         return rootPanel;
     }
 
@@ -698,43 +588,27 @@ public class UITabDAO {
 
     private static class ColorRenderer extends DefaultTableCellRenderer {
         @Override
-        public Component getTableCellRendererComponent(JTable table,
-                                                       Object value, boolean isSelected, boolean hasFocus, int row,
-                                                       int column) {
-
-            Component c = super.getTableCellRendererComponent(table, value,
-                    isSelected, hasFocus, row, column);
-
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean
+                hasFocus, int row, int column) {
+            Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             String sValue = (String) value;
-
             setText(sValue);
-
             if (isSelected || Const.STATUS_OK.equals(sValue) || Const.STATUS_GENERATED.equals(sValue)) {
-
                 TableCellRenderer r = table.getCellRenderer(row, column);
-
-                Component c_0 = r.getTableCellRendererComponent(table, value,
-                        isSelected, hasFocus, row, 0);
-
+                Component c_0 = r.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, 0);
                 c.setForeground(c_0.getForeground());
-
             } else {
-
                 c.setForeground(JBColor.RED);
             }
-
             return c;
         }
     }
 
-    private void setFilter() {
-
+    private void set_filter() {
         // If current expression doesn't parse, don't update.
         try {
-
             RowFilter<AbstractTableModel, Object> rf = RowFilter.regexFilter(textField1.getText(), 0);
             sorter.setRowFilter(rf);
-
         } catch (PatternSyntaxException e) {
             sorter.setRowFilter(null);
         }
@@ -778,18 +652,13 @@ public class UITabDAO {
         }
     }
 
-    private void reloadTable() {
-
+    private void reload_table() {
         try {
-
-            final ArrayList<String[]> list = tableModel.getList();
+            final ArrayList<String[]> list = my_table_model.getList();
             list.clear();
-
             FileSearchHelpers.IFile_List fileList = new FileSearchHelpers.IFile_List() {
-
                 @Override
                 public void add(String fileName) {
-
                     String[] item = new String[2];
                     try {
                         item[0] = fileName;
@@ -800,26 +669,18 @@ public class UITabDAO {
                     list.add(item);
                 }
             };
-
-            String xml_configs_folder_full_path = propFile.getParent().getPath();
-
+            String xml_configs_folder_full_path = root_file.getParent().getPath();
             FileSearchHelpers.enum_dao_xml_file_names(xml_configs_folder_full_path, fileList);
-
         } finally {
-
-            tableModel.refresh(); // // table.updateUI();
+            my_table_model.refresh(); // // table.updateUI();
         }
     }
 
-    public void reloadTable(boolean showErrorMsg) {
-
+    public void reload_table(boolean show_error_msg) {
         try {
-
-            reloadTable();
-
+            reload_table();
         } catch (Throwable e) {
-
-            if (showErrorMsg) {
+            if (show_error_msg) {
                 e.printStackTrace();
                 IdeaMessageHelpers.show_error_in_ui_thread(e);
             }
