@@ -212,7 +212,7 @@ public class JdbcUtils {
                 if (type_map != null) {
                     type_name = Helpers.get_cpp_class_name_from_java_class_name(type_map, type_name);
                 }
-                FieldInfo fi = new FieldInfo(field_names_mode, type_name, col_name, "f <- t(c)");
+                FieldInfo fi = new FieldInfo(field_names_mode, type_name, col_name, "t::" + col_name);
                 fi.setAutoIncrement(rsmd.isAutoIncrement(i));
                 if (pk_col_names_set_lower_case.contains(col_name.toLowerCase())) {
                     if (fields_pk != null) {
@@ -257,7 +257,7 @@ public class JdbcUtils {
                 String col_name = _get_jdbc_column_name(rsmd, i);
                 // considers "[B", etc.
                 String java_type_name = _get_jdbc_column_type_name(rsmd, i);
-                FieldInfo field = new FieldInfo(field_names_mode, java_type_name, col_name, "f <- q(c)");
+                FieldInfo field = new FieldInfo(field_names_mode, java_type_name, col_name, "q::" + col_name);
                 if (rsmd.isAutoIncrement(i)) {
                     field.setAutoIncrement(true);
                 } else {
@@ -310,7 +310,7 @@ public class JdbcUtils {
             if (fields_map.containsKey(col_name)) {
                 fields_map.get(col_name).setType(java_type_name);
             } else {
-                FieldInfo explicit_field = new FieldInfo(field_names_mode, java_type_name, col_name, "f <- xml(f)");
+                FieldInfo explicit_field = new FieldInfo(field_names_mode, java_type_name, col_name, "xml::" + col_name);
                 fields.add(explicit_field);
                 fields_map.put(col_name, explicit_field);
             }

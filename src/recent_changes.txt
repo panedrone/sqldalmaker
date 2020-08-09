@@ -1,3 +1,10 @@
+2020-08-09
+
+    - improved RefCursor logic for python + cx_oracle
+    - improved RefCursor logic for php + oci8
+    - enabled last insert id for php + oci8
+    - comments to describe how the mappings were built
+
 2020-08-06
 
     - Fix of 'ref' links in IntelliJ

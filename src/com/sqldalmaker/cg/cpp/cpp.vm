@@ -13,15 +13,12 @@
 #end
 #macro(param_array $dto_param $params)
 #if ($dto_param != "")
-		CValue *params[] = {#foreach ($param in ${params})#set($p="&p."+$param.getName())#list_item(${velocityCount} $p)#end};
-#else
-		CValue *params[] = {#foreach ($param in ${params})#set($p="&"+$param.getName())#list_item(${velocityCount} $p)#end};
-#end
+		CValue *params[] = {#foreach ($param in ${params})#set($p="&p."+$param.getName())#list_item(${velocityCount} $p)#end};#else
+		CValue *params[] = {#foreach ($param in ${params})#set($p="&"+$param.getName())#list_item(${velocityCount} $p)#end};#end
 #end
 #macro(sql_var $external_sql $sql)
 #if(!${external_sql})
 		DL_STR sql = DL_T(${sql});
-
 #end
 #end
 ## ====================================================================================================================
@@ -32,15 +29,15 @@
 \#include "DataStore.h"
 
 /**
- * ${class_name} is a generated DTO class. Don't modify it manually.
- * Visit http://sqldalmaker.sourceforge.net/ for details.
+ * This is a generated DTO class. Don't modify it manually.
+ * http://sqldalmaker.sourceforge.net
  */
 class ${class_name}
 {
 public:
 
 #foreach($field in ${fields})
-	${field.getType()} ${field.getName()};
+	${field.getType()} ${field.getName()}; // ${field.getComment()}
 #end
 };
 
@@ -54,8 +51,8 @@ public:
 #end
 
 /**
- * ${class_name} is a generated DAO class. Don't modify it manually.
- * Visit http://sqldalmaker.sourceforge.net/ for details.
+ * This is a generated DAO class. Don't modify it manually.
+ * http://sqldalmaker.sourceforge.net
  */
 class ${class_name}
 {
@@ -75,8 +72,8 @@ public:
 #elseif($mode=="dao_create")
 
 	/* 
-	   CRUD-Create. The table '${table_name}'.
-	   Auto-generated values are assigned to appropriate fields of DTO.
+	   (C)RUD::${table_name}
+	   Generated values are passed to DTO.
 	   Returns the number of affected rows or -1 on error.
 	*/
 	int ${method_name}(${dto_param} &p)
@@ -84,7 +81,6 @@ public:
 #sql_var(false $sql)
 		CValue *params[] = {#foreach ($param in ${params})#set($p="&p."+${param.getName()})#list_item(${velocityCount} $p)#end};
 		CValue *ai_values[]= {#foreach ($key in ${keys})#set($p="&p."+${key.getColumnName()})#list_item(${velocityCount} $p)#end};
-
 		return m_ds.insert(sql,	${params.size()}, params, ${keys.size()}, ai_values);
 	}
 ## ====================================================================================================================
@@ -92,7 +88,7 @@ public:
 	
 	/* 
 #if($crud)
-	   CRUD-Read. The table '${ref}'.
+	   C(R)UD: ${ref}
 #end
 	   Returns the number of fetched rows or -1 on error.
 	 */
@@ -109,13 +105,10 @@ public:
 		{
 			${returned_type_name} buff;
 			CListReader<${returned_type_name}> *pReader;
-
 			void processRow() { pReader->read(buff); }
-
 		} rp;
 
 		rp.pReader = &reader;
-
 #if(${dto_param} != "")
 #if(${params.size()} > 0)
 		CValue *params[] = {#foreach ($param in ${params})#set($p="&p."+$param.getName())#list_item(${velocityCount} $p)#end};
@@ -131,7 +124,6 @@ public:
 		CValue *res_values[] = {&rp.buff};
 #end
 		DL_STR col_names[] = {#foreach ($field in ${fields})#if(${velocityCount} == 1)DL_T("${field.getName()}")#else, DL_T("${field.getName()}")#end#end};
-
 		return m_ds.queryRowList(sql, ${params.size()},#if(${params.size()} > 0) params#else 0#end, ${fields.size()}, res_values, col_names, &rp);
 	}
 #else
@@ -157,7 +149,6 @@ public:
 		CValue *res_values[] = {&res};
 #end
 		DL_STR col_names[] = {#foreach ($field in ${fields})#if(${velocityCount} == 1)DL_T("${field.getName()}")#else, DL_T("${field.getName()}")#end#end};
-
 		return m_ds.queryRow(sql, ${params.size()},#if(${params.size()} > 0) params#else 0#end, ${fields.size()}, res_values, col_names);
 	}
 #end
@@ -166,11 +157,11 @@ public:
 	
 	/*
 #if($method_type == "CREATE")
-	   CRUD-Create. The table '${table_name}'.
+	   (C)RUD::${table_name}
 #elseif($method_type == "UPDATE")
-	   CRUD-Update. The table '${table_name}'.
+	   CR(U)D:${table_name}
 #elseif($method_type == "DELETE")
-	   CRUD-Delete. The table '${table_name}'.
+	   CRU(D)::${table_name}
 #end
 	   Returns the number of affected rows or -1 on error.
 	*/
@@ -178,7 +169,6 @@ public:
 	{
 #sql_var(${external_sql} $sql)
 #param_array($dto_param $params)
-
 		return m_ds.execDML(sql, ${params.size()}, params);
 	}
 #end

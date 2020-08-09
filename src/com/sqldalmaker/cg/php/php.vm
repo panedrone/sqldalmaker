@@ -34,7 +34,7 @@ namespace ${namespace};
 #end
 /**
  * This is a generated DTO class. Don't modify it manually.
- * Visit http://sqldalmaker.sourceforge.net/ for details.
+ * http://sqldalmaker.sourceforge.net
  */
 class ${class_name} {
 
@@ -46,12 +46,12 @@ class ${class_name} {
     /**
      * @return ($f.getType())
      */
-    public function ${field.getterMethod()}() {
+    public function ${f.getterMethod()}() {
         return ${d}this->$f.getName();
     }
 
     /**
-     * @param ($field.getType()) ${d}$field.getName()
+     * @param ($f.getType()) ${d}$f.getName()
      */
     public function ${f.setterMethod()}(${d}$f.getName()) {
         ${d}this->$f.getName() = ${d}$f.getName();
@@ -79,8 +79,8 @@ use ${u};
 
 #end
 /**
- * ${class_name} is a generated DAO class. Don't modify it manually.
- * Visit http://sqldalmaker.sourceforge.net/ for details.
+ * This is a generated DAO class. Don't modify it manually.
+ * http://sqldalmaker.sourceforge.net
  */
 class ${class_name} {
 
@@ -96,8 +96,8 @@ class ${class_name} {
 #elseif($mode=="dao_create")
 
     /**
-     * CRUD-Create. The table '${table_name}'.
-     * Auto-generated values are assigned to related fields of DTO.
+     * (C)RUD::${table_name}
+     * Generated values are passed to DTO.
      * @param ${dto_param} ${d}p
      * @return TRUE on success or FALSE on failure
      */
@@ -116,7 +116,7 @@ class ${class_name} {
 
     /**
 #if($crud)
-     * CRUD-Read. The table '${ref}'.
+     * C(R)UD::${ref}
 #end
 #if(${is_external_sql})
      * @param string ${d}sql external SQL statement
@@ -183,11 +183,11 @@ class ${class_name} {
 
     /**
 #if ($crud == "create")
-     * CRUD-Create. The table '${table_name}'.
+     * (C)RUD::${table_name}
 #elseif ($crud == "update")
-     * CRUD-Update. The table '${table_name}'.
+     * CR(U)D::${table_name}
 #elseif ($crud == "delete")
-     * CRUD-Delete. The table '${table_name}'.
+     * CRU(D)::${table_name}
 #end
 #if(${is_external_sql})
      * @param string ${d}sql external SQL statement

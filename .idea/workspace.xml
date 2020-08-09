@@ -2,30 +2,22 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1fb1c605-8c08-4b11-a01b-d42d0945087f" name="Default" comment="added option to exclude views in DTO/DAO assistants">
-      <change afterPath="$PROJECT_DIR$/.idea/artifacts/sqldalmaker_intellij_jar.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/build.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/sqldalmaker-intellij.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/sqldalmaker-intellij.zip" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/com/sqldalmaker/VelocityTemplateLanguage.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.name" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.name" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/sqldalmaker-intellij.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/artifacts/sqldalmaker_intellij_jar.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/META-INF/plugin.xml" beforeDir="false" afterPath="$PROJECT_DIR$/META-INF/plugin.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/com.sqldalmaker.intellij.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/manifest.mf" beforeDir="false" afterPath="$PROJECT_DIR$/manifest.mf" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/nbproject/private/private.xml" beforeDir="false" afterPath="$PROJECT_DIR$/nbproject/private/private.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/FieldInfo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/FieldInfo.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/Helpers.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/Helpers.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sqldalmaker-intellij.iml" beforeDir="false" afterPath="$PROJECT_DIR$/sqldalmaker-intellij.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/JdbcUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/JdbcUtils.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/SqlUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/SqlUtils.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/java/java.vm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/cpp/cpp.vm" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/cpp/cpp.vm" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/java/java.vm" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/java/java.vm" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/php/php.vm" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/php/php.vm" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/python/python.vm" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/python/python.vm" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/cg/ruby/ruby.vm" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/cg/ruby/ruby.vm" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/Bundle.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/Bundle.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/NbpCG.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/NbpCG.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/SdmTabDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/SdmTabDAO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/SdmTabDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/sqldalmaker/netbeans/SdmTabDTO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UIProfileEditor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UIProfileEditor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabDAO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src_intellij/com/sqldalmaker/intellij/ui/UITabDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/recent_changes.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/recent_changes.txt" afterDir="false" />
     </list>
     <list id="0b913ed8-6e39-405f-b29b-9d52c75467b5" name="Failed commit: Default" comment="" />
     <option name="SHOW_DIALOG" value="false" />
@@ -970,10 +962,10 @@
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
     <state x="92" y="92" width="1736" height="866" key="DiffContextDialog/0.0.1920.1050@0.0.1920.1050" timestamp="1596734995162" />
-    <state x="740" y="281" width="588" height="654" key="FileChooserDialogImpl" timestamp="1596931430096">
+    <state x="740" y="281" width="588" height="654" key="FileChooserDialogImpl" timestamp="1596932219272">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state x="740" y="281" width="588" height="654" key="FileChooserDialogImpl/0.0.1920.1050@0.0.1920.1050" timestamp="1596931430096" />
+    <state x="740" y="281" width="588" height="654" key="FileChooserDialogImpl/0.0.1920.1050@0.0.1920.1050" timestamp="1596932219272" />
     <state width="1078" height="188" key="GridCell.Tab.0.bottom" timestamp="1596929323281">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
@@ -1030,10 +1022,10 @@
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
     <state x="693" y="226" key="RollbackChangesDialog/0.0.1920.1050@0.0.1920.1050" timestamp="1589819515181" />
-    <state x="319" y="146" width="1421" height="853" key="SettingsEditor" timestamp="1596931433796">
+    <state x="319" y="146" width="1421" height="853" key="SettingsEditor" timestamp="1596932224952">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state x="319" y="146" width="1421" height="853" key="SettingsEditor/0.0.1920.1050@0.0.1920.1050" timestamp="1596931433796" />
+    <state x="319" y="146" width="1421" height="853" key="SettingsEditor/0.0.1920.1050@0.0.1920.1050" timestamp="1596932224952" />
     <state x="776" y="302" key="chooseDestDirectoryDialog" timestamp="1588406446535">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>

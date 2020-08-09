@@ -73,8 +73,8 @@ public class ${class_name} {
 #elseif($mode=="dao_create")
 
     /*
-        CRUD-Create. The table '${table_name}'.
-        Auto-generated values are assigned to appropriate fields of DTO.
+        (C)RUD::${table_name}
+        Generated values are passed to DTO.
         Returns the number of affected rows or -1 on error.
      */
     public int ${method_name}(${dto_param} p) throws Exception {
@@ -93,7 +93,7 @@ public class ${class_name} {
 
 #if($crud)
     /*
-        CRUD-Read. The table '${ref}'.
+        C(R)UD::${ref}
      */
 #end
 #if($fetch_list)
@@ -152,11 +152,11 @@ public class ${class_name} {
 
     /*
 #if($method_type == "CREATE")
-        CRUD-Create. The table '${table_name}'.
+        (C)RUD::${table_name}
 #elseif($method_type == "UPDATE")
-        CRUD-Update. The table '${table_name}'.
+        CR(U)D::${table_name}
 #elseif($method_type == "DELETE")
-        CRUD-Delete. The table '${table_name}'.
+        CRU(D)::${table_name}
 #end
         Returns the number of affected rows or -1 on error.
      */
@@ -169,11 +169,11 @@ public class ${class_name} {
 
     /*
 #if($method_type == "CREATE")
-        CRUD-Create. The table '${table_name}'.
+        (C)RUD::${table_name}
 #elseif($method_type == "UPDATE")
-        CRUD-Update. The table '${table_name}'.
+        CR(U)D::${table_name}
 #elseif($method_type == "DELETE")
-        CRUD-Delete. The table '${table_name}'.
+        CRU(D)::${table_name}
 #end
         Returns the number of affected rows or -1 on error.
      */

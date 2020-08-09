@@ -27,7 +27,7 @@ self#if($external_sql), sql#end, #end
 #if ($mode=="dto_class")
 """
  This is a generated DTO class. Don't modify it manually.
- Visit http://sqldalmaker.sourceforge.net/ for details.
+ http://sqldalmaker.sourceforge.net
 """
 
 
@@ -46,7 +46,7 @@ class $class_name:
 #elseif($mode=="dao_class")
 """
  This is a generated DAO class. Don't modify it manually.
- Visit http://sqldalmaker.sourceforge.net/ for details.
+ http://sqldalmaker.sourceforge.net
 """
 
 
@@ -69,8 +69,8 @@ class $class_name:
 
     def $method_name(self, p):
         """
-        CRUD-Create. The table '$table_name'.
-        Auto-generated values are assigned to related fields of DTO.
+        (C)RUD::$table_name
+        Generated values are passed to DTO.
         @type p: $dto_param
         @rtype: None
         @raise: Exception if no rows inserted.
@@ -89,7 +89,7 @@ class $class_name:
     def $method_name(#if($dto_param != "")#param_decls_dto($is_external_sql)p#else#param_decls($is_external_sql $params)#end#if($out_params), out_params#end):
         """
 #if($crud)
-        CRUD-Read-All. The table '$ref'.
+        C(R)UD::$ref
 #end
 #if($is_external_sql)
         @type sql: str
@@ -126,7 +126,7 @@ class $class_name:
     def $method_name(#if($dto_param != "")#param_decls_dto($is_external_sql)p, obj#else#param_decls($is_external_sql $params)#if($use_dto), obj#end#end#if($out_params), out_params#end):
         """
 #if($crud)
-        CRUD-Read. The table '$ref'.
+        C(R)UD::$ref
 #end
 #if($is_external_sql)
         @type sql: str
@@ -168,13 +168,11 @@ class $class_name:
     def $method_name(#if($dto_param != "")#param_decls_dto($is_external_sql)p#else#param_decls($is_external_sql $params)#end):
         """
 #if ($crud == "create")
-        CRUD-Create. The table '$table_name'.
+        (C)RUD::$table_name
 #elseif ($crud == "update")
-        CRUD-Update. The table '$table_name'.
+        CR(U)D::$table_name
 #elseif ($crud == "delete")
-        CRUD-Delete. The table '$table_name'.
-#else
-        Returns number of affected rows.
+        CRU(D)::$table_name
 #end
 #if ($is_external_sql)
         @type sql: str
@@ -186,7 +184,7 @@ class $class_name:
         @type $param.getName(): $param.getType()
 #end
 #end
-        @rtype: int
+        @rtype: int (the number of affected rows)
         """
 #sql_var($is_external_sql $sql)
         return self.ds.exec_dml(sql, #param_array($dto_param))
