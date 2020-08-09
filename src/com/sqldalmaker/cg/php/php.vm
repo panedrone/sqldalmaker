@@ -96,7 +96,7 @@ class ${class_name} {
 #elseif($mode=="dao_create")
 
     /**
-     * (C)RUD::${table_name}
+     * (C)RUD: ${table_name}
      * Generated values are passed to DTO.
      * @param ${dto_param} ${d}p
      * @return TRUE on success or FALSE on failure
@@ -116,7 +116,7 @@ class ${class_name} {
 
     /**
 #if($crud)
-     * C(R)UD::${ref}
+     * C(R)UD: ${ref}
 #end
 #if(${is_external_sql})
      * @param string ${d}sql external SQL statement
@@ -183,11 +183,11 @@ class ${class_name} {
 
     /**
 #if ($crud == "create")
-     * (C)RUD::${table_name}
+     * (C)RUD: ${table_name}
 #elseif ($crud == "update")
-     * CR(U)D::${table_name}
+     * CR(U)D: ${table_name}
 #elseif ($crud == "delete")
-     * CRU(D)::${table_name}
+     * CRU(D): ${table_name}
 #end
 #if(${is_external_sql})
      * @param string ${d}sql external SQL statement

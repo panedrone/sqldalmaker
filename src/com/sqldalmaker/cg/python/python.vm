@@ -69,7 +69,7 @@ class $class_name:
 
     def $method_name(self, p):
         """
-        (C)RUD::$table_name
+        (C)RUD: $table_name
         Generated values are passed to DTO.
         @type p: $dto_param
         @rtype: None
@@ -89,7 +89,7 @@ class $class_name:
     def $method_name(#if($dto_param != "")#param_decls_dto($is_external_sql)p#else#param_decls($is_external_sql $params)#end#if($out_params), out_params#end):
         """
 #if($crud)
-        C(R)UD::$ref
+        C(R)UD: $ref
 #end
 #if($is_external_sql)
         @type sql: str
@@ -126,7 +126,7 @@ class $class_name:
     def $method_name(#if($dto_param != "")#param_decls_dto($is_external_sql)p, obj#else#param_decls($is_external_sql $params)#if($use_dto), obj#end#end#if($out_params), out_params#end):
         """
 #if($crud)
-        C(R)UD::$ref
+        C(R)UD: $ref
 #end
 #if($is_external_sql)
         @type sql: str
@@ -168,11 +168,11 @@ class $class_name:
     def $method_name(#if($dto_param != "")#param_decls_dto($is_external_sql)p#else#param_decls($is_external_sql $params)#end):
         """
 #if ($crud == "create")
-        (C)RUD::$table_name
+        (C)RUD: $table_name
 #elseif ($crud == "update")
-        CR(U)D::$table_name
+        CR(U)D: $table_name
 #elseif ($crud == "delete")
-        CRU(D)::$table_name
+        CRU(D): $table_name
 #end
 #if ($is_external_sql)
         @type sql: str

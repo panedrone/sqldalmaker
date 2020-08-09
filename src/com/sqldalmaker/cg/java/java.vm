@@ -73,7 +73,7 @@ public class ${class_name} {
 #elseif($mode=="dao_create")
 
     /*
-        (C)RUD::${table_name}
+        (C)RUD: ${table_name}
         Generated values are passed to DTO.
         Returns the number of affected rows or -1 on error.
      */
@@ -93,7 +93,7 @@ public class ${class_name} {
 
 #if($crud)
     /*
-        C(R)UD::${ref}
+        C(R)UD: ${ref}
      */
 #end
 #if($fetch_list)
@@ -152,11 +152,11 @@ public class ${class_name} {
 
     /*
 #if($method_type == "CREATE")
-        (C)RUD::${table_name}
+        (C)RUD: ${table_name}
 #elseif($method_type == "UPDATE")
-        CR(U)D::${table_name}
+        CR(U)D: ${table_name}
 #elseif($method_type == "DELETE")
-        CRU(D)::${table_name}
+        CRU(D): ${table_name}
 #end
         Returns the number of affected rows or -1 on error.
      */
@@ -169,11 +169,11 @@ public class ${class_name} {
 
     /*
 #if($method_type == "CREATE")
-        (C)RUD::${table_name}
+        (C)RUD: ${table_name}
 #elseif($method_type == "UPDATE")
-        CR(U)D::${table_name}
+        CR(U)D: ${table_name}
 #elseif($method_type == "DELETE")
-        CRU(D)::${table_name}
+        CRU(D): ${table_name}
 #end
         Returns the number of affected rows or -1 on error.
      */

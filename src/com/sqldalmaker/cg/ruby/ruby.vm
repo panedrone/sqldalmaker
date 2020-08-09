@@ -64,7 +64,7 @@ end
 ## ====================================================================================================================
 #elseif($mode=="dao_create")
 
-  # (C)RUD::$table_name
+  # (C)RUD: $table_name
   # Generated values are passed to DTO.
   # @param [$dto_param] p
   def $method_name(p)
@@ -82,7 +82,7 @@ end
 
 #if($fetch_list)
 #if($crud)
-  # C(R)UD::$ref
+  # C(R)UD: $ref
 #end
 #if($is_external_sql)
   # @param [String] sql
@@ -114,7 +114,7 @@ end
   end
 #else
 #if($crud)
-  # C(R)UD::$ref
+  # C(R)UD: $ref
 #end
 #if($is_external_sql)
   # @param [String] sql
@@ -153,11 +153,11 @@ end
 #elseif($mode=="dao_exec_dml")
 
 #if ($crud == "create")
-  # (C)RUD::$table_name
+  # (C)RUD: $table_name
 #elseif ($crud == "update")
-  # CR(U)D::$table_name
+  # CR(U)D: $table_name
 #elseif ($crud == "delete")
-  # CRU(D)::$table_name
+  # CRU(D): $table_name
 #end
 #if ($is_external_sql)
   # @param [String] sql
