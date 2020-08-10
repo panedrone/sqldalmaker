@@ -65,9 +65,11 @@ public class UITabDAO {
             public void changedUpdate(DocumentEvent e) {
                 set_filter();
             }
+
             public void removeUpdate(DocumentEvent e) {
                 set_filter();
             }
+
             public void insertUpdate(DocumentEvent e) {
                 set_filter();
             }
@@ -100,7 +102,7 @@ public class UITabDAO {
         btn_Generate.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                generate();
+                generate_sync();
             }
         });
         btn_OpenXML.addActionListener(new ActionListener() {
@@ -242,7 +244,7 @@ public class UITabDAO {
         }
     }
 
-    protected void generate() {
+    protected void generate_sync() {
         final java.util.List<IdeaHelpers.GeneratedFileData> list = new ArrayList<IdeaHelpers.GeneratedFileData>();
         final StringBuilder output_dir = new StringBuilder();
         class Error {
@@ -274,14 +276,14 @@ public class UITabDAO {
                         String contextPath = DaoClass.class.getPackage().getName();
                         XmlParser xml_parser = new XmlParser(contextPath, Helpers.concat_path(local_abs_path, Const.DAO_XSD));
                         for (int row : selectedRows) {
-                            String daoXmlRelPath = (String) table.getValueAt(row, 0);
+                            String dao_xml_rel_path = (String) table.getValueAt(row, 0);
                             try {
-                                ProgressManager.progress(daoXmlRelPath);
-                                String dao_class_name = Helpers.get_dao_class_name(daoXmlRelPath);
-                                String daoXmlAbsPath = Helpers.concat_path(local_abs_path, daoXmlRelPath);
-                                DaoClass dao_class = xml_parser.unmarshal(daoXmlAbsPath);
-                                String[] fileContent = gen.translate(dao_class_name, dao_class);
-                                IdeaTargetLanguageHelpers.prepare_generated_file_data(root_file, dao_class_name, fileContent, list);
+                                ProgressManager.progress(dao_xml_rel_path);
+                                String dao_class_name = Helpers.get_dao_class_name(dao_xml_rel_path);
+                                String dao_xml_abs_path = Helpers.concat_path(local_abs_path, dao_xml_rel_path);
+                                DaoClass dao_class = xml_parser.unmarshal(dao_xml_abs_path);
+                                String[] file_content = gen.translate(dao_class_name, dao_class);
+                                IdeaTargetLanguageHelpers.prepare_generated_file_data(root_file, dao_class_name, file_content, list);
                                 table.setValueAt(Const.STATUS_GENERATED, row, 1);
                                 try {
                                     Thread.sleep(50);
@@ -298,8 +300,7 @@ public class UITabDAO {
                             } catch (Throwable e) {
                                 String msg = e.getMessage();
                                 table.setValueAt(msg, row, 1);
-                                IdeaMessageHelpers.add_dao_error_message(settings, project, root_file, daoXmlRelPath, msg);
-                                // _error = e;
+                                IdeaMessageHelpers.add_dao_error_message(settings, project, root_file, dao_xml_rel_path, msg);
                                 // break; // exit the loop
                             }
                         }
@@ -358,7 +359,7 @@ public class UITabDAO {
             try {
                 // !!!! after 'try'
                 IDaoCG gen = IdeaTargetLanguageHelpers.create_dao_cg(con, project, root_file, profile, null);
-                validateAsync(gen, my_table_model, profile);
+                validate_sync(gen, my_table_model, profile);
             } finally {
                 con.close();
             }
@@ -368,7 +369,7 @@ public class UITabDAO {
         }
     }
 
-    private void validateAsync(final IDaoCG gen, final TableModel model, final Settings settings) {
+    private void validate_sync(final IDaoCG gen, final TableModel model, final Settings settings) {
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
@@ -377,28 +378,27 @@ public class UITabDAO {
                     String contextPath = DaoClass.class.getPackage().getName();
                     XmlParser xml_parser = new XmlParser(contextPath, Helpers.concat_path(local_abs_path, Const.DAO_XSD));
                     for (int i = 0; i < model.getRowCount(); i++) {
-                        String daoXmlRelPath = (String) model.getValueAt(i, 0);
+                        String dao_xml_rel_path = (String) model.getValueAt(i, 0);
                         try {
-                            ProgressManager.progress(daoXmlRelPath);
-                            String dao_class_name = Helpers.get_dao_class_name(daoXmlRelPath);
-                            String daoXmlAbsPath = Helpers.concat_path(local_abs_path, daoXmlRelPath);
-                            DaoClass dao_class = xml_parser.unmarshal(daoXmlAbsPath);
-                            String[] fileContent = gen.translate(dao_class_name, dao_class);
-                            StringBuilder validationBuff = new StringBuilder();
-                            IdeaTargetLanguageHelpers.validate_dao(project, root_file, settings, dao_class_name, fileContent,
-                                    validationBuff);
-                            String status = validationBuff.toString();
+                            ProgressManager.progress(dao_xml_rel_path);
+                            String dao_class_name = Helpers.get_dao_class_name(dao_xml_rel_path);
+                            String dao_xml_abs_path = Helpers.concat_path(local_abs_path, dao_xml_rel_path);
+                            DaoClass dao_class = xml_parser.unmarshal(dao_xml_abs_path);
+                            String[] file_content = gen.translate(dao_class_name, dao_class);
+                            StringBuilder validation_buff = new StringBuilder();
+                            IdeaTargetLanguageHelpers.validate_dao(project, root_file, settings, dao_class_name, file_content, validation_buff);
+                            String status = validation_buff.toString();
                             if (status.length() == 0) {
                                 model.setValueAt(Const.STATUS_OK, i, 1);
                             } else {
                                 model.setValueAt(status, i, 1);
-                                IdeaMessageHelpers.add_dao_error_message(settings, project, root_file, daoXmlRelPath, status);
+                                IdeaMessageHelpers.add_dao_error_message(settings, project, root_file, dao_xml_rel_path, status);
                             }
                         } catch (Throwable ex) {
                             // ex.printStackTrace();
                             String msg = ex.getMessage();
                             model.setValueAt(msg, i, 1);
-                            IdeaMessageHelpers.add_dao_error_message(settings, project, root_file, daoXmlRelPath, msg);
+                            IdeaMessageHelpers.add_dao_error_message(settings, project, root_file, dao_xml_rel_path, msg);
                         }
                         try {
                             Thread.sleep(50);

@@ -33,8 +33,7 @@ public class PhpCG {
         private final String namespace;
 
         public DTO(DtoClasses jaxb_dto_classes, Connection connection, String sql_root_abs_path,
-                String vm_file_system_dir, String namespace) throws Exception {
-
+                   String vm_file_system_dir, String namespace) throws Exception {
             this.jaxb_dto_classes = jaxb_dto_classes.getDtoClass();
             this.sql_root_abs_path = sql_root_abs_path;
             this.namespace = namespace;
@@ -48,7 +47,6 @@ public class PhpCG {
 
         @Override
         public String[] translate(String dto_class_name) throws Exception {
-            
             DtoClass jaxb_dto_class = null;
             for (DtoClass cls : jaxb_dto_classes) {
                 if (cls.getName().equals(dto_class_name)) {
@@ -88,8 +86,7 @@ public class PhpCG {
         private final String dao_namespace;
 
         public DAO(DtoClasses jaxb_dto_classes, Connection connection, String sql_root_abs_path,
-                String vm_file_system_dir, String dto_namespace, String dao_namespace) throws Exception {
-
+                   String vm_file_system_dir, String dto_namespace, String dao_namespace) throws Exception {
             this.jaxb_dto_classes = jaxb_dto_classes;
             this.sql_root_abs_path = sql_root_abs_path;
             this.dto_namespace = dto_namespace;
@@ -104,7 +101,6 @@ public class PhpCG {
 
         @Override
         public String[] translate(String dao_class_name, DaoClass dao_class) throws Exception {
-            
             imports.clear();
             uses.clear();
             List<String> methods = new ArrayList<String>();
@@ -133,7 +129,6 @@ public class PhpCG {
 
         @Override
         public StringBuilder render_jaxb_query(Object jaxb_element) throws Exception {
-            
             QueryMethodInfo mi = new QueryMethodInfo(jaxb_element);
             String xml_node_name = JaxbUtils.get_jaxb_node_name(jaxb_element);
             Helpers.check_required_attr(xml_node_name, mi.jaxb_method);
@@ -163,12 +158,10 @@ public class PhpCG {
         //
         // this method is called from both 'render_jaxb_query' and 'render_crud_read'
         //
-        private StringBuilder _render_query(
-                String dao_query_jdbc_sql, boolean is_external_sql,
-                String jaxb_dto_or_return_type, boolean jaxb_return_type_is_dto, boolean fetch_list,
-                String method_name, String dto_param_type, String crud_table,
-                List<FieldInfo> fields, List<FieldInfo> params) throws Exception {
-
+        private StringBuilder _render_query(String dao_query_jdbc_sql, boolean is_external_sql,
+                                            String jaxb_dto_or_return_type, boolean jaxb_return_type_is_dto, boolean fetch_list,
+                                            String method_name, String dto_param_type, String crud_table,
+                                            List<FieldInfo> fields, List<FieldInfo> params) throws Exception {
             if (dao_query_jdbc_sql == null) {
                 return Helpers.get_no_pk_warning(method_name);
             }
@@ -200,7 +193,6 @@ public class PhpCG {
         }
 
         private String _get_rendered_dto_class_name(String dto_class_name) throws Exception {
-            
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
             imports.add(jaxb_dto_class.getName());
             String full_name;
@@ -217,7 +209,6 @@ public class PhpCG {
 
         @Override
         public StringBuilder render_jaxb_exec_dml(ExecDml element) throws Exception {
-            
             String method = element.getMethod();
             String ref = element.getRef();
             String xml_node_name = JaxbUtils.get_jaxb_node_name(element);
@@ -242,9 +233,8 @@ public class PhpCG {
         }
 
         private void _render_exec_dml(StringBuilder buffer, String jdbc_dao_sql, boolean is_external_sql,
-                String class_name, String method_name, String dto_param_type, String[] param_descriptors,
-                String xml_node_name, String sql_path) throws Exception {
-
+                                      String class_name, String method_name, String dto_param_type, String[] param_descriptors,
+                                      String xml_node_name, String sql_path) throws Exception {
             SqlUtils.throw_if_select_sql(jdbc_dao_sql);
             List<FieldInfo> params = new ArrayList<FieldInfo>();
             db_utils.get_dao_exec_dml_info(jdbc_dao_sql, dto_param_type, param_descriptors, params);
@@ -264,9 +254,8 @@ public class PhpCG {
             buffer.append(sw.getBuffer());
         }
 
-        private void _assign_params(List<FieldInfo> params, String dto_param_type, 
-                Map<String, Object> context) throws Exception {
-            
+        private void _assign_params(List<FieldInfo> params, String dto_param_type,
+                                    Map<String, Object> context) throws Exception {
             int paramsCount = params.size();
             if (dto_param_type.length() > 0) {
                 if (paramsCount == 0) {
@@ -280,7 +269,6 @@ public class PhpCG {
         }
 
         private String[] _parse_method_declaration(String method_text) throws Exception {
-            
             String dto_param_type = "";
             String param_descriptors = "";
             String method_name;
@@ -303,8 +291,7 @@ public class PhpCG {
 
         @Override
         public StringBuilder render_crud_create(String class_name, String method_name, String table_name,
-                String dto_class_name, boolean fetch_generated, String generated) throws Exception {
-
+                                                String dto_class_name, boolean fetch_generated, String generated) throws Exception {
             List<FieldInfo> fields_not_ai = new ArrayList<FieldInfo>();
             List<FieldInfo> fields_ai = new ArrayList<FieldInfo>();
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
@@ -337,8 +324,7 @@ public class PhpCG {
 
         @Override
         public StringBuilder render_crud_read(String method_name, String dao_table_name, String dto_class_name,
-                String explicit_pk, boolean fetch_list) throws Exception {
-
+                                              String explicit_pk, boolean fetch_list) throws Exception {
             List<FieldInfo> fields_all = new ArrayList<FieldInfo>();
             List<FieldInfo> fields_pk = new ArrayList<FieldInfo>();
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
@@ -349,10 +335,8 @@ public class PhpCG {
         }
 
         @Override
-        public StringBuilder render_crud_update(
-                String class_name, String method_name, String table_name,
-                String explicit_pk, String dto_class_name, boolean primitive_params) throws Exception {
-
+        public StringBuilder render_crud_update(String class_name, String method_name, String table_name,
+                                                String explicit_pk, String dto_class_name, boolean primitive_params) throws Exception {
             List<FieldInfo> updated_fields = new ArrayList<FieldInfo>();
             List<FieldInfo> fields_pk = new ArrayList<FieldInfo>();
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
@@ -386,9 +370,8 @@ public class PhpCG {
         }
 
         @Override
-        public StringBuilder render_crud_delete(String class_name, String method_name, 
-                String table_name, String explicit_pk) throws Exception {
-
+        public StringBuilder render_crud_delete(String class_name, String method_name,
+                                                String table_name, String explicit_pk) throws Exception {
             List<FieldInfo> fields_pk = new ArrayList<FieldInfo>();
             String dao_jdbc_sql = db_utils.get_dao_crud_delete_info(table_name, explicit_pk, fields_pk);
             if (fields_pk.isEmpty()) {
@@ -417,7 +400,6 @@ public class PhpCG {
 
         @Override
         public StringBuilder render_jaxb_crud(TypeCrud jaxb_type_crud) throws Exception {
-            
             String node_name = JaxbUtils.get_jaxb_node_name(jaxb_type_crud);
             String dto_class_name = jaxb_type_crud.getDto();
             if (dto_class_name.length() == 0) {

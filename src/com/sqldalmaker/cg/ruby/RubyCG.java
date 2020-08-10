@@ -33,7 +33,6 @@ public class RubyCG {
 
         public DTO(DtoClasses jaxb_dto_classes, Connection connection, String sql_root_abs_path,
                    String vm_file_system_dir) throws Exception {
-
             this.jaxb_dto_classes = jaxb_dto_classes.getDtoClass();
             this.sql_root_abs_path = sql_root_abs_path;
             if (vm_file_system_dir == null) {
@@ -51,7 +50,6 @@ public class RubyCG {
 
         @Override
         public String[] translate(String dto_class_name) throws Exception {
-
             DtoClass jaxb_dto_class = null;
             for (DtoClass cls : jaxb_dto_classes) {
                 if (cls.getName().equals(dto_class_name)) {
@@ -87,9 +85,9 @@ public class RubyCG {
         private final Set<String> uses = new HashSet<String>();
         private final TemplateEngine te;
         private final JdbcUtils db_utils;
+
         public DAO(DtoClasses jaxb_dto_classes, Connection connection, String sql_root_abs_path,
                    String vm_file_system_dir) throws Exception {
-
             this.jaxb_dto_classes = jaxb_dto_classes;
             this.sql_root_abs_path = sql_root_abs_path;
             if (vm_file_system_dir == null) {
@@ -97,13 +95,11 @@ public class RubyCG {
             } else {
                 te = new TemplateEngine(vm_file_system_dir, true);
             }
-
             db_utils = new JdbcUtils(connection, FieldNamesMode.PYTHON_RUBY, null);
         }
 
         @Override
         public String[] translate(String dao_class_name, DaoClass dao_class) throws Exception {
-
             imports.clear();
             uses.clear();
             List<String> methods = new ArrayList<String>();
@@ -136,7 +132,6 @@ public class RubyCG {
 
         @Override
         public StringBuilder render_jaxb_query(Object jaxb_element) throws Exception {
-
             QueryMethodInfo mi = new QueryMethodInfo(jaxb_element);
             String xml_node_name = JaxbUtils.get_jaxb_node_name(jaxb_element);
             Helpers.check_required_attr(xml_node_name, mi.jaxb_method);
@@ -166,12 +161,10 @@ public class RubyCG {
         //
         // this method is called from both 'render_jaxb_query' and 'render_crud_read'
         //
-        private StringBuilder _render_query(
-                String dao_query_jdbc_sql, boolean is_external_sql,
-                String jaxb_dto_or_return_type, boolean jaxb_return_type_is_dto, boolean fetch_list,
-                String method_name, String dto_param_type, String crud_table,
-                List<FieldInfo> fields_all, List<FieldInfo> fields_pk) throws Exception {
-
+        private StringBuilder _render_query(String dao_query_jdbc_sql, boolean is_external_sql,
+                                            String jaxb_dto_or_return_type, boolean jaxb_return_type_is_dto, boolean fetch_list,
+                                            String method_name, String dto_param_type, String crud_table,
+                                            List<FieldInfo> fields_all, List<FieldInfo> fields_pk) throws Exception {
             if (dao_query_jdbc_sql == null) {
                 return Helpers.get_no_pk_warning(method_name);
             }
@@ -204,7 +197,6 @@ public class RubyCG {
         }
 
         private String _get_rendered_dto_class_name(String dto_class_name, boolean add_to_import) throws Exception {
-
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
             if (add_to_import) {
                 String s = Helpers.convert_to_ruby_file_name(jaxb_dto_class.getName());
@@ -215,7 +207,6 @@ public class RubyCG {
 
         @Override
         public StringBuilder render_jaxb_exec_dml(ExecDml element) throws Exception {
-
             String method = element.getMethod();
             String ref = element.getRef();
             String xml_node_name = JaxbUtils.get_jaxb_node_name(element);
@@ -242,7 +233,6 @@ public class RubyCG {
         private void _render_exec_dml(StringBuilder buffer, String jdbc_dao_sql, boolean is_external_sql,
                                       String method_name, String dto_param_type, String[] param_descriptors,
                                       String xml_node_name, String sql_path) throws Exception {
-
             SqlUtils.throw_if_select_sql(jdbc_dao_sql);
             List<FieldInfo> params = new ArrayList<FieldInfo>();
             db_utils.get_dao_exec_dml_info(jdbc_dao_sql, dto_param_type, param_descriptors, params);
@@ -261,12 +251,10 @@ public class RubyCG {
             buffer.append(sw.getBuffer());
         }
 
-        private void _assign_params(List<FieldInfo> params, String dto_param_type, Map<String, Object> context)
-                throws Exception {
-
-            int paramsCount = params.size();
+        private void _assign_params(List<FieldInfo> params, String dto_param_type, Map<String, Object> context) throws Exception {
+            int params_count = params.size();
             if (dto_param_type.length() > 0) {
-                if (paramsCount == 0) {
+                if (params_count == 0) {
                     throw new Exception("DTO parameter specified but SQL-query does not contain any parameters");
                 }
                 context.put("dto_param", _get_rendered_dto_class_name(dto_param_type, false));
@@ -278,7 +266,6 @@ public class RubyCG {
         }
 
         private String[] _parse_method_declaration(String method_text) throws Exception {
-
             String dto_param_type = "";
             String param_descriptors = "";
             String method_name;
@@ -302,7 +289,6 @@ public class RubyCG {
         @Override
         public StringBuilder render_crud_create(String class_name, String method_name, String table_name,
                                                 String dto_class_name, boolean fetch_generated, String generated) throws Exception {
-
             List<FieldInfo> fields_not_ai = new ArrayList<FieldInfo>();
             List<FieldInfo> fields_ai = new ArrayList<FieldInfo>();
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
@@ -336,7 +322,6 @@ public class RubyCG {
         @Override
         public StringBuilder render_crud_read(String method_name, String dao_table_name, String dto_class_name,
                                               String explicit_pk, boolean fetch_list) throws Exception {
-
             List<FieldInfo> fields_all = new ArrayList<FieldInfo>();
             List<FieldInfo> fields_pk = new ArrayList<FieldInfo>();
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
@@ -347,10 +332,8 @@ public class RubyCG {
         }
 
         @Override
-        public StringBuilder render_crud_update(
-                String class_name, String method_name, String table_name,
-                String explicit_pk, String dto_class_name, boolean primitive_params) throws Exception {
-
+        public StringBuilder render_crud_update(String class_name, String method_name, String table_name,
+                                                String explicit_pk, String dto_class_name, boolean primitive_params) throws Exception {
             List<FieldInfo> updated_fields = new ArrayList<FieldInfo>();
             List<FieldInfo> fields_pk = new ArrayList<FieldInfo>();
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
@@ -382,9 +365,7 @@ public class RubyCG {
         }
 
         @Override
-        public StringBuilder render_crud_delete(
-                String class_name, String method_name, String table_name, String explicit_pk) throws Exception {
-
+        public StringBuilder render_crud_delete(String class_name, String method_name, String table_name, String explicit_pk) throws Exception {
             List<FieldInfo> fields_pk = new ArrayList<FieldInfo>();
             String dao_jdbc_sql = db_utils.get_dao_crud_delete_info(table_name, explicit_pk, fields_pk);
             if (fields_pk.isEmpty()) {
@@ -414,7 +395,6 @@ public class RubyCG {
 
         @Override
         public StringBuilder render_jaxb_crud(TypeCrud jaxb_type_crud) throws Exception {
-
             String node_name = JaxbUtils.get_jaxb_node_name(jaxb_type_crud);
             String dto_class_name = jaxb_type_crud.getDto();
             if (dto_class_name.length() == 0) {

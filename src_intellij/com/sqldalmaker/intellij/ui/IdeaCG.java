@@ -111,13 +111,13 @@ public class IdeaCG {
             public void run() {
                 try {
                     Settings settings = SdmUtils.load_settings(xml_file_dir.getPath());
-                    String xml_metaprogram_abs_path = root_file.getParent().getPath();
+                    String xml_mp_abs_path = root_file.getParent().getPath();
                     Connection con = IdeaHelpers.get_connection(project, settings);
                     try {
                         IDtoCG gen = IdeaTargetLanguageHelpers.create_dto_cg(con, project, root_file, settings, output_dir);
                         try {
                             String dto_xml_abs_path = xml_file.getPath();
-                            String dto_xsd_abs_path = xml_metaprogram_abs_path + "/" + Const.DTO_XSD;
+                            String dto_xsd_abs_path = xml_mp_abs_path + "/" + Const.DTO_XSD;
                             List<DtoClass> dto_classes = SdmUtils.get_dto_classes(dto_xml_abs_path, dto_xsd_abs_path);
                             for (DtoClass cls : dto_classes) {
                                 ProgressManager.progress(cls.getName());

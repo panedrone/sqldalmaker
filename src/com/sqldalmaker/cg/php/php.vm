@@ -164,9 +164,9 @@ class ${class_name} {
     public function ${method_name}(#if(${dto_param} != "")#param_decls_dto($is_external_sql)${dto_param} ${d}p#else#param_decls($is_external_sql $params)#end) {
 #sql_var(${is_external_sql} $sql)
 #if($use_dto)
-        ${d}obj = new ${returned_type_name};
         ${d}row = ${d}this->ds->queryDto(${d}sql, #param_array($dto_param));
         if ($row) {
+            ${d}obj = new ${returned_type_name}();
 #foreach($f in ${fields})
             ${d}obj->${f.setterMethod()}(${d}row["${f.getColumnName()}"]); // ${f.getComment()}
 #end
