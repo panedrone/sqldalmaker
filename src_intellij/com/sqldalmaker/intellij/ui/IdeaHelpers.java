@@ -68,7 +68,7 @@ public class IdeaHelpers {
             content_root_list += "[" + content_root_path + "]";
         }
         if (!found) {
-            throw new Exception("Something is wrong with project structure.\r\nProject base path '" + project_path + "' not found besides content roots:\r\n" + content_root_list);
+            throw new Exception("Something is wrong with project structure.\r\nProject base path '" + project_path + "' not found among content roots:\r\n" + content_root_list);
         }
         File file = new File(project_path);
         // https://intellij-support.jetbrains.com/hc/en-us/community/posts/360001957360-Get-file-from-path-to-have-a-virtual-file

@@ -71,7 +71,7 @@ public class SqlUtils {
         boolean is_sp = is_jdbc_stored_proc_call(jdbc_sql);
         String php_sql;
         if (is_sp) {
-            php_sql = jdbc_sp_call_to_php_sp_call(jdbc_sql);
+            php_sql = _jdbc_sp_call_to_php_sp_call(jdbc_sql);
         } else {
             php_sql = jdbc_sql;
         }
@@ -157,15 +157,15 @@ public class SqlUtils {
             }
         } else if (is_jdbc_stored_proc_call(ref)) {
             return ref;
-        } else if (is_stored_proc_call_shortcut(ref)) {
+        } else if (is_sp_call_shortcut(ref)) {
             return ref;
-        } else if (is_stored_func_call_shortcut(ref)) {
+        } else if (is_udf_call_shortcut(ref)) {
             return ref;
         } else if (is_sql_file_ref(ref)) {
             String sql_file_path = Helpers.concat_path(sql_root_abs_path, ref);
             return Helpers.load_text_from_file(sql_file_path);
         } else if (is_sql_shortcut_ref(ref)) {
-            String res = shortcut_ref_to_jdbc_sql(ref);
+            String res = _sql_shortcut_to_jdbc_sql(ref);
             return res;
         } else if (is_table_ref(ref)) {
             table_name = ref;
@@ -187,7 +187,7 @@ public class SqlUtils {
             String sql_file_path = Helpers.concat_path(sql_root_abs_path, ref);
             return Helpers.load_text_from_file(sql_file_path);
         } else if (is_sql_shortcut_ref(ref)) {
-            String res = shortcut_ref_to_jdbc_sql(ref);
+            String res = _sql_shortcut_to_jdbc_sql(ref);
             return res;
         } /*else if (is_table_ref(ref)) { // is_table_ref returns true for 'select * from my_table'
             throw new Exception("Table names are not allowed here: ref=\"" + ref + "\"");
@@ -256,9 +256,6 @@ public class SqlUtils {
         return ref == null || ref.trim().length() == 0;
     }
 
-    //
-    // called from PsiReferenceSql
-    //
     public static boolean is_table_ref(String ref) {
         if (ref == null || ref.length() == 0) {
             return false;
@@ -272,14 +269,15 @@ public class SqlUtils {
         if (is_sql_file_ref(ref)) {
             return false;
         }
-        if (is_stored_proc_call_shortcut(ref)) {
+        if (is_sp_call_shortcut(ref)) {
             return false;
         }
-        if (is_stored_func_call_shortcut(ref)) {
+        if (is_udf_call_shortcut(ref)) {
             return false;
         }
-        final char[] ILLEGAL_CHARACTERS = {'/', '\n', '\r', '\t', '\0', '\f', '`', '?', '*', '\\', '<', '>', '|',
-                '\"'/* , ':' */, ';', ','};
+        final char[] ILLEGAL_CHARACTERS = {
+            '/', '\n', '\r', '\t', '\0', '\f', /*'`',*/ '?', '*', '\\', '<', '>', '|',
+            '\"'/* , ':' */, ';', ',', '(', ')', '{', '}'};
         for (char c : ILLEGAL_CHARACTERS) {
             if (ref.contains(Character.toString(c))) {
                 return false;
@@ -304,13 +302,10 @@ public class SqlUtils {
             // throw new Exception("Invalid JDBC call: " + jdbc_sql);
             return false;
         }
-        return is_stored_proc_call_shortcut(jdbc_sql);
+        return is_sp_call_shortcut(jdbc_sql);
     }
 
-    //
-    // called from PsiReferenceSql
-    //
-    public static boolean is_stored_proc_call_shortcut(String text) {
+    public static boolean is_sp_call_shortcut(String text) {
         String[] parts = text.split("\\s+");
         if (parts.length < 2) {
 
@@ -320,10 +315,7 @@ public class SqlUtils {
         return call.compareToIgnoreCase("call") == 0;
     }
 
-    //
-    // called from PsiReferenceSql
-    //
-    public static boolean is_stored_func_call_shortcut(String sql) {
+    public static boolean is_udf_call_shortcut(String sql) {
         String[] parts = sql.split("\\s+");
         if (parts.length < 2) {
             return false;
@@ -332,7 +324,7 @@ public class SqlUtils {
         return select.compareToIgnoreCase("select") == 0;
     }
 
-    private static String jdbc_sp_call_to_php_sp_call(String jdbc_sql) throws java.lang.Exception {
+    private static String _jdbc_sp_call_to_php_sp_call(String jdbc_sql) throws java.lang.Exception {
         // keep initial syntax, modify it in DataStore.php if needed
         return jdbc_sql;
 //        jdbc_sql = jdbc_sql.trim();
@@ -366,7 +358,7 @@ public class SqlUtils {
         return new String[]{before_brackets, inside_brackets};
     }
 
-    private static String shortcut_ref_to_jdbc_sql(String ref) throws Exception {
+    private static String _sql_shortcut_to_jdbc_sql(String ref) throws Exception {
         String[] parts2 = parse_sql_shortcut_ref(ref);
         String table_name = parts2[0];
         // validate_table_name(table_name); // TODO: PostgreSQL JDBC prepareStatement
@@ -374,7 +366,7 @@ public class SqlUtils {
         String param_descriptors = parts2[1];
         String[] param_arr = Helpers.get_listed_items(param_descriptors);
         if (param_arr.length < 1) {
-            throw new Exception("Not empty list of parameters expected in ref shortcut");
+            throw new Exception("Not empty list of parameters expected in SQL shortcut");
         }
         String params = param_arr[0] + "=?";
         for (int i = 1; i < param_arr.length; i++) {

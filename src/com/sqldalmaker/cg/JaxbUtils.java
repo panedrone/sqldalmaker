@@ -25,7 +25,6 @@ public class JaxbUtils {
     }
 
     public static DtoClass find_jaxb_dto_class(String dto_class_name, DtoClasses jaxb_dto_classes) throws Exception {
-
         if (dto_class_name == null || dto_class_name.length() == 0) {
             throw new Exception("Invalid name of DTO class: " + dto_class_name);
         }
@@ -46,9 +45,7 @@ public class JaxbUtils {
         return res;
     }
 
-    public static void process_jaxb_dao_class(IDaoCG dao_cg, DaoClass jaxb_dao_class, List<String> methods)
-            throws Exception {
-
+    public static void process_jaxb_dao_class(IDaoCG dao_cg, DaoClass jaxb_dao_class, List<String> methods) throws Exception {
         if (jaxb_dao_class.getCrudOrCrudAutoOrQuery() != null) {
             for (int i = 0; i < jaxb_dao_class.getCrudOrCrudAutoOrQuery().size(); i++) {
                 Object jaxb_element = jaxb_dao_class.getCrudOrCrudAutoOrQuery().get(i);
@@ -71,7 +68,6 @@ public class JaxbUtils {
 
     private static boolean process_jaxb_crud_create(IDaoCG dao_cg, TypeCrud jaxb_type_crud, String dto_class_name,
                                                     String table_name, boolean lower_under_scores, StringBuilder code_buff) throws Exception {
-
         String method_name = null;
         if (jaxb_type_crud.getCreate() != null) {
             method_name = jaxb_type_crud.getCreate().getMethod();
@@ -96,7 +92,6 @@ public class JaxbUtils {
 
     private static boolean process_jaxb_crud_read_all(IDaoCG dao_cg, TypeCrud jaxb_type_crud, String dto_class_name,
                                                       String table_name, boolean lower_under_scores, StringBuilder code_buff) throws Exception {
-
         String method_name = null;
         if (jaxb_type_crud.getReadAll() != null) {
             method_name = jaxb_type_crud.getReadAll().getMethod();
@@ -117,9 +112,8 @@ public class JaxbUtils {
     }
 
     private static boolean process_jaxb_crud_read(IDaoCG dao_cg, TypeCrud jaxb_type_crud, String dto_class_name,
-                                                  String table_name, String explicit_pk, boolean lower_under_scores, StringBuilder code_buff)
-            throws Exception {
-
+                                                  String table_name, String explicit_pk, boolean lower_under_scores,
+                                                  StringBuilder code_buff) throws Exception {
         String method_name = null;
         if (jaxb_type_crud.getRead() != null) {
             method_name = jaxb_type_crud.getRead().getMethod();
@@ -140,9 +134,8 @@ public class JaxbUtils {
     }
 
     private static boolean process_jaxb_crud_update(IDaoCG dao_cg, TypeCrud jaxb_type_crud, String dto_class_name,
-                                                    String table_name, String explicit_primary_keys, boolean lower_under_scores, StringBuilder code_buff)
-            throws Exception {
-
+                                                    String table_name, String explicit_primary_keys, boolean lower_under_scores,
+                                                    StringBuilder code_buff) throws Exception {
         String method_name = null;
         if (jaxb_type_crud.getUpdate() != null) {
             method_name = jaxb_type_crud.getUpdate().getMethod();
@@ -164,9 +157,8 @@ public class JaxbUtils {
     }
 
     private static boolean process_jaxb_crud_delete(IDaoCG dao_cg, TypeCrud jaxb_type_crud, String dto_class_name,
-                                                    String table_name, String explicit_pk, boolean lower_under_scores, StringBuilder code_buff)
-            throws Exception {
-
+                                                    String table_name, String explicit_pk, boolean lower_under_scores,
+                                                    StringBuilder code_buff) throws Exception {
         String method_name = null;
         if (jaxb_type_crud.getDelete() != null) {
             method_name = jaxb_type_crud.getDelete().getMethod();
@@ -188,7 +180,6 @@ public class JaxbUtils {
 
     public static StringBuilder process_jaxb_crud(IDaoCG dao_cg, boolean lower_under_scores, TypeCrud jaxb_type_crud,
                                                   String dto_class_name) throws Exception {
-
         String table_name = jaxb_type_crud.getTable();
         String explicit_primary_keys = jaxb_type_crud.getPk();
         boolean is_empty = true;
@@ -215,8 +206,7 @@ public class JaxbUtils {
         }
         if ((jaxb_type_crud instanceof Crud) && is_empty) {
             String node_name = get_jaxb_node_name(jaxb_type_crud);
-            throw new Exception(
-                    "Element '" + node_name + "' is empty. Add the method declarations or change to 'crud-auto'");
+            throw new Exception("Element '" + node_name + "' is empty. Add the method declarations or change to 'crud-auto'");
         }
         return code_buff;
     }
