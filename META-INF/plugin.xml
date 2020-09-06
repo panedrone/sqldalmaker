@@ -2,7 +2,7 @@
     <id>dal-mpe</id>
     <name>SQL DAL Maker</name>
     <category>Database</category>
-    <version>1.133.2020-08-12</version>
+    <version>1.134.2020-09-06</version>
     <vendor email="sqldalmaker@gmail.com"/>
     <!-- please see http://confluence.intellij.net/display/IDEADEV/Build+Number+Ranges for description -->
     <idea-version since-build="133.1885"/>
@@ -18,9 +18,9 @@ To generate the class, you declare it in XML meta-program.<br/>
     <change-notes>
         <![CDATA[
 <ul>
-<li>improved RefCursor logic for python + cx_oracle</li>
-<li>improved RefCursor logic for php + oci8</li>
-<li>enabled last insert id for php + oci8</li>
+<li>improved RefCursors logic for python + cx_oracle</li>
+<li>improved RefCursors logic for php + oci8</li>
+<li>enabled fetching of last insert id for php + oci8</li>
 <li>added comments to describe how the mappings were built</li>
 </ul>]]></change-notes>
 

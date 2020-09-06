@@ -131,9 +131,9 @@ public class EclipseTargetLanguageHelpers {
 			FieldNamesMode field_names_mode;
 			int fnm = settings.getDto().getFieldNamesMode();
 			if (fnm == 1) {
-				field_names_mode = FieldNamesMode.TO_LOWER_CAMEL_CASE;
+				field_names_mode = FieldNamesMode.LOWER_CAMEL_CASE;
 			} else if (fnm == 2) {
-				field_names_mode = FieldNamesMode.TO_LOWER_CASE;
+				field_names_mode = FieldNamesMode.LOWER_CASE;
 			} else {
 				field_names_mode = FieldNamesMode.AS_IS;
 			}
@@ -214,9 +214,9 @@ public class EclipseTargetLanguageHelpers {
 			FieldNamesMode field_names_mode;
 			int fnm = settings.getDto().getFieldNamesMode();
 			if (fnm == 1) {
-				field_names_mode = FieldNamesMode.TO_LOWER_CAMEL_CASE;
+				field_names_mode = FieldNamesMode.LOWER_CAMEL_CASE;
 			} else if (fnm == 2) {
-				field_names_mode = FieldNamesMode.TO_LOWER_CASE;
+				field_names_mode = FieldNamesMode.LOWER_CASE;
 			} else {
 				field_names_mode = FieldNamesMode.AS_IS;
 			}

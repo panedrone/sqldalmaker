@@ -40,7 +40,7 @@ public class PythonCG {
             } else {
                 te = new TemplateEngine(vm_file_system_dir, true);
             }
-            db_utils = new JdbcUtils(connection, FieldNamesMode.PYTHON_RUBY, null);
+            db_utils = new JdbcUtils(connection, FieldNamesMode.SNAKE_CASE, null);
         }
 
         @Override
@@ -92,7 +92,7 @@ public class PythonCG {
             } else {
                 te = new TemplateEngine(vm_file_system_dir, true);
             }
-            db_utils = new JdbcUtils(connection, FieldNamesMode.PYTHON_RUBY, null);
+            db_utils = new JdbcUtils(connection, FieldNamesMode.SNAKE_CASE, null);
         }
 
         @Override
@@ -138,7 +138,7 @@ public class PythonCG {
                 String method_name = parsed[0];
                 String dto_param_type = parsed[1];
                 String param_descriptors = parsed[2];
-                String[] method_param_descriptors = Helpers.get_listed_items(param_descriptors);
+                String[] method_param_descriptors = Helpers.get_listed_items(param_descriptors, false);
                 boolean out_params;
                 if (method_param_descriptors.length > 0 && "out_params".equals(method_param_descriptors[method_param_descriptors.length - 1])) {
                     out_params = true;
@@ -224,7 +224,7 @@ public class PythonCG {
                 String method_name = parsed[0]; // never is null
                 String dto_param_type = parsed[1]; // never is null
                 String param_descriptors = parsed[2]; // never is null
-                String[] method_param_descriptors = Helpers.get_listed_items(param_descriptors);
+                String[] method_param_descriptors = Helpers.get_listed_items(param_descriptors, true);
                 boolean is_external_sql = element.isExternalSql();
                 StringBuilder buff = new StringBuilder();
                 _render_exec_dml(buff, dao_jdbc_sql, is_external_sql, method_name, dto_param_type,
@@ -241,11 +241,52 @@ public class PythonCG {
                                       String method_name, String dto_param_type, String[] param_descriptors,
                                       String xml_node_name, String sql_path) throws Exception {
             SqlUtils.throw_if_select_sql(jdbc_dao_sql);
-            List<FieldInfo> params = new ArrayList<FieldInfo>();
-            db_utils.get_dao_exec_dml_info(jdbc_dao_sql, dto_param_type, param_descriptors, params);
+            List<FieldInfo> _params = new ArrayList<FieldInfo>();
+            db_utils.get_dao_exec_dml_info(jdbc_dao_sql, dto_param_type, param_descriptors, _params);
             String sql_str = SqlUtils.jdbc_sql_to_python_string(jdbc_dao_sql);
+            List<MappingInfo> m_list = new ArrayList<MappingInfo>();
+            List<FieldInfo> method_params = new ArrayList<FieldInfo>();
+            List<FieldInfo> exec_xml_params = new ArrayList<FieldInfo>();
+            for (int pd_i = 0; pd_i < param_descriptors.length; pd_i++) {
+                FieldInfo p = _params.get(pd_i);
+                String pd = param_descriptors[pd_i];
+                if (pd.startsWith("[") && pd.endsWith("]")) {
+                    String inner_list = pd.substring(1, pd.length() - 1);
+                    String[] implicit_param_descriptors = Helpers.get_listed_items(inner_list, true);
+                    List<String> cb_elements = new ArrayList<String>();
+                    for (int ipd_i = 0; ipd_i < implicit_param_descriptors.length; ipd_i++) {
+                        String ipd = implicit_param_descriptors[ipd_i];
+                        String parts[] = parse_param_descriptor(ipd);
+                        if (parts == null) {
+                            throw new Exception("Implicit cursors are specified incorrectly." +
+                                    " Expected syntax: [on_dto_1:Dto1, on_dto_2:Dto2, ...]. Specified: "
+                                    + "[" + String.join(",", implicit_param_descriptors) + "]");
+                        }
+                        MappingInfo m = create_mapping(parts);
+                        m_list.add(m);
+                        method_params.add(new FieldInfo(FieldNamesMode.SNAKE_CASE, p.getType(), m.method_param_name, "parameter"));
+                        cb_elements.add(m.exec_dml_param_name);
+                    }
+                    String exec_xml_param = "[" + String.join(",", cb_elements) + "]";
+                    exec_xml_params.add(new FieldInfo(FieldNamesMode.SNAKE_CASE, p.getType(), exec_xml_param, "parameter"));
+                } else {
+                    String param_descriptor = param_descriptors[pd_i];
+                    String parts[] = parse_param_descriptor(param_descriptor);
+                    if (parts != null) {
+                        MappingInfo m = create_mapping(parts);
+                        m_list.add(m);
+                        method_params.add(new FieldInfo(FieldNamesMode.SNAKE_CASE, p.getType(), m.method_param_name, "parameter"));
+                        exec_xml_params.add(new FieldInfo(FieldNamesMode.SNAKE_CASE, p.getType(), m.exec_dml_param_name, "parameter"));
+                    } else {
+                        method_params.add(p);
+                        exec_xml_params.add(p);
+                    }
+                }
+            }
             Map<String, Object> context = new HashMap<String, Object>();
-            _assign_params(params, dto_param_type, context);
+            _assign_params(method_params, dto_param_type, context);
+            context.put("params2", exec_xml_params);
+            context.put("mappings", m_list);
             context.put("dto_param", dto_param_type);
             context.put("method_name", method_name);
             context.put("sql", sql_str);
@@ -258,11 +299,39 @@ public class PythonCG {
             buffer.append(sw.getBuffer());
         }
 
+        private String[] parse_param_descriptor(String param_descriptor) {
+            String parts[] = null;
+            if (param_descriptor.contains("~")) {
+                parts = param_descriptor.split("~");
+            }
+            if (param_descriptor.contains(":")) {
+                parts = param_descriptor.split(":");
+            }
+            return parts;
+        }
+
+        private MappingInfo create_mapping(String[] parts) throws Exception {
+            MappingInfo m = new MappingInfo();
+            m.method_param_name = parts[0].trim();
+            String cb_param_name = String.format("_map_cb_%s", m.method_param_name);
+            m.exec_dml_param_name = cb_param_name;
+            m.dto_class_name = parts[1].trim();
+            List<FieldInfo> fields = new ArrayList<FieldInfo>();
+            DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(m.dto_class_name, jaxb_dto_classes);
+            imports.add(jaxb_dto_class.getName());
+            db_utils.get_dto_field_info(jaxb_dto_class, sql_root_abs_path, fields);
+            if (fields.size() > 0) {
+                fields.get(0).setComment(fields.get(0).getComment() + " [INFO] REF CURSOR");
+            }
+            m.fields.addAll(fields);
+            return m;
+        }
+
         private void _assign_params(List<FieldInfo> params, String dto_param_type, Map<String, Object> context) throws Exception {
-            int paramsCount = params.size();
+            int params_count = params.size();
             if (dto_param_type.length() > 0) {
-                if (paramsCount == 0) {
-                    throw new Exception("DTO parameter specified but SQL-query does not contain any parameters");
+                if (params_count == 0) {
+                    throw new Exception("DTO parameter specified for SQL without parameters");
                 }
                 context.put("dto_param", _get_rendered_dto_class_name(dto_param_type, false));
             } else {

@@ -148,7 +148,7 @@ public class Helpers {
         return buffer.toString();
     }
 
-    public static String[] get_listed_items(String list) throws Exception {
+    public static String[] get_listed_items(String list, boolean allow_semicolon) throws Exception {
         if (list != null && list.length() > 0) {
             String[] items;
             items = list.split("[,]");
@@ -163,32 +163,39 @@ public class Helpers {
                 } else {
                     throw new Exception("The item is null or empty: " + list);
                 }
-                check_item(name/* , is_sp */);
+                check_item(name/* , is_sp */, allow_semicolon);
             }
             return items;
         }
         return new String[]{};
     }
 
-    private static void check_item(String name) throws Exception {
+    private static void check_item(String name, boolean allow_semicolon) throws Exception {
         if (name == null || name.length() == 0) {
             throw new Exception("Item name is null or empty");
         }
         char ch_0 = name.charAt(0);
         boolean is_letter_at_0 = Character.isLetter(ch_0);
         if (!is_letter_at_0 || ch_0 == '$') {
-            if (ch_0 != '_') {
+            if (ch_0 != '_' && ch_0 != '[') {
                 throw new Exception("Invalid starting character in the name of item: " + name);
             }
         }
-        for (int i = 1; i < name.length(); i++) {
-            // Google: java is letter
-            // A character is considered to be a Java letter or digit if and only if it is a
-            // letter or a digit or the dollar sign "$" or the underscore "_".
-            char ch = name.charAt(i);
-            boolean is_letter_or_digit = Character.isLetterOrDigit(ch);
-            if (!is_letter_or_digit || ch == '$') {
-                if (ch != '_') {
+        if (ch_0 == '[' && name.endsWith("]")) {
+            String inner_list = name.substring(1, name.length() - 1);
+            get_listed_items(inner_list, allow_semicolon = true);
+        } else {
+            for (int i = 1; i < name.length(); i++) {
+                // Google: java is letter
+                // A character is considered to be a Java letter or digit if and only if it is a
+                // letter or a digit or the dollar sign "$" or the underscore "_".
+                char ch = name.charAt(i);
+                if (!allow_semicolon && ch == ':') {
+                    throw new Exception("':' is not allowed in this context");
+                }
+                boolean is_letter_or_digit = Character.isLetterOrDigit(ch);
+                // SQL parameter name may be detected like 'column1:0' and renamed to column1_0
+                if (!is_letter_or_digit && ch != '$' && ch != '_' && ch != '~' && ch != ':') {
                     throw new Exception("Invalid character in the name of item: " + name);
                 }
             }

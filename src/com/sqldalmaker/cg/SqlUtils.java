@@ -13,8 +13,10 @@ import java.util.List;
  */
 public class SqlUtils {
 
+    private static final String REGEX_NL = "(\\n?\\r)+";
+
     public static String jdbc_sql_to_cpp_str(String sql) {
-        String[] parts = sql.split("(\\n|\\r)+");
+        String[] parts = sql.split(REGEX_NL);
         String new_line = System.getProperty("line.separator");
         String new_line_j = org.apache.commons.lang.StringEscapeUtils.escapeJava("\n");
         StringBuilder res = new StringBuilder();
@@ -44,7 +46,7 @@ public class SqlUtils {
     }
 
     public static String jdbc_sql_to_java_str(String jdbc_sql) {
-        String[] parts = jdbc_sql.split("(\\n|\\r)+");
+        String[] parts = jdbc_sql.split(REGEX_NL);
         // "\n" it is OK for Eclipse debugger window:
         String new_line = "\n"; // System.getProperty("line.separator");
         StringBuilder res = new StringBuilder();
@@ -67,7 +69,7 @@ public class SqlUtils {
         return res.toString();
     }
 
-    public static String jdbc_sql_to_php_str(String jdbc_sql) throws Exception {
+    public static String jdbc_sql_to_php_str(String jdbc_sql) /* throws Exception */ {
         boolean is_sp = is_jdbc_stored_proc_call(jdbc_sql);
         String php_sql;
         if (is_sp) {
@@ -79,7 +81,7 @@ public class SqlUtils {
     }
 
     private static String php_sql_to_php_str(String php_sql) {
-        String[] parts = php_sql.split("(\\n|\\r)+");
+        String[] parts = php_sql.split(REGEX_NL);
         String new_line = "\n"; // System.getProperty("line.separator");
         StringBuilder res = new StringBuilder();
         for (int i = 0; i < parts.length; i++) {
@@ -101,16 +103,16 @@ public class SqlUtils {
         return res.toString();
     }
 
-    public static String jdbc_sql_to_ruby_string(String jdbc_sql) throws Exception {
+    public static String jdbc_sql_to_ruby_string(String jdbc_sql) /*throws Exception*/ {
         return jdbc_sql_to_python_string(jdbc_sql);
     }
 
-    public static String jdbc_sql_to_python_string(String jdbc_sql) throws Exception {
+    public static String jdbc_sql_to_python_string(String jdbc_sql) /*throws Exception*/ {
         return python_sql_to_python_string(jdbc_sql);
     }
 
     private static String python_sql_to_python_string(String python_sql) {
-        String[] parts = python_sql.split("(\\n|\\r)+");
+        String[] parts = python_sql.split(REGEX_NL);
         String new_line = "\n"; // System.getProperty("line.separator");
         StringBuilder res = new StringBuilder();
         for (int i = 0; i < parts.length; i++) {
@@ -132,7 +134,7 @@ public class SqlUtils {
         return res.toString();
     }
 
-    public static void throw_if_select_sql(String jdbc_dao_sql) throws Exception {
+    public static void throw_if_select_sql(String jdbc_dao_sql) /*throws Exception*/ {
 // allow to execute SELECT in exec-dml
 //
 //        String trimmed = jdbc_dao_sql.toLowerCase().trim();
@@ -231,7 +233,7 @@ public class SqlUtils {
                 return false;
             }
             String inside_brackets = parts[1];
-            Helpers.get_listed_items(inside_brackets);
+            Helpers.get_listed_items(inside_brackets, false);
         } catch (Exception e) {
             return false;
         }
@@ -276,8 +278,8 @@ public class SqlUtils {
             return false;
         }
         final char[] ILLEGAL_CHARACTERS = {
-            '/', '\n', '\r', '\t', '\0', '\f', /*'`',*/ '?', '*', '\\', '<', '>', '|',
-            '\"'/* , ':' */, ';', ',', '(', ')', '{', '}'};
+                '/', '\n', '\r', '\t', '\0', '\f', /*'`',*/ '?', '*', '\\', '<', '>', '|',
+                '\"'/* , ':' */, ';', ',', '(', ')', '{', '}'};
         for (char c : ILLEGAL_CHARACTERS) {
             if (ref.contains(Character.toString(c))) {
                 return false;
@@ -324,8 +326,10 @@ public class SqlUtils {
         return select.compareToIgnoreCase("select") == 0;
     }
 
-    private static String _jdbc_sp_call_to_php_sp_call(String jdbc_sql) throws java.lang.Exception {
-        // keep initial syntax, modify it in DataStore.php if needed
+    //
+    // keep initial syntax, modify it in DataStore.php if needed
+    //
+    private static String _jdbc_sp_call_to_php_sp_call(String jdbc_sql) /*throws java.lang.Exception*/ {
         return jdbc_sql;
 //        jdbc_sql = jdbc_sql.trim();
 //        if (is_jdbc_stored_proc_call(jdbc_sql)) { // confirms syntax {call sp_name(...)}
@@ -364,7 +368,7 @@ public class SqlUtils {
         // validate_table_name(table_name); // TODO: PostgreSQL JDBC prepareStatement
         // passes wrong table names
         String param_descriptors = parts2[1];
-        String[] param_arr = Helpers.get_listed_items(param_descriptors);
+        String[] param_arr = Helpers.get_listed_items(param_descriptors, false);
         if (param_arr.length < 1) {
             throw new Exception("Not empty list of parameters expected in SQL shortcut");
         }

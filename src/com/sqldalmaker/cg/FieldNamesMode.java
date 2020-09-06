@@ -10,5 +10,5 @@ package com.sqldalmaker.cg;
  */
 public enum FieldNamesMode {
 
-    AS_IS, TO_LOWER_CASE, TO_LOWER_CAMEL_CASE, PYTHON_RUBY
+    AS_IS, LOWER_CASE, LOWER_CAMEL_CASE, SNAKE_CASE
 }

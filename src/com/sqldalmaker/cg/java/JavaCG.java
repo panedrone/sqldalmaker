@@ -132,7 +132,7 @@ public class JavaCG {
                 String method_name = parsed[0];
                 String dto_param_type = parsed[1];
                 String param_descriptors = parsed[2];
-                String[] method_param_descriptors = Helpers.get_listed_items(param_descriptors);
+                String[] method_param_descriptors = Helpers.get_listed_items(param_descriptors, false);
                 List<FieldInfo> fields = new ArrayList<FieldInfo>();
                 List<FieldInfo> params = new ArrayList<FieldInfo>();
                 String dao_query_jdbc_sql = db_utils.get_dao_query_info(
@@ -212,7 +212,7 @@ public class JavaCG {
                 String method_name = parsed[0]; // never is null
                 String dto_param_type = parsed[1]; // never is null
                 String param_descriptors = parsed[2]; // never is null
-                String[] method_param_descriptors = Helpers.get_listed_items(param_descriptors);
+                String[] method_param_descriptors = Helpers.get_listed_items(param_descriptors, true);
                 boolean is_external_sql = jaxb_exec_dml.isExternalSql();
                 StringBuilder buff = new StringBuilder();
                 _render_exec_dml(buff, dao_jdbc_sql, is_external_sql, method_name, dto_param_type, method_param_descriptors, xml_node_name, ref);

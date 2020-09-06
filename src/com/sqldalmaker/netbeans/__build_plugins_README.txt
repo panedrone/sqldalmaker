@@ -1,3 +1,2 @@
-to build eclipse plug-in, java files of folder 'scr/com/sqldalmaker/netbeans' must be hidden in zip.
-
-to build netbeans plug-in, these file must be unzipped back.
+1) to build eclipse plug-in, 'scr/com/sqldalmaker/netbeans/*.java' must be renamed to *.jav_
+2) to build/develop netbeans plug-in, 'scr/com/sqldalmaker/netbeans/*.jav_' must be renamed back to *.java

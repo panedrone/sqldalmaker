@@ -5,16 +5,10 @@ class OutParam:
     """
     The class to work with both OUT and INOUT parameters
     """
-    def __init__(self, ptype, pvalue=None):
-        self.ptype = ptype
-        self.pvalue = pvalue
 
-
-class RefCursor:
-    """
-    The class to work with SYS_REFCURSOR
-    """
-    pass
+    def __init__(self, param_type, param_value=None):
+        self.param_type = param_type
+        self.param_value = param_value
 
 
 class DataStore:
@@ -91,22 +85,42 @@ class DataStore:
                 cursor.execute(sql, params)
                 return cursor.rowcount
             else:
+                out_cursors = False
                 call_params = []
                 for p in params:
                     if isinstance(p, OutParam):
-                        cp = cursor.var(p.ptype)
-                        cp.setvalue(0, p.pvalue)
+                        cp = cursor.var(p.param_type)
+                        cp.setvalue(0, p.param_value)
                         call_params.append(cp)
-                    elif isinstance(p, RefCursor):
-                        raise Exception("RefCursor-s are not enabled in exec_dml so far.")
+                    elif callable(p):
+                        cp = self.conn.cursor()
+                        call_params.append(cp)
+                        out_cursors = True
+                    elif isinstance(p, list) and callable(p[0]):
+                        pass
                     else:
                         call_params.append(p)
                 cursor.execute(sql, call_params)
+                if out_cursors:
+                    i = 0
+                    for p in params:
+                        if callable(p):
+                            cp = call_params[i]
+                            _fetch_all(cp, p)
+                            cp.close()
+                        i += 1
+                else:
+                    for p in params:
+                        if isinstance(p, list) and callable(p[0]):
+                            i = 0  # (exec-dml)+(SP call)+(list-param containing callback(s)) means 'implicit cursor'
+                            for implicit_cursor in cursor.getimplicitresults():
+                                _fetch_all(implicit_cursor, p[i])
+                                i += 1
                 i = 0
                 for p in params:
                     if isinstance(p, OutParam):
                         cp = call_params[i]
-                        p.pvalue = cp.getvalue()
+                        p.param_value = cp.getvalue()
                     i += 1
 
     def query_scalar(self, sql, params):
@@ -189,41 +203,7 @@ class DataStore:
                 cursor.execute(sql, params)
                 _fetch_all(cursor, callback)
             else:
-                # https://cx-oracle.readthedocs.io/en/latest/user_guide/plsql_execution.html
-                out_cursors = False
-                call_params = []
-                for p in params:
-                    if isinstance(p, OutParam):
-                        cp = cursor.var(p.ptype)
-                        cp.setvalue(0, p.pvalue)
-                        call_params.append(cp)
-                    elif isinstance(p, RefCursor):
-                        cp = self.conn.cursor()
-                        out_cursors = True
-                        call_params.append(cp)
-                    else:
-                        call_params.append(p)
-                cursor.execute(sql, call_params)
-                if out_cursors:
-                    i = 0
-                    for p in params:
-                        if isinstance(p, OutParam):
-                            cp = call_params[i]
-                            p.pvalue = cp.getvalue()
-                        elif isinstance(p, RefCursor):
-                            cp = call_params[i]
-                            _fetch_all(cp, callback)
-                            cp.close()
-                        i += 1
-                else: # implicit cursor if no cursors in 'params'
-                    for implicit_cursor in cursor.getimplicitresults():
-                        _fetch_all(implicit_cursor, callback)
-                    i = 0
-                    for p in params:
-                        if isinstance(p, OutParam):
-                            cp = call_params[i]
-                            p.pvalue = cp.getvalue()
-                        i += 1
+                raise Exception("SP are not allowed in 'query...', use 'exec-dml' instead")
 
 
 def _get_sp_sql(sql, params):

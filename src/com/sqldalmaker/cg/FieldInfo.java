@@ -22,14 +22,16 @@ public class FieldInfo {
         this.db_col_name = db_col_name;
         this.field_type_name = field_type_name;
         field_name = db_col_name;
-        this.field_name = this.field_name.replace(" ", "_"); // for mysql!
-        this.field_name = this.field_name.replace(".", "_"); // [OrderDetails].OrderID
-        this.field_name = this.field_name.replace(":", "_"); // CustomerID:1 -- for latest xenian SQLite3
-        if (FieldNamesMode.TO_LOWER_CASE.equals(field_names_mode)) {
+        if ("parameter".equals(comment) == false) {
+            this.field_name = this.field_name.replace(" ", "_"); // for mysql!
+            this.field_name = this.field_name.replace(".", "_"); // [OrderDetails].OrderID
+            this.field_name = this.field_name.replace(":", "_"); // CustomerID:1 -- for latest xenian SQLite3
+        }
+        if (FieldNamesMode.LOWER_CASE.equals(field_names_mode)) {
             this.field_name = this.field_name.toLowerCase();
-        } else if (FieldNamesMode.TO_LOWER_CAMEL_CASE.equals(field_names_mode)) {
+        } else if (FieldNamesMode.LOWER_CAMEL_CASE.equals(field_names_mode)) {
             this.field_name = toLowerCamelCase(this.field_name);
-        } else if (FieldNamesMode.PYTHON_RUBY.equals(field_names_mode)) {
+        } else if (FieldNamesMode.SNAKE_CASE.equals(field_names_mode)) {
             this.field_name = Helpers.camel_case_to_lower_under_scores(this.field_name);
             this.name_prefix = "_";
         }
@@ -54,6 +56,10 @@ public class FieldInfo {
 
     public String getName() {
         return this.field_name;
+    }
+
+    public void setName(String name) { // it may be changed
+        this.field_name = name;
     }
 
     public String getColumnName() {

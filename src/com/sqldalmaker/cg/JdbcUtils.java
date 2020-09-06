@@ -168,7 +168,7 @@ public class JdbcUtils {
                 pk_col_names_set_lower_case.add(pk_col_name);
             }
         } else { // if PK are specified explicitely, don't use getPrimaryKeys at all
-            String[] gen_keys_arr = Helpers.get_listed_items(explicit_pk);
+            String[] gen_keys_arr = Helpers.get_listed_items(explicit_pk, false);
             Helpers.check_duplicates(gen_keys_arr);
             for (int i = 0; i < gen_keys_arr.length; i++) {
                 gen_keys_arr[i] = gen_keys_arr[i].toLowerCase();
@@ -394,7 +394,17 @@ public class JdbcUtils {
         } catch (Throwable e) { // including AbstractMethodError, SQLServerException, etc.
             params_count = 0;
         }
-        if (params_count != method_param_descriptors.length) {
+        int descriptors_count = 0;
+        for (int i = 0; i< method_param_descriptors.length; i++) {
+            String name = method_param_descriptors[i];
+            if (name.startsWith("[") && name.endsWith("]")) {
+                // implicit cursor callbacks
+            } else {
+                descriptors_count++;
+            }
+        }
+
+        if (params_count != descriptors_count) {
             throw new Exception("Parameters count expected: " + method_param_descriptors.length
                     + ", detected: " + params_count);
         }
@@ -693,7 +703,7 @@ public class JdbcUtils {
         _dao_fields_generated.clear();
         HashSet<String> dao_crud_generated_set = new HashSet<String>();
         if (!("*".equals(dao_crud_generated))) {
-            String[] gen_keys_arr = Helpers.get_listed_items(dao_crud_generated);
+            String[] gen_keys_arr = Helpers.get_listed_items(dao_crud_generated, false);
             Helpers.check_duplicates(gen_keys_arr);
             for (String k : gen_keys_arr) {
                 dao_crud_generated_set.add(k.toLowerCase());
