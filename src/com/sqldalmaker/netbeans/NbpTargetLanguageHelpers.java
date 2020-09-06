@@ -220,10 +220,10 @@ public class NbpTargetLanguageHelpers {
             int fnm = settings.getDto().getFieldNamesMode();
             switch (fnm) {
                 case 1:
-                    field_names_mode = FieldNamesMode.TO_LOWER_CAMEL_CASE;
+                    field_names_mode = FieldNamesMode.LOWER_CAMEL_CASE;
                     break;
                 case 2:
-                    field_names_mode = FieldNamesMode.TO_LOWER_CASE;
+                    field_names_mode = FieldNamesMode.LOWER_CASE;
                     break;
                 default:
                     field_names_mode = FieldNamesMode.AS_IS;
@@ -270,10 +270,10 @@ public class NbpTargetLanguageHelpers {
             int fnm = settings.getDto().getFieldNamesMode();
             switch (fnm) {
                 case 1:
-                    field_names_mode = FieldNamesMode.TO_LOWER_CAMEL_CASE;
+                    field_names_mode = FieldNamesMode.LOWER_CAMEL_CASE;
                     break;
                 case 2:
-                    field_names_mode = FieldNamesMode.TO_LOWER_CASE;
+                    field_names_mode = FieldNamesMode.LOWER_CASE;
                     break;
                 default:
                     field_names_mode = FieldNamesMode.AS_IS;

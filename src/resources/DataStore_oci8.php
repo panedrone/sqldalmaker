@@ -29,20 +29,12 @@ class OutParam {
 
 }
 
-/**
- * The class to work with SYS_REFCURSOR
- */
-class RefCursor {
-
-    public $rcid;
-
-}
-
-// class OciDataStore implements DataStore 
+// class OciDataStore implements DataStore
 class DataStore { // no inheritance is also OK
 
     private $conn = null;
     private $commit_mode;
+    private $NO_RC_IDS = array(null);
 
     function __destruct() {
         self::close();
@@ -54,7 +46,7 @@ class DataStore { // no inheritance is also OK
         }
         $this->conn = oci_connect('ORDERS', 'sa', 'localhost:1521/orcl');
         if (!$this->conn) { // FALSE on error
-            $this->trigger_oci_error();
+            self::_trigger_oci_error();
         }
         $this->commit_mode = OCI_NO_AUTO_COMMIT;
     }
@@ -85,7 +77,7 @@ class DataStore { // no inheritance is also OK
     }
 
     public function insert($_sql, array $params, array &$ai_values) {
-        $sql = self::format_sql($_sql);
+        $sql = self::_format_sql($_sql);
         $gen_key = null;
         if (count($ai_values) > 0) {
             if (count($ai_values) > 1) {
@@ -97,14 +89,14 @@ class DataStore { // no inheritance is also OK
         $stid = oci_parse($this->conn, $sql);
         try {
             $bind_names = SqlBindNames::getSqlBindNames($sql);
-            $this->bind_params($stid, true, $bind_names, $params);
+            self::bind_params($stid, $this->NO_RC_IDS, $bind_names, $params);
             $gen_value = 0;
             if (count($ai_values) > 0) {
                 oci_bind_by_name($stid, ':' . $gen_key, $gen_value, -1, SQLT_INT);
             }
             $r = oci_execute($stid, $this->commit_mode);
             if (!$r) {
-                self::trigger_oci_error();
+                self::_trigger_oci_error();
             }
             if (count($ai_values) > 0) {
                 $ai_values[$gen_key] = $gen_value;
@@ -116,14 +108,57 @@ class DataStore { // no inheritance is also OK
     }
 
     public function execDML($_sql, array $params) {
-        $sql = self::format_sql($_sql);
+        $sql = self::_format_sql($_sql);
         $stid = oci_parse($this->conn, $sql);
         try {
             $bind_names = SqlBindNames::getSqlBindNames($sql);
-            $this->bind_params($stid, true, $bind_names, $params);
+            $rc_ids = array();
+            $out_cursors = self::bind_params($stid, $rc_ids, $bind_names, $params);
             $r = oci_execute($stid, $this->commit_mode);
             if (!$r) {
-                self::trigger_oci_error();
+                self::_trigger_oci_error();
+            }
+            if ($out_cursors) {
+                $cb_index = 0;
+                for ($i = 0; $i < count($params); $i++) {
+                    $p = $params[$i];
+                    if (is_callable($p)) {
+                        $rcid = $rc_ids[$cb_index];
+                        try {
+                            $cb_index++;
+                            // https://www.php.net/manual/en/function.oci-new-cursor.php
+                            oci_execute($rcid, OCI_DEFAULT);  // Execute the REF CURSOR like a normal statement id
+                            while (($row = oci_fetch_array($rcid, OCI_ASSOC + OCI_RETURN_NULLS))) {
+                                $p($row);
+                            }
+                        } finally {
+                            oci_free_statement($rcid);
+                        }
+                    }
+                }
+            } else {
+                for ($i = 0; $i < count($params); $i++) {
+                    $p = $params[$i];
+                    if (is_array($p)) {
+                        // (exec-dml) + (SP call) + (list-param containing callback(s)) means 'implicit cursor'
+                        $cb = $p[0];
+                        if (is_callable($cb)) {
+                            // https://blogs.oracle.com/opal/using-php-and-oracle-database-12c-implicit-result-sets
+                            $cb_index = 0;
+                            while (($imprcid = oci_get_implicit_resultset($stid))) {
+                                try {
+                                    while ($row = oci_fetch_array($imprcid, OCI_ASSOC + OCI_RETURN_NULLS)) {
+                                        $cb = $p[$cb_index];
+                                        $cb($row);
+                                    }
+                                } finally {
+                                    oci_free_statement($imprcid); // missing in blog
+                                }
+                                $cb_index++;
+                            }
+                        }
+                    }
+                }
             }
             return $r;
         } finally {
@@ -143,14 +178,14 @@ class DataStore { // no inheritance is also OK
     }
 
     public function queryList($_sql, array $params) {
-        $sql = self::format_sql($_sql);
+        $sql = self::_format_sql($_sql);
         $stid = oci_parse($this->conn, $sql);
         try {
             $bind_names = SqlBindNames::getSqlBindNames($sql);
-            $this->bind_params($stid, true, $bind_names, $params);
+            self::bind_params($stid, $this->NO_RC_IDS, $bind_names, $params);
             $r = oci_execute($stid, OCI_DEFAULT); // just reading, nothing to commit
             if (!$r) {
-                self::trigger_oci_error();
+                self::_trigger_oci_error();
             }
             $res_arr = array();
             while ($row = oci_fetch_array($stid, OCI_NUM + OCI_RETURN_NULLS)) {
@@ -178,63 +213,39 @@ class DataStore { // no inheritance is also OK
     }
 
     public function queryDtoList($_sql, array $params, $callback) {
-        $sql = self::format_sql($_sql);
+        $sql = self::_format_sql($_sql);
         $stid = oci_parse($this->conn, $sql);
         try {
             $bind_names = SqlBindNames::getSqlBindNames($sql);
-            $sp_name = self::get_sp_name($sql);
+            $sp_name = self::_get_sp_name($sql);
             if (is_null($sp_name)) {
-                $this->bind_params($stid, true, $bind_names, $params);
+                self::bind_params($stid, $this->NO_RC_IDS, $bind_names, $params);
                 $r = oci_execute($stid, OCI_DEFAULT); // just reading, nothing to commit
                 if (!$r) {
-                    self::trigger_oci_error();
+                    self::_trigger_oci_error();
                 }
                 while ($row = oci_fetch_array($stid, OCI_ASSOC + OCI_RETURN_NULLS)) {
                     $callback($row);
                 }
                 return $r;
             } else {
-                $ref_cursors = $this->bind_params($stid, false, $bind_names, $params);
-                $r = oci_execute($stid, OCI_DEFAULT); // just reading, nothing to commit
-                if (!$r) {
-                    self::trigger_oci_error();
-                }
-                if ($ref_cursors) {
-                    for ($i = 0; $i < count($params); $i++) {
-                        if ($params[$i] instanceof RefCursor) {
-                            $rcid = $params[$i]->rcid;
-                            // https://www.php.net/manual/en/function.oci-new-cursor.php
-                            oci_execute($rcid, OCI_DEFAULT);  // Execute the REF CURSOR like a normal statement id
-                            while (($row = oci_fetch_array($rcid, OCI_ASSOC + OCI_RETURN_NULLS))) {
-                                $callback($row);
-                            }
-                            oci_free_statement($rcid);
-                        }
-                    }
-                } else { // implicit cursors if no out ref cursors
-                    // https://blogs.oracle.com/opal/using-php-and-oracle-database-12c-implicit-result-sets
-                    while (($imprcid = oci_get_implicit_resultset($stid))) {
-                        while ($row = oci_fetch_array($imprcid, OCI_ASSOC + OCI_RETURN_NULLS)) {
-                            $callback($row);
-                        }
-                        oci_free_statement($imprcid); // missing in blog
-                    }
-                }
+                throw new Exception("SP are not allowed in 'query...', use 'exec-dml' instead");
             }
         } finally {
             oci_free_statement($stid);
         }
     }
 
-    private function trigger_oci_error() {
+    private function _trigger_oci_error() {
         $e = oci_error();
         trigger_error(htmlentities($e['message'], ENT_QUOTES), E_USER_ERROR);
     }
 
-    private function bind_params($stid, $throw_on_ref_cursors, &$bind_names, &$params) {
+    private function bind_params($stid, &$rc_ids, &$bind_names, &$params) {
         $ref_cursors = false;
         for ($i = 0; $i < count($params); $i++) {
-            if ($params[$i] instanceof OutParam) {
+            $p = $params[$i];
+            if ($p instanceof OutParam) {
                 $type = $params[$i]->type;
                 if ($type == SQLT_RSET || $type == OCI_B_CURSOR) {
                     throw new Exception("SQLT_RSET and OCI_B_CURSOR are not allowed, use RefCursor instead.");
@@ -243,15 +254,17 @@ class DataStore { // no inheritance is also OK
                     $param_name = ':' . $bind_names[$i];
                     oci_bind_by_name($stid, $param_name, $params[$i]->value, $size, $type);
                 }
-            } else if ($params[$i] instanceof RefCursor) {
-                if ($throw_on_ref_cursors) {
+            } else if (is_callable($p)) {
+                if (count($rc_ids) > 0) {
                     throw new Exception("RefCursor is not allowed in this method.");
                 }
                 $rcid = oci_new_cursor($this->conn);
                 $param_name = ':' . $bind_names[$i];
                 oci_bind_by_name($stid, $param_name, $rcid, -1, OCI_B_CURSOR);
-                $params[$i]->rcid = $rcid;
+                array_push($rc_ids, $rcid);
                 $ref_cursors = true;
+            } else if (is_array($p)) {
+                // implicit cursor. do nothing
             } else {
                 oci_bind_by_name($stid, ':' . $bind_names[$i], $params[$i]);
             }
@@ -259,7 +272,7 @@ class DataStore { // no inheritance is also OK
         return $ref_cursors;
     }
 
-    private function get_sp_name($sql_src) {
+    private function _get_sp_name($sql_src) {
         $sql = trim($sql_src);
         $sql_parts = explode('(', $sql);
         if (count($sql_parts) < 2) {
@@ -275,7 +288,7 @@ class DataStore { // no inheritance is also OK
         return null;
     }
 
-    private function format_sql($sql) {
+    private function _format_sql($sql) {
         $i = 1;
         while (true) {
             $pos = strpos($sql, '?');

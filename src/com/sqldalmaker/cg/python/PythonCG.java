@@ -243,10 +243,9 @@ public class PythonCG {
             SqlUtils.throw_if_select_sql(jdbc_dao_sql);
             List<FieldInfo> _params = new ArrayList<FieldInfo>();
             db_utils.get_dao_exec_dml_info(jdbc_dao_sql, dto_param_type, param_descriptors, _params);
-            String sql_str = SqlUtils.jdbc_sql_to_python_string(jdbc_dao_sql);
             List<MappingInfo> m_list = new ArrayList<MappingInfo>();
             List<FieldInfo> method_params = new ArrayList<FieldInfo>();
-            List<FieldInfo> exec_xml_params = new ArrayList<FieldInfo>();
+            List<FieldInfo> exec_dml_params = new ArrayList<FieldInfo>();
             for (int pd_i = 0; pd_i < param_descriptors.length; pd_i++) {
                 FieldInfo p = _params.get(pd_i);
                 String pd = param_descriptors[pd_i];
@@ -268,7 +267,7 @@ public class PythonCG {
                         cb_elements.add(m.exec_dml_param_name);
                     }
                     String exec_xml_param = "[" + String.join(",", cb_elements) + "]";
-                    exec_xml_params.add(new FieldInfo(FieldNamesMode.SNAKE_CASE, p.getType(), exec_xml_param, "parameter"));
+                    exec_dml_params.add(new FieldInfo(FieldNamesMode.SNAKE_CASE, p.getType(), exec_xml_param, "parameter"));
                 } else {
                     String param_descriptor = param_descriptors[pd_i];
                     String parts[] = parse_param_descriptor(param_descriptor);
@@ -276,19 +275,20 @@ public class PythonCG {
                         MappingInfo m = create_mapping(parts);
                         m_list.add(m);
                         method_params.add(new FieldInfo(FieldNamesMode.SNAKE_CASE, p.getType(), m.method_param_name, "parameter"));
-                        exec_xml_params.add(new FieldInfo(FieldNamesMode.SNAKE_CASE, p.getType(), m.exec_dml_param_name, "parameter"));
+                        exec_dml_params.add(new FieldInfo(FieldNamesMode.SNAKE_CASE, p.getType(), m.exec_dml_param_name, "parameter"));
                     } else {
                         method_params.add(p);
-                        exec_xml_params.add(p);
+                        exec_dml_params.add(p);
                     }
                 }
             }
             Map<String, Object> context = new HashMap<String, Object>();
             _assign_params(method_params, dto_param_type, context);
-            context.put("params2", exec_xml_params);
+            context.put("params2", exec_dml_params);
             context.put("mappings", m_list);
             context.put("dto_param", dto_param_type);
             context.put("method_name", method_name);
+            String sql_str = SqlUtils.jdbc_sql_to_python_string(jdbc_dao_sql);
             context.put("sql", sql_str);
             context.put("xml_node_name", xml_node_name);
             context.put("sql_path", sql_path);
@@ -318,7 +318,7 @@ public class PythonCG {
             m.dto_class_name = parts[1].trim();
             List<FieldInfo> fields = new ArrayList<FieldInfo>();
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(m.dto_class_name, jaxb_dto_classes);
-            imports.add(jaxb_dto_class.getName());
+            _get_rendered_dto_class_name(jaxb_dto_class.getName(), true); // extends imports
             db_utils.get_dto_field_info(jaxb_dto_class, sql_root_abs_path, fields);
             if (fields.size() > 0) {
                 fields.get(0).setComment(fields.get(0).getComment() + " [INFO] REF CURSOR");

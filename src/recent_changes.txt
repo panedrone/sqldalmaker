@@ -1,6 +1,7 @@
 2020-09-06
 
-    improved RefCursors logic for python + cx_oracle
+    - improved RefCursors logic for python + cx_oracle
+    - improved RefCursors logic for php + oci8
 
 2020-08-09
 
