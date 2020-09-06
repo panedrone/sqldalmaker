@@ -13,7 +13,7 @@
 // include_once 'DataStore.php';
 
 /**
- * The class to work with both OUT and INOUT parameters
+ * The class to access both OUT and INOUT parameters
  */
 class OutParam {
 

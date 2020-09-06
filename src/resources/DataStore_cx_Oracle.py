@@ -3,7 +3,7 @@ import cx_Oracle
 
 class OutParam:
     """
-    The class to work with both OUT and INOUT parameters
+    The class to access both OUT and INOUT parameters
     """
 
     def __init__(self, param_type, param_value=None):
