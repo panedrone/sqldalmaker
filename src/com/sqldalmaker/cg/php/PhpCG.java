@@ -222,7 +222,7 @@ public class PhpCG {
                 String[] method_param_descriptors = Helpers.get_listed_items(param_descriptors, true);
                 boolean is_external_sql = element.isExternalSql();
                 StringBuilder buff = new StringBuilder();
-                _render_exec_dml(buff, dao_jdbc_sql, is_external_sql, null, method_name, dto_param_type,
+                _render_exec_dml(buff, dao_jdbc_sql, is_external_sql, method_name, dto_param_type,
                         method_param_descriptors, xml_node_name, ref);
                 return buff;
             } catch (Throwable e) {
@@ -233,7 +233,7 @@ public class PhpCG {
         }
 
         private void _render_exec_dml(StringBuilder buffer, String jdbc_dao_sql, boolean is_external_sql,
-                                      String class_name, String method_name, String dto_param_type, String[] param_descriptors,
+                                      String method_name, String dto_param_type, String[] param_descriptors,
                                       String xml_node_name, String sql_path) throws Exception {
             SqlUtils.throw_if_select_sql(jdbc_dao_sql);
             List<FieldInfo> _params = new ArrayList<FieldInfo>();
@@ -251,30 +251,30 @@ public class PhpCG {
                     List<String> cb_elements = new ArrayList<String>();
                     for (int ipd_i = 0; ipd_i < implicit_param_descriptors.length; ipd_i++) {
                         String ipd = implicit_param_descriptors[ipd_i];
-                        String parts[] = parse_param_descriptor(ipd);
+                        String[] parts = _parse_param_descriptor(ipd);
                         if (parts == null) {
                             throw new Exception("Implicit cursors are specified incorrectly."
                                     + " Expected syntax: [on_dto_1:Dto1, on_dto_2:Dto2, ...]. Specified: "
                                     + "[" + String.join(",", implicit_param_descriptors) + "]");
                         }
-                        MappingInfo m = create_mapping(parts);
+                        MappingInfo m = _create_mapping(parts);
                         m_list.add(m);
-                        method_params.add(new FieldInfo(FieldNamesMode.SNAKE_CASE, p.getType(), m.method_param_name, "parameter"));
+                        method_params.add(new FieldInfo(FieldNamesMode.AS_IS, p.getType(), m.method_param_name, "parameter"));
                         cb_elements.add(m.exec_dml_param_name);
                     }
                     String exec_xml_param = "array(" + String.join(",", cb_elements) + ")";
-                    exec_dml_params.add(new FieldInfo(FieldNamesMode.SNAKE_CASE, p.getType(), exec_xml_param, "parameter"));
+                    exec_dml_params.add(new FieldInfo(FieldNamesMode.AS_IS, p.getType(), exec_xml_param, "parameter"));
                 } else {
                     String param_descriptor = param_descriptors[pd_i];
-                    String parts[] = parse_param_descriptor(param_descriptor);
+                    String[] parts = _parse_param_descriptor(param_descriptor);
                     if (parts != null) {
-                        MappingInfo m = create_mapping(parts);
+                        MappingInfo m = _create_mapping(parts);
                         m_list.add(m);
-                        method_params.add(new FieldInfo(FieldNamesMode.SNAKE_CASE, p.getType(), m.method_param_name, "parameter"));
-                        exec_dml_params.add(new FieldInfo(FieldNamesMode.SNAKE_CASE, p.getType(), m.exec_dml_param_name, "parameter"));
+                        method_params.add(new FieldInfo(FieldNamesMode.AS_IS, p.getType(), m.method_param_name, "parameter"));
+                        exec_dml_params.add(new FieldInfo(FieldNamesMode.AS_IS, p.getType(), m.exec_dml_param_name, "parameter"));
                     } else {
                         method_params.add(p);
-                        exec_dml_params.add(new FieldInfo(FieldNamesMode.SNAKE_CASE, p.getType(), "$" + p.getName(), "parameter"));
+                        exec_dml_params.add(new FieldInfo(FieldNamesMode.AS_IS, p.getType(), "$" + p.getName(), "parameter"));
                     }
                 }
             }
@@ -283,7 +283,6 @@ public class PhpCG {
             context.put("params2", exec_dml_params);
             context.put("mappings", m_list);
             context.put("dto_param", dto_param_type);
-            context.put("class_name", class_name);
             context.put("method_name", method_name);
             context.put("sql", sql_str);
             context.put("xml_node_name", xml_node_name);
@@ -295,8 +294,8 @@ public class PhpCG {
             buffer.append(sw.getBuffer());
         }
 
-        private String[] parse_param_descriptor(String param_descriptor) {
-            String parts[] = null;
+        private static String[] _parse_param_descriptor(String param_descriptor) {
+            String[] parts = null;
             if (param_descriptor.contains("~")) {
                 parts = param_descriptor.split("~");
             }
@@ -306,7 +305,7 @@ public class PhpCG {
             return parts;
         }
 
-        private MappingInfo create_mapping(String[] parts) throws Exception {
+        private MappingInfo _create_mapping(String[] parts) throws Exception {
             MappingInfo m = new MappingInfo();
             m.method_param_name = parts[0].trim();
             String cb_param_name = String.format("$_map_cb_%s", m.method_param_name);

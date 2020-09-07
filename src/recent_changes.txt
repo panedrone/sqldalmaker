@@ -1,3 +1,7 @@
+2020-09-07
+
+    - separate processing of multiple RefCursors of one SP call (Oracle).
+
 2020-09-06
 
     - improved RefCursors logic for python + cx_oracle

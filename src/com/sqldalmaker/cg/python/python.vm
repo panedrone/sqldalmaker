@@ -202,7 +202,7 @@ class $class_name:
             ${m.get_method_param_name()}(obj)
 #end
 
-#if ($crud == "create" || $crud == "update" || $crud == "delete")
+#if ($crud == "update" || $crud == "delete")
         return self.ds.exec_dml(sql, #param_array($dto_param))
 #else
         return self.ds.exec_dml(sql, #param_array2($dto_param))

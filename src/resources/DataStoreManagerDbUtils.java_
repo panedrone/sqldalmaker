@@ -1,6 +1,7 @@
 package com.sqldalmaker;
 
 import com.mycom.myproject.dao.TestDao;
+import oracle.jdbc.OracleTypes;
 import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.dbutils.OutParameter;
 import org.apache.commons.dbutils.QueryRunner;
@@ -56,43 +57,6 @@ public class DataStoreManager {
             this.value = value;
         }
     }
-
-    /*
-
-    Example of usage:
-
-         for (Test t : dao.sp_get_rs_test(2, new RefCursor(OracleTypes.CURSOR))) {
-                // process...
-         }
-
-    Also, you can do this:
-
-        public static class RefCursor {
-
-            private final int sqlType;
-
-            public RefCursor() {
-                this.sqlType = OracleTypes.CURSOR;
-            }
-
-         for (Test t : dao.sp_get_rs_test(2, new RefCursor())) {
-                // process...
-         }
-
-     */
-    public static class RefCursor {
-
-        private final int sqlType;
-
-        public RefCursor(int sqlType) {
-            this.sqlType = sqlType;
-        }
-
-        public int getSqlType() {
-            return this.sqlType;
-        }
-    }
-
 
     private Connection conn;
 
@@ -182,18 +146,6 @@ public class DataStoreManager {
             return call.compareToIgnoreCase("call") == 0;
         }
 
-        /**
-         * MyQueryRunner
-         * <p>
-         * 1)allows to get generated keys after INSERT.
-         * http://stackoverflow.com/questions/8705036/how-to-get-generated-keys-with-commons-dbutils
-         * https://issues.apache.org/jira/browse/DBUTILS-54
-         * <p>
-         * 2) allows to call stored procedures that (optionally) obtain IN parameters
-         * and (optionally) return result set.
-         * https://stackoverflow.com/questions/8742224/apache-dbutils-stored-procedure/8742300#8742300
-         * https://javabob64.wordpress.com/2012/01/18/calling-a-stored-procedure-from-dbutils/
-         */
         private class MyQueryRunner extends QueryRunner {
 
             public MyQueryRunner() {
@@ -207,20 +159,24 @@ public class DataStoreManager {
                 super(pmdKnownBroken);
             }
 
-            private boolean prepare_call_params(boolean allow_cursor_params, Object[] params, List<Object> call_params) throws SQLException {
+            private boolean _prepare_call_params(boolean allow_cursor_params, Object[] params, List<Object> call_params) throws SQLException {
                 boolean query_out_cursors = false;
                 for (int i = 0; i < params.length; i++) {
-                    if (params[i] instanceof RefCursor) {
+                    if (params[i] instanceof RowHandler2) {
                         if (allow_cursor_params) {
-                            RefCursor cp = (RefCursor) params[i];
-                            call_params.add(new OutParameter(cp.getSqlType(), Object.class));
+                            // uncomment/comment lines below if you are not on Oracle:
+                            // throw new SQLException("RowHandler params are allowed only for Oracle SYS_REFCURSOR-s");
+                            call_params.add(new OutParameter<Object>(OracleTypes.CURSOR, Object.class));
                             query_out_cursors = true;
                         } else {
-                            throw new SQLException(RefCursor.class.getName() + " are not allowed here");
+                            throw new SQLException(RecordHandler.class.getName() + " are not allowed here");
                         }
+                    } else if (params[i] instanceof RowHandler2[]) {
+                        // implicit cursor: do nothing
                     } else if (params[i] instanceof OutParam) {
                         OutParam cp = (OutParam) params[i];
                         Object param_value = cp.getValue();
+                        //noinspection unchecked
                         call_params.add(new OutParameter(cp.getSqlType(), cp.getJavaType(), cp.getValue()));
                         // call_params.add(param_value);
                     } else {
@@ -230,47 +186,25 @@ public class DataStoreManager {
                 return query_out_cursors;
             }
 
-            public <T> void query_call(Connection conn, String sql, ResultSetHandler<T> rsh, Object... params)
-                    throws SQLException {
+            public <T> void query_call(Connection conn, String sql, ResultSetHandler<T> rsh, Object... params) throws SQLException {
                 CallableStatement stmt = conn.prepareCall(sql);
                 try {
                     List<Object> call_params = new ArrayList<Object>();
-                    boolean query_out_cursors = prepare_call_params(true, params, call_params);
+                    _prepare_call_params(false, params, call_params);
                     super.fillStatement(stmt, call_params.toArray());
-                    if (query_out_cursors) {
-                        // Using Ref Cursors To Return Recordsets
-                        // https://oracle-base.com/articles/misc/using-ref-cursors-to-return-recordsets
-                        stmt.execute();
-                        for (int i = 0; i < params.length; i++) {
-                            if (params[i] instanceof RefCursor) {
-                                ResultSet rs = (ResultSet) stmt.getObject(i + 1);
-                                try {
-                                    rsh.handle(rs);
-                                } finally {
-                                    DbUtils.close(rs);
-                                }
-                            } else if (params[i] instanceof OutParam) {
-                                read_out_param(stmt, i, params);
-                            }
+                    // ResultSet rs = super.wrap(stmt.executeQuery());
+                    stmt.execute(); // it returns false for Oracle SP with implicit ref-cursors
+                    // https://en.it1352.com/article/8242caae4610471d962d4b45c13ae070.html
+                    // unlike executeQuery, it works in both MySQL record-set SP and Oracle implicit SYS_REFCURSOR
+                    while (stmt.getMoreResults()) {
+                        ResultSet rs = stmt.getResultSet();
+                        try {
+                            rsh.handle(rs);
+                        } finally {
+                            DbUtils.close(rs);
                         }
-                    } else {
-                        // ResultSet rs = super.wrap(stmt.executeQuery());
-                        stmt.execute();
-                        // https://en.it1352.com/article/8242caae4610471d962d4b45c13ae070.html
-                        // unlike executeQuery, it works in both MySQL record-set SP and Oracle implicit SYS_REFCURSOR
-                        while (stmt.getMoreResults()) {
-                            ResultSet rs = stmt.getResultSet();
-                            try {
-                                rsh.handle(rs);
-                            } finally {
-                                DbUtils.close(rs);
-                            }
-                        }
-                        read_out_params(stmt, params);
                     }
-                    // need to see real type of exception
-//                } catch (SQLException e) {
-//                    super.rethrow(e, sql, params);
+                    _read_out_params(stmt, params);
                 } finally {
                     DbUtils.close(stmt);
                 }
@@ -280,32 +214,91 @@ public class DataStoreManager {
                 CallableStatement stmt = conn.prepareCall(sql);
                 try {
                     List<Object> call_params = new ArrayList<Object>();
-                    prepare_call_params(false, params, call_params);
+                    boolean query_out_cursors = _prepare_call_params(true, params, call_params);
                     super.fillStatement(stmt, call_params.toArray());
-                    // Returns:
-                    // true if the first result is a ResultSet object; false if the first result is
-                    // an update count or there is no result
-                    stmt.execute();
-                    read_out_params(stmt, params);
-                    // need to see real type of exception
-//                } catch (SQLException e) {
-//                    super.rethrow(e, sql, call_params.toArray());
+                    if (query_out_cursors) {
+                        // Using Ref Cursors To Return Recordsets
+                        // https://oracle-base.com/articles/misc/using-ref-cursors-to-return-recordsets
+                        boolean is_rs = stmt.execute();
+                        if (is_rs) {
+                            throw new SQLException("Invalid usage of Out Ref-Cursors. First result of stmt.execute() is a ResultSet object.");
+                        }
+                        for (int i = 0; i < params.length; i++) {
+                            if (params[i] instanceof RowHandler2) {
+                                final RowHandler2 rh = (RowHandler2) params[i];
+                                final ResultSet rs_cursor = (ResultSet) stmt.getObject(i + 1);
+                                final RowData row_data = new RowData() {
+                                    @Override
+                                    public <V> V getValue(Class<V> type, String columnLabel) throws Exception {
+                                        return type.cast(rs_cursor.getObject(columnLabel));
+                                    }
+                                };
+                                try {
+                                    while (rs_cursor.next()) {
+                                        try {
+                                            rh.handleRow(row_data);
+                                        } catch (Exception e) {
+                                            throw new SQLException(e);
+                                        }
+                                    }
+                                } finally {
+                                    DbUtils.close(rs_cursor);
+                                }
+                            } else if (params[i] instanceof OutParam) {
+                                _read_out_param(stmt, i, params);
+                            }
+                        }
+                    } else {
+                        // ResultSet rs = super.wrap(stmt.executeQuery());
+                        stmt.execute(); // it returns false for Oracle SP with implicit ref-cursors
+                        for (int i = 0; i < params.length; i++) {
+                            if (params[i] instanceof RowHandler2[]) {
+                                final RowHandler2[] rh_arr = (RowHandler2[]) params[i];
+                                // https://en.it1352.com/article/8242caae4610471d962d4b45c13ae070.html
+                                // unlike executeQuery, it works in both MySQL record-set SP and Oracle implicit SYS_REFCURSOR
+                                int rh_index = 0;
+                                while (stmt.getMoreResults()) {
+                                    ResultSet rs_implicit = stmt.getResultSet();
+                                    try {
+                                        final RowData row_data = new RowData() {
+                                            @Override
+                                            public <V> V getValue(Class<V> type, String columnLabel) throws Exception {
+                                                return type.cast(rs_implicit.getObject(columnLabel));
+                                            }
+                                        };
+                                        while (rs_implicit.next()) {
+                                            try {
+                                                rh_arr[rh_index].handleRow(row_data);
+                                            } catch (Exception e) {
+                                                throw new SQLException(e);
+                                            }
+                                        }
+                                        rh_index++;
+                                    } finally {
+                                        DbUtils.close(rs_implicit);
+                                    }
+                                }
+                            }
+                        }
+                        _read_out_params(stmt, params); // for both implicit RC call and ordinary call
+                    }
                 } finally {
                     DbUtils.close(stmt);
                 }
                 return 0;
             }
 
-            private void read_out_params(CallableStatement stmt, Object... params) throws SQLException {
+            private void _read_out_params(CallableStatement stmt, Object... params) throws SQLException {
                 for (int i = 0; i < params.length; i++) {
-                    read_out_param(stmt, i, params);
+                    _read_out_param(stmt, i, params);
                 }
             }
 
-            private void read_out_param(CallableStatement stmt, int zero_index, Object... params) throws SQLException {
+            private void _read_out_param(CallableStatement stmt, int zero_index, Object... params) throws SQLException {
                 if (params[zero_index] instanceof OutParam) {
                     Object out_value = stmt.getObject(zero_index + 1);
                     OutParam op = (OutParam) params[zero_index];
+                    //noinspection unchecked
                     op.setValue(op.getJavaType().cast(out_value));
                 }
             }
@@ -318,7 +311,7 @@ public class DataStoreManager {
                     stmt = conn.prepareStatement(sql, genColNames);
                     super.fillStatement(stmt, params);
                     rows = stmt.executeUpdate();
-                    do_after_insert(stmt, genValues);
+                    _do_after_insert(stmt, genValues);
                 } catch (SQLException e) {
                     super.rethrow(e, sql, params);
                 } finally {
@@ -327,7 +320,7 @@ public class DataStoreManager {
                 return rows;
             }
 
-            private void do_after_insert(PreparedStatement stmt, Object[] genValues) throws SQLException {
+            private void _do_after_insert(PreparedStatement stmt, Object[] genValues) throws SQLException {
                 ResultSet keys = stmt.getGeneratedKeys(); // ok even for oracle (why?)
                 if (keys != null) {
                     try {
@@ -369,11 +362,11 @@ public class DataStoreManager {
                     obj = bigDecimal.longValueExact();
                 } else if (BigInteger.class.equals(type)) {
                     obj = bigDecimal.toBigIntegerExact();
-                } else if (BigDecimal.class.equals(type)) {
-                    obj = bigDecimal;
+                } /*else if (BigDecimal.class.equals(type)) {
+                    obj = bigDecimal; // it is BigDecimal initially
                 } else if (Object.class.equals(type)) {
-                    obj = bigDecimal;
-                } else {
+                    obj = bigDecimal; // it is Object initially
+                } */ else {
                     throw new ClassCastException("Unexpected class '" + type.getName() + "'");
                 }
             }
@@ -422,7 +415,7 @@ public class DataStoreManager {
             if (type == Void.class) {
                 ResultSetHandler<Void> rsh = new ResultSetHandler<Void>() {
                     @Override
-                    public Void handle(final ResultSet rs) throws SQLException {
+                    public Void handle(final ResultSet rs) {
                         return null;
                     }
                 };

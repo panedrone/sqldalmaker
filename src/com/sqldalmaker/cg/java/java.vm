@@ -179,7 +179,23 @@ public class ${class_name} {
      */
     public int ${method_name}(#param_decls($is_external_sql $params)) throws Exception {
 #sql_var($is_external_sql $sql)
+#foreach($m in ${mappings})
+        RowHandler2 ${m.get_exec_dml_param_name()} = new RowHandler2() {
+            @Override
+            public void handleRow(RowData rd) throws Exception {
+                ${m.get_dto_class_name()} obj = new ${m.get_dto_class_name()}();
+#foreach($f in ${m.get_fields()})
+                obj.${f.setterMethod()}(rd.getValue(${f.getType()}.class, "${f.getColumnName()}"));  // ${f.getComment()}
+#end
+                ${m.get_method_param_name()}.handle(obj);
+            }
+        };
+#end
+#if ($method_type == "UPDATE" || $method_type == "DELETE")
         return ds.execDML(sql#foreach($param in ${params}), ${param.getName()}#end);
+#else
+        return ds.execDML(sql#foreach($param in ${params2}), ${param.getName()}#end);
+#end
     }
 #end
 #end

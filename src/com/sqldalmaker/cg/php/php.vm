@@ -217,7 +217,7 @@ class ${class_name} {
             ${d}${m.get_method_param_name()}(${d}obj);
         };
 #end
-#if ($crud == "create" || $crud == "update" || $crud == "delete")
+#if ($crud == "update" || $crud == "delete")
         return ${d}this->ds->execDML(${d}sql, #param_array($dto_param));
 #else
         return ${d}this->ds->execDML(${d}sql, #param_array2($dto_param));
