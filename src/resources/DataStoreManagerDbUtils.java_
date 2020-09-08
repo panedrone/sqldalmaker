@@ -192,10 +192,10 @@ public class DataStoreManager {
                     List<Object> call_params = new ArrayList<Object>();
                     _prepare_call_params(false, params, call_params);
                     super.fillStatement(stmt, call_params.toArray());
-                    // ResultSet rs = super.wrap(stmt.executeQuery());
-                    stmt.execute(); // it returns false for Oracle SP with implicit ref-cursors
+                    // the code to work with Oracle implicit SYS_REFCURSOR-s
                     // https://en.it1352.com/article/8242caae4610471d962d4b45c13ae070.html
-                    // unlike executeQuery, it works in both MySQL record-set SP and Oracle implicit SYS_REFCURSOR
+                    // ........................................
+                    stmt.execute(); // it returns false for Oracle SP with implicit ref-cursors
                     while (stmt.getMoreResults()) {
                         ResultSet rs = stmt.getResultSet();
                         try {
@@ -204,6 +204,23 @@ public class DataStoreManager {
                             DbUtils.close(rs);
                         }
                     }
+                    // ........................................
+                    // the code to work with MySQL SP returning ResultSet-s
+                    // ........................................
+//                    ResultSet rs = stmt.executeQuery();
+//                    while(true) {
+//                        try {
+//                            rsh.handle(rs);
+//                        } finally {
+//                            DbUtils.close(rs);
+//                        }
+//                        if (stmt.getMoreResults()) {
+//                            rs = stmt.getResultSet();
+//                        } else {
+//                            break;
+//                        }
+//                    }
+                    // ........................................
                     _read_out_params(stmt, params);
                 } finally {
                     DbUtils.close(stmt);
