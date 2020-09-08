@@ -111,7 +111,8 @@ public class ${class_name} {
 #end
                 return obj;
             }
-        }#if(${dto_param} != "")#foreach($param in ${params}), p.${param.getterMethod()}()#end);#else#foreach($param in ${params}), ${param.getName()}#end);#end
+        }#if(${dto_param} != "")#foreach($param in ${params}), p.${param.getterMethod()}()#end);#else#foreach($param in ${params}), ${param.getName()}#end);
+#end
 #else
 #if(${dto_param} != "")    
         return ds.queryList(${returned_type_name}.class, sql#foreach($param in ${params}), p.${param.getterMethod()}()#end);
@@ -119,7 +120,6 @@ public class ${class_name} {
         return ds.queryList(${returned_type_name}.class, sql#foreach($param in ${params}), ${param.getName()}#end);
 #end
 #end
-
     }
 #else
     public ${returned_type_name} ${method_name}(#if(${dto_param} != "")#param_decls_dto($is_external_sql)${dto_param} p#else#param_decls($is_external_sql $params)#end) throws Exception {
@@ -135,7 +135,8 @@ public class ${class_name} {
 #end
                 return res;
             }
-        }#if(${dto_param} != "")#foreach($param in ${params}), p.${param.getterMethod()}()#end);#else#foreach($param in ${params}), ${param.getName()}#end);#end
+        }#if(${dto_param} != "")#foreach($param in ${params}), p.${param.getterMethod()}()#end);#else#foreach($param in ${params}), ${param.getName()}#end);
+#end
 #else
 #if(${dto_param} != "")    
         return ds.query(${returned_type_name}.class, sql#foreach($param in ${params}), p.${param.getterMethod()}()#end);
@@ -143,7 +144,6 @@ public class ${class_name} {
         return ds.query(${returned_type_name}.class, sql#foreach($param in ${params}), ${param.getName()}#end);
 #end    
 #end
-
     }
 #end
 ## ====================================================================================================================

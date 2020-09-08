@@ -126,7 +126,7 @@ public class JavaCG {
             Helpers.check_required_attr(xml_node_name, mi.jaxb_method);
             try {
                 if (mi.return_type_is_dto) {
-                    _process_dto_class_name(dto_package, mi.jaxb_dto_or_return_type);
+                    _process_dto_class_name(mi.jaxb_dto_or_return_type);
                 }
                 String[] parsed = _parse_method_declaration(mi.jaxb_method, dto_package);
                 String method_name = parsed[0];
@@ -192,7 +192,7 @@ public class JavaCG {
             return jaxb_dto_class.getName();
         }
 
-        private void _process_dto_class_name(String dto_package, String dto_class_name) {
+        private void _process_dto_class_name(String dto_class_name) {
             if (dto_package != null && dto_package.length() > 0) {
                 imports.add(dto_package + "." + dto_class_name);
             } else {
@@ -255,7 +255,7 @@ public class JavaCG {
                         method_params.add(new FieldInfo(FieldNamesMode.AS_IS, String.format("RecordHandler<%s>", m.dto_class_name), m.method_param_name, "parameter"));
                         cb_elements.add(m.exec_dml_param_name);
                     }
-                    String exec_xml_param = "new RowHandler2[] {" + String.join(",", cb_elements) + "}";
+                    String exec_xml_param = "new RowHandler2[] {" + String.join(", ", cb_elements) + "}";
                     exec_dml_params.add(new FieldInfo(FieldNamesMode.AS_IS, p.getType(), exec_xml_param, "parameter"));
                 } else {
                     String param_descriptor = param_descriptors[pd_i];
@@ -311,7 +311,7 @@ public class JavaCG {
             imports.add("com.sqldalmaker.DataStore.RowData");
             imports.add("com.sqldalmaker.DataStore.RowHandler2");
             imports.add("com.sqldalmaker.DataStore.RecordHandler");
-            _get_rendered_dto_class_name(jaxb_dto_class.getName()); // extends both imports and uses
+            _process_dto_class_name(jaxb_dto_class.getName()); // extends imports
             db_utils.get_dto_field_info(jaxb_dto_class, sql_root_abs_path, fields);
             if (fields.size() > 0) {
                 fields.get(0).setComment(fields.get(0).getComment() + " [INFO] REF CURSOR");
@@ -326,7 +326,7 @@ public class JavaCG {
                 if (params_count == 0) {
                     throw new Exception("DTO parameter specified but SQL-query does not contain any parameters");
                 }
-                _process_dto_class_name(dto_package, dto_param_type);
+                _process_dto_class_name(dto_param_type);
                 context.put("dto_param", _get_rendered_dto_class_name(dto_param_type));
             } else {
                 context.put("dto_param", "");
@@ -346,7 +346,7 @@ public class JavaCG {
                     dto_param_type = parts[0];
                     param_descriptors = parts[1];
                     if (dto_param_type.length() > 0) {
-                        _process_dto_class_name(dto_package, dto_param_type);
+                        _process_dto_class_name(dto_param_type);
                     }
                 } else {
                     param_descriptors = parts[0];
@@ -470,7 +470,7 @@ public class JavaCG {
             }
             try {
                 db_utils.validate_table_name(table_attr);
-                _process_dto_class_name(dto_package, dto_class_name);
+                _process_dto_class_name(dto_class_name);
                 StringBuilder code_buff = JaxbUtils.process_jaxb_crud(this, false, jaxb_type_crud, dto_class_name);
                 return code_buff;
             } catch (Throwable e) {

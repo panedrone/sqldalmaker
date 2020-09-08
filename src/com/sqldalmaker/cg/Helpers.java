@@ -150,6 +150,23 @@ public class Helpers {
 
     public static String[] get_listed_items(String list, boolean allow_semicolon) throws Exception {
         if (list != null && list.length() > 0) {
+            list = list.trim();
+            int pos = list.indexOf('[');
+            String last_arr = null;
+            if (pos != -1) {
+                if (list.endsWith("]") == false) {
+                    throw new Exception("Ending ']' expected");
+                }
+                last_arr = list.substring(pos); // keep []
+                if (pos == 0) {
+                    return new String[] {last_arr};
+                }
+                list = list.substring(0, pos);
+                list = list.trim();
+                if (list.endsWith(",")) {
+                    list = list.substring(0, list.length() - 1); // remove ending ','
+                }
+            }
             String[] items;
             items = list.split("[,]");
             for (int i = 0; i < items.length; i++) {
@@ -165,7 +182,16 @@ public class Helpers {
                 }
                 check_item(name/* , is_sp */, allow_semicolon);
             }
-            return items;
+            if (last_arr != null) {
+                int n = items.length;
+                String newarr[] = new String[n + 1];
+                for (int i = 0; i < n; i++)
+                    newarr[i] = items[i];
+                newarr[n] = last_arr;
+                return newarr;
+            } else {
+                return items;
+            }
         }
         return new String[]{};
     }
@@ -177,27 +203,22 @@ public class Helpers {
         char ch_0 = name.charAt(0);
         boolean is_letter_at_0 = Character.isLetter(ch_0);
         if (!is_letter_at_0 || ch_0 == '$') {
-            if (ch_0 != '_' && ch_0 != '[') {
+            if (ch_0 != '_') {
                 throw new Exception("Invalid starting character in the name of item: " + name);
             }
         }
-        if (ch_0 == '[' && name.endsWith("]")) {
-            String inner_list = name.substring(1, name.length() - 1);
-            get_listed_items(inner_list, allow_semicolon = true);
-        } else {
-            for (int i = 1; i < name.length(); i++) {
-                // Google: java is letter
-                // A character is considered to be a Java letter or digit if and only if it is a
-                // letter or a digit or the dollar sign "$" or the underscore "_".
-                char ch = name.charAt(i);
-                if (!allow_semicolon && ch == ':') {
-                    throw new Exception("':' is not allowed in this context");
-                }
-                boolean is_letter_or_digit = Character.isLetterOrDigit(ch);
-                // SQL parameter name may be detected like 'column1:0' and renamed to column1_0
-                if (!is_letter_or_digit && ch != '$' && ch != '_' && ch != '~' && ch != ':') {
-                    throw new Exception("Invalid character in the name of item: " + name);
-                }
+        for (int i = 1; i < name.length(); i++) {
+            // Google: java is letter
+            // A character is considered to be a Java letter or digit if and only if it is a
+            // letter or a digit or the dollar sign "$" or the underscore "_".
+            char ch = name.charAt(i);
+            if (!allow_semicolon && ch == ':') {
+                throw new Exception("':' is not allowed in this context");
+            }
+            boolean is_letter_or_digit = Character.isLetterOrDigit(ch);
+            // SQL parameter name may be detected like 'column1:0' and renamed to column1_0
+            if (!is_letter_or_digit && ch != '$' && ch != '_' && ch != '~' && ch != ':') {
+                throw new Exception("Invalid character in the name of item: " + name);
             }
         }
     }

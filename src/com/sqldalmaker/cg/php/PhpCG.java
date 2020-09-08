@@ -262,7 +262,7 @@ public class PhpCG {
                         method_params.add(new FieldInfo(FieldNamesMode.AS_IS, p.getType(), m.method_param_name, "parameter"));
                         cb_elements.add(m.exec_dml_param_name);
                     }
-                    String exec_xml_param = "array(" + String.join(",", cb_elements) + ")";
+                    String exec_xml_param = "array(" + String.join(", ", cb_elements) + ")";
                     exec_dml_params.add(new FieldInfo(FieldNamesMode.AS_IS, p.getType(), exec_xml_param, "parameter"));
                 } else {
                     String param_descriptor = param_descriptors[pd_i];
