@@ -29,7 +29,7 @@
 \#include "DataStore.h"
 
 /**
- * This is a generated DTO class. Don't modify it manually.
+ * ${class_name} is a generated DTO class. Don't modify it manually.
  * http://sqldalmaker.sourceforge.net
  */
 class ${class_name}
@@ -51,7 +51,7 @@ public:
 #end
 
 /**
- * This is a generated DAO class. Don't modify it manually.
+ * ${class_name} is a generated DAO class. Don't modify it manually.
  * http://sqldalmaker.sourceforge.net
  */
 class ${class_name}

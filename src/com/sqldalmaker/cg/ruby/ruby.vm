@@ -26,7 +26,7 @@
 #end
 ## ====================================================================================================================
 #if ($mode=="dto_class")
-# This is a generated DTO class. Don't modify it manually.
+# $class_name is a generated DTO class. Don't modify it manually.
 # http://sqldalmaker.sourceforge.net
 
 class $class_name
@@ -46,7 +46,7 @@ class $class_name
 end
 ## ====================================================================================================================
 #elseif($mode=="dao_class")
-# This is a generated DAO class. Don't modify it manually.
+# $class_name is a generated DAO class. Don't modify it manually.
 # http://sqldalmaker.sourceforge.net
 
 #foreach($imp in $imports)
