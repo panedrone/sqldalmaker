@@ -1,6 +1,10 @@
+2020-09-09
+
+    - separate processing of multiple record-sets returned by MySQL SP
+
 2020-09-07
 
-    - separate processing of multiple RefCursors of one SP call (Oracle).
+    - separate processing of multiple RefCursors of one SP call (Oracle)
 
 2020-09-06
 

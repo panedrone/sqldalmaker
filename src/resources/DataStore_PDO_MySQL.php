@@ -1,16 +1,6 @@
 <?php
 
-/*
-  SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
-
-  This is an example of how to implement DataStore in PHP + PDO + MySQL.
-  Copy-paste this code to your project and change it for your needs.
-
-  Improvements are welcome: sqldalmaker@gmail.com
-
- */
-
-// include_once 'DataStore.php';
+// include_once 'DataStore.php'; // uncomment if you need inheritance
 
 class OutParam {
 
@@ -28,12 +18,21 @@ class InOutParam {
 
 }
 
-// class PDODataStore implements DataStore
+/*
+  SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
+  Contact: sqldalmaker@gmail.com
+
+  This is an example of how to implement DataStore in PHP + PDO + MySQL.
+  Copy-paste this code to your project and change it for your needs.
+ */
+
+// class PDODataStore implements DataStore 
 class DataStore { // no inheritance is also OK
 
     private $db;
 
     function __destruct() {
+        // close connections when the object is destroyed
         $this->db = null;
     }
 
@@ -62,29 +61,26 @@ class DataStore { // no inheritance is also OK
         if (is_null($this->db)) {
             throw new Exception("Already closed");
         }
+        /*         * * close the database connection ** */
         $this->db = null;
     }
 
     public function insert($sql, array $params, array &$ai_values) {
         $stmt = $this->db->prepare($sql);
-        try {
-            // http://stackoverflow.com/questions/10699543/pdo-prepared-statement-in-php-using-associative-arrays-yields-wrong-results
-            // use the optional parameter of execute instead of explicitly binding the parameters:
-            $res = $stmt->execute($params);
-            // http://www.php.net/manual/en/pdo.lastinsertid.php
-            // Returns the ID of the last inserted row, or the last value from a sequence object,
-            // depending on the underlying driver. For example, PDO_PGSQL requires you to specify the name
-            // of a sequence object for the name parameter.
-            // This method may not return a meaningful or consistent result across different PDO drivers,
-            // because the underlying database may not even support the notion of auto-increment fields or sequences.
-            foreach (array_keys($ai_values) as $key) {
-                $id = $this->db->lastInsertId($key);
-                $ai_values[$key] = $id;
-            }
-            return $res;
-        } finally {
-            $stmt->closeCursor();
+        // http://stackoverflow.com/questions/10699543/pdo-prepared-statement-in-php-using-associative-arrays-yields-wrong-results
+        // use the optional parameter of execute instead of explicitly binding the parameters:
+        $res = $stmt->execute($params);
+        // http://www.php.net/manual/en/pdo.lastinsertid.php
+        // Returns the ID of the last inserted row, or the last value from a sequence object,
+        // depending on the underlying driver. For example, PDO_PGSQL requires you to specify the name
+        // of a sequence object for the name parameter.
+        // This method may not return a meaningful or consistent result across different PDO drivers,
+        // because the underlying database may not even support the notion of auto-increment fields or sequences.
+        foreach (array_keys($ai_values) as $key) {
+            $id = $this->db->lastInsertId($key);
+            $ai_values[$key] = $id;
         }
+        return $res;
     }
 
     private function get_sp_name($sql_src) {
@@ -129,6 +125,8 @@ class DataStore { // no inheritance is also OK
                 $name = "@inout_param_$i";
                 $call_params[$name] = $params[$i];
                 $in_params[$name] = $params[$i]->value;
+            } else if (is_array($params[$i])) {
+                // MySQL SP call returning result-set(s)
             } else {
                 $name = ":in_param_$i";
                 $call_params[$name] = null;
@@ -157,74 +155,95 @@ class DataStore { // no inheritance is also OK
             $call_params = array();
             $sql = $this->get_call_info($sp_name, $params, $in_params, $call_params);
             $stmt = $this->db->prepare($sql);
-            try {
-                $this->init_call_params($stmt, $in_params);
-                $res = $stmt->execute();
-            } finally {
-                $stmt->closeCursor();
+            $this->init_call_params($stmt, $in_params);
+            $sp_returning_result_sets = false;
+            for ($i = 0; $i < count($params); $i++) {
+                $p = $params[$i];
+                if (is_array($p) && is_callable($p[0])) {
+                    $sp_returning_result_sets = true;
+                    break;
+                }
             }
+            if ($sp_returning_result_sets) {
+                for ($i = 0; $i < count($params); $i++) {
+                    $p = $params[$i];
+                    if (is_array($p)) {
+                        // (exec-dml) + (SP call) + (list-param containing callback(s)) means 'MySQL SP call returning result-set(s)'
+                        $cb = $p[0];
+                        if (is_callable($cb)) {
+                            $cb_index = 0;
+                            $res = $stmt->execute(); // params were bound by get_call_info
+                            if ($res) {
+                                while (true) {
+                                    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                                        $cb = $p[$cb_index];
+                                        $cb($row);
+                                    }
+                                    // nextRowset() always returs true!!!
+                                    if ($cb_index >= count($p) - 1) {
+                                        break;
+                                    }
+                                    $next = $stmt->nextRowset();
+                                    if (!$next) {
+                                        break;
+                                    }
+                                    $cb_index++;
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                $res = $stmt->execute();
+            }
+            $stmt->closeCursor();
             $this->fetch_out_params($call_params);
             return $res;
         } else {
             $stmt = $this->db->prepare($sql);
-            try {
-                $res = $stmt->execute($params);
-            } finally {
-                $stmt->closeCursor();
-            }
+            $res = $stmt->execute($params);
+            $stmt->closeCursor();
             return $res;
         }
     }
 
     public function query($sql, array $params) {
         $stmt = $this->db->prepare($sql);
-        try {
-            $stmt->execute($params);
-            $res = $stmt->fetchColumn();
-            return $res;
-        } finally {
-            $stmt->closeCursor();
-        }
+        $stmt->execute($params);
+        $value = $stmt->fetchColumn();
+        $stmt->closeCursor();
+        return $value;
     }
 
     public function queryList($sql, array $params) {
         $stmt = $this->db->prepare($sql);
-        try {
-            $stmt->execute($params);
-            $res_arr = array();
-            while ($val = $stmt->fetchColumn()) {
-                array_push($res_arr, $val);
-            }
-            return $res_arr;
-        } finally {
-            $stmt->closeCursor();
+        $stmt->execute($params);
+        $res = array();
+        while ($val = $stmt->fetchColumn()) {
+            array_push($res, $val);
         }
+        $stmt->closeCursor();
+        return $res;
     }
 
     public function queryDto($sql, array $params) {
         $stmt = $this->db->prepare($sql);
-        try {
-            $stmt->execute($params);
-            $res = $stmt->fetch(PDO::FETCH_ASSOC);
-            return $res;
-        } finally {
-            $stmt->closeCursor();
-        }
+        $stmt->execute($params);
+        $res = $stmt->fetch(PDO::FETCH_ASSOC);
+        $stmt->closeCursor();
+        return $res;
     }
 
     public function queryDtoList($sql, array $params, $callback) {
         $stmt = $this->db->prepare($sql);
-        try {
-            $res = $stmt->execute($params);
-            if ($res) {
-                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                    $callback($row);
-                }
+        $res = $stmt->execute($params);
+        if ($res) {
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $callback($row);
             }
-            return $res;
-        } finally {
-            $stmt->closeCursor();
         }
+        $stmt->closeCursor();
+        return $res;
     }
 
 }
