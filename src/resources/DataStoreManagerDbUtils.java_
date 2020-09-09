@@ -60,6 +60,8 @@ public class DataStoreManager {
 
     private Connection conn;
 
+    private boolean is_oracle;
+
     public void open() throws Exception {
         conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:orcl", "ORDERS", "sa");
         // conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:XE", "ORDERS", "root");
@@ -68,6 +70,9 @@ public class DataStoreManager {
         // conn = DriverManager.getConnection("jdbc:sqlserver://localhost\\SQLEXPRESS;databaseName=AdventureWorks2014", "sa", "root");
         // conn = DriverManager.getConnection("jdbc:h2:todo_list", "", "");
         // conn = DriverManager.getConnection("jdbc:sqlite:thesaurus.sqlite", "", "");
+        DatabaseMetaData dmd = conn.getMetaData();
+        String url = dmd.getURL();
+        is_oracle = url.contains("oracle");
         conn.setAutoCommit(false);
     }
 
@@ -195,31 +200,34 @@ public class DataStoreManager {
                     // the code to work with Oracle implicit SYS_REFCURSOR-s
                     // https://en.it1352.com/article/8242caae4610471d962d4b45c13ae070.html
                     // ........................................
-                    stmt.execute(); // it returns false for Oracle SP with implicit ref-cursors
-                    while (stmt.getMoreResults()) {
-                        ResultSet rs = stmt.getResultSet();
-                        try {
-                            rsh.handle(rs);
-                        } finally {
-                            DbUtils.close(rs);
+                    if (is_oracle) {
+                        stmt.execute(); // it returns false for Oracle SP with implicit ref-cursors
+                        while (stmt.getMoreResults()) {
+                            ResultSet rs = stmt.getResultSet();
+                            try {
+                                rsh.handle(rs);
+                            } finally {
+                                DbUtils.close(rs);
+                            }
+                        }
+                    } else {
+                        // ........................................
+                        // the code to work with MySQL SP returning ResultSet-s
+                        // ........................................
+                        ResultSet rs = stmt.executeQuery();
+                        while (true) {
+                            try {
+                                rsh.handle(rs);
+                            } finally {
+                                DbUtils.close(rs);
+                            }
+                            if (stmt.getMoreResults()) {
+                                rs = stmt.getResultSet();
+                            } else {
+                                break;
+                            }
                         }
                     }
-                    // ........................................
-                    // the code to work with MySQL SP returning ResultSet-s
-                    // ........................................
-//                    ResultSet rs = stmt.executeQuery();
-//                    while(true) {
-//                        try {
-//                            rsh.handle(rs);
-//                        } finally {
-//                            DbUtils.close(rs);
-//                        }
-//                        if (stmt.getMoreResults()) {
-//                            rs = stmt.getResultSet();
-//                        } else {
-//                            break;
-//                        }
-//                    }
                     // ........................................
                     _read_out_params(stmt, params);
                 } finally {
@@ -265,37 +273,81 @@ public class DataStoreManager {
                                 _read_out_param(stmt, i, params);
                             }
                         }
-                    } else {
-                        // ResultSet rs = super.wrap(stmt.executeQuery());
-                        stmt.execute(); // it returns false for Oracle SP with implicit ref-cursors
+                    } else { // if (query_out_cursors) {
+                        boolean implicit_result_sets = false;
                         for (int i = 0; i < params.length; i++) {
                             if (params[i] instanceof RowHandler2[]) {
-                                final RowHandler2[] rh_arr = (RowHandler2[]) params[i];
-                                // https://en.it1352.com/article/8242caae4610471d962d4b45c13ae070.html
-                                // unlike executeQuery, it works in both MySQL record-set SP and Oracle implicit SYS_REFCURSOR
-                                int rh_index = 0;
-                                while (stmt.getMoreResults()) {
-                                    ResultSet rs_implicit = stmt.getResultSet();
+                                implicit_result_sets = true;
+                                break;
+                            }
+                        }
+                        if (implicit_result_sets) {
+                            class RC_Handler {
+                                // make it class field to allow both changing and access from RowData
+                                private ResultSet rs_implicit;
+
+                                private void fetch(RowData row_data, RowHandler2 rh) throws SQLException {
                                     try {
-                                        final RowData row_data = new RowData() {
-                                            @Override
-                                            public <V> V getValue(Class<V> type, String columnLabel) throws Exception {
-                                                return type.cast(rs_implicit.getObject(columnLabel));
-                                            }
-                                        };
                                         while (rs_implicit.next()) {
                                             try {
-                                                rh_arr[rh_index].handleRow(row_data);
+                                                rh.handleRow(row_data);
                                             } catch (Exception e) {
                                                 throw new SQLException(e);
                                             }
                                         }
-                                        rh_index++;
                                     } finally {
                                         DbUtils.close(rs_implicit);
                                     }
                                 }
+
+                                public void fetch_all() throws SQLException {
+                                    final RowData row_data = new RowData() {
+                                        @Override
+                                        public <V> V getValue(Class<V> type, String columnLabel) throws Exception {
+                                            return type.cast(rs_implicit.getObject(columnLabel));
+                                        }
+                                    };
+                                    //
+                                    // Oracle wants stmt.execute() --> getMoreResults() --> getResultSet()
+                                    // MySQL wants executeQuery() first
+                                    //
+                                    if (is_oracle) {
+                                        stmt.execute(); // it returns false for Oracle SP with implicit ref-cursors
+                                        for (int i = 0; i < params.length; i++) {
+                                            if (params[i] instanceof RowHandler2[]) {
+                                                RowHandler2[] rh_arr = (RowHandler2[]) params[i];
+                                                int rh_index = 0;
+                                                while (stmt.getMoreResults()) { // move trough result-sets
+                                                    rs_implicit = stmt.getResultSet();
+                                                    fetch(row_data, rh_arr[rh_index]);
+                                                    rh_index++;
+                                                }
+                                            }
+                                        }
+                                    } else {
+                                        rs_implicit = stmt.executeQuery();
+                                        for (int i = 0; i < params.length; i++) {
+                                            if (params[i] instanceof RowHandler2[]) {
+                                                RowHandler2[] rh_arr = (RowHandler2[]) params[i];
+                                                int rh_index = 0;
+                                                while (true) { // move trough result-sets
+                                                    fetch(row_data, rh_arr[rh_index]);
+                                                    rh_index++;
+                                                    if (stmt.getMoreResults()) {
+                                                        rs_implicit = stmt.getResultSet();
+                                                    } else {
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
                             }
+                            RC_Handler rch = new RC_Handler();
+                            rch.fetch_all();
+                        } else {
+                            stmt.execute(); // it returns false for Oracle SP with implicit ref-cursors
                         }
                         _read_out_params(stmt, params); // for both implicit RC call and ordinary call
                     }
