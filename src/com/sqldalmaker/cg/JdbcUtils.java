@@ -394,25 +394,22 @@ public class JdbcUtils {
         } catch (Throwable e) { // including AbstractMethodError, SQLServerException, etc.
             params_count = 0;
         }
-        int descriptors_count = 0;
         for (int i = 0; i< method_param_descriptors.length; i++) {
-            String name = method_param_descriptors[i];
-            if (name.startsWith("[") && name.endsWith("]")) {
+            String param_descriptor = method_param_descriptors[i].trim();
+            if (param_descriptor.startsWith("[") ) {
                 // implicit cursor callbacks
+                if (param_descriptor.endsWith("]") == false) {
+                    throw new Exception("Ending ']' expected");
+                }
             } else {
-                descriptors_count++;
+                String default_param_type_name = _get_jdbc_param_type_name(pm, i);
+                FieldInfo pi = _create_param_info(param_names_mode, param_descriptor, default_param_type_name);
+                _params.add(pi);
             }
         }
-
-        if (params_count != descriptors_count) {
+        if (params_count != _params.size()) {
             throw new Exception("Parameters count expected: " + method_param_descriptors.length
                     + ", detected: " + params_count);
-        }
-        for (int i = 0; i < method_param_descriptors.length; i++) {
-            String param_descriptor = method_param_descriptors[i];
-            String default_param_type_name = _get_jdbc_param_type_name(pm, i);
-            FieldInfo pi = _create_param_info(param_names_mode, param_descriptor, default_param_type_name);
-            _params.add(pi);
         }
     }
 

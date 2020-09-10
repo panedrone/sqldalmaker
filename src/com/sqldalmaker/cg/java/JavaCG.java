@@ -236,7 +236,6 @@ public class JavaCG {
             List<FieldInfo> method_params = new ArrayList<FieldInfo>();
             List<FieldInfo> exec_dml_params = new ArrayList<FieldInfo>();
             for (int pd_i = 0; pd_i < param_descriptors.length; pd_i++) {
-                FieldInfo p = _params.get(pd_i);
                 String pd = param_descriptors[pd_i];
                 if (pd.startsWith("[") && pd.endsWith("]")) {
                     String inner_list = pd.substring(1, pd.length() - 1);
@@ -256,8 +255,9 @@ public class JavaCG {
                         cb_elements.add(m.exec_dml_param_name);
                     }
                     String exec_xml_param = "new RowHandler2[] {" + String.join(", ", cb_elements) + "}";
-                    exec_dml_params.add(new FieldInfo(FieldNamesMode.AS_IS, p.getType(), exec_xml_param, "parameter"));
+                    exec_dml_params.add(new FieldInfo(FieldNamesMode.AS_IS, "[]", exec_xml_param, "parameter"));
                 } else {
+                    FieldInfo p = _params.get(pd_i);
                     String param_descriptor = param_descriptors[pd_i];
                     String[] parts = _parse_param_descriptor(param_descriptor);
                     if (parts != null) {
