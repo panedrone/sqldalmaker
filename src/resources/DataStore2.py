@@ -8,11 +8,10 @@ class OutParam:
 class DataStore:
     """
     SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
+    Contact: sqldalmaker@gmail.com
 
     This is an example of how to implement DataStore in Python + MySQL.
     Copy-paste this code to your project and change it for your needs.
-
-    Improvements are welcome: sqldalmaker@gmail.com
     """
 
     def __init__(self):
@@ -48,17 +47,12 @@ class DataStore:
             Exception: if no rows inserted.
         """
         sql = _prepare_sql(sql)
-
-        cursor = self.connection.cursor()
-
-        try:
+        with self.connection.cursor() as cursor:
             cursor.execute(sql, params)
             if len(ai_values) > 0:
                 ai_values[0][1] = cursor.lastrowid
             if cursor.rowcount == 0:
                 raise Exception('No rows inserted')
-        finally:
-            cursor.close()
 
     def exec_dml(self, sql, params):
         """
@@ -69,11 +63,8 @@ class DataStore:
             Number of updated rows.
         """
         sql = _prepare_sql(sql)
-
-        cursor = self.connection.cursor()
-
-        try:
-            sp = _get_sp_name(sql)
+        sp = _get_sp_name(sql)
+        with self.connection.cursor() as cursor:
             if sp is None:
                 cursor.execute(sql, params)
                 return cursor.rowcount
@@ -81,10 +72,17 @@ class DataStore:
                 call_params = _get_call_params(params)
                 # result_args: https://pynative.com/python-mysql-execute-stored-procedure/
                 result_args = cursor.callproc(sp, call_params)
+                for p in params:
+                    if isinstance(p, list) and callable(p[0]):
+                        i = 0 # MySQL SP returning result-sets
+                        # http://www.mysqltutorial.org/calling-mysql-stored-procedures-python/
+                        for result in cursor.stored_results():
+                            cb = p[i]
+                            _fetch_all(result, cb)
+                            i += 1
+                        break
                 _assign_out_params(params, result_args)
                 return 0
-        finally:
-            cursor.close()
 
     def query_scalar(self, sql, params):
         """
@@ -97,13 +95,10 @@ class DataStore:
             Exception: if amount of rows != 1.
         """
         rows = self.query_scalar_array(sql, params)
-
         if len(rows) == 0:
             raise Exception('No rows')
-
         if len(rows) > 1:
             raise Exception('More than 1 row exists')
-
         if isinstance(rows[0], list):
             return rows[0][0]
         else:
@@ -118,14 +113,9 @@ class DataStore:
             params (array, optional): Values of SQL parameters if needed.
         """
         sql = _prepare_sql(sql)
-
         res = []
-
-        cursor = self.connection.cursor()
-
         sp = _get_sp_name(sql)
-
-        try:
+        with self.connection.cursor() as cursor:
             if sp is None:
                 cursor.execute(sql, params)
                 # fetchone() in here throws 'Unread result found' in cursor.close()
@@ -142,9 +132,6 @@ class DataStore:
                     for row_values in result:  # .fetchall():
                         res.append(row_values[0])
                 _assign_out_params(params, result_args)
-        finally:
-            cursor.close()
-
         return res
 
     def query_single_row(self, sql, params):
@@ -161,15 +148,11 @@ class DataStore:
 
         def callback(row):
             rows.append(row)
-
         self.query_all_rows(sql, params, callback)
-
         if len(rows) == 0:
             raise Exception('No rows')
-
         if len(rows) > 1:
             raise Exception('More than 1 row exists')
-
         return rows[0]
 
     def query_all_rows(self, sql, params, callback):
@@ -182,14 +165,10 @@ class DataStore:
             callback
         """
         sql = _prepare_sql(sql)
-
+        sp = _get_sp_name(sql)
         # How to retrieve SQL result column value using column name in Python?
         # https://stackoverflow.com/questions/10195139/how-to-retrieve-sql-result-column-value-using-column-name-in-python
-
-        cursor = self.connection.cursor(dictionary=True)
-
-        try:
-            sp = _get_sp_name(sql)
+        with self.connection.cursor(dictionary=True) as cursor:
             if sp is None:
                 cursor.execute(sql, params)
                 # fetchone() in here throws 'Undead data' in cursor.close()
@@ -201,21 +180,23 @@ class DataStore:
                 result_args = cursor.callproc(sp, call_params)
                 # http://www.mysqltutorial.org/calling-mysql-stored-procedures-python/
                 for result in cursor.stored_results():
-                    # cursor(dictionary=True) does not help in here. workarounds:
-                    # https://stackoverflow.com/questions/34030020/mysql-python-connector-get-columns-names-from-select-statement-in-stored-procedu
-                    # https://kadler.github.io/2018/01/08/fetching-python-database-cursors-by-column-name.html#
-                    for row_values in result:  # .fetchall():
-                        row = {}
-                        i = 0
-                        for d in result.description:
-                            col_name = d[0]
-                            value = row_values[i]
-                            row[col_name] = value
-                            i = i + 1
-                        callback(row)
+                    _fetch_all(result, callback)
                 _assign_out_params(params, result_args)
-        finally:
-            cursor.close()
+
+
+def _fetch_all(result, callback):
+    # cursor(dictionary=True) does not help in here. workarounds:
+    # https://stackoverflow.com/questions/34030020/mysql-python-connector-get-columns-names-from-select-statement-in-stored-procedu
+    # https://kadler.github.io/2018/01/08/fetching-python-database-cursors-by-column-name.html#
+    for row_values in result:  # .fetchall():
+        row = {}
+        i = 0
+        for d in result.description:
+            col_name = d[0]
+            value = row_values[i]
+            row[col_name] = value
+            i = i + 1
+        callback(row)
 
 
 def _prepare_sql(sql):
@@ -230,7 +211,6 @@ def _get_sp_name(sql):
     @rtype : str
     """
     parts = sql.split()
-
     if len(parts) >= 2 and parts[0].strip().lower() == "call":
         name = parts[1]
         end = name.find("(")
@@ -238,21 +218,10 @@ def _get_sp_name(sql):
             return name
         else:
             return name[0:end]
-
     return None
 
 
 def _get_call_params(params):
-    call_params = []
-    for p in params:
-        if isinstance(p, OutParam):
-            call_params.append(p.value)
-        else:
-            call_params.append(p)
-    return call_params
-
-
-def _assign_out_params(params, result_args):
     """
     COMMENT FROM SOURCES OF MySQL Connector => cursor.py:
 
@@ -261,6 +230,18 @@ def _assign_out_params(params, result_args):
     tuple with first item as the value of the parameter to pass
     and second argument the type of the argument.
     """
+    call_params = []
+    for p in params:
+        if isinstance(p, OutParam):
+            call_params.append(p.value)
+        elif isinstance(p, list) and callable(p[0]):
+            pass # MySQL SP returning result-sets
+        else:
+            call_params.append(p)
+    return call_params
+
+
+def _assign_out_params(params, result_args):
     for i in range(len(params)):
         if isinstance(params[i], OutParam):
             params[i].value = result_args[i]
