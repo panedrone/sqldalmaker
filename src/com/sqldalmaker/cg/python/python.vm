@@ -191,16 +191,16 @@ class $class_name:
 #end
         @rtype: int (the number of affected rows)
         """
-#sql_var($is_external_sql $sql)
 #foreach($m in ${mappings})
-
         def ${m.get_exec_dml_param_name()}(row):
             obj = ${m.get_dto_class_name()}()
 #foreach($f in ${m.get_fields()})
             obj.${f.getName()} = row["${f.getColumnName()}"]  # ${f.getComment()}
 #end
             ${m.get_method_param_name()}(obj)
+
 #end
+#sql_var($is_external_sql $sql)
 #if ($crud == "update" || $crud == "delete")
         return self.ds.exec_dml(sql, #param_array($dto_param))
 #else
