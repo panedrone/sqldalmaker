@@ -1,10 +1,14 @@
+2020-09-14
+
+    - Added DataStoreManager.java for JSF
+
 2020-09-10
 
     - separate processing of multiple record-sets returned by MySQL SP
 
 2020-09-07
 
-    - separate processing of multiple RefCursors returned by Oracle SP
+    - separate processing of multiple ref-cursors returned by Oracle SP
 
 2020-09-06
 

@@ -176,20 +176,18 @@ public class DataStoreManager {
 					if (params[i] instanceof RowHandler2) {
 						if (allow_cursor_params) {
 							// uncomment/comment lines below if you are not on Oracle:
-							throw new SQLException("RowHandler params are allowed only for Oracle SYS_REFCURSOR-s");
+							throw new SQLException("RowHandler2 params are allowed only for Oracle SYS_REFCURSOR-s");
 //							call_params.add(new OutParameter<Object>(OracleTypes.CURSOR, Object.class));
 //							query_out_cursors = true;
 						} else {
-							throw new SQLException(RecordHandler.class.getName() + " are not allowed here");
+							throw new SQLException(RowHandler2.class.getName() + " are not allowed here");
 						}
 					} else if (params[i] instanceof RowHandler2[]) {
 						// implicit cursor: do nothing
 					} else if (params[i] instanceof OutParam) {
 						OutParam cp = (OutParam) params[i];
-						Object param_value = cp.getValue();
 						// noinspection unchecked
 						call_params.add(new OutParameter(cp.getSqlType(), cp.getJavaType(), cp.getValue()));
-						// call_params.add(param_value);
 					} else {
 						call_params.add(params[i]);
 					}
@@ -204,10 +202,11 @@ public class DataStoreManager {
 					List<Object> call_params = new ArrayList<Object>();
 					_prepare_call_params(false, params, call_params);
 					super.fillStatement(stmt, call_params.toArray());
-					// the code to work with Oracle implicit SYS_REFCURSOR-s
-					// https://en.it1352.com/article/8242caae4610471d962d4b45c13ae070.html
-					// ........................................
 					if (is_oracle) {
+                        // ........................................
+                        // the code to work with Oracle implicit SYS_REFCURSOR-s
+                        // https://en.it1352.com/article/8242caae4610471d962d4b45c13ae070.html
+                        // ........................................
 						stmt.execute(); // it returns false for Oracle SP with implicit ref-cursors
 						while (stmt.getMoreResults()) {
 							ResultSet rs = stmt.getResultSet();

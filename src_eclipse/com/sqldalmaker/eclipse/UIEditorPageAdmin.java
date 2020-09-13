@@ -259,30 +259,43 @@ public class UIEditorPageAdmin extends Composite {
 		btnDatastorejava.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		btnDatastorejava.setText("DataStore.java");
 		toolkit.adapt(btnDatastorejava, true, true);
-
-		Button btnDatastoreJavaDbutils = new Button(composite_2, SWT.NONE);
-		btnDatastoreJavaDbutils.addSelectionListener(new SelectionAdapter() {
+		new Label(composite_2, SWT.NONE);
+				new Label(composite_2, SWT.NONE);
+		
+				Button btnDatastoreJavaDbutils = new Button(composite_2, SWT.NONE);
+				btnDatastoreJavaDbutils.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(SelectionEvent e) {
+						EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStoreManagerDbUtils.java_",
+								"DataStoreManager.java");
+					}
+				});
+				btnDatastoreJavaDbutils.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+				btnDatastoreJavaDbutils.setText("DataStoreManager.java (Apache DbUtils)");
+				toolkit.adapt(btnDatastoreJavaDbutils, true, true);
+		
+		Button btnDatastoremanagerjavaapacheDbutils = new Button(composite_2, SWT.NONE);
+		btnDatastoremanagerjavaapacheDbutils.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStoreManagerDbUtils.java_",
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStoreManagerDbUtilsJSF.java_",
 						"DataStoreManager.java");
 			}
 		});
-		btnDatastoreJavaDbutils.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-		btnDatastoreJavaDbutils.setText("DataStoreManager.java (Apache DbUtils)");
-		toolkit.adapt(btnDatastoreJavaDbutils, true, true);
-
-		Button btnNewButton_4 = new Button(composite_2, SWT.NONE);
-		btnNewButton_4.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStoreManagerAndroid.java_",
-						"DataStoreManager.java");
-			}
-		});
-		btnNewButton_4.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-		toolkit.adapt(btnNewButton_4, true, true);
-		btnNewButton_4.setText("DataStoreManager.java (Android)");
+		btnDatastoremanagerjavaapacheDbutils.setText("DataStoreManager.java (Apache DbUtils + JSF)");
+		toolkit.adapt(btnDatastoremanagerjavaapacheDbutils, true, true);
+		
+				Button btnNewButton_4 = new Button(composite_2, SWT.NONE);
+				btnNewButton_4.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(SelectionEvent e) {
+						EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStoreManagerAndroid.java_",
+								"DataStoreManager.java");
+					}
+				});
+				btnNewButton_4.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+				toolkit.adapt(btnNewButton_4, true, true);
+				btnNewButton_4.setText("DataStoreManager.java (Android)");
 
 		Button btnDatastoreCQt = new Button(composite_2, SWT.NONE);
 		btnDatastoreCQt.addSelectionListener(new SelectionAdapter() {

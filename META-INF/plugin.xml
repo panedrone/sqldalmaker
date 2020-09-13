@@ -2,7 +2,7 @@
     <id>dal-mpe</id>
     <name>SQL DAL Maker</name>
     <category>Database</category>
-    <version>1.143.2020-09-11</version>
+    <version>1.144.2020-09-14</version>
     <vendor email="sqldalmaker@gmail.com"/>
     <!-- please see http://confluence.intellij.net/display/IDEADEV/Build+Number+Ranges for description -->
     <idea-version since-build="133.1885"/>
@@ -18,6 +18,7 @@ To generate the class, you declare it in XML meta-program.<br/>
     <change-notes>
         <![CDATA[
 <ul>
+<li>Added DataStoreManager.java for JSF</li>
 <li>Implemented separate processing of multiple record-sets returned by MySQL SP</li>
 <li>Improved RefCursors logic for 1) Python + cx_Oracle 2) PHP + OCI 3) Java + DbUtils</li>
 <li>Enabled fetching of last insert id for php + oci8</li>
