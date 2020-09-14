@@ -273,29 +273,19 @@ public class UIEditorPageAdmin extends Composite {
 				btnDatastoreJavaDbutils.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 				btnDatastoreJavaDbutils.setText("DataStoreManager.java (Apache DbUtils)");
 				toolkit.adapt(btnDatastoreJavaDbutils, true, true);
-		
-		Button btnDatastoremanagerjavaapacheDbutils = new Button(composite_2, SWT.NONE);
-		btnDatastoremanagerjavaapacheDbutils.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStoreManagerDbUtilsJSF.java_",
-						"DataStoreManager.java");
-			}
-		});
-		btnDatastoremanagerjavaapacheDbutils.setText("DataStoreManager.java (Apache DbUtils + JSF)");
-		toolkit.adapt(btnDatastoremanagerjavaapacheDbutils, true, true);
-		
-				Button btnNewButton_4 = new Button(composite_2, SWT.NONE);
-				btnNewButton_4.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(SelectionEvent e) {
-						EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStoreManagerAndroid.java_",
-								"DataStoreManager.java");
-					}
-				});
-				btnNewButton_4.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-				toolkit.adapt(btnNewButton_4, true, true);
-				btnNewButton_4.setText("DataStoreManager.java (Android)");
+				
+						Button btnNewButton_4 = new Button(composite_2, SWT.NONE);
+						btnNewButton_4.addSelectionListener(new SelectionAdapter() {
+							@Override
+							public void widgetSelected(SelectionEvent e) {
+								EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStoreManagerAndroid.java_",
+										"DataStoreManager.java");
+							}
+						});
+						btnNewButton_4.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+						toolkit.adapt(btnNewButton_4, true, true);
+						btnNewButton_4.setText("DataStoreManager.java (Android)");
+		new Label(composite_2, SWT.NONE);
 
 		Button btnDatastoreCQt = new Button(composite_2, SWT.NONE);
 		btnDatastoreCQt.addSelectionListener(new SelectionAdapter() {

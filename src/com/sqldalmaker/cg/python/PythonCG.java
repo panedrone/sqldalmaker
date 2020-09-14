@@ -58,6 +58,7 @@ public class PythonCG {
             List<FieldInfo> fields = new ArrayList<FieldInfo>();
             db_utils.get_dto_field_info(jaxb_dto_class, sql_root_abs_path, fields);
             Map<String, Object> context = new HashMap<String, Object>();
+            context.put("ref", jaxb_dto_class.getRef());
             context.put("class_name", dto_class_name);
             Helpers.convert_to_python_type_names(fields);
             context.put("fields", fields);

@@ -61,6 +61,7 @@ public class PhpCG {
             db_utils.get_dto_field_info(jaxb_dto_class, sql_root_abs_path, fields);
             Map<String, Object> context = new HashMap<String, Object>();
             context.put("class_name", dto_class_name);
+            context.put("ref", jaxb_dto_class.getRef());
             context.put("fields", fields);
             context.put("namespace", namespace);
             context.put("mode", "dto_class");

@@ -63,6 +63,7 @@ public class JavaCG {
             Map<String, Object> context = new HashMap<String, Object>();
             context.put("package", dto_package);
             context.put("class_name", dto_class_name);
+            context.put("ref", jaxb_dto_class.getRef());
             context.put("implements", dto_inheritance);
             context.put("fields", fields);
             context.put("mode", "dto_class");
