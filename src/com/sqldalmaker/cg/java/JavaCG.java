@@ -252,7 +252,7 @@ public class JavaCG {
                         }
                         MappingInfo m = _create_mapping(parts);
                         m_list.add(m);
-                        method_params.add(new FieldInfo(FieldNamesMode.AS_IS, String.format("RecordHandler<%s>", m.dto_class_name), m.method_param_name, "parameter"));
+                        method_params.add(new FieldInfo(FieldNamesMode.AS_IS, String.format("final RecordHandler<%s>", m.dto_class_name), m.method_param_name, "parameter"));
                         cb_elements.add(m.exec_dml_param_name);
                     }
                     String exec_xml_param = "new RowHandler2[] {" + String.join(", ", cb_elements) + "}";
@@ -264,7 +264,7 @@ public class JavaCG {
                     if (parts != null) {
                         MappingInfo m = _create_mapping(parts);
                         m_list.add(m);
-                        method_params.add(new FieldInfo(FieldNamesMode.AS_IS, String.format("RecordHandler<%s>", m.dto_class_name), m.method_param_name, "parameter"));
+                        method_params.add(new FieldInfo(FieldNamesMode.AS_IS, String.format("final RecordHandler<%s>", m.dto_class_name), m.method_param_name, "parameter"));
                         exec_dml_params.add(new FieldInfo(FieldNamesMode.AS_IS, p.getType(), m.exec_dml_param_name, "parameter"));
                     } else {
                         method_params.add(p);

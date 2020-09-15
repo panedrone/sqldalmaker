@@ -1,7 +1,8 @@
 package com.sqldalmaker;
 
-import com.sqldalmaker.todolist.model.dao.TodoListDao;
+import com.mycom.myproject.dao.TestDao;
 
+import oracle.jdbc.OracleTypes;
 import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.dbutils.OutParameter;
 import org.apache.commons.dbutils.QueryRunner;
@@ -59,14 +60,47 @@ public class DataStoreManager {
         }
     }
 
+    /*
+        Helper method to simplify construct:
+
+            OutParam<?> out_param = dsm.create_out_param(OracleTypes.NUMBER, BigDecimal.class);
+     */
+    public <T> OutParam<T> create_out_param(int sqlType, Class<T> javaType) {
+        return new OutParam<T>(sqlType, javaType);
+    }
+
+    /*
+        Helper method to simplify construct:
+
+            OutParam<?> inout_param = dsm.create_inout_param(OracleTypes.NUMBER, new BigDecimal(10));
+     */
+    public <T> OutParam<T> create_inout_param(int sqlType, T value) {
+        return new OutParam<T>(sqlType, (Class<T>) value.getClass(), value);
+    }
+
+    /*
+        Something like this is also OK:
+
+            public static class OutNumber extends OutParam<BigDecimal> {
+
+                public OutNumber() { // OUT
+                    super(OracleTypes.NUMBER, BigDecimal.class);
+                }
+
+                public OutNumber(BigDecimal value) { // INOUT
+                    super(OracleTypes.NUMBER, BigDecimal.class, value);
+                }
+            }
+     */
+
     private Connection conn;
 
     private boolean is_oracle;
 
     public void setDataSource(DataSource dataSource) throws SQLException {
         /*
-        
-        For JSF web-apps, setDataSource(...) may be used in this way:
+
+        For JSF-apps, setDataSource(...) may be used in this way:
         =============================================================
 
         src/main/resources/applicationContext.xml
@@ -77,7 +111,7 @@ public class DataStoreManager {
             <property name="url" value="jdbc:h2:#{servletContext.getRealPath('')}/todo_list" />
             <property name="username" value="" />
             <property name="password" value="" />
-        </bean>    
+        </bean>
 
         <bean id="datastoreManager" class="com.sqldalmaker.DataStoreManager" scope="session">
             <property name="dataSource" ref="dataSource"/>
@@ -98,7 +132,7 @@ public class DataStoreManager {
             <groupId>org.springframework</groupId>
             <artifactId>spring-jdbc</artifactId>
             <version>3.0.5.RELEASE</version>
-        </dependency>    
+        </dependency>
 
         ^^ 'spring-jdbc' is still required to make it working...
 
@@ -126,35 +160,35 @@ public class DataStoreManager {
     }
 
     /*
-     * Method open() may be used instead of setDataSource for desktop apps:
+     * Method open() may be used instead of setDataSource (for desktop apps):
      */
-//    public void open() throws Exception {
-//        // To use OracleTypes.CURSOR, uncomment appropriate code in _prepare_call_params(...) below
-//        conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:orcl", "ORDERS", "sa");
-//        // conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:XE", "ORDERS", "root");
-//        // conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/test", "postgres", "sa");
-//        // conn = DriverManager.getConnection("jdbc:mysql://localhost/sakila", "root", "root");
-//        // conn = DriverManager.getConnection("jdbc:sqlserver://localhost\\SQLEXPRESS;databaseName=AdventureWorks2014", "sa", "root");
-//        // conn = DriverManager.getConnection("jdbc:h2:todo_list", "", "");
-//        // conn = DriverManager.getConnection("jdbc:sqlite:thesaurus.sqlite", "", "");
-//        DatabaseMetaData dmd = conn.getMetaData();
-//        String url = dmd.getURL();
-//        is_oracle = url.contains("oracle");
-//        conn.setAutoCommit(false);
-//    }
+    public void open() throws Exception {
+        // To use OracleTypes.CURSOR, uncomment appropriate code in _prepare_call_params(...) below
+        conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:orcl", "ORDERS", "sa");
+        // conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:XE", "ORDERS", "root");
+        // conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/test", "postgres", "sa");
+        // conn = DriverManager.getConnection("jdbc:mysql://localhost/sakila", "root", "root");
+        // conn = DriverManager.getConnection("jdbc:sqlserver://localhost\\SQLEXPRESS;databaseName=AdventureWorks2014", "sa", "root");
+        // conn = DriverManager.getConnection("jdbc:h2:todo_list", "", "");
+        // conn = DriverManager.getConnection("jdbc:sqlite:thesaurus.sqlite", "", "");
+        DatabaseMetaData dmd = conn.getMetaData();
+        String url = dmd.getURL();
+        is_oracle = url.contains("oracle");
+        conn.setAutoCommit(false);
+    }
 
     /*
-     * Method close() may be used for desktop apps:
+     * Remove close() for 'live' connections:
      */
-//    public void close() throws Exception {
-//        conn.setAutoCommit(true);
-//        conn.close();
-//    }
-//    
+    public void close() throws Exception {
+        conn.setAutoCommit(true);
+        conn.close();
+    }
+
     private final MyDataStore ds = new MyDataStore();
 
-    public TodoListDao createTodoListDao() {
-        return new TodoListDao(ds);
+    public TestDao createTestDao() {
+        return new TestDao(ds);
     }
 
     private class MyDataStore extends DataStore {
@@ -216,26 +250,27 @@ public class DataStoreManager {
                 super(pmdKnownBroken);
             }
 
+            private <T> void _add_out_param(OutParam<T> cp, List<Object> call_params) {
+                /* wrap into method to suppress warnings regarding Java generics */
+                call_params.add(new OutParameter<T>(cp.getSqlType(), cp.getJavaType(), cp.getValue()));
+            }
+
             private boolean _prepare_call_params(boolean allow_cursor_params, Object[] params, List<Object> call_params) throws SQLException {
                 boolean query_out_cursors = false;
                 for (int i = 0; i < params.length; i++) {
                     if (params[i] instanceof RowHandler2) {
                         if (allow_cursor_params) {
                             // uncomment/comment lines below if you are not on Oracle:
-                            throw new SQLException("RowHandler2 params are allowed only for Oracle SYS_REFCURSOR-s");
-//                            call_params.add(new OutParameter<Object>(OracleTypes.CURSOR, Object.class));
-//                            query_out_cursors = true;
+                            // throw new SQLException("RowHandler2 params are allowed only for Oracle SYS_REFCURSOR-s");
+                            call_params.add(new OutParameter<Object>(OracleTypes.CURSOR, Object.class));
+                            query_out_cursors = true;
                         } else {
                             throw new SQLException(RowHandler2.class.getName() + " are not allowed here");
                         }
-                    } else if (params[i] instanceof RowHandler2[]) {
-                        // implicit cursor: do nothing
                     } else if (params[i] instanceof OutParam) {
-                        OutParam cp = (OutParam) params[i];
-                        //noinspection unchecked
-                        call_params.add(new OutParameter(cp.getSqlType(), cp.getJavaType(), cp.getValue()));
-                        // call_params.add(param_value);
-                    } else {
+                        OutParam<?> cp = (OutParam<?>) params[i];
+                        _add_out_param(cp, call_params);
+                    } else if (!(params[i] instanceof RowHandler2[])) { // for implicit cursor do nothing in here
                         call_params.add(params[i]);
                     }
                 }
@@ -294,7 +329,7 @@ public class DataStoreManager {
                     boolean query_out_cursors = _prepare_call_params(true, params, call_params);
                     super.fillStatement(stmt, call_params.toArray());
                     if (query_out_cursors) {
-                        // Using Ref Cursors To Return Recordsets
+                        // Using Ref Cursors To Return Record-sets
                         // https://oracle-base.com/articles/misc/using-ref-cursors-to-return-recordsets
                         boolean is_rs = stmt.execute();
                         if (is_rs) {
@@ -335,7 +370,6 @@ public class DataStoreManager {
                         }
                         if (implicit_result_sets) {
                             class RC_Handler {
-
                                 // make it class field to allow both changing and access from RowData
                                 private ResultSet rs_implicit;
 
@@ -416,12 +450,16 @@ public class DataStoreManager {
                 }
             }
 
+            private <T> void _assign_out_param(OutParam<T> op, Object out_value) {
+                /* wrap into method to suppress warnings regarding Java generics */
+                op.setValue(op.getJavaType().cast(out_value));
+            }
+
             private void _read_out_param(CallableStatement stmt, int zero_index, Object... params) throws SQLException {
                 if (params[zero_index] instanceof OutParam) {
                     Object out_value = stmt.getObject(zero_index + 1);
-                    OutParam op = (OutParam) params[zero_index];
-                    //noinspection unchecked
-                    op.setValue(op.getJavaType().cast(out_value));
+                    OutParam<?> op = (OutParam<?>) params[zero_index];
+                    _assign_out_param(op, out_value);
                 }
             }
 
