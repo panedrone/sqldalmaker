@@ -1,6 +1,10 @@
+2020-09-21
+
+    - Bugfix of Eclipse IDE tool-bar button
+
 2020-09-14
 
-    - Added DataStoreManager.java for JSF
+    - DataStoreManager.java adapted for JSF
 
 2020-09-10
 
