@@ -580,7 +580,7 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
     }//GEN-LAST:event_jButton17ActionPerformed
 
     private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
-        NbpIdeEditorHelpers.open_resource_file_in_editor_async("DataStoreManagerDbUtils.java", "DataStoreManagerDbUtils.java_");
+        NbpIdeEditorHelpers.open_resource_file_in_editor_async("DataStoreManager.java", "DataStoreManagerJDBC.java_");
     }//GEN-LAST:event_jButton8ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed

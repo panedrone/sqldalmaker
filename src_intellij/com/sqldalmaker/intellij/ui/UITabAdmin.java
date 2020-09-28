@@ -227,7 +227,7 @@ public class UITabAdmin {
         dataStoreJavaDbUtilsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "DataStoreManagerDbUtils.java_", "DataStoreManager.java");
+                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "DataStoreManagerJDBC.java_", "DataStoreManager.java");
             }
         });
 //        dataStoreGroovyButton.addActionListener(new ActionListener() {
@@ -489,7 +489,7 @@ public class UITabAdmin {
         btn_cx_Oracle.setText("DataStore.py (cx_Oracle)");
         panel4.add(btn_cx_Oracle, new GridConstraints(6, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         dataStoreJavaDbUtilsButton = new JButton();
-        dataStoreJavaDbUtilsButton.setText("DataStoreManager.java (Apache DbUtils)");
+        dataStoreJavaDbUtilsButton.setText("DataStoreManager.java (JDBC)");
         panel4.add(dataStoreJavaDbUtilsButton, new GridConstraints(4, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         dataStoreJavaAndroidButton = new JButton();
         dataStoreJavaAndroidButton.setText("DataStoreManager.java (Android)");

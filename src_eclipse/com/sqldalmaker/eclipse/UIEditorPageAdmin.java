@@ -266,12 +266,12 @@ public class UIEditorPageAdmin extends Composite {
 		btnDatastoreJavaDbutils.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStoreManagerDbUtils.java_",
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStoreManagerJDBC.java_",
 						"DataStoreManager.java");
 			}
 		});
 		btnDatastoreJavaDbutils.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-		btnDatastoreJavaDbutils.setText("DataStoreManager.java (Apache DbUtils)");
+		btnDatastoreJavaDbutils.setText("DataStoreManager.java (JDBC)");
 		toolkit.adapt(btnDatastoreJavaDbutils, true, true);
 
 		Button btnNewButton_4 = new Button(composite_2, SWT.NONE);

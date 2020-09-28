@@ -1,3 +1,7 @@
+2020-09-28
+
+    - Added DataStoreManagerJDBC.java
+
 2020-09-21
 
     - Bugfix of Eclipse IDE tool-bar button
