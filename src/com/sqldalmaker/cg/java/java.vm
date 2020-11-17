@@ -101,17 +101,19 @@ public class ${class_name} {
     public List<${returned_type_name}> ${method_name}(#if(${dto_param} != "")#param_decls_dto($is_external_sql)${dto_param} p#else#param_decls($is_external_sql $params)#end) throws Exception {
 #sql_var($is_external_sql $sql)
 #if($use_dto)
-        return ds.queryDtoList(sql, new DataStore.RowHandler<${returned_type_name}>() {
+        final List<${returned_type_name}> res = new java.util.ArrayList<${returned_type_name}>();
+        ds.queryDtoList(sql, new DataStore.RowHandler2() {
             @Override
-            public ${returned_type_name} handleRow(DataStore.RowData rd) throws Exception {
+            public void handleRow(DataStore.RowData rd) throws Exception {
                 ${returned_type_name} obj = new ${returned_type_name}();
 #foreach($f in ${fields})
 #set($i = ${velocityCount} - 1)
                 obj.${f.setterMethod()}(rd.getValue(${f.getType()}.class, "${f.getColumnName()}"));  // ${f.getComment()}
 #end
-                return obj;
+                res.add(obj);
             }
         }#if(${dto_param} != "")#foreach($param in ${params}), p.${param.getterMethod()}()#end);#else#foreach($param in ${params}), ${param.getName()}#end);
+        return res;
 #end
 #else
 #if(${dto_param} != "")    
@@ -125,17 +127,22 @@ public class ${class_name} {
     public ${returned_type_name} ${method_name}(#if(${dto_param} != "")#param_decls_dto($is_external_sql)${dto_param} p#else#param_decls($is_external_sql $params)#end) throws Exception {
 #sql_var($is_external_sql $sql)
 #if($use_dto)
-        return ds.queryDto(sql, new DataStore.RowHandler<${returned_type_name}>() {
+        final List<${returned_type_name}> res = new java.util.ArrayList<${returned_type_name}>();
+        ds.queryDtoList(sql, new DataStore.RowHandler2() {
             @Override
-            public ${returned_type_name} handleRow(DataStore.RowData rd) throws Exception {
-                ${returned_type_name} res = new ${returned_type_name}();
+            public void handleRow(DataStore.RowData rd) throws Exception {
+                ${returned_type_name} obj = new ${returned_type_name}();
 #foreach($f in ${fields})
 #set($i = ${velocityCount} - 1)
-                res.${f.setterMethod()}(rd.getValue(${f.getType()}.class, "${f.getColumnName()}"));  // ${f.getComment()}
+                obj.${f.setterMethod()}(rd.getValue(${f.getType()}.class, "${f.getColumnName()}"));  // ${f.getComment()}
 #end
-                return res;
+                res.add(obj);
             }
         }#if(${dto_param} != "")#foreach($param in ${params}), p.${param.getterMethod()}()#end);#else#foreach($param in ${params}), ${param.getName()}#end);
+        if (res.size() != 1) {
+            return null;
+        }
+        return res.get(0);
 #end
 #else
 #if(${dto_param} != "")    

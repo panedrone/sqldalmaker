@@ -4,9 +4,9 @@ import java.util.List;
 
 /**
  * Definition of Data Access Controller for SQL DAL Maker + Java.
- *
- * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
- * Contact: sqldalmaker@gmail.com
+ * <p>
+ * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net Contact:
+ * sqldalmaker@gmail.com
  */
 public abstract class DataStore {
 
@@ -30,18 +30,9 @@ public abstract class DataStore {
     public abstract <T> List<T> queryList(Class<T> type, String sql, Object... params) throws Exception;
 
     public interface RowData {
-
-        public abstract <T> T getValue(Class<T> type, String columnLabel) throws Exception;
+        <T> T getValue(Class<T> type, String columnLabel) throws Exception;
     }
 
-    public interface RowHandler<T> {
-
-        abstract T handleRow(RowData rd) throws Exception;
-    }
-
-    public abstract <T> T queryDto(String sql, RowHandler<T> rowHandler,
-                                   Object... params) throws Exception;
-
-    public abstract <T> List<T> queryDtoList(String sql, RowHandler<T> rowHandler,
-                                             Object... params) throws Exception;
+    public abstract void queryDtoList(String sql, RowHandler2 rowHandler,
+                                      Object... params) throws Exception;
 }

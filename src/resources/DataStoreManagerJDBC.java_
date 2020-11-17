@@ -380,20 +380,7 @@ public class DataStoreManager {
         }
 
         @Override
-        public <T> T queryDto(String sql, final RowHandler<T> rowHandler, Object... params) throws Exception {
-            List<T> list = queryDtoList(sql, rowHandler, params);
-            if (list == null || list.size() == 0) {
-                throw new SQLException("No rows: " + sql); // return null; as alternative
-            }
-            if (list.size() > 1) {
-                throw new SQLException("More than 1 row available: " + sql);
-            }
-            return list.get(0);
-        }
-
-        @Override
-        public <T> List<T> queryDtoList(String sql, final RowHandler<T> rowHandler, Object... params) throws Exception {
-            final List<T> res = new ArrayList<T>();
+        public void queryDtoList(String sql, final RowHandler2 row_handler, Object... params) throws Exception {
             RsHandler rsh = new RsHandler() {
                 @Override
                 public void handle(final ResultSet rs) throws SQLException {
@@ -413,7 +400,7 @@ public class DataStoreManager {
                             };
                             try {
                                 while (rs_value.next()) {
-                                    _process_row(rowData, rowHandler, res);
+                                    _process_row(rowData, row_handler);
                                 }
                             } finally {
                                 // if (rs_value != null) {
@@ -436,15 +423,14 @@ public class DataStoreManager {
                                 return type.cast(rs.getObject(columnLabel));
                             }
                         };
-                        _process_row(row_data, rowHandler, res); // 1st row is already fetched by rs.next()
+                        _process_row(row_data, row_handler); // 1st row is already fetched by rs.next()
                         while (rs.next()) { // fetch the rest
-                            _process_row(row_data, rowHandler, res);
+                            _process_row(row_data, row_handler);
                         }
                     }
                 }
             };
             _query(sql, rsh, params);
-            return res;
         }
 
         private int _update(Connection conn, String sql, Object... params) throws SQLException {
@@ -468,10 +454,9 @@ public class DataStoreManager {
             return rows;
         }
 
-        private <T> void _process_row(RowData rowData, RowHandler<T> rowHandler, List<T> res) throws SQLException {
+        private <T> void _process_row(RowData row_data, RowHandler2 row_handler) throws SQLException {
             try {
-                T t = rowHandler.handleRow(rowData);
-                res.add(t);
+                row_handler.handleRow(row_data);
             } catch (Exception e) {
                 throw new SQLException(e);
             }

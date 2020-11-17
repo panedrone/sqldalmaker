@@ -1,3 +1,8 @@
+2020-11-17
+
+    - Simplified DataStore.java and examples of its implementation
+    - Generated Java code adapted for new DataStore.java
+
 2020-09-28
 
     - Added DataStoreManagerJDBC.java
