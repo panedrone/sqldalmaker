@@ -163,6 +163,8 @@ public class JavaCG {
             }
             String returned_type_name;
             if (jaxb_return_type_is_dto) {
+                imports.add("java.util.List");
+                imports.add("java.util.ArrayList");
                 returned_type_name = _get_rendered_dto_class_name(jaxb_dto_or_return_type);
             } else {
                 returned_type_name = fields.get(0).getType();

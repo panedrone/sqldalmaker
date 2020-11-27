@@ -97,11 +97,10 @@ public class ${class_name} {
      */
 #end
 #if($fetch_list)
-#set($tmp = $imports.add("java.util.List"))
     public List<${returned_type_name}> ${method_name}(#if(${dto_param} != "")#param_decls_dto($is_external_sql)${dto_param} p#else#param_decls($is_external_sql $params)#end) throws Exception {
 #sql_var($is_external_sql $sql)
 #if($use_dto)
-        final List<${returned_type_name}> res = new java.util.ArrayList<${returned_type_name}>();
+        final List<${returned_type_name}> res = new ArrayList<${returned_type_name}>();
         ds.queryDtoList(sql, new DataStore.RowHandler2() {
             @Override
             public void handleRow(DataStore.RowData rd) throws Exception {
@@ -127,7 +126,7 @@ public class ${class_name} {
     public ${returned_type_name} ${method_name}(#if(${dto_param} != "")#param_decls_dto($is_external_sql)${dto_param} p#else#param_decls($is_external_sql $params)#end) throws Exception {
 #sql_var($is_external_sql $sql)
 #if($use_dto)
-        final List<${returned_type_name}> res = new java.util.ArrayList<${returned_type_name}>();
+        final List<${returned_type_name}> res = new ArrayList<${returned_type_name}>();
         ds.queryDtoList(sql, new DataStore.RowHandler2() {
             @Override
             public void handleRow(DataStore.RowData rd) throws Exception {
