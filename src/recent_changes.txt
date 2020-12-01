@@ -1,3 +1,7 @@
+2020-12-01
+
+	- Further improvements for Java
+	
 2020-11-17
 
     - Simplified DataStore.java and examples of its implementation
