@@ -1,10 +1,14 @@
+2020-12-02
+
+    - DataStoreManagerAndroid.java adapted for new DataStore.java
+
 2020-12-01
 
 	- Further improvements for Java
 	
 2020-11-17
 
-    - Simplified DataStore.java and examples of its implementation
+    - Simplified DataStore.java and DataStoreManagerJDBC.java
     - Generated Java code adapted for new DataStore.java
 
 2020-09-28
