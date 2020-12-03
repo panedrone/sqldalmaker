@@ -5,11 +5,8 @@
  */
 package com.sqldalmaker.intellij.ui;
 
-import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.FileTypeConsumer;
 import com.intellij.openapi.fileTypes.FileTypeFactory;
-import com.intellij.openapi.util.IconLoader;
-import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -20,54 +17,14 @@ import javax.swing.*;
  * Date: 20.06.12
  */
 public class RootFileTypeFactory extends FileTypeFactory {
-
-    private static final FileType file_type = new MyFileType();
-
-    public static final class MyFileType implements FileType {
-
-        private static final Icon icon = IconLoader.getIcon("/img/sqldalmaker.gif");
-
-        @NotNull
-        @Override
-        public String getName() {
-            return getClass().getName();
-        }
-
-        @NotNull
-        @Override
-        public String getDescription() {
-            return "SQL DAL Maker root file";
-        }
-
-        @NotNull
-        @Override
-        public String getDefaultExtension() {
-            return "";
-        }
-
-        public Icon getIcon() {
-            return icon;
-        }
-
-        @Override
-        public boolean isBinary() {
-            return false;
-        }
-
-        @Override
-        public boolean isReadOnly() {
-            return false;
-        }
-
-        @NotNull
-        @Override
-        public String getCharset(@NotNull VirtualFile file, @NotNull byte[] content) {
-            return "";
-        }
-    }
-
+    /*
+    Language and File Type
+    https://jetbrains.org/intellij/sdk/docs/tutorials/custom_language_support/language_and_filetype.html
+    Registering a File Type
+    https://jetbrains.org/intellij/sdk/docs/reference_guide/custom_language_support/registering_file_type.html
+     */
     @Override
     public void createFileTypes(@NotNull FileTypeConsumer consumer) {
-        IdeaTargetLanguageHelpers.register(consumer, file_type);
+        IdeaTargetLanguageHelpers.register(consumer, RootFileType.INSTANCE);
     }
 }

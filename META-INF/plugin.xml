@@ -2,7 +2,7 @@
     <id>dal-mpe</id>
     <name>SQL DAL Maker</name>
     <category>Database</category>
-    <version>1.153.2020-12-02</version>
+    <version>1.153.1.2020-12-03</version>
     <vendor email="sqldalmaker@gmail.com"/>
     <!-- please see http://confluence.intellij.net/display/IDEADEV/Build+Number+Ranges for description -->
     <idea-version since-build="133.1885"/>
@@ -33,17 +33,26 @@ To generate the class, you declare it in XML meta-program.<br/>
     </module-components>
 
     <actions>
-
         <group class="com.sqldalmaker.intellij.SdmActionGroup" id="SdmActionGroup" text="SDM"
                description="SDM" icon="/img/sqldalmaker.png" popup="true">
             <add-to-group group-id="FileMainSettingsGroup" anchor="last"/>
             <add-to-group group-id="MainToolBarSettings" anchor="last"/>
         </group>
-
     </actions>
 
     <extensions defaultExtensionNs="com.intellij">
+        <!--
+        Register the FileType Using a Factory
+        https://jetbrains.org/intellij/sdk/docs/tutorials/custom_language_support/language_and_filetype.html
+        -->
         <fileTypeFactory implementation="com.sqldalmaker.intellij.ui.RootFileTypeFactory"/>
+        <!--
+        Register the FileType Directly
+        Direct registration is possible when targeting version 2019.2 (and later) of the IntelliJ Platform - no FileTypeFactory is required.
+        https://jetbrains.org/intellij/sdk/docs/tutorials/custom_language_support/language_and_filetype.html
+        -->
+        <fileType name="com.sqldalmaker.intellij.ui.RootFileType" implementationClass="com.sqldalmaker.intellij.ui.RootFileType"
+                  fieldName="INSTANCE" extensions="dal"/>
         <fileEditorProvider implementation="com.sqldalmaker.intellij.ui.RootFileEditorProvider"/>
         <editorTabTitleProvider implementation="com.sqldalmaker.intellij.ui.RootFileEditorTabTitleProvider"/>
         <psi.referenceContributor
