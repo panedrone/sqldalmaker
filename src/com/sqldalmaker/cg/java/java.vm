@@ -19,7 +19,7 @@ String sql#if(${params.size()} > 0), #end
 #end
 #macro(sql_var $is_external_sql $sql)
 #if (!${is_external_sql})
-        String sql = "${sql}";
+        String sql = ${sql};
 #end
 #end
 ## ====================================================================================================================
@@ -188,7 +188,7 @@ public class ${class_name} {
             }
         };
 #end
-#if ($method_type == "UPDATE" || $method_type == "DELETE")
+#if ($method_type == "CREATE" || $method_type == "UPDATE" || $method_type == "DELETE")
         return ds.execDML(sql#foreach($param in ${params}), ${param.getName()}#end);
 #else
         return ds.execDML(sql#foreach($param in ${params2}), ${param.getName()}#end);

@@ -2,7 +2,7 @@
     <id>dal-mpe</id>
     <name>SQL DAL Maker</name>
     <category>Database</category>
-    <version>1.153.1.2020-12-03</version>
+    <version>1.155.2020-12-10</version>
     <vendor email="sqldalmaker@gmail.com"/>
     <!-- please see http://confluence.intellij.net/display/IDEADEV/Build+Number+Ranges for description -->
     <idea-version since-build="133.1885"/>
@@ -18,9 +18,11 @@ To generate the class, you declare it in XML meta-program.<br/>
     <change-notes>
         <![CDATA[
 <ul>
-<li>Improvements of DataStore.java and DataStoreManagerJDBC.java</li>
-<li>Generated Java code adapted for new DataStore.java</li>
-<li>DataStoreManagerAndroid.java adapted for new DataStore.java</li>
+<li>BugFixes of CRUD-Create (PHP, Java, Python)</li>
+<li>Adapted for 2020.3</li>
+<li>Adapted generated code for new DataStore.java</li>
+<li>Adapted DataStoreManagerJDBC.java and DataStoreManagerAndroid.java for new DataStore.java</li>
+<li>Improvements of DataStore.java</li>
 </ul>]]></change-notes>
 
     <application-components>

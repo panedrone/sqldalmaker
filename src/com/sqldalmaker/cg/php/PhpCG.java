@@ -369,7 +369,6 @@ public class PhpCG {
             Map<String, Object> context = new HashMap<String, Object>();
             context.put("method_type", "CREATE");
             context.put("table_name", table_name);
-            context.put("crud", "create");
             context.put("class_name", class_name);
             context.put("sql", sql_str);
             context.put("method_name", method_name);
@@ -419,18 +418,17 @@ public class PhpCG {
             String sql_str = SqlUtils.jdbc_sql_to_php_str(dao_jdbc_sql);
             updated_fields.addAll(fields_pk);
             Map<String, Object> context = new HashMap<String, Object>();
+            context.put("mode", "dao_exec_dml");
+            context.put("method_type", "UPDATE");
             context.put("class_name", class_name);
             context.put("method_name", method_name);
             context.put("sql", sql_str);
-            context.put("method_type", "UPDATE");
-            context.put("crud", "update");
             context.put("table_name", table_name);
             // You cannot overload PHP functions. More useful for update is
             // version with DTO parameter:
             context.put("dto_param", primitive_params ? "" : _get_rendered_dto_class_name(dto_class_name));
             context.put("params", updated_fields);
             context.put("is_external_sql", false);
-            context.put("mode", "dao_exec_dml");
             StringWriter sw = new StringWriter();
             te.merge(context, sw);
             StringBuilder buffer = new StringBuilder();
@@ -449,11 +447,10 @@ public class PhpCG {
             String sql_str = SqlUtils.jdbc_sql_to_php_str(dao_jdbc_sql);
             Map<String, Object> context = new HashMap<String, Object>();
             context.put("mode", "dao_exec_dml");
+            context.put("method_type", "DELETE");
             context.put("class_name", class_name);
             context.put("method_name", method_name);
             context.put("sql", sql_str);
-            context.put("method_type", "DELETE");
-            context.put("crud", "delete");
             context.put("table_name", table_name);
             // You cannot overload PHP functions. More useful for update is
             // version with DTO parameter:

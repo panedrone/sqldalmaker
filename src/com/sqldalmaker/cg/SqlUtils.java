@@ -13,10 +13,15 @@ import java.util.List;
  */
 public class SqlUtils {
 
-    private static final String REGEX_NL = "(\\n?\\r)+";
+    private static String[] get_sql_lines(String sql) {
+        sql = sql.replace('\r', '\n');
+        sql = sql.replace('\t', ' ');
+        String[] parts = sql.split("\\n+");
+        return parts;
+    }
 
-    public static String jdbc_sql_to_cpp_str(String sql) {
-        String[] parts = sql.split(REGEX_NL);
+    public static String jdbc_sql_to_cpp_str(String jdbc_sql) {
+        String[] parts = get_sql_lines(jdbc_sql);
         String new_line = System.getProperty("line.separator");
         String new_line_j = org.apache.commons.lang.StringEscapeUtils.escapeJava("\n");
         StringBuilder res = new StringBuilder();
@@ -46,12 +51,11 @@ public class SqlUtils {
     }
 
     public static String jdbc_sql_to_java_str(String jdbc_sql) {
-        String[] parts = jdbc_sql.split(REGEX_NL);
-        // "\n" it is OK for Eclipse debugger window:
+        String[] parts = get_sql_lines(jdbc_sql);
         String new_line = "\n"; // System.getProperty("line.separator");
         StringBuilder res = new StringBuilder();
         for (int i = 0; i < parts.length; i++) {
-            String j_str = parts[i].replace('\t', ' ');
+            String j_str = parts[i];
             // packed into Velocity JAR:
             j_str = org.apache.commons.lang.StringEscapeUtils.escapeJava(j_str);
             // fix the bug in StringEscapeUtils:
@@ -60,11 +64,13 @@ public class SqlUtils {
             // out.write('/');
             // break;
             j_str = j_str.replace("\\/", "/");
-            res.append(j_str);
-            if (i < parts.length - 1) {
-                String s = " \" " + new_line + "                + \"";
-                res.append(s);
+            if (i == 0) {
+                j_str = "\"" + j_str + "\"";
+            } else {
+                // "\n" it is OK for debugger window:
+                j_str = new_line + "                + \"\\n " + j_str + "\"";
             }
+            res.append(j_str);
         }
         return res.toString();
     }
@@ -81,11 +87,11 @@ public class SqlUtils {
     }
 
     private static String php_sql_to_php_str(String php_sql) {
-        String[] parts = php_sql.split(REGEX_NL);
+        String[] parts = get_sql_lines(php_sql);
         String new_line = "\n"; // System.getProperty("line.separator");
         StringBuilder res = new StringBuilder();
         for (int i = 0; i < parts.length; i++) {
-            String j_str = parts[i].replace('\t', ' ');
+            String j_str = parts[i];
             // packed into Velocity JAR:
             j_str = org.apache.commons.lang.StringEscapeUtils.escapeJava(j_str);
             // fix the bug in StringEscapeUtils:
@@ -94,11 +100,13 @@ public class SqlUtils {
             // out.write('/');
             // break;
             j_str = j_str.replace("\\/", "/");
-            res.append(j_str);
-            if (i < parts.length - 1) {
-                String s = " \" " + new_line + "                . \"";
-                res.append(s);
+            if (i == 0) {
+                j_str = "\"" + j_str + "\"";
+            } else {
+                // "\n" it is OK for debugger window:
+                j_str = new_line + "                . \"\\n " + j_str + "\"";
             }
+            res.append(j_str);
         }
         return res.toString();
     }
@@ -112,7 +120,7 @@ public class SqlUtils {
     }
 
     private static String python_sql_to_python_string(String python_sql) {
-        String[] parts = python_sql.split(REGEX_NL);
+        String[] parts = get_sql_lines(python_sql);
         String new_line = "\n"; // System.getProperty("line.separator");
         StringBuilder res = new StringBuilder();
         for (int i = 0; i < parts.length; i++) {

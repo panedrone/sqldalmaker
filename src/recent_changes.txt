@@ -1,3 +1,7 @@
+2020-12-10
+
+	- Bugfixes of CRUD-create (PHP, Java, Python)
+
 2020-12-02
 
     - DataStoreManagerAndroid.java adapted for new DataStore.java

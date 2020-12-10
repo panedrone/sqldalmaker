@@ -172,11 +172,11 @@ class $class_name:
 
     def $method_name(#if($dto_param != "")#param_decls_dto($is_external_sql)p#else#param_decls($is_external_sql $params)#end):
         """
-#if ($crud == "create")
+#if ($method_type == "CREATE")
         (C)RUD: $table_name
-#elseif ($crud == "update")
+#elseif ($method_type == "UPDATE")
         CR(U)D: $table_name
-#elseif ($crud == "delete")
+#elseif ($method_type == "DELETE")
         CRU(D): $table_name
 #end
 #if ($is_external_sql)
@@ -201,7 +201,7 @@ class $class_name:
 
 #end
 #sql_var($is_external_sql $sql)
-#if ($crud == "update" || $crud == "delete")
+#if ($method_type == "CREATE" || $method_type == "UPDATE" || $method_type == "DELETE")
         return self.ds.exec_dml(sql, #param_array($dto_param))
 #else
         return self.ds.exec_dml(sql, #param_array2($dto_param))

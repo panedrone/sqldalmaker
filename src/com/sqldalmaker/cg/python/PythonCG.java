@@ -374,7 +374,6 @@ public class PythonCG {
             Map<String, Object> context = new HashMap<String, Object>();
             context.put("method_type", "CREATE");
             context.put("table_name", table_name);
-            context.put("crud", "create");
             context.put("class_name", class_name);
             context.put("sql", sql_str);
             context.put("method_name", method_name);
@@ -423,11 +422,10 @@ public class PythonCG {
             updated_fields.addAll(fields_pk);
             Map<String, Object> context = new HashMap<String, Object>();
             context.put("mode", "dao_exec_dml");
+            context.put("method_type", "UPDATE");
             context.put("class_name", class_name);
             context.put("method_name", method_name);
             context.put("sql", sql_str);
-            context.put("method_type", "UPDATE");
-            context.put("crud", "update");
             context.put("table_name", table_name);
             context.put("dto_param", primitive_params ? "" : _get_rendered_dto_class_name(dto_class_name, false));
             context.put("params", updated_fields);
