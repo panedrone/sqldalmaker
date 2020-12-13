@@ -42,7 +42,7 @@ interface DataStore {
      * @param array $params
      * @return: mixed: array indexed by column name as returned in your result set (single row) or FALSE on failure.
      */
-    public function queryDto($sql, array $params);
+    public function queryRow($sql, array $params);
 
     /**
      * @param string $sql
@@ -50,5 +50,5 @@ interface DataStore {
      * @param callable $callback
      * @return TRUE on success or FALSE on failure.
      */
-    public function queryDtoList($sql, array $params, $callback);
+    public function queryRowList($sql, array $params, $callback);
 }
