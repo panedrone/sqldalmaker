@@ -2,12 +2,9 @@
 
 /*
   SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
-
   This is an example of how to implement DataStore in PHP + OCI8 (ORACLE).
   Copy-paste this code to your project and change it for your needs.
-
   Improvements are welcome: sqldalmaker@gmail.com
-
  */
 
 // include_once 'DataStore.php';
@@ -197,12 +194,12 @@ class DataStore { // no inheritance is also OK
         }
     }
 
-    public function queryDto($sql, array $params) {
+    public function queryRow($sql, array $params) {
         $res_arr = array();
         $callback = function($row) use(&$res_arr) {
             array_push($res_arr, $row);
         };
-        queryDtoList($sql, $params, $callback);
+        queryRowList($sql, $params, $callback);
         if (count($res_arr) == 0) {
             throw new Exception('No rows');
         }
@@ -212,7 +209,7 @@ class DataStore { // no inheritance is also OK
         return $res_arr[0];
     }
 
-    public function queryDtoList($_sql, array $params, $callback) {
+    public function queryRowList($_sql, array $params, $callback) {
         $sql = self::_format_sql($_sql);
         $stid = oci_parse($this->conn, $sql);
         try {

@@ -226,7 +226,7 @@ class DataStore { // no inheritance is also OK
         return $res;
     }
 
-    public function queryDto($sql, array $params) {
+    public function queryRow($sql, array $params) {
         $stmt = $this->db->prepare($sql);
         $stmt->execute($params);
         $res = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -234,7 +234,7 @@ class DataStore { // no inheritance is also OK
         return $res;
     }
 
-    public function queryDtoList($sql, array $params, $callback) {
+    public function queryRowList($sql, array $params, $callback) {
         $stmt = $this->db->prepare($sql);
         $res = $stmt->execute($params);
         if ($res) {

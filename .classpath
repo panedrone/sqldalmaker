@@ -4,7 +4,7 @@
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src_eclipse"/>
 	<classpathentry excluding="com/sqldalmaker/netbeans/" kind="src" path="src"/>
-	<classpathentry kind="lib" path="D:/work/sqldalmaker/sqldalmaker-plugins/lib/velocity-1.7-dep.jar"/>
+	<classpathentry kind="lib" path="lib/velocity-1.7-dep.jar"/>
 	<classpathentry kind="lib" path="lib/FastInfoset-1.2.15.jar"/>
 	<classpathentry kind="lib" path="lib/istack-commons-runtime-3.0.7.jar"/>
 	<classpathentry kind="lib" path="lib/javax.activation-api-1.2.0.jar"/>

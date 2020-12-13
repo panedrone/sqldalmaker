@@ -1,6 +1,10 @@
 2020-12-10
 
-	- Bugfixes of CRUD-create (PHP, Java, Python)
+    - Remnamed in PHP: queryDto -> queryRow, queryDtoList --> queryRowList
+
+2020-12-10
+
+    - Bugfixes of CRUD-create (PHP, Java, Python)
 
 2020-12-02
 
@@ -8,7 +12,7 @@
 
 2020-12-01
 
-	- Further improvements for Java
+    - Further improvements for Java
 	
 2020-11-17
 

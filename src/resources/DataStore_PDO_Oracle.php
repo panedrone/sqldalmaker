@@ -194,7 +194,7 @@ class DataStore { // no inheritance is also OK
         }
     }
 
-    public function queryDto($sql, array $params) {
+    public function queryRow($sql, array $params) {
         $stmt = $this->db->prepare($sql);
         try {
             $stmt->execute($params);
@@ -205,7 +205,7 @@ class DataStore { // no inheritance is also OK
         }
     }
 
-    public function queryDtoList($sql, array $params, $callback) {
+    public function queryRowList($sql, array $params, $callback) {
         $stmt = $this->db->prepare($sql);
         try {
             $res = $stmt->execute($params);
