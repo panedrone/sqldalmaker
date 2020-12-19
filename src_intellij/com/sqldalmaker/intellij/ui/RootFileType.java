@@ -2,7 +2,9 @@ package com.sqldalmaker.intellij.ui;
 
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.vfs.VirtualFile;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
@@ -24,7 +26,7 @@ public class RootFileType implements FileType {
     @NotNull
     @Override
     public String getDescription() {
-        return "SDM Root-File";
+        return "SDM root-file";
     }
 
     @NotNull
@@ -47,8 +49,10 @@ public class RootFileType implements FileType {
         return false;
     }
 
+    @NonNls
+    @Nullable
     @Override
-    public String getCharset(@NotNull VirtualFile file, @NotNull byte[] content) {
+    public String getCharset(@NotNull VirtualFile file, byte[] content) {
         return null;
     }
 }

@@ -30,8 +30,8 @@ public class UIDialogNewDaoXml extends JDialog {
     private JButton buttonOK;
     private JButton buttonCancel;
     private JTextField textField1;
-    private Project project;
-    private VirtualFile propFile;
+    private final Project project;
+    private final VirtualFile propFile;
 
     public UIDialogNewDaoXml(Project project, VirtualFile propFile) {
         $$$setupUI$$$();

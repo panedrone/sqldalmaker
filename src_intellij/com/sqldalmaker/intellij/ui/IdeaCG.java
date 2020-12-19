@@ -79,7 +79,7 @@ public class IdeaCG {
                 }
             }
         };
-        ProgressManager.getInstance().runProcessWithProgressSynchronously(runnable, "Code Validation", false, project);
+        ProgressManager.getInstance().runProcessWithProgressSynchronously(runnable, "Code validation", false, project);
     }
 
     public static void generate_all_dto(Project project, VirtualFile xml_file) {
@@ -138,7 +138,7 @@ public class IdeaCG {
                 }
             }
         };
-        ProgressManager.getInstance().runProcessWithProgressSynchronously(runnable, "Code Generation", false, project);
+        ProgressManager.getInstance().runProcessWithProgressSynchronously(runnable, "Code generation", false, project);
         try { // outside of Runnable
             if (list.size() > 0) {
                 String xml_file_rel_path = IdeaHelpers.get_relative_path(project, xml_file);

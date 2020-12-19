@@ -23,10 +23,6 @@ import org.jetbrains.annotations.NotNull;
  */
 public class RootFileEditorProvider implements FileEditorProvider, DumbAware {
 
-    //    RootFileEditorProvider(FileTypeFactory ftf) {
-//
-//    }
-
     @Override
     public boolean accept(@NotNull Project project, @NotNull VirtualFile file) {
         return IdeaTargetLanguageHelpers.accept(file);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 sqldalmaker@gmail.com
+ * Copyright 2011-2020 sqldalmaker@gmail.com
  * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
  * Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -31,7 +31,7 @@ import java.util.Locale;
  */
 public class UIDialogSelectDbSchema extends JDialog {
 
-    private Project project;
+    private final Project project;
 
     private JPanel contentPane;
     private JButton buttonOK;
@@ -56,44 +56,33 @@ public class UIDialogSelectDbSchema extends JDialog {
 
     private UIDialogSelectDbSchema(Project project, VirtualFile profile, ISelectDbSchemaCallback callback, boolean dto, boolean fk) throws Exception {
         $$$setupUI$$$();
-
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
-
         this.project = project;
         this.callback = callback;
         this.settings = IdeaHelpers.load_settings(profile);
-
         setTitle("Select schema and provide options");
-
         lbl_jdbc_url.setText(settings.getJdbc().getUrl());
-
         buttonOK.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 onOK();
             }
         });
-
         buttonCancel.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 onCancel();
             }
         });
-
         table.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
-
                     onOK();
-
                 } else if (e.getClickCount() == 1) {
-
                     on_selection_changed();
                 }
             }
         });
-
 // call onCancel() when cross is clicked
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
@@ -101,24 +90,20 @@ public class UIDialogSelectDbSchema extends JDialog {
                 onCancel();
             }
         });
-
 // call onCancel() on ESCAPE
         contentPane.registerKeyboardAction(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 onCancel();
             }
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-
         if (dto || fk) {
             this.radioPanel.setVisible(false);
             chk_add_fk_access.setVisible(false);
         }
-
         if (fk) {
             this.chk_omit.setVisible(false);
             this.chk_including_views.setVisible(false);
         }
-
         radio_selected_schema.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -131,81 +116,52 @@ public class UIDialogSelectDbSchema extends JDialog {
                 on_selection_changed();
             }
         });
-
         refresh();
     }
 
     private void on_selection_changed() {
-
         boolean enabled = false;
-
         if (radio_user_as_schema.isSelected()) {
-
             enabled = true;
-
             chk_schema_in_xml.setEnabled(true);
-
             String user = settings.getJdbc().getUser();
-
             selected_schema = user;
-
         } else if (radio_selected_schema.isSelected()) {
-
             if (table.getRowCount() == 0) {
-
                 chk_schema_in_xml.setSelected(false);
                 chk_schema_in_xml.setEnabled(false);
-
                 enabled = true;
-
                 selected_schema = null;
-
             } else {
-
                 chk_schema_in_xml.setEnabled(true);
-
                 if (table.getRowCount() == 1) {
-
                     enabled = true;
-
                     selected_schema = null;
-
                 } else {
-
                     int[] indexes = getSelection();
-
                     enabled = indexes.length == 1;
-
                     if (enabled) {
-
-                        selected_schema = (String) table.getModel().getValueAt(indexes[0], 0);
+                       selected_schema = (String) table.getModel().getValueAt(indexes[0], 0);
                     }
                 }
             }
         }
-
         buttonOK.setEnabled(enabled);
     }
 
     private int[] getSelection() {
-
         int rc = table.getModel().getRowCount();
-
         if (rc == 1) {
             return new int[]{0};
         }
-
         int[] selected_rows = table.getSelectedRows();
-
         return selected_rows;
     }
 
     private void onOK() {
-
         callback.process_ok(chk_schema_in_xml.isSelected(), selected_schema,
                 chk_omit.isSelected(), chk_including_views.isSelected(), chk_singular.isSelected(),
                 crudAutoRadioButton.isSelected(), chk_add_fk_access.isSelected());
-
         dispose();
     }
 
@@ -214,11 +170,9 @@ public class UIDialogSelectDbSchema extends JDialog {
         dispose();
     }
 
-    private ISelectDbSchemaCallback callback;
+    private final ISelectDbSchemaCallback callback;
 
-    static void open(Project project,
-                     VirtualFile profile, ISelectDbSchemaCallback callback, boolean dto, boolean fk) throws Exception {
-
+    static void open(Project project, VirtualFile profile, ISelectDbSchemaCallback callback, boolean dto, boolean fk) throws Exception {
         UIDialogSelectDbSchema dlg = new UIDialogSelectDbSchema(project, profile, callback, dto, fk);
         // dlg.setPreferredSize(new Dimension(520, 280));
         dlg.pack(); // after setPreferredSize
@@ -227,19 +181,12 @@ public class UIDialogSelectDbSchema extends JDialog {
     }
 
     private void refresh() {
-
         try {
-
             final ArrayList<String> items = new ArrayList<String>();
-
             Connection con = IdeaHelpers.get_connection(project, settings);
-
             try {
-
                 JdbcUtils.get_schema_names(con, items);
-
                 table.setModel(new AbstractTableModel() {
-
                     public Object getValueAt(int rowIndex, int columnIndex) {
                         return items.get(rowIndex);
                     }
@@ -256,26 +203,18 @@ public class UIDialogSelectDbSchema extends JDialog {
                         return items.size();
                     }
                 });
-
                 if (items.size() == 0) {
-
                     lbl_hint.setText("This database doesn't have schemas. Just provide options.");
                     radio_selected_schema.setText("Without schema");
-
                 } else {
-
                     lbl_hint.setText("Select schema or click 'DB user name as schema'. Provide options.");
                     radio_selected_schema.setText("Use selected schema");
                     chk_schema_in_xml.setSelected(true);
                 }
-
             } finally {
-
                 con.close();
             }
-
             on_selection_changed();
-
         } catch (Exception e) {
             e.printStackTrace();
             IdeaMessageHelpers.show_error_in_ui_thread(e);

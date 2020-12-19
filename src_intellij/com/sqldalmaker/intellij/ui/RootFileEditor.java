@@ -28,8 +28,8 @@ import java.beans.PropertyChangeListener;
 public class RootFileEditor extends UserDataHolderBase implements FileEditor {
 
     private UIProfileEditor form;
-    private Project project;
-    private VirtualFile file;
+    private final Project project;
+    private final VirtualFile file;
 
     RootFileEditor(@NotNull Project project, @NotNull VirtualFile file) {
         super();

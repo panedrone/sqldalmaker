@@ -30,7 +30,6 @@ import java.util.List;
 public class SdmActionGroup extends ActionGroup {
 
     abstract static class SdmAction extends AnAction {
-
         SdmAction(String text) {
             this.getTemplatePresentation().setText(text, false); // to prevent parsing and replacement of '_'
         }
@@ -130,7 +129,10 @@ public class SdmActionGroup extends ActionGroup {
                 return new AnAction[0];
             }
             List<AnAction> drop_down_actions_list = new ArrayList<AnAction>();
-            FileEditor editor = FileEditorManager.getInstance(project).getSelectedEditor(); // @Nullable
+            FileEditorManager fm = FileEditorManager.getInstance(project);
+            // FileEditor editor = fm.getSelectedEditor(); // since 182.711
+            VirtualFile[] files = fm.getSelectedFiles();
+            FileEditor editor = files.length == 0 ? null : fm.getSelectedEditor(files[0]);
             if (editor instanceof TextEditor) {
                 VirtualFile xml_file = editor.getFile(); // @Nullable
                 if (xml_file != null) {
@@ -153,7 +155,6 @@ public class SdmActionGroup extends ActionGroup {
                     }
                 }
             }
-
             for (String title : titles) {
                 SdmAction action = new SdmAction(title) {
                     @Override
@@ -167,7 +168,6 @@ public class SdmActionGroup extends ActionGroup {
                         }
                     }
                 };
-
                 drop_down_actions_list.add(action);
             }
             AnAction[] arr = new AnAction[drop_down_actions_list.size()];
@@ -181,7 +181,6 @@ public class SdmActionGroup extends ActionGroup {
 
     public boolean disableIfNoVisibleChildren() {
         // in other case, it calls getChildren each 3 sec.
-        //
         return false;
     }
 }

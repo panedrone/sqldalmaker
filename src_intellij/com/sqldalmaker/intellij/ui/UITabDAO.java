@@ -135,8 +135,6 @@ public class UITabDAO {
             if (c instanceof JButton) {
                 JButton b = (JButton) c;
                 b.setCursor(wc);
-                // b.setBorder(BorderFactory.createEmptyBorder(2, 4, 2, 4));
-                //b.setOpaque(false);
                 b.setFocusPainted(false);
                 // https://stackoverflow.com/questions/4585867/transparent-jbutton
                 b.setOpaque(false);
@@ -144,8 +142,6 @@ public class UITabDAO {
                 b.setBorderPainted(false);
                 // https://coderanch.com/t/336633/java/transparent-jbuttons
                 b.setBorder(null);
-//                b.setOpaque(true);
-//                b.setBackground(tool_panel.getBackground());
             }
         }
         button_fk_assistant.addActionListener(new ActionListener() {
@@ -212,10 +208,6 @@ public class UITabDAO {
                     reload_table(true);
                 }
             }
-//            public void windowClosing(WindowEvent e)
-//            {
-//                System.out.println("jdialog window closing");
-//            }
         });
         d.setVisible(true);
     }
@@ -317,7 +309,7 @@ public class UITabDAO {
                 }
             }
         };
-        ProgressManager.getInstance().runProcessWithProgressSynchronously(runnable, "Code Generation", false, project);
+        ProgressManager.getInstance().runProcessWithProgressSynchronously(runnable, "Code generation", false, project);
         // write only the generated files
         // writeActions can show their own dialogs
         try {
@@ -399,11 +391,6 @@ public class UITabDAO {
                             String msg = ex.getMessage();
                             model.setValueAt(msg, i, 1);
                             IdeaMessageHelpers.add_dao_error_message(settings, project, root_file, dao_xml_rel_path, msg);
-                        }
-                        try {
-                            Thread.sleep(50);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
                         }
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {
@@ -616,7 +603,7 @@ public class UITabDAO {
 
     private static class MyTableModel extends AbstractTableModel {
 
-        private ArrayList<String[]> list = new ArrayList<String[]>();
+        private final ArrayList<String[]> list = new ArrayList<String[]>();
 
         public ArrayList<String[]> getList() {
             return list;

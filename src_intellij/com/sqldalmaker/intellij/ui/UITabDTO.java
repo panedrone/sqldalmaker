@@ -75,9 +75,11 @@ public class UITabDTO {
             public void changedUpdate(DocumentEvent e) {
                 set_filter();
             }
+
             public void removeUpdate(DocumentEvent e) {
                 set_filter();
             }
+
             public void insertUpdate(DocumentEvent e) {
                 set_filter();
             }
@@ -149,8 +151,6 @@ public class UITabDTO {
             if (c instanceof JButton) {
                 JButton b = (JButton) c;
                 b.setCursor(wc);
-                // b.setBorder(BorderFactory.createEmptyBorder(2, 4, 2, 4));
-                //b.setOpaque(false);
                 b.setFocusPainted(false);
                 // https://stackoverflow.com/questions/4585867/transparent-jbutton
                 b.setOpaque(false);
@@ -327,7 +327,7 @@ public class UITabDTO {
 
     private static class MyTableModel extends AbstractTableModel {
 
-        private ArrayList<String[]> list = new ArrayList<String[]>();
+        private final ArrayList<String[]> list = new ArrayList<String[]>();
 
         public ArrayList<String[]> getList() {
             return list;
@@ -536,11 +536,6 @@ public class UITabDTO {
                         model.setValueAt(msg, i, 2);
                         IdeaMessageHelpers.add_dto_error_message(settings, project, root_file, dto_class_name, msg);
                     }
-                    try {
-                        Thread.sleep(50);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                             table.updateUI();
@@ -606,8 +601,6 @@ public class UITabDTO {
                                 String msg = e.getMessage();
                                 table.setValueAt(msg, row, 2);
                                 IdeaMessageHelpers.add_dto_error_message(settings, project, root_file, dto_class_name, msg);
-                                // _error = e;
-                                // break; // exit the loop
                             }
                         }
                     } finally {
@@ -623,7 +616,7 @@ public class UITabDTO {
                 }
             }
         };
-        ProgressManager.getInstance().runProcessWithProgressSynchronously(runnable, "Code Generation", false, project);
+        ProgressManager.getInstance().runProcessWithProgressSynchronously(runnable, "Code generation", false, project);
         // write only the generated files
         // writeActions can show their own dialogs
         try {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 sqldalmaker@gmail.com
+ * Copyright 2011-2020 sqldalmaker@gmail.com
  * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
  * Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -36,24 +36,17 @@ public class UIProfileEditor {
     private static final Cursor hand = new Cursor(Cursor.HAND_CURSOR);
 
     private static JButton createSimpleButton(String text) {
-
         JButton button = new JButton(text);
-
         button.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
-
         button.setCursor(hand);
-
         button.setFocusPainted(false);
-
         button.setOpaque(false);
         button.setContentAreaFilled(false);
         button.setBorderPainted(false);
-
         return button;
     }
 
     void makeUnderline(JButton b, String text, boolean underline) {
-
         if (underline) {
             b.setText("<html><u>" + text + "</u></html>");
         } else {
@@ -64,15 +57,12 @@ public class UIProfileEditor {
     public void openDTO() {
         CardLayout cl = (CardLayout) (cards1.getLayout());
         cl.show(cards1, DTO);
-
         makeUnderline(buttonDto, DTO, true);
         makeUnderline(buttonDao, DAO, false);
         makeUnderline(buttonAdmin, Admin, false);
-
         if (toolbar != null) {
             panel_1.remove(toolbar);
         }
-
         toolbar = tabDTO1.get_tool_bar();
         panel_1.add(toolbar);
         panel_1.updateUI();
@@ -81,15 +71,12 @@ public class UIProfileEditor {
     public void openDAO() {
         CardLayout cl = (CardLayout) (cards1.getLayout());
         cl.show(cards1, DAO);
-
         makeUnderline(buttonDto, DTO, false);
         makeUnderline(buttonDao, DAO, true);
         makeUnderline(buttonAdmin, Admin, false);
-
         if (toolbar != null) {
             panel_1.remove(toolbar);
         }
-
         toolbar = tabDAO1.get_tool_bar();
         panel_1.add(toolbar);
         panel_1.updateUI();
@@ -98,58 +85,44 @@ public class UIProfileEditor {
     public void openAdmin() {
         CardLayout cl = (CardLayout) (cards1.getLayout());
         cl.show(cards1, Admin);
-
         makeUnderline(buttonDto, DTO, false);
         makeUnderline(buttonDao, DAO, false);
         makeUnderline(buttonAdmin, Admin, true);
-
         if (toolbar != null) {
             panel_1.remove(toolbar);
         }
-
-//                toolbar = tabAdmin.getToolBar();
-//                panel_1.add(toolbar);
         panel_1.updateUI();
     }
 
     public UIProfileEditor() {
         $$$setupUI$$$();
-
         buttonDto = createSimpleButton(DTO);
         buttonDao = createSimpleButton(DAO);
         buttonAdmin = createSimpleButton(Admin);
-
-
         buttonDto.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 openDTO();
             }
         });
-
         buttonDao.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 openDAO();
             }
         });
-
         buttonAdmin.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 openAdmin();
             }
         });
-
-
         panel_1.add(buttonDto);
         panel_1.add(buttonDao);
         panel_1.add(buttonAdmin);
-
         makeUnderline(buttonDto, DTO, true);
         makeUnderline(buttonDao, DAO, false);
         makeUnderline(buttonAdmin, Admin, false);
-
         CardLayout cl = (CardLayout) (cards1.getLayout());
         cl.show(cards1, DTO);
     }
@@ -163,30 +136,24 @@ public class UIProfileEditor {
     protected UITabAdmin tabAdmin; // protected to supress warning
 
     public void init(Project project, VirtualFile file) {
-
         try {
-
             tabDTO1 = new UITabDTO();
             cards1.add(tabDTO1.get_root_panel(), DTO);
             tabDTO1.set_project(project);
             tabDTO1.set_file(file);
             tabDTO1.reload_table(false);
-
             tabDAO1 = new UITabDAO();
             cards1.add(tabDAO1.get_root_panel(), DAO);
             tabDAO1.set_project(project);
             tabDAO1.set_file(file);
             tabDAO1.reload_table(false);
-
             tabAdmin = new UITabAdmin();
             cards1.add(tabAdmin.getRootPanel(), Admin);
             tabAdmin.setProject(project);
             tabAdmin.setFile(file);
             tabAdmin.init_runtime();
-
             toolbar = tabDTO1.get_tool_bar();
             panel_1.add(toolbar);
-
         } catch (Exception e) {
             e.printStackTrace();
             IdeaMessageHelpers.show_error_in_ui_thread(e);

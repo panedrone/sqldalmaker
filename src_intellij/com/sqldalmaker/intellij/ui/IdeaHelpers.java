@@ -6,7 +6,6 @@
 package com.sqldalmaker.intellij.ui;
 
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.components.impl.ProjectPathMacroManager;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.NavigatableFileEditor;
@@ -52,11 +51,6 @@ public class IdeaHelpers {
         if (project_path == null) {
             throw new Exception("Cannot detect the project base path");
         }
-        // D:/work/runtime-EclipseApplication/mysql_sakila_python/.idea/misc.xml
-        // String cp = project.getProjectFilePath();
-        // VirtualFile f = project.getProjectFile(); // null
-        // String pu = project.getPresentableUrl(); // the same as getBasePath()
-        // String project_name = project.getName(); // it may differ of project_path last segment
         boolean found = false;
         String content_root_list = "";
         // https://jetbrains.org/intellij/sdk/docs/reference_guide/project_model/project.html
@@ -184,10 +178,13 @@ public class IdeaHelpers {
                                             String driver_class_name, String url,
                                             String user_name, String password) throws Exception {
 
-        url = url.replace("${project_loc}", "$PROJECT_DIR$"); // for compatibility with Eclipse
-        ProjectPathMacroManager pPmm = new ProjectPathMacroManager(project);
-        url = pPmm.expandPath(url);
         VirtualFile project_dir = get_project_base_dir(project);
+        String project_abs_path = project_dir.getPath();
+        if (url.contains("${project_loc}")) {
+            url = url.replace("${project_loc}", project_abs_path); // for compatibility with Eclipse
+        } else if (url.contains("$PROJECT_DIR$")) {
+            url = url.replace("$PROJECT_DIR$", project_abs_path); // for compatibility with Eclipse
+        }
         VirtualFile driver_file = project_dir.findFileByRelativePath(driver_jar);
         if (driver_file == null) {
             File base_directory = new File(project_dir.getPath());

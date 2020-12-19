@@ -14,7 +14,6 @@ import com.intellij.openapi.fileEditor.FileEditorStateLevel;
  * Date: 21.06.12
  */
 public class RootFileEditorState implements FileEditorState {
-
     @Override
     public boolean canBeMergedWith(FileEditorState otherState, FileEditorStateLevel level) {
         return false;
