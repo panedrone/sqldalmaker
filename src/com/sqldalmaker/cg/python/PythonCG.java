@@ -275,8 +275,8 @@ public class PythonCG {
                     if (parts != null) {
                         MappingInfo m = _create_mapping(parts);
                         m_list.add(m);
-                        method_params.add(new FieldInfo(FieldNamesMode.SNAKE_CASE, p.getType(), m.method_param_name, "parameter"));
-                        exec_dml_params.add(new FieldInfo(FieldNamesMode.SNAKE_CASE, p.getType(), m.exec_dml_param_name, "parameter"));
+                        method_params.add(new FieldInfo(FieldNamesMode.SNAKE_CASE, "callable", m.method_param_name, "parameter"));
+                        exec_dml_params.add(new FieldInfo(FieldNamesMode.SNAKE_CASE, "callable", m.exec_dml_param_name, "parameter"));
                     } else {
                         method_params.add(p);
                         exec_dml_params.add(p);

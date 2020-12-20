@@ -81,11 +81,11 @@ class $class_name:
         @raise: Exception if no rows inserted.
         """
 #sql_var(false $sql)
-        ai_values = [#foreach ($key in $keys)#set($p='["'+${key.getColumnName()} +'", None]')#list_item($velocityCount $p)#end]
-        self.ds.insert_row(sql, [#foreach ($param in $params)#set($p="p."+${param.getName()})#list_item($velocityCount $p)#end], ai_values)
+        _ai_values = [#foreach ($key in $keys)#set($p='["'+${key.getColumnName()} +'", None]')#list_item($velocityCount $p)#end]
+        self.ds.insert_row(sql, [#foreach ($param in $params)#set($p="p."+${param.getName()})#list_item($velocityCount $p)#end], _ai_values)
 #foreach ($key in $keys)
 #set($i = $velocityCount - 1)
-        p.$key.getName() = ai_values[$i][1]
+        p.$key.getName() = _ai_values[$i][1]
 #end
 ## ====================================================================================================================
 #elseif($mode=="dao_query")
@@ -116,11 +116,11 @@ class $class_name:
         _res = []
 
         def _map_cb(row):
-            obj = ${returned_type_name}()
+            _obj = ${returned_type_name}()
 #foreach($f in ${fields})
-            obj.${f.getName()} = row["${f.getColumnName()}"]  # ${f.getComment()}
+            _obj.${f.getName()} = row["${f.getColumnName()}"]  # ${f.getComment()}
 #end
-            _res.append(obj)
+            _res.append(_obj)
 
         self.ds.query_all_rows(sql, #param_array($dto_param), _map_cb#if($out_params), out_params#end)
         return _res
@@ -193,11 +193,11 @@ class $class_name:
         """
 #foreach($m in ${mappings})
         def ${m.get_exec_dml_param_name()}(row):
-            obj = ${m.get_dto_class_name()}()
+            _obj = ${m.get_dto_class_name()}()
 #foreach($f in ${m.get_fields()})
-            obj.${f.getName()} = row["${f.getColumnName()}"]  # ${f.getComment()}
+            _obj.${f.getName()} = row["${f.getColumnName()}"]  # ${f.getComment()}
 #end
-            ${m.get_method_param_name()}(obj)
+            ${m.get_method_param_name()}(_obj)
 
 #end
 #sql_var($is_external_sql $sql)
