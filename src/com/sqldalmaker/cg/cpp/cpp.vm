@@ -13,12 +13,14 @@
 #end
 #macro(param_array $dto_param $params)
 #if ($dto_param != "")
-		CValue *params[] = {#foreach ($param in ${params})#set($p="&p."+$param.getName())#list_item(${velocityCount} $p)#end};#else
-		CValue *params[] = {#foreach ($param in ${params})#set($p="&"+$param.getName())#list_item(${velocityCount} $p)#end};#end
+        CValue *params[] = {#foreach ($param in ${params})#set($p="&p."+$param.getName())#list_item(${velocityCount} $p)#end};
+#else
+        CValue *params[] = {#foreach ($param in ${params})#set($p="&"+$param.getName())#list_item(${velocityCount} $p)#end};
+#end
 #end
 #macro(sql_var $external_sql $sql)
 #if(!${external_sql})
-		DL_STR sql = DL_T(${sql});
+        DL_STR sql = DL_T(${sql});
 #end
 #end
 ## ====================================================================================================================
@@ -32,12 +34,11 @@
  * ${class_name} is a generated DTO class. Don't modify it manually.
  * http://sqldalmaker.sourceforge.net
  */
-class ${class_name}
-{
+class ${class_name} {
 public:
 
 #foreach($field in ${fields})
-	${field.getType()} ${field.getName()}; // ${field.getComment()}
+    ${field.getType()} ${field.getName()}; // ${field.getComment()}
 #end
 };
 
@@ -54,121 +55,113 @@ public:
  * ${class_name} is a generated DAO class. Don't modify it manually.
  * http://sqldalmaker.sourceforge.net
  */
-class ${class_name}
-{
+class ${class_name} {
 protected:
 
-	CDataStore &m_ds;
+    CDataStore &m_ds;
 
 public:
 
-	${class_name}(CDataStore &ds) : m_ds(ds)
-	{
-	}
+    ${class_name}(CDataStore &ds) : m_ds(ds) {
+    }
 #foreach($method in ${methods})${method}#end
 };
 
 #endif // !defined(_${class_name}_)## ==================================================================================================================== 
 #elseif($mode=="dao_create")
 
-	/* 
-	   (C)RUD: ${table_name}
-	   Generated values are passed to DTO.
-	   Returns the number of affected rows or -1 on error.
-	*/
-	int ${method_name}(${dto_param} &p)
-	{
+    /* 
+       (C)RUD: ${table_name}
+       Generated values are passed to DTO.
+       Returns the number of affected rows or -1 on error.
+    */
+    int ${method_name}(${dto_param} &p) {
 #sql_var(false $sql)
-		CValue *params[] = {#foreach ($param in ${params})#set($p="&p."+${param.getName()})#list_item(${velocityCount} $p)#end};
-		CValue *ai_values[]= {#foreach ($key in ${keys})#set($p="&p."+${key.getColumnName()})#list_item(${velocityCount} $p)#end};
-		return m_ds.insert(sql,	${params.size()}, params, ${keys.size()}, ai_values);
-	}
+        CValue *params[] = {#foreach ($param in ${params})#set($p="&p."+${param.getName()})#list_item(${velocityCount} $p)#end};
+        CValue *ai_values[]= {#foreach ($key in ${keys})#set($p="&p."+${key.getColumnName()})#list_item(${velocityCount} $p)#end};
+        return m_ds.insert(sql,	${params.size()}, params, ${keys.size()}, ai_values);
+    }
 ## ====================================================================================================================
 #elseif($mode=="dao_query")
 	
-	/* 
+    /* 
 #if($crud)
-	   C(R)UD: ${ref}
+       C(R)UD: ${ref}
 #end
-	   Returns the number of fetched rows or -1 on error.
-	 */
+       Returns the number of fetched rows or -1 on error.
+     */
 #if($fetch_list)
 #set($reader = "CListReader<"+${returned_type_name}+"> &reader")
 #if(${dto_param} != "")
-	int ${method_name}(#if($external_sql)DL_STR sql, #end${dto_param} &p, ${reader})
+    int ${method_name}(#if($external_sql)DL_STR sql, #end${dto_param} &p, ${reader}) {
 #else
-	int ${method_name}(#if($external_sql)DL_STR sql, #end#out_params($params)#if(${params.size()}>0), #end${reader})
+    int ${method_name}(#if($external_sql)DL_STR sql, #end#out_params($params)#if(${params.size()}>0), #end${reader}) {
 #end
-	{
 #sql_var(${external_sql} $sql)
-		struct : public CRowProcessor
-		{
-			${returned_type_name} buff;
-			CListReader<${returned_type_name}> *pReader;
-			void processRow() { pReader->read(buff); }
-		} rp;
-
-		rp.pReader = &reader;
+        struct : public CRowProcessor {
+            ${returned_type_name} buff;
+            CListReader<${returned_type_name}> *pReader;
+            void processRow() { pReader->read(buff); }
+        } rp;
+        rp.pReader = &reader;
 #if(${dto_param} != "")
 #if(${params.size()} > 0)
-		CValue *params[] = {#foreach ($param in ${params})#set($p="&p."+$param.getName())#list_item(${velocityCount} $p)#end};
+        CValue *params[] = {#foreach ($param in ${params})#set($p="&p."+$param.getName())#list_item(${velocityCount} $p)#end};
 #end
 #else
 #if(${params.size()} > 0)
-		CValue *params[] = {#foreach ($param in ${params})#set($p="&"+$param.getName())#list_item(${velocityCount} $p)#end};
+        CValue *params[] = {#foreach ($param in ${params})#set($p="&"+$param.getName())#list_item(${velocityCount} $p)#end};
 #end
 #end
 #if($return_type_is_dto)
-		CValue *res_values[] = {#foreach ($field in ${fields})#set($v="&rp.buff."+$field.getName())#list_item(${velocityCount} $v)#end};
+        CValue *res_values[] = {#foreach ($field in ${fields})#set($v="&rp.buff."+$field.getName())#list_item(${velocityCount} $v)#end};
 #else
-		CValue *res_values[] = {&rp.buff};
+        CValue *res_values[] = {&rp.buff};
 #end
-		DL_STR col_names[] = {#foreach ($field in ${fields})#if(${velocityCount} == 1)DL_T("${field.getName()}")#else, DL_T("${field.getName()}")#end#end};
-		return m_ds.queryRowList(sql, ${params.size()},#if(${params.size()} > 0) params#else 0#end, ${fields.size()}, res_values, col_names, &rp);
-	}
+        DL_STR col_names[] = {#foreach ($field in ${fields})#if(${velocityCount} == 1)DL_T("${field.getName()}")#else, DL_T("${field.getName()}")#end#end};
+        return m_ds.queryRowList(sql, ${params.size()},#if(${params.size()} > 0) params#else 0#end, ${fields.size()}, res_values, col_names, &rp);
+    }
 #else
 #if(${dto_param} != "")
-	int ${method_name}(#if($external_sql)DL_STR sql, #end${dto_param} &p, ${returned_type_name} &res)
+    int ${method_name}(#if($external_sql)DL_STR sql, #end${dto_param} &p, ${returned_type_name} &res) {
 #else
-	int ${method_name}(#if($external_sql)DL_STR sql, #end#out_params($params)#if(${params.size()}>0), #end${returned_type_name} &res)
+    int ${method_name}(#if($external_sql)DL_STR sql, #end#out_params($params)#if(${params.size()}>0), #end${returned_type_name} &res) {
 #end
-	{
 #sql_var(${external_sql} $sql)
 #if(${dto_param} != "")
 #if(${params.size()} > 0)
-		CValue *params[] = {#foreach ($param in ${params})#set($p="&p."+$param.getName())#list_item(${velocityCount} $p)#end};
+        CValue *params[] = {#foreach ($param in ${params})#set($p="&p."+$param.getName())#list_item(${velocityCount} $p)#end};
 #end
 #else
 #if(${params.size()} > 0)
-		CValue *params[] = {#foreach ($param in ${params})#set($p="&"+$param.getName())#list_item(${velocityCount} $p)#end};
+        CValue *params[] = {#foreach ($param in ${params})#set($p="&"+$param.getName())#list_item(${velocityCount} $p)#end};
 #end
 #end
 #if($return_type_is_dto)
-		CValue *res_values[] = {#foreach ($field in ${fields})#set($v="&res."+$field.getName())#list_item(${velocityCount} $v)#end};
+        CValue *res_values[] = {#foreach ($field in ${fields})#set($v="&res."+$field.getName())#list_item(${velocityCount} $v)#end};
 #else
-		CValue *res_values[] = {&res};
+        CValue *res_values[] = {&res};
 #end
-		DL_STR col_names[] = {#foreach ($field in ${fields})#if(${velocityCount} == 1)DL_T("${field.getName()}")#else, DL_T("${field.getName()}")#end#end};
-		return m_ds.queryRow(sql, ${params.size()},#if(${params.size()} > 0) params#else 0#end, ${fields.size()}, res_values, col_names);
-	}
+        DL_STR col_names[] = {#foreach ($field in ${fields})#if(${velocityCount} == 1)DL_T("${field.getName()}")#else, DL_T("${field.getName()}")#end#end};
+        return m_ds.queryRow(sql, ${params.size()},#if(${params.size()} > 0) params#else 0#end, ${fields.size()}, res_values, col_names);
+    }
 #end
 ## ==================================================================================================================== 
 #elseif($mode=="dao_exec_dml")
 	
-	/*
+    /*
 #if($method_type == "CREATE")
-	   (C)RUD: ${table_name}
+       (C)RUD: ${table_name}
 #elseif($method_type == "UPDATE")
-	   CR(U)D: ${table_name}
+       CR(U)D: ${table_name}
 #elseif($method_type == "DELETE")
-	   CRU(D): ${table_name}
+       CRU(D): ${table_name}
 #end
-	   Returns the number of affected rows or -1 on error.
-	*/
-	int ${method_name}(#if(${dto_param} != "")#if($external_sql)DL_STR sql, #end${dto_param} &p#else#if($external_sql)DL_STR sql#if(${params.size()}>0), #end#end#out_params($params)#end)
-	{
+       Returns the number of affected rows or -1 on error.
+    */
+    int ${method_name}(#if(${dto_param} != "")#if($external_sql)DL_STR sql, #end${dto_param} &p#else#if($external_sql)DL_STR sql#if(${params.size()}>0), #end#end#out_params($params)#end) {
 #sql_var(${external_sql} $sql)
 #param_array($dto_param $params)
-		return m_ds.execDML(sql, ${params.size()}, params);
-	}
+        return m_ds.execDML(sql, ${params.size()}, params);
+    }
 #end

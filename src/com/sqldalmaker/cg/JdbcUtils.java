@@ -187,9 +187,6 @@ public class JdbcUtils {
             for (int i = 1; i <= column_count; i++) {
                 String col_name = _get_jdbc_column_name(rsmd, i);
                 String type_name = _get_jdbc_column_type_name(rsmd, i);
-                if (type_map != null) {
-                    type_name = Helpers.get_cpp_class_name_from_java_class_name(type_map, type_name);
-                }
                 FieldInfo fi = new FieldInfo(field_names_mode, type_name, col_name, "t(" + col_name + ")");
                 fi.setAutoIncrement(rsmd.isAutoIncrement(i));
                 if (pk_col_names_set_lower_case.contains(col_name.toLowerCase())) {
@@ -209,7 +206,14 @@ public class JdbcUtils {
         } finally {
             ps.close();
         }
-        _refine_fields_by_table_metadata(table_name, fields_map);
+        _refine_field_info_by_table_meta_data(table_name, fields_map);
+        if (type_map != null) {
+            for (FieldInfo fi : fields_map.values()) {
+                String java_type_name = fi.getType();
+                String type_name = Helpers.get_cpp_class_name_from_java_class_name(type_map, java_type_name);
+                fi.setType(type_name);
+            }
+        }
         return fields_map;
     }
 
@@ -273,14 +277,14 @@ public class JdbcUtils {
             StringBuilder error = new StringBuilder();
             _get_fields_map_by_jdbc_sql(jdbc_sql, dto_fields_map, _dto_fields, error);
             if (SqlUtils.is_table_ref(dto_ref)) {
-                _refine_fields_by_table_metadata(dto_ref, dto_fields_map);
+                _refine_field_info_by_table_meta_data(dto_ref, dto_fields_map);
             } else if (SqlUtils.is_sql_shortcut_ref(dto_ref)) {
                 String[] parts = SqlUtils.parse_sql_shortcut_ref(dto_ref);
                 String table_name = parts[0];
                 // obtain fields the same way like in the case of table. params will be obtained
                 // from DAO SQL.
                 // params are obtained below (considering DAO SQL and method_param_descriptors)
-                _refine_fields_by_table_metadata(table_name, dto_fields_map);
+                _refine_field_info_by_table_meta_data(table_name, dto_fields_map);
             }
         }
         _refine_fields_by_jaxb_explicit_fields(jaxb_dto_class.getField(), dto_fields_map, _dto_fields);
@@ -289,7 +293,9 @@ public class JdbcUtils {
         }
         if (type_map != null) {
             for (FieldInfo fi : _dto_fields) {
-                fi.setType(Helpers.get_cpp_class_name_from_java_class_name(type_map, fi.getType()));
+                String java_type_name = fi.getType();
+                String type_name = Helpers.get_cpp_class_name_from_java_class_name(type_map, java_type_name);
+                fi.setType(type_name);
             }
         }
         return dto_fields_map;
@@ -313,7 +319,8 @@ public class JdbcUtils {
         }
     }
 
-    private void _refine_fields_by_table_metadata(final String table_name, Map<String, FieldInfo> fields_map) throws Exception {
+    private void _refine_field_info_by_table_meta_data(
+            final String table_name, Map<String, FieldInfo> fields_map) throws Exception {
         if (!SqlUtils.is_table_ref(table_name)) {
             throw new Exception("Table name expected: " + table_name);
         }

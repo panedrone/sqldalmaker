@@ -135,7 +135,7 @@ public class CppCG {
                 return _render_query(dao_query_jdbc_sql, mi.jaxb_is_external_sql,
                         mi.jaxb_dto_or_return_type, mi.return_type_is_dto, mi.fetch_list,
                         method_name, dto_param_type, null, fields, params);
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 // e.printStackTrace();
                 String msg = "<" + xml_node_name + " method=\"" + mi.jaxb_method + "\" ref=\"" + mi.jaxb_ref
                         + "\"...\n";
@@ -168,7 +168,7 @@ public class CppCG {
             context.put("crud", crud_table != null);
             context.put("ref", crud_table);
             context.put("sql", cpp_sql_str);
-            context.put("use_dto", jaxb_return_type_is_dto);
+            context.put("return_type_is_dto", jaxb_return_type_is_dto);
             context.put("returned_type_name", returned_type_name);
             context.put("fetch_list", fetch_list);
             context.put("imports", imports);
@@ -215,7 +215,7 @@ public class CppCG {
                 _render_exec_dml(buff, dao_jdbc_sql, is_external_sql, method_name, dto_param_type,
                         method_param_descriptors, xml_node_name, ref);
                 return buff;
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 // e.printStackTrace();
                 String msg = "<" + xml_node_name + " method=\"" + method + "\" ref=\"" + ref + "\"...\n";
                 throw new Exception(Helpers.get_error_message(msg, e));
@@ -395,7 +395,7 @@ public class CppCG {
                 _process_dto_class_name(dto_class_name);
                 StringBuilder code_buff = JaxbUtils.process_jaxb_crud(this, true, jaxb_type_crud, dto_class_name);
                 return code_buff;
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 // e.printStackTrace();
                 String msg = "<" + node_name + " dto=\"" + dto_class_name + "\" table=\"" + table_attr + "\"...\n";
                 throw new Exception(Helpers.get_error_message(msg, e));

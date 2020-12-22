@@ -2,22 +2,19 @@
 #define __DataStore_H_
 
 /*
-    SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
-
-    This is an example of how to implement DataStore in C++ and Qt5.
+    This is an example of how to implement DataStore in C++ and Qt5/6.
     Copy-paste this code to your project and change it for your needs.
-
+    SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
     Improvements are welcome: sqldalmaker@gmail.com
-*/
+ */
 
-#include <QSqlDatabase>
+#include <QtSql/QSqlDatabase>
 #include <QString>
 #include <QBitArray>
 
 #include <list>
 
-enum ValueType
-{
+enum ValueType {
     VALUE_TYPE_LONG = 1,
     VALUE_TYPE_DOUBLE = 2,
     VALUE_TYPE_TEXT = 3,
@@ -28,70 +25,59 @@ enum ValueType
 CValue represents nullable values of columns and parameters.
 Create inheritors and extend ValueType enum on demand.
 Read also comments for type-map in 'setting.xml'.
-*/
-class CValue
-{
+ */
+class CValue {
 public:
 
     bool IsNull;
 
-    CValue(ValueType t)
-    {
+    CValue(ValueType t) {
         type = t;
         IsNull = false;
     }
 
-    ValueType getType()
-    {
+    ValueType getType() {
         return type;
     }
 
 private:
 
-    ValueType type;	 // C++ RTTI may be off
+    ValueType type; // C++ RTTI may be off
 };
 
-class CLong: public CValue
-{
+class CLong : public CValue {
 public:
 
-    CLong() : CValue(VALUE_TYPE_LONG)
-    {
+    CLong() : CValue(VALUE_TYPE_LONG) {
         Value = 0;
     }
 
     int Value;
 };
 
-class CDouble: public CValue
-{
+class CDouble : public CValue {
 public:
 
-    CDouble() : CValue(VALUE_TYPE_DOUBLE)
-    {
+    CDouble() : CValue(VALUE_TYPE_DOUBLE) {
         Value = 0;
     }
 
     double Value;
 };
 
-class CText: public CValue
-{
+class CText : public CValue {
 public:
 
-    CText() : CValue(VALUE_TYPE_TEXT)
-    {
+    CText() : CValue(VALUE_TYPE_TEXT) {
     }
 
     QString Value;
 };
 
-class CBlob: public CValue
-{
+class CBlob : public CValue {
 public:
 
-    CBlob() : CValue(VALUE_TYPE_BLOB)
-    {
+    CBlob() : CValue(VALUE_TYPE_BLOB) {
     }
 
     QBitArray Value;
@@ -99,11 +85,11 @@ public:
 
 /////////////////////////////////////////////////////
 
-class CRowProcessor
-{
+class CRowProcessor {
 public:
 
-    virtual ~CRowProcessor() {}
+    virtual ~CRowProcessor() {
+    }
     virtual void processRow() = 0;
 };
 
@@ -115,8 +101,7 @@ public:
 
 /////////////////////////////////////////////////////
 
-class CDataStore
-{
+class CDataStore {
 private:
 
     QString errors;
@@ -127,8 +112,7 @@ private:
 
 public:
 
-    const QString & getLastErrors()
-    {
+    const QString & getLastErrors() {
         return errors;
     }
 
@@ -175,14 +159,14 @@ _tprintf(_T("%ls\r\n"), c.CategoryName.m_value.GetBuffer());
 
 dao.getAllCategories(&lr);
 
-*/
+ */
 
 template <class T>
-class CListReader
-{
+class CListReader {
 public:
 
-    virtual ~CListReader() {}
+    virtual ~CListReader() {
+    }
     virtual void read(/*const*/ T &t) = 0;
 };
 
@@ -199,17 +183,15 @@ dao.getAllCategories(&lr);
 
 _tprintf(_T("%d\r\n"), c.list.size());
 
-*/
+ */
 
 template <class T>
-class CListReader2 : public CListReader<T>
-{
+class CListReader2 : public CListReader<T> {
 public:
 
     std::list<T> list; // TODO: not tested yet
 
-    void read(T &t)
-    {
+    void read(T &t) {
         list.push_back(t);
     }
 };

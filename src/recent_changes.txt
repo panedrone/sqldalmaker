@@ -1,10 +1,14 @@
+2020-12-22
+
+    - Fixes for C++
+
 2020-12-10
 
-    - Remnamed in PHP: queryDto -> queryRow, queryDtoList --> queryRowList
+    - Renamed in PHP: queryDto -> queryRow, queryDtoList --> queryRowList
 
 2020-12-10
 
-    - Bugfixes of CRUD-create (PHP, Java, Python)
+    - Fixes of CRUD-create (PHP, Java, Python)
 
 2020-12-02
 
@@ -80,21 +84,21 @@
 
 2020-06-27
 
-	- Updated DataStore.java + Apache DbUtils for basic support of PostgreSQL UDF that RETURNS SETOF REFCURSOR.
-	- Fix in DataStore_psycopg2.py => exec_dml(...)
-	- Fix in DataStore_PDO_PostgreSQL.php => execDml(...)
+    - Updated DataStore.java + Apache DbUtils for basic support of PostgreSQL UDF that RETURNS SETOF REFCURSOR.
+    - Fix in DataStore_psycopg2.py => exec_dml(...)
+    - Fix in DataStore_PDO_PostgreSQL.php => execDml(...)
 
 2020-06-25
 
-	Updated DataStore.php for MySQL to support OUT and INOUT parameters.
+    Updated DataStore.php for MySQL to support OUT and INOUT parameters.
 
 2020-06-23
 
-	Updated DataStore.py for psycopg2 to support OUT parameters.
+    Updated DataStore.py for psycopg2 to support OUT parameters.
 	
 2020-06-23
 
-	Updated DataStore.py for MySQL to support OUT parameters.
+    Updated DataStore.py for MySQL to support OUT parameters.
 
 2020-06-22
 

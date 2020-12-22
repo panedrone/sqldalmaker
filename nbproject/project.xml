@@ -224,8 +224,16 @@
             </test-dependencies>
             <public-packages/>
             <class-path-extension>
+                <runtime-relative-path>ext/jaxb-runtime-2.3.1.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/jaxb-runtime-2.3.1.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
                 <runtime-relative-path>ext/jaxb-impl-2.3.1.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/jaxb-impl-2.3.1.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/stax-ex-1.8.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/stax-ex-1.8.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/istack-commons-runtime-3.0.7.jar</runtime-relative-path>
@@ -242,6 +250,10 @@
             <class-path-extension>
                 <runtime-relative-path>ext/FastInfoset-1.2.15.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/FastInfoset-1.2.15.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/txw2-2.3.1.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/txw2-2.3.1.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/velocity-1.7-dep.jar</runtime-relative-path>
