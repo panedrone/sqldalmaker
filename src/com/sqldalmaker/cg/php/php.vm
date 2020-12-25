@@ -209,8 +209,7 @@ class ${class_name} {
     public function ${method_name}(#if(${dto_param} != "")#param_decls_dto($is_external_sql)${dto_param} ${d}p#else#param_decls($is_external_sql $params)#end) {
 #sql_var(${is_external_sql} $sql)
 #foreach($m in ${mappings})
-        ${m.get_exec_dml_param_name()} = function(${d}row)         ${m.get_exec_dml_param_name()} = function(${d}row) use(&${d}${m.get_method_param_name()}) {
-use(&${d}${m.get_method_param_name()}) {
+        ${m.get_exec_dml_param_name()} = function(${d}row) use(&${d}${m.get_method_param_name()}) {
             ${d}obj = new ${m.get_dto_class_name()}();
 #foreach($f in ${m.get_fields()})
             ${d}obj->${f.setterMethod()}(${d}row["${f.getColumnName()}"]); // ${f.getComment()}

@@ -19,7 +19,6 @@ To generate the class, you declare it in XML meta-program.<br/>
         <![CDATA[
 <ul>
 <li>Fixes for SP returning Result-Set(s) implicitly</li>
-<li>Fixes for SP returning Result-Set(s) implicitly</li>
 <li>Fixes for C++</li>
 <li>Added '@type: callable' to suppress Python warnings</li>
 <li>Fixed issues of compatibility with IntelliJ-Platform 2017.+</li>
