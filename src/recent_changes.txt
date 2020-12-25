@@ -1,3 +1,7 @@
+2020-12-25
+
+    - Fixes for SP returning Result-Set(s) implicitly
+
 2020-12-22
 
     - Fixes for C++

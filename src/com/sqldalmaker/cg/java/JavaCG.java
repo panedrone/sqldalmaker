@@ -261,7 +261,10 @@ public class JavaCG {
                         method_params.add(new FieldInfo(FieldNamesMode.AS_IS, String.format("final RecordHandler<%s>", m.dto_class_name), m.method_param_name, "parameter"));
                         cb_elements.add(m.exec_dml_param_name);
                     }
-                    String exec_xml_param = "new RowHandler[] {" + String.join(", ", cb_elements) + "}";
+                    String exec_xml_param = "new RowHandler[]{" + String.join(", ", cb_elements) + "}";
+                    if (pd_i == 0) {
+                        exec_xml_param = "(Object) " + exec_xml_param;
+                    }
                     exec_dml_params.add(new FieldInfo(FieldNamesMode.AS_IS, "[]", exec_xml_param, "parameter"));
                 } else {
                     FieldInfo p = _params.get(pd_i);

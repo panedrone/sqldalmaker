@@ -2,7 +2,7 @@
     <id>dal-mpe</id>
     <name>SQL DAL Maker</name>
     <category>Database</category>
-    <version>1.157.2020-12-20</version>
+    <version>1.159.2020-12-25</version>
     <vendor email="sqldalmaker@gmail.com"/>
     <!-- please see http://confluence.intellij.net/display/IDEADEV/Build+Number+Ranges for description -->
     <idea-version since-build="173.2099.1"/>
@@ -18,10 +18,12 @@ To generate the class, you declare it in XML meta-program.<br/>
     <change-notes>
         <![CDATA[
 <ul>
+<li>Fixes for SP returning Result-Set(s) implicitly</li>
+<li>Fixes for SP returning Result-Set(s) implicitly</li>
+<li>Fixes for C++</li>
 <li>Added '@type: callable' to suppress Python warnings</li>
-<li>Fixed compatibility issues for 2017+</li>
-<li>Fixes issues of CRUD-Create (PHP, Java, Python)</li>
-<li>Adapted for 2020.3</li>
+<li>Fixed issues of compatibility with IntelliJ-Platform 2017.+</li>
+<li>Fixed issues of CRUD-Create (PHP, Java, Python)</li>
 </ul>]]></change-notes>
 
     <application-components>

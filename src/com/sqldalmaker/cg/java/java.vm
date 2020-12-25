@@ -79,8 +79,8 @@ public class ${class_name} {
      */
     public int ${method_name}(${dto_param} p) throws Exception {
 #sql_var(false $sql)
-        String []gen_col_nm = new String[] {#foreach ($key in ${keys})#list_item_str(${velocityCount} ${key.getColumnName()})#end};
-        Object []gen_values = new Object[gen_col_nm.length];
+        String[] gen_col_nm = new String[]{#foreach ($key in ${keys})#list_item_str(${velocityCount} ${key.getColumnName()})#end};
+        Object[] gen_values = new Object[gen_col_nm.length];
         int res = ds.insert(sql, gen_col_nm, gen_values#foreach($param in ${params}), p.${param.getterMethod()}()#end);
 #foreach ($key in ${keys})
 #set($i = ${velocityCount} - 1)

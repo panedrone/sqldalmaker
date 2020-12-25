@@ -10,5 +10,8 @@
 	<classpathentry kind="lib" path="lib/javax.activation-api-1.2.0.jar"/>
 	<classpathentry kind="lib" path="lib/jaxb-api-2.3.1.jar"/>
 	<classpathentry kind="lib" path="lib/jaxb-impl-2.3.1.jar"/>
+	<classpathentry kind="lib" path="lib/jaxb-runtime-2.3.1.jar"/>
+	<classpathentry kind="lib" path="lib/stax-ex-1.8.jar"/>
+	<classpathentry kind="lib" path="lib/txw2-2.3.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
