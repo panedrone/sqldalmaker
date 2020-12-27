@@ -45,11 +45,6 @@ To generate the class, you declare it in XML meta-program.<br/>
 
     <extensions defaultExtensionNs="com.intellij">
         <!--
-        Register the FileType Using a Factory
-        https://jetbrains.org/intellij/sdk/docs/tutorials/custom_language_support/language_and_filetype.html
-        -->
-        <fileTypeFactory implementation="com.sqldalmaker.intellij.ui.RootFileTypeFactory"/>
-        <!--
         Register the FileType Directly
         Direct registration is possible when targeting version 2019.2 (and later) of the IntelliJ Platform - no FileTypeFactory is required.
         https://jetbrains.org/intellij/sdk/docs/tutorials/custom_language_support/language_and_filetype.html
