@@ -1,3 +1,7 @@
+2021-01-23
+
+    - 'Validate All' on the tab 'Admin'
+
 2020-12-25
 
     - Fixes for SP returning Result-Set(s) implicitly

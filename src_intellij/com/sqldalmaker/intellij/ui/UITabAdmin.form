@@ -38,12 +38,12 @@
                       <text value="Reference settings.xml"/>
                     </properties>
                   </component>
-                  <component id="72e18" class="javax.swing.JButton" binding="testConnectionButton" default-binding="true">
+                  <component id="72e18" class="javax.swing.JButton" binding="btn_validate_all">
                     <constraints>
                       <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                     </constraints>
                     <properties>
-                      <text value="Test connection"/>
+                      <text value="Validate All"/>
                     </properties>
                   </component>
                   <component id="a821f" class="javax.swing.JButton" binding="recentChangesButton" default-binding="true">

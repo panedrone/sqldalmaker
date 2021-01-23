@@ -5,14 +5,12 @@
  */
 package com.sqldalmaker.intellij.ui;
 
-import com.intellij.ide.plugins.IdeaPluginDescriptor;
-import com.intellij.ide.plugins.PluginManager;
-import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
+import com.sqldalmaker.cg.Helpers;
 import com.sqldalmaker.common.Const;
 import com.sqldalmaker.jaxb.settings.Settings;
 
@@ -31,7 +29,7 @@ import java.sql.Connection;
  */
 public class UITabAdmin {
     private JButton editSettingsXmlButton;
-    private JButton testConnectionButton;
+    private JButton btn_validate_all;
     private JButton createOverwriteXSDFilesButton;
     private JButton createOverwriteSettingsXmlButton;
     private JButton createOverwriteDtoXmlButton;
@@ -68,11 +66,7 @@ public class UITabAdmin {
     private JButton dataStorePhpOCI8Button;
 
     private Project project;
-    private VirtualFile propFile;
-
-//    public JComponent getToolBar() {
-//        return toolbar_1;
-//    }
+    private VirtualFile root_file;
 
     public void init_runtime() {
 
@@ -85,15 +79,16 @@ public class UITabAdmin {
                 // Programmatically get the version of an IntelliJ IDEA plugin
                 // https://stackoverflow.com/questions/28080707/programmatically-get-the-version-of-an-intellij-idea-plugin
 
-                PluginId id = PluginId.getId("dal-mpe"); // @NotNull
-
-                // @Nullable
-                IdeaPluginDescriptor ds = PluginManager.getPlugin(id);
-                if (ds != null) {
-                    String jv = System.getProperty("java.version");
-                    vTextField.setText(ds.getVersion() + " on Java " + jv);
+                String plugin_version = "1.160+";
+                try {
+                    String plugin_xml = IdeaHelpers.read_from_jar_file("", "plugin.xml");
+                    String[] parts = plugin_xml.split("<version>");
+                    plugin_version = parts[1].split("</version>")[0];
+                } catch (Throwable e) {
+                    //
                 }
-
+                String jv = System.getProperty("java.version");
+                vTextField.setText(plugin_version + " on Java " + jv);
                 vTextField.setBorder(BorderFactory.createEmptyBorder());
                 // https://stackoverflow.com/questions/291115/java-swing-using-jscrollpane-and-having-it-scroll-back-to-top
                 scroll_pane.getVerticalScrollBar().setValue(0);
@@ -104,15 +99,6 @@ public class UITabAdmin {
     }
 
     public UITabAdmin() {
-
-//        rootPanel.remove(toolbar_1);
-//        Cursor wc = new Cursor(Cursor.HAND_CURSOR);
-//
-//        for (Component c : toolbar1.getComponents()) {
-//            JButton b = (JButton) c;
-//            b.setCursor(wc);
-//        }
-
         try {
             text1.setContentType("text/html");
             text1.setEditable(false);
@@ -136,12 +122,6 @@ public class UITabAdmin {
                     }
                 }
             });
-
-//            HTMLDocument doc = (HTMLDocument) text1.getDocument();
-//            HTMLEditorKit editorKit = (HTMLEditorKit) text1.getEditorKit();
-//
-//            editorKit.insertHTML(doc, doc.getLength(), text, 0, 0, null);
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -152,7 +132,7 @@ public class UITabAdmin {
                         "This action creates/overwrites XSD files in the folder of XML meta-program. Continue?",
                         "Warning", JOptionPane.YES_NO_OPTION);
                 if (dialogResult == JOptionPane.YES_OPTION) {
-                    IdeaMetaProgramInitHelpers.create_xsd(propFile);
+                    IdeaMetaProgramInitHelpers.create_xsd(root_file);
                 }
             }
         });
@@ -162,7 +142,7 @@ public class UITabAdmin {
                 int dialogResult = JOptionPane.showConfirmDialog(null, "This action creates/overwrites settings.xml in the folder of XML meta-program. Continue?",
                         "Warning", JOptionPane.YES_NO_OPTION);
                 if (dialogResult == JOptionPane.YES_OPTION) {
-                    IdeaMetaProgramInitHelpers.create_settings_xml(propFile);
+                    IdeaMetaProgramInitHelpers.create_settings_xml(root_file);
                 }
             }
         });
@@ -172,20 +152,20 @@ public class UITabAdmin {
                 int dialogResult = JOptionPane.showConfirmDialog(null, "This action creates/overwrites dto.xml in the folder of XML meta-program. Continue?",
                         "Warning", JOptionPane.YES_NO_OPTION);
                 if (dialogResult == JOptionPane.YES_OPTION) {
-                    IdeaMetaProgramInitHelpers.create_dto_xml(propFile);
+                    IdeaMetaProgramInitHelpers.create_dto_xml(root_file);
                 }
             }
         });
         editSettingsXmlButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                IdeaEditorHelpers.open_settings_xml_sync(project, propFile);
+                IdeaEditorHelpers.open_settings_xml_sync(project, root_file);
             }
         });
-        testConnectionButton.addActionListener(new ActionListener() {
+        btn_validate_all.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                testConnection();
+                validate_all();
             }
         });
         php_vm.addActionListener(new ActionListener() {
@@ -230,12 +210,6 @@ public class UITabAdmin {
                 IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "DataStoreManagerJDBC.java_", "DataStoreManager.java");
             }
         });
-//        dataStoreGroovyButton.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "DataStoreManager.groovy_", "DataStoreManager.groovy");
-//            }
-//        });
         dataStoreJavaAndroidButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -355,16 +329,81 @@ public class UITabAdmin {
         });
     }
 
-    private void testConnection() {
-        try {
-            Settings prof = IdeaHelpers.load_settings(propFile);
-            Connection con = IdeaHelpers.get_connection(project, prof);
-            con.close();
-            IdeaMessageHelpers.show_info_in_ui_thread("Test connection succeeded.");
-        } catch (/*Exception*/ Throwable ex) {
-            IdeaMessageHelpers.show_error_in_ui_thread(ex);
-            ex.printStackTrace();
+    private static String get_err_msg(Throwable ex) {
+        return ex.getClass().getName() + " -> " + ex.getMessage(); // printStackTrace();
+    }
+
+    private void validate_all() {
+        StringBuilder buff = new StringBuilder();
+        String xml_meraprogram_folder_full_path = root_file.getParent().getPath();
+        Settings sett = null;
+        if (check_xsd(buff, Const.SETTINGS_XSD)) {
+            try {
+                sett = IdeaHelpers.load_settings(root_file);
+                add_ok_msg(buff, Const.SETTINGS_XML);
+            } catch (Exception ex) {
+                add_err_msg(buff, "Invalid " + Const.SETTINGS_XML + ": " + get_err_msg(ex));
+            }
+        } else {
+            add_err_msg(buff, "Cannot load " + Const.SETTINGS_XML + " because of invalid " + Const.SETTINGS_XSD);
         }
+        check_xsd(buff, Const.DTO_XSD);
+        check_xsd(buff, Const.DAO_XSD);
+        if (sett == null) {
+            add_err_msg(buff, "Test connection -> failed because of invalid settings");
+        } else {
+            try {
+                Connection con = IdeaHelpers.get_connection(project, sett);
+                con.close();
+                add_ok_msg(buff, "Test connection");
+            } catch (Exception ex) {
+                add_err_msg(buff, "Test connection: " + get_err_msg(ex));
+            }
+        }
+        IdeaMessageHelpers.show_info_in_ui_thread(buff.toString());
+    }
+
+    private boolean check_xsd(StringBuilder buff, String xsd_name) {
+        VirtualFile sett = root_file.getParent().findChild(xsd_name);
+        if (sett == null) {
+            add_err_msg(buff, "File not found: " + xsd_name);
+            return false;
+        } else {
+            String cur_text;
+            try {
+                cur_text = Helpers.load_text_from_file(sett.getPath());
+            } catch (Exception ex) {
+                add_err_msg(buff, get_err_msg(ex));
+                return false;
+            }
+            String ref_text;
+            try {
+                ref_text = IdeaHelpers.read_from_jar_file(xsd_name);
+            } catch (Exception ex) {
+                add_err_msg(buff, get_err_msg(ex));
+                return false;
+            }
+            if (ref_text.equals(cur_text)) {
+                add_ok_msg(buff, xsd_name);
+            } else {
+                add_err_msg(buff, xsd_name + " is out-of-date! Use 'Create/Overwrite XSD files'");
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void add_ok_msg(StringBuilder buff, String msg) {
+        buff.append("\r\n");
+        buff.append(msg);
+        buff.append(" -> OK");
+        IdeaMessageHelpers.add_info_to_ide_log(msg + " -> OK");
+    }
+
+    private void add_err_msg(StringBuilder buff, String msg) {
+        buff.append("\r\n[ERROR] ");
+        buff.append(msg);
+        IdeaMessageHelpers.add_error_to_ide_log("ERROR", msg);
     }
 
     public void setProject(Project project) {
@@ -372,7 +411,7 @@ public class UITabAdmin {
     }
 
     public void setFile(VirtualFile file) {
-        this.propFile = file;
+        this.root_file = file;
     }
 
     public JComponent getRootPanel() {
@@ -408,9 +447,9 @@ public class UITabAdmin {
         referenceSettingsXmlButton = new JButton();
         referenceSettingsXmlButton.setText("Reference settings.xml");
         panel2.add(referenceSettingsXmlButton, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
-        testConnectionButton = new JButton();
-        testConnectionButton.setText("Test connection");
-        panel2.add(testConnectionButton, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        btn_validate_all = new JButton();
+        btn_validate_all.setText("Validate All");
+        panel2.add(btn_validate_all, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         recentChangesButton = new JButton();
         recentChangesButton.setText("Recent changes");
         panel2.add(recentChangesButton, new GridConstraints(0, 3, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
@@ -525,9 +564,6 @@ public class UITabAdmin {
         panel1.add(spacer1, new GridConstraints(5, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
     }
 
-    /**
-     * @noinspection ALL
-     */
     public JComponent $$$getRootComponent$$$() {
         return rootPanel;
     }

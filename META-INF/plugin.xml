@@ -2,7 +2,7 @@
     <id>dal-mpe</id>
     <name>SQL DAL Maker</name>
     <category>Database</category>
-    <version>1.160.2020-12-26</version>
+    <version>1.161.2021-01</version>
     <vendor email="sqldalmaker@gmail.com"/>
     <!-- please see http://confluence.intellij.net/display/IDEADEV/Build+Number+Ranges for description -->
     <idea-version since-build="173.2099.1"/>
@@ -11,19 +11,16 @@
 
     <description><![CDATA[
 SQL DAL Maker is a generator of DTO and DAO classes to access relational databases. Target programming languages: PHP, Java, C++, Python, Ruby.<br/>
-<br/>
 To generate the class, you declare it in XML meta-program.<br/>
+<br/>
+<a href="https://github.com/panedrone/sqldalmaker/releases/tag/latest">Download mp4</a>
     ]]></description>
 
     <change-notes>
         <![CDATA[
 <ul>
-<li>Built as ZIP including all the plugin libraries specified in the project settings</li>
+<li>'Validate All' on the tab 'Admin'</li>
 <li>Fixes for SP returning Result-Set(s) implicitly</li>
-<li>Fixes for C++</li>
-<li>Added '@type: callable' to suppress Python warnings</li>
-<li>Fixed issues of compatibility with IntelliJ-Platform 2017.+</li>
-<li>Fixed issues of CRUD-Create (PHP, Java, Python)</li>
 </ul>]]></change-notes>
 
     <application-components>
