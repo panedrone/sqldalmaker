@@ -10,8 +10,8 @@
     <depends>com.intellij.modules.lang</depends>
 
     <description><![CDATA[
-SQL DAL Maker is a generator of DTO and DAO classes to access relational databases. Target programming languages: PHP, Java, C++, Python, Ruby.<br/>
-To generate the class, you declare it in XML meta-program.<br/>
+SQL DAL Maker is a generator of DTO and DAO classes to access relational databases. Target programming languages:
+PHP, Java, C++, Python, Ruby. To generate the class, you declare it in XML meta-program.<br/>
 <br/>
 <a href="https://github.com/panedrone/sqldalmaker/releases/tag/latest">Download mp4</a>
     ]]></description>

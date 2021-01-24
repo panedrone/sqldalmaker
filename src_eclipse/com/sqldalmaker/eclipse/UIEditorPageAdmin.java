@@ -30,6 +30,7 @@ import org.osgi.framework.Version;
 
 import com.sqldalmaker.cg.Helpers;
 import com.sqldalmaker.common.Const;
+import com.sqldalmaker.jaxb.settings.Settings;
 
 /**
  *
@@ -44,25 +45,8 @@ public class UIEditorPageAdmin extends Composite {
 	private IEditor2 editor2;
 	private Action action_settings_xml;
 	private Action action_test_conn;
+	private Action action_validate_all;
 	private Text txtV;
-
-	protected void testConnection() {
-
-		try {
-
-			Connection conn = EclipseHelpers.get_connection(editor2);
-
-			conn.close();
-
-			EclipseMessageHelpers.show_info("Test connection succeeded.");
-
-		} catch (Throwable ex) {
-
-			ex.printStackTrace();
-
-			EclipseMessageHelpers.show_error(ex);
-		}
-	}
 
 	/**
 	 * Create the composite.
@@ -117,11 +101,11 @@ public class UIEditorPageAdmin extends Composite {
 		btnNewButton_1.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				testConnection();
+				validate_all();
 			}
 		});
 		toolkit.adapt(btnNewButton_1, true, true);
-		btnNewButton_1.setText("Test connection");
+		btnNewButton_1.setText("Validate All");
 
 		Composite composite_1 = new Composite(composite_top, SWT.NONE);
 		composite_1.setLayout(new GridLayout(3, false));
@@ -484,46 +468,133 @@ public class UIEditorPageAdmin extends Composite {
 		toolkit.adapt(text_1, true, true);
 	}
 
+	private static String get_err_msg(Throwable ex) {
+		return ex.getClass().getName() + " -> " + ex.getMessage(); // printStackTrace();
+	}
+
+	private void validate_all() {
+		EclipseConsoleHelpers.init_console();
+		StringBuilder buff = new StringBuilder();
+		Settings sett = null;
+		if (check_xsd(buff, Const.SETTINGS_XSD)) {
+			try {
+				sett = EclipseHelpers.load_settings(editor2);
+				add_ok_msg(buff, Const.SETTINGS_XML);
+			} catch (Exception ex) {
+				add_err_msg(buff, "Invalid " + Const.SETTINGS_XML + ": " + get_err_msg(ex));
+			}
+		} else {
+			add_err_msg(buff, "Cannot load " + Const.SETTINGS_XML + " because of invalid " + Const.SETTINGS_XSD);
+		}
+		check_xsd(buff, Const.DTO_XSD);
+		check_xsd(buff, Const.DAO_XSD);
+		if (sett == null) {
+			add_err_msg(buff, "Test connection -> failed because of invalid settings");
+		} else {
+			try {
+				Connection con = EclipseHelpers.get_connection(editor2);
+				con.close();
+				add_ok_msg(buff, "Test connection");
+			} catch (Exception ex) {
+				add_err_msg(buff, "Test connection: " + get_err_msg(ex));
+			}
+		}
+		EclipseMessageHelpers.show_info(buff.toString());
+	}
+
+	private boolean check_xsd(StringBuilder buff, String xsd_name) {
+		IFile xsd = editor2.find_metaprogram_file(xsd_name);
+		if (xsd == null) {
+			add_err_msg(buff, "File not found: " + xsd_name);
+			return false;
+		} else {
+			String cur_text;
+			try {
+				String xsd_abs_path = editor2.get_metaprogram_file_abs_path(xsd_name);
+				cur_text = Helpers.load_text_from_file(xsd_abs_path);
+			} catch (Exception ex) {
+				add_err_msg(buff, get_err_msg(ex));
+				return false;
+			}
+			String ref_text;
+			try {
+				ref_text = EclipseHelpers.read_from_resource_folder(xsd_name);
+			} catch (Exception ex) {
+				add_err_msg(buff, get_err_msg(ex));
+				return false;
+			}
+			if (ref_text.equals(cur_text)) {
+				add_ok_msg(buff, xsd_name);
+			} else {
+				add_err_msg(buff, xsd_name + " is out-of-date! Use 'Create/Overwrite XSD files'");
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private void add_ok_msg(StringBuilder buff, String msg) {
+		buff.append("\r\n");
+		buff.append(msg);
+		buff.append(" -> OK");
+		EclipseConsoleHelpers.add_info_msg(msg + " -> OK");
+	}
+
+	private void add_err_msg(StringBuilder buff, String msg) {
+		buff.append("\r\n[ERROR] ");
+		buff.append(msg);
+		EclipseConsoleHelpers.add_error_msg(msg);
+	}
+
+	protected void test_connection() {
+		try {
+			Connection conn = EclipseHelpers.get_connection(editor2);
+			conn.close();
+			EclipseMessageHelpers.show_info("Test connection succeeded.");
+		} catch (Throwable ex) {
+			ex.printStackTrace();
+			EclipseMessageHelpers.show_error(ex);
+		}
+	}
+
 	protected void editSettings() {
 		try {
-
 			IFile file = editor2.find_settings_xml();
-
 			EclipseEditorHelpers.open_editor_sync(getShell(), file, true);
-
 		} catch (Throwable ex) {
-
 			ex.printStackTrace();
-
 			EclipseMessageHelpers.show_error(ex);
 		}
 	}
 
 	private void createActions() {
-		{
-			action_settings_xml = new Action("") {
-
-				@Override
-				public void run() {
-					editSettings();
-				}
-			};
-			action_settings_xml.setToolTipText("Edit settings.xml");
-			action_settings_xml.setImageDescriptor(
-					ResourceManager.getImageDescriptor(UIEditorPageAdmin.class, "/img/XMLFile.gif"));
-		}
-		{
-			action_test_conn = new Action("") {
-
-				@Override
-				public void run() {
-					testConnection();
-				}
-			};
-			action_test_conn.setToolTipText("Test connection");
-			action_test_conn.setImageDescriptor(
-					ResourceManager.getImageDescriptor(UIEditorPageAdmin.class, "/img/connection.gif"));
-		}
+		action_settings_xml = new Action("") {
+			@Override
+			public void run() {
+				editSettings();
+			}
+		};
+		action_settings_xml.setToolTipText("Edit settings.xml");
+		action_settings_xml
+				.setImageDescriptor(ResourceManager.getImageDescriptor(UIEditorPageAdmin.class, "/img/XMLFile.gif"));
+		action_test_conn = new Action("") {
+			@Override
+			public void run() {
+				test_connection();
+			}
+		};
+		action_test_conn.setToolTipText("Test connection");
+		action_test_conn
+				.setImageDescriptor(ResourceManager.getImageDescriptor(UIEditorPageAdmin.class, "/img/connection.gif"));
+		action_validate_all = new Action("") {
+			@Override
+			public void run() {
+				validate_all();
+			}
+		};
+		action_validate_all.setToolTipText("Validate All");
+		action_validate_all
+				.setImageDescriptor(ResourceManager.getImageDescriptor(UIEditorPageAdmin.class, "/img/validate.gif"));
 	}
 
 	public void init_runtime() {
@@ -533,15 +604,11 @@ public class UIEditorPageAdmin extends Composite {
 			Version version = bundle.getVersion();
 			String v = String.format("%d.%d.%d.%s", version.getMajor(), version.getMinor(), version.getMicro(),
 					version.getQualifier());
-
 			String jv = System.getProperty("java.version");
-
 			txtV.setText(v + " on Java " + jv);
-
 			String text = Helpers.read_from_jar_file_2("ABOUT.txt");
 			// text += "\r\n" + v;
 			text_1.setText(text);
-
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
