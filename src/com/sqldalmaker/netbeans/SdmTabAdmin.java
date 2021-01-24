@@ -6,8 +6,11 @@
  */
 package com.sqldalmaker.netbeans;
 
+import com.sqldalmaker.cg.Helpers;
 import com.sqldalmaker.common.Const;
+import com.sqldalmaker.jaxb.settings.Settings;
 import java.awt.Desktop;
+import java.io.IOException;
 import java.sql.Connection;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
@@ -15,8 +18,10 @@ import javax.swing.JToolBar;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import org.netbeans.core.spi.multiview.MultiViewElement;
+import org.openide.filesystems.FileObject;
 import org.openide.modules.ModuleInfo;
 import org.openide.modules.Modules;
+import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
@@ -54,7 +59,7 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
             String text = NbpHelpers.read_from_jar_file("", "ABOUT.html");
             jTextPane1.setText(text);
         } catch (Exception ex) {
-            // ex.printStackTrace();
+            Exceptions.printStackTrace(ex);
         }
         jTextPane1.addHyperlinkListener(new HyperlinkListener() {
             @Override
@@ -65,8 +70,8 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
                         try {
                             Desktop desktop = Desktop.getDesktop();
                             desktop.browse(hle.getURL().toURI());
-                        } catch (Throwable ex) {
-                            // ex.printStackTrace();
+                        } catch (Exception ex) {
+                            Exceptions.printStackTrace(ex);
                         }
                     }
                 }
@@ -606,8 +611,8 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
 
         int dialogResult = JOptionPane.showConfirmDialog(null,
-            "This action creates/overwrites 'dto.xml' in the folder of XML meta-program. Continue?",
-            "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                "This action creates/overwrites 'dto.xml' in the folder of XML meta-program. Continue?",
+                "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 
         if (dialogResult == JOptionPane.YES_OPTION) {
 
@@ -618,7 +623,7 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
 
         int dialogResult = JOptionPane.showConfirmDialog(null, "This action creates/overwrites 'settings.xml' in the folder of XML meta-program. Continue?",
-            "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 
         if (dialogResult == JOptionPane.YES_OPTION) {
 
@@ -629,7 +634,7 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
 
         int dialogResult = JOptionPane.showConfirmDialog(null, "This action creates/overwrites XSD files in the folder of XML meta-program. Continue?",
-            "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 
         if (dialogResult == JOptionPane.YES_OPTION) {
 
@@ -642,7 +647,7 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
     }//GEN-LAST:event_jButton13ActionPerformed
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
-        testConnection();
+        validate_all();
     }//GEN-LAST:event_jButton6ActionPerformed
 
     private void jButton25ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton25ActionPerformed
@@ -718,18 +723,92 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
     private javax.swing.JTextPane jTextPane1;
     // End of variables declaration//GEN-END:variables
 
-    private void testConnection() {
-        try {
+//    private void testConnection() {
+//        try {
+//            Connection conn = NbpHelpers.get_connection(obj);
+//            conn.close();
+//            NbpIdeMessageHelpers.show_info_in_ui_thread("Test connection succeeded.");
+//        } catch (Exception ex) {
+//            // ex.printStackTrace();
+//            NbpIdeMessageHelpers.show_error_in_ui_thread(ex);
+//        }
+//    }
+    private static String get_err_msg(Throwable ex) {
+        return ex.getClass().getName() + " -> " + ex.getMessage(); // printStackTrace();
+    }
 
-            Connection conn = NbpHelpers.get_connection(obj);
-
-            conn.close();
-
-            NbpIdeMessageHelpers.show_info_in_ui_thread("Test connection succeeded.");
-
-        } catch (Exception ex) {
-            // ex.printStackTrace();
-            NbpIdeMessageHelpers.show_error_in_ui_thread(ex);
+    private void validate_all() {
+        NbpIdeConsoleUtil ide_log = new NbpIdeConsoleUtil(obj);
+        StringBuilder buff = new StringBuilder();
+        Settings sett = null;
+        if (check_xsd(ide_log, buff, Const.SETTINGS_XSD)) {
+            try {
+                sett = NbpHelpers.load_settings(obj);
+                add_ok_msg(ide_log, buff, Const.SETTINGS_XML);
+            } catch (Exception ex) {
+                add_err_msg(ide_log, buff, "Invalid " + Const.SETTINGS_XML + ": " + get_err_msg(ex));
+            }
+        } else {
+            add_err_msg(ide_log, buff, "Cannot load " + Const.SETTINGS_XML + " because of invalid " + Const.SETTINGS_XSD);
         }
+        check_xsd(ide_log, buff, Const.DTO_XSD);
+        check_xsd(ide_log, buff, Const.DAO_XSD);
+        if (sett == null) {
+            add_err_msg(ide_log, buff, "Test connection -> failed because of invalid settings");
+        } else {
+            try {
+                Connection con = NbpHelpers.get_connection(obj);
+                con.close();
+                add_ok_msg(ide_log, buff, "Test connection");
+            } catch (Exception ex) {
+                add_err_msg(ide_log, buff, "Test connection: " + get_err_msg(ex));
+            }
+        }
+        NbpIdeMessageHelpers.show_info_in_ui_thread(buff.toString());
+    }
+
+    private boolean check_xsd(NbpIdeConsoleUtil ide_log, StringBuilder buff, String xsd_name) {
+        FileObject root_file = obj.getPrimaryFile();
+        FileObject mp_folder = root_file.getParent();
+        FileObject xml_file = mp_folder.getFileObject(xsd_name);
+        if (xml_file == null) {
+            add_err_msg(ide_log, buff, "File not found: " + xsd_name);
+            return false;
+        } else {
+            String cur_text;
+            try {
+                cur_text = Helpers.load_text_from_file(xml_file.getPath());
+            } catch (IOException ex) {
+                add_err_msg(ide_log, buff, get_err_msg(ex));
+                return false;
+            }
+            String ref_text;
+            try {
+                ref_text = NbpHelpers.read_from_jar_file(xsd_name);
+            } catch (Exception ex) {
+                add_err_msg(ide_log, buff, get_err_msg(ex));
+                return false;
+            }
+            if (ref_text.equals(cur_text)) {
+                add_ok_msg(ide_log, buff, xsd_name);
+            } else {
+                add_err_msg(ide_log, buff, xsd_name + " is out-of-date! Use 'Create/Overwrite XSD files'");
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void add_ok_msg(NbpIdeConsoleUtil ide_log, StringBuilder buff, String msg) {
+        buff.append("\r\n");
+        buff.append(msg);
+        buff.append(" -> OK");
+        ide_log.add_success_message(msg + " -> OK");
+    }
+
+    private void add_err_msg(NbpIdeConsoleUtil ide_log, StringBuilder buff, String msg) {
+        buff.append("\r\n[ERROR] ");
+        buff.append(msg);
+        ide_log.add_error_message(msg);
     }
 }

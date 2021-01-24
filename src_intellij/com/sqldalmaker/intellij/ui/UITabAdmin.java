@@ -335,7 +335,6 @@ public class UITabAdmin {
 
     private void validate_all() {
         StringBuilder buff = new StringBuilder();
-        String xml_meraprogram_folder_full_path = root_file.getParent().getPath();
         Settings sett = null;
         if (check_xsd(buff, Const.SETTINGS_XSD)) {
             try {
@@ -364,14 +363,14 @@ public class UITabAdmin {
     }
 
     private boolean check_xsd(StringBuilder buff, String xsd_name) {
-        VirtualFile sett = root_file.getParent().findChild(xsd_name);
-        if (sett == null) {
+        VirtualFile xsd_file = root_file.getParent().findChild(xsd_name);
+        if (xsd_file == null) {
             add_err_msg(buff, "File not found: " + xsd_name);
             return false;
         } else {
             String cur_text;
             try {
-                cur_text = Helpers.load_text_from_file(sett.getPath());
+                cur_text = Helpers.load_text_from_file(xsd_file.getPath());
             } catch (Exception ex) {
                 add_err_msg(buff, get_err_msg(ex));
                 return false;
