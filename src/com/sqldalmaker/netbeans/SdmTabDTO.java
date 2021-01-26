@@ -466,12 +466,16 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
                     int col = table.columnAtPoint(new Point(e.getX(), e.getY()));
                     int row = table.rowAtPoint(new Point(e.getX(), e.getY()));
                     if (row >= 0) {
-                        if (col == 0) {
-                            goto_dto_class_declaration_async();
-                        } else if (col == 1) {
-                            open_sql();
-                        } else {
-                            open_generated_source_file();
+                        switch (col) {
+                            case 0:
+                                goto_dto_class_declaration_async();
+                                break;
+                            case 1:
+                                open_sql();
+                                break;
+                            default:
+                                open_generated_source_file();
+                                break;
                         }
                     } else {
                         open_dto_xml();
