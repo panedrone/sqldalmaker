@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  The <plugins> element contains the description of the plugins available at this repository. Required.
+  Publishing a Plugin to a Custom Plugin Repository
+-->
+<plugins>
+    <!--
+      Each <plugin> element describes one plugin in the repository. Required.
+      id - used by JetBrains IDEs to uniquely identify a plugin. Required. Must match <id> in plugin.xml
+      url - path to download the plugin JAR/ZIP file. Required. Must be HTTPS
+      version - version of this plugin. Required. Must match <version> in plugin.xml
+    -->
+    <plugin id="dal-mpe" url="https://github.com/panedrone/sqldalmaker/releases/download/latest/sqldalmaker-intellij.zip" version="1.161">
+        <idea-version since-build="181.3" />
+    </plugin>
+</plugins>
