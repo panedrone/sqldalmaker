@@ -10,7 +10,7 @@
       url - path to download the plugin JAR/ZIP file. Required. Must be HTTPS
       version - version of this plugin. Required. Must match <version> in plugin.xml
     -->
-    <plugin id="dal-mpe" url="https://github.com/panedrone/sqldalmaker/releases/download/latest/sqldalmaker-intellij.zip" version="1.161">
-        <idea-version since-build="181.3" />
+    <plugin id="dal-mpe" url="https://github.com/panedrone/sqldalmaker/releases/download/latest/sqldalmaker-intellij.zip" version="1.161.2021-01">
+        <idea-version since-build="173.2099.1" />
     </plugin>
 </plugins>
