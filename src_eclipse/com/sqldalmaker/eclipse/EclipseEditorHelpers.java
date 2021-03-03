@@ -14,8 +14,10 @@ import java.sql.Connection;
 import javax.xml.bind.Marshaller;
 
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -52,43 +54,51 @@ public class EclipseEditorHelpers {
 
 	public static void open_editor_sync(ByteArrayOutputStream output_stream, String full_path, String title)
 			throws Exception {
-
 		IEditorInput ei = new MyStorageEditorInput(output_stream, full_path, title);
-
 		open_editor_sync(ei, full_path);
 	}
 
 	public static IEditorPart open_editor_sync(Shell shell, IFile file, boolean create_missing)
 			throws InternalException, PartInitException {
-
-		if (file == null || file.exists() == false) {
-
-			String title = file.getFullPath().toPortableString();
-
-			if (create_missing) {
-
-				if (EclipseMessageHelpers.show_confirmation(
-						"'" + title + "' does not exist. " + "Do you want to create a new one?") == false) {
-
-					return null;
-				}
-
-				create_new_file_sync(shell, file, (InputStream) null, title, (IProgressMonitor) null);
-
-			} else {
-
-				throw new InternalException("'" + title + "' not found. Try to refresh (F5).");
+		if (file == null) {
+			throw new InternalException("File not found.\r\nTry to refresh the project tree (F5).");
+		}
+		boolean exists = file.exists(); // false for Go
+		if (!exists) {
+			IProject project = file.getProject();
+			String path = file.getFullPath().toPortableString();
+			if (project == null) {
+				throw new InternalException("No project for " + path);
+			}
+			IContainer folder = file.getParent();
+			if (folder == null) {
+				throw new InternalException("No parent detected for " + path);
+			}
+			String name = file.getName();
+			IResource res = folder.findMember(name, true);
+			if (!(res instanceof IFile)) {
+				throw new InternalException("Not detected as file " + path);
 			}
 		}
-
-		return open_editor_sync(new FileEditorInput(file), file.getName());
+		if (exists || file.getName().endsWith(".go")) {
+			return open_editor_sync(new FileEditorInput(file), file.getName());
+		}
+		String title = file.getFullPath().toPortableString();
+		if (create_missing) {
+			if (EclipseMessageHelpers.show_confirmation(
+					"'" + title + "' does not exist. " + "Do you want to create a new one?") == false) {
+				return null;
+			}
+			create_new_file_sync(shell, file, (InputStream) null, title, (IProgressMonitor) null);
+		} else {
+			throw new InternalException("'" + title + "' not found.\r\nTry to refresh the project tree (F5).");
+		}
+		return null;
 	}
 
 	private static void create_new_file_sync(Shell shell, IFile new_file_handle, InputStream initial_contents,
 			String title, IProgressMonitor monitor) {
-
 		CreateFileOperation op = new CreateFileOperation(new_file_handle, null, initial_contents, title);
-
 		try {
 			// see bug
 			// https://bugs.eclipse.org/bugs/show_bug.cgi?id=219901
@@ -97,12 +107,9 @@ public class EclipseEditorHelpers {
 			// accidental file deletions.
 			//
 			op.execute(monitor, WorkspaceUndoUtil.getUIInfoAdapter(shell));
-
 		} catch (final ExecutionException e) {
-
 			shell.getDisplay().syncExec(new Runnable() {
 				public void run() {
-
 					EclipseMessageHelpers.show_error(e);
 				}
 			});
@@ -111,167 +118,102 @@ public class EclipseEditorHelpers {
 
 	public static IEditorPart open_editor_sync(IEditorInput editor_input, String file_name)
 			throws PartInitException, InternalException {
-
 		IEditorRegistry r = PlatformUI.getWorkbench().getEditorRegistry();
-
 		IEditorDescriptor desc = r.getDefaultEditor(file_name);
-
 		// Eclipse for RCP and RAP Developers' does not have SQL editor
-
 		if (desc == null) {
-
 			desc = r.getDefaultEditor("*.txt");
 		}
-
 		if (desc == null) {
-
 			throw new InternalException("Cannot obtain editor descriptor.");
 		}
-
 		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-
 		IEditorPart editor_part;
-
 		try {
-
 			editor_part = page.openEditor(editor_input, desc.getId());
-
 		} catch (Throwable ex) {
-
 			desc = r.getDefaultEditor("*.txt");
-
 			if (desc == null) {
-
 				throw new InternalException("Cannot obtain editor descriptor.");
 			}
-
 			editor_part = page.openEditor(editor_input, desc.getId());
 		}
-
 		return editor_part;
 	}
 
 	public static void open_dto_xml_in_editor_sync(com.sqldalmaker.jaxb.dto.ObjectFactory object_factory,
 			DtoClasses root) throws Exception {
-
 		Marshaller marshaller = XmlHelpers.create_marshaller(object_factory.getClass().getPackage().getName(),
 				Const.DTO_XSD);
-
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
-
 		try {
-
 			marshaller.marshal(root, out);
-
 			out.flush();
-
 			String text = new String(out.toByteArray());
-
 			String[] parts = text.split("\\?>");
-
 			text = parts[0] + Const.COMMENT_GENERATED_DTO_XML + parts[1];
-
 			ByteArrayOutputStream out2 = new ByteArrayOutputStream();
-
 			for (int i = 0; i < text.length(); ++i)
 				out2.write(text.charAt(i));
-
 			try {
-
 				open_editor_sync(out2, "dto.xml", "_dto.xml"); // '%' throws URI exception in NB
-
 			} finally {
-
 				out2.close();
 			}
-
 		} finally {
-
 			out.close();
 		}
 	}
 
 	public static void open_dao_xml_in_editor_sync(String instance_name, String file_name, Object root)
 			throws Exception {
-
 		Marshaller marshaller = XmlHelpers.create_marshaller(instance_name, Const.DAO_XSD);
-
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
-
 		try {
-
 			marshaller.marshal(root, out);
-
 			out.flush();
-
 			String text = new String(out.toByteArray());
-
 			String[] parts = text.split("\\?>");
-
 			text = parts[0] + Const.COMMENT_GENERATED_DAO_XML + parts[1];
-
 			ByteArrayOutputStream out2 = new ByteArrayOutputStream();
-
 			for (int i = 0; i < text.length(); ++i)
 				out2.write(text.charAt(i));
-
 			try {
-
 				open_editor_sync(out2, file_name, file_name); // '%' throws URI exception in NB
-
 			} finally {
-
 				out2.close();
 			}
-
 		} finally {
-
 			out.close();
 		}
 	}
 
 	public static void open_tmp_field_tags_sync(String class_name, String ref, IProject project, final IEditor2 editor2)
 			throws Exception {
-
 		String project_root = EclipseHelpers.get_absolute_dir_path_str(project);
-
 		Connection con = EclipseHelpers.get_connection(editor2);
-
 		try {
-
 			com.sqldalmaker.jaxb.dto.ObjectFactory object_factory = new com.sqldalmaker.jaxb.dto.ObjectFactory();
-
 			DtoClasses root = object_factory.createDtoClasses();
-
 			DtoClass cls = object_factory.createDtoClass();
 			cls.setName(class_name);
 			cls.setRef(ref);
 			root.getDtoClass().add(cls);
-
 			EclipseHelpers.gen_tmp_field_tags(con, object_factory, cls, project_root, editor2);
-
 			open_dto_xml_in_editor_sync(object_factory, root);
-
 		} finally {
-
 			con.close();
 		}
 	}
 
 	public static class MyStorageEditorInput extends PlatformObject implements IStorageEditorInput {
-
 		// ^^ "extends PlatformObject" is copy-paste from FileEditorInput
-
 		private IStorage storage;
-
 		private String title;
-
 		private String full_path;
-
 		private ByteArrayOutputStream output_stream;
 
 		private class MyStorage extends PlatformObject implements IStorage {
-
 			@SuppressWarnings({ "rawtypes", "unchecked" })
 			@Override
 			public Object getAdapter(Class adapter) {
@@ -280,22 +222,16 @@ public class EclipseEditorHelpers {
 
 			@Override
 			public InputStream getContents() throws CoreException {
-
 				try {
-
 					// Return new stream as many times as they want. It prevents
 					// java.io.IOException: Read error in
 					// org.eclipse.jdt.internal.ui.javaeditor.CompilationUnitDocumentProvider.createFakeCompiltationUnit(CompilationUnitDocumentProvider.java:1090)
 					// For example,
 					// org.eclipse.debug.core.sourcelookup.containers.LocalFileStorage.getContents()
 					// creates it each time;
-
 					ByteArrayInputStream res = new ByteArrayInputStream(output_stream.toByteArray());
-
 					return res;
-
 				} catch (Throwable e) {
-
 					return null;
 				}
 			}
@@ -319,13 +255,9 @@ public class EclipseEditorHelpers {
 		} /////////////////////////////////// end of class MyStorageEditorInput.MyStorage
 
 		public MyStorageEditorInput(ByteArrayOutputStream output_stream, String full_path, String title) {
-
 			this.output_stream = output_stream;
-
 			this.full_path = full_path;
-
 			this.title = title;
-
 			this.storage = new MyStorage();
 		}
 
@@ -367,9 +299,7 @@ public class EclipseEditorHelpers {
 
 		@Override
 		public boolean equals(Object obj) {
-
 			return false; // always create a new one
-
 			// equals(Object obj) is based on implementation from
 			// FileEditorInput class.
 			// It prevents opening multiple copies of the same resource

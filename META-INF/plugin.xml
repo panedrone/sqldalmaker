@@ -2,7 +2,7 @@
     <id>dal-mpe</id>
     <name>SQL DAL Maker</name>
     <category>Database</category>
-    <version>1.161.2021-01</version>
+    <version>1.162.2021-03</version>
     <vendor email="sqldalmaker@gmail.com"/>
     <!-- please see http://confluence.intellij.net/display/IDEADEV/Build+Number+Ranges for description -->
     <idea-version since-build="173.2099.1"/>
@@ -11,7 +11,7 @@
 
     <description><![CDATA[
 SQL DAL Maker is a generator of DTO and DAO classes to access relational databases. Target programming languages:
-PHP, Java, C++, Python, Ruby. To generate the class, you declare it in XML meta-program.<br/>
+PHP, Java, C++, Python, Ruby, and GoLang. To generate the class, you declare it in XML meta-program.<br/>
 <br/>
 <a href="https://github.com/panedrone/sqldalmaker/releases/tag/latest">Download mp4</a>
     ]]></description>
@@ -19,8 +19,8 @@ PHP, Java, C++, Python, Ruby. To generate the class, you declare it in XML meta-
     <change-notes>
         <![CDATA[
 <ul>
-<li>'Validate All' on the tab 'Admin'</li>
-<li>Fixes for SP returning Result-Set(s) implicitly</li>
+<li>Initial implementation for GoLang. Tested on SQLite3, Oracle, SQL Server.</li>
+<li>'Validate All' on the tab 'Admin'.</li>
 </ul>]]></change-notes>
 
     <application-components>

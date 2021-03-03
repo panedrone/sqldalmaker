@@ -77,7 +77,7 @@ public class EclipseConsoleHelpers {
 		MessageConsoleStream out = my_console.newMessageStream();
 		out.setActivateOnWrite(true); // // http://useof.org/java-open-source/org.eclipse.ui.console.MessageConsole
 		// https://stackoverflow.com/questions/207947/how-do-i-get-a-platform-dependent-new-line-character
-		out.println(String.format("[INFO] %s%n", msg));
+		out.println(String.format("%s%n", msg));
 		// myConsole.activate();
 		// === console (tab) may be created, but console view
 		// is hidden and located behind other consoles

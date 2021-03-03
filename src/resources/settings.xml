@@ -8,18 +8,20 @@
 
 	<folders target="src" sql="sqldalmaker/sql" />
 
-	<!-- scope: (only Java and PHP) package name of DTO classes for Java or 
-		name-space name of DTO classes for PHP; -->
+	<!-- scope (only Java, Go, PHP): the name of package (Java, Go) or name-space 
+		(PHP) for DTO; -->
 	<!-- inheritance: (only Java) fully-qualified name of base class; example 
 		for GWT: 1) inheritance="implements com.google.gwt.user.client.rpc.IsSerializable" 
 		2) target class: public class Word implements com.google.gwt.user.client.rpc.IsSerializable... -->
-	<!-- field-names-mode (Java only): 0 - as column names; 1 - camelCase; 2 - snake_case; -->
+	<!-- field-names-mode (Java only): 0 - as column names; 1 - camelCase; 2 
+		- snake_case; -->
+	<!-- single-file: for future use. -->
 
 	<dto scope="com.mycom.myproject.dto" inheritance=""
-		field-names-mode="0" />
+		field-names-mode="0" single-file="" />
 
-	<!-- scope: (only Java and PHP) package name of DAO classes for Java or 
-		namespace name of DAO classes for PHP; -->
+	<!-- scope (only Java, Go, PHP): the name of package (Java, Go) or name-space 
+		(PHP) for DAO; -->
 
 	<dao scope="com.mycom.myproject.dao" />
 
@@ -46,14 +48,42 @@
 		class="com.mysql.jdbc.Driver" url="jdbc:mysql://localhost/orders"
 		user="root" pwd="root" />
 
-	<!-- At the moment, type-map is used only for C++. Below is an example for 
-		C++ and SQLite. -->
+     <!-- tag 'type-map' aims to specify how the types detected by 
+          code generator (JDBC) or are rendered in target code. -->
 
+	<!-- Example for Go and SQLite3: -->
+
+	<type-map default="interface{}">
+		<type java="java.lang.Integer" target="int64" />
+		<type java="java.lang.Double" target="float64" />
+		<type java="java.lang.Float" target="float64" />
+		<type java="java.lang.String" target="string" />
+		<type java="byte[]" target="byte[]" />
+	</type-map>
+
+	<!-- if detected JDBC type is missing in 'type-map', then 'default' is used. -->
+	
+	<!-- if 'default' is empty, and JDBC type detected by code generator 
+	     is not "redefined", then this type is rendered as-is 
+	     (this is why type-map for Java+JDBC is not considered at all). -->
+
+	<!-- The types detected by JDBC and the types of Android run-time may differ: -->
+
+<!-- 
+	<type-map default="">
+		<type java="java.lang.Integer" target="java.lang.Long" />
+	</type-map>
+ -->
+ 
+ 	<!-- Example for C++ and SQLite3: -->
+
+<!-- 	
 	<type-map default="CValue">
 		<type java="java.lang.Long" target="CLong" />
 		<type java="java.lang.Double" target="CDouble" />
 		<type java="java.lang.String" target="CText" />
 		<type java="byte[]" target="CBlob" />
 	</type-map>
+-->
 
 </settings>

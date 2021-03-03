@@ -1,3 +1,8 @@
+2021-03-03
+
+    Initial implementation for GoLang. Tested on SQLite3, Oracle, SQL Server.
+    Update XSD files and check existing XML to conform updates.
+
 2021-01-23
 
     - 'Validate All' on the tab 'Admin'

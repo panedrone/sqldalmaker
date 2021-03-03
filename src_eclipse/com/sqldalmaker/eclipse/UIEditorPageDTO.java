@@ -504,7 +504,7 @@ public class UIEditorPageDTO extends Composite {
 						} catch (Throwable ex) {
 							String msg = ex.getMessage();
 							if (msg == null) {
-								msg = "???";
+								msg = "java.lang.NullPointerException. Try to update XSD files from the tab 'Admin'. Then check existing XML to conform updates.";
 							}
 							item.setStatus(msg);
 							// throw ex; // outer 'catch' cannot read the

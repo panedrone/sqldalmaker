@@ -69,6 +69,10 @@ public class Helpers {
         return Helpers.camel_case_to_lower_under_scores(class_name) + ".rb";
     }
 
+    public static String convert_to_golang_file_name(String class_name) {
+        return Helpers.camel_case_to_lower_under_scores(class_name) + ".go";
+    }
+    
     private static String java_primitive_name_to_class_name(String name) {
         Class<?> clazz = PRIMITIVE_CLASSES.get(name);
         if (clazz != null) {
@@ -307,7 +311,7 @@ public class Helpers {
         for (FieldInfo fi : fields) {
             String type = fi.getType();
             type = get_python_type_name(type);
-            fi.setType(type);
+            fi.set_type_by_map(type);
         }
     }
 
@@ -424,13 +428,16 @@ public class Helpers {
         return msg + " " + e.getMessage();
     }
 
-    static void validate_java_type_name(final String java_type_name) throws Exception {
+    static void validate_java_type_name(final String type_name) throws Exception {
+    	if (type_name == null) {
+            throw new Exception("Cannot detect type name. . Try to update XSD files from the tab 'Admin'. Then check existing XML to conform updates.");
+    	}
         String type;
-        String[] arr_parts = java_type_name.split("\\[");
+        String[] arr_parts = type_name.split("\\[");
         if (arr_parts.length == 2 && "]".equals(arr_parts[1].trim())) {
             type = arr_parts[0].trim();
         } else {
-            type = java_type_name;
+            type = type_name;
         }
         try {
             Helpers.process_java_type_name(type);
@@ -439,7 +446,7 @@ public class Helpers {
             try {
                 Helpers.process_java_type_name(java_class_name2);
             } catch (ClassNotFoundException e1) {
-                throw new Exception("Invalid type name: " + java_type_name);
+                throw new Exception("Invalid type name: " + type_name);
             }
         }
     }

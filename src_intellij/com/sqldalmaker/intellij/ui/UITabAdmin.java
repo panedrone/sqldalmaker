@@ -64,6 +64,8 @@ public class UITabAdmin {
     private JButton btn_php_oracle;
     private JButton btn_cx_Oracle;
     private JButton dataStorePhpOCI8Button;
+    private JButton btn_golang;
+    private JButton btn_golangVM;
 
     private Project project;
     private VirtualFile root_file;
@@ -177,7 +179,7 @@ public class UITabAdmin {
         java_vm.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                IdeaEditorHelpers.open_or_activate_jar_file_in_editor(project, "com/sqldalmaker/cg/java", "java.vm", "java.vm");
+                IdeaEditorHelpers.open_or_activate_jar_file_in_editor(project, "com/sqldalmaker/cg/java", "go.vm", "go.vm");
             }
         });
         cppVmButton.addActionListener(new ActionListener() {
@@ -327,6 +329,18 @@ public class UITabAdmin {
                 IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "DataStore_oci8.php", "DataStore_oci8.php");
             }
         });
+        btn_golang.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "data_store.go", "data_store.go");
+            }
+        });
+        btn_golangVM.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                IdeaEditorHelpers.open_or_activate_jar_file_in_editor(project, "com/sqldalmaker/cg/go", "go.vm", "go.vm");
+            }
+        });
     }
 
     private static String get_err_msg(Throwable ex) {
@@ -473,7 +487,7 @@ public class UITabAdmin {
         createOverwriteDtoXmlButton.setText("Create/Overwrite dto.xml");
         panel3.add(createOverwriteDtoXmlButton, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         final JPanel panel4 = new JPanel();
-        panel4.setLayout(new GridLayoutManager(9, 3, new Insets(10, 0, 0, 0), 1, -1));
+        panel4.setLayout(new GridLayoutManager(10, 3, new Insets(10, 0, 0, 0), 1, -1));
         panel1.add(panel4, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_NORTHWEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         dataStoreCATLButton = new JButton();
         dataStoreCATLButton.setText("DataStore, C++ (ATL, , SQLite3)");
@@ -532,8 +546,11 @@ public class UITabAdmin {
         dataStoreJavaAndroidButton = new JButton();
         dataStoreJavaAndroidButton.setText("DataStoreManager.java (Android)");
         panel4.add(dataStoreJavaAndroidButton, new GridConstraints(4, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        btn_golang = new JButton();
+        btn_golang.setText("data_store.go (database/sql)");
+        panel4.add(btn_golang, new GridConstraints(9, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JPanel panel5 = new JPanel();
-        panel5.setLayout(new GridLayoutManager(1, 5, new Insets(10, 0, 0, 0), 1, -1));
+        panel5.setLayout(new GridLayoutManager(1, 6, new Insets(10, 0, 0, 0), 1, -1));
         panel1.add(panel5, new GridConstraints(3, 0, 1, 1, GridConstraints.ANCHOR_NORTHWEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         php_vm = new JButton();
         php_vm.setText("php.vm");
@@ -547,6 +564,9 @@ public class UITabAdmin {
         pythonVmButton = new JButton();
         pythonVmButton.setText("python.vm");
         panel5.add(pythonVmButton, new GridConstraints(0, 3, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        btn_golangVM = new JButton();
+        btn_golangVM.setText("go.vm");
+        panel5.add(btn_golangVM, new GridConstraints(0, 5, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         rubyVmButton = new JButton();
         rubyVmButton.setText("ruby.vm");
         panel5.add(rubyVmButton, new GridConstraints(0, 4, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));

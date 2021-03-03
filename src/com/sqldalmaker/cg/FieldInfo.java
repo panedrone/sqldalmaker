@@ -50,10 +50,21 @@ public class FieldInfo {
         return this.field_type_name;
     }
 
-    public void setType(String field_type_name) {
+    boolean type_renamed = false;
+
+    public void set_type_by_map(String field_type_name) {
+    	if (type_renamed) {
+        	System.out.println(this.field_type_name);
+    		return;
+    	}
+    	type_renamed = true;
         this.field_type_name = field_type_name;
     }
 
+    public void refine_type(String field_type_name) {
+        this.field_type_name = field_type_name;
+    }
+    
     public String getName() {
         return this.field_name;
     }

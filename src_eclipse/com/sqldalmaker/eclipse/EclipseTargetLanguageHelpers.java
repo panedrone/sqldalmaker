@@ -20,6 +20,7 @@ import com.sqldalmaker.cg.Helpers;
 import com.sqldalmaker.cg.IDaoCG;
 import com.sqldalmaker.cg.IDtoCG;
 import com.sqldalmaker.cg.cpp.CppCG;
+import com.sqldalmaker.cg.go.GoCG;
 import com.sqldalmaker.cg.java.JavaCG;
 import com.sqldalmaker.cg.php.PhpCG;
 import com.sqldalmaker.cg.python.PythonCG;
@@ -70,6 +71,10 @@ public class EclipseTargetLanguageHelpers {
 			root_files.add((IFile) res);
 		}
 		res = xml_mp_folder.findMember(RootFileName.RUBY);
+		if (res instanceof IFile) {
+			root_files.add((IFile) res);
+		}
+		res = xml_mp_folder.findMember(RootFileName.GO);
 		if (res instanceof IFile) {
 			root_files.add((IFile) res);
 		}
@@ -156,6 +161,17 @@ public class EclipseTargetLanguageHelpers {
 			CppCG.DTO gen = new CppCG.DTO(dto_classes, settings.getTypeMap(), conn, sql_root_abs_path,
 					settings.getCpp().getClassPrefix(), vm_file_system_path);
 			return gen;
+		} else if (RootFileName.GO.equals(root_file_name)) {
+			if (output_dir != null) {
+				String rel_path = settings.getFolders().getTarget();
+				String abs_path = EclipseHelpers.get_absolute_dir_path_str(project, rel_path);
+				output_dir.append(abs_path);
+			}
+			String dto_package = settings.getDto().getScope();
+			String dto_inheritance = settings.getDto().getInheritance();
+			GoCG.DTO gen = new GoCG.DTO(dto_classes, settings.getTypeMap(), conn, dto_package, dto_inheritance, sql_root_abs_path,
+					vm_file_system_path);
+			return gen;
 		} else {
 			throw new Exception(get_unknown_root_file_msg(root_file_name));
 		}
@@ -240,6 +256,15 @@ public class EclipseTargetLanguageHelpers {
 			CppCG.DAO gen = new CppCG.DAO(dto_classes, settings.getTypeMap(), conn, sql_root_abs_path, class_prefix,
 					vm_file_system_path);
 			return gen;
+		} else if (RootFileName.GO.equals(root_fn)) {
+			if (output_dir != null) {
+				String rel_path = settings.getFolders().getTarget();
+				String abs_path = EclipseHelpers.get_absolute_dir_path_str(project, rel_path);
+				output_dir.append(abs_path);
+			}
+			String dto_package = settings.getDto().getScope();
+			GoCG.DAO gen = new GoCG.DAO(dto_classes, settings.getTypeMap(), conn, dto_package, sql_root_abs_path, vm_file_system_path);
+			return gen;
 		} else {
 			throw new Exception(get_unknown_root_file_msg(root_fn));
 		}
@@ -263,6 +288,9 @@ public class EclipseTargetLanguageHelpers {
 			return project.getFile(path);
 		} else if (RootFileName.RUBY.equals(root_fn)) {
 			String path = settings.getFolders().getTarget() + "/" + Helpers.convert_to_ruby_file_name(class_name);
+			return project.getFile(path);
+		} else if (RootFileName.GO.equals(root_fn)) {
+			String path = settings.getFolders().getTarget() + "/" + Helpers.convert_to_golang_file_name(class_name);
 			return project.getFile(path);
 		}
 		throw new Exception(get_unknown_root_file_msg(root_fn));
@@ -290,6 +318,10 @@ public class EclipseTargetLanguageHelpers {
 		if (res instanceof IFile) {
 			return res;
 		}
+		res = meta_program_location.findMember(RootFileName.GO);
+		if (res instanceof IFile) {
+			return res;
+		}
 		throw new Exception("Root file not found");
 	}
 
@@ -311,6 +343,8 @@ public class EclipseTargetLanguageHelpers {
 			return output_dir + "/" + class_name + ".java";
 		} else if (RootFileName.CPP.equals(fn)) {
 			return output_dir + "/" + class_name + ".h";
+		} else if (RootFileName.GO.equals(fn)) {
+			return output_dir + "/" + class_name + ".go";
 		}
 		return null;
 	}
@@ -323,8 +357,9 @@ public class EclipseTargetLanguageHelpers {
 	public static String get_root_file_relative_path(final IFile file) {
 
 		String fn = file.getName();
-		if (RootFileName.JAVA.equals(fn) || RootFileName.CPP.equals(fn) || // ProfileNames.OBJC.equals(fn) ||
-				RootFileName.PHP.equals(fn) || RootFileName.PYTHON.equals(fn) || RootFileName.RUBY.equals(fn)) {
+		if (RootFileName.JAVA.equals(fn) || RootFileName.CPP.equals(fn) || 
+				RootFileName.PHP.equals(fn) || RootFileName.PYTHON.equals(fn) || RootFileName.RUBY.equals(fn) ||
+				RootFileName.GO.equals(fn)) {
 			try {
 				return file.getFullPath().toPortableString();
 			} catch (Exception e) {

@@ -8,7 +8,7 @@
       		default="true"
             name="SDM"
             icon="icons/sqldalmaker.gif"
-            filenames="php.dal, java.dal, cpp.dal, python.dal, ruby.dal"
+            filenames="php.dal, java.dal, cpp.dal, python.dal, ruby.dal, go.dal"
             class="com.sqldalmaker.eclipse.Editor2"
             id="com.sqldalmaker.eclipse.Editor">
       </editor>

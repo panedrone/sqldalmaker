@@ -17,4 +17,5 @@ public class RootFileName {
     public static final String PHP = "php.dal";
     public static final String PYTHON = "python.dal";
     public static final String RUBY = "ruby.dal";
+    public static final String GO = "go.dal";
 }

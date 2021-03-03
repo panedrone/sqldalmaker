@@ -110,7 +110,7 @@
                   </component>
                 </children>
               </grid>
-              <grid id="c482d" layout-manager="GridLayoutManager" row-count="9" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="1" vgap="-1">
+              <grid id="c482d" layout-manager="GridLayoutManager" row-count="10" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="1" vgap="-1">
                 <margin top="10" left="0" bottom="0" right="0"/>
                 <constraints>
                   <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="9" fill="0" indent="0" use-parent-layout="false"/>
@@ -270,9 +270,17 @@
                       <text value="DataStoreManager.java (Android)"/>
                     </properties>
                   </component>
+                  <component id="e9ae5" class="javax.swing.JButton" binding="btn_golang">
+                    <constraints>
+                      <grid row="9" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties>
+                      <text value="data_store.go (database/sql)"/>
+                    </properties>
+                  </component>
                 </children>
               </grid>
-              <grid id="4187c" layout-manager="GridLayoutManager" row-count="1" column-count="5" same-size-horizontally="false" same-size-vertically="false" hgap="1" vgap="-1">
+              <grid id="4187c" layout-manager="GridLayoutManager" row-count="1" column-count="6" same-size-horizontally="false" same-size-vertically="false" hgap="1" vgap="-1">
                 <margin top="10" left="0" bottom="0" right="0"/>
                 <constraints>
                   <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="9" fill="0" indent="0" use-parent-layout="false"/>
@@ -310,6 +318,14 @@
                     </constraints>
                     <properties>
                       <text value="python.vm"/>
+                    </properties>
+                  </component>
+                  <component id="b9c18" class="javax.swing.JButton" binding="btn_golangVM">
+                    <constraints>
+                      <grid row="0" column="5" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties>
+                      <text value="go.vm"/>
                     </properties>
                   </component>
                   <component id="2dce" class="javax.swing.JButton" binding="rubyVmButton" default-binding="true">

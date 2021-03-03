@@ -86,7 +86,7 @@ public class UIEditorPageDAO extends Composite {
 	private Action action_newXml;
 	private Action action_openXml;
 	private Action action_getCrudDao;
-	private Action action_open_java;
+	private Action action_goto_source;
 
 	private ToolBarManager toolBarManager;
 	private ToolBar toolBar1;
@@ -131,7 +131,7 @@ public class UIEditorPageDAO extends Composite {
 		toolkit.paintBordersFor(toolBar1);
 		toolBarManager.add(action_newXml);
 		toolBarManager.add(action_openXml);
-		toolBarManager.add(action_open_java);
+		toolBarManager.add(action_goto_source);
 		toolBarManager.add(action_getCrudDao);
 		toolBarManager.add(action_FK);
 		toolBarManager.add(action_refresh);
@@ -302,15 +302,15 @@ public class UIEditorPageDAO extends Composite {
 					.setImageDescriptor(ResourceManager.getImageDescriptor(UIEditorPageDAO.class, "/img/xmldoc.gif"));
 		}
 		{
-			action_open_java = new Action("") {
+			action_goto_source = new Action("") {
 				@Override
 				public void run() {
 					open_generated_source_file();
 				}
 			};
-			action_open_java.setImageDescriptor(
+			action_goto_source.setImageDescriptor(
 					ResourceManager.getImageDescriptor(UIEditorPageDAO.class, "/img/GeneratedFile.gif"));
-			action_open_java.setToolTipText("Go to generated source");
+			action_goto_source.setToolTipText("Go to generated source");
 		}
 		{
 			action_FK = new Action("") {
@@ -731,6 +731,6 @@ public class UIEditorPageDAO extends Composite {
 		}
 		action_generate.setEnabled(enabled);
 		action_openXml.setEnabled(enabled);
-		action_open_java.setEnabled(enabled);
+		action_goto_source.setEnabled(enabled);
 	}
 }

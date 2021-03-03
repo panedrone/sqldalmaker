@@ -243,8 +243,6 @@ public class UIEditorPageAdmin extends Composite {
 		btnDatastorejava.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		btnDatastorejava.setText("DataStore.java");
 		toolkit.adapt(btnDatastorejava, true, true);
-		new Label(composite_2, SWT.NONE);
-		new Label(composite_2, SWT.NONE);
 
 		Button btnDatastoreJavaDbutils = new Button(composite_2, SWT.NONE);
 		btnDatastoreJavaDbutils.addSelectionListener(new SelectionAdapter() {
@@ -269,7 +267,6 @@ public class UIEditorPageAdmin extends Composite {
 		btnNewButton_4.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		toolkit.adapt(btnNewButton_4, true, true);
 		btnNewButton_4.setText("DataStoreManager.java (Android)");
-		new Label(composite_2, SWT.NONE);
 
 		Button btnDatastoreCQt = new Button(composite_2, SWT.NONE);
 		btnDatastoreCQt.addSelectionListener(new SelectionAdapter() {
@@ -381,8 +378,22 @@ public class UIEditorPageAdmin extends Composite {
 		new Label(composite_2, SWT.NONE);
 		new Label(composite_2, SWT.NONE);
 
+		Button btnNewButton_8_1 = new Button(composite_2, SWT.NONE);
+		btnNewButton_8_1.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				// ending '_' because of bugs
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/data_store.go", "data_store.go_");
+			}
+		});
+		btnNewButton_8_1.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+		btnNewButton_8_1.setText("data_store.go (database/sql)");
+		toolkit.adapt(btnNewButton_8_1, true, true);
+		new Label(composite_2, SWT.NONE);
+		new Label(composite_2, SWT.NONE);
+
 		Composite composite_3 = new Composite(composite_top, SWT.NONE);
-		composite_3.setLayout(new GridLayout(5, false));
+		composite_3.setLayout(new GridLayout(6, false));
 
 		Button btnRecentChanges = new Button(composite_0, SWT.NONE);
 		btnRecentChanges.addSelectionListener(new SelectionAdapter() {
@@ -417,10 +428,10 @@ public class UIEditorPageAdmin extends Composite {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				EclipseResourceEditorHelpers.open_resource_file_in_text_editor("com/sqldalmaker/cg/java/java.vm",
-						"java.vm");
+						"go.vm");
 			}
 		});
-		button_1.setText("java.vm");
+		button_1.setText("go.vm");
 		toolkit.adapt(button_1, true, true);
 
 		Button button_2 = new Button(composite_3, SWT.NONE);
@@ -455,6 +466,16 @@ public class UIEditorPageAdmin extends Composite {
 		});
 		button_4.setText("ruby.vm");
 		toolkit.adapt(button_4, true, true);
+
+		Button button_4_1 = new Button(composite_3, SWT.NONE);
+		button_4_1.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				EclipseResourceEditorHelpers.open_resource_file_in_text_editor("com/sqldalmaker/cg/go/go.vm", "go.vm");
+			}
+		});
+		button_4_1.setText("go.vm");
+		toolkit.adapt(button_4_1, true, true);
 
 		Composite composite_text = new Composite(composite_top, SWT.NONE);
 		composite_text.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));

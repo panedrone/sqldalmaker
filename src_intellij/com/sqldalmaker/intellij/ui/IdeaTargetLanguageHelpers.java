@@ -15,6 +15,7 @@ import com.sqldalmaker.cg.Helpers;
 import com.sqldalmaker.cg.IDaoCG;
 import com.sqldalmaker.cg.IDtoCG;
 import com.sqldalmaker.cg.cpp.CppCG;
+import com.sqldalmaker.cg.go.GoCG;
 import com.sqldalmaker.cg.java.JavaCG;
 import com.sqldalmaker.cg.php.PhpCG;
 import com.sqldalmaker.cg.python.PythonCG;
@@ -61,6 +62,10 @@ public class IdeaTargetLanguageHelpers {
         if (root_file != null) {
             root_files.add(root_file);
         }
+        root_file = xml_metaprogram_dir.findFileByRelativePath(RootFileName.GO);
+        if (root_file != null) {
+            root_files.add(root_file);
+        }
         return root_files;
     }
 
@@ -79,6 +84,7 @@ public class IdeaTargetLanguageHelpers {
         consumer.consume(file_type, new ExactFileNameMatcher(RootFileName.PHP));
         consumer.consume(file_type, new ExactFileNameMatcher(RootFileName.PYTHON));
         consumer.consume(file_type, new ExactFileNameMatcher(RootFileName.RUBY));
+        consumer.consume(file_type, new ExactFileNameMatcher(RootFileName.GO));
     }
 
     private static String _get_unknown_root_file_msg(String fn) {
@@ -99,6 +105,8 @@ public class IdeaTargetLanguageHelpers {
             rel_path = settings.getFolders().getTarget() + "/" + Helpers.convert_to_ruby_file_name(value);
         } else if (RootFileName.CPP.equals(fn)) {
             rel_path = settings.getFolders().getTarget() + "/" + value + ".h";
+        } else if (RootFileName.GO.equals(fn)) {
+            rel_path = settings.getFolders().getTarget() + "/" + value + ".go";
         } else {
             throw new Exception(_get_unknown_root_file_msg(fn));
         }
@@ -119,6 +127,8 @@ public class IdeaTargetLanguageHelpers {
             file_name = Helpers.convert_to_ruby_file_name(class_name);
         } else if (RootFileName.CPP.equals(fn)) {
             file_name = class_name + ".h";
+        } else if (RootFileName.GO.equals(fn)) {
+            file_name = class_name + ".go";
         } else {
             throw new Exception(_get_unknown_root_file_msg(fn));
         }
@@ -151,6 +161,9 @@ public class IdeaTargetLanguageHelpers {
         } else if (RootFileName.CPP.equals(fn)) {
             String dao_destination = Helpers.concat_path(module_root, source_folder);
             file_name = Helpers.concat_path(dao_destination, class_name + ".h");
+        } else if (RootFileName.GO.equals(fn)) {
+            String dao_destination = Helpers.concat_path(module_root, source_folder);
+            file_name = Helpers.concat_path(dao_destination, class_name + ".go");
         } else {
             throw new Exception(_get_unknown_root_file_msg(fn));
         }
@@ -190,6 +203,9 @@ public class IdeaTargetLanguageHelpers {
         } else if (RootFileName.CPP.equals(fn)) {
             String dao_destination = Helpers.concat_path(module_root, source_folder);
             file_name = Helpers.concat_path(dao_destination, dao_class_name + ".h");
+        } else if (RootFileName.GO.equals(fn)) {
+            String dao_destination = Helpers.concat_path(module_root, source_folder);
+            file_name = Helpers.concat_path(dao_destination, dao_class_name + ".go");
         } else {
             throw new Exception(_get_unknown_root_file_msg(fn));
         }
@@ -214,7 +230,8 @@ public class IdeaTargetLanguageHelpers {
                 || //ProfileNames.OBJC.equals(fn) ||
                 RootFileName.PHP.equals(fn)
                 || RootFileName.PYTHON.equals(fn)
-                || RootFileName.RUBY.equals(fn)) {
+                || RootFileName.RUBY.equals(fn)
+                 || RootFileName.GO.equals(fn)) {
             try {
                 return IdeaHelpers.get_relative_path(project, file);
             } catch (Exception e) {
@@ -230,7 +247,8 @@ public class IdeaTargetLanguageHelpers {
                 // ProfileNames.OBJC.equals(file.getName()) ||
                 RootFileName.PHP.equals(file.getName()) ||
                 RootFileName.PYTHON.equals(file.getName()) ||
-                RootFileName.RUBY.equals(file.getName());
+                RootFileName.RUBY.equals(file.getName()) ||
+                RootFileName.GO.equals(file.getName());
     }
 
     public static IDtoCG create_dto_cg(
@@ -297,6 +315,13 @@ public class IdeaTargetLanguageHelpers {
                 output_dir_rel_path.append(package_rel_path);
             }
             return new RubyCG.DTO(dto_classes, connection, sql_root_abs_path, vm_file_system_path);
+        } else if (RootFileName.GO.equals(fn)) {
+            if (output_dir_rel_path != null) {
+                String package_rel_path = settings.getFolders().getTarget();
+                output_dir_rel_path.append(package_rel_path);
+            }
+            String dto_package = settings.getDto().getScope();
+            return new GoCG.DTO(dto_package, dto_classes, settings.getTypeMap(), connection, sql_root_abs_path, vm_file_system_path);
         } else {
             throw new Exception(_get_unknown_root_file_msg(fn));
         }
@@ -364,6 +389,13 @@ public class IdeaTargetLanguageHelpers {
                 output_dir_rel_path.append(package_rel_path);
             }
             return new RubyCG.DAO(dto_classes, con, sql_root_abs_path, vm_file_system_path);
+        } else if (RootFileName.GO.equals(fn)) {
+            if (output_dir_rel_path != null) {
+                String package_rel_path = settings.getFolders().getTarget();
+                output_dir_rel_path.append(package_rel_path);
+            }
+            String dao_package = settings.getDao().getScope();
+            return new GoCG.DAO(dao_package, dto_classes, settings.getTypeMap(), con, sql_root_abs_path, vm_file_system_path);
         } else {
             throw new Exception(_get_unknown_root_file_msg(fn));
         }
