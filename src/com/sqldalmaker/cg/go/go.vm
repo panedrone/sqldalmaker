@@ -130,4 +130,24 @@ func (dao *${class_name}) ${method_name}(#param_decls_dto($is_external_sql)p *${
     return dao.ds.execDML(sql#foreach($param in ${params}), p.${param.getName()}#end)
 }
 #end
+#if($plain_params)
+
+#if($method_type == "CREATE")
+// (C)RUD: ${table_name}
+#elseif($method_type == "UPDATE")
+// CR(U)D: ${table_name}
+#elseif($method_type == "DELETE")
+// CRU(D): ${table_name}
+#end
+// Returns the number of affected rows or -1 on error.
+
+func (dao *${class_name}) ${method_name}(#param_decls($is_external_sql $params)) int64 {
+#sql_var($is_external_sql $sql)
+#if ($method_type == "CREATE" || $method_type == "UPDATE" || $method_type == "DELETE")
+    return dao.ds.execDML(sql#foreach($param in ${params}), ${param.getName()}#end);
+#else
+    return dao.ds.execDML(sql#foreach($param in ${params2}), ${param.getName()}#end);
+#end
+}
+#end
 #end
