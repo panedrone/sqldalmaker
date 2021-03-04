@@ -1,90 +1,92 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <settings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:noNamespaceSchemaLocation="settings.xsd">
+          xsi:noNamespaceSchemaLocation="settings.xsd">
 
-	<!-- target: base path to the folder/package of generated files (relative 
-		to the project root); ensure presence of __init__.py for Python; -->
-	<!-- sql: base folder of SQL files (relative to the project root); -->
+    <!-- target: base path to the folder/package of generated files (relative
+        to the project root); ensure presence of __init__.py for Python; -->
+    <!-- sql: base folder of SQL files (relative to the project root); -->
 
-	<folders target="src" sql="sqldalmaker/sql" />
+    <folders target="src" sql="sqldalmaker/sql"/>
 
-	<!-- scope (only Java, Go, PHP): the name of package (Java, Go) or name-space 
-		(PHP) for DTO; -->
-	<!-- inheritance: (only Java) fully-qualified name of base class; example 
-		for GWT: 1) inheritance="implements com.google.gwt.user.client.rpc.IsSerializable" 
-		2) target class: public class Word implements com.google.gwt.user.client.rpc.IsSerializable... -->
-	<!-- field-names-mode (Java only): 0 - as column names; 1 - camelCase; 2 
-		- snake_case; -->
-	<!-- single-file: for future use. -->
+    <!-- scope (only Java, Go, PHP): the name of package (Java, Go) or name-space
+        (PHP) for DTO; -->
+    <!-- inheritance: (only Java) fully-qualified name of base class; example
+        for GWT: 1) inheritance="implements com.google.gwt.user.client.rpc.IsSerializable"
+        2) target class: public class Word implements com.google.gwt.user.client.rpc.IsSerializable... -->
+    <!-- field-names-mode (Java only): 0 - as column names; 1 - camelCase; 2
+        - snake_case; -->
+    <!-- single-file: for future use. -->
 
-	<dto scope="com.mycom.myproject.dto" inheritance=""
-		field-names-mode="0" single-file="" />
+    <dto scope="com.mycom.myproject.dto" inheritance=""
+         field-names-mode="0" single-file=""/>
 
-	<!-- scope (only Java, Go, PHP): the name of package (Java, Go) or name-space 
-		(PHP) for DAO; -->
+    <!-- scope (only Java, Go, PHP): the name of package (Java, Go) or name-space
+        (PHP) for DAO; -->
 
-	<dao scope="com.mycom.myproject.dao" />
+    <dao scope="com.mycom.myproject.dao"/>
 
-	<!-- location of external VM file (relative to the project root): -->
+    <!-- location of external VM file (relative to the project root): -->
 
-	<external-vm-file path="" />
+    <external-vm-file path=""/>
 
-	<!-- IDE integration -->
+    <!-- IDE integration -->
 
-	<ide event-log="true" />
+    <ide event-log="true"/>
 
-	<!-- prefix of generated C++ classes: -->
+    <!-- prefix of generated C++ classes: -->
 
-	<cpp class-prefix="" />
+    <cpp class-prefix=""/>
 
-	<!-- jar: location of JDBC driver JAR file (relative to the project root); -->
-	<!-- class: JDBC driver class name; -->
-	<!-- url: JDBC connection URL (use $PROJECT_DIR$ or ${project_loc} if you 
-		need to specify project path); -->
-	<!-- user: user name; -->
-	<!-- pwd: password; -->
+    <!-- jar: location of JDBC driver JAR file (relative to the project root); -->
+    <!-- class: JDBC driver class name; -->
+    <!-- url: JDBC connection URL (use $PROJECT_DIR$ or ${project_loc} if you
+        need to specify project path); -->
+    <!-- user: user name; -->
+    <!-- pwd: password; -->
 
-	<jdbc jar="lib/mysql-connector-java-5.1.22-bin.jar"
-		class="com.mysql.jdbc.Driver" url="jdbc:mysql://localhost/orders"
-		user="root" pwd="root" />
+    <jdbc jar="lib/mysql-connector-java-5.1.22-bin.jar"
+          class="com.mysql.jdbc.Driver" url="jdbc:mysql://localhost/orders"
+          user="root" pwd="root"/>
 
-     <!-- tag 'type-map' aims to specify how the types detected by 
-          code generator (JDBC) or are rendered in target code. -->
+    <!-- tag 'type-map' aims to specify how the types detected by
+         code generator (JDBC) are rendered in target code. -->
 
-	<!-- Example for Go and SQLite3: -->
+    <!-- if detected JDBC type is missing in 'type-map', then 'default' is used. -->
 
-	<type-map default="interface{}">
-		<type detected="java.lang.Integer" target="int64" />
-		<type detected="java.lang.Double" target="float64" />
-		<type detected="java.lang.Float" target="float64" />
-		<type detected="java.lang.String" target="string" />
-		<type detected="byte[]" target="byte[]" />
-	</type-map>
+    <!-- if 'default' is empty, detected type is renderes as-is. -->
 
-	<!-- if detected JDBC type is missing in 'type-map', then 'default' is used. -->
-	
-	<!-- if the type is defined in XML meta-program explicitly,
-	     it will be rendered as-is (without considering type-map) -->
+    <!-- this is why type-map for Java+JDBC is empty: -->
 
-	<!-- for Java+JDBC, type-map is not needed at all. -->
+    <type-map default="">
+    </type-map>
 
-	<!-- The types detected by JDBC and the types of Android run-time may differ: -->
+    <!-- The types detected by JDBC and the types of Android run-time may differ: -->
 
-<!-- 
-	<type-map default="">
-		<type detected="java.lang.Integer" target="java.lang.Long" />
-	</type-map>
- -->
- 
- 	<!-- Example for C++ and SQLite3: -->
+    <!--    <type-map default="">-->
+    <!--        <type detected="java.lang.Integer" target="java.lang.Long"/>-->
+    <!--    </type-map>-->
 
-<!-- 	
-	<type-map default="CValue">
-		<type detected="java.lang.Long" target="CLong" />
-		<type detected="java.lang.Double" target="CDouble" />
-		<type detected="java.lang.String" target="CText" />
-		<type detected="byte[]" target="CBlob" />
-	</type-map>
--->
+    <!-- if the type is defined in XML meta-program explicitly,
+         it will be rendered as-is anyway (without considering type-map) -->
+
+    <!-- Example for Go and SQLite3: -->
+
+    <!--    <type-map default="">-->
+    <!--        <type detected="java.lang.Integer" target="int64" />-->
+    <!--        <type detected="java.lang.Double" target="float64" />-->
+    <!--        <type detected="java.lang.Float" target="float64" />-->
+    <!--        <type detected="java.lang.String" target="string" />-->
+    <!--        <type detected="byte[]" target="byte[]" />-->
+    <!--        <type detected="java.lang.Object" target="interface{}" />-->
+    <!--    </type-map>-->
+
+    <!-- Example for C++ and SQLite3: -->
+
+    <!--    <type-map default="CValue">-->
+    <!--        <type detected="java.lang.Long" target="CLong"/>-->
+    <!--        <type detected="java.lang.Double" target="CDouble"/>-->
+    <!--        <type detected="java.lang.String" target="CText"/>-->
+    <!--        <type detected="byte[]" target="CBlob"/>-->
+    <!--    </type-map>-->
 
 </settings>

@@ -50,7 +50,6 @@ type ${class_name} struct {
 
 // (C)RUD: ${table_name}
 // Generated values are passed to DTO.
-// Returns the number of affected rows or -1 on error.
 
 func (dao *${class_name}) ${method_name}(p *${dto_param}) {
 #sql_var(false $sql)
@@ -80,7 +79,7 @@ func (dao *${class_name}) ${method_name}(#if(${dto_param} != "")#param_decls_dto
 #end
         res = append(res, obj)
     }
-    dao.ds.queryAllRows(sql, onDto#if(${dto_param} != "")#foreach($param in ${params}), p.${param.getterMethod()}()#end);#else#foreach($param in ${params}), ${param.getName()}#end)
+    dao.ds.queryAllRows(sql, onDto#if(${dto_param} != "")#foreach($param in ${params}), p.${param.getterMethod()}()#end)#else#foreach($param in ${params}), ${param.getName()}#end)
     return res
 #end
 #else
@@ -95,7 +94,7 @@ func (dao *${class_name}) ${method_name}(#if(${dto_param} != "")#param_decls_dto
 func (dao *${class_name}) ${method_name}(#if(${dto_param} != "")#param_decls_dto($is_external_sql)${dto_param} p#else#param_decls($is_external_sql $params)#end) ${returned_type_name} {
 #sql_var($is_external_sql $sql)
 #if($use_dto)
-    rd := dao.ds.queryRow(sql#if(${dto_param} != "")#foreach($param in ${params}), p.${param.getterMethod()}()#end);#else#foreach($param in ${params}), ${param.getName()}#end)
+    rd := dao.ds.queryRow(sql#if(${dto_param} != "")#foreach($param in ${params}), p.${param.getterMethod()}()#end)#else#foreach($param in ${params}), ${param.getName()}#end)
     obj := ${returned_type_name}{}
 #foreach($f in ${fields})
 #set($i = ${velocityCount} - 1)
@@ -144,9 +143,9 @@ func (dao *${class_name}) ${method_name}(#param_decls_dto($is_external_sql)p *${
 func (dao *${class_name}) ${method_name}(#param_decls($is_external_sql $params)) int64 {
 #sql_var($is_external_sql $sql)
 #if ($method_type == "CREATE" || $method_type == "UPDATE" || $method_type == "DELETE")
-    return dao.ds.execDML(sql#foreach($param in ${params}), ${param.getName()}#end);
+    return dao.ds.execDML(sql#foreach($param in ${params}), ${param.getName()}#end)
 #else
-    return dao.ds.execDML(sql#foreach($param in ${params2}), ${param.getName()}#end);
+    return dao.ds.execDML(sql#foreach($param in ${params2}), ${param.getName()}#end)
 #end
 }
 #end

@@ -231,7 +231,7 @@ public class IdeaTargetLanguageHelpers {
                 RootFileName.PHP.equals(fn)
                 || RootFileName.PYTHON.equals(fn)
                 || RootFileName.RUBY.equals(fn)
-                 || RootFileName.GO.equals(fn)) {
+                || RootFileName.GO.equals(fn)) {
             try {
                 return IdeaHelpers.get_relative_path(project, file);
             } catch (Exception e) {
@@ -286,7 +286,7 @@ public class IdeaTargetLanguageHelpers {
                 String package_rel_path = SdmUtils.get_package_relative_path(settings, dto_package);
                 output_dir_rel_path.append(package_rel_path);
             }
-            return new JavaCG.DTO(dto_classes, connection, dto_package, sql_root_abs_path, dto_inheritance,
+            return new JavaCG.DTO(dto_classes, settings.getTypeMap(), connection, dto_package, sql_root_abs_path, dto_inheritance,
                     field_names_mode, vm_file_system_path);
         } else if (RootFileName.CPP.equals(fn)) {
             if (output_dir_rel_path != null) {
@@ -361,7 +361,7 @@ public class IdeaTargetLanguageHelpers {
                 String package_rel_path = SdmUtils.get_package_relative_path(settings, dao_package);
                 output_dir_rel_path.append(package_rel_path);
             }
-            return new JavaCG.DAO(dto_classes, con, dto_package, dao_package, sql_root_abs_path, field_names_mode, vm_file_system_path);
+            return new JavaCG.DAO(dto_classes, settings.getTypeMap(), con, dto_package, dao_package, sql_root_abs_path, field_names_mode, vm_file_system_path);
         } else if (RootFileName.CPP.equals(fn)) {
             if (output_dir_rel_path != null) {
                 String package_rel_path = settings.getFolders().getTarget();

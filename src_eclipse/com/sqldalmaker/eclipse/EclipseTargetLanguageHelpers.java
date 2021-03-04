@@ -286,10 +286,10 @@ public class EclipseTargetLanguageHelpers {
 			String path = settings.getFolders().getTarget() + "/" + class_name + ".py";
 			return project.getFile(path);
 		} else if (RootFileName.RUBY.equals(root_fn)) {
-			String path = settings.getFolders().getTarget() + "/" + Helpers.convert_to_ruby_file_name(class_name);
+			String path = settings.getFolders().getTarget() + "/" + Helpers.convert_to_lower_underscores_file_name(class_name, "rb");
 			return project.getFile(path);
 		} else if (RootFileName.GO.equals(root_fn)) {
-			String path = settings.getFolders().getTarget() + "/" + Helpers.convert_to_golang_file_name(class_name);
+			String path = settings.getFolders().getTarget() + "/" + Helpers.convert_to_lower_underscores_file_name(class_name, "go");
 			return project.getFile(path);
 		}
 		throw new Exception(get_unknown_root_file_msg(root_fn));
@@ -333,7 +333,7 @@ public class EclipseTargetLanguageHelpers {
 	public static String get_rel_path(String fn, StringBuilder output_dir, String class_name) {
 
 		if (RootFileName.RUBY.equals(fn)) {
-			return output_dir + "/" + Helpers.convert_to_ruby_file_name(class_name);
+			return output_dir + "/" + Helpers.convert_to_lower_underscores_file_name(class_name, "rb");
 		} else if (RootFileName.PYTHON.equals(fn)) {
 			return output_dir + "/" + class_name + ".py";
 		} else if (RootFileName.PHP.equals(fn)) {
@@ -343,7 +343,7 @@ public class EclipseTargetLanguageHelpers {
 		} else if (RootFileName.CPP.equals(fn)) {
 			return output_dir + "/" + class_name + ".h";
 		} else if (RootFileName.GO.equals(fn)) {
-			return output_dir + "/" + class_name + ".go";
+			return output_dir + "/" + Helpers.convert_to_lower_underscores_file_name(class_name, "go");
 		}
 		return null;
 	}

@@ -13,7 +13,7 @@
 				<xs:element ref="ide" minOccurs="1" maxOccurs="1" />
 				<xs:element ref="cpp" minOccurs="1" maxOccurs="1" />
 				<xs:element ref="jdbc" minOccurs="1" maxOccurs="1" />
-				<xs:element ref="type-map" minOccurs="0" maxOccurs="1" />
+				<xs:element ref="type-map" minOccurs="1" maxOccurs="1" />
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>

@@ -9,6 +9,7 @@ import com.sqldalmaker.cg.*;
 import com.sqldalmaker.jaxb.dao.*;
 import com.sqldalmaker.jaxb.dto.DtoClass;
 import com.sqldalmaker.jaxb.dto.DtoClasses;
+import com.sqldalmaker.jaxb.settings.TypeMap;
 
 import java.io.StringWriter;
 import java.sql.Connection;
@@ -32,8 +33,8 @@ public class JavaCG {
         private final TemplateEngine te;
         private final JdbcUtils db_utils;
 
-        public DTO(DtoClasses jaxb_dto_classes, Connection connection, String dto_package, String sql_root_abs_path,
-                String dto_inheritance, FieldNamesMode field_names_mode, String vm_file_system_dir) throws Exception {
+        public DTO(DtoClasses jaxb_dto_classes, TypeMap type_map, Connection connection, String dto_package, String sql_root_abs_path,
+                   String dto_inheritance, FieldNamesMode field_names_mode, String vm_file_system_dir) throws Exception {
             this.jaxb_dto_classes = jaxb_dto_classes.getDtoClass();
             this.dto_package = dto_package;
             this.sql_root_abs_path = sql_root_abs_path;
@@ -43,7 +44,7 @@ public class JavaCG {
             } else {
                 te = new TemplateEngine(vm_file_system_dir, true);
             }
-            db_utils = new JdbcUtils(connection, field_names_mode, null);
+            db_utils = new JdbcUtils(connection, field_names_mode, type_map);
         }
 
         @Override
@@ -85,7 +86,7 @@ public class JavaCG {
         private final TemplateEngine te;
         private final JdbcUtils db_utils;
 
-        public DAO(DtoClasses jaxb_dto_classes, Connection connection, String dto_package, String dao_package,
+        public DAO(DtoClasses jaxb_dto_classes, TypeMap type_map, Connection connection, String dto_package, String dao_package,
                 String sql_root_abs_path, FieldNamesMode field_names_mode, String vm_file_system_dir) throws Exception {
             this.jaxb_dto_classes = jaxb_dto_classes;
             this.dto_package = dto_package;
@@ -96,7 +97,7 @@ public class JavaCG {
             } else {
                 te = new TemplateEngine(vm_file_system_dir, true);
             }
-            db_utils = new JdbcUtils(connection, field_names_mode, null);
+            db_utils = new JdbcUtils(connection, field_names_mode, type_map);
         }
 
         @Override
