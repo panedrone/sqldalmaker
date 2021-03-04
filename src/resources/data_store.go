@@ -8,7 +8,7 @@ import (
 
 	// _ "github.com/mattn/go-sqlite3"		// SQLite3
 	// _ "github.com/go-sql-driver/mysql"	// MySQL
-	_ "github.com/denisenkom/go-mssqldb"	// SQL Server
+	_ "github.com/denisenkom/go-mssqldb" // SQL Server
 	// _ "github.com/godror/godror"			// Oracle
 )
 
@@ -16,7 +16,7 @@ import (
    SQL DAL Maker Web-Site: http://sqldalmaker.sourceforge.net
    This is an example of how to implement DataStore in GoLang using "database/sql".
    Copy-paste this code to your project and change it for your needs.
-   Improvements are welcome: sqldalmaker@gmail.com
+   Improvements are welcome: sdm@gmail.com
 */
 
 type DataStore struct {
@@ -26,14 +26,16 @@ type DataStore struct {
 
 func (ds *DataStore) open() {
 	var err error
+	ds.handle, err = sql.Open("sqlite3", "./todo-list.sqlite")
+
 	// ds.handle, _ = sql.Open("sqlite3", "./sqlite-database.db")
 	// ds.handle, _ = sql.Open("mysql", "root:root@/sakila")
 	// -----------------
 	// SQL Server https://github.com/denisenkom/go-mssqldb
 	// The sqlserver driver uses normal MS SQL Server syntax and expects parameters in the
 	// sql query to be in the form of either @Name or @p1 to @pN (ordinal position).
-	ds.paramPrefix = "@p"
-	ds.handle, err = sql.Open("sqlserver", "sa:root@/localhost:1433/SQLExpress?database=AdventureWorks2014")
+	// ds.paramPrefix = "@p"
+	// ds.handle, err = sql.Open("sqlserver", "sa:root@/localhost:1433/SQLExpress?database=AdventureWorks2014")
 	// -----------------
 	//ds.paramPrefix = ":"
 	//ds.handle, _ = sql.Open("godror", `user="ORDERS" password="root" connectString="localhost:1521/orcl"`)
@@ -121,7 +123,7 @@ func (ds *DataStore) queryAll(sql string, args ...interface{}) []interface{} {
 		values := make([]string, len(rowData))
 		arr = append(arr, values[0])
 	}
-	ds.queryAllRows(sql, onRowHandler, args)
+	ds.queryAllRows(sql, onRowHandler, args...)
 	return arr
 }
 
@@ -130,7 +132,7 @@ func (ds *DataStore) queryRow(sql string, args ...interface{}) map[string]interf
 	onRowHandler := func(rowData map[string]interface{}) {
 		arr = append(arr, rowData)
 	}
-	ds.queryAllRows(sql, onRowHandler, args)
+	ds.queryAllRows(sql, onRowHandler, args...)
 	if arr == nil || len(arr) == 0 {
 		return nil
 	}
