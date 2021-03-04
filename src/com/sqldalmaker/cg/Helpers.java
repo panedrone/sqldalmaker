@@ -63,16 +63,12 @@ public class Helpers {
         return src.replaceAll(regex, replacement).toLowerCase();
     }
 
-    public static String convert_to_ruby_file_name(String class_name) {
+    public static String convert_to_lower_underscores_file_name(String class_name, String ext) {
         // http://stackoverflow.com/questions/221320/standard-file-naming-conventions-in-ruby
         // In Rails the convention of using underscores is necessary (almost).
-        return Helpers.camel_case_to_lower_under_scores(class_name) + ".rb";
+        return Helpers.camel_case_to_lower_under_scores(class_name) + "." + ext;
     }
 
-    public static String convert_to_golang_file_name(String class_name) {
-        return Helpers.camel_case_to_lower_under_scores(class_name) + ".go";
-    }
-    
     private static String java_primitive_name_to_class_name(String name) {
         Class<?> clazz = PRIMITIVE_CLASSES.get(name);
         if (clazz != null) {
@@ -351,39 +347,6 @@ public class Helpers {
 
     public static void convert_to_ruby_type_names(List<FieldInfo> fields) {
 
-    }
-
-    private static String get_qualified_name(String java_class_name) {
-        java_class_name = java_class_name.replaceAll("\\s+", "");
-        String element_name;
-        boolean is_array;
-        if (java_class_name.contains("[")) {
-            element_name = java_class_name.replace('[', ' ').replace(']', ' ').trim();
-            is_array = true;
-        } else {
-            is_array = false;
-            element_name = java_class_name;
-        }
-        boolean is_primitive = Helpers.PRIMITIVE_CLASSES.containsKey(element_name);
-        if (!is_primitive && !java_class_name.contains(".")) {
-            element_name = "java.lang." + element_name;
-        }
-        java_class_name = element_name;
-        if (is_array) {
-            java_class_name += " []";
-        }
-        return java_class_name;
-    }
-
-    public static String get_cpp_class_name_from_java_class_name(TypeMap jaxb_type_map, String java_class_name) {
-        String s1 = get_qualified_name(java_class_name);
-        for (Type t : jaxb_type_map.getType()) {
-            String s2 = get_qualified_name(t.getJava());
-            if (s2.equals(s1)) {
-                return t.getTarget();
-            }
-        }
-        return jaxb_type_map.getDefault();
     }
 
     public static StringBuilder get_only_pk_warning(String method_name) {

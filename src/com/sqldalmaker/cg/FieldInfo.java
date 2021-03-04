@@ -30,7 +30,9 @@ public class FieldInfo {
         if (FieldNamesMode.LOWER_CASE.equals(field_names_mode)) {
             this.field_name = this.field_name.toLowerCase();
         } else if (FieldNamesMode.LOWER_CAMEL_CASE.equals(field_names_mode)) {
-            this.field_name = toLowerCamelCase(this.field_name);
+            this.field_name = toCamelCase(this.field_name, false);
+        } else if (FieldNamesMode.TITLE_CASE.equals(field_names_mode)) {
+            this.field_name = toCamelCase(this.field_name, true);
         } else if (FieldNamesMode.SNAKE_CASE.equals(field_names_mode)) {
             this.field_name = Helpers.camel_case_to_lower_under_scores(this.field_name);
             this.name_prefix = "_";
@@ -99,7 +101,7 @@ public class FieldInfo {
         return "set" + X;
     }
 
-    public static String toLowerCamelCase(String str) {
+    public static String toCamelCase(String str, boolean title_case) {
         if (!str.contains("_")) {
             boolean all_is_upper_case = Helpers.is_upper_case(str);
             if (all_is_upper_case) {
@@ -123,6 +125,10 @@ public class FieldInfo {
                     sb.append(s.substring(1).toLowerCase());
                 }
             }
+        }
+        if (title_case) {
+            char upper = Character.toTitleCase(sb.charAt(0));
+            sb.setCharAt(0, upper);
         }
         return sb.toString();
     }

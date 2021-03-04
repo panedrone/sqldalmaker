@@ -102,11 +102,11 @@ public class IdeaTargetLanguageHelpers {
         } else if (RootFileName.PYTHON.equals(fn)) {
             rel_path = settings.getFolders().getTarget() + "/" + value + ".py";
         } else if (RootFileName.RUBY.equals(fn)) {
-            rel_path = settings.getFolders().getTarget() + "/" + Helpers.convert_to_ruby_file_name(value);
+            rel_path = settings.getFolders().getTarget() + "/" + Helpers.convert_to_lower_underscores_file_name(value, "rb");
         } else if (RootFileName.CPP.equals(fn)) {
             rel_path = settings.getFolders().getTarget() + "/" + value + ".h";
         } else if (RootFileName.GO.equals(fn)) {
-            rel_path = settings.getFolders().getTarget() + "/" + value + ".go";
+            rel_path = settings.getFolders().getTarget() + "/" + Helpers.convert_to_lower_underscores_file_name(value, "go");
         } else {
             throw new Exception(_get_unknown_root_file_msg(fn));
         }
@@ -124,11 +124,11 @@ public class IdeaTargetLanguageHelpers {
         } else if (RootFileName.PYTHON.equals(fn)) {
             file_name = class_name + ".py";
         } else if (RootFileName.RUBY.equals(fn)) {
-            file_name = Helpers.convert_to_ruby_file_name(class_name);
+            file_name = Helpers.convert_to_lower_underscores_file_name(class_name, "rb");
         } else if (RootFileName.CPP.equals(fn)) {
             file_name = class_name + ".h";
         } else if (RootFileName.GO.equals(fn)) {
-            file_name = class_name + ".go";
+            file_name = Helpers.convert_to_lower_underscores_file_name(class_name, "go");
         } else {
             throw new Exception(_get_unknown_root_file_msg(fn));
         }
@@ -157,13 +157,13 @@ public class IdeaTargetLanguageHelpers {
             file_name = Helpers.concat_path(dao_destination, class_name + ".py");
         } else if (RootFileName.RUBY.equals(fn)) {
             String dao_destination = Helpers.concat_path(module_root, source_folder);
-            file_name = Helpers.concat_path(dao_destination, Helpers.convert_to_ruby_file_name(class_name));
+            file_name = Helpers.concat_path(dao_destination, Helpers.convert_to_lower_underscores_file_name(class_name, "rb"));
         } else if (RootFileName.CPP.equals(fn)) {
             String dao_destination = Helpers.concat_path(module_root, source_folder);
             file_name = Helpers.concat_path(dao_destination, class_name + ".h");
         } else if (RootFileName.GO.equals(fn)) {
             String dao_destination = Helpers.concat_path(module_root, source_folder);
-            file_name = Helpers.concat_path(dao_destination, class_name + ".go");
+            file_name = Helpers.concat_path(dao_destination, Helpers.convert_to_lower_underscores_file_name(class_name, "go"));
         } else {
             throw new Exception(_get_unknown_root_file_msg(fn));
         }
@@ -199,13 +199,13 @@ public class IdeaTargetLanguageHelpers {
             file_name = Helpers.concat_path(dao_destination, dao_class_name + ".py");
         } else if (RootFileName.RUBY.equals(fn)) {
             String dao_destination = Helpers.concat_path(module_root, source_folder);
-            file_name = Helpers.concat_path(dao_destination, Helpers.convert_to_ruby_file_name(dao_class_name));
+            file_name = Helpers.concat_path(dao_destination, Helpers.convert_to_lower_underscores_file_name(dao_class_name, "rb"));
         } else if (RootFileName.CPP.equals(fn)) {
             String dao_destination = Helpers.concat_path(module_root, source_folder);
             file_name = Helpers.concat_path(dao_destination, dao_class_name + ".h");
         } else if (RootFileName.GO.equals(fn)) {
             String dao_destination = Helpers.concat_path(module_root, source_folder);
-            file_name = Helpers.concat_path(dao_destination, dao_class_name + ".go");
+            file_name = Helpers.concat_path(dao_destination, Helpers.convert_to_lower_underscores_file_name(dao_class_name, "go"));
         } else {
             throw new Exception(_get_unknown_root_file_msg(fn));
         }

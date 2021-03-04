@@ -199,7 +199,7 @@ public class RubyCG {
         private String _get_rendered_dto_class_name(String dto_class_name, boolean add_to_import) throws Exception {
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
             if (add_to_import) {
-                String s = Helpers.convert_to_ruby_file_name(jaxb_dto_class.getName());
+                String s = Helpers.convert_to_lower_underscores_file_name(jaxb_dto_class.getName(), "rb");
                 imports.add(s);
             }
             return jaxb_dto_class.getName();

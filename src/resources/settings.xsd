@@ -81,7 +81,7 @@
 	</xs:element>
 	<xs:element name="type">
 		<xs:complexType>
-			<xs:attribute name="java" use="required" type="xs:string" />
+			<xs:attribute name="detected" use="required" type="xs:string" />
 			<xs:attribute name="target" use="required" type="xs:string" />
 		</xs:complexType>
 	</xs:element>

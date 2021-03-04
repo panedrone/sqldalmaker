@@ -168,8 +168,7 @@ public class EclipseTargetLanguageHelpers {
 				output_dir.append(abs_path);
 			}
 			String dto_package = settings.getDto().getScope();
-			String dto_inheritance = settings.getDto().getInheritance();
-			GoCG.DTO gen = new GoCG.DTO(dto_classes, settings.getTypeMap(), conn, dto_package, dto_inheritance, sql_root_abs_path,
+			GoCG.DTO gen = new GoCG.DTO(dto_package, dto_classes, settings.getTypeMap(), conn, sql_root_abs_path,
 					vm_file_system_path);
 			return gen;
 		} else {
@@ -262,8 +261,8 @@ public class EclipseTargetLanguageHelpers {
 				String abs_path = EclipseHelpers.get_absolute_dir_path_str(project, rel_path);
 				output_dir.append(abs_path);
 			}
-			String dto_package = settings.getDto().getScope();
-			GoCG.DAO gen = new GoCG.DAO(dto_classes, settings.getTypeMap(), conn, dto_package, sql_root_abs_path, vm_file_system_path);
+			String dao_package = settings.getDao().getScope();
+			GoCG.DAO gen = new GoCG.DAO(dao_package, dto_classes, settings.getTypeMap(), conn, sql_root_abs_path, vm_file_system_path);
 			return gen;
 		} else {
 			throw new Exception(get_unknown_root_file_msg(root_fn));

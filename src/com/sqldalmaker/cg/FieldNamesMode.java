@@ -10,5 +10,5 @@ package com.sqldalmaker.cg;
  */
 public enum FieldNamesMode {
 
-    AS_IS, LOWER_CASE, LOWER_CAMEL_CASE, SNAKE_CASE
+    AS_IS, LOWER_CASE, LOWER_CAMEL_CASE, SNAKE_CASE, TITLE_CASE
 }

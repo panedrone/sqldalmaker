@@ -45,7 +45,7 @@ public class GoCG {
             } else {
                 te = new TemplateEngine(vm_file_system_dir, true);
             }
-            db_utils = new JdbcUtils(connection, FieldNamesMode.LOWER_CAMEL_CASE, type_map);
+            db_utils = new JdbcUtils(connection, FieldNamesMode.TITLE_CASE, type_map);
         }
 
         @Override
@@ -100,7 +100,7 @@ public class GoCG {
             } else {
                 te = new TemplateEngine(vm_file_system_dir, true);
             }
-            db_utils = new JdbcUtils(connection, FieldNamesMode.LOWER_CAMEL_CASE, type_map);
+            db_utils = new JdbcUtils(connection, FieldNamesMode.TITLE_CASE, type_map);
         }
 
         @Override

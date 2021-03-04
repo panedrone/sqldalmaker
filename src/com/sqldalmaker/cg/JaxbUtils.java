@@ -215,7 +215,7 @@ public class JaxbUtils {
         List<DtoClass.Field> fields = jaxb_dto_class.getField();
         Set<String> col_names = new HashSet<String>();
         for (DtoClass.Field fe : fields) {
-            String java_class_name = fe.getType();
+            // String java_class_name = fe.getType();
             // Helpers.validate_java_type_name(java_class_name); it may be not java from now
             String col = fe.getColumn();
             if (col == null || col.trim().length() == 0) {

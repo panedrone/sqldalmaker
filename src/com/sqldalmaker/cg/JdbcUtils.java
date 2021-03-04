@@ -20,12 +20,13 @@ public class JdbcUtils {
 
     private final Connection conn;
     private final FieldNamesMode field_names_mode;
-    private final TypeMap type_map;
 
-    public JdbcUtils(Connection conn, FieldNamesMode field_names_mode, TypeMap type_map) {
+    private final TypeMapManager type_map;
+
+    public JdbcUtils(Connection conn, FieldNamesMode field_names_mode, TypeMap type_map) throws Exception {
         this.conn = conn;
         this.field_names_mode = field_names_mode;
-        this.type_map = type_map;
+        this.type_map = new TypeMapManager(type_map);
     }
 
     private static String _get_jdbc_column_name(ResultSetMetaData rsmd, int col) throws Exception {
@@ -207,10 +208,10 @@ public class JdbcUtils {
             ps.close();
         }
         _refine_field_info_by_table_meta_data(table_name, fields_map);
-        if (type_map != null) {
+        if (type_map.is_defined()) {
             for (FieldInfo fi : fields_map.values()) {
-                String java_type_name = fi.getType();
-                String type_name = Helpers.get_cpp_class_name_from_java_class_name(type_map, java_type_name);
+                String type_name = fi.getType();
+                type_name = type_map.get_rendered_type_name(type_name);
                 fi.set_type_by_map(type_name);
             }
         }
@@ -291,10 +292,10 @@ public class JdbcUtils {
         if (_dto_fields.isEmpty()) {
             throw new Exception("Cannot detect DTO fields: " + jaxb_dto_class.getName());
         }
-        if (type_map != null) {
+        if (type_map.is_defined()) {
             for (FieldInfo fi : _dto_fields) {
-                String java_type_name = fi.getType();
-                String type_name = Helpers.get_cpp_class_name_from_java_class_name(type_map, java_type_name);
+                String type_name = fi.getType();
+                type_name = type_map.get_rendered_type_name(type_name);
                 fi.set_type_by_map(type_name);
             }
         }
@@ -401,9 +402,9 @@ public class JdbcUtils {
         } catch (Throwable e) { // including AbstractMethodError, SQLServerException, etc.
             params_count = 0;
         }
-        for (int i = 0; i< method_param_descriptors.length; i++) {
+        for (int i = 0; i < method_param_descriptors.length; i++) {
             String param_descriptor = method_param_descriptors[i].trim();
-            if (param_descriptor.startsWith("[") ) {
+            if (param_descriptor.startsWith("[")) {
                 // implicit cursor callbacks
                 if (param_descriptor.endsWith("]") == false) {
                     throw new Exception("Ending ']' expected");
@@ -420,7 +421,7 @@ public class JdbcUtils {
         }
     }
 
-    private void _get_params_by_descriptors(FieldNamesMode param_names_mode, String[] method_param_descriptors, List<FieldInfo> _params) {
+    private void _get_params_by_descriptors(FieldNamesMode param_names_mode, String[] method_param_descriptors, List<FieldInfo> _params) throws Exception {
         _params.clear();
         for (int i = 0; i < method_param_descriptors.length; i++) {
             String param_descriptor = method_param_descriptors[i];
@@ -429,7 +430,7 @@ public class JdbcUtils {
         }
     }
 
-    private FieldInfo _create_param_info(FieldNamesMode param_names_mode, String param_descriptor, String default_param_type_name) {
+    private FieldInfo _create_param_info(FieldNamesMode param_names_mode, String param_descriptor, String default_param_type_name) throws Exception {
         String param_type_name;
         String param_name;
         String[] parts = Helpers.parse_param_descriptor(param_descriptor);
@@ -440,9 +441,7 @@ public class JdbcUtils {
             param_type_name = parts[0];
             param_name = parts[1];
         }
-        if (type_map != null) {
-            param_type_name = Helpers.get_cpp_class_name_from_java_class_name(type_map, param_type_name);
-        }
+        param_type_name = type_map.get_rendered_type_name(param_type_name);
         return new FieldInfo(param_names_mode, param_type_name, param_name, "parameter");
     }
 
@@ -680,9 +679,10 @@ public class JdbcUtils {
             _get_free_sql_info(sql_root_abs_path, dao_query_jdbc_sql, method_param_descriptors, param_names_mode,
                     jaxb_dto_or_return_type, jaxb_return_type_is_dto, jaxb_dto_classes, _fields, _params);
         }
-        if (type_map != null) {
+        if (type_map.is_defined()) {
             for (FieldInfo fi : _fields) {
-                fi.set_type_by_map(Helpers.get_cpp_class_name_from_java_class_name(type_map, fi.getType()));
+                String type_name = type_map.get_rendered_type_name(fi.getType());
+                fi.set_type_by_map(type_name);
             }
         }
         return dao_query_jdbc_sql;
