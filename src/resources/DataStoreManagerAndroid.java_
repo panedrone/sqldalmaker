@@ -16,7 +16,7 @@ import java.util.Locale;
 
 /*
     SQL DAL Maker Web-Site: http://sqldalmaker.sourceforge.net
-    This is an example of how to implement DataStore in Java + JDBC.
+    This is an example of how to implement DataStore in Java + Android/SQLite3.
     Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/DataStoreManagerAndroid.java_
     Copy-paste this code to your project and change it for your needs.
     Improvements are welcome: sqldalmaker@gmail.com
