@@ -284,7 +284,8 @@ public class EclipseTargetLanguageHelpers {
 			String path = settings.getFolders().getTarget() + "/" + class_name + ".h";
 			return project.getFile(path);
 		} else if (RootFileName.PYTHON.equals(root_fn)) {
-			String path = settings.getFolders().getTarget() + "/" + class_name + ".py";
+			String path = settings.getFolders().getTarget() + "/"
+					+ Helpers.convert_to_lower_underscores_file_name(class_name, "py");
 			return project.getFile(path);
 		} else if (RootFileName.RUBY.equals(root_fn)) {
 			String path = settings.getFolders().getTarget() + "/"
@@ -338,7 +339,7 @@ public class EclipseTargetLanguageHelpers {
 		if (RootFileName.RUBY.equals(fn)) {
 			return output_dir + "/" + Helpers.convert_to_lower_underscores_file_name(class_name, "rb");
 		} else if (RootFileName.PYTHON.equals(fn)) {
-			return output_dir + "/" + class_name + ".py";
+			return output_dir + "/" + Helpers.convert_to_lower_underscores_file_name(class_name, "py");
 		} else if (RootFileName.PHP.equals(fn)) {
 			return output_dir + "/" + class_name + ".php";
 		} else if (RootFileName.JAVA.equals(fn)) {

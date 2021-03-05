@@ -100,7 +100,7 @@ public class IdeaTargetLanguageHelpers {
         } else if (RootFileName.PHP.equals(fn)) {
             rel_path = settings.getFolders().getTarget() + "/" + value + ".php";
         } else if (RootFileName.PYTHON.equals(fn)) {
-            rel_path = settings.getFolders().getTarget() + "/" + value + ".py";
+            rel_path = settings.getFolders().getTarget() + "/" + Helpers.convert_to_lower_underscores_file_name(value, "py");
         } else if (RootFileName.RUBY.equals(fn)) {
             rel_path = settings.getFolders().getTarget() + "/" + Helpers.convert_to_lower_underscores_file_name(value, "rb");
         } else if (RootFileName.CPP.equals(fn)) {
@@ -122,7 +122,7 @@ public class IdeaTargetLanguageHelpers {
         } else if (RootFileName.PHP.equals(fn)) {
             file_name = class_name + ".php";
         } else if (RootFileName.PYTHON.equals(fn)) {
-            file_name = class_name + ".py";
+            file_name = Helpers.convert_to_lower_underscores_file_name(class_name, "py");
         } else if (RootFileName.RUBY.equals(fn)) {
             file_name = Helpers.convert_to_lower_underscores_file_name(class_name, "rb");
         } else if (RootFileName.CPP.equals(fn)) {
@@ -154,7 +154,7 @@ public class IdeaTargetLanguageHelpers {
             file_name = Helpers.concat_path(dao_destination, class_name + ".php");
         } else if (RootFileName.PYTHON.equals(fn)) {
             String dao_destination = Helpers.concat_path(module_root, source_folder);
-            file_name = Helpers.concat_path(dao_destination, class_name + ".py");
+            file_name = Helpers.concat_path(dao_destination, Helpers.convert_to_lower_underscores_file_name(class_name, "py"));
         } else if (RootFileName.RUBY.equals(fn)) {
             String dao_destination = Helpers.concat_path(module_root, source_folder);
             file_name = Helpers.concat_path(dao_destination, Helpers.convert_to_lower_underscores_file_name(class_name, "rb"));
@@ -196,7 +196,7 @@ public class IdeaTargetLanguageHelpers {
             file_name = Helpers.concat_path(dao_destination, dao_class_name + ".php");
         } else if (RootFileName.PYTHON.equals(fn)) {
             String dao_destination = Helpers.concat_path(module_root, source_folder);
-            file_name = Helpers.concat_path(dao_destination, dao_class_name + ".py");
+            file_name = Helpers.concat_path(dao_destination, Helpers.convert_to_lower_underscores_file_name(dao_class_name, "py"));
         } else if (RootFileName.RUBY.equals(fn)) {
             String dao_destination = Helpers.concat_path(module_root, source_folder);
             file_name = Helpers.concat_path(dao_destination, Helpers.convert_to_lower_underscores_file_name(dao_class_name, "rb"));
