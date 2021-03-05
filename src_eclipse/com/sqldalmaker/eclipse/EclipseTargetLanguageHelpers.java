@@ -149,8 +149,8 @@ public class EclipseTargetLanguageHelpers {
 				output_dir.append(abs_path);
 			}
 			String dto_inheritance = settings.getDto().getInheritance();
-			JavaCG.DTO gen = new JavaCG.DTO(dto_classes, conn, dto_package, sql_root_abs_path, dto_inheritance,
-					field_names_mode, vm_file_system_path);
+			JavaCG.DTO gen = new JavaCG.DTO(dto_classes, settings.getTypeMap(), conn, dto_package, sql_root_abs_path,
+					dto_inheritance, field_names_mode, vm_file_system_path);
 			return gen;
 		} else if (RootFileName.CPP.equals(root_file_name)) {
 			if (output_dir != null) {
@@ -242,8 +242,8 @@ public class EclipseTargetLanguageHelpers {
 				output_dir.append(abs_path);
 			}
 			String dto_package = settings.getDto().getScope();
-			JavaCG.DAO gen = new JavaCG.DAO(dto_classes, conn, dto_package, dao_package, sql_root_abs_path,
-					field_names_mode, vm_file_system_path);
+			JavaCG.DAO gen = new JavaCG.DAO(dto_classes, settings.getTypeMap(), conn, dto_package, dao_package,
+					sql_root_abs_path, field_names_mode, vm_file_system_path);
 			return gen;
 		} else if (RootFileName.CPP.equals(root_fn)) {
 			if (output_dir != null) {
@@ -262,7 +262,8 @@ public class EclipseTargetLanguageHelpers {
 				output_dir.append(abs_path);
 			}
 			String dao_package = settings.getDao().getScope();
-			GoCG.DAO gen = new GoCG.DAO(dao_package, dto_classes, settings.getTypeMap(), conn, sql_root_abs_path, vm_file_system_path);
+			GoCG.DAO gen = new GoCG.DAO(dao_package, dto_classes, settings.getTypeMap(), conn, sql_root_abs_path,
+					vm_file_system_path);
 			return gen;
 		} else {
 			throw new Exception(get_unknown_root_file_msg(root_fn));
@@ -286,10 +287,12 @@ public class EclipseTargetLanguageHelpers {
 			String path = settings.getFolders().getTarget() + "/" + class_name + ".py";
 			return project.getFile(path);
 		} else if (RootFileName.RUBY.equals(root_fn)) {
-			String path = settings.getFolders().getTarget() + "/" + Helpers.convert_to_lower_underscores_file_name(class_name, "rb");
+			String path = settings.getFolders().getTarget() + "/"
+					+ Helpers.convert_to_lower_underscores_file_name(class_name, "rb");
 			return project.getFile(path);
 		} else if (RootFileName.GO.equals(root_fn)) {
-			String path = settings.getFolders().getTarget() + "/" + Helpers.convert_to_lower_underscores_file_name(class_name, "go");
+			String path = settings.getFolders().getTarget() + "/"
+					+ Helpers.convert_to_lower_underscores_file_name(class_name, "go");
 			return project.getFile(path);
 		}
 		throw new Exception(get_unknown_root_file_msg(root_fn));
@@ -356,9 +359,8 @@ public class EclipseTargetLanguageHelpers {
 	public static String get_root_file_relative_path(final IFile file) {
 
 		String fn = file.getName();
-		if (RootFileName.JAVA.equals(fn) || RootFileName.CPP.equals(fn) || 
-				RootFileName.PHP.equals(fn) || RootFileName.PYTHON.equals(fn) || RootFileName.RUBY.equals(fn) ||
-				RootFileName.GO.equals(fn)) {
+		if (RootFileName.JAVA.equals(fn) || RootFileName.CPP.equals(fn) || RootFileName.PHP.equals(fn)
+				|| RootFileName.PYTHON.equals(fn) || RootFileName.RUBY.equals(fn) || RootFileName.GO.equals(fn)) {
 			try {
 				return file.getFullPath().toPortableString();
 			} catch (Exception e) {

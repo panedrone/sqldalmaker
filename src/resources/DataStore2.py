@@ -8,10 +8,10 @@ class OutParam:
 class DataStore:
     """
     SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
-    Contact: sqldalmaker@gmail.com
-
     This is an example of how to implement DataStore in Python + MySQL.
+    Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/DataStore2.py
     Copy-paste this code to your project and change it for your needs.
+    Improvements are welcome: sqldalmaker@gmail.com
     """
 
     def __init__(self):

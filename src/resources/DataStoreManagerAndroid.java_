@@ -14,6 +14,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+/*
+    SQL DAL Maker Web-Site: http://sqldalmaker.sourceforge.net
+    This is an example of how to implement DataStore in Java + JDBC.
+    Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/DataStoreManagerAndroid.java_
+    Copy-paste this code to your project and change it for your needs.
+    Improvements are welcome: sqldalmaker@gmail.com
+ */
 public class DataStoreManager {
 
     private static final String DB_NAME = "thesaurus.db";

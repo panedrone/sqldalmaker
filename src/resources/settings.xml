@@ -53,7 +53,7 @@
 
     <!-- if detected JDBC type is missing in 'type-map', then 'default' is used. -->
 
-    <!-- if 'default' is empty, detected type is renderes as-is. -->
+    <!-- if 'default' is empty, detected type is rendered as-is. -->
 
     <!-- this is why type-map for Java+JDBC is empty: -->
 

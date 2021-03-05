@@ -2,17 +2,16 @@
 
 /*
   SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
-
-  This is an example of how to implement DataStore in PHP + PDO + ORACLE.
+  This is an example of how to implement DataStore in PHP + PDO + Oracle.
+  Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/DataStore_PDO_Oracle.php
   Copy-paste this code to your project and change it for your needs.
+  Improvements are welcome: sqldalmaker@gmail.com
 
   Known Issues:
 
   - UDF returning SYS_REFCURSOR
   - SYS_REFCURSOR-s as OUT params
   - Implicit SYS_REFCURSOR-s
-
-  Improvements are welcome: sqldalmaker@gmail.com
 
  */
 

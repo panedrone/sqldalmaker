@@ -4,10 +4,9 @@ import sqlite3
 class DataStore:
     """
     SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
-
     This is an example of how to implement DataStore in Python + SQLite3.
+    Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/DataStore1.py
     Copy-paste this code to your project and change it for your needs.
-
     Improvements are welcome: sqldalmaker@gmail.com
     """
 

@@ -3,8 +3,10 @@ require 'dbi'
 class DataStore
 
   #  SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
-  #  About DataStore: http://sqldalmaker.sourceforge.net/xml-meta-programming.html
-  #  Contact: sqldalmaker@gmail.com
+  #  This is an example of how to implement DataStore in Rubi + DBI.
+  #  Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store.rb
+  #  Copy-paste this code to your project and change it for your needs.
+  #  Improvements are welcome: sdm@gmail.com
 
   #  This is an example of how to implement DataStore in Ruby + DBI.
   #  Copy-paste this code to your project and change it for your needs.

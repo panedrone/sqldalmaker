@@ -2,9 +2,10 @@
 #define __DataStore_H_
 
 /*
-    This is an example of how to implement DataStore in C++ and Qt5/6.
-    Copy-paste this code to your project and change it for your needs.
     SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
+    This is an example of how to implement DataStore in C++ and Qt5/6.
+    Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/DataStore_Qt5.h
+    Copy-paste this code to your project and change it for your needs.
     Improvements are welcome: sqldalmaker@gmail.com
  */
 

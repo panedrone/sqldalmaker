@@ -2,10 +2,9 @@
 
 /*
   SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
-
   This is an example of how to implement DataStore in PHP + PDO + SQL Server.
+  Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/DataStore_PDO_SQL_Server.php
   Copy-paste this code to your project and change it for your needs.
-
   Improvements are welcome: sqldalmaker@gmail.com
  
  */

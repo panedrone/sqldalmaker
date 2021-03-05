@@ -121,7 +121,7 @@ public class EclipseEditorHelpers {
 		IEditorRegistry r = PlatformUI.getWorkbench().getEditorRegistry();
 		IEditorDescriptor desc = r.getDefaultEditor(file_name);
 		// Eclipse for RCP and RAP Developers' does not have SQL editor
-		if (desc == null) {
+		if (desc == null/* || file_name.endsWith(".go")*/) {
 			desc = r.getDefaultEditor("*.txt");
 		}
 		if (desc == null) {

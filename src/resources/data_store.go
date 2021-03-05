@@ -14,7 +14,8 @@ import (
 
 /*
    SQL DAL Maker Web-Site: http://sqldalmaker.sourceforge.net
-   This is an example of how to implement DataStore in GoLang using "database/sql".
+   This is an example of how to implement DataStore in Go using "database/sql".
+   Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store.go
    Copy-paste this code to your project and change it for your needs.
    Improvements are welcome: sdm@gmail.com
 */

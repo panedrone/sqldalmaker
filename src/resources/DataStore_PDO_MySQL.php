@@ -20,10 +20,10 @@ class InOutParam {
 
 /*
   SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
-  Contact: sqldalmaker@gmail.com
-
   This is an example of how to implement DataStore in PHP + PDO + MySQL.
+  Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/DataStore_PDO_MySQL.php
   Copy-paste this code to your project and change it for your needs.
+  Improvements are welcome: sqldalmaker@gmail.com
  */
 
 // class PDODataStore implements DataStore 
