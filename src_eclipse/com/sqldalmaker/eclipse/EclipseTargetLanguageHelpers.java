@@ -212,7 +212,8 @@ public class EclipseTargetLanguageHelpers {
 				String abs_path = EclipseHelpers.get_absolute_dir_path_str(project, rel_path);
 				output_dir.append(abs_path);
 			}
-			PythonCG.DAO gen = new PythonCG.DAO(dto_classes, conn, sql_root_abs_path, rel_path, vm_file_system_path);
+            String dto_package = rel_path = rel_path.replace("/", ".").replace("\\", ".");
+			PythonCG.DAO gen = new PythonCG.DAO(dto_package, dto_classes, conn, sql_root_abs_path, vm_file_system_path);
 			return gen;
 		} else if (RootFileName.PHP.equals(root_fn)) {
 			if (output_dir != null) {

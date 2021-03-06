@@ -310,12 +310,12 @@ public class UIEditorPageAdmin extends Composite {
 		btnNewButton_7.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/data_store_mysql.py", "DataStore.py");
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/data_store_mysql.py", "data_store.py");
 			}
 		});
 		btnNewButton_7.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		toolkit.adapt(btnNewButton_7, true, true);
-		btnNewButton_7.setText("DataStore.py (MySQL)");
+		btnNewButton_7.setText("data_store.py (MySQL)");
 
 		Button btnDatastorepycxoracle = new Button(composite_2, SWT.NONE);
 		btnDatastorepycxoracle.addSelectionListener(new SelectionAdapter() {
@@ -326,7 +326,7 @@ public class UIEditorPageAdmin extends Composite {
 			}
 		});
 		btnDatastorepycxoracle.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1));
-		btnDatastorepycxoracle.setText("DataStore.py (cx_Oracle)");
+		btnDatastorepycxoracle.setText("data_store.py (cx_Oracle)");
 		toolkit.adapt(btnDatastorepycxoracle, true, true);
 		new Label(composite_2, SWT.NONE);
 
@@ -339,7 +339,7 @@ public class UIEditorPageAdmin extends Composite {
 			}
 		});
 		btnNewButton_7_1_1.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-		btnNewButton_7_1_1.setText("DataStore.py (psycopg2)");
+		btnNewButton_7_1_1.setText("data_store.py (psycopg2)");
 		toolkit.adapt(btnNewButton_7_1_1, true, true);
 
 		Button btnNewButton_7_1 = new Button(composite_2, SWT.NONE);
@@ -351,19 +351,19 @@ public class UIEditorPageAdmin extends Composite {
 			}
 		});
 		btnNewButton_7_1.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-		btnNewButton_7_1.setText("DataStore.py (pyodbc, SQL Server)");
+		btnNewButton_7_1.setText("data_store.py (pyodbc, SQL Server)");
 		toolkit.adapt(btnNewButton_7_1, true, true);
 
 		Button btnNewButton_6 = new Button(composite_2, SWT.NONE);
 		btnNewButton_6.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/data_store_sqlite3.py", "DataStore.py");
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/data_store_sqlite3.py", "data_store.py");
 			}
 		});
 		btnNewButton_6.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		toolkit.adapt(btnNewButton_6, true, true);
-		btnNewButton_6.setText("DataStore.py (SQLite3)");
+		btnNewButton_6.setText("data_store.py (SQLite3)");
 
 		Button btnNewButton_8 = new Button(composite_2, SWT.NONE);
 		btnNewButton_8.addSelectionListener(new SelectionAdapter() {

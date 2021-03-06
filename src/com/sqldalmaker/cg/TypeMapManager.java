@@ -41,7 +41,7 @@ class TypeMapManager {
     //      1) detected using JDBC or
     //      2) detected from explicit declarations in XML meta-program
 
-    public String get_rendered_type_name(String detected_type_name) throws Exception {
+    public String get_rendered_type_name(String detected_type_name) {
         if (detected.size() == 0) {
             // if no re-definitions, pass any type as-is (independently of 'default')
             return detected_type_name;
