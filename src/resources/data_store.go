@@ -8,14 +8,13 @@ import (
 
 	// _ "github.com/mattn/go-sqlite3"		// SQLite3
 	// _ "github.com/go-sql-driver/mysql"	// MySQL
-	_ "github.com/denisenkom/go-mssqldb" // SQL Server
+	// _ "github.com/denisenkom/go-mssqldb" // SQL Server
 	// _ "github.com/godror/godror"			// Oracle
 )
 
 /*
    SQL DAL Maker Web-Site: http://sqldalmaker.sourceforge.net
-   This is an example of how to implement DataStore in Go using "database/sql".
-   Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store.go
+   This is an example of how to implement DataStore in GoLang using "database/sql".
    Copy-paste this code to your project and change it for your needs.
    Improvements are welcome: sdm@gmail.com
 */
@@ -108,7 +107,7 @@ func (ds *DataStore) execDML(sql string, args ...interface{}) int64 {
 }
 
 func (ds *DataStore) query(sql string, args ...interface{}) interface{} {
-	arr := ds.queryAll(sql, args...)
+	arr := ds.queryAll(sql, args)
 	if arr == nil || len(arr) == 0 {
 		return nil
 	}
@@ -120,11 +119,18 @@ func (ds *DataStore) query(sql string, args ...interface{}) interface{} {
 
 func (ds *DataStore) queryAll(sql string, args ...interface{}) []interface{} {
 	var arr []interface{}
-	onRowHandler := func(rowData map[string]interface{}) {
-		values := make([]string, len(rowData))
-		arr = append(arr, values[0])
+	sql = ds.formatSQL(sql)
+	rows, err := ds.handle.Query(sql, args...)
+	if err != nil {
+		log.Fatal(err)
+		return nil
 	}
-	ds.queryAllRows(sql, onRowHandler, args...)
+	defer rows.Close()
+	for rows.Next() {
+		var data interface{}
+		rows.Scan(&data)
+		arr = append(arr, data)
+	}
 	return arr
 }
 
