@@ -130,11 +130,26 @@ public class Helpers {
         return concat_path(res, seg2);
     }
 
-    //
+    // Java File exists Case sensitive
+    // https://stackoverflow.com/questions/34603505/java-file-exists-case-sensitive-jpg-and-jpg
+
+    public static boolean exists(File dir, String filename) {
+        String[] files = dir.list();
+        for (String file : files)
+            if (file.equals(filename))
+                return true;
+        return false;
+    }
+
     // http://www.java2s.com/Tutorial/Java/0180__File/LoadatextfilecontentsasaString.htm
-    //
+
     public static String load_text_from_file(String file_path) throws IOException {
         File file = new File(file_path);
+        File dir = new File(file.getParent());
+        String file_name = file.getName();
+        if (!exists(dir, file_name)) {
+            throw new IOException("File not found (case-sensitive): " + file_name);
+        }
         FileReader reader = new FileReader(file);
         try {
             return load_text(reader);
@@ -164,7 +179,7 @@ public class Helpers {
                 }
                 last_arr = list.substring(pos); // keep []
                 if (pos == 0) {
-                    return new String[] {last_arr};
+                    return new String[]{last_arr};
                 }
                 list = list.substring(0, pos);
                 list = list.trim();
@@ -189,7 +204,7 @@ public class Helpers {
             }
             if (last_arr != null) {
                 int n = items.length;
-                String newarr[] = new String[n + 1];
+                String []newarr = new String[n + 1];
                 for (int i = 0; i < n; i++)
                     newarr[i] = items[i];
                 newarr[n] = last_arr;
@@ -308,7 +323,7 @@ public class Helpers {
         }
     }
 
-    public static void convert_to_python_type_names(List<FieldInfo> fields) {
+    public static void convert_to_python_type_names(List<FieldInfo> fields) throws Exception {
         for (FieldInfo fi : fields) {
             String type = fi.getType();
             type = get_python_type_name(type);
@@ -379,11 +394,6 @@ public class Helpers {
         buffer.append(ls);
     }
 
-//    public static void build_no_pk_warning(StringBuilder buffer, String method_name) {
-//        String msg = Helpers.get_no_pk_message(method_name);
-//        Helpers.build_warning_comment(buffer, msg);
-//    }
-
     public static String get_no_pk_message(String method_name) {
         return "    // INFO: " + method_name + " is omitted because PK is not detected.";
     }
@@ -397,9 +407,9 @@ public class Helpers {
     }
 
     static void validate_java_type_name(final String type_name) throws Exception {
-    	if (type_name == null) {
+        if (type_name == null) {
             throw new Exception("Cannot detect type name. . Try to update XSD files from the tab 'Admin'. Then check existing XML to conform updates.");
-    	}
+        }
         String type;
         String[] arr_parts = type_name.split("\\[");
         if (arr_parts.length == 2 && "]".equals(arr_parts[1].trim())) {

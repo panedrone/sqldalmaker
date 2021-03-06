@@ -247,13 +247,13 @@ public class UITabAdmin {
         dataStorePySQLite3Button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "DataStore1.py", "DataStore_SQLite3.py");
+                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "data_store_sqlite3.py", "data_store.py");
             }
         });
         dataStorePyMySQLButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "DataStore2.py", "DataStore_MySQL.py");
+                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "data_store_mysql.py", "data_store.py");
             }
         });
         dataStoreRUBYDBIButton.addActionListener(new ActionListener() {
@@ -284,13 +284,13 @@ public class UITabAdmin {
         datastore_pyodbc.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "DataStore_pyodbc.py", "DataStore_pyodbc.py");
+                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "data_store_pyodbc.py", "data_store.py");
             }
         });
         dataStorePsycopg2Button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "DataStore_psycopg2.py", "DataStore_psycopg2.py");
+                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "data_store_psycopg2.py", "data_store.py");
             }
         });
         btn_php_pg.addActionListener(new ActionListener() {
@@ -320,7 +320,7 @@ public class UITabAdmin {
         btn_cx_Oracle.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "DataStore_cx_Oracle.py", "DataStore_cx_Oracle.py");
+                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "data_store_cx_oracle.py", "data_store.py");
             }
         });
         dataStorePhpOCI8Button.addActionListener(new ActionListener() {
@@ -399,7 +399,7 @@ public class UITabAdmin {
             if (ref_text.equals(cur_text)) {
                 add_ok_msg(buff, xsd_name);
             } else {
-                add_err_msg(buff, xsd_name + " is out-of-date! Use 'Create/Overwrite XSD files'");
+                add_err_msg(buff, "File '" + xsd_name + "' is invalid or out-of-date! Use 'Create/Overwrite XSD files'");
                 return false;
             }
         }
@@ -526,19 +526,19 @@ public class UITabAdmin {
         dataStoreCSTLButton.setText("DataStore, C++ (STL, , SQLite3)");
         panel4.add(dataStoreCSTLButton, new GridConstraints(5, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         dataStorePyMySQLButton = new JButton();
-        dataStorePyMySQLButton.setText("DataStore.py (MySQL)");
+        dataStorePyMySQLButton.setText("data_store.py (MySQL)");
         panel4.add(dataStorePyMySQLButton, new GridConstraints(6, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         dataStorePsycopg2Button = new JButton();
-        dataStorePsycopg2Button.setText("DataStore.py (psycopg2)");
+        dataStorePsycopg2Button.setText("data_store.py (psycopg2)");
         panel4.add(dataStorePsycopg2Button, new GridConstraints(7, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         dataStorePySQLite3Button = new JButton();
-        dataStorePySQLite3Button.setText("DataStore.py (SQLite3)");
+        dataStorePySQLite3Button.setText("data_store.py (SQLite3)");
         panel4.add(dataStorePySQLite3Button, new GridConstraints(7, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         datastore_pyodbc = new JButton();
-        datastore_pyodbc.setText("DataStore.py (pyodbc, SQL Server)");
+        datastore_pyodbc.setText("data_store.py (pyodbc, SQL Server)");
         panel4.add(datastore_pyodbc, new GridConstraints(7, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         btn_cx_Oracle = new JButton();
-        btn_cx_Oracle.setText("DataStore.py (cx_Oracle)");
+        btn_cx_Oracle.setText("data_store.py (cx_Oracle)");
         panel4.add(btn_cx_Oracle, new GridConstraints(6, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         dataStoreJavaDbUtilsButton = new JButton();
         dataStoreJavaDbUtilsButton.setText("DataStoreManager.java (JDBC)");

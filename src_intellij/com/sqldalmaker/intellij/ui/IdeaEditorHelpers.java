@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2020 sqldalmaker@gmail.com
+ * Copyright 2011-2021 sqldalmaker@gmail.com
  * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
  * Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -21,6 +21,7 @@ import com.sqldalmaker.jaxb.dto.DtoClasses;
 import com.sqldalmaker.jaxb.dto.ObjectFactory;
 import com.sqldalmaker.jaxb.settings.Settings;
 
+import java.io.File;
 import java.sql.Connection;
 
 /**
@@ -35,12 +36,22 @@ public class IdeaEditorHelpers {
         fem.openFile(file, true, true);
     }
 
-    public static void open_local_file_in_editor_sync(Project project, VirtualFile root_file, String rel_path) throws Exception {
-
-        VirtualFile file = root_file.getParent().findFileByRelativePath(rel_path);
+    private static VirtualFile find_case_sensitive(VirtualFile dir, String rel_path) throws Exception {
+        VirtualFile file = dir.findFileByRelativePath(rel_path);
         if (file == null) {
-            throw new Exception("Not found: " + rel_path);
+            throw new Exception("File not found: " + rel_path);
         }
+        String file_name = new File(rel_path).getName();
+        String vf_name = file.getName();
+        if (!vf_name.equals(file_name)) {
+            throw new Exception("File not found (case-sensitive): " + file_name);
+        }
+        return file;
+    }
+
+    public static void open_local_file_in_editor_sync(Project project, VirtualFile root_file, String rel_path) throws Exception {
+        VirtualFile dir = root_file.getParent();
+        VirtualFile file = find_case_sensitive(dir, rel_path);
         open_in_editor_sync(project, file);
     }
 
@@ -49,17 +60,12 @@ public class IdeaEditorHelpers {
     }
 
     public static void open_project_file_in_editor_sync(Project project, String rel_path) throws Exception {
-
         VirtualFile project_dir = IdeaHelpers.get_project_base_dir(project);
-        VirtualFile file = project_dir.findFileByRelativePath(rel_path);
-        if (file == null) {
-            throw new Exception("Not found: " + rel_path);
-        }
+        VirtualFile file = find_case_sensitive(project_dir, rel_path);
         open_in_editor_sync(project, file);
     }
 
     public static void open_text_in_new_editor(Project project, String file_name, String text) {
-
         FileEditorManager fem = FileEditorManager.getInstance(project);
         String virtual_file_name = "_" + file_name; // '%' throws URI exception in NB
         // http://grepcode.com/file/repository.grepcode.com/java/ext/com.jetbrains/intellij-idea/9.0.4/com/intellij/openapi/vfs/VirtualFile.java
@@ -160,7 +166,6 @@ public class IdeaEditorHelpers {
 
     public static void gen_tmp_field_tags(String class_name, String ref,
                                           Project project, VirtualFile root_file) throws Exception {
-
         Settings settings = IdeaHelpers.load_settings(root_file);
         Connection con = IdeaHelpers.get_connection(project, settings);
         try {

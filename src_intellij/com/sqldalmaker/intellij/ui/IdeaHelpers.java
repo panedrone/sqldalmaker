@@ -5,6 +5,7 @@
  */
 package com.sqldalmaker.intellij.ui;
 
+import com.intellij.history.LocalHistory;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
@@ -232,13 +233,19 @@ public class IdeaHelpers {
         private String output_dir_module_relative_path;
 
         private static void writeFile(VirtualFile dir, GeneratedFileData gf) throws Exception {
-
+            // findFileByRelativePath is case-insensitive
             VirtualFile file = dir.findFileByRelativePath(gf.file_name);
             if (file == null) {
                 // createChildData may show dialog and throw
                 // java.lang.IllegalStateException: The DialogWrapper can be used only on event dispatch thread.
                 // if it is called outside of WriteAction
                 file = dir.createChildData(null, gf.file_name);
+            } else {
+                // rename if the case differs
+                if (file.getName() != gf.file_name) {
+                    // https://www.programcreek.com/java-api-examples/?class=com.intellij.openapi.vfs.VirtualFile&method=delete
+                    file.rename(LocalHistory.VFS_EVENT_REQUESTOR, gf.file_name);
+                }
             }
             file.setBinaryContent(gf.file_content.getBytes());
         }

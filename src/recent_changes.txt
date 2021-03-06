@@ -1,6 +1,10 @@
+2021-03-06
+
+    Reworked for standard Python file names.
+
 2021-03-03
 
-    Initial implementation for GoLang. Tested on SQLite3, Oracle, SQL Server.
+    Initial implementation for Go. Tested on SQLite3, Oracle, and SQL Server.
     Update XSD files and check existing XML to conform updates.
 
 2021-01-23

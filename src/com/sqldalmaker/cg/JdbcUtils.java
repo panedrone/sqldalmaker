@@ -303,7 +303,7 @@ public class JdbcUtils {
     }
 
     private void _refine_fields_by_jaxb_explicit_fields(List<DtoClass.Field> jaxb_explicit_fields,
-                                                        Map<String, FieldInfo> fields_map, List<FieldInfo> fields) {
+                                                        Map<String, FieldInfo> fields_map, List<FieldInfo> fields) throws Exception {
         if (jaxb_explicit_fields == null) {
             return;
         }
@@ -494,7 +494,7 @@ public class JdbcUtils {
         }
     }
 
-    private static FieldInfo _get_ret_field_info(FieldNamesMode field_names_mode, String exlicit_ret_type, List<FieldInfo> dao_fields) {
+    private static FieldInfo _get_ret_field_info(FieldNamesMode field_names_mode, String exlicit_ret_type, List<FieldInfo> dao_fields) throws Exception {
         String ret_type_name;
         if (exlicit_ret_type != null && exlicit_ret_type.trim().length() > 0) {
             ret_type_name = exlicit_ret_type;

@@ -18,8 +18,11 @@ public class FieldInfo {
     private boolean is_auto_increment;
     private String comment;
 
-    public FieldInfo(FieldNamesMode field_names_mode, String field_type_name, String db_col_name, String comment) {
+    public FieldInfo(FieldNamesMode field_names_mode, String field_type_name, String db_col_name, String comment) throws Exception {
         this.db_col_name = db_col_name;
+        if (field_type_name == null) {
+            throw new Exception("<field type=null. Ensure that XSD and XML are valid.");
+        }
         this.field_type_name = field_type_name;
         field_name = db_col_name;
         if ("parameter".equals(comment) == false) {
@@ -54,11 +57,14 @@ public class FieldInfo {
 
     boolean type_renamed = false;
 
-    public void set_type_by_map(String field_type_name) {
+    public void set_type_by_map(String field_type_name) throws Exception {
     	if (type_renamed) {
         	System.out.println(this.field_type_name);
     		return;
     	}
+        if (field_type_name == null) {
+            throw new Exception("Invalid <type-map... Ensure that XSD and XML are valid.");
+        }
     	type_renamed = true;
         this.field_type_name = field_type_name;
     }

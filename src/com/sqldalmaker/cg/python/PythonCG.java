@@ -66,9 +66,6 @@ public class PythonCG {
             StringWriter sw = new StringWriter();
             te.merge(context, sw);
             String text = sw.toString();
-            text = text.replace("java.lang.", "");
-            text = text.replace("java.util.", "");
-            text = text.replace("java.math.", "");
             return new String[]{text};
         }
     }
@@ -76,18 +73,36 @@ public class PythonCG {
     public static class DAO implements IDaoCG {
 
         private final String sql_root_abs_path;
-        private final String dal_package;
+        private final String dto_package;
         private final DtoClasses jaxb_dto_classes;
-        private final Set<String> imports = new HashSet<String>();
-        private final Set<String> uses = new HashSet<String>();
+
+        public static class ImportItem {
+            public String file_name;
+            public String class_name;
+
+            public ImportItem(String file_name, String class_name) {
+                this.file_name = file_name;
+                this.class_name = class_name;
+            }
+
+            public String getFileName() {
+                return this.file_name;
+            }
+
+            public String getClassName() {
+                return this.class_name;
+            }
+        }
+
+        private final Map<String, ImportItem> imports = new HashMap<String, ImportItem>();
         private final TemplateEngine te;
         private final JdbcUtils db_utils;
 
-        public DAO(DtoClasses jaxb_dto_classes, Connection connection, String sql_root_abs_path, String dal_package,
+        public DAO(String dto_package, DtoClasses jaxb_dto_classes, Connection connection, String sql_root_abs_path,
                    String vm_file_system_dir) throws Exception {
             this.jaxb_dto_classes = jaxb_dto_classes;
             this.sql_root_abs_path = sql_root_abs_path;
-            this.dal_package = dal_package;
+            this.dto_package = dto_package;
             if (vm_file_system_dir == null) {
                 te = new TemplateEngine(get_template_path(), false);
             } else {
@@ -99,7 +114,6 @@ public class PythonCG {
         @Override
         public String[] translate(String dao_class_name, DaoClass dao_class) throws Exception {
             imports.clear();
-            uses.clear();
             List<String> methods = new ArrayList<String>();
             JaxbUtils.process_jaxb_dao_class(this, dao_class, methods);
             for (int i = 0; i < methods.size(); i++) {
@@ -107,25 +121,13 @@ public class PythonCG {
                 methods.set(i, m);
             }
             Map<String, Object> context = new HashMap<String, Object>();
-            String[] arr = new String[imports.size()];
-            String[] imports_arr = imports.toArray(arr);
-            Arrays.sort(imports_arr);
-            context.put("imports", imports_arr);
-            arr = new String[uses.size()];
-            String[] uses_arr = uses.toArray(arr);
-            Arrays.sort(uses_arr);
-            context.put("uses", uses_arr);
+            context.put("imports", imports.values());
             context.put("class_name", dao_class_name);
             context.put("methods", methods);
             context.put("mode", "dao_class");
-            context.put("imports", imports);
-            context.put("package", dal_package);
             StringWriter sw = new StringWriter();
             te.merge(context, sw);
             String text = sw.toString();
-            text = text.replace("java.lang.", "");
-            text = text.replace("java.util.", "");
-            text = text.replace("java.math.", "");
             return new String[]{text};
         }
 
@@ -194,7 +196,7 @@ public class PythonCG {
             }
             context.put("returned_type_name", returned_type_name);
             context.put("fetch_list", fetch_list);
-            context.put("imports", imports);
+            context.put("imports", imports.values());
             context.put("is_external_sql", is_external_sql);
             context.put("out_params", out_params);
             _assign_params(fields_pk, dto_param_type, context);
@@ -208,7 +210,13 @@ public class PythonCG {
         private String _get_rendered_dto_class_name(String dto_class_name, boolean add_to_import) throws Exception {
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
             if (add_to_import) {
-                imports.add(jaxb_dto_class.getName());
+                String dto_class_nm = jaxb_dto_class.getName();
+                String python_fn = Helpers.camel_case_to_lower_under_scores(dto_class_nm);
+                if (dto_package != null && dto_package.length() > 0) {
+                    python_fn = dto_package + "." + python_fn;
+                }
+                ImportItem item = new ImportItem(python_fn, dto_class_nm);
+                imports.put(dto_class_nm, item);
             }
             return jaxb_dto_class.getName();
         }

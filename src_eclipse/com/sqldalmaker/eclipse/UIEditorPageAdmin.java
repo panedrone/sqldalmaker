@@ -310,7 +310,7 @@ public class UIEditorPageAdmin extends Composite {
 		btnNewButton_7.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore2.py", "DataStore.py");
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/data_store_mysql.py", "DataStore.py");
 			}
 		});
 		btnNewButton_7.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
@@ -321,8 +321,8 @@ public class UIEditorPageAdmin extends Composite {
 		btnDatastorepycxoracle.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore_cx_Oracle.py",
-						"DataStore_cx_Oracle.py");
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/data_store_cx_oracle.py",
+						"data_store_cx_oracle.py");
 			}
 		});
 		btnDatastorepycxoracle.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1));
@@ -334,8 +334,8 @@ public class UIEditorPageAdmin extends Composite {
 		btnNewButton_7_1_1.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore_psycopg2.py",
-						"DataStore_psycopg2.py");
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/data_store_psycopg2.py",
+						"data_store_psycopg2.py");
 			}
 		});
 		btnNewButton_7_1_1.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
@@ -346,8 +346,8 @@ public class UIEditorPageAdmin extends Composite {
 		btnNewButton_7_1.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore_pyodbc.py",
-						"DataStore_pyodbc.py");
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/data_store_pyodbc.py",
+						"data_store_pyodbc.py");
 			}
 		});
 		btnNewButton_7_1.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
@@ -358,7 +358,7 @@ public class UIEditorPageAdmin extends Composite {
 		btnNewButton_6.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore1.py", "DataStore.py");
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/data_store_sqlite3.py", "DataStore.py");
 			}
 		});
 		btnNewButton_6.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));

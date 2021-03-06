@@ -108,7 +108,7 @@ func (ds *DataStore) execDML(sql string, args ...interface{}) int64 {
 }
 
 func (ds *DataStore) query(sql string, args ...interface{}) interface{} {
-	arr := ds.queryAll(sql, args)
+	arr := ds.queryAll(sql, args...)
 	if arr == nil || len(arr) == 0 {
 		return nil
 	}
