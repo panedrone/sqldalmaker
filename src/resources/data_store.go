@@ -8,6 +8,7 @@ import (
 
 	// _ "github.com/mattn/go-sqlite3"		// SQLite3
 	// _ "github.com/go-sql-driver/mysql"	// MySQL
+	_ "github.com/ziutek/mymysql/godrv" // MySQL
 	// _ "github.com/denisenkom/go-mssqldb" // SQL Server
 	// _ "github.com/godror/godror"			// Oracle
 )
@@ -26,10 +27,11 @@ type DataStore struct {
 
 func (ds *DataStore) open() {
 	var err error
-	ds.handle, err = sql.Open("sqlite3", "./todo-list.sqlite")
+	// ds.handle, err = sql.Open("sqlite3", "./todo-list.sqlite")
 
 	// ds.handle, _ = sql.Open("sqlite3", "./sqlite-database.db")
 	// ds.handle, _ = sql.Open("mysql", "root:root@/sakila")
+	ds.handle, err = sql.Open("mymysql", "sakila/root/root")
 	// -----------------
 	// SQL Server https://github.com/denisenkom/go-mssqldb
 	// The sqlserver driver uses normal MS SQL Server syntax and expects parameters in the
@@ -113,7 +115,7 @@ func (ds *DataStore) query(sql string, args ...interface{}) interface{} {
 		if arr == nil {
 			arr = append(arr, date)
 		} else {
-			manyRows = false
+			manyRows = true
 		}
 	}
 	ds.queryAll(sql, onRow, args...)
