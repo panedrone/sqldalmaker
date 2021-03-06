@@ -35,8 +35,8 @@ import (
     "${imp}"
 #end
 )
-#end
 
+#end
 type ${class_name} struct {
 #foreach($f in ${fields})
     ${f.getName()} ${f.getType()}
@@ -55,8 +55,8 @@ import (
     "${imp}"
 #end
 )
-#end
 
+#end
 type ${class_name} struct {
     ds *DataStore
 }
