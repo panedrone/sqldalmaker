@@ -1,4 +1,4 @@
-package go_my_sql_sakila
+package main
 
 import (
 	"database/sql"
@@ -107,47 +107,54 @@ func (ds *DataStore) execDML(sql string, args ...interface{}) int64 {
 }
 
 func (ds *DataStore) query(sql string, args ...interface{}) interface{} {
-	sql = ds.formatSQL(sql)
-	rows, err := ds.handle.Query(sql, args...)
-	if err != nil {
-		log.Fatal(err)
+	var arr []interface{}
+	manyRows := false
+	onRow := func(date interface{}) {
+		if arr == nil {
+			arr = append(arr, date)
+		} else {
+			manyRows = false
+		}
+	}
+	ds.queryAll(sql, onRow, args...)
+	if arr == nil {
 		return nil
 	}
-	defer rows.Close()
-	var data interface{} = nil
-	for rows.Next() {
-		if data != nil {
-			break
-		}
-		rows.Scan(&data)
+	if manyRows {
+		// return nil
 	}
-	return data
+	return arr[0]
 }
 
-func (ds *DataStore) queryAll(sql string, args ...interface{}) interface{} {
-	var arr []interface{}
+func (ds *DataStore) queryAll(sql string, onRow func(interface{}), args ...interface{}) {
 	sql = ds.formatSQL(sql)
 	rows, err := ds.handle.Query(sql, args...)
 	if err != nil {
 		log.Fatal(err)
-		return nil
+		return
 	}
 	defer rows.Close()
-	for rows.Next() {
-		var data interface{}
-		rows.Scan(&data)
-		arr = append(arr, data)
+	// all columns! if less, it returns nil-s
+	colNames, _ := rows.Columns()
+	values := make([]interface{}, len(colNames))
+	valuePointers := make([]interface{}, len(colNames))
+	for i := range values {
+		valuePointers[i] = &values[i]
 	}
-	return arr
+	for rows.Next() {
+		rows.Scan(valuePointers...)
+		data := values[0]
+		onRow(data)
+	}
 }
 
 func (ds *DataStore) queryRow(sql string, args ...interface{}) map[string]interface{} {
 	var arr []map[string]interface{}
-	onRowHandler := func(rowData map[string]interface{}) {
+	onRow := func(rowData map[string]interface{}) {
 		arr = append(arr, rowData)
 	}
-	ds.queryAllRows(sql, onRowHandler, args...)
-	if arr == nil || len(arr) == 0 {
+	ds.queryAllRows(sql, onRow, args...)
+	if arr == nil {
 		return nil
 	}
 	if len(arr) > 1 {
@@ -156,7 +163,7 @@ func (ds *DataStore) queryRow(sql string, args ...interface{}) map[string]interf
 	return arr[0]
 }
 
-func (ds *DataStore) queryAllRows(sql string, onRow func(rowData map[string]interface{}), args ...interface{}) {
+func (ds *DataStore) queryAllRows(sql string, onRow func(map[string]interface{}), args ...interface{}) {
 	// many thanks to:
 	// https://stackoverflow.com/questions/51731423/how-to-read-a-row-from-a-table-to-a-map-without-knowing-columns
 	sql = ds.formatSQL(sql)

@@ -99,11 +99,17 @@ func (dao *${class_name}) ${method_name}(#if(${dto_param} != "")#param_decls_dto
     return res
 #end
 #else
-#if(${dto_param} != "")    
-    return dao.ds.queryAll(sql#foreach($param in ${params}), p.${param.getName()}#end).($[]{returned_type_name})
+    var res []${returned_type_name}
+    onRow := func(rawData interface{}) {
+        data := rawData.(${returned_type_name})
+		res = append(res, data)
+	}
+#if(${dto_param} != "")
+    dao.ds.queryAll(sql, onRow#foreach($param in ${params}), p.${param.getName()}#end)
 #else
-    return dao.ds.queryAll(sql#foreach($param in ${params}), ${param.getName()}#end).([]${returned_type_name})
+    dao.ds.queryAll(sql, onRow#foreach($param in ${params}), ${param.getName()}#end)
 #end
+    return res
 #end
 }
 #else
@@ -119,7 +125,7 @@ func (dao *${class_name}) ${method_name}(#if(${dto_param} != "")#param_decls_dto
     return obj
 #end
 #else
-#if(${dto_param} != "")    
+#if(${dto_param} != "")
     return dao.ds.query(sql#foreach($param in ${params}), p.${param.getterMethod()}()#end).(${returned_type_name})
 #else
     return dao.ds.query(sql#foreach($param in ${params}), ${param.getName()}#end).(${returned_type_name})
