@@ -71,7 +71,7 @@ public class FieldInfo {
 
     public void set_type_by_map(String field_type_name) throws Exception {
     	if (type_renamed) {
-        	System.out.println(this.field_type_name);
+        	// System.out.println(this.field_type_name);
     		return;
     	}
         if (field_type_name == null) {
