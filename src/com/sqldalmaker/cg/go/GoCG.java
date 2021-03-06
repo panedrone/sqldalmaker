@@ -64,6 +64,14 @@ public class GoCG {
             db_utils.get_dto_field_info(jaxb_dto_class, sql_root_abs_path, fields);
             Map<String, Object> context = new HashMap<String, Object>();
             context.put("package", dto_package);
+            Set<String> imports = new HashSet<String>();
+            for (FieldInfo fi : fields) {
+                String imp = fi.getImport();
+                if (imp != null) {
+                    imports.add(imp);
+                }
+            }
+            context.put("imports", imports);
             context.put("class_name", dto_class_name);
             context.put("ref", jaxb_dto_class.getRef());
             context.put("fields", fields);
@@ -87,7 +95,6 @@ public class GoCG {
         private final JdbcUtils db_utils;
 
         private String dao_class_name;
-
 
         public DAO(String dao_package, DtoClasses jaxb_dto_classes, TypeMap type_map, Connection connection,
                    String sql_root_abs_path, String vm_file_system_dir) throws Exception {
@@ -182,9 +189,15 @@ public class GoCG {
             context.put("use_dto", jaxb_return_type_is_dto);
             context.put("returned_type_name", returned_type_name);
             context.put("fetch_list", fetch_list);
+            for (FieldInfo fi : fields) {
+                String imp = fi.getImport();
+                if (imp != null) {
+                    imports.add(imp);
+                }
+            }
+            _assign_params(params, dto_param_type, context); // before context.put("imports"
             context.put("imports", imports);
             context.put("is_external_sql", is_external_sql);
-            _assign_params(params, dto_param_type, context);
             StringWriter sw = new StringWriter();
             te.merge(context, sw);
             StringBuilder buff = new StringBuilder();
@@ -236,6 +249,12 @@ public class GoCG {
                                       String sql_path) throws Exception {
             SqlUtils.throw_if_select_sql(jdbc_dao_sql);
             List<FieldInfo> _params = new ArrayList<FieldInfo>();
+            for (FieldInfo pi : _params) {
+                String imp = pi.getImport();
+                if (imp != null) {
+                    imports.add(imp);
+                }
+            }
             db_utils.get_dao_exec_dml_info(jdbc_dao_sql, dto_param_type, param_descriptors, _params);
             String java_sql = SqlUtils.jdbc_sql_to_java_str(jdbc_dao_sql);
             List<MappingInfo> m_list = new ArrayList<MappingInfo>();
@@ -346,6 +365,12 @@ public class GoCG {
             } else {
                 context.put("dto_param", "");
             }
+            for (FieldInfo pi : params) {
+                String imp = pi.getImport();
+                if (imp != null) {
+                    imports.add(imp);
+                }
+            }
             context.put("params", params);
         }
 
@@ -391,10 +416,11 @@ public class GoCG {
                 context.put("keys", fields_ai);
                 context.put("mode", "dao_create");
             } else {
-                context.put("plain_params", true);
+                // context.put("plain_params", true);
                 context.put("is_external_sql", false);
                 context.put("mode", "dao_exec_dml");
             }
+            context.put("plain_params", false); // anyway
             StringWriter sw = new StringWriter();
             te.merge(context, sw);
             StringBuilder buffer = new StringBuilder();

@@ -1,4 +1,4 @@
-package main
+package go_my_sql_sakila
 
 import (
 	"database/sql"
@@ -60,7 +60,7 @@ func (ds *DataStore) rollback() {
 	// TODO
 }
 
-func (ds *DataStore) insert(sql string, args ...interface{}) int64 {
+func (ds *DataStore) insert(sql string, args ...interface{}) interface{} {
 	sql = ds.formatSQL(sql)
 	stmt, err := ds.handle.Prepare(sql)
 	if err != nil {
@@ -107,17 +107,24 @@ func (ds *DataStore) execDML(sql string, args ...interface{}) int64 {
 }
 
 func (ds *DataStore) query(sql string, args ...interface{}) interface{} {
-	arr := ds.queryAll(sql, args)
-	if arr == nil || len(arr) == 0 {
+	sql = ds.formatSQL(sql)
+	rows, err := ds.handle.Query(sql, args...)
+	if err != nil {
+		log.Fatal(err)
 		return nil
 	}
-	if len(arr) > 1 {
-		return nil
+	defer rows.Close()
+	var data interface{} = nil
+	for rows.Next() {
+		if data != nil {
+			break
+		}
+		rows.Scan(&data)
 	}
-	return arr[0]
+	return data
 }
 
-func (ds *DataStore) queryAll(sql string, args ...interface{}) []interface{} {
+func (ds *DataStore) queryAll(sql string, args ...interface{}) interface{} {
 	var arr []interface{}
 	sql = ds.formatSQL(sql)
 	rows, err := ds.handle.Query(sql, args...)

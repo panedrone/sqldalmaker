@@ -51,8 +51,20 @@ public class FieldInfo {
         this.comment = comment;
     }
 
+    public String getImport() {
+        String []parts = this.field_type_name.split(":");
+        if (parts.length < 2) {
+            return null;
+        }
+        return parts[0];
+    }
+
     public String getType() {
-        return this.field_type_name;
+        String []parts = this.field_type_name.split(":");
+        if (parts.length < 2) {
+            return this.field_type_name;
+        }
+        return parts[1];
     }
 
     boolean type_renamed = false;

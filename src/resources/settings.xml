@@ -71,6 +71,11 @@
 
     <!-- Example for Go and SQLite3: -->
 
+    <!-- use ':' to specify imports: -->
+
+<!--    <type detected="java.util.Date" target="time:time.Time"/>-->
+
+
     <!--    <type-map default="">-->
     <!--        <type detected="java.lang.Integer" target="int64" />-->
     <!--        <type detected="java.lang.Double" target="float64" />-->
