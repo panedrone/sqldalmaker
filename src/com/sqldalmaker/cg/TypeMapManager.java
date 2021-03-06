@@ -37,7 +37,9 @@ class TypeMapManager {
         }
     }
 
-    // 'detected' in here means 1) detected using JDBC or 2) declared in XML meta-program explicitly
+    // 'detected' in here means
+    //      1) detected using JDBC or
+    //      2) detected from explicit declarations in XML meta-program
 
     public String get_rendered_type_name(String detected_type_name) throws Exception {
         if (detected.size() == 0) {

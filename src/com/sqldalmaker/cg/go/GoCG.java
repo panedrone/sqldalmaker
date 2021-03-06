@@ -429,9 +429,6 @@ public class GoCG {
                 return Helpers.get_only_pk_warning(method_name);
             }
             String sql_str = SqlUtils.jdbc_sql_to_java_str(dao_jdbc_sql);
-            List<FieldInfo> fields = new ArrayList<FieldInfo>();
-            fields.addAll(fields_not_pk);
-            fields.addAll(fields_pk);
             Map<String, Object> context = new HashMap<String, Object>();
             context.put("mode", "dao_exec_dml");
             context.put("class_name", dao_class_name);
@@ -441,7 +438,10 @@ public class GoCG {
             context.put("plain_params", false);
             context.put("sql", sql_str);
             context.put("dto_param", primitive_params ? "" : _get_rendered_dto_class_name(dto_class_name));
-            context.put("params", fields);
+            List<FieldInfo> params = new ArrayList<FieldInfo>();
+            params.addAll(fields_not_pk);
+            params.addAll(fields_pk);
+            context.put("params", params);
             context.put("is_external_sql", false);
             StringWriter sw = new StringWriter();
             te.merge(context, sw);
