@@ -303,25 +303,25 @@ public class JdbcUtils {
     }
 
     private void _refine_fields_by_jaxb_explicit_fields(List<DtoClass.Field> jaxb_explicit_fields,
-                                                        Map<String, FieldInfo> fields_map, List<FieldInfo> fields) throws Exception {
+                                                        Map<String, FieldInfo> fields_map,
+                                                        List<FieldInfo> fields) throws Exception {
         if (jaxb_explicit_fields == null) {
             return;
         }
         for (DtoClass.Field jaxb_explicit_field : jaxb_explicit_fields) {
             String col_name = jaxb_explicit_field.getColumn();
-            String java_type_name = jaxb_explicit_field.getType();
+            String type_name = jaxb_explicit_field.getType();
             if (fields_map.containsKey(col_name)) {
-                fields_map.get(col_name).refine_type(java_type_name);
+                fields_map.get(col_name).refine_type(type_name);
             } else {
-                FieldInfo explicit_field = new FieldInfo(field_names_mode, java_type_name, col_name, "xml(" + col_name + ")");
+                FieldInfo explicit_field = new FieldInfo(field_names_mode, type_name, col_name, "xml(" + col_name + ")");
                 fields.add(explicit_field);
                 fields_map.put(col_name, explicit_field);
             }
         }
     }
 
-    private void _refine_field_info_by_table_meta_data(
-            final String table_name, Map<String, FieldInfo> fields_map) throws Exception {
+    private void _refine_field_info_by_table_meta_data(final String table_name, Map<String, FieldInfo> fields_map) throws Exception {
         if (!SqlUtils.is_table_ref(table_name)) {
             throw new Exception("Table name expected: " + table_name);
         }

@@ -7,10 +7,13 @@ import (
 	"strings"
 
 	// _ "github.com/mattn/go-sqlite3"		// SQLite3
-	// _ "github.com/go-sql-driver/mysql"	// MySQL
-	_ "github.com/ziutek/mymysql/godrv" // MySQL
 	// _ "github.com/denisenkom/go-mssqldb" // SQL Server
 	// _ "github.com/godror/godror"			// Oracle
+
+	// only strings for MySQL (so far). see _prepareFetch below and related comments.
+
+	// _ "github.com/go-sql-driver/mysql"	// MySQL
+	_ "github.com/ziutek/mymysql/godrv" // MySQL
 )
 
 /*
@@ -47,7 +50,10 @@ func (ds *DataStore) open() {
 }
 
 func (ds *DataStore) close() {
-	ds.handle.Close()
+	err := ds.handle.Close()
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func (ds *DataStore) begin() {
@@ -63,13 +69,18 @@ func (ds *DataStore) rollback() {
 }
 
 func (ds *DataStore) insert(sql string, args ...interface{}) interface{} {
-	sql = ds.formatSQL(sql)
+	sql = ds._formatSQL(sql)
 	stmt, err := ds.handle.Prepare(sql)
 	if err != nil {
 		log.Fatal(err)
 		return -1
 	}
-	defer stmt.Close()
+	defer func() {
+		err = stmt.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
 	res, err2 := stmt.Exec(args...)
 	if err2 != nil {
 		log.Fatal(err)
@@ -89,13 +100,18 @@ func (ds *DataStore) insert(sql string, args ...interface{}) interface{} {
 }
 
 func (ds *DataStore) execDML(sql string, args ...interface{}) int64 {
-	sql = ds.formatSQL(sql)
+	sql = ds._formatSQL(sql)
 	stmt, err := ds.handle.Prepare(sql)
 	if err != nil {
 		log.Fatal(err)
 		return -1
 	}
-	defer stmt.Close()
+	defer func() {
+		err = stmt.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
 	res, err2 := stmt.Exec(args...)
 	if err2 != nil {
 		log.Fatal(err)
@@ -129,22 +145,25 @@ func (ds *DataStore) query(sql string, args ...interface{}) interface{} {
 }
 
 func (ds *DataStore) queryAll(sql string, onRow func(interface{}), args ...interface{}) {
-	sql = ds.formatSQL(sql)
+	sql = ds._formatSQL(sql)
 	rows, err := ds.handle.Query(sql, args...)
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
-	defer rows.Close()
+	defer func() {
+		err = rows.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
 	// all columns! if less, it returns nil-s
-	colNames, _ := rows.Columns()
-	values := make([]interface{}, len(colNames))
-	valuePointers := make([]interface{}, len(colNames))
-	for i := range values {
-		valuePointers[i] = &values[i]
-	}
+	_, _, values, valuePointers := ds._prepareFetch(rows)
 	for rows.Next() {
-		rows.Scan(valuePointers...)
+		err = rows.Scan(valuePointers...)
+		if err != nil {
+			log.Fatal(err)
+		}
 		data := values[0]
 		onRow(data)
 	}
@@ -168,30 +187,71 @@ func (ds *DataStore) queryRow(sql string, args ...interface{}) map[string]interf
 func (ds *DataStore) queryAllRows(sql string, onRow func(map[string]interface{}), args ...interface{}) {
 	// many thanks to:
 	// https://stackoverflow.com/questions/51731423/how-to-read-a-row-from-a-table-to-a-map-without-knowing-columns
-	sql = ds.formatSQL(sql)
+	sql = ds._formatSQL(sql)
 	rows, err := ds.handle.Query(sql, args...)
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
-	defer rows.Close()
-	colNames, _ := rows.Columns()
-	data := make(map[string]interface{})
-	values := make([]interface{}, len(colNames))
-	valuePointers := make([]interface{}, len(colNames))
-	for i := range values {
-		valuePointers[i] = &values[i]
-	}
+	defer func() {
+		err = rows.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
+	colNames, data, values, valuePointers := ds._prepareFetch(rows)
 	for rows.Next() {
-		rows.Scan(valuePointers...)
+		err = rows.Scan(valuePointers...)
+		if err != nil {
+			log.Fatal(err)
+		}
 		for i, colName := range colNames {
 			data[colName] = values[i]
 		}
 		onRow(data)
 	}
 }
+/*
+Temporary workaround for MySQL:
 
-func (ds *DataStore) formatSQL(sql string) string {
+<type-map default="">
+	<type detected="java.lang.Short" target="string"/>
+	<type detected="java.lang.Integer" target="string"/>
+	<type detected="java.lang.String" target="string"/>
+	<type detected="java.util.Date" target="string"/>
+	<type detected="byte[]" target="string"/>
+	<type detected="java.lang.Boolean" target="string"/>
+	<type detected="java.math.BigDecimal" target="string"/>
+</type-map>
+
+Origin is described here:
+
+https://github.com/ziutek/mymysql#type-mapping
+
+After text query you always receive a text result.
+Mysql text result corresponds to []byte type in mymysql.
+It isn't string type due to avoidance of unnecessary type conversions.
+You can always convert []byte to string yourself...
+
+TODO: Enable something like type-convertors in 'type-map' and generated code.
+
+<type detected="java.lang.String" target="ds.toStr(...)"/>
+
+*/
+
+func (ds *DataStore) _prepareFetch(rows *sql.Rows) ([]string, map[string]interface{}, []string, []interface{}) {
+	colNames, _ := rows.Columns()
+	data := make(map[string]interface{})
+	values := make([]string, len(colNames)) // fetch strings for MySQL. see comment about 'type-map' above
+	// values := make([]interface{}, len(colNames)) // interface{} is ok for SQLite3, Oracle, and SQL Server
+	valuePointers := make([]interface{}, len(colNames))
+	for i := range values {
+		valuePointers[i] = &values[i]
+	}
+	return colNames, data, values, valuePointers
+}
+
+func (ds *DataStore) _formatSQL(sql string) string {
 	if len(ds.paramPrefix) == 0 {
 		return sql
 	}
