@@ -27,15 +27,17 @@ public class FieldInfo {
         field_name = db_col_name;
         if ("parameter".equals(comment) == false) {
             this.field_name = this.field_name.replace(" ", "_"); // for mysql!
+            this.field_name = this.field_name.replace("[", "");
+            this.field_name = this.field_name.replace("]", "");
             this.field_name = this.field_name.replace(".", "_"); // [OrderDetails].OrderID
             this.field_name = this.field_name.replace(":", "_"); // CustomerID:1 -- for latest xenian SQLite3
         }
         if (FieldNamesMode.LOWER_CASE.equals(field_names_mode)) {
             this.field_name = this.field_name.toLowerCase();
         } else if (FieldNamesMode.LOWER_CAMEL_CASE.equals(field_names_mode)) {
-            this.field_name = toCamelCase(this.field_name, false);
+            this.field_name = to_camel_or_title_case(this.field_name, false);
         } else if (FieldNamesMode.TITLE_CASE.equals(field_names_mode)) {
-            this.field_name = toCamelCase(this.field_name, true);
+            this.field_name = to_camel_or_title_case(this.field_name, true);
         } else if (FieldNamesMode.SNAKE_CASE.equals(field_names_mode)) {
             this.field_name = Helpers.camel_case_to_lower_under_scores(this.field_name);
             this.name_prefix = "_";
@@ -119,15 +121,20 @@ public class FieldInfo {
         return "set" + X;
     }
 
-    public static String toCamelCase(String str, boolean title_case) {
+    private static String to_camel_or_title_case(String str, boolean title_case) {
         if (!str.contains("_")) {
-            boolean all_is_upper_case = Helpers.is_upper_case(str);
-            if (all_is_upper_case) {
-                str = str.toLowerCase();
+            if (title_case) {
+                return Helpers.replace_char_at(str, 0, Character.toTitleCase(str.charAt(0)));
+            } else {
+                boolean all_is_upper_case = Helpers.is_upper_case(str);
+                if (all_is_upper_case) {
+                    str = str.toLowerCase();
+                    return str;
+                } else {
+                    return Helpers.replace_char_at(str, 0, Character.toLowerCase(str.charAt(0)));
+                }
             }
-            return Helpers.replace_char_at(str, 0, Character.toLowerCase(str.charAt(0)));
         }
-        // http://stackoverflow.com/questions/1143951/what-is-the-simplest-way-to-convert-a-java-string-from-all-caps-words-separated
         StringBuilder sb = new StringBuilder();
         String[] arr = str.split("_");
         for (int i = 0; i < arr.length; i++) {
@@ -135,18 +142,26 @@ public class FieldInfo {
             if (s.length() == 0) {
                 continue; // E.g. _ALL_FILE_GROUPS
             }
+            char ch0 = s.charAt(0);
             if (i == 0) {
-                sb.append(s.toLowerCase());
+                if (title_case) {
+                    ch0 = Character.toTitleCase(ch0);
+                } else {
+                    ch0 = Character.toLowerCase(ch0);
+                }
             } else {
-                sb.append(Character.toUpperCase(s.charAt(0)));
-                if (s.length() > 1) {
-                    sb.append(s.substring(1).toLowerCase());
+                ch0 = Character.toTitleCase(ch0);
+            }
+            sb.append(ch0);
+            if (s.length() > 1) {
+                String tail = s.substring(1);
+                boolean all_is_upper_case = Helpers.is_upper_case(tail);
+                if (all_is_upper_case) {
+                    sb.append(tail.toLowerCase());
+                } else {
+                    sb.append(tail);
                 }
             }
-        }
-        if (title_case) {
-            char upper = Character.toTitleCase(sb.charAt(0));
-            sb.setCharAt(0, upper);
         }
         return sb.toString();
     }
