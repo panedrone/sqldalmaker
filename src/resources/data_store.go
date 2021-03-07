@@ -29,12 +29,11 @@ type DataStore struct {
 }
 
 func (ds *DataStore) open() {
-	var err error
 	// ds.handle, err = sql.Open("sqlite3", "./todo-list.sqlite")
-
-	// ds.handle, _ = sql.Open("sqlite3", "./sqlite-database.db")
-	// ds.handle, _ = sql.Open("mysql", "root:root@/sakila")
-	ds.handle, err = sql.Open("mymysql", "sakila/root/root")
+	ds.handle, err = sql.Open("sqlite3", "./northwindEF.sqlite")
+	// -----------------
+	// ds.handle, err = sql.Open("mysql", "root:root@/sakila")
+	// ds.handle, err = sql.Open("mymysql", "sakila/root/root")
 	// -----------------
 	// SQL Server https://github.com/denisenkom/go-mssqldb
 	// The sqlserver driver uses normal MS SQL Server syntax and expects parameters in the
@@ -239,7 +238,8 @@ TODO: Enable something like type-convertors in 'type-map' and generated code.
 
 */
 
-func (ds *DataStore) _prepareFetch(rows *sql.Rows) ([]string, map[string]interface{}, []string, []interface{}) {
+// func (ds *DataStore) _prepareFetch(rows *sql.Rows) ([]string, map[string]interface{}, []string, []interface{}) {   // MySQL
+func (ds *DataStore) _prepareFetch(rows *sql.Rows) ([]string, map[string]interface{}, []interface{}, []interface{}) {
 	colNames, _ := rows.Columns()
 	data := make(map[string]interface{})
 	// values := make([]string, len(colNames)) // fetch strings for MySQL. see comment about 'type-map' above
