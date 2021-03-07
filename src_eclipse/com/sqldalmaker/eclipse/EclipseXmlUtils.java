@@ -1,7 +1,7 @@
 /*
- * Copyright 2011-2020 sqldalmaker@gmail.com
- * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
- * Read LICENSE.txt in the root of this project/archive for details.
+ * Copyright 2011-2021 sqldalmaker@gmail.com
+ * Read LICENSE.txt in the root of this project/archive.
+ * Project web-site: http://sqldalmaker.sourceforge.net
  */
 package com.sqldalmaker.eclipse;
 
@@ -28,7 +28,7 @@ public class EclipseXmlUtils {
 
 	public static void goto_dto_class_declaration(Shell shell, IFile file, String dto_class_name) throws Exception {
 
-		IEditorPart part = EclipseEditorHelpers.open_editor_sync(shell, file, false);
+		IEditorPart part = EclipseEditorHelpers.open_editor_sync(shell, file);
 		// google: eclipse plugin api editor set caret position
 		// https://stackoverflow.com/questions/35591397/eclipseget-and-set-caret-position-of-the-editor
 		Control control = part.getAdapter(Control.class);

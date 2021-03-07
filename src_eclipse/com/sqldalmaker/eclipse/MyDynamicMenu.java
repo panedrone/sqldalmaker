@@ -1,7 +1,7 @@
 /*
- * Copyright 2011-2020 sqldalmaker@gmail.com
- * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
- * Read LICENSE.txt in the root of this project/archive for details.
+ * Copyright 2011-2021 sqldalmaker@gmail.com
+ * Read LICENSE.txt in the root of this project/archive.
+ * Project web-site: http://sqldalmaker.sourceforge.net
  */
 package com.sqldalmaker.eclipse;
 
@@ -22,12 +22,10 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.ResourceUtil;
 
 import com.sqldalmaker.common.FileSearchHelpers;
-import com.sqldalmaker.common.InternalException;
 
 /**
  *
@@ -130,7 +128,7 @@ public class MyDynamicMenu extends ContributionItem {
 								public void widgetSelected(SelectionEvent e) {
 									try {
 										MyToolbarUtils.open_dal_file(root_file_rel_path, projects);
-									} catch (PartInitException | InternalException e1) {
+									} catch (Exception e1) {
 										e1.printStackTrace();
 										EclipseMessageHelpers.show_error(e1);
 									}

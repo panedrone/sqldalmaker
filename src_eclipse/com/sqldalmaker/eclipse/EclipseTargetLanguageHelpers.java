@@ -1,7 +1,7 @@
 /*
- * Copyright 2011-2020 sqldalmaker@gmail.com
- * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
- * Read LICENSE.txt in the root of this project/archive for details.
+ * Copyright 2011-2021 sqldalmaker@gmail.com
+ * Read LICENSE.txt in the root of this project/archive.
+ * Project web-site: http://sqldalmaker.sourceforge.net
  */
 package com.sqldalmaker.eclipse;
 
@@ -32,14 +32,12 @@ import com.sqldalmaker.jaxb.dto.DtoClasses;
 import com.sqldalmaker.jaxb.settings.Settings;
 
 /**
- *
  * @author sqldalmaker@gmail.com
  *
  */
 public class EclipseTargetLanguageHelpers {
 
 	public static boolean underscores_needed(IEditor2 editor2) {
-
 		String root_fn = editor2.get_root_file_name();
 		if (RootFileName.RUBY.equals(root_fn) || RootFileName.PYTHON.equals(root_fn)) {
 			return true;
@@ -48,7 +46,6 @@ public class EclipseTargetLanguageHelpers {
 	}
 
 	public static List<IFile> get_root_files(IContainer xml_mp_folder) throws Exception {
-
 		if (!(xml_mp_folder instanceof IFolder)) {
 			throw new Exception("IFolder expected");
 		}
@@ -212,7 +209,7 @@ public class EclipseTargetLanguageHelpers {
 				String abs_path = EclipseHelpers.get_absolute_dir_path_str(project, rel_path);
 				output_dir.append(abs_path);
 			}
-            String dto_package = rel_path = rel_path.replace("/", ".").replace("\\", ".");
+			String dto_package = rel_path = rel_path.replace("/", ".").replace("\\", ".");
 			PythonCG.DAO gen = new PythonCG.DAO(dto_package, dto_classes, conn, sql_root_abs_path, vm_file_system_path);
 			return gen;
 		} else if (RootFileName.PHP.equals(root_fn)) {
@@ -273,35 +270,29 @@ public class EclipseTargetLanguageHelpers {
 
 	public static IFile find_source_file_in_project_tree(IProject project, Settings settings, String class_name,
 			String java_package, String root_fn) throws Exception {
-
+		String path;
 		if (RootFileName.JAVA.equals(root_fn)) {
-			String path = SdmUtils.get_package_relative_path(settings, java_package) + "/" + class_name + ".java";
-			return project.getFile(path);
-
+			path = SdmUtils.get_package_relative_path(settings, java_package) + "/" + class_name + ".java";
 		} else if (RootFileName.PHP.equals(root_fn)) {
-			String path = settings.getFolders().getTarget() + "/" + class_name + ".php";
-			return project.getFile(path);
+			path = settings.getFolders().getTarget() + "/" + class_name + ".php";
 		} else if (RootFileName.CPP.equals(root_fn)) {
-			String path = settings.getFolders().getTarget() + "/" + class_name + ".h";
-			return project.getFile(path);
+			path = settings.getFolders().getTarget() + "/" + class_name + ".h";
 		} else if (RootFileName.PYTHON.equals(root_fn)) {
-			String path = settings.getFolders().getTarget() + "/"
+			path = settings.getFolders().getTarget() + "/"
 					+ Helpers.convert_to_lower_underscores_file_name(class_name, "py");
-			return project.getFile(path);
 		} else if (RootFileName.RUBY.equals(root_fn)) {
-			String path = settings.getFolders().getTarget() + "/"
+			path = settings.getFolders().getTarget() + "/"
 					+ Helpers.convert_to_lower_underscores_file_name(class_name, "rb");
-			return project.getFile(path);
 		} else if (RootFileName.GO.equals(root_fn)) {
-			String path = settings.getFolders().getTarget() + "/"
+			path = settings.getFolders().getTarget() + "/"
 					+ Helpers.convert_to_lower_underscores_file_name(class_name, "go");
-			return project.getFile(path);
+		} else {
+			throw new Exception(get_unknown_root_file_msg(root_fn));
 		}
-		throw new Exception(get_unknown_root_file_msg(root_fn));
+		return project.getFile(path);
 	}
 
 	public static IResource find_root_file(IContainer meta_program_location) throws Exception {
-
 		IResource res = meta_program_location.findMember(RootFileName.PHP);
 		if (res instanceof IFile) {
 			return res;
@@ -330,13 +321,11 @@ public class EclipseTargetLanguageHelpers {
 	}
 
 	public static String get_rel_path(IEditor2 editor2, StringBuilder output_dir, String class_name) {
-
 		String fn = editor2.get_root_file_name();
 		return get_rel_path(fn, output_dir, class_name);
 	}
 
 	public static String get_rel_path(String fn, StringBuilder output_dir, String class_name) {
-
 		if (RootFileName.RUBY.equals(fn)) {
 			return output_dir + "/" + Helpers.convert_to_lower_underscores_file_name(class_name, "rb");
 		} else if (RootFileName.PYTHON.equals(fn)) {
@@ -353,13 +342,7 @@ public class EclipseTargetLanguageHelpers {
 		return null;
 	}
 
-	/**
-	 *
-	 * @param file
-	 * @return null if the file is not root-file
-	 */
 	public static String get_root_file_relative_path(final IFile file) {
-
 		String fn = file.getName();
 		if (RootFileName.JAVA.equals(fn) || RootFileName.CPP.equals(fn) || RootFileName.PHP.equals(fn)
 				|| RootFileName.PYTHON.equals(fn) || RootFileName.RUBY.equals(fn) || RootFileName.GO.equals(fn)) {

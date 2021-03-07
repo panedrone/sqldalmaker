@@ -1,7 +1,7 @@
 /*
- * Copyright 2011-2020 sqldalmaker@gmail.com
- * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
- * Read LICENSE.txt in the root of this project/archive for details.
+ * Copyright 2011-2021 sqldalmaker@gmail.com
+ * Read LICENSE.txt in the root of this project/archive.
+ * Project web-site: http://sqldalmaker.sourceforge.net
  */
 package com.sqldalmaker.eclipse;
 
@@ -581,7 +581,7 @@ public class UIEditorPageAdmin extends Composite {
 	protected void editSettings() {
 		try {
 			IFile file = editor2.find_settings_xml();
-			EclipseEditorHelpers.open_editor_sync(getShell(), file, true);
+			EclipseEditorHelpers.open_editor_sync(getShell(), file);
 		} catch (Throwable ex) {
 			ex.printStackTrace();
 			EclipseMessageHelpers.show_error(ex);

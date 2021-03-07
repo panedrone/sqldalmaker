@@ -1,8 +1,7 @@
 /*
- * Copyright 2011-2019 sqldalmaker@gmail.com
- * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
- * Read LICENSE.txt in the root of this project/archive for details.
- * 
+ * Copyright 2011-2021 sqldalmaker@gmail.com
+ * Read LICENSE.txt in the root of this project/archive.
+ * Project web-site: http://sqldalmaker.sourceforge.net
  */
 package com.sqldalmaker.eclipse;
 
@@ -13,7 +12,6 @@ import java.sql.Connection;
 
 import javax.xml.bind.Marshaller;
 
-import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -21,7 +19,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -35,8 +32,6 @@ import org.eclipse.ui.IStorageEditorInput;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.ide.undo.CreateFileOperation;
-import org.eclipse.ui.ide.undo.WorkspaceUndoUtil;
 import org.eclipse.ui.part.FileEditorInput;
 
 import com.sqldalmaker.common.Const;
@@ -46,7 +41,6 @@ import com.sqldalmaker.jaxb.dto.DtoClass;
 import com.sqldalmaker.jaxb.dto.DtoClasses;
 
 /**
- *
  * @author sqldalmaker@gmail.com
  *
  */
@@ -58,70 +52,69 @@ public class EclipseEditorHelpers {
 		open_editor_sync(ei, full_path);
 	}
 
-	public static IEditorPart open_editor_sync(Shell shell, IFile file, boolean create_missing)
-			throws InternalException, PartInitException {
+	private static String get_not_found_message(String msg, String path) {
+		if (path != null) {
+			msg += ": " + path;
+		}
+		msg += "\r\nEnsure upper/lower case.";
+		msg += "\r\nTry to refresh the project tree (F5).";
+		return msg;
+	}
+
+	public static IEditorPart open_editor_sync(Shell shell, IFile file) throws Exception {
 		if (file == null) {
-			throw new InternalException("File not found.\r\nTry to refresh the project tree (F5).");
+			throw new Exception(get_not_found_message("File not found", null));
 		}
 		boolean exists = file.exists(); // false for Go
 		if (!exists) {
 			IProject project = file.getProject();
 			String path = file.getFullPath().toPortableString();
 			if (project == null) {
-				throw new InternalException("No project for " + path);
+				throw new Exception("No project for " + path);
 			}
 			IContainer folder = file.getParent();
 			if (folder == null) {
-				throw new InternalException("No parent detected for " + path);
+				throw new Exception("No parent detected for " + path);
 			}
 			String name = file.getName();
 			IResource res = folder.findMember(name, true);
 			if (!(res instanceof IFile)) {
-				throw new InternalException("Not detected as file " + path);
+				throw new Exception(get_not_found_message("Not detected as file", path));
 			}
 		}
 		if (exists || file.getName().endsWith(".go")) {
 			return open_editor_sync(new FileEditorInput(file), file.getName());
 		}
 		String title = file.getFullPath().toPortableString();
-		if (create_missing) {
-			if (EclipseMessageHelpers.show_confirmation(
-					"'" + title + "' does not exist. " + "Do you want to create a new one?") == false) {
-				return null;
-			}
-			create_new_file_sync(shell, file, (InputStream) null, title, (IProgressMonitor) null);
-		} else {
-			throw new InternalException("'" + title + "' not found.\r\nTry to refresh the project tree (F5).");
-		}
-		return null;
+		throw new Exception(get_not_found_message("File not found", title));
 	}
 
-	private static void create_new_file_sync(Shell shell, IFile new_file_handle, InputStream initial_contents,
-			String title, IProgressMonitor monitor) {
-		CreateFileOperation op = new CreateFileOperation(new_file_handle, null, initial_contents, title);
-		try {
-			// see bug
-			// https://bugs.eclipse.org/bugs/show_bug.cgi?id=219901
-			// directly execute the operation so that the undo state is
-			// not preserved. Making this undoable resulted in too many
-			// accidental file deletions.
-			//
-			op.execute(monitor, WorkspaceUndoUtil.getUIInfoAdapter(shell));
-		} catch (final ExecutionException e) {
-			shell.getDisplay().syncExec(new Runnable() {
-				public void run() {
-					EclipseMessageHelpers.show_error(e);
-				}
-			});
-		}
-	}
+//	private static void create_new_file_sync(Shell shell, IFile new_file_handle, InputStream initial_contents,
+//			String title, IProgressMonitor monitor) {
+//		CreateFileOperation op = new CreateFileOperation(new_file_handle, null, initial_contents, title);
+//		try {
+//			// see bug
+//			// https://bugs.eclipse.org/bugs/show_bug.cgi?id=219901
+//			// directly execute the operation so that the undo state is
+//			// not preserved. Making this undoable resulted in too many
+//			// accidental file deletions.
+//			//
+//			op.execute(monitor, WorkspaceUndoUtil.getUIInfoAdapter(shell));
+//		} catch (final ExecutionException e) {
+//			shell.getDisplay().syncExec(new Runnable() {
+//				public void run() {
+//					EclipseMessageHelpers.show_error(e);
+//				}
+//			});
+//		}
+//	}
 
 	public static IEditorPart open_editor_sync(IEditorInput editor_input, String file_name)
 			throws PartInitException, InternalException {
 		IEditorRegistry r = PlatformUI.getWorkbench().getEditorRegistry();
 		IEditorDescriptor desc = r.getDefaultEditor(file_name);
 		// Eclipse for RCP and RAP Developers' does not have SQL editor
-		if (desc == null/* || file_name.endsWith(".go")*/) {
+		if (desc == null/* || file_name.endsWith(".go") */) {
 			desc = r.getDefaultEditor("*.txt");
 		}
 		if (desc == null) {

@@ -1,7 +1,7 @@
 /*
- * Copyright 2011-2020 sqldalmaker@gmail.com
- * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
- * Read LICENSE.txt in the root of this project/archive for details.
+ * Copyright 2011-2021 sqldalmaker@gmail.com
+ * Read LICENSE.txt in the root of this project/archive.
+ * Project web-site: http://sqldalmaker.sourceforge.net
  */
 package com.sqldalmaker.eclipse;
 
@@ -62,7 +62,6 @@ import com.sqldalmaker.jaxb.dto.DtoClass;
 import com.sqldalmaker.jaxb.settings.Settings;
 
 /**
- *
  * @author sqldalmaker@gmail.com
  *
  */
@@ -71,9 +70,6 @@ public class UIEditorPageDTO extends Composite {
 	private Filter filter;
 
 	private IEditor2 editor2;
-
-	private static final String STATUS_GENERATED = "Generated successfully";
-	private static final String STATUS_OK = "OK";
 
 	// WindowBuilder fails with inheritance
 	private final FormToolkit toolkit = new FormToolkit(Display.getCurrent());
@@ -88,7 +84,7 @@ public class UIEditorPageDTO extends Composite {
 	private Action action_openSQL;
 	private Action action_openXml;
 	private Action action_import;
-	private Action action_openJava;
+	private Action action_open_target;
 	private Action action_genTmpFieldTags;
 
 	private Composite composite_1;
@@ -130,7 +126,7 @@ public class UIEditorPageDTO extends Composite {
 		toolkit.paintBordersFor(toolBar1);
 		toolBarManager.add(action_openXml);
 		toolBarManager.add(action_openSQL);
-		toolBarManager.add(action_openJava);
+		toolBarManager.add(action_open_target);
 		toolBarManager.add(action_genTmpFieldTags);
 		toolBarManager.add(action_import);
 		toolBarManager.add(action_refresh);
@@ -312,15 +308,15 @@ public class UIEditorPageDTO extends Composite {
 					.setImageDescriptor(ResourceManager.getImageDescriptor(UIEditorPageDTO.class, "/img/xmldoc.gif"));
 		}
 		{
-			action_openJava = new Action("") {
+			action_open_target = new Action("") {
 				@Override
 				public void run() {
 					open_generated_source_file();
 				}
 			};
-			action_openJava.setImageDescriptor(
+			action_open_target.setImageDescriptor(
 					ResourceManager.getImageDescriptor(UIEditorPageDTO.class, "/img/GeneratedFile.gif"));
-			action_openJava.setToolTipText("Go to generated source");
+			action_open_target.setToolTipText("Go to generated source");
 		}
 		{
 			action_genTmpFieldTags = new Action("") {
@@ -366,10 +362,12 @@ public class UIEditorPageDTO extends Composite {
 			public int get_total_work() {
 				return items.size();
 			}
+
 			@Override
 			public String get_name() {
 				return "Validation...";
 			}
+
 			@Override
 			public void run_with_progress(IProgressMonitor monitor) throws Exception {
 				monitor.subTask("Connecting...");
@@ -403,7 +401,7 @@ public class UIEditorPageDTO extends Composite {
 							}
 							String status = validation_buff.toString();
 							if (status.length() == 0) {
-								items.get(i).setStatus(STATUS_OK);
+								items.get(i).setStatus(Const.STATUS_OK);
 							} else {
 								items.get(i).setStatus(status);
 								EclipseConsoleHelpers.add_error_msg(dto_class_name + ": " + status);
@@ -499,7 +497,7 @@ public class UIEditorPageDTO extends Composite {
 							String fileName = EclipseTargetLanguageHelpers.get_rel_path(editor2, output_dir,
 									dto_class_name);
 							EclipseHelpers.save_text_to_file(fileName, fileContent[0]);
-							item.setStatus(STATUS_GENERATED);
+							item.setStatus(Const.STATUS_GENERATED);
 							generated = true;
 						} catch (Throwable ex) {
 							String msg = ex.getMessage();
@@ -555,7 +553,7 @@ public class UIEditorPageDTO extends Composite {
 				throw new Exception("Folder does not exist: " + sql_root_folder_relative_path);
 			}
 			IFile file = folder.getFile(relative);
-			EclipseEditorHelpers.open_editor_sync(getShell(), file, true);
+			EclipseEditorHelpers.open_editor_sync(getShell(), file);
 		} catch (Throwable e) {
 			e.printStackTrace();
 			EclipseMessageHelpers.show_error(e);
@@ -570,7 +568,7 @@ public class UIEditorPageDTO extends Composite {
 			}
 			final List<Item> items = prepareSelectedItems();
 			if (items == null || items.size() == 0) {
-				EclipseEditorHelpers.open_editor_sync(getShell(), file, false);
+				EclipseEditorHelpers.open_editor_sync(getShell(), file);
 				return;
 			}
 			EclipseXmlUtils.goto_dto_class_declaration(getShell(), file, items.get(0).get_name());
@@ -591,7 +589,7 @@ public class UIEditorPageDTO extends Composite {
 			Settings settings = EclipseHelpers.load_settings(editor2);
 			file = EclipseTargetLanguageHelpers.find_source_file_in_project_tree(editor2.get_project(), settings, value,
 					settings.getDto().getScope(), editor2.get_root_file_name());
-			EclipseEditorHelpers.open_editor_sync(getShell(), file, false);
+			EclipseEditorHelpers.open_editor_sync(getShell(), file);
 		} catch (Throwable e) {
 			e.printStackTrace();
 			EclipseMessageHelpers.show_error(e);
@@ -633,8 +631,9 @@ public class UIEditorPageDTO extends Composite {
 		public Color getForeground(Object element) {
 			Item item = (Item) element;
 
-			if (item.getStatus() != null && item.getStatus().length() > 0 && STATUS_OK.equals(item.getStatus()) == false
-					&& STATUS_GENERATED.equals(item.getStatus()) == false) {
+			if (item.getStatus() != null && item.getStatus().length() > 0
+					&& Const.STATUS_OK.equals(item.getStatus()) == false
+					&& Const.STATUS_GENERATED.equals(item.getStatus()) == false) {
 
 				return PlatformUI.getWorkbench().getDisplay().getSystemColor(SWT.COLOR_RED);
 			}
@@ -759,7 +758,7 @@ public class UIEditorPageDTO extends Composite {
 		}
 		action_generate.setEnabled(enabled);
 		action_openSQL.setEnabled(enabled);
-		action_openJava.setEnabled(enabled);
+		action_open_target.setEnabled(enabled);
 		action_genTmpFieldTags.setEnabled(enabled);
 	}
 

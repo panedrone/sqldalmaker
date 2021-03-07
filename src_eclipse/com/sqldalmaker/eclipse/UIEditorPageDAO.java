@@ -1,7 +1,7 @@
 /*
- * Copyright 2011-2020 sqldalmaker@gmail.com
- * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
- * Read LICENSE.txt in the root of this project/archive for details.
+ * Copyright 2011-2021 sqldalmaker@gmail.com
+ * Read LICENSE.txt in the root of this project/archive.
+ * Project web-site: http://sqldalmaker.sourceforge.net
  */
 package com.sqldalmaker.eclipse;
 
@@ -51,13 +51,13 @@ import org.eclipse.wb.swt.ResourceManager;
 
 import com.sqldalmaker.cg.Helpers;
 import com.sqldalmaker.cg.IDaoCG;
+import com.sqldalmaker.common.Const;
 import com.sqldalmaker.common.FileSearchHelpers;
 import com.sqldalmaker.common.XmlParser;
 import com.sqldalmaker.jaxb.dao.DaoClass;
 import com.sqldalmaker.jaxb.settings.Settings;
 
 /**
- *
  * @author sqldalmaker@gmail.com
  *
  */
@@ -69,9 +69,6 @@ public class UIEditorPageDAO extends Composite {
 	public void setEditor2(IEditor2 editor2) {
 		this.editor2 = editor2;
 	}
-
-	protected static final String STATUS_GENERATED = "Generated successfully";
-	protected static final String STATUS_OK = "OK";
 
 	// WindowBuilder fails with inheritance
 	private final FormToolkit toolkit = new FormToolkit(Display.getCurrent());
@@ -341,7 +338,7 @@ public class UIEditorPageDAO extends Composite {
 			Settings settings = EclipseHelpers.load_settings(editor2);
 			file = EclipseTargetLanguageHelpers.find_source_file_in_project_tree(editor2.get_project(), settings,
 					dao_class_name, settings.getDao().getScope(), editor2.get_root_file_name());
-			EclipseEditorHelpers.open_editor_sync(getShell(), file, false);
+			EclipseEditorHelpers.open_editor_sync(getShell(), file);
 		} catch (Throwable e) {
 			e.printStackTrace();
 			EclipseMessageHelpers.show_error(e);
@@ -356,7 +353,7 @@ public class UIEditorPageDAO extends Composite {
 			}
 			String relative = items.get(0).getRelativePath();
 			IFile file = editor2.find_metaprogram_file(relative);
-			EclipseEditorHelpers.open_editor_sync(getShell(), file, true);
+			EclipseEditorHelpers.open_editor_sync(getShell(), file);
 		} catch (Throwable e) {
 			e.printStackTrace();
 			EclipseMessageHelpers.show_error(e);
@@ -378,7 +375,7 @@ public class UIEditorPageDAO extends Composite {
 			if (file != null) {
 				try {
 					reload_table(true);
-					EclipseEditorHelpers.open_editor_sync(getShell(), file, true);
+					EclipseEditorHelpers.open_editor_sync(getShell(), file);
 
 				} catch (Throwable e1) {
 					e1.printStackTrace();
@@ -466,7 +463,7 @@ public class UIEditorPageDAO extends Composite {
 							String fileName = EclipseTargetLanguageHelpers.get_rel_path(editor2, output_dir,
 									dao_class_name);
 							EclipseHelpers.save_text_to_file(fileName, fileContent[0]);
-							item.setStatus(STATUS_GENERATED);
+							item.setStatus(Const.STATUS_GENERATED);
 							generated = true;
 						} catch (Throwable ex) {
 							String msg = ex.getMessage();
@@ -510,10 +507,12 @@ public class UIEditorPageDAO extends Composite {
 			public int get_total_work() {
 				return items.size();
 			}
+
 			@Override
 			public String get_name() {
 				return "Validation...";
 			}
+
 			@Override
 			public void run_with_progress(IProgressMonitor monitor) throws Exception {
 				monitor.subTask("Connecting...");
@@ -555,7 +554,7 @@ public class UIEditorPageDAO extends Composite {
 							}
 							String status = validation_buff.toString();
 							if (status.length() == 0) {
-								items.get(i).setStatus(STATUS_OK);
+								items.get(i).setStatus(Const.STATUS_OK);
 							} else {
 								items.get(i).setStatus(status);
 								EclipseConsoleHelpers.add_error_msg(dao_xml_rel_path + ": " + status);
@@ -622,8 +621,9 @@ public class UIEditorPageDAO extends Composite {
 		public Color getForeground(Object element) {
 			Item item = (Item) element;
 
-			if (item.getStatus() != null && item.getStatus().length() > 0 && STATUS_OK.equals(item.getStatus()) == false
-					&& STATUS_GENERATED.equals(item.getStatus()) == false) {
+			if (item.getStatus() != null && item.getStatus().length() > 0
+					&& Const.STATUS_OK.equals(item.getStatus()) == false
+					&& Const.STATUS_GENERATED.equals(item.getStatus()) == false) {
 
 				return PlatformUI.getWorkbench().getDisplay().getSystemColor(SWT.COLOR_RED);
 			}
