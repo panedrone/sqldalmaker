@@ -242,8 +242,8 @@ TODO: Enable something like type-convertors in 'type-map' and generated code.
 func (ds *DataStore) _prepareFetch(rows *sql.Rows) ([]string, map[string]interface{}, []string, []interface{}) {
 	colNames, _ := rows.Columns()
 	data := make(map[string]interface{})
-	values := make([]string, len(colNames)) // fetch strings for MySQL. see comment about 'type-map' above
-	// values := make([]interface{}, len(colNames)) // interface{} is ok for SQLite3, Oracle, and SQL Server
+	// values := make([]string, len(colNames)) // fetch strings for MySQL. see comment about 'type-map' above
+	values := make([]interface{}, len(colNames)) // interface{} is ok for SQLite3, Oracle, and SQL Server
 	valuePointers := make([]interface{}, len(colNames))
 	for i := range values {
 		valuePointers[i] = &values[i]
