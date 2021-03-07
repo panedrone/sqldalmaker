@@ -29,6 +29,7 @@ type DataStore struct {
 }
 
 func (ds *DataStore) open() {
+	var err error
 	// ds.handle, err = sql.Open("sqlite3", "./todo-list.sqlite")
 	ds.handle, err = sql.Open("sqlite3", "./northwindEF.sqlite")
 	// -----------------
