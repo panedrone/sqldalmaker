@@ -61,7 +61,7 @@ public class SdmUtils {
     /*
         Used in XML assistants
      */
-    public static void add_fk_access(boolean underscores_needed, Connection conn, boolean schema_in_xml,
+    public static void add_fk_access(FieldNamesMode field_names_mode, Connection conn, boolean schema_in_xml,
                                      String selected_schema, DatabaseMetaData db_info, ResultSet rs_tables, List<Object> nodes,
                                      boolean plural_to_singular) throws SQLException {
         String fk_table_name = rs_tables.getString("TABLE_NAME");
@@ -87,7 +87,11 @@ public class SdmUtils {
             boolean first = true;
             for (String fk_column_name : fk_column_names) {
                 String c = fk_column_name;
-                c = Helpers.camel_case_to_lower_under_scores(c);
+                if (field_names_mode == FieldNamesMode.SNAKE_CASE) {
+                    c = Helpers.camel_case_to_lower_under_scores(c);
+                } else if (field_names_mode == FieldNamesMode.LOWER_CAMEL_CASE) {
+                    c = to_lower_camel_or_title_case(c, false);
+                }
                 if (first) {
                     params += c;
                     columns += fk_column_name;
@@ -102,10 +106,13 @@ public class SdmUtils {
                     + table_name_to_dto_class_name(pk_table_name, true);
             QueryDtoList node = new QueryDtoList();
             node.setDto(dto_class_name);
-            if (underscores_needed) {
+            if (field_names_mode == FieldNamesMode.SNAKE_CASE) {
                 method_name = Helpers.camel_case_to_lower_under_scores(method_name);
             }
-            String method = method_name + "(" + params.toLowerCase() + ")";
+//            } else if (field_names_mode == FieldNamesMode.LOWER_CAMEL_CASE) {
+//                method_name = to_lower_camel_or_title_case(method_name);
+//            }
+            String method = method_name + "(" + params + ")";
             node.setMethod(method);
             if (schema_in_xml && selected_schema != null && selected_schema.length() > 0) {
                 node.setRef(selected_schema + "." + fk_table_name + "(" + columns + ")");
@@ -116,35 +123,15 @@ public class SdmUtils {
         }
     }
 
-    private static String to_camel_case(String str) {
-        if (!str.contains("_")) {
-            boolean all_is_upper_case = Helpers.is_upper_case(str);
-            if (all_is_upper_case) {
-                str = str.toLowerCase();
-            }
-            return Helpers.replace_char_at(str, 0, Character.toUpperCase(str.charAt(0)));
-        }
-        // http://stackoverflow.com/questions/1143951/what-is-the-simplest-way-to-convert-a-java-string-from-all-caps-words-separated
-        StringBuilder sb = new StringBuilder();
-        String[] arr = str.split("_");
-        for (String s : arr) {
-            if (s.length() == 0) {
-                continue; // E.g. _ALL_FILE_GROUPS
-            }
-            sb.append(Character.toUpperCase(s.charAt(0)));
-            if (s.length() > 1) {
-                sb.append(s.substring(1).toLowerCase());
-            }
-        }
-        // }
-        return sb.toString();
+    private static String to_lower_camel_or_title_case(String str, boolean title_case) {
+        return Helpers.to_lower_camel_or_title_case(str, title_case);
     }
 
     /*
         just table name without schema needed
      */
     public static String table_name_to_dto_class_name(String table_name, boolean plural_to_singular) {
-        String word = to_camel_case(table_name);
+        String word = to_lower_camel_or_title_case(table_name, true);
         if (plural_to_singular) {
             int last_word_index = -1;
             String last_word;
@@ -176,7 +163,7 @@ public class SdmUtils {
                                                           Connection conn, Set<String> in_use, boolean schema_in_xml, String selected_schema,
                                                           boolean include_views, boolean crud_auto,
                                                           boolean add_fk_access, boolean plural_to_singular,
-                                                          boolean underscores_needed) throws SQLException {
+                                                          FieldNamesMode field_names_mode) throws SQLException {
         DaoClass root = object_factory.createDaoClass();
         List<Object> nodes = root.getCrudOrCrudAutoOrQuery();
         DatabaseMetaData db_info = conn.getMetaData();
@@ -202,7 +189,7 @@ public class SdmUtils {
                             {
                                 TypeMethod tm = new TypeMethod();
                                 String m = "create" + dto_class_name;
-                                if (underscores_needed) {
+                                if (field_names_mode == FieldNamesMode.SNAKE_CASE) {
                                     m = Helpers.camel_case_to_lower_under_scores(m);
                                 }
                                 tm.setMethod(m);
@@ -211,7 +198,7 @@ public class SdmUtils {
                             {
                                 TypeMethod tm = new TypeMethod();
                                 String m = "read" + dto_class_name + "List";
-                                if (underscores_needed) {
+                                if (field_names_mode == FieldNamesMode.SNAKE_CASE) {
                                     m = Helpers.camel_case_to_lower_under_scores(m);
                                 }
                                 tm.setMethod(m);
@@ -220,7 +207,7 @@ public class SdmUtils {
                             {
                                 TypeMethod tm = new TypeMethod();
                                 String m = "read" + dto_class_name;
-                                if (underscores_needed) {
+                                if (field_names_mode == FieldNamesMode.SNAKE_CASE) {
                                     m = Helpers.camel_case_to_lower_under_scores(m);
                                 }
                                 tm.setMethod(m);
@@ -229,7 +216,7 @@ public class SdmUtils {
                             {
                                 TypeMethod tm = new TypeMethod();
                                 String m = "update" + dto_class_name;
-                                if (underscores_needed) {
+                                if (field_names_mode == FieldNamesMode.SNAKE_CASE) {
                                     m = Helpers.camel_case_to_lower_under_scores(m);
                                 }
                                 tm.setMethod(m);
@@ -238,7 +225,7 @@ public class SdmUtils {
                             {
                                 TypeMethod tm = new TypeMethod();
                                 String m = "delete" + dto_class_name;
-                                if (underscores_needed) {
+                                if (field_names_mode == FieldNamesMode.SNAKE_CASE) {
                                     m = Helpers.camel_case_to_lower_under_scores(m);
                                 }
                                 tm.setMethod(m);
@@ -247,7 +234,7 @@ public class SdmUtils {
                             nodes.add(crud);
                         }
                         if (add_fk_access) {
-                            add_fk_access(underscores_needed, conn, schema_in_xml, selected_schema, db_info, rs,
+                            add_fk_access(field_names_mode, conn, schema_in_xml, selected_schema, db_info, rs,
                                     nodes, plural_to_singular);
                         }
                     }
@@ -262,14 +249,14 @@ public class SdmUtils {
     }
 
     public static DaoClass get_fk_access_xml(Connection conn, ObjectFactory object_factory, boolean schema_in_xml,
-                                             String selected_schema, boolean plural_to_singular, boolean underscores_needed) throws SQLException {
+                                             String selected_schema, boolean plural_to_singular, FieldNamesMode field_names_mode) throws SQLException {
         DaoClass root = object_factory.createDaoClass();
         List<Object> nodes = root.getCrudOrCrudAutoOrQuery();
         DatabaseMetaData db_info = conn.getMetaData();
         ResultSet rs = JdbcUtils.get_tables_rs(conn, db_info, selected_schema, /* include_views */ false); // no FK in views
         try {
             while (rs.next()) {
-                add_fk_access(underscores_needed, conn, schema_in_xml, selected_schema, db_info, rs, nodes,
+                add_fk_access(field_names_mode, conn, schema_in_xml, selected_schema, db_info, rs, nodes,
                         plural_to_singular);
             }
         } finally {

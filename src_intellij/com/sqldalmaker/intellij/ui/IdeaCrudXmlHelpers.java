@@ -7,6 +7,7 @@ package com.sqldalmaker.intellij.ui;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.sqldalmaker.cg.FieldNamesMode;
 import com.sqldalmaker.cg.Helpers;
 import com.sqldalmaker.common.*;
 import com.sqldalmaker.common.FileSearchHelpers.IFile_List;
@@ -101,6 +102,29 @@ public class IdeaCrudXmlHelpers {
         return res;
     }
 
+    private static FieldNamesMode get_field_names_mode(VirtualFile root_file, Settings settings) {
+        boolean force_snake_case = IdeaTargetLanguageHelpers.snake_case_needed(root_file);
+        FieldNamesMode field_names_mode;
+        if (force_snake_case) {
+            field_names_mode = FieldNamesMode.SNAKE_CASE;
+        } else {
+            boolean force_lower_camel_case = IdeaTargetLanguageHelpers.lower_camel_case_needed(root_file);
+            if (force_lower_camel_case) {
+                field_names_mode = FieldNamesMode.LOWER_CAMEL_CASE;
+            } else {
+                int fnm = settings.getDto().getFieldNamesMode();
+                if (fnm == 1) {
+                    field_names_mode = FieldNamesMode.LOWER_CAMEL_CASE;
+                } else if (fnm == 2) {
+                    field_names_mode = FieldNamesMode.LOWER_CASE;
+                } else {
+                    field_names_mode = FieldNamesMode.SNAKE_CASE;
+                }
+            }
+        }
+        return field_names_mode;
+    }
+
     public static void get_crud_dao_xml(final Project project, final VirtualFile root_file) {
 
         ISelectDbSchemaCallback callback = new ISelectDbSchemaCallback() {
@@ -108,8 +132,8 @@ public class IdeaCrudXmlHelpers {
             public void process_ok(boolean schema_in_xml, String selected_schema, boolean skip_used, boolean include_views,
                                    boolean plural_to_singular, boolean crud_auto, boolean add_fk_access) {
                 try {
-                    boolean underscores_needed = IdeaTargetLanguageHelpers.underscores_needed(root_file);
                     Settings settings = IdeaHelpers.load_settings(root_file);
+                    FieldNamesMode field_names_mode = get_field_names_mode(root_file, settings);
                     Connection connection = IdeaHelpers.get_connection(project, settings);
                     com.sqldalmaker.jaxb.dao.ObjectFactory object_factory = new com.sqldalmaker.jaxb.dao.ObjectFactory();
                     DaoClass root;
@@ -123,7 +147,7 @@ public class IdeaCrudXmlHelpers {
                         root = SdmUtils.create_crud_xml_jaxb_dao_class(object_factory,
                                 connection, in_use, schema_in_xml, selected_schema,
                                 include_views, crud_auto, add_fk_access,
-                                plural_to_singular, underscores_needed);
+                                plural_to_singular, field_names_mode);
                     } finally {
                         connection.close();
                     }
@@ -149,15 +173,14 @@ public class IdeaCrudXmlHelpers {
             public void process_ok(boolean schema_in_xml, String selected_schema, boolean skip_used, boolean include_views,
                                    boolean plural_to_singular, boolean crud_auto, boolean add_fk_access) {
                 try {
-                    boolean underscores_needed = IdeaTargetLanguageHelpers.underscores_needed(root_file);
                     com.sqldalmaker.jaxb.dao.ObjectFactory object_factory = new com.sqldalmaker.jaxb.dao.ObjectFactory();
                     DaoClass root;
                     Settings settings = IdeaHelpers.load_settings(root_file);
+                    FieldNamesMode field_names_mode = get_field_names_mode(root_file, settings);
                     Connection connection = IdeaHelpers.get_connection(project, settings);
                     try {
                         root = SdmUtils.get_fk_access_xml(connection, object_factory, schema_in_xml, selected_schema, plural_to_singular,
-                                underscores_needed);
-
+                                field_names_mode);
                     } finally {
                         connection.close();
                     }

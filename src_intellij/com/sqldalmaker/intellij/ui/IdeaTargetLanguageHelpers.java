@@ -69,9 +69,17 @@ public class IdeaTargetLanguageHelpers {
         return root_files;
     }
 
-    public static boolean underscores_needed(VirtualFile root_file) {
+    public static boolean snake_case_needed(VirtualFile root_file) {
         String fn = root_file.getName();
         if (RootFileName.RUBY.equals(fn) || RootFileName.PYTHON.equals(fn)) {
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean lower_camel_case_needed(VirtualFile root_file) {
+        String fn = root_file.getName();
+        if (RootFileName.GO.equals(fn)) {
             return true;
         }
         return false;
@@ -278,7 +286,7 @@ public class IdeaTargetLanguageHelpers {
             } else if (fnm == 2) {
                 field_names_mode = FieldNamesMode.LOWER_CASE;
             } else {
-                field_names_mode = FieldNamesMode.AS_IS;
+                field_names_mode = FieldNamesMode.SNAKE_CASE;
             }
             String dto_inheritance = settings.getDto().getInheritance();
             String dto_package = settings.getDto().getScope();

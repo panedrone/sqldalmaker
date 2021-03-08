@@ -460,4 +460,49 @@ public class Helpers {
             throw new Exception("<" + node_name + "...\n'method' is not set.");
         }
     }
+
+    public static String to_lower_camel_or_title_case(String str, boolean title_case) {
+        if (!str.contains("_")) {
+            if (title_case) {
+                return Helpers.replace_char_at(str, 0, Character.toTitleCase(str.charAt(0)));
+            } else {
+                boolean all_is_upper_case = Helpers.is_upper_case(str);
+                if (all_is_upper_case) {
+                    str = str.toLowerCase();
+                    return str;
+                } else {
+                    return Helpers.replace_char_at(str, 0, Character.toLowerCase(str.charAt(0)));
+                }
+            }
+        }
+        StringBuilder sb = new StringBuilder();
+        String[] arr = str.split("_");
+        for (int i = 0; i < arr.length; i++) {
+            String s = arr[i];
+            if (s.length() == 0) {
+                continue; // E.g. _ALL_FILE_GROUPS
+            }
+            char ch0 = s.charAt(0);
+            if (i == 0) {
+                if (title_case) {
+                    ch0 = Character.toTitleCase(ch0);
+                } else {
+                    ch0 = Character.toLowerCase(ch0);
+                }
+            } else {
+                ch0 = Character.toTitleCase(ch0);
+            }
+            sb.append(ch0);
+            if (s.length() > 1) {
+                String tail = s.substring(1);
+                boolean all_is_upper_case = Helpers.is_upper_case(tail);
+                if (all_is_upper_case) {
+                    sb.append(tail.toLowerCase());
+                } else {
+                    sb.append(tail);
+                }
+            }
+        }
+        return sb.toString();
+    }
 }
