@@ -121,7 +121,15 @@ public class PythonCG {
                 methods.set(i, m);
             }
             Map<String, Object> context = new HashMap<String, Object>();
-            context.put("imports", imports.values());
+            List<ImportItem> imp = new ArrayList<>(imports.values());
+            imp.sort(new Comparator<ImportItem>() {
+                @Override
+                public int compare(ImportItem o1, ImportItem o2) {
+                    // file_name includes package
+                    return o1.file_name.compareTo(o2.file_name);
+                }
+            });
+            context.put("imports", imp);
             context.put("class_name", dao_class_name);
             context.put("methods", methods);
             context.put("mode", "dao_class");
