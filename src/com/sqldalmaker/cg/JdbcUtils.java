@@ -227,7 +227,7 @@ public class JdbcUtils {
             try {
                 rsmd = ps.getMetaData(); // throws SQLException;
             } catch (Throwable th) {
-                _error.append("getMetaData() throws Exception: ");
+                _error.append("PreparedStatement.getMetaData() throws Exception: ");
                 _error.append(th.getMessage());
                 return;
             }
@@ -235,18 +235,18 @@ public class JdbcUtils {
             // @return the description of a <code>ResultSet</code> object's columns or
             // <code>null</code> if the driver cannot return a <code>ResultSetMetaData</code> object
             if (rsmd == null) {
-                _error.append("getMetaData() == null");
+                _error.append("PreparedStatement.getMetaData() == null");
                 return;
             }
             int column_count;
             try {
                 column_count = rsmd.getColumnCount(); // throws SQLException;
                 if (column_count < 1) {
-                    _error.append("getColumnCount() == ");
+                    _error.append("ResultSetMetaData.getColumnCount() == ");
                     _error.append(column_count);
                 }
             } catch (Throwable e) {
-                _error.append("getColumnCount() throws Exception: ");
+                _error.append("ResultSetMetaData.getColumnCount() throws Exception: ");
                 _error.append(e.getMessage());
                 return;
             }
@@ -272,25 +272,34 @@ public class JdbcUtils {
                                                    List<FieldInfo> _dto_fields) throws Exception {
         _dto_fields.clear();
         Map<String, FieldInfo> dto_fields_map = new HashMap<String, FieldInfo>();
-        String dto_ref = jaxb_dto_class.getRef();
-        if (!SqlUtils.is_empty_ref(dto_ref)) {
-            String jdbc_sql = SqlUtils.jdbc_sql_by_dto_class_ref(dto_ref, sql_root_abs_path);
+        String jaxb_dto_ref = jaxb_dto_class.getRef();
+        if (!SqlUtils.is_empty_ref(jaxb_dto_ref)) {
+            String jdbc_sql = SqlUtils.jdbc_sql_by_dto_class_ref(jaxb_dto_ref, sql_root_abs_path);
             StringBuilder error = new StringBuilder();
             _get_fields_map_by_jdbc_sql(jdbc_sql, dto_fields_map, _dto_fields, error);
-            if (SqlUtils.is_table_ref(dto_ref)) {
-                _refine_field_info_by_table_meta_data(dto_ref, dto_fields_map);
-            } else if (SqlUtils.is_sql_shortcut_ref(dto_ref)) {
-                String[] parts = SqlUtils.parse_sql_shortcut_ref(dto_ref);
+            if (error.length() > 0) {
+                error.append("\r\n");
+                error.append(jdbc_sql);
+                throw new Exception(error.toString());
+            }
+            if (SqlUtils.is_table_ref(jaxb_dto_ref)) {
+                String table_name = jaxb_dto_ref;
+                _refine_field_info_by_table_meta_data(table_name, dto_fields_map);
+            } else if (SqlUtils.is_sql_shortcut_ref(jaxb_dto_ref)) {
+                String[] parts = SqlUtils.parse_sql_shortcut_ref(jaxb_dto_ref);
                 String table_name = parts[0];
-                // obtain fields the same way like in the case of table. params will be obtained
-                // from DAO SQL.
-                // params are obtained below (considering DAO SQL and method_param_descriptors)
                 _refine_field_info_by_table_meta_data(table_name, dto_fields_map);
             }
         }
-        _refine_fields_by_jaxb_explicit_fields(jaxb_dto_class.getField(), dto_fields_map, _dto_fields);
+        // field types may be redefined in <field type=...
+        List<DtoClass.Field> jaxb_fields = jaxb_dto_class.getField();
+        _refine_field_types_by_jaxb(jaxb_fields, dto_fields_map, _dto_fields);
         if (_dto_fields.isEmpty()) {
-            throw new Exception("Cannot detect DTO fields: " + jaxb_dto_class.getName());
+            String msg = "Cannot detect the fields for <dto-class name=\"" + jaxb_dto_class.getName() + "\"...";
+            if (!SqlUtils.is_empty_ref(jaxb_dto_ref)) {
+                msg += "\r\nCheck if the value of 'ref' is valid:\r\n" + jaxb_dto_ref;
+            }
+            throw new Exception(msg);
         }
         if (type_map.is_defined()) {
             for (FieldInfo fi : _dto_fields) {
@@ -302,9 +311,9 @@ public class JdbcUtils {
         return dto_fields_map;
     }
 
-    private void _refine_fields_by_jaxb_explicit_fields(List<DtoClass.Field> jaxb_explicit_fields,
-                                                        Map<String, FieldInfo> fields_map,
-                                                        List<FieldInfo> fields) throws Exception {
+    private void _refine_field_types_by_jaxb(List<DtoClass.Field> jaxb_explicit_fields,
+                                             Map<String, FieldInfo> fields_map,
+                                             List<FieldInfo> fields) throws Exception {
         if (jaxb_explicit_fields == null) {
             return;
         }
