@@ -179,16 +179,15 @@ public class IdeaEditorHelpers {
             final String module_root = project_dir.getPath();
             String sql_root_folder_full_path = module_root + "/" + settings.getFolders().getSql();
             SdmUtils.gen_tmp_field_tags(con, object_factory, cls, sql_root_folder_full_path);
-            open_dto_xml_in_editor(object_factory, project, dto_classes, true);
+            open_dto_xml_in_editor(object_factory, project, dto_classes);
         } finally {
             con.close();
         }
     }
 
     public static void open_dto_xml_in_editor(ObjectFactory object_factory, Project project,
-                                              DtoClasses dto_classes, boolean remove_java_lang) throws Exception {
-
-        String text = XmlHelpers.get_dto_xml_text(object_factory, dto_classes, remove_java_lang);
+                                              DtoClasses dto_classes) throws Exception {
+        String text = XmlHelpers.get_dto_xml_text(object_factory, dto_classes);
         String[] parts = text.split("\\?>");
         text = parts[0] + Const.COMMENT_GENERATED_DTO_XML + parts[1];
         open_text_in_new_editor(project, "dto.xml", text);
@@ -197,8 +196,7 @@ public class IdeaEditorHelpers {
     public static void open_dao_xml_in_editor(Project project,
                                               com.sqldalmaker.jaxb.dao.ObjectFactory object_factory,
                                               String file_name, DaoClass root) throws Exception {
-
-        String text = XmlHelpers.get_dao_xml_text(object_factory, root, true);
+        String text = XmlHelpers.get_dao_xml_text(object_factory, root);
         String[] parts = text.split("\\?>");
         text = parts[0] + Const.COMMENT_GENERATED_DAO_XML + parts[1];
         IdeaEditorHelpers.open_text_in_new_editor(project, file_name, text);

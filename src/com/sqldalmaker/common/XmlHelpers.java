@@ -1,8 +1,7 @@
 /*
- * Copyright 2011-2020 sqldalmaker@gmail.com
- * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
- * Read LICENSE.txt in the root of this project/archive for details.
- *
+ * Copyright 2011-2021 sqldalmaker@gmail.com
+ * Read LICENSE.txt in the root of this project/archive.
+ * Project web-site: http://sqldalmaker.sourceforge.net
  */
 package com.sqldalmaker.common;
 
@@ -19,7 +18,6 @@ import java.io.ByteArrayOutputStream;
 public class XmlHelpers {
 
     public static Marshaller create_marshaller(String instance_name, String xsd) throws Exception {
-
         ClassLoader cl = XmlHelpers.class.getClassLoader();
         JAXBContext jc = JAXBContext.newInstance(instance_name, cl);
         // http://docs.oracle.com/javase/6/docs/api/javax/xml/bind/Marshaller.html
@@ -31,9 +29,7 @@ public class XmlHelpers {
         return marshaller;
     }
 
-    private static String get_xml_text(String instance_name, Object root, String xsd, boolean remove_java_lang)
-            throws Exception {
-
+    private static String get_xml_text(String instance_name, Object root, String xsd) throws Exception {
         Marshaller marshaller = create_marshaller(instance_name, xsd);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         String text;
@@ -41,28 +37,21 @@ public class XmlHelpers {
             marshaller.marshal(root, out);
             out.flush();
             text = new String(out.toByteArray());
-            if (remove_java_lang) {
-                text = text.replace("java.lang.", "");
-            }
         } finally {
             out.close();
         }
         return text;
     }
 
-    public static String get_dto_xml_text(com.sqldalmaker.jaxb.dto.ObjectFactory object_factory, DtoClasses root,
-                                          boolean remove_java_lang) throws Exception {
-
-        String text = get_xml_text(object_factory.getClass().getPackage().getName(), root, Const.DTO_XSD,
-                remove_java_lang);
+    public static String get_dto_xml_text(com.sqldalmaker.jaxb.dto.ObjectFactory object_factory,
+                                          DtoClasses root) throws Exception {
+        String text = get_xml_text(object_factory.getClass().getPackage().getName(), root, Const.DTO_XSD);
         return text;
     }
 
-    public static String get_dao_xml_text(com.sqldalmaker.jaxb.dao.ObjectFactory object_factory, DaoClass root,
-                                          boolean remove_java_lang) throws Exception {
-
-        String text = get_xml_text(object_factory.getClass().getPackage().getName(), root, Const.DAO_XSD,
-                remove_java_lang);
+    public static String get_dao_xml_text(com.sqldalmaker.jaxb.dao.ObjectFactory object_factory,
+                                          DaoClass root) throws Exception {
+        String text = get_xml_text(object_factory.getClass().getPackage().getName(), root, Const.DAO_XSD);
         return text;
     }
 }

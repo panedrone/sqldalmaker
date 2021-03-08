@@ -78,7 +78,6 @@
 
     <!--    <type-map default="">-->
     <!--        <type detected="java.lang.Integer" target="int64" />-->
-    <!--        <type detected="java.lang.Double" target="float64" />-->
     <!--        <type detected="java.lang.Float" target="float64" />-->
     <!--        <type detected="java.lang.String" target="string" />-->
     <!--        <type detected="byte[]" target="byte[]" />-->
@@ -88,8 +87,8 @@
     <!-- Example for C++ and SQLite3: -->
 
     <!--    <type-map default="CValue">-->
-    <!--        <type detected="java.lang.Long" target="CLong"/>-->
-    <!--        <type detected="java.lang.Double" target="CDouble"/>-->
+    <!--        <type detected="java.lang.Integer" target="CLong"/>-->
+    <!--        <type detected="java.lang.Float" target="CDouble"/>-->
     <!--        <type detected="java.lang.String" target="CText"/>-->
     <!--        <type detected="byte[]" target="CBlob"/>-->
     <!--    </type-map>-->
