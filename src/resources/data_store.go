@@ -285,7 +285,7 @@ func (ds *DataStore) _formatSQL(sql string) string {
 	return sql
 }
 
-// extent this method on demand:
+// extend this method on demand:
 
 func (ds *DataStore) assign(fieldAddr interface{}, value interface{}) {
 	if value == nil {
@@ -307,7 +307,7 @@ func (ds *DataStore) assign(fieldAddr interface{}, value interface{}) {
 	case *bool:
 		*d = value.(bool)
 		return
-	case *[]byte: // the same as uint8
+	case *[]byte: // the same as []uint8
 		*d = value.([]byte)
 		return
 	case *interface{}:
