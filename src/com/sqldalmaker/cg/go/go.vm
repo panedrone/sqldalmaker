@@ -91,7 +91,7 @@ func (dao *${class_name}) ${method_name}(#if(${dto_param} != "")#param_decls_dto
         obj := ${returned_type_name}{}
 #foreach($f in ${fields})
 #set($i = ${velocityCount} - 1)
-        obj.${f.getName()} = rd["${f.getColumnName()}"].(${f.getType()})
+        dao.ds.assign(&obj.${f.getName()}, rd["${f.getColumnName()}"]) // (${f.getType()})
 #end
         res = append(res, obj)
     }
@@ -120,7 +120,7 @@ func (dao *${class_name}) ${method_name}(#if(${dto_param} != "")#param_decls_dto
     obj := ${returned_type_name}{}
 #foreach($f in ${fields})
 #set($i = ${velocityCount} - 1)
-    obj.${f.getName()} = rd["${f.getColumnName()}"].(${f.getType()})
+    dao.ds.assign(&obj.${f.getName()}, rd["${f.getColumnName()}"]) // (${f.getType()})
 #end
     return obj
 #end

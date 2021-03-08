@@ -2,7 +2,7 @@
     <id>dal-mpe</id>
     <name>SQL DAL Maker</name>
     <category>Database</category>
-    <version>1.171.2021-08</version>
+    <version>1.172.2021-08</version>
     <vendor email="sqldalmaker@gmail.com"/>
     <!-- please see http://confluence.intellij.net/display/IDEADEV/Build+Number+Ranges for description -->
     <idea-version since-build="173.2099.1"/>
@@ -19,8 +19,7 @@ PHP, Java, C++, Python, Ruby, and Go. To generate the class, you declare it in X
     <change-notes>
         <![CDATA[
 <ul>
-<li>Reworked for standard Python file names.</li>
-<li>Initial implementation for Go. Tested on SQLite3, Oracle, SQL Server.</li>
+<li>Further improvements for Go. Tested on MySQL, Oracle, SQL Server, SQLite3.</li>
 </ul>]]></change-notes>
 
     <application-components>

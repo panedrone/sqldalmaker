@@ -1,3 +1,7 @@
+2021-03-08
+
+    Solved problem 'Go + DB NULL'.
+
 2021-03-06
 
     Reworked for standard Python file names.

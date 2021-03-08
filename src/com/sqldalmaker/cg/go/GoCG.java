@@ -189,12 +189,13 @@ public class GoCG {
             context.put("use_dto", jaxb_return_type_is_dto);
             context.put("returned_type_name", returned_type_name);
             context.put("fetch_list", fetch_list);
-            for (FieldInfo fi : fields) {
-                String imp = fi.getImport();
-                if (imp != null) {
-                    imports.add(imp);
-                }
-            }
+            // not used directly since v1.172
+//            for (FieldInfo fi : fields) {
+//                String imp = fi.getImport();
+//                if (imp != null) {
+//                    imports.add(imp);
+//                }
+//            }
             _assign_params(params, dto_param_type, context); // before context.put("imports"
             context.put("imports", imports);
             context.put("is_external_sql", is_external_sql);
@@ -341,9 +342,9 @@ public class GoCG {
             m.dto_class_name = parts[1].trim();
             List<FieldInfo> fields = new ArrayList<FieldInfo>();
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(m.dto_class_name, jaxb_dto_classes);
-            imports.add("com.sqldalmaker.DataStore.RowData");
-            imports.add("com.sqldalmaker.DataStore.RowHandler");
-            imports.add("com.sqldalmaker.DataStore.RecordHandler");
+//            imports.add("com.sqldalmaker.DataStore.RowData");
+//            imports.add("com.sqldalmaker.DataStore.RowHandler");
+//            imports.add("com.sqldalmaker.DataStore.RecordHandler");
             _process_dto_class_name(jaxb_dto_class.getName()); // extends imports
             db_utils.get_dto_field_info(jaxb_dto_class, sql_root_abs_path, fields);
             if (fields.size() > 0) {

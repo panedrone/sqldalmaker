@@ -2,9 +2,11 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"strconv"
 	"strings"
+	"time"
 
 	// _ "github.com/mattn/go-sqlite3"		// SQLite3
 	_ "github.com/denisenkom/go-mssqldb" // SQL Server
@@ -281,4 +283,37 @@ func (ds *DataStore) _formatSQL(sql string) string {
 		i += 1
 	}
 	return sql
+}
+
+// extent this method on demand:
+
+func (ds *DataStore) assign(fieldAddr interface{}, value interface{}) {
+	if value == nil {
+		return // leave as-is
+	}
+	switch d := fieldAddr.(type) {
+	case *string:
+		*d = value.(string)
+		return
+	case *int64:
+		*d = value.(int64)
+		return
+	case *float64:
+		*d = value.(float64)
+		return
+	case *time.Time:
+		*d = value.(time.Time)
+		return
+	case *bool:
+		*d = value.(bool)
+		return
+	case *[]byte: // the same as uint8
+		*d = value.([]byte)
+		return
+	case *interface{}:
+		*d = value
+		return
+	default:
+		log.Fatal(fmt.Sprintf("Unknown type in DataStore.assign(...): %T", d))
+	}
 }
