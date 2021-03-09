@@ -65,11 +65,22 @@ public class GoCG {
             Map<String, Object> context = new HashMap<String, Object>();
             context.put("package", dto_package);
             Set<String> imports = new HashSet<String>();
+            int max = -1;
             for (FieldInfo fi : fields) {
                 String imp = fi.getImport();
                 if (imp != null) {
                     imports.add(imp);
                 }
+                int len = fi.getName().length();
+                if (len > max) {
+                    max = len;
+                }
+            }
+            String format = "%-" + max + "." + max + "s";
+            for (FieldInfo fi : fields) {
+                String name = fi.getName();
+                name = String.format(format, name);
+                fi.setName(name);
             }
             context.put("imports", imports);
             context.put("class_name", dto_class_name);
@@ -79,6 +90,8 @@ public class GoCG {
             StringWriter sw = new StringWriter();
             te.merge(context, sw);
             String text = sw.toString();
+            // seems like Go fmt makes \n
+            text = text.replace("\r\n", "\n");
             return new String[]{text};
         }
     }
@@ -128,6 +141,8 @@ public class GoCG {
             StringWriter sw = new StringWriter();
             te.merge(context, sw);
             String text = sw.toString();
+            // seems like Go fmt makes \n
+            text = text.replace("\r\n", "\n");
             return new String[]{text};
         }
 

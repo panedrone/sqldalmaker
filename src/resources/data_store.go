@@ -11,9 +11,7 @@ import (
 	// _ "github.com/mattn/go-sqlite3"		// SQLite3
 	_ "github.com/denisenkom/go-mssqldb" // SQL Server
 	// _ "github.com/godror/godror"			// Oracle
-
 	// only strings for MySQL (so far). see _prepareFetch below and related comments.
-
 	// _ "github.com/go-sql-driver/mysql"	// MySQL
 	// _ "github.com/ziutek/mymysql/godrv" // MySQL
 )
@@ -226,6 +224,7 @@ func (ds *DataStore) queryAllRows(sql string, onRow func(map[string]interface{})
 		onRow(data)
 	}
 }
+
 /*
 Temporary workaround for MySQL:
 
@@ -248,7 +247,7 @@ Mysql text result corresponds to []byte type in mymysql.
 It isn't string type due to avoidance of unnecessary type conversions.
 You can always convert []byte to string yourself...
 
-TODO: Enable something like type-convertors in 'type-map' and generated code.
+TODO: Improve DataStore.assign(...) to convert strings (or byte-arrays) to the real types
 
 <type detected="java.lang.String" target="ds.toStr(...)"/>
 
@@ -285,8 +284,6 @@ func (ds *DataStore) _formatSQL(sql string) string {
 	return sql
 }
 
-// extend this method on demand:
-
 func (ds *DataStore) assign(fieldAddr interface{}, value interface{}) {
 	if value == nil {
 		return // leave as-is
@@ -307,7 +304,7 @@ func (ds *DataStore) assign(fieldAddr interface{}, value interface{}) {
 	case *bool:
 		*d = value.(bool)
 		return
-	case *[]byte: // the same as []uint8
+	case *[]byte:  // the same as uint8
 		*d = value.([]byte)
 		return
 	case *interface{}:

@@ -19,7 +19,7 @@ String sql#if(${params.size()} > 0), #end
 #end
 #macro(sql_var $is_external_sql $sql)
 #if (!${is_external_sql})
-    sql := ${sql}
+	sql := ${sql}
 #end
 #end
 ## ====================================================================================================================
@@ -32,14 +32,14 @@ package ${package}
 #if (${imports.size()} > 0)
 import (
 #foreach($imp in ${imports})
-    "${imp}"
+	"${imp}"
 #end
 )
 
 #end
 type ${class_name} struct {
 #foreach($f in ${fields})
-    ${f.getName()} ${f.getType()}
+	${f.getName()} ${f.getType()}
 #end
 }
 ## ====================================================================================================================
@@ -52,13 +52,13 @@ package ${package}
 #if (${imports.size()} > 0)
 import (
 #foreach($imp in ${imports})
-    "${imp}"
+	"${imp}"
 #end
 )
 
 #end
 type ${class_name} struct {
-    ds *DataStore
+	ds *DataStore
 }
 #foreach($method in ${methods})${method}#end
 ## ====================================================================================================================
@@ -69,10 +69,10 @@ type ${class_name} struct {
 
 func (dao *${class_name}) ${method_name}(p *${dto_param}) {
 #sql_var(false $sql)
-    res := dao.ds.insert(sql#foreach($param in ${params}), p.${param.getName()}#end)
+	res := dao.ds.insert(sql#foreach($param in ${params}), p.${param.getName()}#end)
 #foreach ($key in ${keys})
 #set($i = ${velocityCount} - 1)
-    p.${key.getName()} = res.(${key.getType()})
+	p.${key.getName()} = res.(${key.getType()})
 #end
 }
 ## ====================================================================================================================
@@ -86,49 +86,49 @@ func (dao *${class_name}) ${method_name}(p *${dto_param}) {
 func (dao *${class_name}) ${method_name}(#if(${dto_param} != "")#param_decls_dto($is_external_sql)${dto_param} p#else#param_decls($is_external_sql $params)#end) []${returned_type_name} {
 #sql_var($is_external_sql $sql)
 #if($use_dto)
-    var res []${returned_type_name}
-    onDto := func(rd map[string]interface{}) {
-        obj := ${returned_type_name}{}
+	var res []${returned_type_name}
+	onDto := func(rd map[string]interface{}) {
+		obj := ${returned_type_name}{}
 #foreach($f in ${fields})
 #set($i = ${velocityCount} - 1)
-        dao.ds.assign(&obj.${f.getName()}, rd["${f.getColumnName()}"]) // (${f.getType()})
+		dao.ds.assign(&obj.${f.getName()}, rd["${f.getColumnName()}"])#* // (${f.getType()}) *#
 #end
-        res = append(res, obj)
-    }
-    dao.ds.queryAllRows(sql, onDto#if(${dto_param} != "")#foreach($param in ${params}), p.${param.getterMethod()}()#end)#else#foreach($param in ${params}), ${param.getName()}#end)
-    return res
+		res = append(res, obj)
+	}
+	dao.ds.queryAllRows(sql, onDto#if(${dto_param} != "")#foreach($param in ${params}), p.${param.getterMethod()}()#end)#else#foreach($param in ${params}), ${param.getName()}#end)
+	return res
 #end
 #else
-    var res []${returned_type_name}
-    onRow := func(rawData interface{}) {
-        data := rawData.(${returned_type_name})
+	var res []${returned_type_name}
+	onRow := func(rawData interface{}) {
+		data := rawData.(${returned_type_name})
 		res = append(res, data)
 	}
 #if(${dto_param} != "")
-    dao.ds.queryAll(sql, onRow#foreach($param in ${params}), p.${param.getName()}#end)
+	dao.ds.queryAll(sql, onRow#foreach($param in ${params}), p.${param.getName()}#end)
 #else
-    dao.ds.queryAll(sql, onRow#foreach($param in ${params}), ${param.getName()}#end)
+	dao.ds.queryAll(sql, onRow#foreach($param in ${params}), ${param.getName()}#end)
 #end
-    return res
+	return res
 #end
 }
 #else
 func (dao *${class_name}) ${method_name}(#if(${dto_param} != "")#param_decls_dto($is_external_sql)${dto_param} p#else#param_decls($is_external_sql $params)#end) ${returned_type_name} {
 #sql_var($is_external_sql $sql)
 #if($use_dto)
-    rd := dao.ds.queryRow(sql#if(${dto_param} != "")#foreach($param in ${params}), p.${param.getterMethod()}()#end)#else#foreach($param in ${params}), ${param.getName()}#end)
-    obj := ${returned_type_name}{}
+	rd := dao.ds.queryRow(sql#if(${dto_param} != "")#foreach($param in ${params}), p.${param.getterMethod()}()#end)#else#foreach($param in ${params}), ${param.getName()}#end)
+	obj := ${returned_type_name}{}
 #foreach($f in ${fields})
 #set($i = ${velocityCount} - 1)
-    dao.ds.assign(&obj.${f.getName()}, rd["${f.getColumnName()}"]) // (${f.getType()})
+	dao.ds.assign(&obj.${f.getName()}, rd["${f.getColumnName()}"])#* // (${f.getType()}) *#
 #end
-    return obj
+	return obj
 #end
 #else
 #if(${dto_param} != "")
-    return dao.ds.query(sql#foreach($param in ${params}), p.${param.getterMethod()}()#end).(${returned_type_name})
+	return dao.ds.query(sql#foreach($param in ${params}), p.${param.getterMethod()}()#end).(${returned_type_name})
 #else
-    return dao.ds.query(sql#foreach($param in ${params}), ${param.getName()}#end).(${returned_type_name})
+	return dao.ds.query(sql#foreach($param in ${params}), ${param.getName()}#end).(${returned_type_name})
 #end    
 #end
 }
@@ -148,7 +148,7 @@ func (dao *${class_name}) ${method_name}(#if(${dto_param} != "")#param_decls_dto
 
 func (dao *${class_name}) ${method_name}(#param_decls_dto($is_external_sql)p *${dto_param}) int64 {
 #sql_var($is_external_sql $sql)
-    return dao.ds.execDML(sql#foreach($param in ${params}), p.${param.getName()}#end)
+	return dao.ds.execDML(sql#foreach($param in ${params}), p.${param.getName()}#end)
 }
 #end
 #if($plain_params)
@@ -165,9 +165,9 @@ func (dao *${class_name}) ${method_name}(#param_decls_dto($is_external_sql)p *${
 func (dao *${class_name}) ${method_name}(#param_decls($is_external_sql $params)) int64 {
 #sql_var($is_external_sql $sql)
 #if ($method_type == "CREATE" || $method_type == "UPDATE" || $method_type == "DELETE")
-    return dao.ds.execDML(sql#foreach($param in ${params}), ${param.getName()}#end)
+	return dao.ds.execDML(sql#foreach($param in ${params}), ${param.getName()}#end)
 #else
-    return dao.ds.execDML(sql#foreach($param in ${params2}), ${param.getName()}#end)
+	return dao.ds.execDML(sql#foreach($param in ${params2}), ${param.getName()}#end)
 #end
 }
 #end
