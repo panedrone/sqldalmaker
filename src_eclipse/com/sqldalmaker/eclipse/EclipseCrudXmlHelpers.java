@@ -15,6 +15,7 @@ import java.util.Set;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.swt.widgets.Shell;
 
+import com.sqldalmaker.cg.FieldNamesMode;
 import com.sqldalmaker.common.FileSearchHelpers;
 import com.sqldalmaker.common.FileSearchHelpers.IFile_List;
 import com.sqldalmaker.common.ISelectDbSchemaCallback;
@@ -22,6 +23,7 @@ import com.sqldalmaker.common.SdmUtils;
 import com.sqldalmaker.jaxb.dao.DaoClass;
 import com.sqldalmaker.jaxb.dao.ObjectFactory;
 import com.sqldalmaker.jaxb.dto.DtoClasses;
+import com.sqldalmaker.jaxb.settings.Settings;
 
 /**
  * The class to control 1) DTO XML assistant 2) DAO XML assistant 3) FK access
@@ -96,6 +98,29 @@ public class EclipseCrudXmlHelpers {
 		return res;
 	}
 
+	private static FieldNamesMode get_field_names_mode(IEditor2 editor2, Settings settings) {
+		boolean force_snake_case = EclipseTargetLanguageHelpers.snake_case_needed(editor2);
+		FieldNamesMode field_names_mode;
+		if (force_snake_case) {
+			field_names_mode = FieldNamesMode.SNAKE_CASE;
+		} else {
+			boolean force_lower_camel_case = EclipseTargetLanguageHelpers.lower_camel_case_needed(editor2);
+			if (force_lower_camel_case) {
+				field_names_mode = FieldNamesMode.LOWER_CAMEL_CASE;
+			} else {
+				int fnm = settings.getDto().getFieldNamesMode();
+				if (fnm == 0) {
+					field_names_mode = FieldNamesMode.AS_IS;
+				} else if (fnm == 1) {
+					field_names_mode = FieldNamesMode.LOWER_CAMEL_CASE;
+				} else {
+					field_names_mode = FieldNamesMode.SNAKE_CASE;
+				}
+			}
+		}
+		return field_names_mode;
+	}
+
 	public static void get_crud_dao_xml(Shell parent_shell, final IEditor2 editor2) throws Exception {
 
 		ISelectDbSchemaCallback callback = new ISelectDbSchemaCallback() {
@@ -103,9 +128,10 @@ public class EclipseCrudXmlHelpers {
 			public void process_ok(boolean schema_in_xml, String selected_schema, boolean skip_used,
 					boolean include_views, boolean plural_to_singular, boolean use_crud_auto, boolean add_fk_access) {
 				try {
-					boolean underscores_needed = EclipseTargetLanguageHelpers.underscores_needed(editor2);
 					ObjectFactory object_factory = new ObjectFactory();
 					DaoClass root;
+					Settings settings = EclipseHelpers.load_settings(editor2);
+					FieldNamesMode field_names_mode = get_field_names_mode(editor2, settings);
 					Connection connection = EclipseHelpers.get_connection(editor2);
 					try {
 						// !!!! after 'try'
@@ -118,7 +144,7 @@ public class EclipseCrudXmlHelpers {
 						}
 						root = SdmUtils.create_crud_xml_jaxb_dao_class(object_factory, connection, in_use,
 								schema_in_xml, selected_schema, include_views, use_crud_auto, add_fk_access,
-								plural_to_singular, underscores_needed);
+								plural_to_singular, field_names_mode);
 					} finally {
 						connection.close();
 					}
@@ -143,13 +169,14 @@ public class EclipseCrudXmlHelpers {
 			public void process_ok(boolean schema_in_xml, String selected_schema, boolean skip_used,
 					boolean include_views, boolean plural_to_singular, boolean use_crud_auto, boolean add_fk_access) {
 				try {
-					boolean underscores_needed = EclipseTargetLanguageHelpers.underscores_needed(editor2);
 					ObjectFactory object_factory = new ObjectFactory();
 					DaoClass root;
+					Settings settings = EclipseHelpers.load_settings(editor2);
+					FieldNamesMode field_names_mode = get_field_names_mode(editor2, settings);
 					Connection conn = EclipseHelpers.get_connection(editor2);
 					try {
 						root = SdmUtils.get_fk_access_xml(conn, object_factory, schema_in_xml, selected_schema,
-								plural_to_singular, underscores_needed);
+								plural_to_singular, field_names_mode);
 					} finally {
 						conn.close();
 					}

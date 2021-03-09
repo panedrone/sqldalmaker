@@ -37,9 +37,17 @@ import com.sqldalmaker.jaxb.settings.Settings;
  */
 public class EclipseTargetLanguageHelpers {
 
-	public static boolean underscores_needed(IEditor2 editor2) {
+	public static boolean snake_case_needed(IEditor2 editor2) {
 		String root_fn = editor2.get_root_file_name();
 		if (RootFileName.RUBY.equals(root_fn) || RootFileName.PYTHON.equals(root_fn)) {
+			return true;
+		}
+		return false;
+	}
+
+	public static boolean lower_camel_case_needed(IEditor2 editor2) {
+		String root_fn = editor2.get_root_file_name();
+		if (RootFileName.GO.equals(root_fn)) {
 			return true;
 		}
 		return false;
