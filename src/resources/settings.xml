@@ -13,8 +13,7 @@
     <!-- inheritance: (only Java) fully-qualified name of base class; example
         for GWT: 1) inheritance="implements com.google.gwt.user.client.rpc.IsSerializable"
         2) target class: public class Word implements com.google.gwt.user.client.rpc.IsSerializable... -->
-    <!-- field-names-mode (Java only): 0 - as column names; 1 - camelCase; 2
-        - snake_case; -->
+    <!-- field-names-mode (Java only): 1 - camelCase; 2 - snake_case; -->
     <!-- single-file: for future use. -->
 
     <dto scope="com.mycom.myproject.dto" inheritance=""
