@@ -41,7 +41,7 @@ public class PhpCG {
             } else {
                 te = new TemplateEngine(vm_file_system_dir, true);
             }
-            db_utils = new JdbcUtils(connection, FieldNamesMode.AS_IS, null);
+            db_utils = new JdbcUtils(connection, FieldNamesMode.AS_IS, FieldNamesMode.AS_IS, null);
         }
 
         @Override
@@ -96,7 +96,7 @@ public class PhpCG {
             } else {
                 te = new TemplateEngine(vm_file_system_dir, true);
             }
-            db_utils = new JdbcUtils(connection, FieldNamesMode.AS_IS, null);
+            db_utils = new JdbcUtils(connection, FieldNamesMode.AS_IS, FieldNamesMode.AS_IS, null);
         }
 
         @Override

@@ -303,7 +303,7 @@ public class SdmUtils {
 
     public static void gen_tmp_field_tags(Connection connection, com.sqldalmaker.jaxb.dto.ObjectFactory object_factory,
                                           DtoClass dto_class, String sql_root_abs_path) throws Exception {
-        JdbcUtils db_utils = new JdbcUtils(connection, FieldNamesMode.AS_IS, null);
+        JdbcUtils db_utils = new JdbcUtils(connection, FieldNamesMode.AS_IS, FieldNamesMode.AS_IS, null);
         ArrayList<FieldInfo> fields = new ArrayList<FieldInfo>();
         db_utils.get_dto_field_info(dto_class, sql_root_abs_path, fields);
         for (FieldInfo f : fields) {

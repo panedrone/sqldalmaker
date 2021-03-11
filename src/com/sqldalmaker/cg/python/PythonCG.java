@@ -39,7 +39,7 @@ public class PythonCG {
             } else {
                 te = new TemplateEngine(vm_file_system_dir, true);
             }
-            db_utils = new JdbcUtils(connection, FieldNamesMode.SNAKE_CASE, null);
+            db_utils = new JdbcUtils(connection, FieldNamesMode.SNAKE_CASE, FieldNamesMode.SNAKE_CASE, null);
         }
 
         @Override
@@ -107,7 +107,7 @@ public class PythonCG {
             } else {
                 te = new TemplateEngine(vm_file_system_dir, true);
             }
-            db_utils = new JdbcUtils(connection, FieldNamesMode.SNAKE_CASE, null);
+            db_utils = new JdbcUtils(connection, FieldNamesMode.SNAKE_CASE, FieldNamesMode.SNAKE_CASE, null);
         }
 
         @Override

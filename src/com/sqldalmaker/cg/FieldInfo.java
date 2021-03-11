@@ -54,7 +54,7 @@ public class FieldInfo {
     }
 
     public String getImport() {
-        String []parts = this.field_type_name.split(":");
+        String[] parts = this.field_type_name.split(":");
         if (parts.length < 2) {
             return null;
         }
@@ -62,7 +62,7 @@ public class FieldInfo {
     }
 
     public String getType() {
-        String []parts = this.field_type_name.split(":");
+        String[] parts = this.field_type_name.split(":");
         if (parts.length < 2) {
             return this.field_type_name;
         }
@@ -72,27 +72,32 @@ public class FieldInfo {
     boolean type_renamed = false;
 
     public void set_type_by_map(String field_type_name) throws Exception {
-    	if (type_renamed) {
-        	// System.out.println(this.field_type_name);
-    		return;
-    	}
+        if (type_renamed) {
+            // System.out.println(this.field_type_name);
+            return;
+        }
         if (field_type_name == null) {
             throw new Exception("Invalid <type-map... Ensure that XSD and XML are valid.");
         }
-    	type_renamed = true;
+        type_renamed = true;
         this.field_type_name = field_type_name;
     }
 
     public void refine_type(String field_type_name) {
         this.field_type_name = field_type_name;
     }
-    
+
     public String getName() {
         return this.field_name;
     }
 
     public void setName(String name) { // it may be changed
         this.field_name = name;
+    }
+
+    public String getLowerCamelCaseName() {
+        String res = Helpers.to_lower_camel_or_title_case(this.field_name, false);
+        return res;
     }
 
     public String getColumnName() {

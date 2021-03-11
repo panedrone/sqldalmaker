@@ -12,7 +12,7 @@
 #if ($external_sql == true)
 String sql#if(${params.size()} > 0), #end
 #end
-#foreach($param in ${params})#if(${velocityCount} == 1)${param.getName()} ${param.getType()}#else, ${param.getName()} ${param.getType()}#end#end
+#foreach($param in ${params})#if(${velocityCount} == 1)${param.getLowerCamelCaseName()} ${param.getType()}#else, ${param.getLowerCamelCaseName()} ${param.getType()}#end#end
 #end
 #macro(param_decls_dto $external_sql)
 #if($external_sql == true)String sql, #end
@@ -83,22 +83,25 @@ func (dao *${class_name}) ${method_name}(p *${dto_param}) {
 
 #end
 #if($fetch_list)
-func (dao *${class_name}) ${method_name}(#if(${dto_param} != "")#param_decls_dto($is_external_sql)${dto_param} p#else#param_decls($is_external_sql $params)#end) []${returned_type_name} {
+func (dao *${class_name}) ${method_name}(#if(${dto_param} != "")#param_decls_dto($is_external_sql)${dto_param} p#else#param_decls($is_external_sql $params)#end) []*${returned_type_name} {
 #sql_var($is_external_sql $sql)
 #if($use_dto)
-	var res []${returned_type_name}
+	var res []*${returned_type_name}
 	onDto := func(rd map[string]interface{}) {
 		obj := ${returned_type_name}{}
 #foreach($f in ${fields})
 #set($i = ${velocityCount} - 1)
 		dao.ds.assign(&obj.${f.getName()}, rd["${f.getColumnName()}"])#* // (${f.getType()}) *#
 #end
-		res = append(res, obj)
+		res = append(res, &obj)
 	}
-	dao.ds.queryAllRows(sql, onDto#if(${dto_param} != "")#foreach($param in ${params}), p.${param.getterMethod()}()#end)#else#foreach($param in ${params}), ${param.getName()}#end)
+	dao.ds.queryAllRows(sql, onDto#if(${dto_param} != "")#foreach($param in ${params}), p.${param.getterMethod()}()#end)#else#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
 	return res
+}
 #end
 #else
+func (dao *${class_name}) ${method_name}(#if(${dto_param} != "")#param_decls_dto($is_external_sql)${dto_param} p#else#param_decls($is_external_sql $params)#end) []${returned_type_name} {
+#sql_var($is_external_sql $sql)
 	var res []${returned_type_name}
 	onRow := func(rawData interface{}) {
 		data := rawData.(${returned_type_name})
@@ -107,16 +110,16 @@ func (dao *${class_name}) ${method_name}(#if(${dto_param} != "")#param_decls_dto
 #if(${dto_param} != "")
 	dao.ds.queryAll(sql, onRow#foreach($param in ${params}), p.${param.getName()}#end)
 #else
-	dao.ds.queryAll(sql, onRow#foreach($param in ${params}), ${param.getName()}#end)
+	dao.ds.queryAll(sql, onRow#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
 #end
 	return res
-#end
 }
+#end
 #else
 func (dao *${class_name}) ${method_name}(#if(${dto_param} != "")#param_decls_dto($is_external_sql)${dto_param} p#else#param_decls($is_external_sql $params)#end) ${returned_type_name} {
 #sql_var($is_external_sql $sql)
 #if($use_dto)
-	rd := dao.ds.queryRow(sql#if(${dto_param} != "")#foreach($param in ${params}), p.${param.getterMethod()}()#end)#else#foreach($param in ${params}), ${param.getName()}#end)
+	rd := dao.ds.queryRow(sql#if(${dto_param} != "")#foreach($param in ${params}), p.${param.getterMethod()}()#end)#else#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
 	obj := ${returned_type_name}{}
 #foreach($f in ${fields})
 #set($i = ${velocityCount} - 1)
@@ -128,7 +131,7 @@ func (dao *${class_name}) ${method_name}(#if(${dto_param} != "")#param_decls_dto
 #if(${dto_param} != "")
 	return dao.ds.query(sql#foreach($param in ${params}), p.${param.getterMethod()}()#end).(${returned_type_name})
 #else
-	return dao.ds.query(sql#foreach($param in ${params}), ${param.getName()}#end).(${returned_type_name})
+	return dao.ds.query(sql#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end).(${returned_type_name})
 #end    
 #end
 }
@@ -165,7 +168,7 @@ func (dao *${class_name}) ${method_name}(#param_decls_dto($is_external_sql)p *${
 func (dao *${class_name}) ${method_name}(#param_decls($is_external_sql $params)) int64 {
 #sql_var($is_external_sql $sql)
 #if ($method_type == "CREATE" || $method_type == "UPDATE" || $method_type == "DELETE")
-	return dao.ds.execDML(sql#foreach($param in ${params}), ${param.getName()}#end)
+	return dao.ds.execDML(sql#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
 #else
 	return dao.ds.execDML(sql#foreach($param in ${params2}), ${param.getName()}#end)
 #end

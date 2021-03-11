@@ -44,7 +44,7 @@ public class RubyCG {
             // characters.
             // Class names and module names are constants, and follow the constant
             // naming conventions.
-            db_utils = new JdbcUtils(connection, FieldNamesMode.SNAKE_CASE, null);
+            db_utils = new JdbcUtils(connection, FieldNamesMode.SNAKE_CASE, FieldNamesMode.SNAKE_CASE, null);
         }
 
         @Override
@@ -94,7 +94,7 @@ public class RubyCG {
             } else {
                 te = new TemplateEngine(vm_file_system_dir, true);
             }
-            db_utils = new JdbcUtils(connection, FieldNamesMode.SNAKE_CASE, null);
+            db_utils = new JdbcUtils(connection, FieldNamesMode.SNAKE_CASE, FieldNamesMode.SNAKE_CASE, null);
         }
 
         @Override

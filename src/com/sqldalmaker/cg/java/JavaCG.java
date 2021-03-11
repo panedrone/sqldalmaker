@@ -44,7 +44,7 @@ public class JavaCG {
             } else {
                 te = new TemplateEngine(vm_file_system_dir, true);
             }
-            db_utils = new JdbcUtils(connection, field_names_mode, type_map);
+            db_utils = new JdbcUtils(connection, field_names_mode, FieldNamesMode.AS_IS, type_map);
         }
 
         @Override
@@ -97,7 +97,7 @@ public class JavaCG {
             } else {
                 te = new TemplateEngine(vm_file_system_dir, true);
             }
-            db_utils = new JdbcUtils(connection, field_names_mode, type_map);
+            db_utils = new JdbcUtils(connection, field_names_mode, FieldNamesMode.AS_IS, type_map);
         }
 
         @Override

@@ -45,7 +45,7 @@ public class GoCG {
             } else {
                 te = new TemplateEngine(vm_file_system_dir, true);
             }
-            db_utils = new JdbcUtils(connection, FieldNamesMode.TITLE_CASE, type_map);
+            db_utils = new JdbcUtils(connection, FieldNamesMode.TITLE_CASE, FieldNamesMode.LOWER_CAMEL_CASE, type_map);
         }
 
         @Override
@@ -120,7 +120,7 @@ public class GoCG {
             } else {
                 te = new TemplateEngine(vm_file_system_dir, true);
             }
-            db_utils = new JdbcUtils(connection, FieldNamesMode.TITLE_CASE, type_map);
+            db_utils = new JdbcUtils(connection, FieldNamesMode.TITLE_CASE, FieldNamesMode.LOWER_CAMEL_CASE, type_map);
         }
 
         @Override
@@ -201,19 +201,11 @@ public class GoCG {
             context.put("crud", crud_table != null);
             context.put("ref", crud_table);
             context.put("sql", java_sql_str);
+            context.put("is_external_sql", is_external_sql);
             context.put("use_dto", jaxb_return_type_is_dto);
             context.put("returned_type_name", returned_type_name);
             context.put("fetch_list", fetch_list);
-            // not used directly since v1.172
-//            for (FieldInfo fi : fields) {
-//                String imp = fi.getImport();
-//                if (imp != null) {
-//                    imports.add(imp);
-//                }
-//            }
-            _assign_params(params, dto_param_type, context); // before context.put("imports"
-            context.put("imports", imports);
-            context.put("is_external_sql", is_external_sql);
+            _assign_params_and_imports(params, dto_param_type, context);
             StringWriter sw = new StringWriter();
             te.merge(context, sw);
             StringBuilder buff = new StringBuilder();
@@ -321,7 +313,6 @@ public class GoCG {
                 }
             }
             Map<String, Object> context = new HashMap<String, Object>();
-            _assign_params(method_params, dto_param_type, context);
             context.put("params2", exec_dml_params);
             context.put("mappings", m_list);
             boolean plain_params = dto_param_type.length() == 0;
@@ -333,6 +324,7 @@ public class GoCG {
             context.put("sql_path", sql_path);
             context.put("is_external_sql", is_external_sql);
             context.put("mode", "dao_exec_dml");
+            _assign_params_and_imports(method_params, dto_param_type, context);
             StringWriter sw = new StringWriter();
             te.merge(context, sw);
             buffer.append(sw.getBuffer());
@@ -369,25 +361,35 @@ public class GoCG {
             return m;
         }
 
-        private void _assign_params(List<FieldInfo> params, String dto_param_type, Map<String, Object> context)
+        private void _assign_params_and_imports(List<FieldInfo> params, String dto_param_type, Map<String, Object> context)
                 throws Exception {
             int params_count = params.size();
-            if (dto_param_type.length() > 0) {
+            boolean plain_params;
+            if (dto_param_type != null && dto_param_type.length() > 0) {
                 if (params_count == 0) {
                     throw new Exception("DTO parameter specified but SQL-query does not contain any parameters");
                 }
                 _process_dto_class_name(dto_param_type);
                 context.put("dto_param", _get_rendered_dto_class_name(dto_param_type));
+                plain_params = false;
             } else {
                 context.put("dto_param", "");
+                plain_params = true;
             }
-            for (FieldInfo pi : params) {
-                String imp = pi.getImport();
-                if (imp != null) {
-                    imports.add(imp);
+            context.put("plain_params", plain_params);
+            if (plain_params) {
+                for (FieldInfo pi : params) {
+                    String imp = pi.getImport();
+                    if (imp != null) {
+                        imports.add(imp);
+                    }
                 }
             }
             context.put("params", params);
+            if (context.get("imports") != null) {
+                throw new Exception("Invalid assignment of 'imports'");
+            }
+            context.put("imports", imports);
         }
 
         private String[] _parse_method_declaration(String method_text, String dto_package) throws Exception {
@@ -477,14 +479,13 @@ public class GoCG {
             context.put("table_name", table_name);
             context.put("method_type", "UPDATE");
             context.put("method_name", method_name);
-            context.put("plain_params", false);
+            context.put("is_external_sql", false);
             context.put("sql", sql_str);
-            context.put("dto_param", primitive_params ? "" : _get_rendered_dto_class_name(dto_class_name));
             List<FieldInfo> params = new ArrayList<FieldInfo>();
             params.addAll(fields_not_pk);
             params.addAll(fields_pk);
-            context.put("params", params);
-            context.put("is_external_sql", false);
+            String dto_param = primitive_params ? "" : dto_class_name;
+            _assign_params_and_imports(params, dto_param, context);
             StringWriter sw = new StringWriter();
             te.merge(context, sw);
             StringBuilder buffer = new StringBuilder();
@@ -507,11 +508,9 @@ public class GoCG {
             context.put("table_name", table_name);
             context.put("method_type", "DELETE");
             context.put("method_name", method_name);
-            context.put("plain_params", true);
             context.put("sql", java_sql_str);
-            context.put("dto_param", "");
-            context.put("params", fields_pk);
             context.put("is_external_sql", false);
+            _assign_params_and_imports(fields_pk, "", context);
             StringWriter sw = new StringWriter();
             te.merge(context, sw);
             StringBuilder buffer = new StringBuilder();

@@ -19,13 +19,15 @@ import java.util.*;
 public class JdbcUtils {
 
     private final Connection conn;
-    private final FieldNamesMode field_names_mode;
+    private final FieldNamesMode dto_field_names_mode;
+    private final FieldNamesMode method_params_names_mode;
 
     private final TypeMapManager type_map;
 
-    public JdbcUtils(Connection conn, FieldNamesMode field_names_mode, TypeMap type_map) throws Exception {
+    public JdbcUtils(Connection conn, FieldNamesMode field_names_mode, FieldNamesMode method_params_names_mode, TypeMap type_map) throws Exception {
         this.conn = conn;
-        this.field_names_mode = field_names_mode;
+        this.dto_field_names_mode = field_names_mode;
+        this.method_params_names_mode = method_params_names_mode;
         this.type_map = new TypeMapManager(type_map);
     }
 
@@ -188,7 +190,7 @@ public class JdbcUtils {
             for (int i = 1; i <= column_count; i++) {
                 String col_name = _get_jdbc_column_name(rsmd, i);
                 String type_name = _get_jdbc_column_type_name(rsmd, i);
-                FieldInfo fi = new FieldInfo(field_names_mode, type_name, col_name, "t(" + col_name + ")");
+                FieldInfo fi = new FieldInfo(dto_field_names_mode, type_name, col_name, "t(" + col_name + ")");
                 fi.setAutoIncrement(rsmd.isAutoIncrement(i));
                 if (pk_col_names_set_lower_case.contains(col_name.toLowerCase())) {
                     if (_fields_pk != null) {
@@ -254,7 +256,7 @@ public class JdbcUtils {
                 String col_name = _get_jdbc_column_name(rsmd, i);
                 // considers "[B", etc.
                 String java_type_name = _get_jdbc_column_type_name(rsmd, i);
-                FieldInfo field = new FieldInfo(field_names_mode, java_type_name, col_name, "q(" + col_name + ")");
+                FieldInfo field = new FieldInfo(dto_field_names_mode, java_type_name, col_name, "q(" + col_name + ")");
                 if (rsmd.isAutoIncrement(i)) {
                     field.setAutoIncrement(true);
                 } else {
@@ -323,7 +325,7 @@ public class JdbcUtils {
             if (fields_map.containsKey(col_name)) {
                 fields_map.get(col_name).refine_type(type_name);
             } else {
-                FieldInfo explicit_field = new FieldInfo(field_names_mode, type_name, col_name, "xml(" + col_name + ")");
+                FieldInfo explicit_field = new FieldInfo(dto_field_names_mode, type_name, col_name, "xml(" + col_name + ")");
                 fields.add(explicit_field);
                 fields_map.put(col_name, explicit_field);
             }
@@ -550,7 +552,7 @@ public class JdbcUtils {
             _refine_dao_fields_by_dto_fields(jaxb_dto_class, sql_root_abs_path, dao_all_fields);
             _fields.addAll(dao_all_fields);
         } else {
-            _fields.add(_get_ret_field_info(field_names_mode, jaxb_dto_or_return_type, dao_all_fields));
+            _fields.add(_get_ret_field_info(dto_field_names_mode, jaxb_dto_or_return_type, dao_all_fields));
         }
         if (_fields.size() > 0) {
             String comment = _fields.get(0).getComment();
@@ -606,7 +608,7 @@ public class JdbcUtils {
                 throw new Exception(msg);
             }
         } else { // jaxb_return_type_is_dto == false
-            _fields.add(_get_ret_field_info(field_names_mode, jaxb_dto_or_return_type, dao_fields));
+            _fields.add(_get_ret_field_info(dto_field_names_mode, jaxb_dto_or_return_type, dao_fields));
         }
         _get_free_sql_params_info(dao_query_jdbc_sql, param_names_mode, method_param_descriptors, _params);
     }
@@ -664,6 +666,13 @@ public class JdbcUtils {
         _get_dto_fields(jaxb_dto_class, sql_root_abs_path, _fields);
     }
 
+    private FieldNamesMode _refine_method_params_names_mode(String dto_param_type) {
+        // if it is something like <query method="get_some_value(MyDTO(m_id, m_date))", use field_names_mode (???)
+        FieldNamesMode mode = dto_param_type == null || dto_param_type.length() == 0
+                ? FieldNamesMode.AS_IS : method_params_names_mode;
+        return mode;
+    }
+
     /////////////////////////////////////////////////////////////////////////////
     //
     // DAO. Free-SQL
@@ -675,9 +684,7 @@ public class JdbcUtils {
         _params.clear();
         Helpers.check_duplicates(method_param_descriptors);
         String dao_query_jdbc_sql = SqlUtils.jdbc_sql_by_query_ref(dao_jaxb_ref, sql_root_abs_path);
-        // if it is something like <query method="get_some_value(MyDTO(m_id, m_date))", use field_names_mode (???)
-        FieldNamesMode param_names_mode = dto_param_type == null || dto_param_type.length() == 0
-                ? FieldNamesMode.AS_IS : field_names_mode;
+        FieldNamesMode param_names_mode = _refine_method_params_names_mode(dto_param_type);
         /*if (SqlUtils.is_table_ref(dao_jaxb_ref)) {
             throw new Exception("Table name as a value of 'ref' is not allowed in <query...");
         } else*/
@@ -699,9 +706,7 @@ public class JdbcUtils {
 
     public void get_dao_exec_dml_info(String dao_jdbc_sql, String dto_param_type, String[] method_param_descriptors,
                                       List<FieldInfo> _params) throws Exception {
-        // if it is something like <query method="get_some_value(MyDTO(m_id, m_date))", use field_names_mode (???)
-        FieldNamesMode param_names_mode = dto_param_type == null || dto_param_type.length() == 0
-                ? FieldNamesMode.AS_IS : field_names_mode;
+        FieldNamesMode param_names_mode = _refine_method_params_names_mode(dto_param_type);
         _get_free_sql_params_info(dao_jdbc_sql, param_names_mode, method_param_descriptors, _params);
     }
 
