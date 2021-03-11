@@ -16,8 +16,7 @@
     <!-- field-names-mode (Java only): 1 - camelCase; 2 - snake_case; -->
     <!-- single-file: for future use. -->
 
-    <dto scope="com.mycom.myproject.dto" inheritance=""
-         field-names-mode="0" single-file=""/>
+    <dto scope="com.mycom.myproject.dto" inheritance="" field-names-mode="1" single-file=""/>
 
     <!-- scope (only Java, Go, PHP): the name of package (Java, Go) or name-space
         (PHP) for DAO; -->
