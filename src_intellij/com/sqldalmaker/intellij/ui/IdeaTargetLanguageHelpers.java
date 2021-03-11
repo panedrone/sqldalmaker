@@ -283,8 +283,6 @@ public class IdeaTargetLanguageHelpers {
             int fnm = settings.getDto().getFieldNamesMode();
             if (fnm == 1) {
                 field_names_mode = FieldNamesMode.LOWER_CAMEL_CASE;
-            } else if (fnm == 2) {
-                field_names_mode = FieldNamesMode.LOWER_CASE;
             } else {
                 field_names_mode = FieldNamesMode.SNAKE_CASE;
             }
@@ -358,10 +356,8 @@ public class IdeaTargetLanguageHelpers {
             int fnm = settings.getDto().getFieldNamesMode();
             if (fnm == 1) {
                 field_names_mode = FieldNamesMode.LOWER_CAMEL_CASE;
-            } else if (fnm == 2) {
-                field_names_mode = FieldNamesMode.LOWER_CASE;
             } else {
-                field_names_mode = FieldNamesMode.AS_IS;
+                field_names_mode = FieldNamesMode.SNAKE_CASE;
             }
             String dto_package = settings.getDto().getScope();
             String dao_package = settings.getDao().getScope();
@@ -390,7 +386,7 @@ public class IdeaTargetLanguageHelpers {
             if (output_dir_rel_path != null) {
                 output_dir_rel_path.append(package_rel_path);
             }
-            String dto_package = package_rel_path = package_rel_path.replace("/", ".").replace("\\", ".");
+            String dto_package = package_rel_path.replace("/", ".").replace("\\", ".");
             return new PythonCG.DAO(dto_package, dto_classes, con, sql_root_abs_path, vm_file_system_path);
         } else if (RootFileName.RUBY.equals(fn)) {
             if (output_dir_rel_path != null) {

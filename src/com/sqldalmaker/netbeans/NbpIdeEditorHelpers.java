@@ -125,7 +125,7 @@ public class NbpIdeEditorHelpers {
             Settings sett = NbpHelpers.load_settings(obj);
             String sql_root_folder_abs_path = NbpPathHelpers.get_absolute_dir_path_str(obj, sett.getFolders().getSql());
             gen_tmp_field_tags(con, object_factory, cls_element, sql_root_folder_abs_path);
-            open_dto_in_editor_async(object_factory, root, true);
+            open_dto_in_editor_async(object_factory, root);
         } finally {
             con.close();
         }
@@ -138,7 +138,7 @@ public class NbpIdeEditorHelpers {
         for (FieldInfo f : fields) {
             DtoClass.Field df = object_factory.createDtoClassField();
             df.setColumn(f.getColumnName());
-            df.setJavaType(f.getType());
+            df.setType(f.getType());
             dto_class.getField().add(df);
         }
     }
@@ -162,15 +162,15 @@ public class NbpIdeEditorHelpers {
         open_in_editor_async(file);
     }
 
-    public static void open_dto_in_editor_async(com.sqldalmaker.jaxb.dto.ObjectFactory object_factory, DtoClasses dto_classes, boolean remove_java_lang) throws Exception {
-        String text = XmlHelpers.get_dto_xml_text(object_factory, dto_classes, remove_java_lang);
+    public static void open_dto_in_editor_async(com.sqldalmaker.jaxb.dto.ObjectFactory object_factory, DtoClasses dto_classes) throws Exception {
+        String text = XmlHelpers.get_dto_xml_text(object_factory, dto_classes);
         String[] parts = text.split("\\?>");
         text = parts[0] + Const.COMMENT_GENERATED_DTO_XML + parts[1];
         open_text_in_editor_async("_dto.xml", text); // '%' throws URI exception in NB
     }
 
     private static void open_dao_in_editor_async(com.sqldalmaker.jaxb.dao.ObjectFactory object_factory, DaoClass dao_classes, String file_name) throws Exception {
-        String text = XmlHelpers.get_dao_xml_text(object_factory, dao_classes, true);
+        String text = XmlHelpers.get_dao_xml_text(object_factory, dao_classes);
         String[] parts = text.split("\\?>");
         text = parts[0] + Const.COMMENT_GENERATED_DAO_XML + parts[1];
         open_text_in_editor_async(file_name, text);

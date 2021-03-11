@@ -174,7 +174,7 @@ public class JavaCG {
             } else {
                 returned_type_name = fields.get(0).getType();
             }
-            String java_sql_str = SqlUtils.jdbc_sql_to_java_str(dao_query_jdbc_sql);
+            String java_sql_str = SqlUtils.format_jdbc_sql_for_java(dao_query_jdbc_sql);
             Map<String, Object> context = new HashMap<String, Object>();
             context.put("mode", "dao_query");
             context.put("fields", fields);
@@ -239,7 +239,7 @@ public class JavaCG {
             SqlUtils.throw_if_select_sql(jdbc_dao_sql);
             List<FieldInfo> _params = new ArrayList<FieldInfo>();
             db_utils.get_dao_exec_dml_info(jdbc_dao_sql, dto_param_type, param_descriptors, _params);
-            String java_sql = SqlUtils.jdbc_sql_to_java_str(jdbc_dao_sql);
+            String java_sql = SqlUtils.format_jdbc_sql_for_java(jdbc_dao_sql);
             List<MappingInfo> m_list = new ArrayList<MappingInfo>();
             List<FieldInfo> method_params = new ArrayList<FieldInfo>();
             List<FieldInfo> exec_dml_params = new ArrayList<FieldInfo>();
@@ -373,12 +373,12 @@ public class JavaCG {
             List<FieldInfo> fields_ai = new ArrayList<FieldInfo>();
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
             String dao_jdbc_sql = db_utils.get_dao_crud_create_info(jaxb_dto_class, sql_root_abs_path, table_name, generated, fields_not_ai, fields_ai);
-            String sql_str = SqlUtils.jdbc_sql_to_java_str(dao_jdbc_sql);
+            String java_sql_str = SqlUtils.format_jdbc_sql_for_java(dao_jdbc_sql);
             Map<String, Object> context = new HashMap<String, Object>();
             context.put("method_type", "CREATE");
             context.put("table_name", table_name);
             context.put("class_name", class_name);
-            context.put("sql", sql_str);
+            context.put("sql", java_sql_str);
             context.put("method_name", method_name);
             context.put("params", fields_not_ai);
             context.put("dto_param", _get_rendered_dto_class_name(dto_class_name));
@@ -422,14 +422,14 @@ public class JavaCG {
             if (fields_not_pk.isEmpty()) {
                 return Helpers.get_only_pk_warning(method_name);
             }
-            String sql_str = SqlUtils.jdbc_sql_to_java_str(dao_jdbc_sql);
+            String java_sql_str = SqlUtils.format_jdbc_sql_for_java(dao_jdbc_sql);
             fields_not_pk.addAll(fields_pk);
             Map<String, Object> context = new HashMap<String, Object>();
             context.put("mode", "dao_exec_dml");
             context.put("class_name", class_name);
             context.put("plain_params", true);
             context.put("method_name", method_name);
-            context.put("sql", sql_str);
+            context.put("sql", java_sql_str);
             context.put("method_type", "UPDATE");
             context.put("table_name", table_name);
             context.put("dto_param", primitive_params ? "" : _get_rendered_dto_class_name(dto_class_name));
@@ -449,7 +449,7 @@ public class JavaCG {
             if (fields_pk.isEmpty()) {
                 return Helpers.get_no_pk_warning(method_name);
             }
-            String java_sql_str = SqlUtils.jdbc_sql_to_java_str(dao_jdbc_sql);
+            String java_sql_str = SqlUtils.format_jdbc_sql_for_java(dao_jdbc_sql);
             Map<String, Object> context = new HashMap<String, Object>();
             context.put("mode", "dao_exec_dml");
             context.put("class_name", class_name);

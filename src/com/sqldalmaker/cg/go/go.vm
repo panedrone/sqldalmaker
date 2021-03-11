@@ -83,9 +83,9 @@ func (dao *${class_name}) ${method_name}(p *${dto_param}) {
 
 #end
 #if($fetch_list)
+#if($use_dto)
 func (dao *${class_name}) ${method_name}(#if(${dto_param} != "")#param_decls_dto($is_external_sql)${dto_param} p#else#param_decls($is_external_sql $params)#end) []*${returned_type_name} {
 #sql_var($is_external_sql $sql)
-#if($use_dto)
 	var res []*${returned_type_name}
 	onDto := func(rd map[string]interface{}) {
 		obj := ${returned_type_name}{}

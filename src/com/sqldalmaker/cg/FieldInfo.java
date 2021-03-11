@@ -32,9 +32,7 @@ public class FieldInfo {
             this.field_name = this.field_name.replace(".", "_"); // [OrderDetails].OrderID
             this.field_name = this.field_name.replace(":", "_"); // CustomerID:1 -- for latest xenian SQLite3
         }
-        if (FieldNamesMode.LOWER_CASE.equals(field_names_mode)) {
-            this.field_name = this.field_name.toLowerCase();
-        } else if (FieldNamesMode.LOWER_CAMEL_CASE.equals(field_names_mode)) {
+        if (FieldNamesMode.LOWER_CAMEL_CASE.equals(field_names_mode)) {
             this.field_name = Helpers.to_lower_camel_or_title_case(this.field_name, false);
         } else if (FieldNamesMode.TITLE_CASE.equals(field_names_mode)) {
             this.field_name = Helpers.to_lower_camel_or_title_case(this.field_name, true);

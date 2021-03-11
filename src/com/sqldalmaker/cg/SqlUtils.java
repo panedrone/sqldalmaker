@@ -50,7 +50,15 @@ public class SqlUtils {
         return res.toString();
     }
 
-    public static String jdbc_sql_to_java_str(String jdbc_sql) {
+    public static String format_jdbc_sql_for_go(String jdbc_sql) {
+        return SqlUtils.format_jdbc_sql(jdbc_sql, true);
+    }
+
+    public static String format_jdbc_sql_for_java(String jdbc_sql) {
+        return SqlUtils.format_jdbc_sql(jdbc_sql, false);
+    }
+
+    public static String format_jdbc_sql(String jdbc_sql, boolean tabs) {
         String[] parts = get_sql_lines(jdbc_sql);
         String new_line = "\n"; // System.getProperty("line.separator");
         StringBuilder res = new StringBuilder();
@@ -68,7 +76,11 @@ public class SqlUtils {
                 j_str = "\"" + j_str + "\"";
             } else {
                 // "\n" it is OK for debugger window:
-                j_str = " + " + new_line + "        \"\\n " + j_str + "\"";
+                if (tabs) {
+                    j_str = " +" + new_line + "\t\t\"\\n " + j_str + "\"";
+                } else {
+                    j_str = " +" + new_line + "        \"\\n " + j_str + "\"";
+                }
             }
             res.append(j_str);
         }
