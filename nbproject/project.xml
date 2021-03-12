@@ -248,6 +248,14 @@
                 <binary-origin>release/modules/ext/jaxb-api-2.3.1.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
+                <runtime-relative-path>ext/jaxb-api-osgi-2.2.7.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/jaxb-api-osgi-2.2.7.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/itextpdf-5.5.9.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/itextpdf-5.5.9.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
                 <runtime-relative-path>ext/FastInfoset-1.2.15.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/FastInfoset-1.2.15.jar</binary-origin>
             </class-path-extension>

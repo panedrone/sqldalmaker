@@ -37,7 +37,7 @@ public class FieldInfo {
         } else if (FieldNamesMode.TITLE_CASE.equals(field_names_mode)) {
             this.field_name = Helpers.to_lower_camel_or_title_case(this.field_name, true);
         } else if (FieldNamesMode.SNAKE_CASE.equals(field_names_mode)) {
-            this.field_name = Helpers.camel_case_to_lower_under_scores(this.field_name);
+            this.field_name = Helpers.camel_case_to_snake_case(this.field_name);
             this.name_prefix = "_";
         }
         this.comment = comment;

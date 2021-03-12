@@ -32,7 +32,7 @@ public class PhpCG {
         private final String namespace;
 
         public DTO(DtoClasses jaxb_dto_classes, Connection connection, String sql_root_abs_path,
-                   String vm_file_system_dir, String namespace) throws Exception {
+                   String vm_file_system_dir, String namespace, FieldNamesMode field_names_mode) throws Exception {
             this.jaxb_dto_classes = jaxb_dto_classes.getDtoClass();
             this.sql_root_abs_path = sql_root_abs_path;
             this.namespace = namespace;
@@ -41,7 +41,7 @@ public class PhpCG {
             } else {
                 te = new TemplateEngine(vm_file_system_dir, true);
             }
-            db_utils = new JdbcUtils(connection, FieldNamesMode.AS_IS, FieldNamesMode.AS_IS, null);
+            db_utils = new JdbcUtils(connection, field_names_mode, FieldNamesMode.AS_IS, null);
         }
 
         @Override
@@ -86,7 +86,8 @@ public class PhpCG {
         private final String dao_namespace;
 
         public DAO(DtoClasses jaxb_dto_classes, Connection connection, String sql_root_abs_path,
-                   String vm_file_system_dir, String dto_namespace, String dao_namespace) throws Exception {
+                   String vm_file_system_dir, String dto_namespace, String dao_namespace,
+                   FieldNamesMode field_names_mode) throws Exception {
             this.jaxb_dto_classes = jaxb_dto_classes;
             this.sql_root_abs_path = sql_root_abs_path;
             this.dto_namespace = dto_namespace;
@@ -96,7 +97,7 @@ public class PhpCG {
             } else {
                 te = new TemplateEngine(vm_file_system_dir, true);
             }
-            db_utils = new JdbcUtils(connection, FieldNamesMode.AS_IS, FieldNamesMode.AS_IS, null);
+            db_utils = new JdbcUtils(connection, field_names_mode, FieldNamesMode.AS_IS, null);
         }
 
         @Override
@@ -477,7 +478,9 @@ public class PhpCG {
             try {
                 db_utils.validate_table_name(table_attr);
                 _get_rendered_dto_class_name(dto_class_name);
-                StringBuilder code_buff = JaxbUtils.process_jaxb_crud(this, false, jaxb_type_crud, dto_class_name);
+                FieldNamesMode fnm = db_utils.get_dto_field_names_mode();
+                boolean snake_case_method_names = fnm == FieldNamesMode.SNAKE_CASE;
+                StringBuilder code_buff = JaxbUtils.process_jaxb_crud(this, snake_case_method_names, jaxb_type_crud, dto_class_name);
                 return code_buff;
             } catch (Throwable e) {
                 // e.printStackTrace();

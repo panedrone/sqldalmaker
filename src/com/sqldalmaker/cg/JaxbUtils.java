@@ -67,7 +67,7 @@ public class JaxbUtils {
     }
 
     private static boolean process_jaxb_crud_create(IDaoCG dao_cg, TypeCrud jaxb_type_crud, String dto_class_name,
-                                                    String table_name, boolean lower_under_scores, StringBuilder code_buff) throws Exception {
+                                                    String table_name, boolean snake_case_method_names, StringBuilder code_buff) throws Exception {
         String method_name = null;
         if (jaxb_type_crud.getCreate() != null) {
             method_name = jaxb_type_crud.getCreate().getMethod();
@@ -79,8 +79,8 @@ public class JaxbUtils {
         if (method_name == null) {
             return true;
         }
-        if (lower_under_scores) {
-            method_name = Helpers.camel_case_to_lower_under_scores(method_name);
+        if (snake_case_method_names) {
+            method_name = Helpers.camel_case_to_snake_case(method_name);
         }
         boolean fetch_generated = jaxb_type_crud.isFetchGenerated();
         String generated = jaxb_type_crud.getGenerated();
@@ -91,7 +91,7 @@ public class JaxbUtils {
     }
 
     private static boolean process_jaxb_crud_read_all(IDaoCG dao_cg, TypeCrud jaxb_type_crud, String dto_class_name,
-                                                      String table_name, boolean lower_under_scores, StringBuilder code_buff) throws Exception {
+                                                      String table_name, boolean snake_case_method_names, StringBuilder code_buff) throws Exception {
         String method_name = null;
         if (jaxb_type_crud.getReadAll() != null) {
             method_name = jaxb_type_crud.getReadAll().getMethod();
@@ -103,8 +103,8 @@ public class JaxbUtils {
         if (method_name == null) {
             return true;
         }
-        if (lower_under_scores) {
-            method_name = Helpers.camel_case_to_lower_under_scores(method_name);
+        if (snake_case_method_names) {
+            method_name = Helpers.camel_case_to_snake_case(method_name);
         }
         StringBuilder tmp = dao_cg.render_crud_read(method_name, table_name, dto_class_name, null, true);
         code_buff.append(tmp);
@@ -112,7 +112,7 @@ public class JaxbUtils {
     }
 
     private static boolean process_jaxb_crud_read(IDaoCG dao_cg, TypeCrud jaxb_type_crud, String dto_class_name,
-                                                  String table_name, String explicit_pk, boolean lower_under_scores,
+                                                  String table_name, String explicit_pk, boolean snake_case_method_names,
                                                   StringBuilder code_buff) throws Exception {
         String method_name = null;
         if (jaxb_type_crud.getRead() != null) {
@@ -125,8 +125,8 @@ public class JaxbUtils {
         if (method_name == null) {
             return true;
         }
-        if (lower_under_scores) {
-            method_name = Helpers.camel_case_to_lower_under_scores(method_name);
+        if (snake_case_method_names) {
+            method_name = Helpers.camel_case_to_snake_case(method_name);
         }
         StringBuilder tmp = dao_cg.render_crud_read(method_name, table_name, dto_class_name, explicit_pk, false);
         code_buff.append(tmp);
@@ -134,7 +134,7 @@ public class JaxbUtils {
     }
 
     private static boolean process_jaxb_crud_update(IDaoCG dao_cg, TypeCrud jaxb_type_crud, String dto_class_name,
-                                                    String table_name, String explicit_primary_keys, boolean lower_under_scores,
+                                                    String table_name, String explicit_primary_keys, boolean snake_case_method_names,
                                                     StringBuilder code_buff) throws Exception {
         String method_name = null;
         if (jaxb_type_crud.getUpdate() != null) {
@@ -147,8 +147,8 @@ public class JaxbUtils {
         if (method_name == null) {
             return true;
         }
-        if (lower_under_scores) {
-            method_name = Helpers.camel_case_to_lower_under_scores(method_name);
+        if (snake_case_method_names) {
+            method_name = Helpers.camel_case_to_snake_case(method_name);
         }
         StringBuilder tmp = dao_cg.render_crud_update(null, method_name, table_name, explicit_primary_keys,
                 dto_class_name, false);
@@ -157,7 +157,7 @@ public class JaxbUtils {
     }
 
     private static boolean process_jaxb_crud_delete(IDaoCG dao_cg, TypeCrud jaxb_type_crud, String dto_class_name,
-                                                    String table_name, String explicit_pk, boolean lower_under_scores,
+                                                    String table_name, String explicit_pk, boolean snake_case_method_names,
                                                     StringBuilder code_buff) throws Exception {
         String method_name = null;
         if (jaxb_type_crud.getDelete() != null) {
@@ -170,38 +170,38 @@ public class JaxbUtils {
         if (method_name == null) {
             return true;
         }
-        if (lower_under_scores) {
-            method_name = Helpers.camel_case_to_lower_under_scores(method_name);
+        if (snake_case_method_names) {
+            method_name = Helpers.camel_case_to_snake_case(method_name);
         }
         StringBuilder tmp = dao_cg.render_crud_delete(null, method_name, table_name, explicit_pk);
         code_buff.append(tmp);
         return true;
     }
 
-    public static StringBuilder process_jaxb_crud(IDaoCG dao_cg, boolean lower_under_scores, TypeCrud jaxb_type_crud,
+    public static StringBuilder process_jaxb_crud(IDaoCG dao_cg, boolean snake_case_method_names, TypeCrud jaxb_type_crud,
                                                   String dto_class_name) throws Exception {
         String table_name = jaxb_type_crud.getTable();
         String explicit_primary_keys = jaxb_type_crud.getPk();
         boolean is_empty = true;
         StringBuilder code_buff = new StringBuilder();
-        if (process_jaxb_crud_create(dao_cg, jaxb_type_crud, dto_class_name, table_name, lower_under_scores,
+        if (process_jaxb_crud_create(dao_cg, jaxb_type_crud, dto_class_name, table_name, snake_case_method_names,
                 code_buff)) {
             is_empty = false;
         }
-        if (process_jaxb_crud_read_all(dao_cg, jaxb_type_crud, dto_class_name, table_name, lower_under_scores,
+        if (process_jaxb_crud_read_all(dao_cg, jaxb_type_crud, dto_class_name, table_name, snake_case_method_names,
                 code_buff)) {
             is_empty = false;
         }
         if (process_jaxb_crud_read(dao_cg, jaxb_type_crud, dto_class_name, table_name, explicit_primary_keys,
-                lower_under_scores, code_buff)) {
+                snake_case_method_names, code_buff)) {
             is_empty = false;
         }
         if (process_jaxb_crud_update(dao_cg, jaxb_type_crud, dto_class_name, table_name, explicit_primary_keys,
-                lower_under_scores, code_buff)) {
+                snake_case_method_names, code_buff)) {
             is_empty = false;
         }
         if (process_jaxb_crud_delete(dao_cg, jaxb_type_crud, dto_class_name, table_name, explicit_primary_keys,
-                lower_under_scores, code_buff)) {
+                snake_case_method_names, code_buff)) {
             is_empty = false;
         }
         if ((jaxb_type_crud instanceof Crud) && is_empty) {

@@ -1,7 +1,7 @@
 /*
- * Copyright 2011-2020 sqldalmaker@gmail.com
- * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
- * Read LICENSE.txt in the root of this project/archive for details.
+ * Copyright 2011-2021 sqldalmaker@gmail.com
+ * Read LICENSE.txt in the root of this project/archive.
+ * Project web-site: http://sqldalmaker.sourceforge.net
  */
 package com.sqldalmaker.cg;
 
@@ -29,6 +29,10 @@ public class JdbcUtils {
         this.dto_field_names_mode = field_names_mode;
         this.method_params_names_mode = method_params_names_mode;
         this.type_map = new TypeMapManager(type_map);
+    }
+
+    public FieldNamesMode get_dto_field_names_mode() {
+        return this.dto_field_names_mode;
     }
 
     private static String _get_jdbc_column_name(ResultSetMetaData rsmd, int col) throws Exception {

@@ -6,6 +6,8 @@
  */
 package com.sqldalmaker.cg;
 
+import com.sqldalmaker.jaxb.settings.Settings;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -61,17 +63,17 @@ public class Helpers {
         return new String[]{before_brackets, inside_brackets};
     }
 
-    public static String camel_case_to_lower_under_scores(String src) {
+    public static String camel_case_to_snake_case(String src) {
         // http://stackoverflow.com/questions/10310321/regex-for-converting-camelcase-to-camel-case-in-java
         String regex = "([a-z])([A-Z]+)";
         String replacement = "$1_$2";
         return src.replaceAll(regex, replacement).toLowerCase();
     }
 
-    public static String convert_to_lower_underscores_file_name(String class_name, String ext) {
+    public static String convert_file_name_to_snake_case(String class_name, String ext) {
         // http://stackoverflow.com/questions/221320/standard-file-naming-conventions-in-ruby
         // In Rails the convention of using underscores is necessary (almost).
-        return Helpers.camel_case_to_lower_under_scores(class_name) + "." + ext;
+        return Helpers.camel_case_to_snake_case(class_name) + "." + ext;
     }
 
     private static String java_primitive_name_to_class_name(String name) {
@@ -128,6 +130,17 @@ public class Helpers {
     public static String concat_path(String seg0, String seg1, String seg2) {
         String res = concat_path(seg0, seg1);
         return concat_path(res, seg2);
+    }
+
+    public static FieldNamesMode get_field_names_mode(Settings settings) {
+        FieldNamesMode field_names_mode;
+        int fnm = settings.getDto().getFieldNamesMode();
+        if (fnm == 1) {
+            field_names_mode = FieldNamesMode.LOWER_CAMEL_CASE;
+        } else {
+            field_names_mode = FieldNamesMode.SNAKE_CASE;
+        }
+        return field_names_mode;
     }
 
     // Java File exists Case sensitive

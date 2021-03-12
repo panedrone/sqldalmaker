@@ -134,19 +134,13 @@ public class EclipseTargetLanguageHelpers {
 				String abs_path = EclipseHelpers.get_absolute_dir_path_str(project, rel_path);
 				output_dir.append(abs_path);
 			}
+			FieldNamesMode field_names_mode = Helpers.get_field_names_mode(settings);
 			String dto_package = settings.getDto().getScope();
-			PhpCG.DTO gen = new PhpCG.DTO(dto_classes, conn, sql_root_abs_path, vm_file_system_path, dto_package);
+			PhpCG.DTO gen = new PhpCG.DTO(dto_classes, conn, sql_root_abs_path, vm_file_system_path, dto_package,
+					field_names_mode);
 			return gen;
 		} else if (RootFileName.JAVA.equals(root_file_name)) {
-			FieldNamesMode field_names_mode;
-			int fnm = settings.getDto().getFieldNamesMode();
-			if (fnm == 1) {
-				field_names_mode = FieldNamesMode.LOWER_CAMEL_CASE;
-			} else if (fnm == 2) {
-				field_names_mode = FieldNamesMode.LOWER_CASE;
-			} else {
-				field_names_mode = FieldNamesMode.AS_IS;
-			}
+			FieldNamesMode field_names_mode = Helpers.get_field_names_mode(settings);
 			String dto_package = settings.getDto().getScope();
 			if (output_dir != null) {
 				String rel_path = SdmUtils.get_package_relative_path(settings, dto_package);
@@ -226,27 +220,20 @@ public class EclipseTargetLanguageHelpers {
 				String abs_path = EclipseHelpers.get_absolute_dir_path_str(project, rel_path);
 				output_dir.append(abs_path);
 			}
+			FieldNamesMode field_names_mode = Helpers.get_field_names_mode(settings);
 			String dto_package = settings.getDto().getScope();
 			String dao_package = settings.getDao().getScope();
 			PhpCG.DAO gen = new PhpCG.DAO(dto_classes, conn, sql_root_abs_path, vm_file_system_path, dto_package,
-					dao_package);
+					dao_package, field_names_mode);
 			return gen;
 		} else if (RootFileName.JAVA.equals(root_fn)) {
-			FieldNamesMode field_names_mode;
-			int fnm = settings.getDto().getFieldNamesMode();
-			if (fnm == 1) {
-				field_names_mode = FieldNamesMode.LOWER_CAMEL_CASE;
-			} else if (fnm == 2) {
-				field_names_mode = FieldNamesMode.LOWER_CASE;
-			} else {
-				field_names_mode = FieldNamesMode.AS_IS;
-			}
 			String dao_package = settings.getDao().getScope();
 			if (output_dir != null) {
 				String rel_path = SdmUtils.get_package_relative_path(settings, dao_package);
 				String abs_path = EclipseHelpers.get_absolute_dir_path_str(project, rel_path);
 				output_dir.append(abs_path);
 			}
+			FieldNamesMode field_names_mode = Helpers.get_field_names_mode(settings);
 			String dto_package = settings.getDto().getScope();
 			JavaCG.DAO gen = new JavaCG.DAO(dto_classes, settings.getTypeMap(), conn, dto_package, dao_package,
 					sql_root_abs_path, field_names_mode, vm_file_system_path);
@@ -286,14 +273,11 @@ public class EclipseTargetLanguageHelpers {
 		} else if (RootFileName.CPP.equals(root_fn)) {
 			path = settings.getFolders().getTarget() + "/" + class_name + ".h";
 		} else if (RootFileName.PYTHON.equals(root_fn)) {
-			path = settings.getFolders().getTarget() + "/"
-					+ Helpers.convert_to_lower_underscores_file_name(class_name, "py");
+			path = settings.getFolders().getTarget() + "/" + Helpers.convert_file_name_to_snake_case(class_name, "py");
 		} else if (RootFileName.RUBY.equals(root_fn)) {
-			path = settings.getFolders().getTarget() + "/"
-					+ Helpers.convert_to_lower_underscores_file_name(class_name, "rb");
+			path = settings.getFolders().getTarget() + "/" + Helpers.convert_file_name_to_snake_case(class_name, "rb");
 		} else if (RootFileName.GO.equals(root_fn)) {
-			path = settings.getFolders().getTarget() + "/"
-					+ Helpers.convert_to_lower_underscores_file_name(class_name, "go");
+			path = settings.getFolders().getTarget() + "/" + Helpers.convert_file_name_to_snake_case(class_name, "go");
 		} else {
 			throw new Exception(get_unknown_root_file_msg(root_fn));
 		}
@@ -335,9 +319,9 @@ public class EclipseTargetLanguageHelpers {
 
 	public static String get_rel_path(String fn, StringBuilder output_dir, String class_name) {
 		if (RootFileName.RUBY.equals(fn)) {
-			return output_dir + "/" + Helpers.convert_to_lower_underscores_file_name(class_name, "rb");
+			return output_dir + "/" + Helpers.convert_file_name_to_snake_case(class_name, "rb");
 		} else if (RootFileName.PYTHON.equals(fn)) {
-			return output_dir + "/" + Helpers.convert_to_lower_underscores_file_name(class_name, "py");
+			return output_dir + "/" + Helpers.convert_file_name_to_snake_case(class_name, "py");
 		} else if (RootFileName.PHP.equals(fn)) {
 			return output_dir + "/" + class_name + ".php";
 		} else if (RootFileName.JAVA.equals(fn)) {
@@ -345,7 +329,7 @@ public class EclipseTargetLanguageHelpers {
 		} else if (RootFileName.CPP.equals(fn)) {
 			return output_dir + "/" + class_name + ".h";
 		} else if (RootFileName.GO.equals(fn)) {
-			return output_dir + "/" + Helpers.convert_to_lower_underscores_file_name(class_name, "go");
+			return output_dir + "/" + Helpers.convert_file_name_to_snake_case(class_name, "go");
 		}
 		return null;
 	}

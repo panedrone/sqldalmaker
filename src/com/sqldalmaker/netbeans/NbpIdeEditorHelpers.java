@@ -9,6 +9,7 @@ import com.sqldalmaker.cg.JdbcUtils;
 import com.sqldalmaker.cg.FieldInfo;
 import com.sqldalmaker.cg.FieldNamesMode;
 import com.sqldalmaker.common.Const;
+import com.sqldalmaker.common.SdmUtils;
 import com.sqldalmaker.common.XmlHelpers;
 import com.sqldalmaker.jaxb.dao.DaoClass;
 import com.sqldalmaker.jaxb.dto.DtoClass;
@@ -124,22 +125,10 @@ public class NbpIdeEditorHelpers {
             root.getDtoClass().add(cls_element);
             Settings sett = NbpHelpers.load_settings(obj);
             String sql_root_folder_abs_path = NbpPathHelpers.get_absolute_dir_path_str(obj, sett.getFolders().getSql());
-            gen_tmp_field_tags(con, object_factory, cls_element, sql_root_folder_abs_path);
+            SdmUtils.gen_tmp_field_tags(con, object_factory, cls_element, sql_root_folder_abs_path);
             open_dto_in_editor_async(object_factory, root);
         } finally {
             con.close();
-        }
-    }
-
-    private static void gen_tmp_field_tags(Connection con, ObjectFactory object_factory, DtoClass dto_class, String sql_root_abs_path) throws Exception {
-        JdbcUtils db_utils = new JdbcUtils(con, FieldNamesMode.AS_IS, null);
-        List<FieldInfo> fields = new ArrayList<FieldInfo>();
-        db_utils.get_dto_field_info(dto_class, sql_root_abs_path, fields);
-        for (FieldInfo f : fields) {
-            DtoClass.Field df = object_factory.createDtoClassField();
-            df.setColumn(f.getColumnName());
-            df.setType(f.getType());
-            dto_class.getField().add(df);
         }
     }
 

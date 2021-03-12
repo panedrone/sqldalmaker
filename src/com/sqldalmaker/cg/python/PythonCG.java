@@ -218,7 +218,7 @@ public class PythonCG {
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
             if (add_to_import) {
                 String dto_class_nm = jaxb_dto_class.getName();
-                String python_fn = Helpers.camel_case_to_lower_under_scores(dto_class_nm);
+                String python_fn = Helpers.camel_case_to_snake_case(dto_class_nm);
                 if (dto_package != null && dto_package.length() > 0) {
                     python_fn = dto_package + "." + python_fn;
                 }

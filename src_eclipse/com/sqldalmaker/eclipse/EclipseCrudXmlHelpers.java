@@ -109,9 +109,7 @@ public class EclipseCrudXmlHelpers {
 				field_names_mode = FieldNamesMode.LOWER_CAMEL_CASE;
 			} else {
 				int fnm = settings.getDto().getFieldNamesMode();
-				if (fnm == 0) {
-					field_names_mode = FieldNamesMode.AS_IS;
-				} else if (fnm == 1) {
+				if (fnm == 1) {
 					field_names_mode = FieldNamesMode.LOWER_CAMEL_CASE;
 				} else {
 					field_names_mode = FieldNamesMode.SNAKE_CASE;

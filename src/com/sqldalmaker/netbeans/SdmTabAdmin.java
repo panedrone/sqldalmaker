@@ -177,12 +177,16 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         jButton15 = new javax.swing.JButton();
         jButton9 = new javax.swing.JButton();
         jButton18 = new javax.swing.JButton();
+        jLabel4 = new javax.swing.JLabel();
+        jLabel6 = new javax.swing.JLabel();
+        jButton34 = new javax.swing.JButton();
         jPanel7 = new javax.swing.JPanel();
         jButton19 = new javax.swing.JButton();
         jButton20 = new javax.swing.JButton();
         jButton21 = new javax.swing.JButton();
         jButton22 = new javax.swing.JButton();
         jButton23 = new javax.swing.JButton();
+        jButton31 = new javax.swing.JButton();
         jTextPane1 = new javax.swing.JTextPane();
 
         setName(""); // NOI18N
@@ -279,7 +283,7 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         jPanel6.add(jPanel4);
 
         jPanel5.setPreferredSize(new java.awt.Dimension(860, 220));
-        jPanel5.setLayout(new java.awt.GridLayout(9, 3));
+        jPanel5.setLayout(new java.awt.GridLayout(10, 3));
 
         jButton10.setText("DataStore.php");
         jButton10.setFocusPainted(false);
@@ -453,6 +457,18 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
             }
         });
         jPanel5.add(jButton18);
+        jPanel5.add(jLabel4);
+        jPanel5.add(jLabel6);
+
+        jButton34.setText("data_store.go (database/sql)");
+        jButton34.setToolTipText("");
+        jButton34.setFocusPainted(false);
+        jButton34.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton34ActionPerformed(evt);
+            }
+        });
+        jPanel5.add(jButton34);
 
         jPanel6.add(jPanel5);
 
@@ -503,6 +519,15 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
             }
         });
         jPanel7.add(jButton23);
+
+        jButton31.setText("go.vm");
+        jButton31.setFocusPainted(false);
+        jButton31.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton31ActionPerformed(evt);
+            }
+        });
+        jPanel7.add(jButton31);
 
         jPanel6.add(jPanel7);
 
@@ -689,6 +714,14 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
 //        });
     }//GEN-LAST:event_jPanel6MouseEntered
 
+    private void jButton31ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton31ActionPerformed
+        NbpIdeEditorHelpers.open_resource_file_in_editor_async("go.vm", "com/sqldalmaker/cg/go", "go.vm");
+    }//GEN-LAST:event_jButton31ActionPerformed
+
+    private void jButton34ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton34ActionPerformed
+        NbpIdeEditorHelpers.open_resource_file_in_editor_async("data_store.go", "data_store.go");
+    }//GEN-LAST:event_jButton34ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton10;
@@ -714,8 +747,10 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
     private javax.swing.JButton jButton29;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton30;
+    private javax.swing.JButton jButton31;
     private javax.swing.JButton jButton32;
     private javax.swing.JButton jButton33;
+    private javax.swing.JButton jButton34;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton6;
@@ -725,7 +760,9 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
     private javax.swing.JLabel jLabel17;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;

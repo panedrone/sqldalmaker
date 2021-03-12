@@ -88,7 +88,7 @@ public class SdmUtils {
             for (String fk_column_name : fk_column_names) {
                 String c = fk_column_name;
                 if (field_names_mode == FieldNamesMode.SNAKE_CASE) {
-                    c = Helpers.camel_case_to_lower_under_scores(c);
+                    c = Helpers.camel_case_to_snake_case(c);
                 } else if (field_names_mode == FieldNamesMode.LOWER_CAMEL_CASE) {
                     c = to_lower_camel_or_title_case(c, false);
                 }
@@ -107,7 +107,7 @@ public class SdmUtils {
             QueryDtoList node = new QueryDtoList();
             node.setDto(dto_class_name);
             if (field_names_mode == FieldNamesMode.SNAKE_CASE) {
-                method_name = Helpers.camel_case_to_lower_under_scores(method_name);
+                method_name = Helpers.camel_case_to_snake_case(method_name);
             }
 //            } else if (field_names_mode == FieldNamesMode.LOWER_CAMEL_CASE) {
 //                method_name = to_lower_camel_or_title_case(method_name);
@@ -190,7 +190,7 @@ public class SdmUtils {
                                 TypeMethod tm = new TypeMethod();
                                 String m = "create" + dto_class_name;
                                 if (field_names_mode == FieldNamesMode.SNAKE_CASE) {
-                                    m = Helpers.camel_case_to_lower_under_scores(m);
+                                    m = Helpers.camel_case_to_snake_case(m);
                                 }
                                 tm.setMethod(m);
                                 crud.setCreate(tm);
@@ -199,7 +199,7 @@ public class SdmUtils {
                                 TypeMethod tm = new TypeMethod();
                                 String m = "read" + dto_class_name + "List";
                                 if (field_names_mode == FieldNamesMode.SNAKE_CASE) {
-                                    m = Helpers.camel_case_to_lower_under_scores(m);
+                                    m = Helpers.camel_case_to_snake_case(m);
                                 }
                                 tm.setMethod(m);
                                 crud.setReadAll(tm);
@@ -208,7 +208,7 @@ public class SdmUtils {
                                 TypeMethod tm = new TypeMethod();
                                 String m = "read" + dto_class_name;
                                 if (field_names_mode == FieldNamesMode.SNAKE_CASE) {
-                                    m = Helpers.camel_case_to_lower_under_scores(m);
+                                    m = Helpers.camel_case_to_snake_case(m);
                                 }
                                 tm.setMethod(m);
                                 crud.setRead(tm);
@@ -217,7 +217,7 @@ public class SdmUtils {
                                 TypeMethod tm = new TypeMethod();
                                 String m = "update" + dto_class_name;
                                 if (field_names_mode == FieldNamesMode.SNAKE_CASE) {
-                                    m = Helpers.camel_case_to_lower_under_scores(m);
+                                    m = Helpers.camel_case_to_snake_case(m);
                                 }
                                 tm.setMethod(m);
                                 crud.setUpdate(tm);
@@ -226,7 +226,7 @@ public class SdmUtils {
                                 TypeMethod tm = new TypeMethod();
                                 String m = "delete" + dto_class_name;
                                 if (field_names_mode == FieldNamesMode.SNAKE_CASE) {
-                                    m = Helpers.camel_case_to_lower_under_scores(m);
+                                    m = Helpers.camel_case_to_snake_case(m);
                                 }
                                 tm.setMethod(m);
                                 crud.setDelete(tm);

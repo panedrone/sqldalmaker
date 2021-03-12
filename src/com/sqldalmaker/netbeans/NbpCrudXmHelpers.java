@@ -6,6 +6,7 @@
  */
 package com.sqldalmaker.netbeans;
 
+import com.sqldalmaker.cg.FieldNamesMode;
 import com.sqldalmaker.common.FileSearchHelpers;
 import com.sqldalmaker.jaxb.dao.DaoClass;
 import com.sqldalmaker.jaxb.dto.DtoClasses;
@@ -15,6 +16,7 @@ import java.util.HashSet;
 import java.util.Set;
 import com.sqldalmaker.common.ISelectDbSchemaCallback;
 import com.sqldalmaker.common.SdmUtils;
+import com.sqldalmaker.jaxb.settings.Settings;
 import java.util.List;
 
 /**
@@ -48,7 +50,7 @@ public class NbpCrudXmHelpers {
                     } finally {
                         connection.close();
                     }
-                    NbpIdeEditorHelpers.open_dto_in_editor_async(object_factory, root, false);
+                    NbpIdeEditorHelpers.open_dto_in_editor_async(object_factory, root);
                 } catch (Exception e) {
                     NbpIdeMessageHelpers.show_error_in_ui_thread(e);
                 }
@@ -70,7 +72,8 @@ public class NbpCrudXmHelpers {
             public void process_ok(boolean schema_in_xml, String selected_schema, boolean omit_used,
                     boolean include_views, boolean plural_to_singular, boolean use_crud_auto, boolean add_fk_access) {
                 try {
-                    boolean underscores_needed = NbpTargetLanguageHelpers.underscores_needed(obj);
+                    Settings settings = NbpHelpers.load_settings(obj);
+                    FieldNamesMode field_names_mode = get_field_names_mode(obj, settings);
                     com.sqldalmaker.jaxb.dao.ObjectFactory object_factory = new com.sqldalmaker.jaxb.dao.ObjectFactory();
                     DaoClass root;
                     Connection connection = NbpHelpers.get_connection(obj);
@@ -83,7 +86,7 @@ public class NbpCrudXmHelpers {
                         }
                         root = SdmUtils.create_crud_xml_jaxb_dao_class(object_factory, connection, in_use,
                                 schema_in_xml, selected_schema, include_views, use_crud_auto, add_fk_access,
-                                plural_to_singular, underscores_needed);
+                                plural_to_singular, field_names_mode);
                     } finally {
                         connection.close();
                     }
@@ -116,19 +119,41 @@ public class NbpCrudXmHelpers {
         return res;
     }
 
+    private static FieldNamesMode get_field_names_mode(SdmDataObject obj, Settings settings) {
+        boolean force_snake_case = NbpTargetLanguageHelpers.snake_case_needed(obj);
+        FieldNamesMode field_names_mode;
+        if (force_snake_case) {
+            field_names_mode = FieldNamesMode.SNAKE_CASE;
+        } else {
+            boolean force_lower_camel_case = NbpTargetLanguageHelpers.lower_camel_case_needed(obj);
+            if (force_lower_camel_case) {
+                field_names_mode = FieldNamesMode.LOWER_CAMEL_CASE;
+            } else {
+                int fnm = settings.getDto().getFieldNamesMode();
+                if (fnm == 1) {
+                    field_names_mode = FieldNamesMode.LOWER_CAMEL_CASE;
+                } else {
+                    field_names_mode = FieldNamesMode.SNAKE_CASE;
+                }
+            }
+        }
+        return field_names_mode;
+    }
+    
     public static void get_fk_access_xml(final SdmDataObject obj) throws Exception {
         ISelectDbSchemaCallback callback = new ISelectDbSchemaCallback() {
             @Override
             public void process_ok(boolean schema_in_xml, String selected_schema, boolean omit_used,
                     boolean include_views, boolean plural_to_singular, boolean crud_auto, boolean add_fk_access) {
                 try {
-                    boolean underscores_needed = NbpTargetLanguageHelpers.underscores_needed(obj);
+                    Settings settings = NbpHelpers.load_settings(obj);
+                    FieldNamesMode field_names_mode = get_field_names_mode(obj, settings);
                     com.sqldalmaker.jaxb.dao.ObjectFactory object_factory = new com.sqldalmaker.jaxb.dao.ObjectFactory();
                     DaoClass root;
                     Connection conn = NbpHelpers.get_connection(obj);
                     try {
                         root = SdmUtils.get_fk_access_xml(conn, object_factory, schema_in_xml, selected_schema,
-                                plural_to_singular, underscores_needed);
+                                plural_to_singular, field_names_mode);
                     } finally {
                         conn.close();
                     }

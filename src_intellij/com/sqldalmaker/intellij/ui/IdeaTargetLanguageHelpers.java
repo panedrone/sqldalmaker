@@ -1,7 +1,7 @@
 /*
- * Copyright 2011-2020 sqldalmaker@gmail.com
- * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
- * Read LICENSE.txt in the root of this project/archive for details.
+ * Copyright 2011-2021 sqldalmaker@gmail.com
+ * Read LICENSE.txt in the root of this project/archive.
+ * Project web-site: http://sqldalmaker.sourceforge.net
  */
 package com.sqldalmaker.intellij.ui;
 
@@ -108,13 +108,13 @@ public class IdeaTargetLanguageHelpers {
         } else if (RootFileName.PHP.equals(fn)) {
             rel_path = settings.getFolders().getTarget() + "/" + value + ".php";
         } else if (RootFileName.PYTHON.equals(fn)) {
-            rel_path = settings.getFolders().getTarget() + "/" + Helpers.convert_to_lower_underscores_file_name(value, "py");
+            rel_path = settings.getFolders().getTarget() + "/" + Helpers.convert_file_name_to_snake_case(value, "py");
         } else if (RootFileName.RUBY.equals(fn)) {
-            rel_path = settings.getFolders().getTarget() + "/" + Helpers.convert_to_lower_underscores_file_name(value, "rb");
+            rel_path = settings.getFolders().getTarget() + "/" + Helpers.convert_file_name_to_snake_case(value, "rb");
         } else if (RootFileName.CPP.equals(fn)) {
             rel_path = settings.getFolders().getTarget() + "/" + value + ".h";
         } else if (RootFileName.GO.equals(fn)) {
-            rel_path = settings.getFolders().getTarget() + "/" + Helpers.convert_to_lower_underscores_file_name(value, "go");
+            rel_path = settings.getFolders().getTarget() + "/" + Helpers.convert_file_name_to_snake_case(value, "go");
         } else {
             throw new Exception(_get_unknown_root_file_msg(fn));
         }
@@ -130,13 +130,13 @@ public class IdeaTargetLanguageHelpers {
         } else if (RootFileName.PHP.equals(fn)) {
             file_name = class_name + ".php";
         } else if (RootFileName.PYTHON.equals(fn)) {
-            file_name = Helpers.convert_to_lower_underscores_file_name(class_name, "py");
+            file_name = Helpers.convert_file_name_to_snake_case(class_name, "py");
         } else if (RootFileName.RUBY.equals(fn)) {
-            file_name = Helpers.convert_to_lower_underscores_file_name(class_name, "rb");
+            file_name = Helpers.convert_file_name_to_snake_case(class_name, "rb");
         } else if (RootFileName.CPP.equals(fn)) {
             file_name = class_name + ".h";
         } else if (RootFileName.GO.equals(fn)) {
-            file_name = Helpers.convert_to_lower_underscores_file_name(class_name, "go");
+            file_name = Helpers.convert_file_name_to_snake_case(class_name, "go");
         } else {
             throw new Exception(_get_unknown_root_file_msg(fn));
         }
@@ -162,16 +162,16 @@ public class IdeaTargetLanguageHelpers {
             file_name = Helpers.concat_path(dao_destination, class_name + ".php");
         } else if (RootFileName.PYTHON.equals(fn)) {
             String dao_destination = Helpers.concat_path(module_root, source_folder);
-            file_name = Helpers.concat_path(dao_destination, Helpers.convert_to_lower_underscores_file_name(class_name, "py"));
+            file_name = Helpers.concat_path(dao_destination, Helpers.convert_file_name_to_snake_case(class_name, "py"));
         } else if (RootFileName.RUBY.equals(fn)) {
             String dao_destination = Helpers.concat_path(module_root, source_folder);
-            file_name = Helpers.concat_path(dao_destination, Helpers.convert_to_lower_underscores_file_name(class_name, "rb"));
+            file_name = Helpers.concat_path(dao_destination, Helpers.convert_file_name_to_snake_case(class_name, "rb"));
         } else if (RootFileName.CPP.equals(fn)) {
             String dao_destination = Helpers.concat_path(module_root, source_folder);
             file_name = Helpers.concat_path(dao_destination, class_name + ".h");
         } else if (RootFileName.GO.equals(fn)) {
             String dao_destination = Helpers.concat_path(module_root, source_folder);
-            file_name = Helpers.concat_path(dao_destination, Helpers.convert_to_lower_underscores_file_name(class_name, "go"));
+            file_name = Helpers.concat_path(dao_destination, Helpers.convert_file_name_to_snake_case(class_name, "go"));
         } else {
             throw new Exception(_get_unknown_root_file_msg(fn));
         }
@@ -204,16 +204,16 @@ public class IdeaTargetLanguageHelpers {
             file_name = Helpers.concat_path(dao_destination, dao_class_name + ".php");
         } else if (RootFileName.PYTHON.equals(fn)) {
             String dao_destination = Helpers.concat_path(module_root, source_folder);
-            file_name = Helpers.concat_path(dao_destination, Helpers.convert_to_lower_underscores_file_name(dao_class_name, "py"));
+            file_name = Helpers.concat_path(dao_destination, Helpers.convert_file_name_to_snake_case(dao_class_name, "py"));
         } else if (RootFileName.RUBY.equals(fn)) {
             String dao_destination = Helpers.concat_path(module_root, source_folder);
-            file_name = Helpers.concat_path(dao_destination, Helpers.convert_to_lower_underscores_file_name(dao_class_name, "rb"));
+            file_name = Helpers.concat_path(dao_destination, Helpers.convert_file_name_to_snake_case(dao_class_name, "rb"));
         } else if (RootFileName.CPP.equals(fn)) {
             String dao_destination = Helpers.concat_path(module_root, source_folder);
             file_name = Helpers.concat_path(dao_destination, dao_class_name + ".h");
         } else if (RootFileName.GO.equals(fn)) {
             String dao_destination = Helpers.concat_path(module_root, source_folder);
-            file_name = Helpers.concat_path(dao_destination, Helpers.convert_to_lower_underscores_file_name(dao_class_name, "go"));
+            file_name = Helpers.concat_path(dao_destination, Helpers.convert_file_name_to_snake_case(dao_class_name, "go"));
         } else {
             throw new Exception(_get_unknown_root_file_msg(fn));
         }
@@ -278,14 +278,16 @@ public class IdeaTargetLanguageHelpers {
         DtoClasses dto_classes = xml_parser.unmarshal(dto_xml_abs_path);
         String fn = root_file.getName();
         ////////////////////////////////////////////////////
-        if (RootFileName.JAVA.equals(fn)) {
-            FieldNamesMode field_names_mode;
-            int fnm = settings.getDto().getFieldNamesMode();
-            if (fnm == 1) {
-                field_names_mode = FieldNamesMode.LOWER_CAMEL_CASE;
-            } else {
-                field_names_mode = FieldNamesMode.SNAKE_CASE;
+        if (RootFileName.PHP.equals(fn)) {
+            if (output_dir_rel_path != null) {
+                String package_rel_path = settings.getFolders().getTarget();
+                output_dir_rel_path.append(package_rel_path);
             }
+            FieldNamesMode field_names_mode = Helpers.get_field_names_mode(settings);
+            String dto_package = settings.getDto().getScope();
+            return new PhpCG.DTO(dto_classes, connection, sql_root_abs_path, vm_file_system_path, dto_package, field_names_mode);
+        } else if (RootFileName.JAVA.equals(fn)) {
+            FieldNamesMode field_names_mode = Helpers.get_field_names_mode(settings);
             String dto_inheritance = settings.getDto().getInheritance();
             String dto_package = settings.getDto().getScope();
             if (output_dir_rel_path != null) {
@@ -302,13 +304,6 @@ public class IdeaTargetLanguageHelpers {
             Settings sett = IdeaHelpers.load_settings(root_file);
             return new CppCG.DTO(dto_classes, sett.getTypeMap(), connection, sql_root_abs_path,
                     settings.getCpp().getClassPrefix(), vm_file_system_path);
-        } else if (RootFileName.PHP.equals(fn)) {
-            if (output_dir_rel_path != null) {
-                String package_rel_path = settings.getFolders().getTarget();
-                output_dir_rel_path.append(package_rel_path);
-            }
-            String dto_package = settings.getDto().getScope();
-            return new PhpCG.DTO(dto_classes, connection, sql_root_abs_path, vm_file_system_path, dto_package);
         } else if (RootFileName.PYTHON.equals(fn)) {
             if (output_dir_rel_path != null) {
                 String package_rel_path = settings.getFolders().getTarget();
@@ -351,14 +346,17 @@ public class IdeaTargetLanguageHelpers {
         DtoClasses dto_classes = xml_parser.unmarshal(dto_xml_abs_path);
         String fn = root_file.getName();
         ////////////////////////////////////////////////////
-        if (RootFileName.JAVA.equals(fn)) {
-            FieldNamesMode field_names_mode;
-            int fnm = settings.getDto().getFieldNamesMode();
-            if (fnm == 1) {
-                field_names_mode = FieldNamesMode.LOWER_CAMEL_CASE;
-            } else {
-                field_names_mode = FieldNamesMode.SNAKE_CASE;
+        if (RootFileName.PHP.equals(fn)) {
+            if (output_dir_rel_path != null) {
+                String package_rel_path = settings.getFolders().getTarget();
+                output_dir_rel_path.append(package_rel_path);
             }
+            FieldNamesMode field_names_mode = Helpers.get_field_names_mode(settings);
+            String dto_package = settings.getDto().getScope();
+            String dao_package = settings.getDao().getScope();
+            return new PhpCG.DAO(dto_classes, con, sql_root_abs_path, vm_file_system_path, dto_package, dao_package, field_names_mode);
+        } else if (RootFileName.JAVA.equals(fn)) {
+            FieldNamesMode field_names_mode = Helpers.get_field_names_mode(settings);
             String dto_package = settings.getDto().getScope();
             String dao_package = settings.getDao().getScope();
             if (output_dir_rel_path != null) {
@@ -373,14 +371,6 @@ public class IdeaTargetLanguageHelpers {
             }
             String class_prefix = settings.getCpp().getClassPrefix();
             return new CppCG.DAO(dto_classes, settings.getTypeMap(), con, sql_root_abs_path, class_prefix, vm_file_system_path);
-        } else if (RootFileName.PHP.equals(fn)) {
-            if (output_dir_rel_path != null) {
-                String package_rel_path = settings.getFolders().getTarget();
-                output_dir_rel_path.append(package_rel_path);
-            }
-            String dto_package = settings.getDto().getScope();
-            String dao_package = settings.getDao().getScope();
-            return new PhpCG.DAO(dto_classes, con, sql_root_abs_path, vm_file_system_path, dto_package, dao_package);
         } else if (RootFileName.PYTHON.equals(fn)) {
             String package_rel_path = settings.getFolders().getTarget();
             if (output_dir_rel_path != null) {

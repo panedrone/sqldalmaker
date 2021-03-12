@@ -65,7 +65,7 @@ public class NbpTargetLanguageHelpers {
         return "Unknown root file: " + fn;
     }
 
-    public static boolean underscores_needed(SdmDataObject obj) {
+    public static boolean snake_case_needed(SdmDataObject obj) {
         String fn = obj.getPrimaryFile().getNameExt();
         if (RootFileName.RUBY.equals(fn) || RootFileName.PYTHON.equals(fn)) {
             return true;
@@ -73,14 +73,23 @@ public class NbpTargetLanguageHelpers {
         return false;
     }
 
+    public static boolean lower_camel_case_needed(SdmDataObject obj) {
+        String fn = obj.getPrimaryFile().getNameExt();
+        if (RootFileName.GO.equals(fn)) {
+            return true;
+        }
+        return false;
+    }
+
+    
     public static String get_target_file_name(SdmDataObject obj, String class_name) throws Exception {
         String fn = obj.getPrimaryFile().getNameExt();
         if (RootFileName.RUBY.equals(fn)) {
-            return Helpers.convert_to_lower_underscores_file_name(class_name, "rb");
+            return Helpers.convert_file_name_to_snake_case(class_name, "rb");
         } else if (RootFileName.PYTHON.equals(fn)) {
-            return Helpers.convert_to_lower_underscores_file_name(class_name, "py");
+            return Helpers.convert_file_name_to_snake_case(class_name, "py");
         } else if (RootFileName.GO.equals(fn)) {
-            return Helpers.convert_to_lower_underscores_file_name(class_name, "go");
+            return Helpers.convert_file_name_to_snake_case(class_name, "go");
         } else if (RootFileName.PHP.equals(fn)) {
             return class_name + ".php";
         } else if (RootFileName.JAVA.equals(fn)) {
@@ -106,13 +115,13 @@ public class NbpTargetLanguageHelpers {
             file_abs_path = Helpers.concat_path(dao_destination, dto_class_name + ".php");
         } else if (RootFileName.PYTHON.equals(fn)) {
             String dao_destination = Helpers.concat_path(project_root_abs_path, source_folder_rel_path);
-            file_abs_path = Helpers.concat_path(dao_destination, Helpers.convert_to_lower_underscores_file_name(dto_class_name, "py"));
+            file_abs_path = Helpers.concat_path(dao_destination, Helpers.convert_file_name_to_snake_case(dto_class_name, "py"));
         } else if (RootFileName.RUBY.equals(fn)) {
             String dao_destination = Helpers.concat_path(project_root_abs_path, source_folder_rel_path);
-            file_abs_path = Helpers.concat_path(dao_destination, Helpers.convert_to_lower_underscores_file_name(dto_class_name, "rb"));
+            file_abs_path = Helpers.concat_path(dao_destination, Helpers.convert_file_name_to_snake_case(dto_class_name, "rb"));
         } else if (RootFileName.GO.equals(fn)) {
             String dao_destination = Helpers.concat_path(project_root_abs_path, source_folder_rel_path);
-            file_abs_path = Helpers.concat_path(dao_destination, Helpers.convert_to_lower_underscores_file_name(dto_class_name, "go"));
+            file_abs_path = Helpers.concat_path(dao_destination, Helpers.convert_file_name_to_snake_case(dto_class_name, "go"));
         } else if (RootFileName.CPP.equals(fn)) {
             String dao_destination = Helpers.concat_path(project_root_abs_path, source_folder_rel_path);
             file_abs_path = Helpers.concat_path(dao_destination, dto_class_name + ".h");
@@ -144,13 +153,13 @@ public class NbpTargetLanguageHelpers {
             file_name = Helpers.concat_path(destination, dao_class_name + ".php");
         } else if (RootFileName.PYTHON.equals(fn)) {
             String destination = Helpers.concat_path(project_root_abs_path, source_folder_rel_path);
-            file_name = Helpers.concat_path(destination, Helpers.convert_to_lower_underscores_file_name(dao_class_name, "py"));
+            file_name = Helpers.concat_path(destination, Helpers.convert_file_name_to_snake_case(dao_class_name, "py"));
         } else if (RootFileName.RUBY.equals(fn)) {
             String destination = Helpers.concat_path(project_root_abs_path, source_folder_rel_path);
-            file_name = Helpers.concat_path(destination, Helpers.convert_to_lower_underscores_file_name(dao_class_name, "rb"));
+            file_name = Helpers.concat_path(destination, Helpers.convert_file_name_to_snake_case(dao_class_name, "rb"));
         } else if (RootFileName.GO.equals(fn)) {
             String destination = Helpers.concat_path(project_root_abs_path, source_folder_rel_path);
-            file_name = Helpers.concat_path(destination, Helpers.convert_to_lower_underscores_file_name(dao_class_name, "go"));
+            file_name = Helpers.concat_path(destination, Helpers.convert_file_name_to_snake_case(dao_class_name, "go"));
         } else if (RootFileName.CPP.equals(fn)) {
             String destination = Helpers.concat_path(project_root_abs_path, source_folder_rel_path);
             file_name = Helpers.concat_path(destination, dao_class_name + ".h");
@@ -177,11 +186,11 @@ public class NbpTargetLanguageHelpers {
         } else if (RootFileName.PHP.equals(fn)) {
             rel_path = settings.getFolders().getTarget() + "/" + value + ".php";
         } else if (RootFileName.PYTHON.equals(fn)) {
-            rel_path = settings.getFolders().getTarget() + "/" + Helpers.convert_to_lower_underscores_file_name(value, "py");
+            rel_path = settings.getFolders().getTarget() + "/" + Helpers.convert_file_name_to_snake_case(value, "py");
         } else if (RootFileName.RUBY.equals(fn)) {
-            rel_path = settings.getFolders().getTarget() + "/" + Helpers.convert_to_lower_underscores_file_name(value, "rb");
+            rel_path = settings.getFolders().getTarget() + "/" + Helpers.convert_file_name_to_snake_case(value, "rb");
         } else if (RootFileName.GO.equals(fn)) {
-            rel_path = settings.getFolders().getTarget() + "/" + Helpers.convert_to_lower_underscores_file_name(value, "go");
+            rel_path = settings.getFolders().getTarget() + "/" + Helpers.convert_file_name_to_snake_case(value, "go");
         } else if (RootFileName.CPP.equals(fn)) {
             rel_path = settings.getFolders().getTarget() + "/" + value + ".h";
         } else {
@@ -190,7 +199,7 @@ public class NbpTargetLanguageHelpers {
         NbpIdeEditorHelpers.open_project_file_in_editor_async(obj, rel_path);
     }
 
-    public static IDtoCG create_dto_cg(Connection connection, SdmDataObject obj, 
+    public static IDtoCG create_dto_cg(Connection connection, SdmDataObject obj,
             Settings settings, StringBuilder output_dir_rel_path) throws Exception {
         String fn = obj.getPrimaryFile().getNameExt();
         String sql_root_abs_path = NbpPathHelpers.get_absolute_dir_path_str(obj, settings.getFolders().getSql());
@@ -231,20 +240,12 @@ public class NbpTargetLanguageHelpers {
                 String package_rel_path = settings.getFolders().getTarget();
                 output_dir_rel_path.append(package_rel_path);
             }
+            FieldNamesMode field_names_mode = Helpers.get_field_names_mode(settings);
             String dto_package = settings.getDto().getScope();
-            PhpCG.DTO gen = new PhpCG.DTO(dto_classes, connection, sql_root_abs_path, vm_file_system_path, dto_package);
+            PhpCG.DTO gen = new PhpCG.DTO(dto_classes, connection, sql_root_abs_path, vm_file_system_path, dto_package, field_names_mode);
             return gen;
         } else if (RootFileName.JAVA.equals(fn)) {
-            FieldNamesMode field_names_mode;
-            int fnm = settings.getDto().getFieldNamesMode();
-            switch (fnm) {
-                case 1:
-                    field_names_mode = FieldNamesMode.LOWER_CAMEL_CASE;
-                    break;
-                default:
-                    field_names_mode = FieldNamesMode.SNAKE_CASE;
-                    break;
-            }
+            FieldNamesMode field_names_mode = Helpers.get_field_names_mode(settings);
             String dto_inheritance = settings.getDto().getInheritance();
             String dto_package = settings.getDto().getScope();
             if (output_dir_rel_path != null) {
@@ -281,17 +282,17 @@ public class NbpTargetLanguageHelpers {
         String context_path = DtoClasses.class.getPackage().getName();
         XmlParser xml_Parser = new XmlParser(context_path, dto_xsd_abs_path);
         DtoClasses dto_classes = xml_Parser.unmarshal(dto_xml_abs_path);
-        if (RootFileName.JAVA.equals(fn)) {
-            FieldNamesMode field_names_mode;
-            int fnm = settings.getDto().getFieldNamesMode();
-            switch (fnm) {
-                case 1:
-                    field_names_mode = FieldNamesMode.LOWER_CAMEL_CASE;
-                    break;
-                default:
-                    field_names_mode = FieldNamesMode.SNAKE_CASE;
-                    break;
+        if (RootFileName.PHP.equals(fn)) {
+            if (output_dir != null) {
+                String package_rel_path = settings.getFolders().getTarget();
+                output_dir.append(package_rel_path);
             }
+            FieldNamesMode field_names_mode = Helpers.get_field_names_mode(settings);
+            String dto_package = settings.getDto().getScope();
+            String dao_package = settings.getDao().getScope();
+            return new PhpCG.DAO(dto_classes, con, sql_root_abs_path, vm_file_system_path, dto_package, dao_package, field_names_mode);
+        } else if (RootFileName.JAVA.equals(fn)) {
+            FieldNamesMode field_names_mode = Helpers.get_field_names_mode(settings);
             String dto_package = settings.getDto().getScope();
             String dao_package = settings.getDao().getScope();
             if (output_dir != null) {
@@ -307,14 +308,6 @@ public class NbpTargetLanguageHelpers {
             }
             String class_prefix = settings.getCpp().getClassPrefix();
             return new CppCG.DAO(dto_classes, settings.getTypeMap(), con, sql_root_abs_path, class_prefix, vm_file_system_path);
-        } else if (RootFileName.PHP.equals(fn)) {
-            if (output_dir != null) {
-                String package_rel_path = settings.getFolders().getTarget();
-                output_dir.append(package_rel_path);
-            }
-            String dto_package = settings.getDto().getScope();
-            String dao_package = settings.getDao().getScope();
-            return new PhpCG.DAO(dto_classes, con, sql_root_abs_path, vm_file_system_path, dto_package, dao_package);
         } else if (RootFileName.PYTHON.equals(fn)) {
             String package_rel_path = settings.getFolders().getTarget();
             if (output_dir != null) {

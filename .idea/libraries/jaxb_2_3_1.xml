@@ -9,6 +9,8 @@
       <root url="jar://$PROJECT_DIR$/lib/jaxb-runtime-2.3.1.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/stax-ex-1.8.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/txw2-2.3.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/itextpdf-5.5.9.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jaxb-api-osgi-2.2.7.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
