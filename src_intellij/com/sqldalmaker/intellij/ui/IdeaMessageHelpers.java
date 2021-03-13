@@ -37,6 +37,8 @@ public class IdeaMessageHelpers {
 //        }
         NotificationGroup res = NotificationGroup.findRegisteredGroup("SQL DAL Maker"); // not available in 2017.3
 //        if (res == null) {
+//            // https://www.plugin-dev.com/intellij-notifications.pdf
+//            // https://plugins.jetbrains.com/docs/intellij/notifications.html
 //            // inbound NONE, working in in 2017.3, deprecated in 2021.3
 //            // @NotNull
 //            res = NotificationGroup.logOnlyGroup("SQL DAL Maker");

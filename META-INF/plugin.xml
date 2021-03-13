@@ -41,6 +41,7 @@ PHP, Java, C++, Python, Ruby, and Go. To generate the class, you declare it in X
 
     <extensions defaultExtensionNs="com.intellij">
         <!--
+        https://plugins.jetbrains.com/docs/intellij/notifications.html
         notificationGroup and fileType are not available in 2017.3, but errors are silent...
         -->
         <notificationGroup id="SQL DAL Maker" displayType="NONE"/>
