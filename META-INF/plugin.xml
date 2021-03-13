@@ -41,11 +41,16 @@ PHP, Java, C++, Python, Ruby, and Go. To generate the class, you declare it in X
 
     <extensions defaultExtensionNs="com.intellij">
         <!--
+        notificationGroup and fileType are not available in 2017.3, but errors are silent...
+        -->
+        <notificationGroup id="SQL DAL Maker" displayType="NONE"/>
+        <!--
         Register the FileType Directly
         Direct registration is possible when targeting version 2019.2 (and later) of the IntelliJ Platform - no FileTypeFactory is required.
         https://jetbrains.org/intellij/sdk/docs/tutorials/custom_language_support/language_and_filetype.html
         -->
-        <fileType name="com.sqldalmaker.intellij.ui.RootFileType" implementationClass="com.sqldalmaker.intellij.ui.RootFileType"
+        <fileType name="com.sqldalmaker.intellij.ui.RootFileType"
+                  implementationClass="com.sqldalmaker.intellij.ui.RootFileType"
                   fieldName="INSTANCE" extensions="dal"/>
         <fileEditorProvider implementation="com.sqldalmaker.intellij.ui.RootFileEditorProvider"/>
         <editorTabTitleProvider implementation="com.sqldalmaker.intellij.ui.RootFileEditorTabTitleProvider"/>

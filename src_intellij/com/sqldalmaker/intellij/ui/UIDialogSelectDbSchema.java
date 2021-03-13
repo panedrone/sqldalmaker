@@ -1,7 +1,7 @@
 /*
- * Copyright 2011-2020 sqldalmaker@gmail.com
- * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
- * Read LICENSE.txt in the root of this project/archive for details.
+ * Copyright 2011-2021 sqldalmaker@gmail.com
+ * Read LICENSE.txt in the root of this project/archive.
+ * Project web-site: http://sqldalmaker.sourceforge.net
  */
 package com.sqldalmaker.intellij.ui;
 
@@ -15,14 +15,11 @@ import com.sqldalmaker.common.ISelectDbSchemaCallback;
 import com.sqldalmaker.jaxb.settings.Settings;
 
 import javax.swing.*;
-import javax.swing.plaf.FontUIResource;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.text.StyleContext;
 import java.awt.*;
 import java.awt.event.*;
 import java.sql.Connection;
 import java.util.ArrayList;
-import java.util.Locale;
 
 /**
  * Created with IntelliJ IDEA.
@@ -141,7 +138,7 @@ public class UIDialogSelectDbSchema extends JDialog {
                     int[] indexes = getSelection();
                     enabled = indexes.length == 1;
                     if (enabled) {
-                       selected_schema = (String) table.getModel().getValueAt(indexes[0], 0);
+                        selected_schema = (String) table.getModel().getValueAt(indexes[0], 0);
                     }
                 }
             }
@@ -337,10 +334,7 @@ public class UIDialogSelectDbSchema extends JDialog {
                 resultName = currentFont.getName();
             }
         }
-        Font font = new Font(resultName, style >= 0 ? style : currentFont.getStyle(), size >= 0 ? size : currentFont.getSize());
-        boolean isMac = System.getProperty("os.name", "").toLowerCase(Locale.ENGLISH).startsWith("mac");
-        Font fontWithFallback = isMac ? new Font(font.getFamily(), font.getStyle(), font.getSize()) : new StyleContext().getFont(font.getFamily(), font.getStyle(), font.getSize());
-        return fontWithFallback instanceof FontUIResource ? fontWithFallback : new FontUIResource(fontWithFallback);
+        return new Font(resultName, style >= 0 ? style : currentFont.getStyle(), size >= 0 ? size : currentFont.getSize());
     }
 
     /**
@@ -349,5 +343,4 @@ public class UIDialogSelectDbSchema extends JDialog {
     public JComponent $$$getRootComponent$$$() {
         return contentPane;
     }
-
 }

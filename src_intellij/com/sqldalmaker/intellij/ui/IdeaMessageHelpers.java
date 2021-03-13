@@ -1,7 +1,7 @@
 /*
- * Copyright 2011-2020 sqldalmaker@gmail.com
- * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
- * Read LICENSE.txt in the root of this project/archive for details.
+ * Copyright 2011-2021 sqldalmaker@gmail.com
+ * Read LICENSE.txt in the root of this project/archive.
+ * Project web-site: http://sqldalmaker.sourceforge.net
  */
 package com.sqldalmaker.intellij.ui;
 
@@ -27,32 +27,61 @@ public class IdeaMessageHelpers {
 
     // https://stackoverflow.com/questions/32928914/how-do-i-show-a-notification-in-intellij
 
-    public static final NotificationGroup GROUP_DISPLAY_ID_INFO =
-            new NotificationGroup("sqldalmaker", NotificationDisplayType.NONE, true);
+    // https://plugins.jetbrains.com/docs/intellij/notifications.html#editor-hints
 
-//    public static void add_error_to_ide_log(String msg) {
-//        Notifications.Bus.notify(GROUP_DISPLAY_ID_INFO.createNotification(msg, MessageType.ERROR));
-//    }
+    @SuppressWarnings("CommentedOutCode")
+    private static NotificationGroup getNotificationGroup() {
+//        for (NotificationGroup gr : NotificationGroup.getAllRegisteredGroups()) {
+//            String id = gr.getDisplayId();
+//            System.out.println(id);
+//        }
+        NotificationGroup res = NotificationGroup.findRegisteredGroup("SQL DAL Maker"); // not available in 2017.3
+//        if (res == null) {
+//            // inbound NONE, working in in 2017.3, deprecated in 2021.3
+//            // @NotNull
+//            res = NotificationGroup.logOnlyGroup("SQL DAL Maker");
+//        }
+        //noinspection ConstantConditions
+        if (res == null) {
+            // NONE is prefferable
+            res = NotificationGroup.findRegisteredGroup("Compiler");  // inbound, NONE, available in 2017.3
+            if (res == null) {
+                res = NotificationGroup.findRegisteredGroup("Run Anything"); // inbound, BALOON, not available in 2017.3
+                if (res == null) {
+                    res = NotificationGroup.findRegisteredGroup("Error Report");  // inbound, BALOON, not available in 2017.3
+                }
+            }
+        }
+        return res;
+    }
+
+    private static final NotificationGroup GROUP_DISPLAY_ID_INFO = getNotificationGroup();
+    // new NotificationGroup("sqldalmaker", NotificationDisplayType.NONE, true);  // Scheduled for removal constructor usage (1)
 
     public static void add_warning_to_ide_log(String msg) {
+        if (GROUP_DISPLAY_ID_INFO == null) {
+            return;
+        }
         Notifications.Bus.notify(GROUP_DISPLAY_ID_INFO.createNotification(msg, MessageType.WARNING));
     }
 
     public static void add_info_to_ide_log(String msg) {
+        if (GROUP_DISPLAY_ID_INFO == null) {
+            return;
+        }
         Notifications.Bus.notify(GROUP_DISPLAY_ID_INFO.createNotification(msg, MessageType.INFO));
     }
 
     public static void add_error_to_ide_log(final String title, String msg) {
-
+        if (GROUP_DISPLAY_ID_INFO == null) {
+            return;
+        }
         NotificationListener listener = new NotificationListener.Adapter() {
-
+            @SuppressWarnings("CommentedOutCode")
             @Override
             protected void hyperlinkActivated(@NotNull Notification notification, @NotNull HyperlinkEvent hyperlinkEvent) {
-
                 // notification.expire();
-
                 // notification.setTitle("");
-
                 // notification.hideBalloon();
             }
         };
@@ -61,6 +90,9 @@ public class IdeaMessageHelpers {
 
     public static void add_dto_error_message(Settings settings, final Project project,
                                              final VirtualFile root_file, final String clazz, String msg) {
+        if (GROUP_DISPLAY_ID_INFO == null) {
+            return;
+        }
         Ide ide = settings.getIde();
         if (ide != null) {
             if (!ide.isEventLog()) {
@@ -95,6 +127,9 @@ public class IdeaMessageHelpers {
 
     public static void add_dao_error_message(Settings settings, final Project project,
                                              final VirtualFile root_file, final String dao_xml_rel_path, String msg) {
+        if (GROUP_DISPLAY_ID_INFO == null) {
+            return;
+        }
         Ide ide = settings.getIde();
         if (ide != null) {
             if (!ide.isEventLog()) {
