@@ -105,7 +105,7 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
 
                 @Override
                 public void focusGained(FocusEvent arg0) {
-                    System.out.println("panel focus");
+                    // System.out.println("panel focus");
                     // jScrollPane1.requestFocus();
                     jScrollPane1.grabFocus();
                 }
@@ -204,7 +204,6 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
                 jPanel6MouseEntered(evt);
             }
         });
-        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
         jPanel3.setLayout(new java.awt.GridLayout(1, 0));
 
@@ -249,8 +248,6 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         jTextField1.setText("v. ?");
         jPanel3.add(jTextField1);
 
-        jPanel6.add(jPanel3);
-
         jPanel4.setLayout(new java.awt.GridLayout(1, 0));
 
         jButton1.setText("Create/Overwrite XSD files");
@@ -279,8 +276,6 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
             }
         });
         jPanel4.add(jButton3);
-
-        jPanel6.add(jPanel4);
 
         jPanel5.setPreferredSize(new java.awt.Dimension(860, 220));
         jPanel5.setLayout(new java.awt.GridLayout(10, 3));
@@ -470,8 +465,6 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         });
         jPanel5.add(jButton34);
 
-        jPanel6.add(jPanel5);
-
         jPanel7.setPreferredSize(new java.awt.Dimension(860, 24));
         jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
 
@@ -529,15 +522,40 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         });
         jPanel7.add(jButton31);
 
-        jPanel6.add(jPanel7);
-
         jTextPane1.setEditable(false);
         jTextPane1.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
         jTextPane1.setAutoscrolls(false);
         jTextPane1.setMargin(new java.awt.Insets(0, 12, 12, 12));
         jTextPane1.setName(""); // NOI18N
         jTextPane1.setPreferredSize(new java.awt.Dimension(860, 250));
-        jPanel6.add(jTextPane1);
+
+        javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
+        jPanel6.setLayout(jPanel6Layout);
+        jPanel6Layout.setHorizontalGroup(
+            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel6Layout.createSequentialGroup()
+                .addGap(5, 5, 5)
+                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jTextPane1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+        );
+        jPanel6Layout.setVerticalGroup(
+            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel6Layout.createSequentialGroup()
+                .addGap(5, 5, 5)
+                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(5, 5, 5)
+                .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(5, 5, 5)
+                .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(5, 5, 5)
+                .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(5, 5, 5)
+                .addComponent(jTextPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
 
         jScrollPane1.setViewportView(jPanel6);
 
@@ -695,7 +713,7 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
     }//GEN-LAST:event_jButton5ActionPerformed
 
     private void jPanel6MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel6MouseEntered
-        System.out.println("MouseEntered");
+        // System.out.println("MouseEntered");
         // jPanel6.requestFocus();
         jPanel6.grabFocus();
 //        jPanel6.addFocusListener(new FocusListener(){
