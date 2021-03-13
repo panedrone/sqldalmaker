@@ -8,8 +8,9 @@ import (
 	"strings"
 	"time"
 
+	_ "github.com/lib/pq" // PostgeSQL
 	// _ "github.com/mattn/go-sqlite3"		// SQLite3
-	_ "github.com/denisenkom/go-mssqldb" // SQL Server
+	// _ "github.com/denisenkom/go-mssqldb" // SQL Server
 	// _ "github.com/godror/godror"			// Oracle
 	// only strings for MySQL (so far). see _prepareFetch below and related comments.
 	// _ "github.com/go-sql-driver/mysql"	// MySQL
@@ -30,20 +31,24 @@ type DataStore struct {
 
 func (ds *DataStore) open() {
 	var err error
+	ds.paramPrefix = "$"
+	ds.handle, err = sql.Open("postgres", "postgres://postgres:sa@localhost/my-tests?sslmode=disable")
+	// ds.handle, err = sql.Open("postgres", "postgres://postgres:sa@localhost/my-tests?sslmode=verify-full")
+	// ================================
 	// ds.handle, err = sql.Open("sqlite3", "./todo-list.sqlite")
 	// ds.handle, err = sql.Open("sqlite3", "./northwindEF.sqlite")
-	// -----------------
+	// ================================
 	// ds.handle, err = sql.Open("mysql", "root:root@/sakila")
 	// ds.handle, err = sql.Open("mymysql", "sakila/root/root")
-	// -----------------
+	// ================================
 	// SQL Server https://github.com/denisenkom/go-mssqldb
 	// The sqlserver driver uses normal MS SQL Server syntax and expects parameters in the
 	// sql query to be in the form of either @Name or @p1 to @pN (ordinal position).
-	ds.paramPrefix = "@p"
 	// ensure sqlserver:// in beginning. this one is not valid:
 	// ------ ds.handle, err = sql.Open("sqlserver", "sa:root@/localhost:1433/SQLExpress?database=AdventureWorks2014")
 	// this one is ok:
-	ds.handle, err = sql.Open("sqlserver", "sqlserver://sa:root@localhost:1433?database=AdventureWorks2014")
+	//ds.paramPrefix = "@p"
+	//ds.handle, err = sql.Open("sqlserver", "sqlserver://sa:root@localhost:1433?database=AdventureWorks2014")
 	//query := url.Values{}
 	//query.Add("app name", "AdventureWorks2014")
 	//u := &url.URL{
@@ -54,7 +59,7 @@ func (ds *DataStore) open() {
 	//	RawQuery: query.Encode(),
 	//}
 	// ds.handle, err = sql.Open("sqlserver", u.String())
-	// -----------------
+	// ================================
 	//ds.paramPrefix = ":"
 	//ds.handle, _ = sql.Open("godror", `user="ORDERS" password="root" connectString="localhost:1521/orcl"`)
 	if err != nil {
@@ -290,13 +295,36 @@ func (ds *DataStore) assign(fieldAddr interface{}, value interface{}) {
 	}
 	switch d := fieldAddr.(type) {
 	case *string:
-		*d = value.(string)
+		switch value.(type) {
+		case []byte:
+			*d = string(value.([]byte))
+			return
+		default:
+			*d = value.(string)
+		}
 		return
 	case *int64:
 		*d = value.(int64)
 		return
 	case *float64:
-		*d = value.(float64)
+		switch value.(type) {
+		case []byte:
+			str := string(value.([]byte)) // PostgeSQL
+			*d, _ = strconv.ParseFloat(str, 64)
+			return
+		default:
+			*d = value.(float64)
+		}
+		return
+	case *float32:
+		switch value.(type) {
+		case []byte:
+			str := string(value.([]byte)) // PostgeSQL
+			d64, _ := strconv.ParseFloat(str, 32)
+			*d = float32(d64)
+		default:
+			*d = value.(float32)
+		}
 		return
 	case *time.Time:
 		*d = value.(time.Time)
@@ -304,7 +332,7 @@ func (ds *DataStore) assign(fieldAddr interface{}, value interface{}) {
 	case *bool:
 		*d = value.(bool)
 		return
-	case *[]byte:  // the same as uint8
+	case *[]byte: // the same as uint8
 		*d = value.([]byte)
 		return
 	case *interface{}:
