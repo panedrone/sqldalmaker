@@ -44,11 +44,11 @@ func (ds *DataStore) isSqlServer() bool {
 func (ds *DataStore) open() {
 	var err error
 	// === PostgeSQL ===========================
-	//ds.paramPrefix = "$"
-	//ds.handle, err = sql.Open("postgres", "postgres://postgres:sa@localhost/my-tests?sslmode=disable")
+	// ds.paramPrefix = "$"
+	// ds.handle, err = sql.Open("postgres", "postgres://postgres:sa@localhost/my-tests?sslmode=disable")
 	// ds.handle, err = sql.Open("postgres", "postgres://postgres:sa@localhost/my-tests?sslmode=verify-full")
 	// === SQLite3 =============================
-	ds.handle, err = sql.Open("sqlite3", "./log.sqlite")
+	// ds.handle, err = sql.Open("sqlite3", "./log.sqlite")
 	// ds.handle, err = sql.Open("sqlite3", "./northwindEF.sqlite")
 	// === MySQL ===============================
 	// ds.handle, err = sql.Open("mysql", "root:root@/sakila")
@@ -111,7 +111,7 @@ func _execInsertPg(db *sql.DB, sql, aiNames string, args ...interface{}) interfa
 		}
 		return data
 	}
-	println("[FAILED]:" + sql)
+	println("rows.Next() FAILED:" + sql)
 	return nil
 }
 
@@ -119,6 +119,7 @@ func _execInsertPg(db *sql.DB, sql, aiNames string, args ...interface{}) interfa
 // because of rows.Next() returns false
 
 func _execInsertOracle(db *sql.DB, sql, aiNames string, args ...interface{}) interface{} {
+	// TODO Problem of Oracle + 'insert ... returning ... into ...' and "github.com/godror/godror"
 	// 1) sql += " returning " + aiNames ORA-00925: missing INTO keyword
 	// 2) solution from https://github.com/rana/ora
 	//    not working with "github.com/godror/godror":
@@ -148,7 +149,7 @@ func _execInsertOracle(db *sql.DB, sql, aiNames string, args ...interface{}) int
 		}
 		return data
 	}
-	println("returning FAILED: " + sql)
+	println("rows.Next() FAILED: " + sql)
 	return nil
 }
 
@@ -181,7 +182,7 @@ func _execInsertOracle2(db *sql.DB, sql, aiNames string, args ...interface{}) in
 	if err != nil {
 		// log.Fatal(err)
 		println(err.Error())
-		println("[FAILED] Exec: " + sql)
+		println("Exec() FAILED: " + sql)
 		return nil
 	}
 	// return ai; // remains 0
@@ -190,14 +191,43 @@ func _execInsertOracle2(db *sql.DB, sql, aiNames string, args ...interface{}) in
 	if err != nil {
 		// log.Fatal(err)
 		println(err.Error())
-		println("[FAILED] LastInsertId: " + sql)
+		println("res.LastInsertId() FAILED: " + sql)
 		return nil
 	}
 	return res64
 }
 
+func _execInsertSqlServer(db *sql.DB, sql, aiNames string, args ...interface{}) interface{} {
+	// SQL Server https://github.com/denisenkom/go-mssqldb
+	// LastInsertId should not be used with this driver (or SQL Server) due to
+	// how the TDS protocol works. Please use the OUTPUT Clause or add a select
+	// ID = convert(bigint, SCOPE_IDENTITY()); to the end of your query (ref SCOPE_IDENTITY).
+	//  This will ensure you are getting the correct ID and will prevent a network round trip.
+	sql += ";SELECT @@IDENTITY;"
+	rows, err := db.Query(sql, args...)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer func() {
+		err = rows.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
+	for rows.Next() {
+		var data interface{}
+		err = rows.Scan(&data) // returns []uint8
+		if err != nil {
+			log.Fatal(err)
+		}
+		return data
+	}
+	println("rows.Next() FAILED: " + sql)
+	return nil
+}
+
 func _execInsertBuiltin(db *sql.DB, sql string, args ...interface{}) interface{} {
-	// === panedrone: seems that LastInsertId is available only from Prepare -> Exec
+	// === Prepare -> Exec to access LastInsertId
 	stmt, err := db.Prepare(sql)
 	if err != nil {
 		log.Fatal(err)
@@ -219,31 +249,31 @@ func _execInsertBuiltin(db *sql.DB, sql string, args ...interface{}) interface{}
 	// The Go builtin functions print and println print to stderr
 	// https://stackoverflow.com/questions/29721449/how-can-i-print-to-stderr-in-go-without-using-log
 	println(err.Error())
+	println("res.LastInsertId() FAILED: " + sql)
 	return nil
 }
 
 func (ds *DataStore) insert(sql, aiNames string, args ...interface{}) interface{} {
+	// len(nil) == 0
+	if len(aiNames) == 0 {
+		log.Fatal("DataStore.insert is not applicable for aiNames = " + aiNames)
+	}
 	// Builtin LastInsertId works only with MySQL and SQLite3
 	sql = ds._formatSQL(sql)
 	if ds.isPostgreSQL() {
 		return _execInsertPg(ds.handle, sql, aiNames, args...)
 	} else if ds.isSqlServer() {
-		// TODO implement logic of LastInsertId for SQL Server
-		// SQL Server https://github.com/denisenkom/go-mssqldb
-		// LastInsertId should not be used with this driver (or SQL Server) due to
-		// how the TDS protocol works. Please use the OUTPUT Clause or add a select
-		// ID = convert(bigint, SCOPE_IDENTITY()); to the end of your query (ref SCOPE_IDENTITY).
-		//  This will ensure you are getting the correct ID and will prevent a network round trip.
+		return _execInsertSqlServer(ds.handle, sql, aiNames, args...)
 	} else if ds.isOracle() {
 		// Oracle: specify AI values explicitly:
 		// <crud-auto dto="ProjectInfo" table="PROJECTS" generated="P_ID"/>
-		// TODO Problem of Oracle + 'insert ... returning ... into ...'
 		return _execInsertOracle(ds.handle, sql, aiNames, args...)
 	}
 	return _execInsertBuiltin(ds.handle, sql, args...)
 }
 
 func (ds *DataStore) execDML(sql string, args ...interface{}) int64 {
+	// === Prepare -> Exec to access RowsAffected
 	sql = ds._formatSQL(sql)
 	stmt, err := ds.handle.Prepare(sql)
 	if err != nil {
@@ -439,6 +469,10 @@ func (ds *DataStore) assign(fieldAddr interface{}, value interface{}) {
 		switch value.(type) {
 		case int64:
 			*d = value.(int64)
+			return
+		case []byte:
+			str := string(value.([]byte))
+			*d, _ = strconv.ParseInt(str, 10, 64)
 			return
 		}
 	case *float64:
