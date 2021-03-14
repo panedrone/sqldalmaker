@@ -51,11 +51,57 @@ public class SqlUtils {
     }
 
     public static String format_jdbc_sql_for_go(String jdbc_sql) {
-        return SqlUtils.format_jdbc_sql(jdbc_sql, true);
+        // return SqlUtils.format_jdbc_sql(jdbc_sql, true);
+        String[] parts = get_sql_lines(jdbc_sql);
+        String new_line = "\n"; // System.getProperty("line.separator");
+        StringBuilder res = new StringBuilder();
+        res.append("`");
+        for (int i = 0; i < parts.length; i++) {
+            String j_str = parts[i];
+            // packed into Velocity JAR:
+            j_str = org.apache.commons.lang.StringEscapeUtils.escapeJava(j_str);
+            // fix the bug in StringEscapeUtils:
+            // case '/':
+            // out.write('\\');
+            // out.write('/');
+            // break;
+            j_str = j_str.replace("\\/", "/");
+            if (i == 0) {
+                j_str = j_str;
+            } else {
+                // "\n" it is OK for debugger window:
+                j_str = " " + new_line + "\t\t" + j_str;
+            }
+            res.append(j_str);
+        }
+        res.append("`");
+        return res.toString();
     }
 
     public static String format_jdbc_sql_for_java(String jdbc_sql) {
-        return SqlUtils.format_jdbc_sql(jdbc_sql, false);
+        // return SqlUtils.format_jdbc_sql(jdbc_sql, false);
+        String[] parts = get_sql_lines(jdbc_sql);
+        String new_line = "\n"; // System.getProperty("line.separator");
+        StringBuilder res = new StringBuilder();
+        for (int i = 0; i < parts.length; i++) {
+            String j_str = parts[i];
+            // packed into Velocity JAR:
+            j_str = org.apache.commons.lang.StringEscapeUtils.escapeJava(j_str);
+            // fix the bug in StringEscapeUtils:
+            // case '/':
+            // out.write('\\');
+            // out.write('/');
+            // break;
+            j_str = j_str.replace("\\/", "/");
+            if (i == 0) {
+                j_str = "\"" + j_str + "\"";
+            } else {
+                // "\n" it is OK for debugger window:
+                j_str = " +" + new_line + "        \"\\n " + j_str + "\"";
+            }
+            res.append(j_str);
+        }
+        return res.toString();
     }
 
     public static String format_jdbc_sql(String jdbc_sql, boolean tabs) {

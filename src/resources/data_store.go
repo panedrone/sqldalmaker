@@ -4,17 +4,18 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"reflect"
 	"strconv"
 	"strings"
 	"time"
 
-	_ "github.com/lib/pq" // PostgeSQL
-	// _ "github.com/mattn/go-sqlite3"		// SQLite3
-	// _ "github.com/denisenkom/go-mssqldb" // SQL Server
+	// _ "github.com/mattn/go-sqlite3" // SQLite3
+	_ "github.com/denisenkom/go-mssqldb" // SQL Server
 	// _ "github.com/godror/godror"			// Oracle
 	// only strings for MySQL (so far). see _prepareFetch below and related comments.
 	// _ "github.com/go-sql-driver/mysql"	// MySQL
 	// _ "github.com/ziutek/mymysql/godrv" // MySQL
+	// _ "github.com/lib/pq" // PostgeSQL
 )
 
 /*
@@ -29,39 +30,42 @@ type DataStore struct {
 	handle      *sql.DB
 }
 
+func (ds *DataStore) isPostgreSQL() bool {
+	return ds.paramPrefix == "$"
+}
+
+func (ds *DataStore) isOracle() bool {
+	return ds.paramPrefix == ":"
+}
+func (ds *DataStore) isSqlServer() bool {
+	return ds.paramPrefix == "@p"
+}
+
 func (ds *DataStore) open() {
 	var err error
-	ds.paramPrefix = "$"
-	ds.handle, err = sql.Open("postgres", "postgres://postgres:sa@localhost/my-tests?sslmode=disable")
+	// === PostgeSQL ===========================
+	//ds.paramPrefix = "$"
+	//ds.handle, err = sql.Open("postgres", "postgres://postgres:sa@localhost/my-tests?sslmode=disable")
 	// ds.handle, err = sql.Open("postgres", "postgres://postgres:sa@localhost/my-tests?sslmode=verify-full")
-	// ================================
-	// ds.handle, err = sql.Open("sqlite3", "./todo-list.sqlite")
+	// === SQLite3 =============================
+	ds.handle, err = sql.Open("sqlite3", "./log.sqlite")
 	// ds.handle, err = sql.Open("sqlite3", "./northwindEF.sqlite")
-	// ================================
+	// === MySQL ===============================
 	// ds.handle, err = sql.Open("mysql", "root:root@/sakila")
 	// ds.handle, err = sql.Open("mymysql", "sakila/root/root")
-	// ================================
-	// SQL Server https://github.com/denisenkom/go-mssqldb
+	// === SQL Server ==========================
+	// https://github.com/denisenkom/go-mssqldb
 	// The sqlserver driver uses normal MS SQL Server syntax and expects parameters in the
 	// sql query to be in the form of either @Name or @p1 to @pN (ordinal position).
 	// ensure sqlserver:// in beginning. this one is not valid:
 	// ------ ds.handle, err = sql.Open("sqlserver", "sa:root@/localhost:1433/SQLExpress?database=AdventureWorks2014")
 	// this one is ok:
-	//ds.paramPrefix = "@p"
-	//ds.handle, err = sql.Open("sqlserver", "sqlserver://sa:root@localhost:1433?database=AdventureWorks2014")
-	//query := url.Values{}
-	//query.Add("app name", "AdventureWorks2014")
-	//u := &url.URL{
-	//	Scheme:   "sqlserver",
-	//	User:     url.UserPassword("sa", "root"),
-	//	Host:     fmt.Sprintf("%s:%d", "localhost", 1433),
-	//	// Path:  instance, // if connecting to an instance instead of a port
-	//	RawQuery: query.Encode(),
-	//}
-	// ds.handle, err = sql.Open("sqlserver", u.String())
-	// ================================
+	ds.paramPrefix = "@p"
+	ds.handle, err = sql.Open("sqlserver", "sqlserver://sa:root@localhost:1433?database=AdventureWorks2014")
+	// === Oracle =============================
+	// "github.com/godror/godror"
 	//ds.paramPrefix = ":"
-	//ds.handle, _ = sql.Open("godror", `user="ORDERS" password="root" connectString="localhost:1521/orcl"`)
+	//ds.handle, err = sql.Open("godror", `user="ORDERS" password="root" connectString="localhost:1521/orcl"`)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -76,6 +80,7 @@ func (ds *DataStore) close() {
 
 func (ds *DataStore) begin() {
 	// TODO
+	// (*Tx, error) = ds.handle.Begin()
 }
 
 func (ds *DataStore) commit() {
@@ -86,12 +91,85 @@ func (ds *DataStore) rollback() {
 	// TODO
 }
 
-func (ds *DataStore) insert(sql string, args ...interface{}) interface{} {
-	sql = ds._formatSQL(sql)
-	stmt, err := ds.handle.Prepare(sql)
+func _execInsertPg(db *sql.DB, sql, aiNames string, args ...interface{}) interface{} {
+	sql += " RETURNING " + aiNames
+	rows, err := db.Query(sql, args...)
 	if err != nil {
 		log.Fatal(err)
-		return -1
+	}
+	defer func() {
+		err = rows.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
+	for rows.Next() {
+		var data interface{}
+		err = rows.Scan(&data)
+		if err != nil {
+			log.Fatal(err)
+		}
+		return data
+	}
+	println("[FAILED]:" + sql)
+	return nil
+}
+
+// 'insert ... returning ... into ...' not working with Query
+// because of rows.Next() returns false
+
+func _execInsertOracle(db *sql.DB, sql, aiNames string, args ...interface{}) interface{} {
+	// 1) sql += " returning " + aiNames ORA-00925: missing INTO keyword
+	// 2) solution from https://github.com/rana/ora
+	//    not working with "github.com/godror/godror":
+	//    sql += " RETURNING " + aiNames + " /*LastInsertId*/" // " into :2"// + aiNames
+	// 3) fetching of multiple AI values are not implemented so far
+	sql += " returning " + aiNames + " into :" + aiNames
+	//// DPI-1037: column at array position 0 fetched with error 1406:
+	//// 	- var ai interface{}
+	//// 	- var ai string
+	var ai uint64 // int64, uint64, float64 are OK, but they remain 0
+	args = append(args, &ai)
+	rows, err := db.Query(sql, args...)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer func() {
+		err = rows.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
+	for rows.Next() {
+		var data interface{}
+		err = rows.Scan(&data)
+		if err != nil {
+			log.Fatal(err)
+		}
+		return data
+	}
+	println("returning FAILED: " + sql)
+	return nil
+}
+
+// 'insert ... returning ... into ...' not working with Prepare -> Exec too
+// because of 'LastInsertId is not supported by this driver'
+
+func _execInsertOracle2(db *sql.DB, sql, aiNames string, args ...interface{}) interface{} {
+	// 1) sql += " returning " + aiNames ORA-00925: missing INTO keyword
+	// 2) solution from https://github.com/rana/ora
+	//    not working with "github.com/godror/godror":
+	//    sql += " RETURNING " + aiNames + " /*LastInsertId*/" // " into :2"// + aiNames
+	// 3) fetching of multiple AI values are not implemented so far
+	sql += " returning " + aiNames + " into :" + aiNames
+	//// DPI-1037: column at array position 0 fetched with error 1406:
+	//// 	- var ai interface{}
+	//// 	- var ai string
+	var ai uint64 // int64, uint64, float64 are OK, but they remain 0
+	args = append(args, &ai)
+	stmt, err := db.Prepare(sql)
+	if err != nil {
+		log.Fatal(err)
 	}
 	defer func() {
 		err = stmt.Close()
@@ -99,22 +177,70 @@ func (ds *DataStore) insert(sql string, args ...interface{}) interface{} {
 			log.Fatal(err)
 		}
 	}()
-	res, err2 := stmt.Exec(args...)
-	if err2 != nil {
-		log.Fatal(err)
-		return -1
+	res, err := stmt.Exec(args...)
+	if err != nil {
+		// log.Fatal(err)
+		println(err.Error())
+		println("[FAILED] Exec: " + sql)
+		return nil
 	}
-	// SQL Server https://github.com/denisenkom/go-mssqldb
-	// LastInsertId should not be used with this driver (or SQL Server) due to
-	// how the TDS protocol works. Please use the OUTPUT Clause or add a select
-	// ID = convert(bigint, SCOPE_IDENTITY()); to the end of your query (ref SCOPE_IDENTITY).
-	//  This will ensure you are getting the correct ID and will prevent a network round trip.
-	// ---------
-	id, err3 := res.LastInsertId()
-	if err3 == nil {
+	// return ai; // remains 0
+	// LastInsertId is not supported by this driver
+	res64, err := res.LastInsertId()
+	if err != nil {
+		// log.Fatal(err)
+		println(err.Error())
+		println("[FAILED] LastInsertId: " + sql)
+		return nil
+	}
+	return res64
+}
+
+func _execInsertBuiltin(db *sql.DB, sql string, args ...interface{}) interface{} {
+	// === panedrone: seems that LastInsertId is available only from Prepare -> Exec
+	stmt, err := db.Prepare(sql)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer func() {
+		err = stmt.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
+	res, err := stmt.Exec(args...)
+	if err != nil {
+		log.Fatal(err)
+	}
+	id, err := res.LastInsertId()
+	if err == nil {
 		return id
 	}
-	return -1
+	// The Go builtin functions print and println print to stderr
+	// https://stackoverflow.com/questions/29721449/how-can-i-print-to-stderr-in-go-without-using-log
+	println(err.Error())
+	return nil
+}
+
+func (ds *DataStore) insert(sql, aiNames string, args ...interface{}) interface{} {
+	// Builtin LastInsertId works only with MySQL and SQLite3
+	sql = ds._formatSQL(sql)
+	if ds.isPostgreSQL() {
+		return _execInsertPg(ds.handle, sql, aiNames, args...)
+	} else if ds.isSqlServer() {
+		// TODO implement logic of LastInsertId for SQL Server
+		// SQL Server https://github.com/denisenkom/go-mssqldb
+		// LastInsertId should not be used with this driver (or SQL Server) due to
+		// how the TDS protocol works. Please use the OUTPUT Clause or add a select
+		// ID = convert(bigint, SCOPE_IDENTITY()); to the end of your query (ref SCOPE_IDENTITY).
+		//  This will ensure you are getting the correct ID and will prevent a network round trip.
+	} else if ds.isOracle() {
+		// Oracle: specify AI values explicitly:
+		// <crud-auto dto="ProjectInfo" table="PROJECTS" generated="P_ID"/>
+		// TODO Problem of Oracle + 'insert ... returning ... into ...'
+		return _execInsertOracle(ds.handle, sql, aiNames, args...)
+	}
+	return _execInsertBuiltin(ds.handle, sql, args...)
 }
 
 func (ds *DataStore) execDML(sql string, args ...interface{}) int64 {
@@ -122,7 +248,6 @@ func (ds *DataStore) execDML(sql string, args ...interface{}) int64 {
 	stmt, err := ds.handle.Prepare(sql)
 	if err != nil {
 		log.Fatal(err)
-		return -1
 	}
 	defer func() {
 		err = stmt.Close()
@@ -130,16 +255,16 @@ func (ds *DataStore) execDML(sql string, args ...interface{}) int64 {
 			log.Fatal(err)
 		}
 	}()
-	res, err2 := stmt.Exec(args...)
-	if err2 != nil {
+	res, err := stmt.Exec(args...)
+	if err != nil {
 		log.Fatal(err)
+	}
+	ra, err := res.RowsAffected()
+	if err != nil {
+		println(err.Error())
 		return -1
 	}
-	ra, err3 := res.RowsAffected()
-	if err3 == nil {
-		return ra
-	}
-	return -1
+	return ra
 }
 
 func (ds *DataStore) query(sql string, args ...interface{}) interface{} {
@@ -167,7 +292,6 @@ func (ds *DataStore) queryAll(sql string, onRow func(interface{}), args ...inter
 	rows, err := ds.handle.Query(sql, args...)
 	if err != nil {
 		log.Fatal(err)
-		return
 	}
 	defer func() {
 		err = rows.Close()
@@ -209,7 +333,6 @@ func (ds *DataStore) queryAllRows(sql string, onRow func(map[string]interface{})
 	rows, err := ds.handle.Query(sql, args...)
 	if err != nil {
 		log.Fatal(err)
-		return
 	}
 	defer func() {
 		err = rows.Close()
@@ -252,7 +375,7 @@ Mysql text result corresponds to []byte type in mymysql.
 It isn't string type due to avoidance of unnecessary type conversions.
 You can always convert []byte to string yourself...
 
-TODO: Improve DataStore.assign(...) to convert strings (or byte-arrays) to the real types
+TODO: Improve DataStore.assign(...) to convert strings (or byte-arrays) to more specific types
 
 <type detected="java.lang.String" target="ds.toStr(...)"/>
 
@@ -291,6 +414,11 @@ func (ds *DataStore) _formatSQL(sql string) string {
 
 func (ds *DataStore) assign(fieldAddr interface{}, value interface{}) {
 	if value == nil {
+		switch d := fieldAddr.(type) {
+		case *interface{}:
+			*d = nil
+			return
+		}
 		return // leave as-is
 	}
 	switch d := fieldAddr.(type) {
@@ -299,13 +427,20 @@ func (ds *DataStore) assign(fieldAddr interface{}, value interface{}) {
 		case []byte:
 			*d = string(value.([]byte))
 			return
-		default:
+		case int64:
+			i64 := value.(int64) // MySQL
+			*d = strconv.FormatInt(i64, 10)
+			return
+		case string:
 			*d = value.(string)
+			return
 		}
-		return
 	case *int64:
-		*d = value.(int64)
-		return
+		switch value.(type) {
+		case int64:
+			*d = value.(int64)
+			return
+		}
 	case *float64:
 		switch value.(type) {
 		case []byte:
@@ -339,6 +474,9 @@ func (ds *DataStore) assign(fieldAddr interface{}, value interface{}) {
 		*d = value
 		return
 	default:
-		log.Fatal(fmt.Sprintf("Unknown type in DataStore.assign(...): %T", d))
+		log.Fatal(fmt.Sprintf("Unknown destination type in DataStore.assign(%v, %v)",
+			reflect.TypeOf(fieldAddr), reflect.TypeOf(value)))
 	}
+	log.Fatal(fmt.Sprintf("Unexpected combination of param types in DataStore.assign(%v, %v)",
+		reflect.TypeOf(fieldAddr), reflect.TypeOf(value)))
 }

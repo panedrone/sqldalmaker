@@ -435,7 +435,13 @@ public class GoCG {
             context.put("params", fields_not_ai);
             context.put("dto_param", _get_rendered_dto_class_name(dto_class_name));
             if (fetch_generated && fields_ai.size() > 0) {
-                context.put("keys", fields_ai);
+                List<String> ai_names = new ArrayList<String>();
+                for (FieldInfo ai : fields_ai) {
+                    ai_names.add(ai.getColumnName());
+                }
+                String ai_names_str = String.join(",", ai_names);
+                context.put("ai_names", ai_names_str);
+                context.put("fields_ai", fields_ai);
                 context.put("mode", "dao_create");
             } else {
                 // context.put("plain_params", true);

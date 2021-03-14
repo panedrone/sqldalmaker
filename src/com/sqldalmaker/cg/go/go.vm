@@ -69,10 +69,9 @@ type ${class_name} struct {
 
 func (dao *${class_name}) ${method_name}(p *${dto_param}) {
 #sql_var(false $sql)
-	res := dao.ds.insert(sql#foreach($param in ${params}), p.${param.getName()}#end)
-#foreach ($key in ${keys})
-#set($i = ${velocityCount} - 1)
-	p.${key.getName()} = res.(${key.getType()})
+	res := dao.ds.insert(sql, "${ai_names}"#foreach($param in ${params}), p.${param.getName()}#end)
+#foreach ($ai in ${fields_ai})
+	dao.ds.assign(&p.${ai.getName()}, res)
 #end
 }
 ## ====================================================================================================================
