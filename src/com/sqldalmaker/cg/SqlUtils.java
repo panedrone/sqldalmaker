@@ -67,9 +67,8 @@ public class SqlUtils {
             // break;
             j_str = j_str.replace("\\/", "/");
             if (i == 0) {
-                j_str = j_str;
+                // j_str = j_str;
             } else {
-                // "\n" it is OK for debugger window:
                 j_str = " " + new_line + "\t\t" + j_str;
             }
             res.append(j_str);

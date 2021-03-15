@@ -383,34 +383,6 @@ func (ds *DataStore) queryAllRows(sql string, onRow func(map[string]interface{})
 	}
 }
 
-/*
-Temporary workaround for MySQL:
-
-<type-map default="">
-	<type detected="java.lang.Short" target="string"/>
-	<type detected="java.lang.Integer" target="string"/>
-	<type detected="java.lang.String" target="string"/>
-	<type detected="java.util.Date" target="string"/>
-	<type detected="byte[]" target="string"/>
-	<type detected="java.lang.Boolean" target="string"/>
-	<type detected="java.math.BigDecimal" target="string"/>
-</type-map>
-
-Origin is described here:
-
-https://github.com/ziutek/mymysql#type-mapping
-
-After text query you always receive a text result.
-Mysql text result corresponds to []byte type in mymysql.
-It isn't string type due to avoidance of unnecessary type conversions.
-You can always convert []byte to string yourself...
-
-TODO: Improve DataStore.assign(...) to convert strings (or byte-arrays) to more specific types
-
-<type detected="java.lang.String" target="ds.toStr(...)"/>
-
-*/
-
 // func (ds *DataStore) _prepareFetch(rows *sql.Rows) ([]string, map[string]interface{}, []string, []interface{}) {   // MySQL
 func (ds *DataStore) _prepareFetch(rows *sql.Rows) ([]string, map[string]interface{}, []interface{}, []interface{}) {
 	colNames, _ := rows.Columns()
@@ -442,6 +414,10 @@ func (ds *DataStore) _formatSQL(sql string) string {
 	return sql
 }
 
+/*
+	TODO: Improve DataStore.assign(...) to convert strings (or byte-arrays) to more specific types
+*/
+
 func (ds *DataStore) assign(fieldAddr interface{}, value interface{}) {
 	if value == nil {
 		switch d := fieldAddr.(type) {
@@ -463,6 +439,22 @@ func (ds *DataStore) assign(fieldAddr interface{}, value interface{}) {
 			return
 		case string:
 			*d = value.(string)
+			return
+		}
+	case *int32:
+		switch value.(type) {
+		case int32:
+			*d = value.(int32)
+			return
+		case int64:
+			*d = int32(value.(int64))
+			return
+		case []byte:
+			str := string(value.([]byte))
+			d64, err := strconv.ParseInt(str, 10, 32)
+			if err == nil {
+				*d = int32(d64)
+			}
 			return
 		}
 	case *int64:
@@ -507,9 +499,6 @@ func (ds *DataStore) assign(fieldAddr interface{}, value interface{}) {
 	case *interface{}:
 		*d = value
 		return
-	default:
-		log.Fatal(fmt.Sprintf("Unknown destination type in DataStore.assign(%v, %v)",
-			reflect.TypeOf(fieldAddr), reflect.TypeOf(value)))
 	}
 	log.Fatal(fmt.Sprintf("Unexpected combination of param types in DataStore.assign(%v, %v)",
 		reflect.TypeOf(fieldAddr), reflect.TypeOf(value)))
