@@ -9,6 +9,7 @@ import com.sqldalmaker.cg.*;
 import com.sqldalmaker.jaxb.dao.*;
 import com.sqldalmaker.jaxb.dto.DtoClass;
 import com.sqldalmaker.jaxb.dto.DtoClasses;
+import com.sqldalmaker.jaxb.settings.TypeMap;
 
 import java.io.StringWriter;
 import java.sql.Connection;
@@ -31,7 +32,7 @@ public class PhpCG {
         private final JdbcUtils db_utils;
         private final String namespace;
 
-        public DTO(DtoClasses jaxb_dto_classes, Connection connection, String sql_root_abs_path,
+        public DTO(DtoClasses jaxb_dto_classes, TypeMap jaxb_type_map, Connection connection, String sql_root_abs_path,
                    String vm_file_system_dir, String namespace, FieldNamesMode field_names_mode) throws Exception {
             this.jaxb_dto_classes = jaxb_dto_classes.getDtoClass();
             this.sql_root_abs_path = sql_root_abs_path;
@@ -41,7 +42,7 @@ public class PhpCG {
             } else {
                 te = new TemplateEngine(vm_file_system_dir, true);
             }
-            db_utils = new JdbcUtils(connection, field_names_mode, FieldNamesMode.AS_IS, null);
+            db_utils = new JdbcUtils(connection, field_names_mode, FieldNamesMode.AS_IS, jaxb_type_map);
         }
 
         @Override
@@ -85,7 +86,7 @@ public class PhpCG {
         private final String dto_namespace;
         private final String dao_namespace;
 
-        public DAO(DtoClasses jaxb_dto_classes, Connection connection, String sql_root_abs_path,
+        public DAO(DtoClasses jaxb_dto_classes, TypeMap jaxb_type_map, Connection connection, String sql_root_abs_path,
                    String vm_file_system_dir, String dto_namespace, String dao_namespace,
                    FieldNamesMode field_names_mode) throws Exception {
             this.jaxb_dto_classes = jaxb_dto_classes;
@@ -97,7 +98,7 @@ public class PhpCG {
             } else {
                 te = new TemplateEngine(vm_file_system_dir, true);
             }
-            db_utils = new JdbcUtils(connection, field_names_mode, FieldNamesMode.AS_IS, null);
+            db_utils = new JdbcUtils(connection, field_names_mode, FieldNamesMode.AS_IS, jaxb_type_map);
         }
 
         @Override

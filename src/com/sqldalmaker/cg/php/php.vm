@@ -56,7 +56,7 @@ class ${class_name} {
     }
 
     /**
-     * @param ($f.getType()) ${d}$f.getName()
+     * @param $f.getType() ${d}$f.getName()
      */
     public function ${f.setterMethod()}(${d}$f.getName()) {
         ${d}this->$f.getName() = ${d}$f.getName();
@@ -130,7 +130,7 @@ class ${class_name} {
      * @param ${dto_param} ${d}p
 #else
 #foreach($param in ${params})
-     * @param (${param.getType()}) ${d}${param.getName()}
+     * @param ${param.getType()} ${d}${param.getName()}
 #end
 #end
 #if($fetch_list)
@@ -143,7 +143,7 @@ class ${class_name} {
 #if($use_dto)
      * @return ${returned_type_name} or FALSE on failure
 #else
-     * @return mixed: (${returned_type_name}) ${fields.get(0).getColumnName()} or FALSE on failure
+     * @return mixed: ${returned_type_name} ${fields.get(0).getColumnName()} or FALSE on failure
 #end
 #end
      */
@@ -201,7 +201,7 @@ class ${class_name} {
      * @param ${dto_param} ${d}p
 #else
 #foreach($param in ${params})
-     * @param (${param.getType()}) ${d}${param.getName()}
+     * @param ${param.getType()} ${d}${param.getName()}
 #end
 #end
      * @return TRUE on success or FALSE on failure
