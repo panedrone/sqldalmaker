@@ -309,7 +309,7 @@ public class IdeaTargetLanguageHelpers {
                 String package_rel_path = settings.getFolders().getTarget();
                 output_dir_rel_path.append(package_rel_path);
             }
-            return new PythonCG.DTO(dto_classes, connection, sql_root_abs_path, vm_file_system_path);
+            return new PythonCG.DTO(dto_classes, settings.getTypeMap(), connection, sql_root_abs_path, vm_file_system_path);
         } else if (RootFileName.RUBY.equals(fn)) {
             if (output_dir_rel_path != null) {
                 String package_rel_path = settings.getFolders().getTarget();
@@ -377,7 +377,7 @@ public class IdeaTargetLanguageHelpers {
                 output_dir_rel_path.append(package_rel_path);
             }
             String dto_package = package_rel_path.replace("/", ".").replace("\\", ".");
-            return new PythonCG.DAO(dto_package, dto_classes, con, sql_root_abs_path, vm_file_system_path);
+            return new PythonCG.DAO(dto_package, dto_classes, settings.getTypeMap(), con, sql_root_abs_path, vm_file_system_path);
         } else if (RootFileName.RUBY.equals(fn)) {
             if (output_dir_rel_path != null) {
                 String package_rel_path = settings.getFolders().getTarget();

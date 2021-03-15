@@ -9,6 +9,7 @@ import com.sqldalmaker.cg.*;
 import com.sqldalmaker.jaxb.dao.*;
 import com.sqldalmaker.jaxb.dto.DtoClass;
 import com.sqldalmaker.jaxb.dto.DtoClasses;
+import com.sqldalmaker.jaxb.settings.TypeMap;
 
 import java.io.StringWriter;
 import java.sql.Connection;
@@ -30,7 +31,7 @@ public class PythonCG {
         private final TemplateEngine te;
         private final JdbcUtils db_utils;
 
-        public DTO(DtoClasses jaxb_dto_classes, Connection connection, String sql_root_abs_path,
+        public DTO(DtoClasses jaxb_dto_classes, TypeMap jaxb_type_map, Connection connection, String sql_root_abs_path,
                    String vm_file_system_dir) throws Exception {
             this.jaxb_dto_classes = jaxb_dto_classes.getDtoClass();
             this.sql_root_abs_path = sql_root_abs_path;
@@ -39,7 +40,7 @@ public class PythonCG {
             } else {
                 te = new TemplateEngine(vm_file_system_dir, true);
             }
-            db_utils = new JdbcUtils(connection, FieldNamesMode.SNAKE_CASE, FieldNamesMode.SNAKE_CASE, null);
+            db_utils = new JdbcUtils(connection, FieldNamesMode.SNAKE_CASE, FieldNamesMode.SNAKE_CASE, jaxb_type_map);
         }
 
         @Override
@@ -59,7 +60,6 @@ public class PythonCG {
             Map<String, Object> context = new HashMap<String, Object>();
             context.put("ref", jaxb_dto_class.getRef());
             context.put("class_name", dto_class_name);
-            Helpers.convert_to_python_type_names(fields);
             context.put("fields", fields);
             context.put("mode", "dto_class");
             StringWriter sw = new StringWriter();
@@ -97,8 +97,8 @@ public class PythonCG {
         private final TemplateEngine te;
         private final JdbcUtils db_utils;
 
-        public DAO(String dto_package, DtoClasses jaxb_dto_classes, Connection connection, String sql_root_abs_path,
-                   String vm_file_system_dir) throws Exception {
+        public DAO(String dto_package, DtoClasses jaxb_dto_classes, TypeMap jaxb_type_map,
+                   Connection connection, String sql_root_abs_path, String vm_file_system_dir) throws Exception {
             this.jaxb_dto_classes = jaxb_dto_classes;
             this.sql_root_abs_path = sql_root_abs_path;
             this.dto_package = dto_package;
@@ -107,7 +107,7 @@ public class PythonCG {
             } else {
                 te = new TemplateEngine(vm_file_system_dir, true);
             }
-            db_utils = new JdbcUtils(connection, FieldNamesMode.SNAKE_CASE, FieldNamesMode.SNAKE_CASE, null);
+            db_utils = new JdbcUtils(connection, FieldNamesMode.SNAKE_CASE, FieldNamesMode.SNAKE_CASE, jaxb_type_map);
         }
 
         @Override
@@ -198,9 +198,6 @@ public class PythonCG {
             context.put("ref", crud_table);
             context.put("sql", python_sql_str);
             context.put("use_dto", jaxb_return_type_is_dto);
-            if (!jaxb_return_type_is_dto) {
-                returned_type_name = Helpers.get_python_type_name(returned_type_name);
-            }
             context.put("returned_type_name", returned_type_name);
             context.put("fetch_list", fetch_list);
             context.put("imports", imports.values());
@@ -353,7 +350,6 @@ public class PythonCG {
             } else {
                 context.put("dto_param", "");
             }
-            Helpers.convert_to_python_type_names(params);
             context.put("params", params);
         }
 

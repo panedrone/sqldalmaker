@@ -35,7 +35,7 @@ public class GoCG {
         private final TemplateEngine te;
         private final JdbcUtils db_utils;
 
-        public DTO(String dto_package, DtoClasses jaxb_dto_classes, TypeMap type_map, Connection connection,
+        public DTO(String dto_package, DtoClasses jaxb_dto_classes, TypeMap jaxb_type_map, Connection connection,
                    String sql_root_abs_path, String vm_file_system_dir) throws Exception {
             this.dto_package = dto_package;
             this.jaxb_dto_classes = jaxb_dto_classes.getDtoClass();
@@ -45,7 +45,7 @@ public class GoCG {
             } else {
                 te = new TemplateEngine(vm_file_system_dir, true);
             }
-            db_utils = new JdbcUtils(connection, FieldNamesMode.TITLE_CASE, FieldNamesMode.LOWER_CAMEL_CASE, type_map);
+            db_utils = new JdbcUtils(connection, FieldNamesMode.TITLE_CASE, FieldNamesMode.LOWER_CAMEL_CASE, jaxb_type_map);
         }
 
         @Override
@@ -109,7 +109,7 @@ public class GoCG {
 
         private String dao_class_name;
 
-        public DAO(String dao_package, DtoClasses jaxb_dto_classes, TypeMap type_map, Connection connection,
+        public DAO(String dao_package, DtoClasses jaxb_dto_classes, TypeMap jaxb_type_map, Connection connection,
                    String sql_root_abs_path, String vm_file_system_dir) throws Exception {
             //this.dto_package = dto_package;
             this.dao_package = dao_package;
@@ -120,7 +120,7 @@ public class GoCG {
             } else {
                 te = new TemplateEngine(vm_file_system_dir, true);
             }
-            db_utils = new JdbcUtils(connection, FieldNamesMode.TITLE_CASE, FieldNamesMode.LOWER_CAMEL_CASE, type_map);
+            db_utils = new JdbcUtils(connection, FieldNamesMode.TITLE_CASE, FieldNamesMode.LOWER_CAMEL_CASE, jaxb_type_map);
         }
 
         @Override

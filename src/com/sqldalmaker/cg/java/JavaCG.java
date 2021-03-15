@@ -33,7 +33,7 @@ public class JavaCG {
         private final TemplateEngine te;
         private final JdbcUtils db_utils;
 
-        public DTO(DtoClasses jaxb_dto_classes, TypeMap type_map, Connection connection, String dto_package, String sql_root_abs_path,
+        public DTO(DtoClasses jaxb_dto_classes, TypeMap jaxb_type_map, Connection connection, String dto_package, String sql_root_abs_path,
                    String dto_inheritance, FieldNamesMode field_names_mode, String vm_file_system_dir) throws Exception {
             this.jaxb_dto_classes = jaxb_dto_classes.getDtoClass();
             this.dto_package = dto_package;
@@ -44,7 +44,7 @@ public class JavaCG {
             } else {
                 te = new TemplateEngine(vm_file_system_dir, true);
             }
-            db_utils = new JdbcUtils(connection, field_names_mode, FieldNamesMode.AS_IS, type_map);
+            db_utils = new JdbcUtils(connection, field_names_mode, FieldNamesMode.AS_IS, jaxb_type_map);
         }
 
         @Override
@@ -86,7 +86,7 @@ public class JavaCG {
         private final TemplateEngine te;
         private final JdbcUtils db_utils;
 
-        public DAO(DtoClasses jaxb_dto_classes, TypeMap type_map, Connection connection, String dto_package, String dao_package,
+        public DAO(DtoClasses jaxb_dto_classes, TypeMap jaxb_type_map, Connection connection, String dto_package, String dao_package,
                    String sql_root_abs_path, FieldNamesMode field_names_mode, String vm_file_system_dir) throws Exception {
             this.jaxb_dto_classes = jaxb_dto_classes;
             this.dto_package = dto_package;
@@ -97,7 +97,7 @@ public class JavaCG {
             } else {
                 te = new TemplateEngine(vm_file_system_dir, true);
             }
-            db_utils = new JdbcUtils(connection, field_names_mode, FieldNamesMode.AS_IS, type_map);
+            db_utils = new JdbcUtils(connection, field_names_mode, FieldNamesMode.AS_IS, jaxb_type_map);
         }
 
         @Override

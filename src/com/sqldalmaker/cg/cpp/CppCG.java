@@ -32,7 +32,7 @@ public class CppCG {
         private final JdbcUtils db_utils;
         private final String dto_class_prefix;
 
-        public DTO(DtoClasses jaxb_dto_classes, TypeMap type_map, Connection connection, String sql_root_abs_path,
+        public DTO(DtoClasses jaxb_dto_classes, TypeMap jaxb_type_map, Connection connection, String sql_root_abs_path,
                    String dto_class_prefix, String vm_file_system_dir) throws Exception {
             this.jaxb_dto_classes = jaxb_dto_classes.getDtoClass();
             this.dto_class_prefix = dto_class_prefix;
@@ -42,7 +42,7 @@ public class CppCG {
             } else {
                 te = new TemplateEngine(vm_file_system_dir, true);
             }
-            db_utils = new JdbcUtils(connection, FieldNamesMode.AS_IS, FieldNamesMode.AS_IS, type_map);
+            db_utils = new JdbcUtils(connection, FieldNamesMode.AS_IS, FieldNamesMode.AS_IS, jaxb_type_map);
         }
 
         @Override
@@ -79,7 +79,7 @@ public class CppCG {
         private final TemplateEngine te;
         private final JdbcUtils db_utils;
 
-        public DAO(DtoClasses jaxb_dto_classes, TypeMap type_map, Connection connection, String sql_root_abs_path,
+        public DAO(DtoClasses jaxb_dto_classes, TypeMap jaxb_type_map, Connection connection, String sql_root_abs_path,
                    String class_prefix, String vm_file_system_dir) throws Exception {
             this.jaxb_dto_classes = jaxb_dto_classes;
             this.sql_root_abs_path = sql_root_abs_path;
@@ -89,7 +89,7 @@ public class CppCG {
             } else {
                 te = new TemplateEngine(vm_file_system_dir, true);
             }
-            db_utils = new JdbcUtils(connection, FieldNamesMode.AS_IS, FieldNamesMode.AS_IS, type_map);
+            db_utils = new JdbcUtils(connection, FieldNamesMode.AS_IS, FieldNamesMode.AS_IS, jaxb_type_map);
         }
 
         @Override

@@ -335,48 +335,6 @@ public class Helpers {
         }
     }
 
-    public static void convert_to_python_type_names(List<FieldInfo> fields) throws Exception {
-        for (FieldInfo fi : fields) {
-            String type = fi.getType();
-            type = get_python_type_name(type);
-            fi.set_type_by_map(type);
-        }
-    }
-
-    public static String get_python_type_name(String type) {
-        if (is_class_of(type, String.class)) {
-            return "str";
-        }
-        if (is_class_of(type, Boolean.class)) {
-            return "bool";
-        }
-        if (is_class_of(type, java.util.Date.class)) {
-            return "str"; // built-in, datetime.datetime can be used instead
-        }
-        if (is_class_of(type, Float.class)) {
-            return "float"; // built-in
-        }
-        if (is_class_of(type, Double.class)) {
-            return "float"; // built-in, no double
-        }
-        if (is_class_of(type, java.math.BigDecimal.class)) {
-            return "float"; // built-in, maybe decimal.Decimal is better?
-        }
-        if (is_class_of(type, Integer.class)) {
-            return "int"; // built-in
-        }
-        if (is_class_of(type, Short.class)) {
-            return "int"; // built-in
-        }
-        if (is_class_of(type, Long.class)) {
-            return "long"; // built-in
-        }
-        if (!is_java_type(type)) {
-            return type;
-        }
-        return "object";
-    }
-
     public static void convert_to_ruby_type_names(List<FieldInfo> fields) {
 
     }
