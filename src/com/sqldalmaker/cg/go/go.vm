@@ -103,7 +103,8 @@ func (dao *${class_name}) ${method_name}(#if(${dto_param} != "")#param_decls_dto
 #sql_var($is_external_sql $sql)
 	var res []${returned_type_name}
 	onRow := func(rawData interface{}) {
-		data := rawData.(${returned_type_name})
+		var data ${returned_type_name}
+		dao.ds.assign(&data, rawData)
 		res = append(res, data)
 	}
 #if(${dto_param} != "")
@@ -128,10 +129,13 @@ func (dao *${class_name}) ${method_name}(#if(${dto_param} != "")#param_decls_dto
 #end
 #else
 #if(${dto_param} != "")
-	return dao.ds.query(sql#foreach($param in ${params}), p.${param.getterMethod()}()#end).(${returned_type_name})
+	r := dao.ds.query(sql#foreach($param in ${params}), p.${param.getterMethod()}()#end)
 #else
-	return dao.ds.query(sql#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end).(${returned_type_name})
-#end    
+	r := dao.ds.query(sql#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
+#end
+	var res ${returned_type_name}
+	dao.ds.assign(&res, r)
+	return res
 #end
 }
 #end

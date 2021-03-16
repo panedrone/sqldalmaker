@@ -321,19 +321,19 @@ public class Helpers {
         }
     }
 
-    private static boolean is_class_of(String type, Class<?> clazz) {
-        // getSimpleName is used for types of parameters that are declared in XML
-        return (type.equals(clazz.getName()) || type.equals(clazz.getSimpleName()));
-    }
-
-    private static boolean is_java_type(String type) {
-        try {
-            Class.forName(type);
-            return true;
-        } catch (ClassNotFoundException e) {
-            return false;
-        }
-    }
+//    private static boolean is_class_of(String type, Class<?> clazz) {
+//        // getSimpleName is used for types of parameters that are declared in XML
+//        return (type.equals(clazz.getName()) || type.equals(clazz.getSimpleName()));
+//    }
+//
+//    private static boolean is_java_type(String type) {
+//        try {
+//            Class.forName(type);
+//            return true;
+//        } catch (ClassNotFoundException e) {
+//            return false;
+//        }
+//    }
 
     public static void convert_to_ruby_type_names(List<FieldInfo> fields) {
 

@@ -10,10 +10,10 @@ import (
 	"time"
 
 	// _ "github.com/mattn/go-sqlite3" // SQLite3
-	_ "github.com/denisenkom/go-mssqldb" // SQL Server
+	// _ "github.com/denisenkom/go-mssqldb" // SQL Server
 	// _ "github.com/godror/godror"			// Oracle
 	// only strings for MySQL (so far). see _prepareFetch below and related comments.
-	// _ "github.com/go-sql-driver/mysql"	// MySQL
+	_ "github.com/go-sql-driver/mysql" // MySQL
 	// _ "github.com/ziutek/mymysql/godrv" // MySQL
 	// _ "github.com/lib/pq" // PostgeSQL
 )
@@ -21,6 +21,7 @@ import (
 /*
    SQL DAL Maker Web-Site: http://sqldalmaker.sourceforge.net
    This is an example of how to implement DataStore in GoLang using "database/sql".
+   Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store.go
    Copy-paste this code to your project and change it for your needs.
    Improvements are welcome: sdm@gmail.com
 */
@@ -51,7 +52,7 @@ func (ds *DataStore) open() {
 	// ds.handle, err = sql.Open("sqlite3", "./log.sqlite")
 	// ds.handle, err = sql.Open("sqlite3", "./northwindEF.sqlite")
 	// === MySQL ===============================
-	// ds.handle, err = sql.Open("mysql", "root:root@/sakila")
+	ds.handle, err = sql.Open("mysql", "root:root@/sakila")
 	// ds.handle, err = sql.Open("mymysql", "sakila/root/root")
 	// === SQL Server ==========================
 	// https://github.com/denisenkom/go-mssqldb
@@ -60,8 +61,8 @@ func (ds *DataStore) open() {
 	// ensure sqlserver:// in beginning. this one is not valid:
 	// ------ ds.handle, err = sql.Open("sqlserver", "sa:root@/localhost:1433/SQLExpress?database=AdventureWorks2014")
 	// this one is ok:
-	ds.paramPrefix = "@p"
-	ds.handle, err = sql.Open("sqlserver", "sqlserver://sa:root@localhost:1433?database=AdventureWorks2014")
+	//ds.paramPrefix = "@p"
+	//ds.handle, err = sql.Open("sqlserver", "sqlserver://sa:root@localhost:1433?database=AdventureWorks2014")
 	// === Oracle =============================
 	// "github.com/godror/godror"
 	//ds.paramPrefix = ":"
@@ -79,16 +80,16 @@ func (ds *DataStore) close() {
 }
 
 func (ds *DataStore) begin() {
-	// TODO
+	// _TODO
 	// (*Tx, error) = ds.handle.Begin()
 }
 
 func (ds *DataStore) commit() {
-	// TODO
+	// _TODO
 }
 
 func (ds *DataStore) rollback() {
-	// TODO
+	// _TODO
 }
 
 func _execInsertPg(db *sql.DB, sql, aiNames string, args ...interface{}) interface{} {
@@ -129,7 +130,7 @@ func _execInsertOracle(db *sql.DB, sql, aiNames string, args ...interface{}) int
 	//// DPI-1037: column at array position 0 fetched with error 1406:
 	//// 	- var ai interface{}
 	//// 	- var ai string
-	var ai uint64 // int64, uint64, float64 are OK, but they remain 0
+	var ai uint64 // "github.com/godror/godror": int64, uint64, float64 are passed with no error, but they remain 0
 	args = append(args, &ai)
 	rows, err := db.Query(sql, args...)
 	if err != nil {
@@ -383,12 +384,17 @@ func (ds *DataStore) queryAllRows(sql string, onRow func(map[string]interface{})
 	}
 }
 
-// func (ds *DataStore) _prepareFetch(rows *sql.Rows) ([]string, map[string]interface{}, []string, []interface{}) {   // MySQL
+// MySQL: use []string instead of []interface{} as an option
+// func (ds *DataStore) _prepareFetch(rows *sql.Rows) ([]string, map[string]interface{}, []string, []interface{}) {
 func (ds *DataStore) _prepareFetch(rows *sql.Rows) ([]string, map[string]interface{}, []interface{}, []interface{}) {
 	colNames, _ := rows.Columns()
 	data := make(map[string]interface{})
-	// values := make([]string, len(colNames)) // fetch strings for MySQL. see comment about 'type-map' above
-	values := make([]interface{}, len(colNames)) // interface{} is ok for SQLite3, Oracle, and SQL Server
+	// interface{} is ok for SQLite3, Oracle, and SQL Server.
+	// MySQL and PostgreSQL may require some convertors from []uint8
+	// https://github.com/ziutek/mymysql#type-mapping
+	values := make([]interface{}, len(colNames))
+	// MySQL: use this if strings for all types are ok for you
+	// values := make([]string, len(colNames))
 	valuePointers := make([]interface{}, len(colNames))
 	for i := range values {
 		valuePointers[i] = &values[i]
@@ -414,9 +420,7 @@ func (ds *DataStore) _formatSQL(sql string) string {
 	return sql
 }
 
-/*
-	TODO: Improve DataStore.assign(...) to convert strings (or byte-arrays) to more specific types
-*/
+// _TODO: Improve DataStore.assign(...) to convert string or []uint8 value to more specific type
 
 func (ds *DataStore) assign(fieldAddr interface{}, value interface{}) {
 	if value == nil {
@@ -470,29 +474,40 @@ func (ds *DataStore) assign(fieldAddr interface{}, value interface{}) {
 	case *float64:
 		switch value.(type) {
 		case []byte:
-			str := string(value.([]byte)) // PostgeSQL
+			str := string(value.([]byte)) // PostgeSQL, MySQL
 			*d, _ = strconv.ParseFloat(str, 64)
 			return
-		default:
+		case float32:
+			*d = float64(value.(float32))
+			return
+		case float64:
 			*d = value.(float64)
+			return
 		}
-		return
 	case *float32:
 		switch value.(type) {
 		case []byte:
 			str := string(value.([]byte)) // PostgeSQL
 			d64, _ := strconv.ParseFloat(str, 32)
 			*d = float32(d64)
-		default:
+		case float32:
 			*d = value.(float32)
+			return
 		}
-		return
 	case *time.Time:
 		*d = value.(time.Time)
 		return
 	case *bool:
-		*d = value.(bool)
-		return
+		switch value.(type) {
+		case []byte:
+			str := string(value.([]byte)) // MySQL
+			db, _ := strconv.ParseBool(str)
+			*d = db
+			return
+		case bool:
+			*d = value.(bool)
+			return
+		}
 	case *[]byte: // the same as uint8
 		*d = value.([]byte)
 		return
@@ -500,6 +515,6 @@ func (ds *DataStore) assign(fieldAddr interface{}, value interface{}) {
 		*d = value
 		return
 	}
-	log.Fatal(fmt.Sprintf("Unexpected combination of param types in DataStore.assign(%v, %v)",
+	log.Fatal(fmt.Sprintf("Cannot process this DataStore.assign(%v, %v)",
 		reflect.TypeOf(fieldAddr), reflect.TypeOf(value)))
 }

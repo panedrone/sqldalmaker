@@ -118,7 +118,8 @@ public class EclipseTargetLanguageHelpers {
 				String abs_path = EclipseHelpers.get_absolute_dir_path_str(project, rel_path);
 				output_dir.append(abs_path);
 			}
-			RubyCG.DTO gen = new RubyCG.DTO(dto_classes, conn, sql_root_abs_path, vm_file_system_path);
+			RubyCG.DTO gen = new RubyCG.DTO(dto_classes, settings.getTypeMap(), conn, sql_root_abs_path,
+					vm_file_system_path);
 			return gen;
 		} else if (RootFileName.PYTHON.equals(root_file_name)) {
 			if (output_dir != null) {
@@ -126,7 +127,8 @@ public class EclipseTargetLanguageHelpers {
 				String abs_path = EclipseHelpers.get_absolute_dir_path_str(project, rel_path);
 				output_dir.append(abs_path);
 			}
-			PythonCG.DTO gen = new PythonCG.DTO(dto_classes, conn, sql_root_abs_path, vm_file_system_path);
+			PythonCG.DTO gen = new PythonCG.DTO(dto_classes, settings.getTypeMap(), conn, sql_root_abs_path,
+					vm_file_system_path);
 			return gen;
 		} else if (RootFileName.PHP.equals(root_file_name)) {
 			if (output_dir != null) {
@@ -136,8 +138,8 @@ public class EclipseTargetLanguageHelpers {
 			}
 			FieldNamesMode field_names_mode = Helpers.get_field_names_mode(settings);
 			String dto_package = settings.getDto().getScope();
-			PhpCG.DTO gen = new PhpCG.DTO(dto_classes, conn, sql_root_abs_path, vm_file_system_path, dto_package,
-					field_names_mode);
+			PhpCG.DTO gen = new PhpCG.DTO(dto_classes, settings.getTypeMap(), conn, sql_root_abs_path,
+					vm_file_system_path, dto_package, field_names_mode);
 			return gen;
 		} else if (RootFileName.JAVA.equals(root_file_name)) {
 			FieldNamesMode field_names_mode = Helpers.get_field_names_mode(settings);
@@ -203,7 +205,8 @@ public class EclipseTargetLanguageHelpers {
 				String abs_path = EclipseHelpers.get_absolute_dir_path_str(project, rel_path);
 				output_dir.append(abs_path);
 			}
-			RubyCG.DAO gen = new RubyCG.DAO(dto_classes, conn, sql_root_abs_path, vm_file_system_path);
+			RubyCG.DAO gen = new RubyCG.DAO(dto_classes, settings.getTypeMap(), conn, sql_root_abs_path,
+					vm_file_system_path);
 			return gen;
 		} else if (RootFileName.PYTHON.equals(root_fn)) {
 			String rel_path = settings.getFolders().getTarget();
@@ -212,7 +215,8 @@ public class EclipseTargetLanguageHelpers {
 				output_dir.append(abs_path);
 			}
 			String dto_package = rel_path = rel_path.replace("/", ".").replace("\\", ".");
-			PythonCG.DAO gen = new PythonCG.DAO(dto_package, dto_classes, conn, sql_root_abs_path, vm_file_system_path);
+			PythonCG.DAO gen = new PythonCG.DAO(dto_package, dto_classes, settings.getTypeMap(), conn,
+					sql_root_abs_path, vm_file_system_path);
 			return gen;
 		} else if (RootFileName.PHP.equals(root_fn)) {
 			if (output_dir != null) {
@@ -223,8 +227,8 @@ public class EclipseTargetLanguageHelpers {
 			FieldNamesMode field_names_mode = Helpers.get_field_names_mode(settings);
 			String dto_package = settings.getDto().getScope();
 			String dao_package = settings.getDao().getScope();
-			PhpCG.DAO gen = new PhpCG.DAO(dto_classes, conn, sql_root_abs_path, vm_file_system_path, dto_package,
-					dao_package, field_names_mode);
+			PhpCG.DAO gen = new PhpCG.DAO(dto_classes, settings.getTypeMap(), conn, sql_root_abs_path,
+					vm_file_system_path, dto_package, dao_package, field_names_mode);
 			return gen;
 		} else if (RootFileName.JAVA.equals(root_fn)) {
 			String dao_package = settings.getDao().getScope();

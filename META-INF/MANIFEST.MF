@@ -3,7 +3,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: com.sqldalmaker.eclipse
 Bundle-SymbolicName: com.sqldalmaker.eclipse;singleton:=true
-Bundle-Version: 1.180.0.qualifier
+Bundle-Version: 1.183.0.qualifier
 Bundle-Activator: com.sqldalmaker.eclipse.Activator
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
@@ -27,8 +27,6 @@ Bundle-ClassPath: .,
  lib/jaxb-impl-2.3.1.jar,
  lib/jaxb-runtime-2.3.1.jar,
  lib/stax-ex-1.8.jar,
- lib/txw2-2.3.1.jar,
- lib/itextpdf-5.5.9.jar,
- lib/jaxb-api-osgi-2.2.7.jar
+ lib/txw2-2.3.1.jar
 Bundle-Vendor: sqldalmaker@gmail.com
 

@@ -91,7 +91,7 @@ public class GoCG {
             te.merge(context, sw);
             String text = sw.toString();
             // seems like Go fmt makes \n
-            text = text.replace("\r\n", "\n");
+            // text = text.replace("\r\n", "\n");
             return new String[]{text};
         }
     }
@@ -146,7 +146,7 @@ public class GoCG {
             te.merge(context, sw);
             String text = sw.toString();
             // seems like Go fmt makes \n
-            text = text.replace("\r\n", "\n");
+            // text = text.replace("\r\n", "\n");
             return new String[]{text};
         }
 
@@ -183,10 +183,10 @@ public class GoCG {
         //
         // this method is called from both 'render_jaxb_query' and 'render_crud_read'
         //
-        private StringBuilder _render_query(String dao_query_jdbc_sql, boolean is_external_sql,
-                                            String jaxb_dto_or_return_type, boolean jaxb_return_type_is_dto, boolean fetch_list, String method_name,
-                                            String dto_param_type, String crud_table, List<FieldInfo> fields, List<FieldInfo> params)
-                throws Exception {
+        private StringBuilder _render_query(
+                String dao_query_jdbc_sql, boolean is_external_sql,
+                String jaxb_dto_or_return_type, boolean jaxb_return_type_is_dto, boolean fetch_list, String method_name,
+                String dto_param_type, String crud_table, List<FieldInfo> fields, List<FieldInfo> params) throws Exception {
             if (dao_query_jdbc_sql == null) {
                 return Helpers.get_no_pk_warning(method_name);
             }
@@ -261,13 +261,13 @@ public class GoCG {
                                       String sql_path) throws Exception {
             SqlUtils.throw_if_select_sql(jdbc_dao_sql);
             List<FieldInfo> _params = new ArrayList<FieldInfo>();
+            db_utils.get_dao_exec_dml_info(jdbc_dao_sql, dto_param_type, param_descriptors, _params);
             for (FieldInfo pi : _params) {
                 String imp = pi.getImport();
                 if (imp != null) {
                     imports.add(imp);
                 }
             }
-            db_utils.get_dao_exec_dml_info(jdbc_dao_sql, dto_param_type, param_descriptors, _params);
             String go_sql = SqlUtils.format_jdbc_sql_for_go(jdbc_dao_sql);
             List<MappingInfo> m_list = new ArrayList<MappingInfo>();
             List<FieldInfo> method_params = new ArrayList<FieldInfo>();
@@ -353,9 +353,6 @@ public class GoCG {
             m.dto_class_name = parts[1].trim();
             List<FieldInfo> fields = new ArrayList<FieldInfo>();
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(m.dto_class_name, jaxb_dto_classes);
-//            imports.add("com.sqldalmaker.DataStore.RowData");
-//            imports.add("com.sqldalmaker.DataStore.RowHandler");
-//            imports.add("com.sqldalmaker.DataStore.RecordHandler");
             _process_dto_class_name(jaxb_dto_class.getName()); // extends imports
             db_utils.get_dto_field_info(jaxb_dto_class, sql_root_abs_path, fields);
             if (fields.size() > 0) {
