@@ -107,4 +107,19 @@
     <!--        <type detected="java.util.Date" target="str"/>-->
     <!--    </type-map>-->
 
+    <!-- Example for PHP based on this -->
+    <!-- https://www.w3schools.com/php/php_datatypes.asp -->
+
+    <!--    <type-map default="">-->
+    <!--        <type detected="java.lang.Short" target="Integer"/>-->
+    <!--        <type detected="java.lang.Integer" target="Integer"/>-->
+    <!--        <type detected="java.lang.Long" target="Integer"/>-->
+    <!--        <type detected="java.lang.Float" target="Float"/>-->
+    <!--        <type detected="java.lang.Double" target="Float"/>-->
+    <!--        <type detected="byte[]" target="Array"/>-->
+    <!--        <type detected="java.lang.Boolean" target="Boolean"/>-->
+    <!--        <type detected="java.lang.String" target="String"/>-->
+    <!--        <type detected="java.lang.Object" target="Object"/>-->
+    <!--    </type-map>-->
+
 </settings>

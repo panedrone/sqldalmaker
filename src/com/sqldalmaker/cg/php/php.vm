@@ -49,17 +49,17 @@ class ${class_name} {
 #foreach($f in ${fields})
 
     /**
-     * @return ($f.getType())
+     * @return $f.getType()
      */
     public function ${f.getterMethod()}() {
         return ${d}this->$f.getName();
     }
 
     /**
-     * @param $f.getType() ${d}$f.getName()
+     * @param $f.getType() ${d}value
      */
-    public function ${f.setterMethod()}(${d}$f.getName()) {
-        ${d}this->$f.getName() = ${d}$f.getName();
+    public function ${f.setterMethod()}(${d}value) {
+        ${d}this->$f.getName() = ${d}value;
     }
 #end
 }## ====================================================================================================================
@@ -124,7 +124,7 @@ class ${class_name} {
      * C(R)UD: ${ref}
 #end
 #if(${is_external_sql})
-     * @param string ${d}sql external SQL statement
+     * @param String ${d}sql external SQL statement
 #end
 #if(${dto_param} != "")
      * @param ${dto_param} ${d}p
@@ -137,7 +137,7 @@ class ${class_name} {
 #if($use_dto)
      * @return ${returned_type_name}[] or FALSE on failure
 #else
-     * @return array of (${returned_type_name}) ${fields.get(0).getColumnName()}
+     * @return array of ${returned_type_name} ${fields.get(0).getColumnName()}
 #end
 #else
 #if($use_dto)
@@ -195,7 +195,7 @@ class ${class_name} {
      * CRU(D): ${table_name}
 #end
 #if(${is_external_sql})
-     * @param string ${d}sql external SQL statement
+     * @param String ${d}sql external SQL statement
 #end
 #if(${dto_param} != "")
      * @param ${dto_param} ${d}p

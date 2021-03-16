@@ -1,3 +1,7 @@
+2021-02-15
+
+    Implemented 'type-map' for PHP, Python, Ruby.
+
 2021-03-08
 
     Solved problem 'Go + DB NULL'.

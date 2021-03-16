@@ -68,9 +68,6 @@ public class PhpCG {
             StringWriter sw = new StringWriter();
             te.merge(context, sw);
             String text = sw.toString();
-            text = text.replace("java.lang.", "");
-            text = text.replace("java.util.", "");
-            text = text.replace("java.math.", "");
             return new String[]{text};
         }
     }
