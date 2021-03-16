@@ -91,7 +91,7 @@ public class GoCG {
             te.merge(context, sw);
             String text = sw.toString();
             // seems like Go fmt makes \n
-            // text = text.replace("\r\n", "\n");
+            text = text.replace("\r\n", "\n");
             return new String[]{text};
         }
     }
@@ -146,7 +146,7 @@ public class GoCG {
             te.merge(context, sw);
             String text = sw.toString();
             // seems like Go fmt makes \n
-            // text = text.replace("\r\n", "\n");
+            text = text.replace("\r\n", "\n");
             return new String[]{text};
         }
 

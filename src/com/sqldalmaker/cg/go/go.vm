@@ -173,7 +173,7 @@ func (dao *${class_name}) ${method_name}(#param_decls($is_external_sql $params))
 #if ($method_type == "CREATE" || $method_type == "UPDATE" || $method_type == "DELETE")
 	return dao.ds.execDML(sql#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
 #else
-	return dao.ds.execDML(sql#foreach($param in ${params2}), ${param.getName()}#end)
+	return dao.ds.execDML(sql#foreach($param in ${params2}), ${param.getLowerCamelCaseName()}#end)
 #end
 }
 #end
