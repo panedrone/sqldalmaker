@@ -116,16 +116,19 @@ func (dao *${class_name}) ${method_name}(#if(${dto_param} != "")#param_decls_dto
 }
 #end
 #else
-func (dao *${class_name}) ${method_name}(#if(${dto_param} != "")#param_decls_dto($is_external_sql)${dto_param} p#else#param_decls($is_external_sql $params)#end) ${returned_type_name} {
+func (dao *${class_name}) ${method_name}(#if(${dto_param} != "")#param_decls_dto($is_external_sql)${dto_param} p#else#param_decls($is_external_sql $params)#end) *${returned_type_name} {
 #sql_var($is_external_sql $sql)
 #if($use_dto)
 	rd := dao.ds.queryRow(sql#if(${dto_param} != "")#foreach($param in ${params}), p.${param.getterMethod()}()#end)#else#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
+	if rd == nil {
+		return nil
+	}
 	obj := ${returned_type_name}{}
 #foreach($f in ${fields})
 #set($i = ${velocityCount} - 1)
 	dao.ds.assign(&obj.${f.getName()}, rd["${f.getColumnName()}"])#* // (${f.getType()}) *#
 #end
-	return obj
+	return &obj
 #end
 #else
 #if(${dto_param} != "")
