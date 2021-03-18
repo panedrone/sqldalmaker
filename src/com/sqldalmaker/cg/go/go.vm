@@ -10,12 +10,12 @@
 #end
 #macro(param_decls $external_sql $params)
 #if ($external_sql == true)
-String sql#if(${params.size()} > 0), #end
+sql string#if(${params.size()} > 0), #end
 #end
 #foreach($param in ${params})#if(${velocityCount} == 1)${param.getLowerCamelCaseName()} ${param.getType()}#else, ${param.getLowerCamelCaseName()} ${param.getType()}#end#end
 #end
 #macro(param_decls_dto $external_sql)
-#if($external_sql == true)String sql, #end
+#if($external_sql == true)sql string, #end
 #end
 #macro(sql_var $is_external_sql $sql)
 #if (!${is_external_sql})

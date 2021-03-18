@@ -5,11 +5,6 @@
 	<classpathentry kind="src" path="src_eclipse"/>
 	<classpathentry excluding="com/sqldalmaker/netbeans/" kind="src" path="src"/>
 	<classpathentry kind="lib" path="lib/velocity-1.7-dep.jar"/>
-	<classpathentry kind="lib" path="lib/FastInfoset-1.2.15.jar"/>
-	<classpathentry kind="lib" path="lib/istack-commons-runtime-3.0.7.jar"/>
-	<classpathentry kind="lib" path="lib/javax.activation-api-1.2.0.jar"/>
-	<classpathentry kind="lib" path="lib/stax-ex-1.8.jar"/>
-	<classpathentry kind="lib" path="lib/txw2-2.3.1.jar"/>
 	<classpathentry kind="lib" path="lib-jaxb-2.3.3_nb_12.3/activation.jar"/>
 	<classpathentry kind="lib" path="lib-jaxb-2.3.3_nb_12.3/jaxb-api.jar"/>
 	<classpathentry kind="lib" path="lib-jaxb-2.3.3_nb_12.3/jaxb-impl.jar"/>
