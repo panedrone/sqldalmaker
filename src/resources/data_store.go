@@ -3,19 +3,18 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	"log"
 	"reflect"
 	"strconv"
 	"strings"
 	"time"
 
-	_ "github.com/lib/pq" // PostgeSQL
-	// _ "github.com/mattn/go-sqlite3"		// SQLite3
-	// _ "github.com/denisenkom/go-mssqldb" // SQL Server
+	// _ "github.com/mattn/go-sqlite3" // SQLite3
+	_ "github.com/denisenkom/go-mssqldb" // SQL Server
 	// _ "github.com/godror/godror"			// Oracle
 	// only strings for MySQL (so far). see _prepareFetch below and related comments.
 	// _ "github.com/go-sql-driver/mysql"	// MySQL
 	// _ "github.com/ziutek/mymysql/godrv" // MySQL
+	// _ "github.com/lib/pq" // PostgeSQL
 )
 
 /*
@@ -45,46 +44,38 @@ func (ds *DataStore) isSqlServer() bool {
 
 func (ds *DataStore) open() {
 	var err error
-	ds.paramPrefix = "$"
-	ds.handle, err = sql.Open("postgres", "postgres://postgres:sa@localhost/my-tests?sslmode=disable")
+	// === PostgeSQL ===========================
+	// ds.paramPrefix = "$"
+	// ds.handle, err = sql.Open("postgres", "postgres://postgres:sa@localhost/my-tests?sslmode=disable")
 	// ds.handle, err = sql.Open("postgres", "postgres://postgres:sa@localhost/my-tests?sslmode=verify-full")
-	// ================================
-	// ds.handle, err = sql.Open("sqlite3", "./todo-list.sqlite")
+	// === SQLite3 =============================
+	// ds.handle, err = sql.Open("sqlite3", "./log.sqlite")
 	// ds.handle, err = sql.Open("sqlite3", "./northwindEF.sqlite")
-	// ================================
+	// === MySQL ===============================
 	// ds.handle, err = sql.Open("mysql", "root:root@/sakila")
 	// ds.handle, err = sql.Open("mymysql", "sakila/root/root")
-	// ================================
-	// SQL Server https://github.com/denisenkom/go-mssqldb
+	// === SQL Server ==========================
+	// https://github.com/denisenkom/go-mssqldb
 	// The sqlserver driver uses normal MS SQL Server syntax and expects parameters in the
 	// sql query to be in the form of either @Name or @p1 to @pN (ordinal position).
 	// ensure sqlserver:// in beginning. this one is not valid:
 	// ------ ds.handle, err = sql.Open("sqlserver", "sa:root@/localhost:1433/SQLExpress?database=AdventureWorks2014")
 	// this one is ok:
-	//ds.paramPrefix = "@p"
-	//ds.handle, err = sql.Open("sqlserver", "sqlserver://sa:root@localhost:1433?database=AdventureWorks2014")
-	//query := url.Values{}
-	//query.Add("app name", "AdventureWorks2014")
-	//u := &url.URL{
-	//	Scheme:   "sqlserver",
-	//	User:     url.UserPassword("sa", "root"),
-	//	Host:     fmt.Sprintf("%s:%d", "localhost", 1433),
-	//	// Path:  instance, // if connecting to an instance instead of a port
-	//	RawQuery: query.Encode(),
-	//}
-	// ds.handle, err = sql.Open("sqlserver", u.String())
-	// ================================
+	ds.paramPrefix = "@p"
+	ds.handle, err = sql.Open("sqlserver", "sqlserver://sa:root@localhost:1433?database=AdventureWorks2014")
+	// === Oracle =============================
+	// "github.com/godror/godror"
 	//ds.paramPrefix = ":"
-	//ds.handle, _ = sql.Open("godror", `user="ORDERS" password="root" connectString="localhost:1521/orcl"`)
+	//ds.handle, err = sql.Open("godror", `user="ORDERS" password="root" connectString="localhost:1521/orcl"`)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 }
 
 func (ds *DataStore) close() {
 	err := ds.handle.Close()
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 }
 
@@ -101,21 +92,20 @@ func (ds *DataStore) begin() {
 
 func (ds *DataStore) commit() {
 	if ds.tx == nil {
-		if ds.tx == nil {
-			panic("Tx not started")
-			// return
-		}
+		panic("Tx not started")
+		// return
 	}
 	err := ds.tx.Commit()
 	if err != nil {
 		panic(err)
 	}
-	ds.tx = nil // no need to rollback in defer
+	// to prevent ds.tx.Rollback() in defer
+	ds.tx = nil
 }
 
 func (ds *DataStore) rollback() {
 	if ds.tx == nil {
-		//panic("Tx not started")
+		// commit() was called, just do nothing:
 		return
 	}
 	err := ds.tx.Rollback()
@@ -181,7 +171,7 @@ func (ds *DataStore) _execInsertOracle(sql, aiNames string, args ...interface{})
 	args = append(args, &ai)
 	rows, err := ds._query(sql, args...)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 	defer func() {
 		err = rows.Close()
@@ -218,7 +208,7 @@ func (ds *DataStore) _execInsertOracle2(sql, aiNames string, args ...interface{}
 	args = append(args, &ai)
 	stmt, err := ds._prepare(sql)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 	defer func() {
 		err = stmt.Close()
@@ -278,7 +268,7 @@ func (ds *DataStore) _execInsertBuiltin(sql string, args ...interface{}) interfa
 	// === Prepare -> Exec to access LastInsertId
 	stmt, err := ds._prepare(sql)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 	defer func() {
 		err = stmt.Close()
@@ -304,7 +294,7 @@ func (ds *DataStore) _execInsertBuiltin(sql string, args ...interface{}) interfa
 func (ds *DataStore) insert(sql, aiNames string, args ...interface{}) interface{} {
 	// len(nil) == 0
 	if len(aiNames) == 0 {
-		log.Fatal("DataStore.insert is not applicable for aiNames = " + aiNames)
+		panic("DataStore.insert is not applicable for aiNames = " + aiNames)
 	}
 	// Builtin LastInsertId works only with MySQL and SQLite3
 	sql = ds._formatSQL(sql)
@@ -335,7 +325,7 @@ func (ds *DataStore) execDML(sql string, args ...interface{}) int64 {
 	}()
 	res, err := stmt.Exec(args...)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 	ra, err := res.RowsAffected()
 	if err != nil {
@@ -382,7 +372,7 @@ func (ds *DataStore) queryAll(sql string, onRow func(interface{}), args ...inter
 	for rows.Next() {
 		err = rows.Scan(valuePointers...)
 		if err != nil {
-			log.Fatal(err)
+			panic(err)
 		}
 		data := values[0]
 		onRow(data)
@@ -431,8 +421,12 @@ func (ds *DataStore) queryAllRows(sql string, onRow func(map[string]interface{})
 	}
 }
 
-// MySQL: use []string instead of []interface{} as an option
-// func (ds *DataStore) _prepareFetch(rows *sql.Rows) ([]string, map[string]interface{}, []string, []interface{}) {
+/*
+// MySQL: if string is ok for all types (no conversions needed), use this:
+func (ds *DataStore) _prepareFetch(rows *sql.Rows) ([]string, map[string]interface{}, []string, []interface{}) {
+	// ...
+	values := make([]string, len(colNames))
+ */
 func (ds *DataStore) _prepareFetch(rows *sql.Rows) ([]string, map[string]interface{}, []interface{}, []interface{}) {
 	colNames, _ := rows.Columns()
 	data := make(map[string]interface{})
@@ -440,8 +434,6 @@ func (ds *DataStore) _prepareFetch(rows *sql.Rows) ([]string, map[string]interfa
 	// MySQL and PostgreSQL may require some convertors from []uint8
 	// https://github.com/ziutek/mymysql#type-mapping
 	values := make([]interface{}, len(colNames))
-	// MySQL: use this if strings for all types are ok for you
-	// values := make([]string, len(colNames))
 	valuePointers := make([]interface{}, len(colNames))
 	for i := range values {
 		valuePointers[i] = &values[i]
@@ -537,6 +529,7 @@ func (ds *DataStore) assign(fieldAddr interface{}, value interface{}) {
 			str := string(value.([]byte)) // PostgeSQL
 			d64, _ := strconv.ParseFloat(str, 32)
 			*d = float32(d64)
+			return
 		case float32:
 			*d = value.(float32)
 			return
@@ -562,6 +555,6 @@ func (ds *DataStore) assign(fieldAddr interface{}, value interface{}) {
 		*d = value
 		return
 	}
-	log.Fatal(fmt.Sprintf("Cannot process this DataStore.assign(%v, %v)",
+	panic(fmt.Sprintf("Cannot process this DataStore.assign(%v, %v)",
 		reflect.TypeOf(fieldAddr), reflect.TypeOf(value)))
 }
