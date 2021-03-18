@@ -1,0 +1,14 @@
+<component name="libraryTable">
+  <library name="lib-jaxb-2.3.3_nb_12">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib-jaxb-2.3.3_nb_12.3/activation.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib-jaxb-2.3.3_nb_12.3/jaxb-api.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib-jaxb-2.3.3_nb_12.3/jaxb-impl.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib-jaxb-2.3.3_nb_12.3/jaxb-xjc.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/lib-jaxb-2.3.3_nb_12.3/jaxb-xjc.jar!/" />
+    </SOURCES>
+  </library>
+</component>

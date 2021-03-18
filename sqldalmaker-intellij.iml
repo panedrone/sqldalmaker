@@ -16,6 +16,6 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" scope="RUNTIME" name="velocity-1.7-dep" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="jaxb-2.3.1" level="project" />
+    <orderEntry type="library" name="lib-jaxb-2.3.3_nb_12" level="project" />
   </component>
 </module>
