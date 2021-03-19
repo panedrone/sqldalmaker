@@ -129,6 +129,10 @@ func (ds *DataStore) _prepare(sql string) (*sql.Stmt, error) {
 	return ds.tx.Prepare(sql)
 }
 
+func (ds *DataStore) pgFetch(cursorName string) string {
+	return fmt.Sprintf("fetch all from \"%s\"", cursorName)
+}
+
 func (ds *DataStore) _execInsertPg(sql, aiNames string, args ...interface{}) interface{} {
 	sql += " RETURNING " + aiNames
 	rows, err := ds._query(sql, args...)
@@ -337,20 +341,20 @@ func (ds *DataStore) execDML(sql string, args ...interface{}) int64 {
 
 func (ds *DataStore) query(sql string, args ...interface{}) interface{} {
 	var arr []interface{}
-	manyRows := false
+	rowsFound := 0
 	onRow := func(date interface{}) {
 		if arr == nil {
 			arr = append(arr, date)
 		} else {
-			manyRows = true
+			rowsFound += 1
 		}
 	}
 	ds.queryAll(sql, onRow, args...)
 	if arr == nil {
-		return nil
+		panic("Nothing found")
 	}
-	if manyRows {
-		// return nil
+	if rowsFound > 1 {
+		panic(fmt.Sprintf("Found %d, expected 1", rowsFound))
 	}
 	return arr[0]
 }
@@ -386,10 +390,10 @@ func (ds *DataStore) queryRow(sql string, args ...interface{}) map[string]interf
 	}
 	ds.queryAllRows(sql, onRow, args...)
 	if arr == nil {
-		return nil
+		panic("Nothing found")
 	}
 	if len(arr) > 1 {
-		return nil
+		panic(fmt.Sprintf("Found %d, expected 1", len(arr)))
 	}
 	return arr[0]
 }
@@ -555,6 +559,6 @@ func (ds *DataStore) assign(fieldAddr interface{}, value interface{}) {
 		*d = value
 		return
 	}
-	panic(fmt.Sprintf("Cannot process this DataStore.assign(%v, %v)",
+	panic(fmt.Sprintf("Cannot process this: DataStore.assign(%v, %v)",
 		reflect.TypeOf(fieldAddr), reflect.TypeOf(value)))
 }
