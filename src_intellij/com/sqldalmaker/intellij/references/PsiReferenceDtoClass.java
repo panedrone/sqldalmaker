@@ -1,7 +1,7 @@
 /*
- * Copyright 2011-2020 sqldalmaker@gmail.com
- * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
- * Read LICENSE.txt in the root of this project/archive for details.
+ * Copyright 2011-2021 sqldalmaker@gmail.com
+ * Read LICENSE.txt in the root of this project/archive.
+ * Project web-site: http://sqldalmaker.sourceforge.net
  */
 package com.sqldalmaker.intellij.references;
 
@@ -10,14 +10,9 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiReferenceBase;
-import com.intellij.util.ArrayUtil;
 import com.sqldalmaker.common.Const;
 import com.sqldalmaker.common.FileSearchHelpers;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Collection;
-import java.util.Collections;
 
 /**
  * Created by sqldalmaker@gmail.com
@@ -37,8 +32,8 @@ public class PsiReferenceDtoClass extends PsiReferenceBase<PsiElement> {
     @Override
     public PsiElement resolve() {
 
-        String canonical_text = getCanonicalText();
-        if (canonical_text == null || canonical_text.trim().length() == 0) {
+        String canonical_text = getCanonicalText();  // @NotNull
+        if (canonical_text.trim().length() == 0) {
             return null;
         }
         final PsiFile containing_file = myElement.getContainingFile();
@@ -61,12 +56,12 @@ public class PsiReferenceDtoClass extends PsiReferenceBase<PsiElement> {
         return IdeaReferenceCompletion.find_dto_class_xml_tag(project, dto_xml_file, canonical_text);
     }
 
-    @NotNull
-    @Override
-    public Object[] getVariants() {
-        // code completion is not implemented for this attribute value yet
-        return ArrayUtil.EMPTY_OBJECT_ARRAY;
-    }
+//    @NotNull
+//    @Override
+//    public Object[] getVariants() {
+//        // code completion is not implemented for this attribute value yet
+//        return ArrayUtil.EMPTY_OBJECT_ARRAY;
+//    }
 
     @Override
     public boolean isSoft() {

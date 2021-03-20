@@ -44,6 +44,8 @@ class DataStore:
             sql: SQL statement
             params: the values of SQL parameters
             ai_values: Array like [["o_id", 1], ...] for auto-increment values
+        Returns:
+            None
         Raises:
             Exception: if no rows inserted.
         """
@@ -61,7 +63,7 @@ class DataStore:
             sql: SQL statement
             in_params: the values of SQL parameters
         Returns:
-            the number of updated rows
+            The number of updated rows
         """
         sp_sql = _get_sp_sql(sql, in_params)
         if sp_sql is not None:
@@ -72,11 +74,11 @@ class DataStore:
 
     def query_scalar(self, sql, in_params) -> object:
         """
-        Returns:
-            single scalar value
         Arguments:
             sql: SQL statement
             in_params: the values of SQL parameters if needed
+        Returns:
+            single scalar value
         Raises:
             Exception: if amount of rows != 1
         """
@@ -91,13 +93,16 @@ class DataStore:
             # 'select get_test_rating(?)' returns just scalar value, not array of arrays
             return rows[0]
 
+    # -> "list":
+    # https://www.geeksforgeeks.org/function-annotations-python/
+
     def query_scalar_array(self, sql, in_params) -> "list":  # -> typing.List[object]:
         """
-        Returns:
-            array of scalar values
         Arguments:
             sql: SQL statement.
             in_params: the values of SQL parameters if needed
+        Returns:
+            array of scalar values
         """
         sp_sql = _get_sp_sql(sql, in_params)
         if sp_sql is not None:
@@ -118,13 +123,16 @@ class DataStore:
                     rows = None
         return res
 
+    # -> "dict":
+    # https://www.geeksforgeeks.org/function-annotations-python/
+
     def query_single_row(self, sql, in_params) -> "dict":  # -> typing.Dict[str, object]:
         """
-        Returns:
-            single row
         Arguments:
             sql: SQL statement
             in_params: the values of SQL parameters if needed
+        Returns:
+            single row
         Raises:
             Exception if amount of rows != 1
         """
@@ -142,6 +150,8 @@ class DataStore:
             sql: SQL statement
             in_params: the values of SQL parameters if needed
             callback: a function to process fetched rows
+        Returns:
+            None
         """
         sp_sql = _get_sp_sql(sql, in_params)
         if sp_sql is not None:
