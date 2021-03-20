@@ -166,7 +166,7 @@ func (ds *DataStore) _execInsertOracle(sql, aiNames string, args ...interface{})
 	// 2) solution from https://github.com/rana/ora
 	//    not working with "github.com/godror/godror":
 	//    sql += " RETURNING " + aiNames + " /*LastInsertId*/" // " into :2"// + aiNames
-	// 3) fetching of multiple AI values are not implemented so far
+	// 3) fetching of multiple AI values is not implemented so far
 	sql += " returning " + aiNames + " into :" + aiNames
 	//// DPI-1037: column at array position 0 fetched with error 1406:
 	//// 	- var ai interface{}
