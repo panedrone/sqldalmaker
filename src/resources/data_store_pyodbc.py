@@ -61,7 +61,7 @@ class DataStore:
             sql: SQL statement
             in_params: the values of SQL parameters
         Returns:
-            The number of updated rows
+            the number of updated rows
         """
         sp_sql = _get_sp_sql(sql, in_params)
         if sp_sql is not None:
@@ -91,7 +91,7 @@ class DataStore:
             # 'select get_test_rating(?)' returns just scalar value, not array of arrays
             return rows[0]
 
-    def query_scalar_array(self, sql, in_params):  # -> typing.List[object]:
+    def query_scalar_array(self, sql, in_params) -> "list":  # -> typing.List[object]:
         """
         Returns:
             array of scalar values
@@ -118,10 +118,10 @@ class DataStore:
                     rows = None
         return res
 
-    def query_single_row(self, sql, in_params):  # -> typing.Dict[str, object]:
+    def query_single_row(self, sql, in_params) -> "dict":  # -> typing.Dict[str, object]:
         """
         Returns:
-            Single row
+            single row
         Arguments:
             sql: SQL statement
             in_params: the values of SQL parameters if needed
