@@ -129,10 +129,6 @@ func (ds *DataStore) _prepare(sql string) (*sql.Stmt, error) {
 	return ds.tx.Prepare(sql)
 }
 
-func (ds *DataStore) pgFetch(cursorName string) string {
-	return fmt.Sprintf("fetch all from \"%s\"", cursorName)
-}
-
 func (ds *DataStore) _execInsertPg(sql, aiNames string, args ...interface{}) interface{} {
 	sql += " RETURNING " + aiNames
 	rows, err := ds._query(sql, args...)
@@ -166,7 +162,7 @@ func (ds *DataStore) _execInsertOracle(sql, aiNames string, args ...interface{})
 	// 2) solution from https://github.com/rana/ora
 	//    not working with "github.com/godror/godror":
 	//    sql += " RETURNING " + aiNames + " /*LastInsertId*/" // " into :2"// + aiNames
-	// 3) fetching of multiple AI values is not implemented so far
+	// 3) fetching of multiple AI values are not implemented so far
 	sql += " returning " + aiNames + " into :" + aiNames
 	//// DPI-1037: column at array position 0 fetched with error 1406:
 	//// 	- var ai interface{}
@@ -341,20 +337,20 @@ func (ds *DataStore) execDML(sql string, args ...interface{}) int64 {
 
 func (ds *DataStore) query(sql string, args ...interface{}) interface{} {
 	var arr []interface{}
-	rowsFound := 0
+	manyRows := false
 	onRow := func(date interface{}) {
 		if arr == nil {
 			arr = append(arr, date)
 		} else {
-			rowsFound += 1
+			manyRows = true
 		}
 	}
 	ds.queryAll(sql, onRow, args...)
 	if arr == nil {
-		panic("Nothing found")
+		return nil
 	}
-	if rowsFound > 1 {
-		panic(fmt.Sprintf("Found %d, expected 1", rowsFound))
+	if manyRows {
+		// return nil
 	}
 	return arr[0]
 }
@@ -371,15 +367,16 @@ func (ds *DataStore) queryAll(sql string, onRow func(interface{}), args ...inter
 			panic(err)
 		}
 	}()
-	// all columns! if less, it returns nil-s
+	// fetch all columns! if to fetch less, Scan returns nil-s
 	_, _, values, valuePointers := ds._prepareFetch(rows)
 	for rows.Next() {
 		err = rows.Scan(valuePointers...)
-		if err != nil {
+		if err == nil {
+			// return whole row to enable multiple out params in mssql sp
+			onRow(values)
+		} else {
 			panic(err)
 		}
-		data := values[0]
-		onRow(data)
 	}
 }
 
@@ -390,10 +387,10 @@ func (ds *DataStore) queryRow(sql string, args ...interface{}) map[string]interf
 	}
 	ds.queryAllRows(sql, onRow, args...)
 	if arr == nil {
-		panic("Nothing found")
+		return nil
 	}
 	if len(arr) > 1 {
-		panic(fmt.Sprintf("Found %d, expected 1", len(arr)))
+		return nil
 	}
 	return arr[0]
 }
@@ -415,13 +412,14 @@ func (ds *DataStore) queryAllRows(sql string, onRow func(map[string]interface{})
 	colNames, data, values, valuePointers := ds._prepareFetch(rows)
 	for rows.Next() {
 		err := rows.Scan(valuePointers...)
-		if err != nil {
+		if err == nil {
+			for i, colName := range colNames {
+				data[colName] = values[i]
+			}
+			onRow(data)
+		} else {
 			panic(err)
 		}
-		for i, colName := range colNames {
-			data[colName] = values[i]
-		}
-		onRow(data)
 	}
 }
 
@@ -430,7 +428,7 @@ func (ds *DataStore) queryAllRows(sql string, onRow func(map[string]interface{})
 func (ds *DataStore) _prepareFetch(rows *sql.Rows) ([]string, map[string]interface{}, []string, []interface{}) {
 	// ...
 	values := make([]string, len(colNames))
- */
+*/
 func (ds *DataStore) _prepareFetch(rows *sql.Rows) ([]string, map[string]interface{}, []interface{}, []interface{}) {
 	colNames, _ := rows.Columns()
 	data := make(map[string]interface{})
@@ -487,6 +485,10 @@ func (ds *DataStore) assign(fieldAddr interface{}, value interface{}) {
 		case string:
 			*d = value.(string)
 			return
+		case []interface{}:
+			arr := value.([]interface{})
+			*d = arr[0].(string)
+			return
 		}
 	case *int32:
 		switch value.(type) {
@@ -503,6 +505,10 @@ func (ds *DataStore) assign(fieldAddr interface{}, value interface{}) {
 				*d = int32(d64)
 			}
 			return
+		case []interface{}:
+			arr := value.([]interface{})
+			*d = arr[0].(int32)
+			return
 		}
 	case *int64:
 		switch value.(type) {
@@ -512,6 +518,10 @@ func (ds *DataStore) assign(fieldAddr interface{}, value interface{}) {
 		case []byte:
 			str := string(value.([]byte))
 			*d, _ = strconv.ParseInt(str, 10, 64)
+			return
+		case []interface{}:
+			arr := value.([]interface{})
+			*d = arr[0].(int64)
 			return
 		}
 	case *float64:
@@ -526,6 +536,10 @@ func (ds *DataStore) assign(fieldAddr interface{}, value interface{}) {
 		case float64:
 			*d = value.(float64)
 			return
+		case []interface{}:
+			arr := value.([]interface{})
+			*d = arr[0].(float64)
+			return
 		}
 	case *float32:
 		switch value.(type) {
@@ -537,9 +551,21 @@ func (ds *DataStore) assign(fieldAddr interface{}, value interface{}) {
 		case float32:
 			*d = value.(float32)
 			return
+		case []interface{}:
+			arr := value.([]interface{})
+			*d = arr[0].(float32)
+			return
 		}
 	case *time.Time:
-		*d = value.(time.Time)
+		switch value.(type) {
+		case []time.Time:
+			*d = value.(time.Time)
+			return
+		case []interface{}:
+			arr := value.([]interface{})
+			*d = arr[0].(time.Time)
+			return
+		}
 		return
 	case *bool:
 		switch value.(type) {
@@ -550,15 +576,25 @@ func (ds *DataStore) assign(fieldAddr interface{}, value interface{}) {
 			return
 		case bool:
 			*d = value.(bool)
+		case []interface{}:
+			arr := value.([]interface{})
+			*d = arr[0].(bool)
 			return
 		}
 	case *[]byte: // the same as uint8
-		*d = value.([]byte)
-		return
+		switch value.(type) {
+		case []byte:
+			*d = value.([]byte)
+			return
+		case []interface{}:
+			arr := value.([]interface{})
+			*d = arr[0].([]byte)
+			return
+		}
 	case *interface{}:
 		*d = value
 		return
 	}
-	panic(fmt.Sprintf("Cannot process this: DataStore.assign(%v, %v)",
+	panic(fmt.Sprintf("Cannot process this DataStore.assign(%v, %v)",
 		reflect.TypeOf(fieldAddr), reflect.TypeOf(value)))
 }
