@@ -403,20 +403,21 @@ public class JdbcUtils {
         // ----------
         // ps.getParameterMetaData() throws SQLException for both PreparedStatement and
         // CallableStatement
-        int params_count;
+        int jdbc_params_count;
         ParameterMetaData pm = null;
         try {
             // MS SQL Server: getParameterMetaData throws exception for SF without params
             pm = ps.getParameterMetaData();
             try {
-                params_count = pm.getParameterCount();
+                jdbc_params_count = pm.getParameterCount();
             } catch (Throwable e) { // including AbstractMethodError, SQLServerException, etc.
                 _get_params_by_descriptors(param_names_mode, method_param_descriptors, _params);
                 return;
             }
         } catch (Throwable e) { // including AbstractMethodError, SQLServerException, etc.
-            params_count = 0;
+            jdbc_params_count = 0;
         }
+        int not_cb_params_count = 0;
         for (int i = 0; i < method_param_descriptors.length; i++) {
             String param_descriptor = method_param_descriptors[i].trim();
             if (param_descriptor.startsWith("[")) {
@@ -425,14 +426,26 @@ public class JdbcUtils {
                     throw new Exception("Ending ']' expected");
                 }
             } else {
+                String[] parts = method_param_descriptors[i].split(":");
+                String name;
+                if (parts.length == 1) {
+                    not_cb_params_count++;
+                } else {
+                    String type = parts[1];
+                    parts = type.split("\\s+");
+                    // if the part after ':' contains spaces, than it is not on_test:Test
+                    if (parts.length > 1) {
+                        not_cb_params_count++;
+                    }
+                }
                 String default_param_type_name = _get_jdbc_param_type_name(pm, i);
                 FieldInfo pi = _create_param_info(param_names_mode, param_descriptor, default_param_type_name);
                 _params.add(pi);
             }
         }
-        if (params_count != _params.size()) {
-            throw new Exception("Parameters count expected: " + method_param_descriptors.length
-                    + ", detected: " + params_count);
+        if (jdbc_params_count != not_cb_params_count) {
+            throw new Exception("Parameters declared in method: " + method_param_descriptors.length
+                    + ", detected by MetaData: " + jdbc_params_count);
         }
     }
 

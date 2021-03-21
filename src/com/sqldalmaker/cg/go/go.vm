@@ -172,7 +172,7 @@ func (dao *${class_name}) ${method_name}(#param_decls($is_external_sql $params))
 #sql_var($is_external_sql $sql)
 #foreach($m in ${mappings})
 	${m.get_exec_dml_param_name()} := func(rd map[string]interface{}) {
-		obj := ${m.get_dto_class_name()}{};
+		obj := ${m.get_dto_class_name()}{}
 #foreach($f in ${m.get_fields()})
 		dao.ds.assign(&obj.${f.getName()}, rd["${f.getColumnName()}"] /* ${f.getComment()} */)
 #end
