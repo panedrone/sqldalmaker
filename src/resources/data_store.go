@@ -632,7 +632,7 @@ func _assignTime(d *time.Time, value interface{}) bool {
 	return true
 }
 
-func _assignBytes(d *bool, value interface{}) bool {
+func _assignBool(d *bool, value interface{}) bool {
 	switch value.(type) {
 	case []byte:
 		str := string(value.([]byte)) // MySQL
@@ -685,7 +685,7 @@ func (ds *DataStore) assignValue(fieldAddr interface{}, value interface{}) {
 			return
 		}
 	case *bool:
-		if _assignBytes(d, value) {
+		if _assignBool(d, value) {
 			return
 		}
 	case *[]byte: // the same as uint8
