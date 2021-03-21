@@ -567,6 +567,9 @@ func _assignInt64(d *int64, value interface{}) bool {
 	case []byte:
 		str := string(value.([]byte))
 		*d, _ = strconv.ParseInt(str, 10, 64)
+	case string:
+		str := value.(string)
+		*d, _ = strconv.ParseInt(str, 10, 64)
 	default:
 		return false
 	}
@@ -585,6 +588,12 @@ func _assignInt32(d *int32, value interface{}) bool {
 		if err == nil {
 			*d = int32(d64)
 		}
+	case string:
+		str := value.(string)
+		d64, err := strconv.ParseInt(str, 10, 32)
+		if err == nil {
+			*d = int32(d64)
+		}
 	default:
 		return false
 	}
@@ -593,14 +602,18 @@ func _assignInt32(d *int32, value interface{}) bool {
 
 func _assignFloat32(d *float32, value interface{}) bool {
 	switch value.(type) {
-	case []byte:
-		str := string(value.([]byte)) // PostgeSQL
-		d64, _ := strconv.ParseFloat(str, 64)
-		*d = float32(d64)
 	case float32:
 		*d = value.(float32)
 	case float64:
 		*d = float32(value.(float64))
+	case []byte:
+		str := string(value.([]byte)) // PostgeSQL
+		d64, _ := strconv.ParseFloat(str, 64)
+		*d = float32(d64)
+	case string:
+		str := value.(string) // Oracle
+		d64, _ := strconv.ParseFloat(str, 64)
+		*d = float32(d64)
 	default:
 		return false
 	}
@@ -609,13 +622,16 @@ func _assignFloat32(d *float32, value interface{}) bool {
 
 func _assignFloat64(d *float64, value interface{}) bool {
 	switch value.(type) {
+	case float64:
+		*d = value.(float64)
+	case float32:
+		*d = float64(value.(float32))
 	case []byte:
 		str := string(value.([]byte)) // PostgeSQL, MySQL
 		*d, _ = strconv.ParseFloat(str, 64)
-	case float32:
-		*d = float64(value.(float32))
-	case float64:
-		*d = value.(float64)
+	case string:
+		str := value.(string) // Oracle
+		*d, _ = strconv.ParseFloat(str, 64)
 	default:
 		return false
 	}
@@ -632,7 +648,7 @@ func _assignTime(d *time.Time, value interface{}) bool {
 	return true
 }
 
-func _assignBool(d *bool, value interface{}) bool {
+func _assignBoolean(d *bool, value interface{}) bool {
 	switch value.(type) {
 	case []byte:
 		str := string(value.([]byte)) // MySQL
@@ -685,7 +701,7 @@ func (ds *DataStore) assignValue(fieldAddr interface{}, value interface{}) {
 			return
 		}
 	case *bool:
-		if _assignBool(d, value) {
+		if _assignBoolean(d, value) {
 			return
 		}
 	case *[]byte: // the same as uint8
