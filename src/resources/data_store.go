@@ -7,14 +7,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	// _ "github.com/mattn/go-sqlite3" // SQLite3
-	// _ "github.com/denisenkom/go-mssqldb" // SQL Server
-	// _ "github.com/godror/godror"			// Oracle
-	// only strings for MySQL (so far). see _prepareFetch below and related comments.
-	_ "github.com/go-sql-driver/mysql" // MySQL
-	// _ "github.com/ziutek/mymysql/godrv" // MySQL
-	// _ "github.com/lib/pq" // PostgeSQL
 )
 
 /*
@@ -42,8 +34,28 @@ func (ds *DataStore) isSqlServer() bool {
 	return ds.paramPrefix == "@p"
 }
 
-func (ds *DataStore) open() {
+/*
+	Locate function initDb() in an external file. This is an example:
+
+// file data_store_db.go
+
+package main
+
+import (
+	"database/sql"
+
+   	// _ "github.com/mattn/go-sqlite3" // SQLite3
+   	// _ "github.com/denisenkom/go-mssqldb" // SQL Server
+   	// _ "github.com/godror/godror"			// Oracle
+   	// only strings for MySQL (so far). see _prepareFetch below and related comments.
+   	_ "github.com/go-sql-driver/mysql" // MySQL
+   	// _ "github.com/ziutek/mymysql/godrv" // MySQL
+   	// _ "github.com/lib/pq" // PostgeSQL
+)
+
+func initDbApi() (*sql.DB, error) {
 	var err error
+	var handle *sql.DB
 	// === PostgeSQL ===========================
 	// ds.paramPrefix = "$"
 	// ds.handle, err = sql.Open("postgres", "postgres://postgres:sa@localhost/my-tests?sslmode=disable")
@@ -52,7 +64,7 @@ func (ds *DataStore) open() {
 	// ds.handle, err = sql.Open("sqlite3", "./log.sqlite")
 	// ds.handle, err = sql.Open("sqlite3", "./northwindEF.sqlite")
 	// === MySQL ===============================
-	ds.handle, err = sql.Open("mysql", "root:root@/sakila")
+	handle, err = sql.Open("mysql", "root:root@/sakila")
 	//ds.handle, err = sql.Open("mymysql", "sakila/root/root")
 	// === SQL Server ==========================
 	// https://github.com/denisenkom/go-mssqldb
@@ -67,6 +79,14 @@ func (ds *DataStore) open() {
 	// "github.com/godror/godror"
 	//ds.paramPrefix = ":"
 	//ds.handle, err = sql.Open("godror", `user="ORDERS" password="root" connectString="localhost:1521/orcl"`)
+	return handle, err
+}
+
+*/
+
+func (ds *DataStore) open() {
+	var err error
+	ds.handle, err = initDb()
 	if err != nil {
 		log.Fatal(err)
 	}
