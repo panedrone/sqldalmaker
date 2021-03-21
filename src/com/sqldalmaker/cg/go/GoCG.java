@@ -273,7 +273,7 @@ public class GoCG {
             List<FieldInfo> method_params = new ArrayList<FieldInfo>();
             List<FieldInfo> exec_dml_params = new ArrayList<FieldInfo>();
             for (int pd_i = 0; pd_i < param_descriptors.length; pd_i++) {
-                String pd = param_descriptors[pd_i];
+                String pd = param_descriptors[pd_i].trim();
                 if (pd.startsWith("[") && pd.endsWith("]")) {
                     String inner_list = pd.substring(1, pd.length() - 1);
                     String[] implicit_param_descriptors = Helpers.get_listed_items(inner_list, true);
@@ -288,12 +288,11 @@ public class GoCG {
                         }
                         MappingInfo m = _create_mapping(parts);
                         m_list.add(m);
-                        method_params.add(new FieldInfo(FieldNamesMode.AS_IS,
-                                String.format("final RecordHandler<%s>", m.dto_class_name), m.method_param_name,
-                                "parameter"));
+                        String func_type = String.format("func(*%s)", m.dto_class_name);
+                        method_params.add(new FieldInfo(FieldNamesMode.LOWER_CAMEL_CASE, func_type, m.method_param_name, "parameter"));
                         cb_elements.add(m.exec_dml_param_name);
                     }
-                    String exec_xml_param = "new RowHandler[]{" + String.join(", ", cb_elements) + "}";
+                    String exec_xml_param = "[]func(map[string]interface{}){" + String.join(", ", cb_elements) + "}";
                     if (pd_i == 0) {
                         exec_xml_param = "(Object) " + exec_xml_param;
                     }
@@ -305,9 +304,9 @@ public class GoCG {
                     if (parts != null) {
                         MappingInfo m = _create_mapping(parts);
                         m_list.add(m);
-                        method_params.add(new FieldInfo(FieldNamesMode.AS_IS,
-                                String.format("final RecordHandler<%s>", m.dto_class_name), m.method_param_name,
-                                "parameter"));
+                        String func_type = String.format("func(*%s)", m.dto_class_name);
+                        method_params.add(new FieldInfo(FieldNamesMode.LOWER_CAMEL_CASE,
+                                func_type, m.method_param_name, "parameter"));
                         exec_dml_params.add(
                                 new FieldInfo(FieldNamesMode.AS_IS, p.getType(), m.exec_dml_param_name, "parameter"));
                     } else {
@@ -347,17 +346,17 @@ public class GoCG {
 
         private MappingInfo _create_mapping(String[] parts) throws Exception {
             MappingInfo m = new MappingInfo();
-            m.method_param_name = parts[0].trim();
-            String cb_param_name = String.format("_map_cb_%s", m.method_param_name);
+            m.method_param_name = Helpers.to_lower_camel_or_title_case(parts[0].trim(), false);
+            String cb_param_name = String.format("%sMapper", m.method_param_name);
             m.exec_dml_param_name = cb_param_name;
             m.dto_class_name = parts[1].trim();
             List<FieldInfo> fields = new ArrayList<FieldInfo>();
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(m.dto_class_name, jaxb_dto_classes);
             _process_dto_class_name(jaxb_dto_class.getName()); // extends imports
             db_utils.get_dto_field_info(jaxb_dto_class, sql_root_abs_path, fields);
-            if (fields.size() > 0) {
-                fields.get(0).setComment(fields.get(0).getComment() + " [INFO] REF CURSOR");
-            }
+//            if (fields.size() > 0) {
+//                fields.get(0).setComment(fields.get(0).getComment() + " [INFO] REF CURSOR");
+//            }
             m.fields.addAll(fields);
             return m;
         }

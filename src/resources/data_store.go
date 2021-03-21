@@ -3,15 +3,16 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"strconv"
 	"strings"
 	"time"
 
 	// _ "github.com/mattn/go-sqlite3" // SQLite3
-	_ "github.com/denisenkom/go-mssqldb" // SQL Server
+	// _ "github.com/denisenkom/go-mssqldb" // SQL Server
 	// _ "github.com/godror/godror"			// Oracle
 	// only strings for MySQL (so far). see _prepareFetch below and related comments.
-	// _ "github.com/go-sql-driver/mysql"	// MySQL
+	_ "github.com/go-sql-driver/mysql" // MySQL
 	// _ "github.com/ziutek/mymysql/godrv" // MySQL
 	// _ "github.com/lib/pq" // PostgeSQL
 )
@@ -51,8 +52,8 @@ func (ds *DataStore) open() {
 	// ds.handle, err = sql.Open("sqlite3", "./log.sqlite")
 	// ds.handle, err = sql.Open("sqlite3", "./northwindEF.sqlite")
 	// === MySQL ===============================
-	// ds.handle, err = sql.Open("mysql", "root:root@/sakila")
-	// ds.handle, err = sql.Open("mymysql", "sakila/root/root")
+	ds.handle, err = sql.Open("mysql", "root:root@/sakila")
+	//ds.handle, err = sql.Open("mymysql", "sakila/root/root")
 	// === SQL Server ==========================
 	// https://github.com/denisenkom/go-mssqldb
 	// The sqlserver driver uses normal MS SQL Server syntax and expects parameters in the
@@ -60,14 +61,14 @@ func (ds *DataStore) open() {
 	// ensure sqlserver:// in beginning. this one is not valid:
 	// ------ ds.handle, err = sql.Open("sqlserver", "sa:root@/localhost:1433/SQLExpress?database=AdventureWorks2014")
 	// this one is ok:
-	ds.paramPrefix = "@p"
-	ds.handle, err = sql.Open("sqlserver", "sqlserver://sa:root@localhost:1433?database=AdventureWorks2014")
+	//ds.paramPrefix = "@p"
+	//ds.handle, err = sql.Open("sqlserver", "sqlserver://sa:root@localhost:1433?database=AdventureWorks2014")
 	// === Oracle =============================
 	// "github.com/godror/godror"
 	//ds.paramPrefix = ":"
 	//ds.handle, err = sql.Open("godror", `user="ORDERS" password="root" connectString="localhost:1521/orcl"`)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 }
 
@@ -488,6 +489,10 @@ func (ds *DataStore) assign(fieldAddr interface{}, value interface{}) {
 		case string:
 			*d = value.(string)
 			return
+		case time.Time:
+			t := value.(time.Time)
+			*d = t.Format("2006-01-02 15:04:05")
+			return
 		case []interface{}:
 			arr := value.([]interface{})
 			*d = arr[0].(string)
@@ -541,8 +546,15 @@ func (ds *DataStore) assign(fieldAddr interface{}, value interface{}) {
 			return
 		case []interface{}:
 			arr := value.([]interface{})
-			*d = arr[0].(float64)
-			return
+			v0 := arr[0]
+			switch v0.(type) {
+			case float64:
+				*d = v0.(float64)
+				return
+			case float32:
+				*d = float64(v0.(float32))
+				return
+			}
 		}
 	case *float32:
 		switch value.(type) {
@@ -556,8 +568,15 @@ func (ds *DataStore) assign(fieldAddr interface{}, value interface{}) {
 			return
 		case []interface{}:
 			arr := value.([]interface{})
-			*d = arr[0].(float32)
-			return
+			v0 := arr[0]
+			switch v0.(type) {
+			case float64:
+				*d = v0.(float32)
+				return
+			case float32:
+				*d = float32(v0.(float64))
+				return
+			}
 		}
 	case *time.Time:
 		switch value.(type) {

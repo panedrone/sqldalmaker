@@ -90,7 +90,7 @@ func (dao *${class_name}) ${method_name}(#if(${dto_param} != "")#param_decls_dto
 		obj := ${returned_type_name}{}
 #foreach($f in ${fields})
 #set($i = ${velocityCount} - 1)
-		dao.ds.assign(&obj.${f.getName()}, rd["${f.getColumnName()}"])#* // (${f.getType()}) *#
+		dao.ds.assign(&obj.${f.getName()}, rd["${f.getColumnName()}"] /* ${f.getComment()} */)
 #end
 		res = append(res, &obj)
 	}
@@ -123,7 +123,7 @@ func (dao *${class_name}) ${method_name}(#if(${dto_param} != "")#param_decls_dto
 	obj := ${returned_type_name}{}
 #foreach($f in ${fields})
 #set($i = ${velocityCount} - 1)
-	dao.ds.assign(&obj.${f.getName()}, rd["${f.getColumnName()}"])#* // (${f.getType()}) *#
+	dao.ds.assign(&obj.${f.getName()}, rd["${f.getColumnName()}"] /* ${f.getComment()} */)
 #end
 	return obj
 #end
@@ -170,6 +170,15 @@ func (dao *${class_name}) ${method_name}(#param_decls_dto($is_external_sql)p *${
 
 func (dao *${class_name}) ${method_name}(#param_decls($is_external_sql $params)) int64 {
 #sql_var($is_external_sql $sql)
+#foreach($m in ${mappings})
+	${m.get_exec_dml_param_name()} := func(rd map[string]interface{}) {
+		obj := ${m.get_dto_class_name()}{};
+#foreach($f in ${m.get_fields()})
+		dao.ds.assign(&obj.${f.getName()}, rd["${f.getColumnName()}"] /* ${f.getComment()} */)
+#end
+		${m.get_method_param_name()}(&obj)
+	}
+#end
 #if ($method_type == "CREATE" || $method_type == "UPDATE" || $method_type == "DELETE")
 	return dao.ds.execDML(sql#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
 #else

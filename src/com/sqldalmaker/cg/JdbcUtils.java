@@ -233,7 +233,7 @@ public class JdbcUtils {
             try {
                 rsmd = ps.getMetaData(); // throws SQLException;
             } catch (Throwable th) {
-                _error.append("PreparedStatement.getMetaData() throws Exception: ");
+                _error.append("Trying to obtain MetaData for this SQL throws: ");
                 _error.append(th.getMessage());
                 return;
             }
@@ -241,18 +241,18 @@ public class JdbcUtils {
             // @return the description of a <code>ResultSet</code> object's columns or
             // <code>null</code> if the driver cannot return a <code>ResultSetMetaData</code> object
             if (rsmd == null) {
-                _error.append("PreparedStatement.getMetaData() == null");
+                _error.append("Cannot obtain MetaData for this SQL");
                 return;
             }
             int column_count;
             try {
                 column_count = rsmd.getColumnCount(); // throws SQLException;
                 if (column_count < 1) {
-                    _error.append("ResultSetMetaData.getColumnCount() == ");
+                    _error.append("Cannot obtain column count for this SQL");
                     _error.append(column_count);
                 }
             } catch (Throwable e) {
-                _error.append("ResultSetMetaData.getColumnCount() throws Exception: ");
+                _error.append("Trying to obtain column count for this SQL throws: ");
                 _error.append(e.getMessage());
                 return;
             }
