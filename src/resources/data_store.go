@@ -3,7 +3,6 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	"reflect"
 	"strconv"
 	"strings"
 	"time"
@@ -335,23 +334,20 @@ func (ds *DataStore) execDML(sql string, args ...interface{}) int64 {
 	return ra
 }
 
+func _validateQuery(found int) {
+	if found != 1 {
+		panic(fmt.Sprintf("1 row expected, but %d found. "+
+			"If you need 'find' mode, use 'query-list' or 'query-dto-list' instead", found))
+	}
+}
+
 func (ds *DataStore) query(sql string, args ...interface{}) interface{} {
 	var arr []interface{}
-	manyRows := false
 	onRow := func(date interface{}) {
-		if arr == nil {
-			arr = append(arr, date)
-		} else {
-			manyRows = true
-		}
+		arr = append(arr, date)
 	}
 	ds.queryAll(sql, onRow, args...)
-	if arr == nil {
-		return nil
-	}
-	if manyRows {
-		// return nil
-	}
+	_validateQuery(len(arr)) // A nil slice has a len of 0.
 	return arr[0]
 }
 
@@ -367,15 +363,21 @@ func (ds *DataStore) queryAll(sql string, onRow func(interface{}), args ...inter
 			panic(err)
 		}
 	}()
-	// fetch all columns! if to fetch less, Scan returns nil-s
-	_, _, values, valuePointers := ds._prepareFetch(rows)
-	for rows.Next() {
-		err = rows.Scan(valuePointers...)
-		if err == nil {
-			// return whole row to enable multiple out params in mssql sp
-			onRow(values)
-		} else {
-			panic(err)
+	for {
+		// re-detect columns for each ResultSet
+		// fetch all columns! if to fetch less, Scan returns nil-s
+		_, _, values, valuePointers := ds._prepareFetch(rows)
+		for rows.Next() {
+			err = rows.Scan(valuePointers...)
+			if err == nil {
+				// return whole row to enable multiple out params in mssql sp
+				onRow(values)
+			} else {
+				panic(err)
+			}
+		}
+		if !rows.NextResultSet() {
+			break
 		}
 	}
 }
@@ -386,12 +388,7 @@ func (ds *DataStore) queryRow(sql string, args ...interface{}) map[string]interf
 		arr = append(arr, rowData)
 	}
 	ds.queryAllRows(sql, onRow, args...)
-	if arr == nil {
-		return nil
-	}
-	if len(arr) > 1 {
-		return nil
-	}
+	_validateQuery(len(arr)) // A nil slice has a len of 0.
 	return arr[0]
 }
 
@@ -409,16 +406,22 @@ func (ds *DataStore) queryAllRows(sql string, onRow func(map[string]interface{})
 			panic(err)
 		}
 	}()
-	colNames, data, values, valuePointers := ds._prepareFetch(rows)
-	for rows.Next() {
-		err := rows.Scan(valuePointers...)
-		if err == nil {
-			for i, colName := range colNames {
-				data[colName] = values[i]
+	for {
+		// re-detect columns for each ResultSet
+		colNames, data, values, valuePointers := ds._prepareFetch(rows)
+		for rows.Next() {
+			err := rows.Scan(valuePointers...)
+			if err == nil {
+				for i, colName := range colNames {
+					data[colName] = values[i]
+				}
+				onRow(data)
+			} else {
+				panic(err)
 			}
-			onRow(data)
-		} else {
-			panic(err)
+		}
+		if !rows.NextResultSet() {
+			break
 		}
 	}
 }
@@ -461,7 +464,7 @@ func (ds *DataStore) _formatSQL(sql string) string {
 	return sql
 }
 
-// _TODO: extend/improve DataStore.assign(...) on demand
+// extend/improve DataStore.assign(...) on demand
 
 func (ds *DataStore) assign(fieldAddr interface{}, value interface{}) {
 	if value == nil {
@@ -594,7 +597,9 @@ func (ds *DataStore) assign(fieldAddr interface{}, value interface{}) {
 	case *interface{}:
 		*d = value
 		return
+	case *[]interface{}:
+		*d = value.([]interface{})
+		return
 	}
-	panic(fmt.Sprintf("Cannot process this DataStore.assign(%v, %v)",
-		reflect.TypeOf(fieldAddr), reflect.TypeOf(value)))
+	panic(fmt.Sprintf("Cannot process DataStore.assign(%T, %T)", fieldAddr, value))
 }
