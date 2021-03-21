@@ -3,7 +3,6 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	"log"
 	"strconv"
 	"strings"
 	"time"
@@ -11,7 +10,7 @@ import (
 
 /*
    SQL DAL Maker Web-Site: http://sqldalmaker.sourceforge.net
-   This is an example of how to implement DataStore in GoLang using "database/sql".
+   This is an example of how to implement DataStore in Go + "database/sql".
    Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store.go
    Copy-paste this code to your project and change it for your needs.
    Improvements are welcome: sdm@gmail.com
@@ -35,7 +34,7 @@ func (ds *DataStore) isSqlServer() bool {
 }
 
 /*
-	Locate function initDb() in an external file. This is an example:
+	Locate function initDb(ds *DataStore) in an external file. This is an example:
 
 // file data_store_db.go
 
@@ -53,19 +52,18 @@ import (
    	// _ "github.com/lib/pq" // PostgeSQL
 )
 
-func initDbApi() (*sql.DB, error) {
+func initDb(ds *DataStore) {
 	var err error
-	var handle *sql.DB
 	// === PostgeSQL ===========================
-	// ds.paramPrefix = "$"
-	// ds.handle, err = sql.Open("postgres", "postgres://postgres:sa@localhost/my-tests?sslmode=disable")
+	ds.paramPrefix = "$"
+	ds.handle, err = sql.Open("postgres", "postgres://postgres:sa@localhost/my-tests?sslmode=disable")
 	// ds.handle, err = sql.Open("postgres", "postgres://postgres:sa@localhost/my-tests?sslmode=verify-full")
 	// === SQLite3 =============================
 	// ds.handle, err = sql.Open("sqlite3", "./log.sqlite")
 	// ds.handle, err = sql.Open("sqlite3", "./northwindEF.sqlite")
 	// === MySQL ===============================
-	handle, err = sql.Open("mysql", "root:root@/sakila")
-	//ds.handle, err = sql.Open("mymysql", "sakila/root/root")
+	// ds.handle, err = sql.Open("mysql", "root:root@/sakila")
+	// ds.handle, err = sql.Open("mymysql", "sakila/root/root")
 	// === SQL Server ==========================
 	// https://github.com/denisenkom/go-mssqldb
 	// The sqlserver driver uses normal MS SQL Server syntax and expects parameters in the
@@ -73,23 +71,21 @@ func initDbApi() (*sql.DB, error) {
 	// ensure sqlserver:// in beginning. this one is not valid:
 	// ------ ds.handle, err = sql.Open("sqlserver", "sa:root@/localhost:1433/SQLExpress?database=AdventureWorks2014")
 	// this one is ok:
-	//ds.paramPrefix = "@p"
-	//ds.handle, err = sql.Open("sqlserver", "sqlserver://sa:root@localhost:1433?database=AdventureWorks2014")
+	ds.paramPrefix = "@p"
+	ds.handle, err = sql.Open("sqlserver", "sqlserver://sa:root@localhost:1433?database=AdventureWorks2014")
 	// === Oracle =============================
 	// "github.com/godror/godror"
 	//ds.paramPrefix = ":"
 	//ds.handle, err = sql.Open("godror", `user="ORDERS" password="root" connectString="localhost:1521/orcl"`)
-	return handle, err
+	if err != nil {
+		panic(err)
+	}
 }
 
 */
 
 func (ds *DataStore) open() {
-	var err error
-	ds.handle, err = initDb()
-	if err != nil {
-		log.Fatal(err)
-	}
+	initDb(ds)
 }
 
 func (ds *DataStore) close() {
@@ -412,7 +408,7 @@ func (ds *DataStore) execDML(sql string, args ...interface{}) int64 {
 func _validateQuery(found int) {
 	if found != 1 {
 		panic(fmt.Sprintf("1 row expected, but %d found. "+
-			"If you need 'find' mode, use 'query-list' or 'query-dto-list' instead", found))
+			"If you need a 'find' mode, use 'query-list' or 'query-dto-list' instead", found))
 	}
 }
 
@@ -541,7 +537,116 @@ func (ds *DataStore) _formatSQL(sql string) string {
 
 // extend/improve DataStore.assign(...) on demand
 
-func (ds *DataStore) assign(fieldAddr interface{}, value interface{}) {
+func _assignString(d *string, value interface{}) bool {
+	switch value.(type) {
+	case []byte:
+		*d = string(value.([]byte))
+	case int64:
+		i64 := value.(int64) // MySQL
+		*d = strconv.FormatInt(i64, 10)
+	case int32:
+		i64 := int64(value.(int32)) // MySQL
+		*d = strconv.FormatInt(i64, 10)
+	case string:
+		*d = value.(string)
+	case time.Time:
+		t := value.(time.Time)
+		*d = t.Format("2006-01-02 15:04:05")
+	default:
+		return false
+	}
+	return true
+}
+
+func _assignInt64(d *int64, value interface{}) bool {
+	switch value.(type) {
+	case int64:
+		*d = value.(int64)
+	case int32:
+		*d = int64(value.(int32)) // MySQL
+	case []byte:
+		str := string(value.([]byte))
+		*d, _ = strconv.ParseInt(str, 10, 64)
+	default:
+		return false
+	}
+	return true
+}
+
+func _assignInt32(d *int32, value interface{}) bool {
+	switch value.(type) {
+	case int32:
+		*d = value.(int32)
+	case int64:
+		*d = int32(value.(int64))
+	case []byte:
+		str := string(value.([]byte))
+		d64, err := strconv.ParseInt(str, 10, 32)
+		if err == nil {
+			*d = int32(d64)
+		}
+	default:
+		return false
+	}
+	return true
+}
+
+func _assignFloat32(d *float32, value interface{}) bool {
+	switch value.(type) {
+	case []byte:
+		str := string(value.([]byte)) // PostgeSQL
+		d64, _ := strconv.ParseFloat(str, 64)
+		*d = float32(d64)
+	case float32:
+		*d = value.(float32)
+	case float64:
+		*d = float32(value.(float64))
+	default:
+		return false
+	}
+	return true
+}
+
+func _assignFloat64(d *float64, value interface{}) bool {
+	switch value.(type) {
+	case []byte:
+		str := string(value.([]byte)) // PostgeSQL, MySQL
+		*d, _ = strconv.ParseFloat(str, 64)
+	case float32:
+		*d = float64(value.(float32))
+	case float64:
+		*d = value.(float64)
+	default:
+		return false
+	}
+	return true
+}
+
+func _assignTime(d *time.Time, value interface{}) bool {
+	switch value.(type) {
+	case time.Time:
+		*d = value.(time.Time)
+	default:
+		return false
+	}
+	return true
+}
+
+func _assignBytes(d *bool, value interface{}) bool {
+	switch value.(type) {
+	case []byte:
+		str := string(value.([]byte)) // MySQL
+		db, _ := strconv.ParseBool(str)
+		*d = db
+	case bool:
+		*d = value.(bool)
+	default:
+		return false
+	}
+	return true
+}
+
+func (ds *DataStore) assignValue(fieldAddr interface{}, value interface{}) {
 	if value == nil {
 		switch d := fieldAddr.(type) {
 		case *interface{}:
@@ -550,131 +655,37 @@ func (ds *DataStore) assign(fieldAddr interface{}, value interface{}) {
 		}
 		return // leave as-is
 	}
+	switch value.(type) {
+	case []interface{}:
+		panic("value of type []interface{} is not allowed here")
+	}
 	switch d := fieldAddr.(type) {
 	case *string:
-		switch value.(type) {
-		case []byte:
-			*d = string(value.([]byte))
-			return
-		case int64:
-			i64 := value.(int64) // MySQL
-			*d = strconv.FormatInt(i64, 10)
-			return
-		case string:
-			*d = value.(string)
-			return
-		case time.Time:
-			t := value.(time.Time)
-			*d = t.Format("2006-01-02 15:04:05")
-			return
-		case []interface{}:
-			arr := value.([]interface{})
-			*d = arr[0].(string)
+		if _assignString(d, value) {
 			return
 		}
 	case *int32:
-		switch value.(type) {
-		case int32:
-			*d = value.(int32)
-			return
-		case int64:
-			*d = int32(value.(int64))
-			return
-		case []byte:
-			str := string(value.([]byte))
-			d64, err := strconv.ParseInt(str, 10, 32)
-			if err == nil {
-				*d = int32(d64)
-			}
-			return
-		case []interface{}:
-			arr := value.([]interface{})
-			*d = arr[0].(int32)
+		if _assignInt32(d, value) {
 			return
 		}
 	case *int64:
-		switch value.(type) {
-		case int64:
-			*d = value.(int64)
-			return
-		case []byte:
-			str := string(value.([]byte))
-			*d, _ = strconv.ParseInt(str, 10, 64)
-			return
-		case []interface{}:
-			arr := value.([]interface{})
-			*d = arr[0].(int64)
+		if _assignInt64(d, value) {
 			return
 		}
 	case *float64:
-		switch value.(type) {
-		case []byte:
-			str := string(value.([]byte)) // PostgeSQL, MySQL
-			*d, _ = strconv.ParseFloat(str, 64)
+		if _assignFloat64(d, value) {
 			return
-		case float32:
-			*d = float64(value.(float32))
-			return
-		case float64:
-			*d = value.(float64)
-			return
-		case []interface{}:
-			arr := value.([]interface{})
-			v0 := arr[0]
-			switch v0.(type) {
-			case float64:
-				*d = v0.(float64)
-				return
-			case float32:
-				*d = float64(v0.(float32))
-				return
-			}
 		}
 	case *float32:
-		switch value.(type) {
-		case []byte:
-			str := string(value.([]byte)) // PostgeSQL
-			d64, _ := strconv.ParseFloat(str, 32)
-			*d = float32(d64)
+		if _assignFloat32(d, value) {
 			return
-		case float32:
-			*d = value.(float32)
-			return
-		case []interface{}:
-			arr := value.([]interface{})
-			v0 := arr[0]
-			switch v0.(type) {
-			case float64:
-				*d = v0.(float32)
-				return
-			case float32:
-				*d = float32(v0.(float64))
-				return
-			}
 		}
 	case *time.Time:
-		switch value.(type) {
-		case []time.Time:
-			*d = value.(time.Time)
-			return
-		case []interface{}:
-			arr := value.([]interface{})
-			*d = arr[0].(time.Time)
+		if _assignTime(d, value) {
 			return
 		}
-		return
 	case *bool:
-		switch value.(type) {
-		case []byte:
-			str := string(value.([]byte)) // MySQL
-			db, _ := strconv.ParseBool(str)
-			*d = db
-			return
-		case bool:
-			*d = value.(bool)
-		case []interface{}:
-			arr := value.([]interface{})
-			*d = arr[0].(bool)
+		if _assignBytes(d, value) {
 			return
 		}
 	case *[]byte: // the same as uint8
@@ -682,17 +693,37 @@ func (ds *DataStore) assign(fieldAddr interface{}, value interface{}) {
 		case []byte:
 			*d = value.([]byte)
 			return
-		case []interface{}:
-			arr := value.([]interface{})
-			*d = arr[0].([]byte)
-			return
 		}
 	case *interface{}:
 		*d = value
 		return
-	case *[]interface{}:
-		*d = value.([]interface{})
+	}
+	panic(fmt.Sprintf("Cannot process DataStore.assign(%T, %T)", fieldAddr, value))
+}
+
+func (ds *DataStore) assign(fieldAddr interface{}, value interface{}) {
+	if value == nil {
+		ds.assignValue(fieldAddr, nil)
+		return // leave as-is
+	}
+	switch value.(type) {
+	case []interface{}:
+		switch d := fieldAddr.(type) {
+		case *[]interface{}:
+			*d = value.([]interface{})
+		default:
+			arr := value.([]interface{})
+			v0 := arr[0]
+			ds.assignValue(fieldAddr, v0)
+			return
+		}
+	default:
+		ds.assignValue(fieldAddr, value)
 		return
 	}
 	panic(fmt.Sprintf("Cannot process DataStore.assign(%T, %T)", fieldAddr, value))
+}
+
+func (ds *DataStore) pgFetch(cursor string) string {
+	return fmt.Sprintf("fetch all from \"%s\"", cursor)
 }
