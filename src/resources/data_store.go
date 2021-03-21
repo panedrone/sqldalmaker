@@ -310,9 +310,63 @@ func (ds *DataStore) insert(sql, aiNames string, args ...interface{}) interface{
 	return ds._execInsertBuiltin(sql, args...)
 }
 
+func _preprocessParams(args []interface{}, onRowArr *[]func(map[string]interface{}), queryArgs *[]interface{}) {
+	for _, arg := range args {
+		switch arg.(type) {
+		case []func(map[string]interface{}):
+			if len(*onRowArr) > 0 {
+				panic("len(onRowArr) > 0")
+			}
+			funcArr := arg.([]func(map[string]interface{}))
+			*onRowArr = append(*onRowArr, funcArr...)
+		case func(map[string]interface{}):
+			onRow := arg.(func(map[string]interface{}))
+			*onRowArr = append(*onRowArr, onRow)
+		default:
+			*queryArgs = append(*queryArgs, arg)
+		}
+	}
+}
+
 func (ds *DataStore) execDML(sql string, args ...interface{}) int64 {
-	// === Prepare -> Exec to access RowsAffected
 	sql = ds._formatSQL(sql)
+	var onRowArr []func(map[string]interface{})
+	var queryArgs []interface{}
+	_preprocessParams(args, &onRowArr, &queryArgs)
+	if len(onRowArr) > 0 {
+		rows, err := ds._query(sql, queryArgs...)
+		if err != nil {
+			panic(err)
+		}
+		defer func() {
+			err := rows.Close()
+			if err != nil {
+				panic(err)
+			}
+		}()
+		onRowIndex := 0
+		for {
+			// re-detect columns for each ResultSet
+			colNames, data, values, valuePointers := ds._prepareFetch(rows)
+			for rows.Next() {
+				err := rows.Scan(valuePointers...)
+				if err == nil {
+					for i, colName := range colNames {
+						data[colName] = values[i]
+					}
+					onRowArr[onRowIndex](data)
+				} else {
+					panic(err)
+				}
+			}
+			if !rows.NextResultSet() {
+				break
+			}
+			onRowIndex++
+		}
+		return 0
+	}
+	// === Prepare -> Exec to access RowsAffected
 	stmt, err := ds._prepare(sql)
 	if err != nil {
 		panic(err)
