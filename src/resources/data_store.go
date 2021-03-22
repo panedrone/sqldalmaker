@@ -145,6 +145,10 @@ func (ds *DataStore) _prepare(sql string) (*sql.Stmt, error) {
 	return ds.tx.Prepare(sql)
 }
 
+func (ds *DataStore) pgFetch(cursor string) string {
+	return fmt.Sprintf("fetch all from \"%s\"", cursor)
+}
+
 func (ds *DataStore) _execInsertPg(sql, aiNames string, args ...interface{}) interface{} {
 	sql += " RETURNING " + aiNames
 	rows, err := ds._query(sql, args...)
@@ -535,8 +539,6 @@ func (ds *DataStore) _formatSQL(sql string) string {
 	return sql
 }
 
-// extend/improve DataStore.assign(...) on demand
-
 func _assignString(d *string, value interface{}) bool {
 	switch value.(type) {
 	case []byte:
@@ -717,11 +719,9 @@ func (ds *DataStore) assignValue(fieldAddr interface{}, value interface{}) {
 	panic(fmt.Sprintf("Cannot process DataStore.assign(%T, %T)", fieldAddr, value))
 }
 
+// Extend/improve methods assign, assignValue and related functions on demand:
+
 func (ds *DataStore) assign(fieldAddr interface{}, value interface{}) {
-	if value == nil {
-		ds.assignValue(fieldAddr, nil)
-		return // leave as-is
-	}
 	switch value.(type) {
 	case []interface{}:
 		switch d := fieldAddr.(type) {
@@ -730,16 +730,11 @@ func (ds *DataStore) assign(fieldAddr interface{}, value interface{}) {
 		default:
 			arr := value.([]interface{})
 			v0 := arr[0]
+			// it includes processing of v0 == nil
 			ds.assignValue(fieldAddr, v0)
-			return
 		}
 	default:
+		// it includes processing of value == nil
 		ds.assignValue(fieldAddr, value)
-		return
 	}
-	panic(fmt.Sprintf("Cannot process DataStore.assign(%T, %T)", fieldAddr, value))
-}
-
-func (ds *DataStore) pgFetch(cursor string) string {
-	return fmt.Sprintf("fetch all from \"%s\"", cursor)
 }
