@@ -84,18 +84,18 @@ func initDb(ds *DataStore) {
 
 */
 
-func (ds *DataStore) open() {
+func (ds *DataStore) Open() {
 	initDb(ds)
 }
 
-func (ds *DataStore) close() {
+func (ds *DataStore) Close() {
 	err := ds.handle.Close()
 	if err != nil {
 		panic(err)
 	}
 }
 
-func (ds *DataStore) begin() {
+func (ds *DataStore) Begin() {
 	if ds.tx != nil {
 		panic("Tx already started")
 	}
@@ -106,7 +106,7 @@ func (ds *DataStore) begin() {
 	}
 }
 
-func (ds *DataStore) commit() {
+func (ds *DataStore) Commit() {
 	if ds.tx == nil {
 		panic("Tx not started")
 		// return
@@ -119,7 +119,7 @@ func (ds *DataStore) commit() {
 	ds.tx = nil
 }
 
-func (ds *DataStore) rollback() {
+func (ds *DataStore) Rollback() {
 	if ds.tx == nil {
 		// commit() was called, just do nothing:
 		return
@@ -145,7 +145,7 @@ func (ds *DataStore) _prepare(sqlQuery string) (*sql.Stmt, error) {
 	return ds.tx.Prepare(sqlQuery)
 }
 
-func (ds *DataStore) pgFetch(cursor string) string {
+func (ds *DataStore) PGFetch(cursor string) string {
 	return fmt.Sprintf("fetch all from \"%s\"", cursor)
 }
 
@@ -257,7 +257,7 @@ func (ds *DataStore) _execInsertBuiltin(sqlQuery string, args ...interface{}) in
 	return nil
 }
 
-func (ds *DataStore) insert(sqlQuery string, aiNames string, args ...interface{}) interface{} {
+func (ds *DataStore) Insert(sqlQuery string, aiNames string, args ...interface{}) interface{} {
 	// len(nil) == 0
 	if len(aiNames) == 0 {
 		panic("DataStore.insert is not applicable for aiNames = " + aiNames)
@@ -294,44 +294,40 @@ func _preprocessParams(args []interface{}, onRowArr *[]func(map[string]interface
 	}
 }
 
-func (ds *DataStore) execDML(sqlQuery string, args ...interface{}) int64 {
-	sqlQuery = ds._formatSQL(sqlQuery)
-	var onRowArr []func(map[string]interface{})
-	var queryArgs []interface{}
-	_preprocessParams(args, &onRowArr, &queryArgs)
-	if len(onRowArr) > 0 {
-		rows, err := ds._query(sqlQuery, queryArgs...)
+func (ds *DataStore) _queryCB(sqlQuery string, onRowArr []func(map[string]interface{}), queryArgs ...interface{}) {
+	rows, err := ds._query(sqlQuery, queryArgs...)
+	if err != nil {
+		panic(err)
+	}
+	defer func() {
+		err := rows.Close()
 		if err != nil {
 			panic(err)
 		}
-		defer func() {
-			err := rows.Close()
-			if err != nil {
+	}()
+	onRowIndex := 0
+	for {
+		// re-detect columns for each ResultSet
+		colNames, data, values, valuePointers := ds._prepareFetch(rows)
+		for rows.Next() {
+			err := rows.Scan(valuePointers...)
+			if err == nil {
+				for i, colName := range colNames {
+					data[colName] = values[i]
+				}
+				onRowArr[onRowIndex](data)
+			} else {
 				panic(err)
 			}
-		}()
-		onRowIndex := 0
-		for {
-			// re-detect columns for each ResultSet
-			colNames, data, values, valuePointers := ds._prepareFetch(rows)
-			for rows.Next() {
-				err := rows.Scan(valuePointers...)
-				if err == nil {
-					for i, colName := range colNames {
-						data[colName] = values[i]
-					}
-					onRowArr[onRowIndex](data)
-				} else {
-					panic(err)
-				}
-			}
-			if !rows.NextResultSet() {
-				break
-			}
-			onRowIndex++
 		}
-		return 0
+		if !rows.NextResultSet() {
+			break
+		}
+		onRowIndex++
 	}
+}
+
+func (ds *DataStore) _exec(sqlQuery string, args ...interface{}) int64 {
 	// === Prepare -> Exec to access RowsAffected
 	stmt, err := ds._prepare(sqlQuery)
 	if err != nil {
@@ -355,6 +351,18 @@ func (ds *DataStore) execDML(sqlQuery string, args ...interface{}) int64 {
 	return ra
 }
 
+func (ds *DataStore) Exec(sqlQuery string, args ...interface{}) int64 {
+	sqlQuery = ds._formatSQL(sqlQuery)
+	var onRowArr []func(map[string]interface{})
+	var queryArgs []interface{}
+	_preprocessParams(args, &onRowArr, &queryArgs)
+	if len(onRowArr) > 0 {
+		ds._queryCB(sqlQuery, onRowArr, queryArgs...)
+		return 0
+	}
+	return ds._exec(sqlQuery, args...)
+}
+
 func _validateQuery(found int) {
 	if found != 1 {
 		panic(fmt.Sprintf("1 row expected, but %d found. "+
@@ -362,17 +370,17 @@ func _validateQuery(found int) {
 	}
 }
 
-func (ds *DataStore) query(sqlQuery string, args ...interface{}) interface{} {
+func (ds *DataStore) Query(sqlQuery string, args ...interface{}) interface{} {
 	var arr []interface{}
 	onRow := func(date interface{}) {
 		arr = append(arr, date)
 	}
-	ds.queryAll(sqlQuery, onRow, args...)
+	ds.QueryAll(sqlQuery, onRow, args...)
 	_validateQuery(len(arr)) // A nil slice has a len of 0.
 	return arr[0]
 }
 
-func (ds *DataStore) queryAll(sqlQuery string, onRow func(interface{}), args ...interface{}) {
+func (ds *DataStore) QueryAll(sqlQuery string, onRow func(interface{}), args ...interface{}) {
 	sqlQuery = ds._formatSQL(sqlQuery)
 	rows, err := ds._query(sqlQuery, args...)
 	if err != nil {
@@ -403,17 +411,17 @@ func (ds *DataStore) queryAll(sqlQuery string, onRow func(interface{}), args ...
 	}
 }
 
-func (ds *DataStore) queryRow(sqlQuery string, args ...interface{}) map[string]interface{} {
+func (ds *DataStore) QueryRow(sqlQuery string, args ...interface{}) map[string]interface{} {
 	var arr []map[string]interface{}
 	onRow := func(rowData map[string]interface{}) {
 		arr = append(arr, rowData)
 	}
-	ds.queryAllRows(sqlQuery, onRow, args...)
+	ds.QueryAllRows(sqlQuery, onRow, args...)
 	_validateQuery(len(arr)) // A nil slice has a len of 0.
 	return arr[0]
 }
 
-func (ds *DataStore) queryAllRows(sqlQuery string, onRow func(map[string]interface{}), args ...interface{}) {
+func (ds *DataStore) QueryAllRows(sqlQuery string, onRow func(map[string]interface{}), args ...interface{}) {
 	// many thanks to:
 	// https://stackoverflow.com/questions/51731423/how-to-read-a-row-from-a-table-to-a-map-without-knowing-columns
 	sqlQuery = ds._formatSQL(sqlQuery)
@@ -610,7 +618,7 @@ func _assignBoolean(d *bool, value interface{}) bool {
 	return true
 }
 
-func (ds *DataStore) assignValue(fieldAddr interface{}, value interface{}) {
+func (ds *DataStore) AssignValue(fieldAddr interface{}, value interface{}) {
 	if value == nil {
 		switch d := fieldAddr.(type) {
 		case *interface{}:
@@ -665,9 +673,9 @@ func (ds *DataStore) assignValue(fieldAddr interface{}, value interface{}) {
 	panic(fmt.Sprintf("Cannot process DataStore.assign(%T, %T)", fieldAddr, value))
 }
 
-// Extend/improve methods assign, assignValue and related functions on demand:
+// Extend/improve methods Assign, AssignValue and related functions on demand:
 
-func (ds *DataStore) assign(fieldAddr interface{}, value interface{}) {
+func (ds *DataStore) Assign(fieldAddr interface{}, value interface{}) {
 	switch value.(type) {
 	case []interface{}:
 		switch d := fieldAddr.(type) {
@@ -677,10 +685,10 @@ func (ds *DataStore) assign(fieldAddr interface{}, value interface{}) {
 			arr := value.([]interface{})
 			v0 := arr[0]
 			// it includes processing of v0 == nil
-			ds.assignValue(fieldAddr, v0)
+			ds.AssignValue(fieldAddr, v0)
 		}
 	default:
 		// it includes processing of value == nil
-		ds.assignValue(fieldAddr, value)
+		ds.AssignValue(fieldAddr, value)
 	}
 }
