@@ -1,10 +1,11 @@
 2021-03-22
 
-    go: TitleCase (0) or camelCase (1) for method names in 'settings.xml' -> <dto field-names-mode
-    go + oracle INSERT ... INTO... implemented fetching of generated value.
-    go + out/inout parameters for MS SQL Sever.
-    go + multiple result-sets.
-    go + transactions.
+    Go -> out/inout parameters of SP for Oracle.
+    Go -> TitleCase (0) or camelCase (1) for method names in 'settings.xml' -> <dto field-names-mode
+    Go -> oracle INSERT ... INTO... implemented fetching of generated value.
+    Go -> out/inout parameters of SP for MS SQL Sever.
+    Go -> multiple result-sets.
+    Go -> transactions.
 
 2021-03-15
 

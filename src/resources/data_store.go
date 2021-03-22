@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"reflect"
 	"strconv"
 	"strings"
 	"time"
@@ -15,6 +16,26 @@ import (
    Copy-paste this code to your project and change it for your needs.
    Improvements are welcome: sdm@gmail.com
 */
+
+type InOut struct {
+	/*
+		var outRating float64 // no need to init for OUT parameter
+		cxDao.SpTestOutParams(47, InOut{Dest: &inOut}) // InOut.In is false by default
+		// this one is also ok for OUT parameters:
+		// cxDao.SpTestOutParams(47, &outRating)
+		fmt.Println(outRating)
+
+		inOut := 123.0 // INOUT parameter must be initialised
+		cxDao.SpTestInoutParams(InOut{Dest: &inOut, In: true}) // In: true -> designates INOUT parameter
+		fmt.Println(inOut)
+	*/
+
+	// Dest is a pointer to the value that will be set to the result of the
+	// stored procedure's OUTPUT parameter.
+	Dest interface{}
+	// In is whether the parameter is an INOUT parameter.
+	In bool // false default
+}
 
 type DataStore struct {
 	paramPrefix string
@@ -276,22 +297,49 @@ func (ds *DataStore) Insert(sqlQuery string, aiNames string, args ...interface{}
 	return ds._execInsertBuiltin(sqlQuery, args...)
 }
 
-func _preprocessParams(args []interface{}, onRowArr *[]func(map[string]interface{}), queryArgs *[]interface{}) {
+func _preprocessParams(args []interface{}, onRowArr *[]func(map[string]interface{}), queryArgs *[]interface{}) bool {
+	cbArray := false
+	cb := false
 	for _, arg := range args {
 		switch arg.(type) {
 		case []func(map[string]interface{}):
+			if cbArray {
+				panic(fmt.Sprintf("Forbidden: %v", args))
+			}
+			if cb {
+				panic(fmt.Sprintf("Forbidden: %v", args))
+			}
 			if len(*onRowArr) > 0 {
 				panic("len(onRowArr) > 0")
 			}
 			funcArr := arg.([]func(map[string]interface{}))
 			*onRowArr = append(*onRowArr, funcArr...)
 		case func(map[string]interface{}):
+			if cbArray {
+				panic(fmt.Sprintf("Forbidden: %v", args))
+			}
 			onRow := arg.(func(map[string]interface{}))
 			*onRowArr = append(*onRowArr, onRow)
+		case InOut:
+			inOut := arg.(InOut)
+			val := reflect.ValueOf(inOut.Dest)
+			kindOfJ := val.Kind()
+			if kindOfJ != reflect.Ptr {
+				panic("InOut.Dest is not Ptr")
+			}
+			*queryArgs = append(*queryArgs, sql.Out{Dest: inOut.Dest, In: inOut.In})
 		default:
-			*queryArgs = append(*queryArgs, arg)
+			val := reflect.ValueOf(arg)
+			kindOfJ := val.Kind()
+			if kindOfJ == reflect.Ptr {
+				*queryArgs = append(*queryArgs, sql.Out{Dest: arg, In: false})
+			} else {
+				*queryArgs = append(*queryArgs, arg)
+			}
 		}
 	}
+	// [on_test1:Test, on_test2:Test] will be used to call SP with IMPLICIT cursors
+	return cbArray
 }
 
 func (ds *DataStore) _queryCB(sqlQuery string, onRowArr []func(map[string]interface{}), queryArgs ...interface{}) {
@@ -360,7 +408,8 @@ func (ds *DataStore) Exec(sqlQuery string, args ...interface{}) int64 {
 		ds._queryCB(sqlQuery, onRowArr, queryArgs...)
 		return 0
 	}
-	return ds._exec(sqlQuery, args...)
+	// pass queryArgs in both cases to work with out/inout params
+	return ds._exec(sqlQuery, queryArgs...)
 }
 
 func _validateQuery(found int) {
