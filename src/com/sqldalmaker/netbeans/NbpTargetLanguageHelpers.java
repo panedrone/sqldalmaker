@@ -235,8 +235,9 @@ public class NbpTargetLanguageHelpers {
                 output_dir_rel_path.append(package_rel_path);
             }
             String dto_package = settings.getDto().getScope();
+            FieldNamesMode field_names_mode = Helpers.get_field_names_mode(settings);
             return new GoCG.DTO(dto_package, dto_classes, settings.getTypeMap(),
-                    connection, sql_root_abs_path, vm_file_system_path);
+                    connection, sql_root_abs_path, field_names_mode, vm_file_system_path);
         } else if (RootFileName.PHP.equals(fn)) {
             if (output_dir_rel_path != null) {
                 String package_rel_path = settings.getFolders().getTarget();
@@ -334,8 +335,9 @@ public class NbpTargetLanguageHelpers {
                 output_dir.append(package_rel_path);
             }
             String dao_package = settings.getDao().getScope();
+            FieldNamesMode field_names_mode = Helpers.get_field_names_mode(settings);
             return new GoCG.DAO(dao_package, dto_classes, settings.getTypeMap(),
-                    con, sql_root_abs_path, vm_file_system_path);
+                    con, sql_root_abs_path, field_names_mode, vm_file_system_path);
         } else {
             throw new Exception(get_unknown_root_file_msg(fn));
         }

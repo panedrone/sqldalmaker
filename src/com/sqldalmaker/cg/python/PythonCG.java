@@ -489,7 +489,8 @@ public class PythonCG {
             try {
                 db_utils.validate_table_name(table_name);
                 _get_rendered_dto_class_name(dto_class_name, false);
-                StringBuilder code_buff = JaxbUtils.process_jaxb_crud(this, true, jaxb_type_crud, dto_class_name);
+                StringBuilder code_buff = JaxbUtils.process_jaxb_crud(this, db_utils.get_dto_field_names_mode(),
+                        jaxb_type_crud, dto_class_name);
                 return code_buff;
             } catch (Throwable e) {
                 // e.printStackTrace();

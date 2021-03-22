@@ -1,4 +1,12 @@
-2021-02-15
+2021-03-22
+
+    go: TitleCase (0) or camelCase (1) for method names in 'settings.xml' -> <dto field-names-mode
+    go + oracle INSERT ... INTO... implemented fetching of generated value.
+    go + out/inout parameters for MS SQL Sever.
+    go + multiple result-sets.
+    go + transactions.
+
+2021-03-15
 
     Implemented 'type-map' for PHP, Python, Ruby.
 

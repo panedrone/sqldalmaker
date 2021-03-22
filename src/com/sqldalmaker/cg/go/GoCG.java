@@ -36,7 +36,7 @@ public class GoCG {
         private final JdbcUtils db_utils;
 
         public DTO(String dto_package, DtoClasses jaxb_dto_classes, TypeMap jaxb_type_map, Connection connection,
-                   String sql_root_abs_path, String vm_file_system_dir) throws Exception {
+                   String sql_root_abs_path, FieldNamesMode field_names_mode, String vm_file_system_dir) throws Exception {
             this.dto_package = dto_package;
             this.jaxb_dto_classes = jaxb_dto_classes.getDtoClass();
             this.sql_root_abs_path = sql_root_abs_path;
@@ -45,7 +45,7 @@ public class GoCG {
             } else {
                 te = new TemplateEngine(vm_file_system_dir, true);
             }
-            db_utils = new JdbcUtils(connection, FieldNamesMode.TITLE_CASE, FieldNamesMode.LOWER_CAMEL_CASE, jaxb_type_map);
+            db_utils = new JdbcUtils(connection, field_names_mode, FieldNamesMode.LOWER_CAMEL_CASE, jaxb_type_map);
         }
 
         @Override
@@ -110,7 +110,7 @@ public class GoCG {
         private String dao_class_name;
 
         public DAO(String dao_package, DtoClasses jaxb_dto_classes, TypeMap jaxb_type_map, Connection connection,
-                   String sql_root_abs_path, String vm_file_system_dir) throws Exception {
+                   String sql_root_abs_path, FieldNamesMode field_names_mode, String vm_file_system_dir) throws Exception {
             //this.dto_package = dto_package;
             this.dao_package = dao_package;
             this.jaxb_dto_classes = jaxb_dto_classes;
@@ -120,7 +120,7 @@ public class GoCG {
             } else {
                 te = new TemplateEngine(vm_file_system_dir, true);
             }
-            db_utils = new JdbcUtils(connection, FieldNamesMode.TITLE_CASE, FieldNamesMode.LOWER_CAMEL_CASE, jaxb_type_map);
+            db_utils = new JdbcUtils(connection, field_names_mode, FieldNamesMode.LOWER_CAMEL_CASE, jaxb_type_map);
         }
 
         @Override
@@ -201,6 +201,7 @@ public class GoCG {
             context.put("mode", "dao_query");
             context.put("class_name", dao_class_name);
             context.put("fields", fields);
+            method_name = Helpers.get_method_name(method_name, db_utils.get_dto_field_names_mode());
             context.put("method_name", method_name);
             context.put("crud", crud_table != null);
             context.put("ref", crud_table);
@@ -321,6 +322,7 @@ public class GoCG {
             boolean plain_params = dto_param_type.length() == 0;
             context.put("plain_params", plain_params);
             context.put("class_name", dao_class_name);
+            method_name = Helpers.get_method_name(method_name, db_utils.get_dto_field_names_mode());
             context.put("method_name", method_name);
             context.put("sql", go_sql);
             context.put("xml_node_name", xml_node_name);
@@ -538,7 +540,8 @@ public class GoCG {
             try {
                 db_utils.validate_table_name(table_attr);
                 _process_dto_class_name(dto_class_name);
-                StringBuilder code_buff = JaxbUtils.process_jaxb_crud(this, false, jaxb_type_crud, dto_class_name);
+                StringBuilder code_buff = JaxbUtils.process_jaxb_crud(this, db_utils.get_dto_field_names_mode(),
+                        jaxb_type_crud, dto_class_name);
                 return code_buff;
             } catch (Throwable e) {
                 // e.printStackTrace();

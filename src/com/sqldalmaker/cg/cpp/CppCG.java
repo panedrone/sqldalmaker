@@ -392,7 +392,8 @@ public class CppCG {
             try {
                 db_utils.validate_table_name(table_attr);
                 _process_dto_class_name(dto_class_name);
-                StringBuilder code_buff = JaxbUtils.process_jaxb_crud(this, true, jaxb_type_crud, dto_class_name);
+                StringBuilder code_buff = JaxbUtils.process_jaxb_crud(this, db_utils.get_dto_field_names_mode(),
+                        jaxb_type_crud, dto_class_name);
                 return code_buff;
             } catch (Exception e) {
                 // e.printStackTrace();

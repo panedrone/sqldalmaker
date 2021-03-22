@@ -218,13 +218,13 @@ public class IdeaTargetLanguageHelpers {
             throw new Exception(_get_unknown_root_file_msg(fn));
         }
         String old_text = Helpers.load_text_from_file(file_name);
-        if (old_text == null) {
-            validation_buff.append(Const.OUTPUT_FILE_IS_MISSING);
-        } else {
-            String text = file_content[0];
-            if (!old_text.equals(text)) {
-                validation_buff.append(Const.OUTPUT_FILE_IS_OUT_OF_DATE);
-            }
+//        if (old_text == null) {
+//            validation_buff.append(Const.OUTPUT_FILE_IS_MISSING);
+//        } else {
+        String text = file_content[0];
+        if (!old_text.equals(text)) {
+            validation_buff.append(Const.OUTPUT_FILE_IS_OUT_OF_DATE);
+//            }
         }
     }
 
@@ -325,8 +325,9 @@ public class IdeaTargetLanguageHelpers {
                 output_dir_rel_path.append(package_rel_path);
             }
             String dto_package = settings.getDto().getScope();
+            FieldNamesMode field_names_mode = Helpers.get_field_names_mode(settings);
             return new GoCG.DTO(dto_package, dto_classes, settings.getTypeMap(), connection,
-                    sql_root_abs_path, vm_file_system_path);
+                    sql_root_abs_path, field_names_mode, vm_file_system_path);
         } else {
             throw new Exception(_get_unknown_root_file_msg(fn));
         }
@@ -398,8 +399,9 @@ public class IdeaTargetLanguageHelpers {
                 output_dir_rel_path.append(package_rel_path);
             }
             String dao_package = settings.getDao().getScope();
+            FieldNamesMode field_names_mode = Helpers.get_field_names_mode(settings);
             return new GoCG.DAO(dao_package, dto_classes, settings.getTypeMap(), con,
-                    sql_root_abs_path, vm_file_system_path);
+                    sql_root_abs_path, field_names_mode, vm_file_system_path);
         } else {
             throw new Exception(_get_unknown_root_file_msg(fn));
         }

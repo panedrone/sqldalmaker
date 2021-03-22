@@ -427,7 +427,6 @@ public class JdbcUtils {
                 }
             } else {
                 String[] parts = method_param_descriptors[i].split(":");
-                String name;
                 if (parts.length == 1) {
                     not_cb_params_count++;
                 } else {

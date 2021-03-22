@@ -134,12 +134,25 @@ public class Helpers {
     public static FieldNamesMode get_field_names_mode(Settings settings) {
         FieldNamesMode field_names_mode;
         int fnm = settings.getDto().getFieldNamesMode();
-        if (fnm == 1) {
+        if (fnm == 0) {
+            field_names_mode = FieldNamesMode.TITLE_CASE;
+        } else if (fnm == 1) {
             field_names_mode = FieldNamesMode.LOWER_CAMEL_CASE;
         } else {
             field_names_mode = FieldNamesMode.SNAKE_CASE;
         }
         return field_names_mode;
+    }
+
+    public static String get_method_name(String method_name, FieldNamesMode field_names_mode) {
+        if (FieldNamesMode.LOWER_CAMEL_CASE.equals(field_names_mode)) {
+            return to_lower_camel_or_title_case(method_name, false);
+        } else if (FieldNamesMode.TITLE_CASE.equals(field_names_mode)) {
+            return to_lower_camel_or_title_case(method_name, true);
+        } else if (FieldNamesMode.SNAKE_CASE.equals(field_names_mode)) {
+            return camel_case_to_snake_case(method_name);
+        }
+        return method_name;
     }
 
     // Java File exists Case sensitive

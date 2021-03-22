@@ -169,8 +169,9 @@ public class EclipseTargetLanguageHelpers {
 				output_dir.append(abs_path);
 			}
 			String dto_package = settings.getDto().getScope();
+			FieldNamesMode field_names_mode = Helpers.get_field_names_mode(settings);
 			GoCG.DTO gen = new GoCG.DTO(dto_package, dto_classes, settings.getTypeMap(), conn, sql_root_abs_path,
-					vm_file_system_path);
+					field_names_mode, vm_file_system_path);
 			return gen;
 		} else {
 			throw new Exception(get_unknown_root_file_msg(root_file_name));
@@ -259,8 +260,9 @@ public class EclipseTargetLanguageHelpers {
 				output_dir.append(abs_path);
 			}
 			String dao_package = settings.getDao().getScope();
+			FieldNamesMode field_names_mode = Helpers.get_field_names_mode(settings);
 			GoCG.DAO gen = new GoCG.DAO(dao_package, dto_classes, settings.getTypeMap(), conn, sql_root_abs_path,
-					vm_file_system_path);
+					field_names_mode, vm_file_system_path);
 			return gen;
 		} else {
 			throw new Exception(get_unknown_root_file_msg(root_fn));
