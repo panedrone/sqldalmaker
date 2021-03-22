@@ -131,27 +131,28 @@ func (ds *DataStore) rollback() {
 	ds.tx = nil
 }
 
-func (ds *DataStore) _query(sql string, args ...interface{}) (*sql.Rows, error) {
+func (ds *DataStore) _query(sqlQuery string, args ...interface{}) (*sql.Rows, error) {
 	if ds.tx == nil {
-		return ds.handle.Query(sql, args...)
+		return ds.handle.Query(sqlQuery, args...)
 	}
-	return ds.tx.Query(sql, args...)
+	return ds.tx.Query(sqlQuery, args...)
 }
 
-func (ds *DataStore) _prepare(sql string) (*sql.Stmt, error) {
+func (ds *DataStore) _prepare(sqlQuery string) (*sql.Stmt, error) {
 	if ds.tx == nil {
-		return ds.handle.Prepare(sql)
+		return ds.handle.Prepare(sqlQuery)
 	}
-	return ds.tx.Prepare(sql)
+	return ds.tx.Prepare(sqlQuery)
 }
 
 func (ds *DataStore) pgFetch(cursor string) string {
 	return fmt.Sprintf("fetch all from \"%s\"", cursor)
 }
 
-func (ds *DataStore) _execInsertPg(sql, aiNames string, args ...interface{}) interface{} {
-	sql += " RETURNING " + aiNames
-	rows, err := ds._query(sql, args...)
+func (ds *DataStore) _pgInsert(sqlQuery string, aiNames string, args ...interface{}) interface{} {
+	// fetching of multiple AI values is not implemented so far:
+	sqlQuery += " RETURNING " + aiNames
+	rows, err := ds._query(sqlQuery, args...)
 	if err != nil {
 		panic(err)
 	}
@@ -169,64 +170,19 @@ func (ds *DataStore) _execInsertPg(sql, aiNames string, args ...interface{}) int
 		}
 		return data
 	}
-	println("rows.Next() FAILED:" + sql)
+	println("rows.Next() FAILED:" + sqlQuery)
 	return nil
 }
 
-// 'insert ... returning ... into ...' not working with Query
-// because of rows.Next() returns false
-
-func (ds *DataStore) _execInsertOracle(sql, aiNames string, args ...interface{}) interface{} {
-	// TODO Problem of Oracle + 'insert ... returning ... into ...' and "github.com/godror/godror"
-	// 1) sql += " returning " + aiNames ORA-00925: missing INTO keyword
-	// 2) solution from https://github.com/rana/ora
-	//    not working with "github.com/godror/godror":
-	//    sql += " RETURNING " + aiNames + " /*LastInsertId*/" // " into :2"// + aiNames
-	// 3) fetching of multiple AI values are not implemented so far
-	sql += " returning " + aiNames + " into :" + aiNames
-	//// DPI-1037: column at array position 0 fetched with error 1406:
-	//// 	- var ai interface{}
-	//// 	- var ai string
-	var ai uint64 // "github.com/godror/godror": int64, uint64, float64 are passed with no error, but they remain 0
-	args = append(args, &ai)
-	rows, err := ds._query(sql, args...)
-	if err != nil {
-		panic(err)
-	}
-	defer func() {
-		err = rows.Close()
-		if err != nil {
-			panic(err)
-		}
-	}()
-	for rows.Next() {
-		var data interface{}
-		err = rows.Scan(&data)
-		if err != nil {
-			panic(err)
-		}
-		return data
-	}
-	println("rows.Next() FAILED: " + sql)
-	return nil
-}
-
-// 'insert ... returning ... into ...' not working with Prepare -> Exec too
-// because of 'LastInsertId is not supported by this driver'
-
-func (ds *DataStore) _execInsertOracle2(sql, aiNames string, args ...interface{}) interface{} {
-	// 1) sql += " returning " + aiNames ORA-00925: missing INTO keyword
-	// 2) solution from https://github.com/rana/ora
-	//    not working with "github.com/godror/godror":
-	//    sql += " RETURNING " + aiNames + " /*LastInsertId*/" // " into :2"// + aiNames
-	// 3) fetching of multiple AI values are not implemented so far
-	sql += " returning " + aiNames + " into :" + aiNames
-	//// DPI-1037: column at array position 0 fetched with error 1406:
-	//// 	- var ai interface{}
-	//// 	- var ai string
-	var ai uint64 // int64, uint64, float64 are OK, but they remain 0
-	args = append(args, &ai)
-	stmt, err := ds._prepare(sql)
+func (ds *DataStore) _oracleInsert(sqlQuery string, aiNames string, args ...interface{}) interface{} {
+	// fetching of multiple AI values is not implemented so far:
+	sqlQuery += " returning " + aiNames + " into :" + aiNames
+	// https://ddcode.net/2019/05/11/how-does-go-call-oracles-stored-procedures-and-get-the-return-value-of-the-stored-procedures/
+	// var id64 float64
+	var id64 float64
+	args = append(args, sql.Out{Dest: &id64, In: false})
+	// ----------------
+	stmt, err := ds._prepare(sqlQuery)
 	if err != nil {
 		panic(err)
 	}
@@ -236,33 +192,23 @@ func (ds *DataStore) _execInsertOracle2(sql, aiNames string, args ...interface{}
 			panic(err)
 		}
 	}()
-	res, err := stmt.Exec(args...)
+	_, err = stmt.Exec(args...)
 	if err != nil {
-		// log.Fatal(err)
 		println(err.Error())
-		println("Exec() FAILED: " + sql)
+		println("Exec() FAILED: " + sqlQuery)
 		return nil
 	}
-	// return ai; // remains 0
-	// LastInsertId is not supported by this driver
-	res64, err := res.LastInsertId()
-	if err != nil {
-		// log.Fatal(err)
-		println(err.Error())
-		println("res.LastInsertId() FAILED: " + sql)
-		return nil
-	}
-	return res64
+	return id64
 }
 
-func (ds *DataStore) _execInsertSqlServer(sql string, args ...interface{}) interface{} {
+func (ds *DataStore) _mssqlInsert(sqlQuery string, args ...interface{}) interface{} {
 	// SQL Server https://github.com/denisenkom/go-mssqldb
 	// LastInsertId should not be used with this driver (or SQL Server) due to
 	// how the TDS protocol works. Please use the OUTPUT Clause or add a select
 	// ID = convert(bigint, SCOPE_IDENTITY()); to the end of your query (ref SCOPE_IDENTITY).
 	//  This will ensure you are getting the correct ID and will prevent a network round trip.
-	sql += ";SELECT @@IDENTITY;"
-	rows, err := ds._query(sql, args...)
+	sqlQuery += ";SELECT @@IDENTITY;"
+	rows, err := ds._query(sqlQuery, args...)
 	if err != nil {
 		panic(err)
 	}
@@ -280,13 +226,13 @@ func (ds *DataStore) _execInsertSqlServer(sql string, args ...interface{}) inter
 		}
 		return data
 	}
-	println("rows.Next() FAILED: " + sql)
+	println("rows.Next() FAILED: " + sqlQuery)
 	return nil
 }
 
-func (ds *DataStore) _execInsertBuiltin(sql string, args ...interface{}) interface{} {
+func (ds *DataStore) _execInsertBuiltin(sqlQuery string, args ...interface{}) interface{} {
 	// === Prepare -> Exec to access LastInsertId
-	stmt, err := ds._prepare(sql)
+	stmt, err := ds._prepare(sqlQuery)
 	if err != nil {
 		panic(err)
 	}
@@ -307,27 +253,27 @@ func (ds *DataStore) _execInsertBuiltin(sql string, args ...interface{}) interfa
 	// The Go builtin functions print and println print to stderr
 	// https://stackoverflow.com/questions/29721449/how-can-i-print-to-stderr-in-go-without-using-log
 	println(err.Error())
-	println("res.LastInsertId() FAILED: " + sql)
+	println("res.LastInsertId() FAILED: " + sqlQuery)
 	return nil
 }
 
-func (ds *DataStore) insert(sql, aiNames string, args ...interface{}) interface{} {
+func (ds *DataStore) insert(sqlQuery string, aiNames string, args ...interface{}) interface{} {
 	// len(nil) == 0
 	if len(aiNames) == 0 {
 		panic("DataStore.insert is not applicable for aiNames = " + aiNames)
 	}
 	// Builtin LastInsertId works only with MySQL and SQLite3
-	sql = ds._formatSQL(sql)
+	sqlQuery = ds._formatSQL(sqlQuery)
 	if ds.isPostgreSQL() {
-		return ds._execInsertPg(sql, aiNames, args...)
+		return ds._pgInsert(sqlQuery, aiNames, args...)
 	} else if ds.isSqlServer() {
-		return ds._execInsertSqlServer(sql, args...)
+		return ds._mssqlInsert(sqlQuery, args...)
 	} else if ds.isOracle() {
 		// Oracle: specify AI values explicitly:
 		// <crud-auto dto="ProjectInfo" table="PROJECTS" generated="P_ID"/>
-		return ds._execInsertOracle(sql, aiNames, args...)
+		return ds._oracleInsert(sqlQuery, aiNames, args...)
 	}
-	return ds._execInsertBuiltin(sql, args...)
+	return ds._execInsertBuiltin(sqlQuery, args...)
 }
 
 func _preprocessParams(args []interface{}, onRowArr *[]func(map[string]interface{}), queryArgs *[]interface{}) {
@@ -348,13 +294,13 @@ func _preprocessParams(args []interface{}, onRowArr *[]func(map[string]interface
 	}
 }
 
-func (ds *DataStore) execDML(sql string, args ...interface{}) int64 {
-	sql = ds._formatSQL(sql)
+func (ds *DataStore) execDML(sqlQuery string, args ...interface{}) int64 {
+	sqlQuery = ds._formatSQL(sqlQuery)
 	var onRowArr []func(map[string]interface{})
 	var queryArgs []interface{}
 	_preprocessParams(args, &onRowArr, &queryArgs)
 	if len(onRowArr) > 0 {
-		rows, err := ds._query(sql, queryArgs...)
+		rows, err := ds._query(sqlQuery, queryArgs...)
 		if err != nil {
 			panic(err)
 		}
@@ -387,7 +333,7 @@ func (ds *DataStore) execDML(sql string, args ...interface{}) int64 {
 		return 0
 	}
 	// === Prepare -> Exec to access RowsAffected
-	stmt, err := ds._prepare(sql)
+	stmt, err := ds._prepare(sqlQuery)
 	if err != nil {
 		panic(err)
 	}
@@ -416,19 +362,19 @@ func _validateQuery(found int) {
 	}
 }
 
-func (ds *DataStore) query(sql string, args ...interface{}) interface{} {
+func (ds *DataStore) query(sqlQuery string, args ...interface{}) interface{} {
 	var arr []interface{}
 	onRow := func(date interface{}) {
 		arr = append(arr, date)
 	}
-	ds.queryAll(sql, onRow, args...)
+	ds.queryAll(sqlQuery, onRow, args...)
 	_validateQuery(len(arr)) // A nil slice has a len of 0.
 	return arr[0]
 }
 
-func (ds *DataStore) queryAll(sql string, onRow func(interface{}), args ...interface{}) {
-	sql = ds._formatSQL(sql)
-	rows, err := ds._query(sql, args...)
+func (ds *DataStore) queryAll(sqlQuery string, onRow func(interface{}), args ...interface{}) {
+	sqlQuery = ds._formatSQL(sqlQuery)
+	rows, err := ds._query(sqlQuery, args...)
 	if err != nil {
 		panic(err)
 	}
@@ -457,21 +403,21 @@ func (ds *DataStore) queryAll(sql string, onRow func(interface{}), args ...inter
 	}
 }
 
-func (ds *DataStore) queryRow(sql string, args ...interface{}) map[string]interface{} {
+func (ds *DataStore) queryRow(sqlQuery string, args ...interface{}) map[string]interface{} {
 	var arr []map[string]interface{}
 	onRow := func(rowData map[string]interface{}) {
 		arr = append(arr, rowData)
 	}
-	ds.queryAllRows(sql, onRow, args...)
+	ds.queryAllRows(sqlQuery, onRow, args...)
 	_validateQuery(len(arr)) // A nil slice has a len of 0.
 	return arr[0]
 }
 
-func (ds *DataStore) queryAllRows(sql string, onRow func(map[string]interface{}), args ...interface{}) {
+func (ds *DataStore) queryAllRows(sqlQuery string, onRow func(map[string]interface{}), args ...interface{}) {
 	// many thanks to:
 	// https://stackoverflow.com/questions/51731423/how-to-read-a-row-from-a-table-to-a-map-without-knowing-columns
-	sql = ds._formatSQL(sql)
-	rows, err := ds._query(sql, args...)
+	sqlQuery = ds._formatSQL(sqlQuery)
+	rows, err := ds._query(sqlQuery, args...)
 	if err != nil {
 		panic(err)
 	}
@@ -521,22 +467,22 @@ func (ds *DataStore) _prepareFetch(rows *sql.Rows) ([]string, map[string]interfa
 	return colNames, data, values, valuePointers
 }
 
-func (ds *DataStore) _formatSQL(sql string) string {
+func (ds *DataStore) _formatSQL(sqlQuery string) string {
 	if len(ds.paramPrefix) == 0 {
-		return sql
+		return sqlQuery
 	}
 	i := 1
 	for {
-		pos := strings.Index(sql, "?")
+		pos := strings.Index(sqlQuery, "?")
 		if pos == -1 {
 			break
 		}
-		str1 := sql[0:pos]
-		str2 := sql[pos+1:]
-		sql = str1 + ds.paramPrefix + strconv.Itoa(i) + str2
+		str1 := sqlQuery[0:pos]
+		str2 := sqlQuery[pos+1:]
+		sqlQuery = str1 + ds.paramPrefix + strconv.Itoa(i) + str2
 		i += 1
 	}
-	return sql
+	return sqlQuery
 }
 
 func _assignString(d *string, value interface{}) bool {
