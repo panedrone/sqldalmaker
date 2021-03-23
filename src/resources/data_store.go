@@ -350,12 +350,14 @@ func _preprocessParams(args []interface{}, onRowArr *[]func(map[string]interface
 			}
 			funcArr := arg.([]func(map[string]interface{}))
 			*onRowArr = append(*onRowArr, funcArr...)
+			cbArray = true
 		case func(map[string]interface{}):
 			if cbArray {
 				panic(fmt.Sprintf("Forbidden: %v", args))
 			}
 			onRow := arg.(func(map[string]interface{}))
 			*onRowArr = append(*onRowArr, onRow)
+			cb = true
 		case *OutParam:
 			p := arg.(*OutParam)
 			_validateDest(p.Dest)
