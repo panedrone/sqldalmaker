@@ -1,3 +1,9 @@
+2021-03-23
+
+    Go + Oracle -> UDF returning SYS_REFCURSOR
+    Go + Oracle -> SYS_REFCURSOR-s as OUT parameters
+    (Not working yet: Go + Oracle -> Implicit SYS_REFCURSOR-s)
+
 2021-03-22
 
     Go -> SP OUT/INOUT parameters -> Oracle

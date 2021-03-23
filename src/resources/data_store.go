@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"database/sql/driver"
 	"fmt"
 	"reflect"
 	"strconv"
@@ -333,31 +334,28 @@ func _validateDest(dest interface{}) {
 	}
 }
 
-func _preprocessParams(args []interface{}, onRowArr *[]func(map[string]interface{}), queryArgs *[]interface{}) bool {
-	cbArray := false
-	cb := false
+func _processExecParams(args []interface{}, onRowArr *[]func(map[string]interface{}), queryArgs *[]interface{}) bool {
+	implicitCursors := false
+	outCursors := false
 	for _, arg := range args {
 		switch arg.(type) {
 		case []func(map[string]interface{}):
-			if cbArray {
+			if outCursors {
 				panic(fmt.Sprintf("Forbidden: %v", args))
 			}
-			if cb {
-				panic(fmt.Sprintf("Forbidden: %v", args))
-			}
-			if len(*onRowArr) > 0 {
-				panic("len(onRowArr) > 0")
-			}
+			implicitCursors = true
 			funcArr := arg.([]func(map[string]interface{}))
 			*onRowArr = append(*onRowArr, funcArr...)
-			cbArray = true
 		case func(map[string]interface{}):
-			if cbArray {
+			if implicitCursors {
 				panic(fmt.Sprintf("Forbidden: %v", args))
 			}
+			outCursors = true
 			onRow := arg.(func(map[string]interface{}))
 			*onRowArr = append(*onRowArr, onRow)
-			cb = true
+			//var cursor interface{}
+			var rows driver.Rows
+			*queryArgs = append(*queryArgs, sql.Out{Dest: &rows, In: false})
 		case *OutParam:
 			p := arg.(*OutParam)
 			_validateDest(p.Dest)
@@ -386,7 +384,7 @@ func _preprocessParams(args []interface{}, onRowArr *[]func(map[string]interface
 		}
 	}
 	// Syntax like [on_test1:Test, on_test2:Test] is be used to call SP with IMPLICIT cursors
-	return cbArray
+	return implicitCursors
 }
 
 func (ds *DataStore) _queryCB(sqlQuery string, onRowArr []func(map[string]interface{}), queryArgs ...interface{}) {
@@ -422,7 +420,7 @@ func (ds *DataStore) _queryCB(sqlQuery string, onRowArr []func(map[string]interf
 	}
 }
 
-func (ds *DataStore) _exec(sqlQuery string, args ...interface{}) int64 {
+func (ds *DataStore) _exec(sqlQuery string, onRowArr []func(map[string]interface{}), args ...interface{}) int64 {
 	// === Prepare -> Exec to access RowsAffected
 	stmt, err := ds._prepare(sqlQuery)
 	if err != nil {
@@ -438,6 +436,22 @@ func (ds *DataStore) _exec(sqlQuery string, args ...interface{}) int64 {
 	if err != nil {
 		panic(err)
 	}
+	onRowIndex := 0
+	for _, arg := range args {
+		switch arg.(type) {
+		case sql.Out:
+			out := arg.(sql.Out)
+			if out.Dest != nil {
+				switch out.Dest.(type) {
+				case *driver.Rows:
+					rows := out.Dest.(*driver.Rows)
+					onRow := onRowArr[onRowIndex]
+					_fetchCursor(*rows, onRow)
+					onRowIndex++
+				}
+			}
+		}
+	}
 	ra, err := res.RowsAffected()
 	if err != nil {
 		println(err.Error())
@@ -446,17 +460,44 @@ func (ds *DataStore) _exec(sqlQuery string, args ...interface{}) int64 {
 	return ra
 }
 
+func _fetchCursor(rows driver.Rows, onRow func(map[string]interface{})) {
+	defer func() {
+		err := rows.Close()
+		if err != nil {
+			panic(err)
+		}
+	}()
+	colNames := rows.Columns()
+	data := make(map[string]interface{})
+	values := make([]driver.Value, len(colNames))
+	for {
+		err := rows.Next(values)
+		if err == nil {
+			for i, colName := range colNames {
+				data[colName] = values[i]
+			}
+			onRow(data)
+		} else {
+			break
+		}
+	}
+}
+
 func (ds *DataStore) Exec(sqlQuery string, args ...interface{}) int64 {
 	sqlQuery = ds._formatSQL(sqlQuery)
 	var onRowArr []func(map[string]interface{})
 	var queryArgs []interface{}
-	_preprocessParams(args, &onRowArr, &queryArgs)
-	if len(onRowArr) > 0 {
-		ds._queryCB(sqlQuery, onRowArr, queryArgs...)
+	// Syntax like [on_test1:Test, on_test2:Test] is be used to call SP with IMPLICIT cursors
+	implicitCursors := _processExecParams(args, &onRowArr, &queryArgs)
+	if implicitCursors {
+		if ds.isOracle() {
+			panic("Fetching of Oracle Implicit Cursors is not implemented yet")
+		} else {
+			ds._queryCB(sqlQuery, onRowArr, queryArgs...) // it works with MySQL SP
+		}
 		return 0
 	}
-	// pass queryArgs in both cases to work with out/inout params
-	return ds._exec(sqlQuery, queryArgs...)
+	return ds._exec(sqlQuery, onRowArr, queryArgs...)
 }
 
 func _validateQuery(found int) {
