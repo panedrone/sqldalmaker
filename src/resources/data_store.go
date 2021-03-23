@@ -17,24 +17,33 @@ import (
    Improvements are welcome: sdm@gmail.com
 */
 
-type InOut struct {
+type OutParam struct {
 	/*
-		var outRating float64 // no need to init for OUT parameter
-		cxDao.SpTestOutParams(47, InOut{Dest: &inOut}) // InOut.In is false by default
-		// this one is also ok for OUT parameters:
-		// cxDao.SpTestOutParams(47, &outRating)
+
+		var outRating float64 // <- no need to init it for OUT parameter
+		cxDao.SpTestOutParams(47, OutParam{Dest: &inOut})
+		// cxDao.SpTestOutParams(47, &outRating) // <- this one is also ok for OUT parameters
 		fmt.Println(outRating)
 
-		inOut := 123.0 // INOUT parameter must be initialised
-		cxDao.SpTestInoutParams(InOut{Dest: &inOut, In: true}) // In: true -> designates INOUT parameter
-		fmt.Println(inOut)
 	*/
 
 	// Dest is a pointer to the value that will be set to the result of the
-	// stored procedure's OUTPUT parameter.
+	// stored procedure's OUT parameter.
 	Dest interface{}
-	// In is whether the parameter is an INOUT parameter.
-	In bool // false default
+}
+
+type InOutParam struct {
+	/*
+
+		inOut := 123.0 // INOUT parameter must be initialised
+		cxDao.SpTestInoutParams(InOutParam{Dest: &inOut})
+		fmt.Println(inOut)
+
+	*/
+
+	// Dest is a pointer to the value that will be set to the result of the
+	// stored procedure's OUT parameter.
+	Dest interface{}
 }
 
 type DataStore struct {
@@ -297,6 +306,33 @@ func (ds *DataStore) Insert(sqlQuery string, aiNames string, args ...interface{}
 	return ds._execInsertBuiltin(sqlQuery, args...)
 }
 
+func _isPtr(p interface{}) bool {
+	val := reflect.ValueOf(p)
+	kindOfJ := val.Kind()
+	return kindOfJ == reflect.Ptr
+}
+
+func _pointsToNil(p interface{}) bool {
+	switch d := p.(type) {
+	case *interface{}:
+		pointsTo := *d
+		return pointsTo == nil
+	}
+	return false
+}
+
+func _validateDest(dest interface{}) {
+	if dest == nil {
+		panic("OutParam/InOutParam -> Dest is nil")
+	}
+	if !_isPtr(dest) {
+		panic("OutParam/InOutParam -> Dest must be a Ptr")
+	}
+	if _pointsToNil(dest) {
+		panic("OutParam/InOutParam -> Dest points to nil")
+	}
+}
+
 func _preprocessParams(args []interface{}, onRowArr *[]func(map[string]interface{}), queryArgs *[]interface{}) bool {
 	cbArray := false
 	cb := false
@@ -320,25 +356,34 @@ func _preprocessParams(args []interface{}, onRowArr *[]func(map[string]interface
 			}
 			onRow := arg.(func(map[string]interface{}))
 			*onRowArr = append(*onRowArr, onRow)
-		case InOut:
-			inOut := arg.(InOut)
-			val := reflect.ValueOf(inOut.Dest)
-			kindOfJ := val.Kind()
-			if kindOfJ != reflect.Ptr {
-				panic("InOut.Dest is not Ptr")
-			}
-			*queryArgs = append(*queryArgs, sql.Out{Dest: inOut.Dest, In: inOut.In})
+		case *OutParam:
+			p := arg.(*OutParam)
+			_validateDest(p.Dest)
+			*queryArgs = append(*queryArgs, sql.Out{Dest: p.Dest, In: false})
+		case OutParam:
+			p := arg.(OutParam)
+			_validateDest(p.Dest)
+			*queryArgs = append(*queryArgs, sql.Out{Dest: p.Dest, In: false})
+		case *InOutParam:
+			p := arg.(*InOutParam)
+			_validateDest(p.Dest)
+			*queryArgs = append(*queryArgs, sql.Out{Dest: p.Dest, In: true})
+		case InOutParam:
+			p := arg.(InOutParam)
+			_validateDest(p.Dest)
+			*queryArgs = append(*queryArgs, sql.Out{Dest: p.Dest, In: true})
 		default:
-			val := reflect.ValueOf(arg)
-			kindOfJ := val.Kind()
-			if kindOfJ == reflect.Ptr {
+			if _isPtr(arg) {
+				if _pointsToNil(arg) {
+					panic("arg points to nil")
+				}
 				*queryArgs = append(*queryArgs, sql.Out{Dest: arg, In: false})
 			} else {
 				*queryArgs = append(*queryArgs, arg)
 			}
 		}
 	}
-	// [on_test1:Test, on_test2:Test] will be used to call SP with IMPLICIT cursors
+	// Syntax like [on_test1:Test, on_test2:Test] is be used to call SP with IMPLICIT cursors
 	return cbArray
 }
 
