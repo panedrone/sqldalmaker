@@ -1,3 +1,7 @@
+2021-03-24
+
+    Go -> SP OUT/INOUT parameters -> MySQL
+
 2021-03-23
 
     Go + Oracle -> UDF returning SYS_REFCURSOR
