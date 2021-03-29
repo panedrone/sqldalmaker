@@ -24,6 +24,7 @@ class DataStore:
     def close(self):
         if self.connection:
             self.connection.close()
+            self.connection = None
 
     def start_transaction(self):
         self.connection.start_transaction()

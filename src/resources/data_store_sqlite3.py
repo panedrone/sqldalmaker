@@ -19,6 +19,7 @@ class DataStore:
     def close(self):
         if self._con:
             self._con.close()
+            self._con = None
 
     def start_transaction(self):
         self._con.execute('begin')
