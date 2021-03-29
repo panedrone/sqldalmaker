@@ -13,7 +13,6 @@ class DataStore:
     Copy-paste this code to your project and change it for your needs.
     Improvements are welcome: sqldalmaker@gmail.com
     """
-
     def __init__(self):
         self.connection = None
 

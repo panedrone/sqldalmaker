@@ -18,7 +18,8 @@ class DataStore:
     Copy-paste this code to your project and change it for your needs.
     Improvements are welcome: sqldalmaker@gmail.com
     """
-    conn = None
+    def __init__(self):
+        self.conn = None
 
     def open(self):
         self.conn = psycopg2.connect(host="localhost", database="my-tests", user="postgres", password="sa")

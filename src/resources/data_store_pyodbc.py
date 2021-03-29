@@ -9,7 +9,8 @@ class DataStore:
     Copy-paste this code to your project and change it for your needs.
     Improvements are welcome: sqldalmaker@gmail.com
     """
-    conn = None
+    def __init__(self):
+        self.conn = None
 
     def open(self) -> None:
         # self.conn = pyodbc.connect('DRIVER={CData ODBC Driver for PostgreSQL};'
