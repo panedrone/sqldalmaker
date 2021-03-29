@@ -10,8 +10,10 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiReferenceBase;
+import com.intellij.util.ArrayUtil;
 import com.sqldalmaker.common.Const;
 import com.sqldalmaker.common.FileSearchHelpers;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -56,12 +58,11 @@ public class PsiReferenceDtoClass extends PsiReferenceBase<PsiElement> {
         return IdeaReferenceCompletion.find_dto_class_xml_tag(project, dto_xml_file, canonical_text);
     }
 
-//    @NotNull
-//    @Override
-//    public Object[] getVariants() {
-//        // code completion is not implemented for this attribute value yet
-//        return ArrayUtil.EMPTY_OBJECT_ARRAY;
-//    }
+    @NotNull
+    public Object @NotNull [] getVariants() {
+        // code completion is not implemented for this attribute value yet
+        return ArrayUtil.EMPTY_OBJECT_ARRAY;
+    }
 
     @Override
     public boolean isSoft() {

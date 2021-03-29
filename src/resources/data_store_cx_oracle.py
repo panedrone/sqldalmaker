@@ -19,16 +19,18 @@ class DataStore:
     Copy-paste this code to your project and change it for your needs.
     Improvements are welcome: sqldalmaker@gmail.com
     """
-    conn = None
+    def __init__(self):
+        self.conn = None
 
     def open(self):
-        self.conn = cx_Oracle.connect('ORDERS', 'sa', 'localhost:1521/orcl', encoding='UTF-8')
+        self.conn = cx_Oracle.connect('ORDERS', 'root', 'localhost:1521/orcl', encoding='UTF-8')
         # print(self.conn.autocommit)
 
     def close(self):
-        if self.conn is not None:
-            self.conn.close()
-            self.conn = None
+        if self.conn is None:
+            return
+        self.conn.close()
+        self.conn = None
 
     def start_transaction(self):
         self.conn.begin()
@@ -52,7 +54,6 @@ class DataStore:
         """
         with self.conn.cursor() as cursor:
             sql = _format_sql(sql)
-            gen_col_name = None
             gen_col_param = None
             if len(ai_values) > 0:
                 if len(ai_values) > 1:
@@ -73,54 +74,65 @@ class DataStore:
             sql: SQL statement.
             params: Values of SQL parameters.
         Returns:
-            Number of updated rows.
+            Number of affected rows.
         """
-        sp_sql = _get_sp_sql(sql, params)
+        sp_sql = _get_sp_sql(sql)
         if sp_sql is not None:
             sql = sp_sql
         sql = _format_sql(sql)
         with self.conn.cursor() as cursor:
             if sp_sql is None:
                 cursor.execute(sql, params)
-                return cursor.rowcount
             else:
-                out_cursors = False
-                call_params = []
-                for p in params:
-                    if isinstance(p, OutParam):
-                        cp = cursor.var(p.param_type)
-                        cp.setvalue(0, p.param_value)
-                        call_params.append(cp)
-                    elif callable(p):
-                        cp = self.conn.cursor()
-                        call_params.append(cp)
-                        out_cursors = True
-                    elif isinstance(p, list) and callable(p[0]):
-                        pass
-                    else:
-                        call_params.append(p)
-                cursor.execute(sql, call_params)
-                if out_cursors:
-                    i = 0
-                    for p in params:
-                        if callable(p):
-                            cp = call_params[i]
-                            _fetch_all(cp, p)
-                            cp.close()
+                self._call_proc(sql, cursor, params)
+            return cursor.rowcount
+
+    def _prepare_call_params(self, cursor, params):
+        out_cursors = False
+        call_params = []
+        for p in params:
+            if isinstance(p, OutParam):
+                cp = cursor.var(p.param_type)
+                cp.setvalue(0, p.param_value)
+                call_params.append(cp)
+            elif callable(p):
+                cp = self.conn.cursor()
+                call_params.append(cp)
+                out_cursors = True
+            elif isinstance(p, list) and callable(p[0]):
+                pass
+            else:
+                call_params.append(p)
+        return call_params, out_cursors
+
+    @staticmethod
+    def _process_call_results(cursor, out_cursors, call_params, params):
+        if out_cursors:
+            i = 0
+            for p in params:
+                if callable(p):
+                    cp = call_params[i]
+                    _fetch_all(cp, p)
+                    cp.close()
+                i += 1
+        else:
+            for p in params:
+                if isinstance(p, list) and callable(p[0]):
+                    i = 0  # (exec-dml)+(SP call)+(list-param containing callback(s)) means 'implicit cursor'
+                    for implicit_cursor in cursor.getimplicitresults():
+                        _fetch_all(implicit_cursor, p[i])
                         i += 1
-                else:
-                    for p in params:
-                        if isinstance(p, list) and callable(p[0]):
-                            i = 0  # (exec-dml)+(SP call)+(list-param containing callback(s)) means 'implicit cursor'
-                            for implicit_cursor in cursor.getimplicitresults():
-                                _fetch_all(implicit_cursor, p[i])
-                                i += 1
-                i = 0
-                for p in params:
-                    if isinstance(p, OutParam):
-                        cp = call_params[i]
-                        p.param_value = cp.getvalue()
-                    i += 1
+        i = 0
+        for p in params:
+            if isinstance(p, OutParam):
+                cp = call_params[i]
+                p.param_value = cp.getvalue()
+            i += 1
+
+    def _call_proc(self, sql, cursor, params):
+        call_params, out_cursors = self._prepare_call_params(cursor, params)
+        cursor.execute(sql, call_params)
+        self._process_call_results(cursor, out_cursors, call_params, params)
 
     def query_scalar(self, sql, params):
         """
@@ -150,7 +162,7 @@ class DataStore:
             sql: SQL statement.
             params: Values of SQL parameters if needed.
         """
-        sp_sql = _get_sp_sql(sql, params)
+        sp_sql = _get_sp_sql(sql)
         if sp_sql is not None:
             sql = sp_sql
         sql = _format_sql(sql)
@@ -173,11 +185,7 @@ class DataStore:
             Exception: if amount of rows != 1.
         """
         rows = []
-
-        def callback(row):
-            rows.append(row)
-
-        self.query_all_rows(sql, params, callback)
+        self.query_all_rows(sql, params, lambda row: rows.append(row))
         if len(rows) == 0:
             raise Exception('No rows')
         if len(rows) > 1:
@@ -193,7 +201,7 @@ class DataStore:
             params: Values of SQL parameters if needed.
             callback
         """
-        sp_sql = _get_sp_sql(sql, params)
+        sp_sql = _get_sp_sql(sql)
         if sp_sql is not None:
             sql = sp_sql
         sql = _format_sql(sql)
@@ -205,7 +213,7 @@ class DataStore:
                 raise Exception("SP are not allowed in 'query...', use 'exec-dml' instead")
 
 
-def _get_sp_sql(sql, params):
+def _get_sp_sql(sql):
     parts = sql.split()
     if len(parts) >= 2 and parts[0].strip().lower() == "begin":
         return sql
