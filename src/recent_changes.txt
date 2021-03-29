@@ -1,3 +1,7 @@
+2021-03-29
+
+    Go + PostgreSQL -> OUT and INOUT parameters
+
 2021-03-23
 
     Go + Oracle -> UDF returning SYS_REFCURSOR

@@ -334,9 +334,11 @@ func _validateDest(dest interface{}) {
 	}
 }
 
-func _processExecParams(args []interface{}, onRowArr *[]func(map[string]interface{}), queryArgs *[]interface{}) bool {
+func (ds *DataStore) _processExecParams(args []interface{}, onRowArr *[]func(map[string]interface{}),
+	queryArgs *[]interface{}) (bool, bool) {
 	implicitCursors := false
 	outCursors := false
+	hasPgInOutParams := false
 	for _, arg := range args {
 		switch arg.(type) {
 		case []func(map[string]interface{}):
@@ -377,14 +379,19 @@ func _processExecParams(args []interface{}, onRowArr *[]func(map[string]interfac
 				if _pointsToNil(arg) {
 					panic("arg points to nil")
 				}
-				*queryArgs = append(*queryArgs, sql.Out{Dest: arg, In: false})
+				if ds.isOracle() {
+					*queryArgs = append(*queryArgs, sql.Out{Dest: arg, In: false})
+				} else {
+					*queryArgs = append(*queryArgs, arg) // PostgreSQL
+					hasPgInOutParams = true
+				}
 			} else {
 				*queryArgs = append(*queryArgs, arg)
 			}
 		}
 	}
-	// Syntax like [on_test1:Test, on_test2:Test] is be used to call SP with IMPLICIT cursors
-	return implicitCursors
+	// Syntax like [on_test1:Test, on_test2:Test] is used to call SP with IMPLICIT cursors
+	return implicitCursors, hasPgInOutParams
 }
 
 func (ds *DataStore) _queryCB(sqlQuery string, onRowArr []func(map[string]interface{}), queryArgs ...interface{}) {
@@ -417,6 +424,37 @@ func (ds *DataStore) _queryCB(sqlQuery string, onRowArr []func(map[string]interf
 			break
 		}
 		onRowIndex++
+	}
+}
+
+func (ds *DataStore) _queryCallPostgreSQL(sqlQuery string, queryArgs ...interface{}) {
+	rows, err := ds._query(sqlQuery, queryArgs...)
+	if err != nil {
+		panic(err)
+	}
+	defer func() {
+		err := rows.Close()
+		if err != nil {
+			panic(err)
+		}
+	}()
+	outParamIndex := 0
+	// re-detect columns for each ResultSet
+	_, _, values, valuePointers := ds._prepareFetch(rows)
+	if rows.Next() {
+		err = rows.Scan(valuePointers...)
+		if err == nil {
+			for _, arg := range queryArgs {
+				if _isPtr(arg) {
+					ds.Assign(arg, values[outParamIndex])
+				}
+			}
+		} else {
+			panic(err)
+		}
+		outParamIndex++
+	} else {
+		panic("_queryCallPostgreSQL -> rows.Next() failed")
 	}
 }
 
@@ -488,7 +526,7 @@ func (ds *DataStore) Exec(sqlQuery string, args ...interface{}) int64 {
 	var onRowArr []func(map[string]interface{})
 	var queryArgs []interface{}
 	// Syntax like [on_test1:Test, on_test2:Test] is be used to call SP with IMPLICIT cursors
-	implicitCursors := _processExecParams(args, &onRowArr, &queryArgs)
+	implicitCursors, hasPgInOutParams := ds._processExecParams(args, &onRowArr, &queryArgs)
 	if implicitCursors {
 		if ds.isOracle() {
 			panic("Fetching of Oracle Implicit Cursors is not implemented yet")
@@ -497,7 +535,12 @@ func (ds *DataStore) Exec(sqlQuery string, args ...interface{}) int64 {
 		}
 		return 0
 	}
-	return ds._exec(sqlQuery, onRowArr, queryArgs...)
+	if hasPgInOutParams {
+		ds._queryCallPostgreSQL(sqlQuery, queryArgs...)
+		return 0
+	} else {
+		return ds._exec(sqlQuery, onRowArr, queryArgs...)
+	}
 }
 
 func _validateQuery(found int) {
