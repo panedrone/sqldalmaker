@@ -162,28 +162,28 @@ func (ds *DataStore) Rollback() {
 	ds.tx = nil
 }
 
-func (ds *DataStore) _query(sqlQuery string, args ...interface{}) (*sql.Rows, error) {
+func (ds *DataStore) _query(sqlStr string, args ...interface{}) (*sql.Rows, error) {
 	if ds.tx == nil {
-		return ds.handle.Query(sqlQuery, args...)
+		return ds.handle.Query(sqlStr, args...)
 	}
-	return ds.tx.Query(sqlQuery, args...)
+	return ds.tx.Query(sqlStr, args...)
 }
 
-func (ds *DataStore) _prepare(sqlQuery string) (*sql.Stmt, error) {
+func (ds *DataStore) _prepare(sqlStr string) (*sql.Stmt, error) {
 	if ds.tx == nil {
-		return ds.handle.Prepare(sqlQuery)
+		return ds.handle.Prepare(sqlStr)
 	}
-	return ds.tx.Prepare(sqlQuery)
+	return ds.tx.Prepare(sqlStr)
 }
 
 func (ds *DataStore) PGFetch(cursor string) string {
 	return fmt.Sprintf("fetch all from \"%s\"", cursor)
 }
 
-func (ds *DataStore) _pgInsert(sqlQuery string, aiNames string, args ...interface{}) interface{} {
+func (ds *DataStore) _pgInsert(sqlStr string, aiNames string, args ...interface{}) interface{} {
 	// fetching of multiple AI values is not implemented so far:
-	sqlQuery += " RETURNING " + aiNames
-	rows, err := ds._query(sqlQuery, args...)
+	sqlStr += " RETURNING " + aiNames
+	rows, err := ds._query(sqlStr, args...)
 	if err != nil {
 		panic(err)
 	}
@@ -201,19 +201,19 @@ func (ds *DataStore) _pgInsert(sqlQuery string, aiNames string, args ...interfac
 		}
 		return data
 	}
-	println("rows.Next() FAILED:" + sqlQuery)
+	println("rows.Next() FAILED:" + sqlStr)
 	return nil
 }
 
-func (ds *DataStore) _oracleInsert(sqlQuery string, aiNames string, args ...interface{}) interface{} {
+func (ds *DataStore) _oracleInsert(sqlStr string, aiNames string, args ...interface{}) interface{} {
 	// fetching of multiple AI values is not implemented so far:
-	sqlQuery += " returning " + aiNames + " into :" + aiNames
+	sqlStr += " returning " + aiNames + " into :" + aiNames
 	// https://ddcode.net/2019/05/11/how-does-go-call-oracles-stored-procedures-and-get-the-return-value-of-the-stored-procedures/
 	// var id64 float64
 	var id64 float64
 	args = append(args, sql.Out{Dest: &id64, In: false})
 	// ----------------
-	stmt, err := ds._prepare(sqlQuery)
+	stmt, err := ds._prepare(sqlStr)
 	if err != nil {
 		panic(err)
 	}
@@ -226,20 +226,20 @@ func (ds *DataStore) _oracleInsert(sqlQuery string, aiNames string, args ...inte
 	_, err = stmt.Exec(args...)
 	if err != nil {
 		println(err.Error())
-		println("Exec() FAILED: " + sqlQuery)
+		println("Exec() FAILED: " + sqlStr)
 		return nil
 	}
 	return id64
 }
 
-func (ds *DataStore) _mssqlInsert(sqlQuery string, args ...interface{}) interface{} {
+func (ds *DataStore) _mssqlInsert(sqlStr string, args ...interface{}) interface{} {
 	// SQL Server https://github.com/denisenkom/go-mssqldb
 	// LastInsertId should not be used with this driver (or SQL Server) due to
 	// how the TDS protocol works. Please use the OUTPUT Clause or add a select
 	// ID = convert(bigint, SCOPE_IDENTITY()); to the end of your query (ref SCOPE_IDENTITY).
 	//  This will ensure you are getting the correct ID and will prevent a network round trip.
-	sqlQuery += ";SELECT @@IDENTITY;"
-	rows, err := ds._query(sqlQuery, args...)
+	sqlStr += ";SELECT @@IDENTITY;"
+	rows, err := ds._query(sqlStr, args...)
 	if err != nil {
 		panic(err)
 	}
@@ -257,13 +257,13 @@ func (ds *DataStore) _mssqlInsert(sqlQuery string, args ...interface{}) interfac
 		}
 		return data
 	}
-	println("rows.Next() FAILED: " + sqlQuery)
+	println("rows.Next() FAILED: " + sqlStr)
 	return nil
 }
 
-func (ds *DataStore) _execInsertBuiltin(sqlQuery string, args ...interface{}) interface{} {
+func (ds *DataStore) _execInsertBuiltin(sqlStr string, args ...interface{}) interface{} {
 	// === Prepare -> Exec to access LastInsertId
-	stmt, err := ds._prepare(sqlQuery)
+	stmt, err := ds._prepare(sqlStr)
 	if err != nil {
 		panic(err)
 	}
@@ -284,27 +284,27 @@ func (ds *DataStore) _execInsertBuiltin(sqlQuery string, args ...interface{}) in
 	// The Go builtin functions print and println print to stderr
 	// https://stackoverflow.com/questions/29721449/how-can-i-print-to-stderr-in-go-without-using-log
 	println(err.Error())
-	println("res.LastInsertId() FAILED: " + sqlQuery)
+	println("res.LastInsertId() FAILED: " + sqlStr)
 	return nil
 }
 
-func (ds *DataStore) Insert(sqlQuery string, aiNames string, args ...interface{}) interface{} {
+func (ds *DataStore) Insert(sqlStr string, aiNames string, args ...interface{}) interface{} {
 	// len(nil) == 0
 	if len(aiNames) == 0 {
 		panic("DataStore.insert is not applicable for aiNames = " + aiNames)
 	}
 	// Builtin LastInsertId works only with MySQL and SQLite3
-	sqlQuery = ds._formatSQL(sqlQuery)
+	sqlStr = ds._formatSQL(sqlStr)
 	if ds.isPostgreSQL() {
-		return ds._pgInsert(sqlQuery, aiNames, args...)
+		return ds._pgInsert(sqlStr, aiNames, args...)
 	} else if ds.isSqlServer() {
-		return ds._mssqlInsert(sqlQuery, args...)
+		return ds._mssqlInsert(sqlStr, args...)
 	} else if ds.isOracle() {
 		// Oracle: specify AI values explicitly:
 		// <crud-auto dto="ProjectInfo" table="PROJECTS" generated="P_ID"/>
-		return ds._oracleInsert(sqlQuery, aiNames, args...)
+		return ds._oracleInsert(sqlStr, aiNames, args...)
 	}
-	return ds._execInsertBuiltin(sqlQuery, args...)
+	return ds._execInsertBuiltin(sqlStr, args...)
 }
 
 func _isPtr(p interface{}) bool {
@@ -336,9 +336,9 @@ func _validateDest(dest interface{}) {
 
 func (ds *DataStore) _processExecParams(args []interface{}, onRowArr *[]func(map[string]interface{}),
 	queryArgs *[]interface{}) (bool, bool) {
+
 	implicitCursors := false
 	outCursors := false
-	hasPgInOutParams := false
 	for _, arg := range args {
 		switch arg.(type) {
 		case []func(map[string]interface{}):
@@ -382,8 +382,7 @@ func (ds *DataStore) _processExecParams(args []interface{}, onRowArr *[]func(map
 				if ds.isOracle() {
 					*queryArgs = append(*queryArgs, sql.Out{Dest: arg, In: false})
 				} else {
-					*queryArgs = append(*queryArgs, arg) // PostgreSQL
-					hasPgInOutParams = true
+					*queryArgs = append(*queryArgs, arg) // PostgreSQL, MySQL
 				}
 			} else {
 				*queryArgs = append(*queryArgs, arg)
@@ -391,11 +390,11 @@ func (ds *DataStore) _processExecParams(args []interface{}, onRowArr *[]func(map
 		}
 	}
 	// Syntax like [on_test1:Test, on_test2:Test] is used to call SP with IMPLICIT cursors
-	return implicitCursors, hasPgInOutParams
+	return implicitCursors, outCursors
 }
 
-func (ds *DataStore) _queryCB(sqlQuery string, onRowArr []func(map[string]interface{}), queryArgs ...interface{}) {
-	rows, err := ds._query(sqlQuery, queryArgs...)
+func (ds *DataStore) _queryMySqlCB(sqlStr string, onRowArr []func(map[string]interface{}), queryArgs ...interface{}) {
+	rows, err := ds._query(sqlStr, queryArgs...)
 	if err != nil {
 		panic(err)
 	}
@@ -427,40 +426,9 @@ func (ds *DataStore) _queryCB(sqlQuery string, onRowArr []func(map[string]interf
 	}
 }
 
-func (ds *DataStore) _queryCallPostgreSQL(sqlQuery string, queryArgs ...interface{}) {
-	rows, err := ds._query(sqlQuery, queryArgs...)
-	if err != nil {
-		panic(err)
-	}
-	defer func() {
-		err := rows.Close()
-		if err != nil {
-			panic(err)
-		}
-	}()
-	outParamIndex := 0
-	// re-detect columns for each ResultSet
-	_, _, values, valuePointers := ds._prepareFetch(rows)
-	if rows.Next() {
-		err = rows.Scan(valuePointers...)
-		if err == nil {
-			for _, arg := range queryArgs {
-				if _isPtr(arg) {
-					ds.Assign(arg, values[outParamIndex])
-				}
-			}
-		} else {
-			panic(err)
-		}
-		outParamIndex++
-	} else {
-		panic("_queryCallPostgreSQL -> rows.Next() failed")
-	}
-}
-
-func (ds *DataStore) _exec(sqlQuery string, onRowArr []func(map[string]interface{}), args ...interface{}) int64 {
+func (ds *DataStore) _exec(sqlStr string, onRowArr []func(map[string]interface{}), args ...interface{}) int64 {
 	// === Prepare -> Exec to access RowsAffected
-	stmt, err := ds._prepare(sqlQuery)
+	stmt, err := ds._prepare(sqlStr)
 	if err != nil {
 		panic(err)
 	}
@@ -521,26 +489,21 @@ func _fetchCursor(rows driver.Rows, onRow func(map[string]interface{})) {
 	}
 }
 
-func (ds *DataStore) Exec(sqlQuery string, args ...interface{}) int64 {
-	sqlQuery = ds._formatSQL(sqlQuery)
+func (ds *DataStore) Exec(sqlStr string, args ...interface{}) int64 {
+	sqlStr = ds._formatSQL(sqlStr)
 	var onRowArr []func(map[string]interface{})
 	var queryArgs []interface{}
-	// Syntax like [on_test1:Test, on_test2:Test] is be used to call SP with IMPLICIT cursors
-	implicitCursors, hasPgInOutParams := ds._processExecParams(args, &onRowArr, &queryArgs)
+	// Syntax like [on_test1:Test, on_test2:Test] is used to call SP with IMPLICIT cursors
+	implicitCursors, _ := ds._processExecParams(args, &onRowArr, &queryArgs)
 	if implicitCursors {
 		if ds.isOracle() {
 			panic("Fetching of Oracle Implicit Cursors is not implemented yet")
 		} else {
-			ds._queryCB(sqlQuery, onRowArr, queryArgs...) // it works with MySQL SP
+			ds._queryMySqlCB(sqlStr, onRowArr, queryArgs...)
 		}
 		return 0
 	}
-	if hasPgInOutParams {
-		ds._queryCallPostgreSQL(sqlQuery, queryArgs...)
-		return 0
-	} else {
-		return ds._exec(sqlQuery, onRowArr, queryArgs...)
-	}
+	return ds._exec(sqlStr, onRowArr, queryArgs...)
 }
 
 func _validateQuery(found int) {
@@ -550,19 +513,55 @@ func _validateQuery(found int) {
 	}
 }
 
-func (ds *DataStore) Query(sqlQuery string, args ...interface{}) interface{} {
-	var arr []interface{}
-	onRow := func(date interface{}) {
-		arr = append(arr, date)
+func (ds *DataStore) _queryScalar(sqlStr string, queryArgs ...interface{}) []interface{} {
+	rows, err := ds._query(sqlStr, queryArgs...)
+	if err != nil {
+		panic(err)
 	}
-	ds.QueryAll(sqlQuery, onRow, args...)
-	_validateQuery(len(arr)) // A nil slice has a len of 0.
+	defer func() {
+		err := rows.Close()
+		if err != nil {
+			panic(err)
+		}
+	}()
+	outParamIndex := 0
+	_, _, values, valuePointers := ds._prepareFetch(rows)
+	if rows.Next() {
+		err = rows.Scan(valuePointers...)
+		if err == nil {
+			for _, arg := range queryArgs {
+				if _isPtr(arg) {
+					ds.Assign(arg, values[outParamIndex])
+				}
+			}
+		} else {
+			panic(err)
+		}
+		outParamIndex++
+	} else {
+		panic(fmt.Sprintf("Rows found 0 for %s", sqlStr))
+	}
+	if rows.Next() {
+		panic(fmt.Sprintf("More than 1 row found for %s", sqlStr))
+	}
+	return values
+}
+
+func (ds *DataStore) Query(sqlStr string, args ...interface{}) interface{} {
+	sqlStr = ds._formatSQL(sqlStr)
+	var onRowArr []func(map[string]interface{})
+	var queryArgs []interface{}
+	implicitCursors, outCursors := ds._processExecParams(args, &onRowArr, &queryArgs)
+	if implicitCursors || outCursors {
+		panic("Not supported in Query: implicitCursors || outCursors")
+	}
+	arr := ds._queryScalar(sqlStr, queryArgs...)
 	return arr[0]
 }
 
-func (ds *DataStore) QueryAll(sqlQuery string, onRow func(interface{}), args ...interface{}) {
-	sqlQuery = ds._formatSQL(sqlQuery)
-	rows, err := ds._query(sqlQuery, args...)
+func (ds *DataStore) QueryAll(sqlStr string, onRow func(interface{}), args ...interface{}) {
+	sqlStr = ds._formatSQL(sqlStr)
+	rows, err := ds._query(sqlStr, args...)
 	if err != nil {
 		panic(err)
 	}
@@ -591,21 +590,21 @@ func (ds *DataStore) QueryAll(sqlQuery string, onRow func(interface{}), args ...
 	}
 }
 
-func (ds *DataStore) QueryRow(sqlQuery string, args ...interface{}) map[string]interface{} {
+func (ds *DataStore) QueryRow(sqlStr string, args ...interface{}) map[string]interface{} {
 	var arr []map[string]interface{}
 	onRow := func(rowData map[string]interface{}) {
 		arr = append(arr, rowData)
 	}
-	ds.QueryAllRows(sqlQuery, onRow, args...)
+	ds.QueryAllRows(sqlStr, onRow, args...)
 	_validateQuery(len(arr)) // A nil slice has a len of 0.
 	return arr[0]
 }
 
-func (ds *DataStore) QueryAllRows(sqlQuery string, onRow func(map[string]interface{}), args ...interface{}) {
+func (ds *DataStore) QueryAllRows(sqlStr string, onRow func(map[string]interface{}), args ...interface{}) {
 	// many thanks to:
 	// https://stackoverflow.com/questions/51731423/how-to-read-a-row-from-a-table-to-a-map-without-knowing-columns
-	sqlQuery = ds._formatSQL(sqlQuery)
-	rows, err := ds._query(sqlQuery, args...)
+	sqlStr = ds._formatSQL(sqlStr)
+	rows, err := ds._query(sqlStr, args...)
 	if err != nil {
 		panic(err)
 	}
@@ -655,22 +654,22 @@ func (ds *DataStore) _prepareFetch(rows *sql.Rows) ([]string, map[string]interfa
 	return colNames, data, values, valuePointers
 }
 
-func (ds *DataStore) _formatSQL(sqlQuery string) string {
+func (ds *DataStore) _formatSQL(sqlStr string) string {
 	if len(ds.paramPrefix) == 0 {
-		return sqlQuery
+		return sqlStr
 	}
 	i := 1
 	for {
-		pos := strings.Index(sqlQuery, "?")
+		pos := strings.Index(sqlStr, "?")
 		if pos == -1 {
 			break
 		}
-		str1 := sqlQuery[0:pos]
-		str2 := sqlQuery[pos+1:]
-		sqlQuery = str1 + ds.paramPrefix + strconv.Itoa(i) + str2
+		str1 := sqlStr[0:pos]
+		str2 := sqlStr[pos+1:]
+		sqlStr = str1 + ds.paramPrefix + strconv.Itoa(i) + str2
 		i += 1
 	}
-	return sqlQuery
+	return sqlStr
 }
 
 func _assignString(d *string, value interface{}) bool {
@@ -798,7 +797,7 @@ func _assignBoolean(d *bool, value interface{}) bool {
 	return true
 }
 
-func (ds *DataStore) AssignValue(fieldAddr interface{}, value interface{}) {
+func AssignValue(fieldAddr interface{}, value interface{}) {
 	if value == nil {
 		switch d := fieldAddr.(type) {
 		case *interface{}:
@@ -850,10 +849,10 @@ func (ds *DataStore) AssignValue(fieldAddr interface{}, value interface{}) {
 		*d = value
 		return
 	}
-	panic(fmt.Sprintf("Cannot process DataStore.assign(%T, %T)", fieldAddr, value))
+	panic(fmt.Sprintf("Unexpected parameters: AssignValue(%T, %T)", fieldAddr, value))
 }
 
-// Extend/improve methods Assign, AssignValue and related functions on demand:
+// Extend/improve method Assign and related functions on demand:
 
 func (ds *DataStore) Assign(fieldAddr interface{}, value interface{}) {
 	switch value.(type) {
@@ -865,10 +864,10 @@ func (ds *DataStore) Assign(fieldAddr interface{}, value interface{}) {
 			arr := value.([]interface{})
 			v0 := arr[0]
 			// it includes processing of v0 == nil
-			ds.AssignValue(fieldAddr, v0)
+			AssignValue(fieldAddr, v0)
 		}
 	default:
 		// it includes processing of value == nil
-		ds.AssignValue(fieldAddr, value)
+		AssignValue(fieldAddr, value)
 	}
 }
