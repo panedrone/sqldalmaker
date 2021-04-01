@@ -1,3 +1,7 @@
+2021-04-01
+
+    Go + Oracle -> SP + implicit RC (multiple implicit RC in one SP are not supported yet)
+
 2021-03-29
 
     Go + PostgreSQL -> OUT and INOUT parameters
