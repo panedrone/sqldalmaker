@@ -338,7 +338,6 @@ func (ds *DataStore) _processExecParams(args []interface{}, onRowArr *[]func(map
 	queryArgs *[]interface{}) (bool, bool) {
 	implicitCursors := false
 	outCursors := false
-	hasPgInOutParams := false
 	for _, arg := range args {
 		switch arg.(type) {
 		case []func(map[string]interface{}):
@@ -383,7 +382,6 @@ func (ds *DataStore) _processExecParams(args []interface{}, onRowArr *[]func(map
 					*queryArgs = append(*queryArgs, sql.Out{Dest: arg, In: false})
 				} else {
 					*queryArgs = append(*queryArgs, arg) // PostgreSQL
-					hasPgInOutParams = true
 				}
 			} else {
 				*queryArgs = append(*queryArgs, arg)
@@ -391,7 +389,7 @@ func (ds *DataStore) _processExecParams(args []interface{}, onRowArr *[]func(map
 		}
 	}
 	// Syntax like [on_test1:Test, on_test2:Test] is used to call SP with IMPLICIT cursors
-	return implicitCursors, hasPgInOutParams
+	return implicitCursors, outCursors
 }
 
 func (ds *DataStore) _queryAllImplicitRcOracle(sqlStr string, onRowArr []func(map[string]interface{}), queryArgs ...interface{}) {
@@ -469,37 +467,6 @@ func (ds *DataStore) _queryAllImplicitRcMySQL(sqlStr string, onRowArr []func(map
 	}
 }
 
-func (ds *DataStore) _queryRowPG(sqlStr string, queryArgs ...interface{}) {
-	rows, err := ds._query(sqlStr, queryArgs...)
-	if err != nil {
-		panic(err)
-	}
-	defer func() {
-		err := rows.Close()
-		if err != nil {
-			panic(err)
-		}
-	}()
-	outParamIndex := 0
-	// re-detect columns for each ResultSet
-	_, _, values, valuePointers := ds._prepareFetch(rows)
-	if rows.Next() {
-		err = rows.Scan(valuePointers...)
-		if err == nil {
-			for _, arg := range queryArgs {
-				if _isPtr(arg) {
-					ds.Assign(arg, values[outParamIndex])
-				}
-			}
-		} else {
-			panic(err)
-		}
-		outParamIndex++
-	} else {
-		panic("_queryRowPG -> rows.Next() failed")
-	}
-}
-
 func (ds *DataStore) _exec(sqlStr string, onRowArr []func(map[string]interface{}), args ...interface{}) int64 {
 	// === Prepare -> Exec to access RowsAffected
 	stmt, err := ds._prepare(sqlStr)
@@ -568,7 +535,7 @@ func (ds *DataStore) Exec(sqlStr string, args ...interface{}) int64 {
 	var onRowArr []func(map[string]interface{})
 	var queryArgs []interface{}
 	// Syntax like [on_test1:Test, on_test2:Test] is used to call SP with IMPLICIT cursors
-	implicitCursors, hasPgInOutParams := ds._processExecParams(args, &onRowArr, &queryArgs)
+	implicitCursors, _ := ds._processExecParams(args, &onRowArr, &queryArgs)
 	if implicitCursors {
 		if ds.isOracle() {
 			ds._queryAllImplicitRcOracle(sqlStr, onRowArr, queryArgs...)
@@ -577,12 +544,7 @@ func (ds *DataStore) Exec(sqlStr string, args ...interface{}) int64 {
 		}
 		return 0
 	}
-	if hasPgInOutParams {
-		ds._queryRowPG(sqlStr, queryArgs...)
-		return 0
-	} else {
-		return ds._exec(sqlStr, onRowArr, queryArgs...)
-	}
+	return ds._exec(sqlStr, onRowArr, queryArgs...)
 }
 
 func _validateQuery(found int) {
@@ -592,13 +554,49 @@ func _validateQuery(found int) {
 	}
 }
 
-func (ds *DataStore) Query(sqlStr string, args ...interface{}) interface{} {
-	var arr []interface{}
-	onRow := func(date interface{}) {
-		arr = append(arr, date)
+func (ds *DataStore) _queryScalar(sqlStr string, queryArgs ...interface{}) []interface{} {
+	rows, err := ds._query(sqlStr, queryArgs...)
+	if err != nil {
+		panic(err)
 	}
-	ds.QueryAll(sqlStr, onRow, args...)
-	_validateQuery(len(arr)) // A nil slice has a len of 0.
+	defer func() {
+		err := rows.Close()
+		if err != nil {
+			panic(err)
+		}
+	}()
+	outParamIndex := 0
+	_, _, values, valuePointers := ds._prepareFetch(rows)
+	if rows.Next() {
+		err = rows.Scan(valuePointers...)
+		if err == nil {
+			for _, arg := range queryArgs {
+				if _isPtr(arg) {
+					ds.Assign(arg, values[outParamIndex])
+				}
+			}
+		} else {
+			panic(err)
+		}
+		outParamIndex++
+	} else {
+		panic(fmt.Sprintf("Rows found 0 for %s", sqlStr))
+	}
+	if rows.Next() {
+		panic(fmt.Sprintf("More than 1 row found for %s", sqlStr))
+	}
+	return values
+}
+
+func (ds *DataStore) Query(sqlStr string, args ...interface{}) interface{} {
+	sqlStr = ds._formatSQL(sqlStr)
+	var onRowArr []func(map[string]interface{})
+	var queryArgs []interface{}
+	implicitCursors, outCursors := ds._processExecParams(args, &onRowArr, &queryArgs)
+	if implicitCursors || outCursors {
+		panic("Not supported in Query: implicitCursors || outCursors")
+	}
+	arr := ds._queryScalar(sqlStr, queryArgs...)
 	return arr[0]
 }
 
