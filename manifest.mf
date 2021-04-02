@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
 AutoUpdate-Show-In-Client: true
-OpenIDE-Module: com.sqldalmaker.netbeans
+OpenIDE-Module: sqldalmaker.netbeans
 OpenIDE-Module-Localizing-Bundle: com/sqldalmaker/netbeans/Bundle.properties
-OpenIDE-Module-Specification-Version: 1.193
+OpenIDE-Module-Specification-Version: 1.194

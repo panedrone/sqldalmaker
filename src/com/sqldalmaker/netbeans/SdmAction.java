@@ -45,7 +45,7 @@ import org.openide.util.actions.Presenter;
  */
 @ActionID(
         category = "Tools",
-        id = "com.sqldalmaker.netbeans.SdmAction"
+        id = "sqldalmaker.netbeans.SdmAction"
 )
 @ActionRegistration(
         lazy = false, // must be false to ensure call of getToolbarPresenter
