@@ -625,6 +625,7 @@ func (ds *DataStore) QueryAll(sqlStr string, onRow func(interface{}), args ...in
 }
 
 func (ds *DataStore) QueryRow(sqlStr string, args ...interface{}) map[string]interface{} {
+	sqlStr = ds._formatSQL(sqlStr)
 	rows, err := ds._query(sqlStr, args...)
 	if err != nil {
 		panic(err)
