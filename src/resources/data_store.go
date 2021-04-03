@@ -547,14 +547,7 @@ func (ds *DataStore) Exec(sqlStr string, args ...interface{}) int64 {
 	return ds._exec(sqlStr, onRowArr, queryArgs...)
 }
 
-func _validateQuery(found int) {
-	if found != 1 {
-		panic(fmt.Sprintf("1 row expected, but %d found. "+
-			"If you need a 'find' mode, use 'query-list' or 'query-dto-list' instead", found))
-	}
-}
-
-func (ds *DataStore) _queryScalar(sqlStr string, queryArgs ...interface{}) []interface{} {
+func (ds *DataStore) _queryRowValues(sqlStr string, queryArgs ...interface{}) []interface{} {
 	rows, err := ds._query(sqlStr, queryArgs...)
 	if err != nil {
 		panic(err)
@@ -596,8 +589,8 @@ func (ds *DataStore) Query(sqlStr string, args ...interface{}) interface{} {
 	if implicitCursors || outCursors {
 		panic("Not supported in Query: implicitCursors || outCursors")
 	}
-	arr := ds._queryScalar(sqlStr, queryArgs...)
-	return arr[0]
+	arr := ds._queryRowValues(sqlStr, queryArgs...)
+	return arr // it returns []interface{} for cases like 'SELECT @value, @name;'
 }
 
 func (ds *DataStore) QueryAll(sqlStr string, onRow func(interface{}), args ...interface{}) {
@@ -632,13 +625,33 @@ func (ds *DataStore) QueryAll(sqlStr string, onRow func(interface{}), args ...in
 }
 
 func (ds *DataStore) QueryRow(sqlStr string, args ...interface{}) map[string]interface{} {
-	var arr []map[string]interface{}
-	onRow := func(rowData map[string]interface{}) {
-		arr = append(arr, rowData)
+	rows, err := ds._query(sqlStr, args...)
+	if err != nil {
+		panic(err)
 	}
-	ds.QueryAllRows(sqlStr, onRow, args...)
-	_validateQuery(len(arr)) // A nil slice has a len of 0.
-	return arr[0]
+	defer func() {
+		err := rows.Close()
+		if err != nil {
+			panic(err)
+		}
+	}()
+	colNames, data, values, valuePointers := ds._prepareFetch(rows)
+	if rows.Next() {
+		err = rows.Scan(valuePointers...)
+		if err == nil {
+			for i, colName := range colNames {
+				data[colName] = values[i]
+			}
+		} else {
+			panic(err)
+		}
+	} else {
+		panic(fmt.Sprintf("Rows found 0 for %s", sqlStr))
+	}
+	if rows.Next() {
+		panic(fmt.Sprintf("More than 1 row found for %s", sqlStr))
+	}
+	return data
 }
 
 func (ds *DataStore) QueryAllRows(sqlStr string, onRow func(map[string]interface{}), args ...interface{}) {
