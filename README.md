@@ -6,3 +6,12 @@ Implemented as plug-ins for Eclipse IDE, IntelliJ-Platform, and NetBeans 11+.
 All the details are here: [sqldalmaker.sourceforge.net](sqldalmaker.sourceforge.net)
 
 ![SQL DAL Maker](sqldalmaker-idea.png)
+
+Demo-projects:
+#[PHP](https://github.com/panedrone/sdm.demo.php.sqlite3.todolist)
+#[Java/JDBC/Swing](https://github.com/panedrone/sdm.demo.php.sqlite3.todolist)
+#[Java/JDBC/JSF](https://github.com/panedrone/sdm.demo.php.sqlite3.todolist)
+#[Java/Android](https://github.com/panedrone/sdm.demo.php.sqlite3.todolist)
+#[Python/Flask](https://github.com/panedrone/sdm.demo.php.sqlite3.todolist)
+#[Python/Tkinter](https://github.com/panedrone/sdm.demo.php.sqlite3.todolist)
+#[Python/Go](https://github.com/panedrone/sdm.demo.php.sqlite3.todolist)
