@@ -8,10 +8,10 @@ All the details are here: [sqldalmaker.sourceforge.net](sqldalmaker.sourceforge.
 ![SQL DAL Maker](sqldalmaker-idea.png)
 
 Demo-projects:
-#[PHP](https://github.com/panedrone/sdm.demo.php.sqlite3.todolist)
-#[Java/JDBC/Swing](https://github.com/panedrone/sdm.demo.php.sqlite3.todolist)
-#[Java/JDBC/JSF](https://github.com/panedrone/sdm.demo.php.sqlite3.todolist)
-#[Java/Android](https://github.com/panedrone/sdm.demo.php.sqlite3.todolist)
-#[Python/Flask](https://github.com/panedrone/sdm.demo.php.sqlite3.todolist)
-#[Python/Tkinter](https://github.com/panedrone/sdm.demo.php.sqlite3.todolist)
-#[Python/Go](https://github.com/panedrone/sdm.demo.php.sqlite3.todolist)
+* [PHP](https://github.com/panedrone/sdm.demo.php.sqlite3.todolist)
+* [Java/JDBC/Swing](https://github.com/panedrone/sdm.demo.php.sqlite3.todolist)
+* [Java/JDBC/JSF](https://github.com/panedrone/sdm.demo.php.sqlite3.todolist)
+* [Java/Android](https://github.com/panedrone/sdm.demo.php.sqlite3.todolist)
+* [Python/Flask](https://github.com/panedrone/sdm.demo.php.sqlite3.todolist)
+* [Python/Tkinter](https://github.com/panedrone/sdm.demo.php.sqlite3.todolist)
+* [Python/Go](https://github.com/panedrone/sdm.demo.php.sqlite3.todolist)
