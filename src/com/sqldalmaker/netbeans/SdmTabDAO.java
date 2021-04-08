@@ -1,8 +1,7 @@
 /*
- * Copyright 2011-2020 sqldalmaker@gmail.com
+ * Copyright 2011-2021 sqldalmaker@gmail.com
  * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
  * Read LICENSE.txt in the root of this project/archive for details.
- *
  */
 package com.sqldalmaker.netbeans;
 
@@ -380,16 +379,9 @@ public final class SdmTabDAO extends SdmMultiViewCloneableEditor {
                                 if (msg == null) {
                                     msg = "???";
                                 }
+                                msg = ex.getClass().getName() + ": " + dao_xml_rel_path + " -> " + msg;
                                 my_table_model.setValueAt(msg, row, 1);
-                                // throw ex; // outer 'catch' cannot read the
-                                // message
-                                // !!!! not Internal_Exception to show Exception
-                                // class
-                                // throw new Exception(ex);
-                                // ex.printStackTrace();
-                                // MyNbHelpers.showErrorInUIThread(ex);
-                                // return;
-                                ide_log.add_error_message("[" + ex.getMessage() + "] " + dao_xml_rel_path + " -> " + msg);
+                                ide_log.add_error_message(msg);
                             }
                             // monitor.worked(1);
                             // monitor.worked(1);
@@ -495,16 +487,9 @@ public final class SdmTabDAO extends SdmMultiViewCloneableEditor {
                                 if (msg == null) {
                                     msg = "???";
                                 }
+                                msg = ex.getClass().getName() + ": " + dao_xml_rel_path + " -> " + msg;
                                 my_table_model.setValueAt(msg, i, 1);
-                                // throw ex; // outer 'catch' cannot read the
-                                // message
-                                // !!!! not Internal_Exception to show Exception
-                                // class
-                                // throw new Exception(ex);
-                                // ex.printStackTrace();
-                                //NetbeansHelpers.showErrorInUIThread(ex);
-                                // return;
-                                ide_log.add_error_message("[" + ex.getMessage() + "] " + dao_xml_rel_path + " -> " + msg);
+                                ide_log.add_error_message(msg);
                             }
                             // monitor.worked(1);
                             // monitor.worked(1);

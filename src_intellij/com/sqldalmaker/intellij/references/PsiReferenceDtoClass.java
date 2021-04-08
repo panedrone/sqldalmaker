@@ -59,7 +59,7 @@ public class PsiReferenceDtoClass extends PsiReferenceBase<PsiElement> {
     }
 
     @NotNull
-    public Object @NotNull [] getVariants() {
+    public Object[] getVariants() {
         // code completion is not implemented for this attribute value yet
         return ArrayUtil.EMPTY_OBJECT_ARRAY;
     }
