@@ -46,7 +46,7 @@ class DataStore { // no inheritance is also OK
         $conStr = sprintf("pgsql:host=%s;port=%d;dbname=%s;user=%s;password=%s",
                 'localhost',
                 5432,
-                'test',
+                'my-tests',
                 'postgres',
                 'sa');
         $this->db = new PDO($conStr);
@@ -54,6 +54,10 @@ class DataStore { // no inheritance is also OK
         // By default, PDO does not throw exceptions. To make it throw exceptions on error, call
         $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         // $this->db->setAttribute(PDO::ATTR_PERSISTENT , true);
+    }
+
+    public function pg_fetch($cursor) {
+        return "FETCH ALL FROM \"$cursor\"";
     }
 
     public function beginTransaction() {
@@ -82,11 +86,12 @@ class DataStore { // no inheritance is also OK
         $stmt = $this->db->prepare($sql);
         try {
             $res = $stmt->execute($params);
-            if (count($ai_values) > 0) {
-                $ai = $stmt->fetch(PDO::FETCH_ASSOC);
-                foreach ($ai as $key => $value) {
-                    $ai_values[$key] = $value;
-                }
+            if (count($ai_values) == 0) {
+                return $res;
+            }
+            $ai = $stmt->fetch(PDO::FETCH_ASSOC);
+            foreach ($ai as $key => $value) {
+                $ai_values[$key] = $value;
             }
             return $res;
         } finally {
@@ -143,8 +148,8 @@ class DataStore { // no inheritance is also OK
 
     public function execDML($sql, array $params) {
         $sp_name = $this->get_sp_name($sql);
+        $stmt = $this->db->prepare($sql);
         if ($sp_name != null) {
-            $stmt = $this->db->prepare($sql);
             try {
                 $out_params = array();
                 $this->bind_params($stmt, $params, $out_params);
@@ -155,7 +160,6 @@ class DataStore { // no inheritance is also OK
             }
             return $res;
         } else {
-            $stmt = $this->db->prepare($sql);
             try {
                 $res = $stmt->execute($params);
             } finally {
@@ -205,12 +209,13 @@ class DataStore { // no inheritance is also OK
         $stmt = $this->db->prepare($sql);
         try {
             $res = $stmt->execute($params);
-            if ($res) {
-                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                    $callback($row);
-                }
-                // TODO: PDOStatement::nextRowset() ?
+            if (!$res) {
+                return $res;
             }
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $callback($row);
+            }
+            // TODO: PDOStatement::nextRowset() ?
             return $res;
         } finally {
             $stmt->closeCursor();
