@@ -15,4 +15,4 @@ Demo-projects:
 * [C++/Qt6](https://github.com/panedrone/sdm_demo_qt6_thesaurus)
 * [Python/Flask](https://github.com/panedrone/sdm.demo.python.flask.todolist)
 * [Python/Tkinter](https://github.com/panedrone/sdm.demo.python.tkinter.sqlite3.github-stat)
-* [Python/Go](https://github.com/panedrone/sdm.demo.go.sqlite3.todolist)
+* [Go/Web](https://github.com/panedrone/sdm.demo.go.sqlite3.todolist)
