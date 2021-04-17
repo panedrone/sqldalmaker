@@ -11,7 +11,7 @@ Demo-projects:
 * [PHP/PDO](https://github.com/panedrone/sdm.demo.php.sqlite3.todolist)
 * [Java/JDBC/Swing](https://github.com/panedrone/sdm_demo_swing_thesaurus)
 * [Java/JDBC/JSF](https://github.com/panedrone/sdm.demo.jsf.sqlite3.todolist)
-* [Java/Jasper-Reports](* https://github.com/panedrone/sdm_demo_jasper_reports_northwindEF)
+* [Java/Jasper-Reports](https://github.com/panedrone/sdm_demo_jasper_reports_northwindEF)
 * [Java/Android](https://github.com/panedrone/sdm.demo.android.sqlite3.thesaurus)
 * [C++/Qt6](https://github.com/panedrone/sdm_demo_qt6_thesaurus)
 * [Python/Flask](https://github.com/panedrone/sdm.demo.python.flask.todolist)
