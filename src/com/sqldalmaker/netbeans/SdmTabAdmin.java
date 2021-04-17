@@ -878,7 +878,7 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
             String cur_text;
             try {
                 cur_text = Helpers.load_text_from_file(xml_file.getPath());
-            } catch (IOException ex) {
+            } catch (Exception ex) {
                 add_err_msg(ide_log, buff, get_err_msg(ex));
                 return false;
             }

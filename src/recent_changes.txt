@@ -1,5 +1,9 @@
 2021-04-01
 
+    Fixes for JRE 15+
+
+2021-04-01
+
     Go + Oracle -> SP + implicit RC (multiple implicit RC in one SP are not supported yet)
 
 2021-03-29

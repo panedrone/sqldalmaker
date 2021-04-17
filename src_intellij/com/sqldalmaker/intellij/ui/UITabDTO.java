@@ -516,7 +516,10 @@ public class UITabDTO {
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                for (int i = 0; i < model.getRowCount(); i++) {
+                // === panedrone: don't ask it in loop because of
+                // "Cannot read the array length because "<local3>" is null"
+                int rc = model.getRowCount();
+                for (int i = 0; i < rc; i++) {
                     String dto_class_name = (String) model.getValueAt(i, 0);
                     ProgressManager.progress(dto_class_name);
                     try {

@@ -67,7 +67,8 @@ public class UIEditorPageAdmin extends Composite {
 		setLayout(new FillLayout(SWT.HORIZONTAL));
 
 		Composite composite_top = new Composite(this, SWT.NONE);
-		composite_top.setLayout(new GridLayout(1, false));
+		GridLayout gl_composite_top = new GridLayout(1, false);
+		composite_top.setLayout(gl_composite_top);
 		toolkit.adapt(composite_top);
 		toolkit.paintBordersFor(composite_top);
 
@@ -143,24 +144,31 @@ public class UIEditorPageAdmin extends Composite {
 		btnNewButton_2.setText("Create/Overwrite dto.xml");
 
 		Composite composite_2 = new Composite(composite_top, SWT.NONE);
-		composite_2.setLayout(new GridLayout(3, false));
+		GridLayout gl_composite_2 = new GridLayout(1, false);
+		composite_2.setLayout(gl_composite_2);
 		toolkit.adapt(composite_2);
 		toolkit.paintBordersFor(composite_2);
 
-		Button btnNewButton_5 = new Button(composite_2, SWT.NONE);
+		Composite composite = new Composite(composite_2, SWT.NONE);
+		toolkit.adapt(composite);
+		toolkit.paintBordersFor(composite);
+		composite.setLayout(new GridLayout(8, false));
+
+		Label lblNewLabel = new Label(composite, SWT.NONE);
+		toolkit.adapt(lblNewLabel, true, true);
+		lblNewLabel.setText("PHP");
+
+		Button btnNewButton_5 = new Button(composite, SWT.NONE);
 		btnNewButton_5.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore.php", "DataStore.php");
 			}
 		});
-		btnNewButton_5.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		toolkit.adapt(btnNewButton_5, true, true);
-		btnNewButton_5.setText("DataStore.php");
-		new Label(composite_2, SWT.NONE);
-		new Label(composite_2, SWT.NONE);
+		btnNewButton_5.setText("Base");
 
-		Button btnDatastorephppdoMysql = new Button(composite_2, SWT.NONE);
+		Button btnDatastorephppdoMysql = new Button(composite, SWT.NONE);
 		btnDatastorephppdoMysql.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -168,23 +176,10 @@ public class UIEditorPageAdmin extends Composite {
 						"DataStore_PDO_MySQL.php");
 			}
 		});
-		btnDatastorephppdoMysql.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-		btnDatastorephppdoMysql.setText("DataStore.php (PDO, MySQL)");
+		btnDatastorephppdoMysql.setText("PDO, mysql");
 		toolkit.adapt(btnDatastorephppdoMysql, true, true);
 
-		Button btnDatastorephpociOracle = new Button(composite_2, SWT.NONE);
-		btnDatastorephpociOracle.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore_oci8.php",
-						"DataStore_oci8.php");
-			}
-		});
-		btnDatastorephpociOracle.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-		btnDatastorephpociOracle.setText("DataStore.php (OCI8, Oracle)");
-		toolkit.adapt(btnDatastorephpociOracle, true, true);
-
-		Button btnDatastorephppdoOracle = new Button(composite_2, SWT.NONE);
+		Button btnDatastorephppdoOracle = new Button(composite, SWT.NONE);
 		btnDatastorephppdoOracle.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -192,12 +187,21 @@ public class UIEditorPageAdmin extends Composite {
 						"DataStore_PDO_Oracle.php");
 			}
 		});
-		btnDatastorephppdoOracle.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1));
-		btnDatastorephppdoOracle.setText("DataStore.php (PDO, Oracle)");
+		btnDatastorephppdoOracle.setText("PDO, Oracle");
 		toolkit.adapt(btnDatastorephppdoOracle, true, true);
 
-		Button btnDatastorephppdoPostgresql = new Button(composite_2, SWT.NONE);
-		btnDatastorephppdoPostgresql.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+		Button btnDatastorephpociOracle = new Button(composite, SWT.NONE);
+		btnDatastorephpociOracle.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore_oci8.php",
+						"DataStore_oci8.php");
+			}
+		});
+		btnDatastorephpociOracle.setText("OCI8, Oracle");
+		toolkit.adapt(btnDatastorephpociOracle, true, true);
+
+		Button btnDatastorephppdoPostgresql = new Button(composite, SWT.NONE);
 		btnDatastorephppdoPostgresql.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -205,11 +209,10 @@ public class UIEditorPageAdmin extends Composite {
 						"DataStore_PDO_PostgreSQL.php");
 			}
 		});
-		btnDatastorephppdoPostgresql.setText("DataStore.php (PDO, PostgreSQL)");
+		btnDatastorephppdoPostgresql.setText("PDO, pg");
 		toolkit.adapt(btnDatastorephppdoPostgresql, true, true);
 
-		Button btnDatastorephppdoSql = new Button(composite_2, SWT.NONE);
-		btnDatastorephppdoSql.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+		Button btnDatastorephppdoSql = new Button(composite, SWT.NONE);
 		btnDatastorephppdoSql.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -217,10 +220,10 @@ public class UIEditorPageAdmin extends Composite {
 						"DataStore_PDO_SQL_Server.php");
 			}
 		});
-		btnDatastorephppdoSql.setText("DataStore.php (PDO, SQL Server)");
+		btnDatastorephppdoSql.setText("PDO, mssql");
 		toolkit.adapt(btnDatastorephppdoSql, true, true);
 
-		Button btnNewButton_12 = new Button(composite_2, SWT.NONE);
+		Button btnNewButton_12 = new Button(composite, SWT.NONE);
 		btnNewButton_12.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -228,11 +231,19 @@ public class UIEditorPageAdmin extends Composite {
 						"DataStore_PDO_SQLite3.php");
 			}
 		});
-		btnNewButton_12.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		toolkit.adapt(btnNewButton_12, true, true);
-		btnNewButton_12.setText("DataStore.php (PDO, SQLite3)");
+		btnNewButton_12.setText("PDO, sqlite3");
 
-		Button btnDatastorejava = new Button(composite_2, SWT.NONE);
+		Composite composite_4 = new Composite(composite_2, SWT.NONE);
+		toolkit.adapt(composite_4);
+		toolkit.paintBordersFor(composite_4);
+		composite_4.setLayout(new GridLayout(10, false));
+
+		Label lblJava = new Label(composite_4, SWT.NONE);
+		toolkit.adapt(lblJava, true, true);
+		lblJava.setText("Java");
+
+		Button btnDatastorejava = new Button(composite_4, SWT.NONE);
 		btnDatastorejava.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -240,11 +251,10 @@ public class UIEditorPageAdmin extends Composite {
 						"DataStore.java");
 			}
 		});
-		btnDatastorejava.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-		btnDatastorejava.setText("DataStore.java");
+		btnDatastorejava.setText("Base");
 		toolkit.adapt(btnDatastorejava, true, true);
 
-		Button btnDatastoreJavaDbutils = new Button(composite_2, SWT.NONE);
+		Button btnDatastoreJavaDbutils = new Button(composite_4, SWT.NONE);
 		btnDatastoreJavaDbutils.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -252,11 +262,10 @@ public class UIEditorPageAdmin extends Composite {
 						"DataStoreManager.java");
 			}
 		});
-		btnDatastoreJavaDbutils.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-		btnDatastoreJavaDbutils.setText("DataStoreManager.java (JDBC)");
+		btnDatastoreJavaDbutils.setText("JDBC");
 		toolkit.adapt(btnDatastoreJavaDbutils, true, true);
 
-		Button btnNewButton_4 = new Button(composite_2, SWT.NONE);
+		Button btnNewButton_4 = new Button(composite_4, SWT.NONE);
 		btnNewButton_4.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -264,11 +273,15 @@ public class UIEditorPageAdmin extends Composite {
 						"DataStoreManager.java");
 			}
 		});
-		btnNewButton_4.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		toolkit.adapt(btnNewButton_4, true, true);
-		btnNewButton_4.setText("DataStoreManager.java (Android)");
+		btnNewButton_4.setText("Android");
 
-		Button btnDatastoreCQt = new Button(composite_2, SWT.NONE);
+		Label lblC = new Label(composite_4, SWT.NONE);
+		lblC.setAlignment(SWT.RIGHT);
+		toolkit.adapt(lblC, true, true);
+		lblC.setText("C++");
+
+		Button btnDatastoreCQt = new Button(composite_4, SWT.NONE);
 		btnDatastoreCQt.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -277,23 +290,10 @@ public class UIEditorPageAdmin extends Composite {
 				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore_Qt5.h", "DataStore.h");
 			}
 		});
-		btnDatastoreCQt.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		toolkit.adapt(btnDatastoreCQt, true, true);
-		btnDatastoreCQt.setText("DataStore, C++ (Qt5, Qt5Sql)");
+		btnDatastoreCQt.setText("Qt Sql");
 
-		Button btnNewButton_11 = new Button(composite_2, SWT.NONE);
-		btnNewButton_11.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore.cpp", "DataStore.cpp");
-				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore.h", "DataStore.h");
-			}
-		});
-		btnNewButton_11.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-		toolkit.adapt(btnNewButton_11, true, true);
-		btnNewButton_11.setText("DataStore, C++ (ATL, , SQLite3)");
-
-		Button btnDatastoreCStl = new Button(composite_2, SWT.NONE);
+		Button btnDatastoreCStl = new Button(composite_4, SWT.NONE);
 		btnDatastoreCStl.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -302,22 +302,55 @@ public class UIEditorPageAdmin extends Composite {
 				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore.STL.h", "DataStore.h");
 			}
 		});
-		btnDatastoreCStl.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		toolkit.adapt(btnDatastoreCStl, true, true);
-		btnDatastoreCStl.setText("DataStore, C++ (STL, , SQLite3)");
+		btnDatastoreCStl.setText("STL, sqlite3");
 
-		Button btnNewButton_7 = new Button(composite_2, SWT.NONE);
+		Button btnNewButton_11 = new Button(composite_4, SWT.NONE);
+		btnNewButton_11.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore.cpp", "DataStore.cpp");
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore.h", "DataStore.h");
+			}
+		});
+		toolkit.adapt(btnNewButton_11, true, true);
+		btnNewButton_11.setText("ATL, sqlite3");
+
+		Label lblRuby = new Label(composite_4, SWT.NONE);
+		toolkit.adapt(lblRuby, true, true);
+		lblRuby.setText("Ruby");
+
+		Button btnNewButton_8 = new Button(composite_4, SWT.NONE);
+		btnNewButton_8.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/data_store.rb", "data_store.rb");
+			}
+		});
+		toolkit.adapt(btnNewButton_8, true, true);
+		btnNewButton_8.setText("DBI");
+
+		Composite composite_5 = new Composite(composite_2, SWT.NONE);
+		toolkit.adapt(composite_5);
+		toolkit.paintBordersFor(composite_5);
+		composite_5.setLayout(new GridLayout(8, false));
+
+		Label lblPython = new Label(composite_5, SWT.NONE);
+		toolkit.adapt(lblPython, true, true);
+		lblPython.setText("Python");
+
+		Button btnNewButton_7 = new Button(composite_5, SWT.NONE);
 		btnNewButton_7.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/data_store_mysql.py", "data_store.py");
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/data_store_mysql.py",
+						"data_store.py");
 			}
 		});
-		btnNewButton_7.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		toolkit.adapt(btnNewButton_7, true, true);
-		btnNewButton_7.setText("data_store.py (MySQL)");
+		btnNewButton_7.setText("mysql");
 
-		Button btnDatastorepycxoracle = new Button(composite_2, SWT.NONE);
+		Button btnDatastorepycxoracle = new Button(composite_5, SWT.NONE);
 		btnDatastorepycxoracle.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -325,12 +358,10 @@ public class UIEditorPageAdmin extends Composite {
 						"data_store_cx_oracle.py");
 			}
 		});
-		btnDatastorepycxoracle.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1));
-		btnDatastorepycxoracle.setText("data_store.py (cx_Oracle)");
+		btnDatastorepycxoracle.setText("cx_Oracle");
 		toolkit.adapt(btnDatastorepycxoracle, true, true);
-		new Label(composite_2, SWT.NONE);
 
-		Button btnNewButton_7_1_1 = new Button(composite_2, SWT.NONE);
+		Button btnNewButton_7_1_1 = new Button(composite_5, SWT.NONE);
 		btnNewButton_7_1_1.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -338,11 +369,10 @@ public class UIEditorPageAdmin extends Composite {
 						"data_store_psycopg2.py");
 			}
 		});
-		btnNewButton_7_1_1.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-		btnNewButton_7_1_1.setText("data_store.py (psycopg2)");
+		btnNewButton_7_1_1.setText("psycopg2, pg");
 		toolkit.adapt(btnNewButton_7_1_1, true, true);
 
-		Button btnNewButton_7_1 = new Button(composite_2, SWT.NONE);
+		Button btnNewButton_7_1 = new Button(composite_5, SWT.NONE);
 		btnNewButton_7_1.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -350,35 +380,25 @@ public class UIEditorPageAdmin extends Composite {
 						"data_store_pyodbc.py");
 			}
 		});
-		btnNewButton_7_1.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-		btnNewButton_7_1.setText("data_store.py (pyodbc, SQL Server)");
+		btnNewButton_7_1.setText("pyodbc, mssql");
 		toolkit.adapt(btnNewButton_7_1, true, true);
 
-		Button btnNewButton_6 = new Button(composite_2, SWT.NONE);
+		Button btnNewButton_6 = new Button(composite_5, SWT.NONE);
 		btnNewButton_6.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/data_store_sqlite3.py", "data_store.py");
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/data_store_sqlite3.py",
+						"data_store.py");
 			}
 		});
-		btnNewButton_6.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		toolkit.adapt(btnNewButton_6, true, true);
-		btnNewButton_6.setText("data_store.py (SQLite3)");
+		btnNewButton_6.setText("sqlite3");
 
-		Button btnNewButton_8 = new Button(composite_2, SWT.NONE);
-		btnNewButton_8.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/data_store.rb", "data_store.rb");
-			}
-		});
-		btnNewButton_8.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-		toolkit.adapt(btnNewButton_8, true, true);
-		btnNewButton_8.setText("data_store.rb (DBI)");
-		new Label(composite_2, SWT.NONE);
-		new Label(composite_2, SWT.NONE);
+		Label lblGo = new Label(composite_5, SWT.NONE);
+		toolkit.adapt(lblGo, true, true);
+		lblGo.setText("Go");
 
-		Button btnNewButton_8_1 = new Button(composite_2, SWT.NONE);
+		Button btnNewButton_8_1 = new Button(composite_5, SWT.NONE);
 		btnNewButton_8_1.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -386,11 +406,8 @@ public class UIEditorPageAdmin extends Composite {
 				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/data_store.go", "data_store.go_");
 			}
 		});
-		btnNewButton_8_1.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-		btnNewButton_8_1.setText("data_store.go (database/sql)");
+		btnNewButton_8_1.setText("database/sql");
 		toolkit.adapt(btnNewButton_8_1, true, true);
-		new Label(composite_2, SWT.NONE);
-		new Label(composite_2, SWT.NONE);
 
 		Composite composite_3 = new Composite(composite_top, SWT.NONE);
 		composite_3.setLayout(new GridLayout(6, false));

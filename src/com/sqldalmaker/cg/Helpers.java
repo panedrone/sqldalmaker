@@ -159,7 +159,16 @@ public class Helpers {
     // https://stackoverflow.com/questions/34603505/java-file-exists-case-sensitive-jpg-and-jpg
 
     public static boolean exists(File dir, String filename) {
+        if (!dir.isDirectory()) {
+            // === panedrone: don't throw because of targer files were not generated yet
+            return false;
+//            String path = dir.getAbsolutePath();
+//            throw new Exception("Not a directory: " + path);
+        }
         String[] files = dir.list();
+        if (files == null) {
+            return false; // === panedrone: it may be null in jdk 16
+        }
         for (String file : files)
             if (file.equals(filename))
                 return true;
@@ -168,7 +177,7 @@ public class Helpers {
 
     // http://www.java2s.com/Tutorial/Java/0180__File/LoadatextfilecontentsasaString.htm
 
-    public static String load_text_from_file(String file_path) throws IOException {
+    public static String load_text_from_file(String file_path) throws Exception {
         File file = new File(file_path);
         File dir = new File(file.getParent());
         String file_name = file.getName();

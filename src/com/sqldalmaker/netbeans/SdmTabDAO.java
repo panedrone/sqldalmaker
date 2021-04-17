@@ -451,7 +451,10 @@ public final class SdmTabDAO extends SdmMultiViewCloneableEditor {
                         String metaprogram_abs_path = NbpPathHelpers.get_metaprogram_abs_path(obj);
                         String context_path = DaoClass.class.getPackage().getName();
                         XmlParser xml_Parser = new XmlParser(context_path, Helpers.concat_path(metaprogram_abs_path, Const.DAO_XSD));
-                        for (int i = 0; i < my_table_model.getRowCount(); i++) {
+                        // === panedrone: don't ask it in loop because of
+                        // "Cannot read the array length because "<local3>" is null"
+                        int rc = my_table_model.getRowCount();
+                        for (int i = 0; i < rc; i++) {
                             String dao_xml_rel_path = (String) table.getValueAt(i, 0);
                             try {
                                 // ph.progress(daoXmlRelPath);

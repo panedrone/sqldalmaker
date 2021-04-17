@@ -369,7 +369,10 @@ public class UITabDAO {
                     String local_abs_path = root_file.getParent().getPath();
                     String contextPath = DaoClass.class.getPackage().getName();
                     XmlParser xml_parser = new XmlParser(contextPath, Helpers.concat_path(local_abs_path, Const.DAO_XSD));
-                    for (int i = 0; i < model.getRowCount(); i++) {
+                    // === panedrone: don't ask it in loop because of
+                    // "Cannot read the array length because "<local3>" is null"
+                    int rc = model.getRowCount();
+                    for (int i = 0; i < rc; i++) {
                         String dao_xml_rel_path = (String) model.getValueAt(i, 0);
                         try {
                             ProgressManager.progress(dao_xml_rel_path);

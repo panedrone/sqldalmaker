@@ -279,7 +279,10 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
                         StringBuilder output_dir = new StringBuilder();
                         // !!!! after 'try'
                         IDtoCG gen = NbpTargetLanguageHelpers.create_dto_cg(con, obj, settings, output_dir);
-                        for (int i = 0; i < my_table_model.getRowCount(); i++) {
+                        // === panedrone: don't ask it in loop because of
+                        // "Cannot read the array length because "<local3>" is null"
+                        int rc = my_table_model.getRowCount();
+                        for (int i = 0; i < rc; i++) {
                             String dto_class_name = (String) table.getValueAt(i, 0);
                             // ph.progress(dtoClassName);
                             try {
