@@ -12,6 +12,7 @@ Demo-projects:
 * [Java/JDBC/Swing](https://github.com/panedrone/sdm.demo.swing.sqlite3.thesaurus)
 * [Java/JDBC/JSF](https://github.com/panedrone/sdm.demo.jsf.sqlite3.todolist)
 * [Java/Android](https://github.com/panedrone/sdm.demo.android.sqlite3.thesaurus)
+* [C++/Qt6](https://github.com/panedrone/sdm_demo_qt6_thesaurus)
 * [Python/Flask](https://github.com/panedrone/sdm.demo.python.flask.todolist)
 * [Python/Tkinter](https://github.com/panedrone/sdm.demo.python.tkinter.sqlite3.github-stat)
 * [Python/Go](https://github.com/panedrone/sdm.demo.go.sqlite3.todolist)
