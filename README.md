@@ -9,9 +9,11 @@ All the details are here: [sqldalmaker.sourceforge.net](sqldalmaker.sourceforge.
 
 Demo-projects:
 * [PHP/PDO](https://github.com/panedrone/sdm.demo.php.sqlite3.todolist)
-* [Java/JDBC/Swing](https://github.com/panedrone/sdm.demo.swing.sqlite3.thesaurus)
+* [Java/JDBC/Swing](https://github.com/panedrone/sdm_demo_swing_thesaurus)
 * [Java/JDBC/JSF](https://github.com/panedrone/sdm.demo.jsf.sqlite3.todolist)
+* [Java/JDBC/Jasper-Reports](https://github.com/panedrone/sdm_demo_jasper_reports_northwindEF)
 * [Java/Android](https://github.com/panedrone/sdm.demo.android.sqlite3.thesaurus)
+* [C++/Qt6](https://github.com/panedrone/sdm_demo_qt6_thesaurus)
 * [Python/Flask](https://github.com/panedrone/sdm.demo.python.flask.todolist)
 * [Python/Tkinter](https://github.com/panedrone/sdm.demo.python.tkinter.sqlite3.github-stat)
-* [Python/Go](https://github.com/panedrone/sdm.demo.go.sqlite3.todolist)
+* [Go/Web](https://github.com/panedrone/sdm.demo.go.sqlite3.todolist)
