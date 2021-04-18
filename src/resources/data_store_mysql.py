@@ -8,32 +8,32 @@ class OutParam:
 class DataStore:
     """
     SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
+    Contact: sqldalmaker@gmail.com
+
     This is an example of how to implement DataStore in Python + MySQL.
-    Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store_mysql.py
     Copy-paste this code to your project and change it for your needs.
-    Improvements are welcome: sqldalmaker@gmail.com
     """
+
     def __init__(self):
-        self.connection = None
+        self.conn = None
 
     def open(self):
-        self.connection = connector.Connect(user='root', password='root',
-                                            host='127.0.0.1',
-                                            database='sakila')
+        self.conn = connector.Connect(user='root', password='root',
+                                      host='127.0.0.1',
+                                      database='sakila')
 
     def close(self):
-        if self.connection:
-            self.connection.close()
-            self.connection = None
+        if self.conn:
+            self.conn.close()
 
     def start_transaction(self):
-        self.connection.start_transaction()
+        self.conn.start_transaction()
 
     def commit(self):
-        self.connection.commit()
+        self.conn.commit()
 
     def rollback(self):
-        self.connection.rollback()
+        self.conn.rollback()
 
     def insert_row(self, sql, params, ai_values):
         """
@@ -47,12 +47,15 @@ class DataStore:
             Exception: if no rows inserted.
         """
         sql = _prepare_sql(sql)
-        with self.connection.cursor() as cursor:
+        cursor = self.conn.cursor()
+        try:
             cursor.execute(sql, params)
             if len(ai_values) > 0:
                 ai_values[0][1] = cursor.lastrowid
             if cursor.rowcount == 0:
                 raise Exception('No rows inserted')
+        finally:
+            cursor.close()  # with not working
 
     def exec_dml(self, sql, params):
         """
@@ -64,25 +67,27 @@ class DataStore:
         """
         sql = _prepare_sql(sql)
         sp = _get_sp_name(sql)
-        with self.connection.cursor() as cursor:
+        cursor = self.conn.cursor()
+        try:
             if sp is None:
                 cursor.execute(sql, params)
                 return cursor.rowcount
-            else:
-                call_params = _get_call_params(params)
-                # result_args: https://pynative.com/python-mysql-execute-stored-procedure/
-                result_args = cursor.callproc(sp, call_params)
-                for p in params:
-                    if isinstance(p, list) and callable(p[0]):
-                        i = 0 # MySQL SP returning result-sets
-                        # http://www.mysqltutorial.org/calling-mysql-stored-procedures-python/
-                        for result in cursor.stored_results():
-                            cb = p[i]
-                            _fetch_all(result, cb)
-                            i += 1
-                        break
-                _assign_out_params(params, result_args)
-                return 0
+            call_params = _get_call_params(params)
+            # result_args: https://pynative.com/python-mysql-execute-stored-procedure/
+            result_args = cursor.callproc(sp, call_params)
+            for p in params:
+                if isinstance(p, list) and callable(p[0]):
+                    i = 0 # MySQL SP returning result-sets
+                    # http://www.mysqltutorial.org/calling-mysql-stored-procedures-python/
+                    for result in cursor.stored_results():
+                        cb = p[i]
+                        _fetch_all(result, cb)
+                        i += 1
+                    break
+            _assign_out_params(params, result_args)
+            return 0
+        finally:
+            cursor.close()  # with not working
 
     def query_scalar(self, sql, params):
         """
@@ -115,24 +120,27 @@ class DataStore:
         sql = _prepare_sql(sql)
         res = []
         sp = _get_sp_name(sql)
-        with self.connection.cursor() as cursor:
+        cursor = self.conn.cursor()
+        try:
             if sp is None:
                 cursor.execute(sql, params)
                 # fetchone() in here throws 'Unread result found' in cursor.close()
                 # fetchall() in here because it may break on None value in the first element of array (DBNull)
                 for row in cursor:  # .fetchall():
                     res.append(row[0])
-            else:
-                call_params = _get_call_params(params)
-                # result_args: https://pynative.com/python-mysql-execute-stored-procedure/
-                result_args = cursor.callproc(sp, call_params)
-                # http://www.mysqltutorial.org/calling-mysql-stored-procedures-python/
-                for result in cursor.stored_results():
-                    # fetchall() in here because it may break on None value in the first element of array (DBNull)
-                    for row_values in result:  # .fetchall():
-                        res.append(row_values[0])
-                _assign_out_params(params, result_args)
-        return res
+                return res
+            call_params = _get_call_params(params)
+            # result_args: https://pynative.com/python-mysql-execute-stored-procedure/
+            result_args = cursor.callproc(sp, call_params)
+            # http://www.mysqltutorial.org/calling-mysql-stored-procedures-python/
+            for result in cursor.stored_results():
+                # fetchall() in here because it may break on None value in the first element of array (DBNull)
+                for row_values in result:  # .fetchall():
+                    res.append(row_values[0])
+            _assign_out_params(params, result_args)
+            return res
+        finally:
+            cursor.close()  # with not working
 
     def query_single_row(self, sql, params):
         """
@@ -145,10 +153,7 @@ class DataStore:
             Exception: if amount of rows != 1.
         """
         rows = []
-
-        def callback(row):
-            rows.append(row)
-        self.query_all_rows(sql, params, callback)
+        self.query_all_rows(sql, params, lambda row: rows.append(row))
         if len(rows) == 0:
             raise Exception('No rows')
         if len(rows) > 1:
@@ -168,20 +173,23 @@ class DataStore:
         sp = _get_sp_name(sql)
         # How to retrieve SQL result column value using column name in Python?
         # https://stackoverflow.com/questions/10195139/how-to-retrieve-sql-result-column-value-using-column-name-in-python
-        with self.connection.cursor(dictionary=True) as cursor:
+        cursor = self.conn.cursor(dictionary=True)  # with not working
+        try:
             if sp is None:
                 cursor.execute(sql, params)
                 # fetchone() in here throws 'Undead data' in cursor.close()
                 for row in cursor:  # .fetchall():
                     callback(row)
-            else:
-                call_params = _get_call_params(params)
-                # result_args: https://pynative.com/python-mysql-execute-stored-procedure/
-                result_args = cursor.callproc(sp, call_params)
-                # http://www.mysqltutorial.org/calling-mysql-stored-procedures-python/
-                for result in cursor.stored_results():
-                    _fetch_all(result, callback)
-                _assign_out_params(params, result_args)
+                return
+            call_params = _get_call_params(params)
+            # result_args: https://pynative.com/python-mysql-execute-stored-procedure/
+            result_args = cursor.callproc(sp, call_params)
+            # http://www.mysqltutorial.org/calling-mysql-stored-procedures-python/
+            for result in cursor.stored_results():
+                _fetch_all(result, callback)
+            _assign_out_params(params, result_args)
+        finally:
+            cursor.close()  # with not working
 
 
 def _fetch_all(result, callback):
