@@ -3,11 +3,9 @@ SQL DAL Maker is a generator of DTO and DAO classes to access relational databas
 
 Implemented as plug-ins for Eclipse IDE, IntelliJ-Platform, and NetBeans 11+.
 
-All the details are here: [sqldalmaker.sourceforge.net](sqldalmaker.sourceforge.net)
+Quick-Demo in mp4: [https://github.com/panedrone/sqldalmaker/releases/tag/latest](https://github.com/panedrone/sqldalmaker/releases/tag/latest)
 
-![SQL DAL Maker](sqldalmaker-idea.png)
-
-Demo-projects:
+Demo-Projects:
 * [PHP/PDO](https://github.com/panedrone/sdm.demo.php.sqlite3.todolist)
 * [Java/JDBC/Swing](https://github.com/panedrone/sdm_demo_swing_thesaurus)
 * [Java/JDBC/JSF](https://github.com/panedrone/sdm.demo.jsf.sqlite3.todolist)
@@ -17,3 +15,7 @@ Demo-projects:
 * [Python/Flask](https://github.com/panedrone/sdm.demo.python.flask.todolist)
 * [Python/Tkinter](https://github.com/panedrone/sdm.demo.python.tkinter.sqlite3.github-stat)
 * [Go/Web](https://github.com/panedrone/sdm.demo.go.sqlite3.todolist)
+
+All the details are here: [sqldalmaker.sourceforge.net](sqldalmaker.sourceforge.net)
+
+![SQL DAL Maker](sqldalmaker-idea.png)
