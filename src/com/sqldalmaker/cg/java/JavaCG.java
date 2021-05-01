@@ -172,7 +172,7 @@ public class JavaCG {
                 }
                 returned_type_name = _get_rendered_dto_class_name(jaxb_dto_or_return_type);
             } else {
-                returned_type_name = fields.get(0).getType();
+                returned_type_name = fields.get(0).calc_target_type_name();
             }
             String java_sql_str = SqlUtils.format_jdbc_sql_for_java(dao_query_jdbc_sql);
             Map<String, Object> context = new HashMap<String, Object>();
@@ -275,7 +275,7 @@ public class JavaCG {
                         MappingInfo m = _create_mapping(parts);
                         m_list.add(m);
                         method_params.add(new FieldInfo(FieldNamesMode.AS_IS, String.format("final RecordHandler<%s>", m.dto_class_name), m.method_param_name, "parameter"));
-                        exec_dml_params.add(new FieldInfo(FieldNamesMode.AS_IS, p.getType(), m.exec_dml_param_name, "parameter"));
+                        exec_dml_params.add(new FieldInfo(FieldNamesMode.AS_IS, p.calc_target_type_name(), m.exec_dml_param_name, "parameter"));
                     } else {
                         method_params.add(p);
                         exec_dml_params.add(p);

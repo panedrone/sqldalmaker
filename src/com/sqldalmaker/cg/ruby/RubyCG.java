@@ -172,7 +172,7 @@ public class RubyCG {
             if (jaxb_return_type_is_dto) {
                 returned_type_name = _get_rendered_dto_class_name(jaxb_dto_or_return_type, fetch_list);
             } else {
-                returned_type_name = fields_all.get(0).getType();
+                returned_type_name = fields_all.get(0).calc_target_type_name();
             }
             String ruby_sql_str = SqlUtils.jdbc_sql_to_ruby_string(dao_query_jdbc_sql);
             Map<String, Object> context = new HashMap<String, Object>();

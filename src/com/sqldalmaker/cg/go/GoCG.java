@@ -65,22 +65,36 @@ public class GoCG {
             Map<String, Object> context = new HashMap<String, Object>();
             context.put("package", dto_package);
             Set<String> imports = new HashSet<String>();
-            int max = -1;
+            int max_name_len = -1;
+            int max_type_name_len = -1;
             for (FieldInfo fi : fields) {
-                String imp = fi.getImport();
-                if (imp != null) {
+                String imp = fi.get_import();
+                if (imp.length() > 0) {
                     imports.add(imp);
                 }
                 int len = fi.getName().length();
-                if (len > max) {
-                    max = len;
+                if (len > max_name_len) {
+                    max_name_len = len;
+                }
+                if (fi.type_comment_from_jaxb_type_name().length() > 0) {
+                    int type_name_len = fi.calc_target_type_name().length();
+                    if (type_name_len > max_type_name_len) {
+                        max_type_name_len = type_name_len;
+                    }
                 }
             }
-            String format = "%-" + max + "." + max + "s";
+            String name_format = "%-" + max_name_len + "." + max_name_len + "s";
+            String type_format = "%-" + max_type_name_len + "." + max_type_name_len + "s %s";
             for (FieldInfo fi : fields) {
                 String name = fi.getName();
-                name = String.format(format, name);
+                name = String.format(name_format, name);
                 fi.setName(name);
+                if (max_type_name_len > 0) {
+                    String type_name = fi.calc_target_type_name();
+                    String type_comment = fi.type_comment_from_jaxb_type_name();
+                    type_name = String.format(type_format, type_name, type_comment);
+                    fi.refine_rendered_type(type_name);
+                }
             }
             context.put("imports", imports);
             context.put("class_name", dto_class_name);
@@ -194,7 +208,7 @@ public class GoCG {
             if (jaxb_return_type_is_dto) {
                 returned_type_name = _get_rendered_dto_class_name(jaxb_dto_or_return_type);
             } else {
-                returned_type_name = fields.get(0).getType();
+                returned_type_name = fields.get(0).calc_target_type_name();
             }
             String go_sql_str = SqlUtils.format_jdbc_sql_for_go(dao_query_jdbc_sql);
             Map<String, Object> context = new HashMap<String, Object>();
@@ -264,8 +278,8 @@ public class GoCG {
             List<FieldInfo> _params = new ArrayList<FieldInfo>();
             db_utils.get_dao_exec_dml_info(jdbc_dao_sql, dto_param_type, param_descriptors, _params);
             for (FieldInfo pi : _params) {
-                String imp = pi.getImport();
-                if (imp != null) {
+                String imp = pi.get_import();
+                if (imp.length() > 0) {
                     imports.add(imp);
                 }
             }
@@ -309,7 +323,7 @@ public class GoCG {
                         method_params.add(new FieldInfo(FieldNamesMode.LOWER_CAMEL_CASE,
                                 func_type, m.method_param_name, "parameter"));
                         exec_dml_params.add(
-                                new FieldInfo(FieldNamesMode.AS_IS, p.getType(), m.exec_dml_param_name, "parameter"));
+                                new FieldInfo(FieldNamesMode.AS_IS, p.calc_target_type_name(), m.exec_dml_param_name, "parameter"));
                     } else {
                         method_params.add(p);
                         exec_dml_params.add(p);
@@ -381,8 +395,8 @@ public class GoCG {
             context.put("plain_params", plain_params);
             if (plain_params) {
                 for (FieldInfo pi : params) {
-                    String imp = pi.getImport();
-                    if (imp != null) {
+                    String imp = pi.get_import();
+                    if (imp.length() > 0) {
                         imports.add(imp);
                     }
                 }

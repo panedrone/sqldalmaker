@@ -10,5 +10,6 @@ SQL DAL Maker for NetBeans: http://plugins.netbeans.org/plugin/73614
 
 Project Website: http://sqldalmaker.sourceforge.net
 Source Code: https://github.com/panedrone/sqldalmaker
+Quick-Demo in mp4: https://github.com/panedrone/sqldalmaker/releases/tag/latest
 
 Contact: sqldalmaker@gmail.com

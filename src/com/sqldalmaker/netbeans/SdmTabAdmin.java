@@ -646,23 +646,23 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
     }//GEN-LAST:event_jButton18ActionPerformed
 
     private void jButton15ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton15ActionPerformed
-        NbpIdeEditorHelpers.open_resource_file_in_editor_async("DataStore1.py", "DataStore1.py");
+        NbpIdeEditorHelpers.open_resource_file_in_editor_async("data_store_sqlite3.py", "data_store_sqlite3.py");
     }//GEN-LAST:event_jButton15ActionPerformed
 
     private void jButton9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton9ActionPerformed
-        NbpIdeEditorHelpers.open_resource_file_in_editor_async("DataStore_pyodbc.py", "DataStore_pyodbc.py");
+        NbpIdeEditorHelpers.open_resource_file_in_editor_async("data_store_pyodbc.py", "data_store_pyodbc.py");
     }//GEN-LAST:event_jButton9ActionPerformed
 
     private void jButton27ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton27ActionPerformed
-        NbpIdeEditorHelpers.open_resource_file_in_editor_async("DataStore_psycopg2.py", "DataStore_psycopg2.py");
+        NbpIdeEditorHelpers.open_resource_file_in_editor_async("data_store_psycopg2.py", "data_store_psycopg2.py");
     }//GEN-LAST:event_jButton27ActionPerformed
 
     private void jButton32ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton32ActionPerformed
-        NbpIdeEditorHelpers.open_resource_file_in_editor_async("DataStore_cx_Oracle.py", "DataStore_cx_Oracle.py");
+        NbpIdeEditorHelpers.open_resource_file_in_editor_async("data_store_cx_oracle.py", "data_store_cx_oracle.py");
     }//GEN-LAST:event_jButton32ActionPerformed
 
     private void jButton16ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton16ActionPerformed
-        NbpIdeEditorHelpers.open_resource_file_in_editor_async("DataStore2.py", "DataStore2.py");
+        NbpIdeEditorHelpers.open_resource_file_in_editor_async("data_store_mysql.py", "data_store_mysql.py");
     }//GEN-LAST:event_jButton16ActionPerformed
 
     private void jButton12ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton12ActionPerformed

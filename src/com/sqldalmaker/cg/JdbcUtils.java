@@ -213,12 +213,12 @@ public class JdbcUtils {
         } finally {
             ps.close();
         }
-        _refine_field_info_by_table_meta_data(table_name, fields_map);
+        _refine_by_jdbc_table(table_name, fields_map);
         if (type_map.is_defined()) {
             for (FieldInfo fi : fields_map.values()) {
-                String type_name = fi.getType();
-                type_name = type_map.get_rendered_type_name(type_name);
-                fi.set_type_by_map(type_name);
+                String type_name = fi.calc_target_type_name();
+                type_name = type_map.get_target_type_name(type_name);
+                fi.set_target_type_by_map(type_name);
             }
         }
         return fields_map;
@@ -290,11 +290,11 @@ public class JdbcUtils {
             }
             if (SqlUtils.is_table_ref(jaxb_dto_ref)) {
                 String table_name = jaxb_dto_ref;
-                _refine_field_info_by_table_meta_data(table_name, dto_fields_map);
+                _refine_by_jdbc_table(table_name, dto_fields_map);
             } else if (SqlUtils.is_sql_shortcut_ref(jaxb_dto_ref)) {
                 String[] parts = SqlUtils.parse_sql_shortcut_ref(jaxb_dto_ref);
                 String table_name = parts[0];
-                _refine_field_info_by_table_meta_data(table_name, dto_fields_map);
+                _refine_by_jdbc_table(table_name, dto_fields_map);
             }
         }
         // field types may be redefined in <field type=...
@@ -309,9 +309,9 @@ public class JdbcUtils {
         }
         if (type_map.is_defined()) {
             for (FieldInfo fi : _dto_fields) {
-                String type_name = fi.getType();
-                type_name = type_map.get_rendered_type_name(type_name);
-                fi.set_type_by_map(type_name);
+                String type_name = fi.calc_target_type_name();
+                type_name = type_map.get_target_type_name(type_name);
+                fi.set_target_type_by_map(type_name);
             }
         }
         return dto_fields_map;
@@ -324,19 +324,19 @@ public class JdbcUtils {
             return;
         }
         for (DtoClass.Field jaxb_explicit_field : jaxb_explicit_fields) {
-            String col_name = jaxb_explicit_field.getColumn();
-            String type_name = jaxb_explicit_field.getType();
-            if (fields_map.containsKey(col_name)) {
-                fields_map.get(col_name).refine_type(type_name);
+            String jaxb_col_name = jaxb_explicit_field.getColumn();
+            String jaxb_type = jaxb_explicit_field.getType();
+            if (fields_map.containsKey(jaxb_col_name)) {
+                fields_map.get(jaxb_col_name).assign_jaxb_type(jaxb_type);
             } else {
-                FieldInfo explicit_field = new FieldInfo(dto_field_names_mode, type_name, col_name, "xml(" + col_name + ")");
+                FieldInfo explicit_field = new FieldInfo(dto_field_names_mode, jaxb_type, jaxb_col_name, "xml(" + jaxb_col_name + ")");
                 fields.add(explicit_field);
-                fields_map.put(col_name, explicit_field);
+                fields_map.put(jaxb_col_name, explicit_field);
             }
         }
     }
 
-    private void _refine_field_info_by_table_meta_data(final String table_name, Map<String, FieldInfo> fields_map) throws Exception {
+    private void _refine_by_jdbc_table(final String table_name, Map<String, FieldInfo> fields_map) throws Exception {
         if (!SqlUtils.is_table_ref(table_name)) {
             throw new Exception("Table name expected: " + table_name);
         }
@@ -357,7 +357,7 @@ public class JdbcUtils {
                     int type = rs_columns.getInt("DATA_TYPE");
                     String java_type_name = TypesMapping.getJavaBySqlType(type);
                     FieldInfo fi = fields_map.get(db_col_name);
-                    fi.refine_type(java_type_name);
+                    fi.refine_jdbc_java_type_name(java_type_name);
                     fi.setComment("t(" + db_col_name + ")");
                 }
             }
@@ -460,7 +460,7 @@ public class JdbcUtils {
             param_type_name = parts[0];
             param_name = parts[1];
         }
-        param_type_name = type_map.get_rendered_type_name(param_type_name);
+        param_type_name = type_map.get_target_type_name(param_type_name);
         return new FieldInfo(param_names_mode, param_type_name, param_name, "parameter");
     }
 
@@ -474,9 +474,9 @@ public class JdbcUtils {
                         + "' not found among DTO columns [" + _get_column_names(dto_fields) + "]. Ensure lower/upper case.");
             }
             FieldInfo dto_fi = dto_fields_map.get(dao_col_name);
-            String dto_col_type_name = dto_fi.getType();
+            String dto_col_type_name = dto_fi.calc_target_type_name();
             if (!dto_col_type_name.equals(Object.class.getTypeName())) {
-                dao_fi.set_type_by_map(dto_col_type_name);
+                dao_fi.set_target_type_by_map(dto_col_type_name);
             }
             String dto_comment = dto_fi.getComment();
             String dao_comment = dao_fi.getComment();
@@ -494,7 +494,7 @@ public class JdbcUtils {
             if (dto_fields_map.containsKey(dao_col_name) == false) {
                 throw new Exception("Cannot create mapping for DAO column '" + dao_col_name + "'. Ensure lower/upper case.");
             }
-            dao_field.set_type_by_map(dto_fields_map.get(dao_col_name).getType());
+            dao_field.set_target_type_by_map(dto_fields_map.get(dao_col_name).calc_target_type_name());
             String gen_dao_col_name = dao_col_name.toLowerCase();
             if (dao_crud_generated_set.contains(gen_dao_col_name)) {
                 dao_field.setAutoIncrement(true);
@@ -522,7 +522,7 @@ public class JdbcUtils {
                 // MySQL sakila example: dao_fields.isEmpty() for 'select inventory_in_stock(?)'
                 ret_type_name = Object.class.getName();
             } else {
-                ret_type_name = dao_fields.get(0).getType();
+                ret_type_name = dao_fields.get(0).calc_target_type_name();
             }
         }
         String ret_col_name;
@@ -551,7 +551,7 @@ public class JdbcUtils {
         }
         for (int i = 0; i < method_param_descriptors.length; i++) {
             String param_descriptor = method_param_descriptors[i];
-            String default_param_type_name = dao_key_fields.get(i).getType();
+            String default_param_type_name = dao_key_fields.get(i).calc_target_type_name();
             FieldInfo pi = _create_param_info(param_names_mode, param_descriptor, default_param_type_name);
             _params.add(pi);
         }
@@ -592,7 +592,7 @@ public class JdbcUtils {
                     _fields.get(0).setComment(comment + " [INFO] " + error.toString().trim().replace('\r', ' ').replace('\n', ' '));
                 }
             } else {
-                if (ResultSet.class.getName().equals(dao_fields.get(0).getType())) {
+                if (ResultSet.class.getName().equals(dao_fields.get(0).calc_target_type_name())) {
                     // the story about PostgreSQL + 'select * from get_tests_by_rating_rc(?)' (UDF returning REFCURSOR)
                     _fields.addAll(dto_fields);
                     String comment = _fields.get(0).getComment() + " [INFO] Column 0 is of type ResultSet";
@@ -705,8 +705,8 @@ public class JdbcUtils {
         }
         if (type_map.is_defined()) {
             for (FieldInfo fi : _fields) {
-                String type_name = type_map.get_rendered_type_name(fi.getType());
-                fi.set_type_by_map(type_name);
+                String type_name = type_map.get_target_type_name(fi.calc_target_type_name());
+                fi.set_target_type_by_map(type_name);
             }
         }
         return dao_query_jdbc_sql;

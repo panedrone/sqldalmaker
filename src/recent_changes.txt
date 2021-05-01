@@ -1,10 +1,17 @@
+2021-05-01
+
+    JSON and XML comments for Go
+
+    <dto-class name="Group" ref="get_groups.sql">
+        <field type='int64 `json:"g_id"`' column="g_id"/>
+        <field type='string `json:"g_name"`' column="g_name"/>
+        <field type='int64 `json:"tasks_count"`' column="tasks_count"/>
+    </dto-class>
+
 2021-04-01
 
-    Fixes for JRE 15+
-
-2021-04-01
-
-    Go + Oracle -> SP + implicit RC (multiple implicit RC in one SP are not supported yet)
+    - Fixes for JRE 15+
+    - Go + Oracle -> SP + implicit RC (multiple implicit RC in one SP are not supported yet)
 
 2021-03-29
 

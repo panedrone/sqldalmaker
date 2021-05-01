@@ -167,7 +167,7 @@ public class PhpCG {
 			if (jaxb_return_type_is_dto) {
 				returned_type_name = _get_rendered_dto_class_name(jaxb_dto_or_return_type);
 			} else {
-				returned_type_name = fields.get(0).getType();
+				returned_type_name = fields.get(0).calc_target_type_name();
 			}
 			String php_sql_str = SqlUtils.jdbc_sql_to_php_str(dao_query_jdbc_sql);
 			Map<String, Object> context = new HashMap<String, Object>();
@@ -270,13 +270,13 @@ public class PhpCG {
 						MappingInfo m = _create_mapping(parts);
 						m_list.add(m);
 						method_params.add(
-								new FieldInfo(FieldNamesMode.AS_IS, p.getType(), m.method_param_name, "parameter"));
+								new FieldInfo(FieldNamesMode.AS_IS, p.calc_target_type_name(), m.method_param_name, "parameter"));
 						exec_dml_params.add(
-								new FieldInfo(FieldNamesMode.AS_IS, p.getType(), m.exec_dml_param_name, "parameter"));
+								new FieldInfo(FieldNamesMode.AS_IS, p.calc_target_type_name(), m.exec_dml_param_name, "parameter"));
 					} else {
 						method_params.add(p);
 						exec_dml_params
-								.add(new FieldInfo(FieldNamesMode.AS_IS, p.getType(), "$" + p.getName(), "parameter"));
+								.add(new FieldInfo(FieldNamesMode.AS_IS, p.calc_target_type_name(), "$" + p.getName(), "parameter"));
 					}
 				}
 			}
