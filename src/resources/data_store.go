@@ -169,11 +169,11 @@ func (ds *DataStore) _query(sqlStr string, args ...interface{}) (*sql.Rows, erro
 	return ds.tx.Query(sqlStr, args...)
 }
 
-func (ds *DataStore) _prepare(sqlStr string) (*sql.Stmt, error) {
+func (ds *DataStore) _exec(sqlStr string, args ...interface{}) (sql.Result, error) {
 	if ds.tx == nil {
-		return ds.handle.Prepare(sqlStr)
+		return ds.handle.Exec(sqlStr, args...)
 	}
-	return ds.tx.Prepare(sqlStr)
+	return ds.tx.Exec(sqlStr, args...)
 }
 
 func (ds *DataStore) PGFetch(cursor string) string {
@@ -207,23 +207,14 @@ func (ds *DataStore) _pgInsert(sqlStr string, aiNames string, args ...interface{
 
 func (ds *DataStore) _oracleInsert(sqlStr string, aiNames string, args ...interface{}) interface{} {
 	// fetching of multiple AI values is not implemented so far:
-	sqlStr += " returning " + aiNames + " into :" + aiNames
+	sqlStr = fmt.Sprintf("%s returning %s  into :%d", sqlStr, aiNames, len(args)+1)
 	// https://ddcode.net/2019/05/11/how-does-go-call-oracles-stored-procedures-and-get-the-return-value-of-the-stored-procedures/
-	// var id64 float64
 	var id64 float64
+	// var id64 interface{} --- error
+	// var id64 int64 --- it works, but...
 	args = append(args, sql.Out{Dest: &id64, In: false})
 	// ----------------
-	stmt, err := ds._prepare(sqlStr)
-	if err != nil {
-		panic(err)
-	}
-	defer func() {
-		err = stmt.Close()
-		if err != nil {
-			panic(err)
-		}
-	}()
-	_, err = stmt.Exec(args...)
+	_, err := ds._exec(sqlStr, args...)
 	if err != nil {
 		println(err.Error())
 		println("Exec() FAILED: " + sqlStr)
@@ -261,25 +252,14 @@ func (ds *DataStore) _mssqlInsert(sqlStr string, args ...interface{}) interface{
 	return nil
 }
 
-func (ds *DataStore) _execInsertBuiltin(sqlStr string, args ...interface{}) interface{} {
-	// === Prepare -> Exec to access LastInsertId
-	stmt, err := ds._prepare(sqlStr)
-	if err != nil {
-		panic(err)
-	}
-	defer func() {
-		err = stmt.Close()
-		if err != nil {
-			panic(err)
-		}
-	}()
-	res, err := stmt.Exec(args...)
+func (ds *DataStore) _execInsertBuiltin(sqlStr string, args ...interface{}) *int64 {
+	res, err := ds._exec(sqlStr, args...)
 	if err != nil {
 		panic(err)
 	}
 	id, err := res.LastInsertId()
 	if err == nil {
-		return id
+		return &id
 	}
 	// The Go builtin functions print and println print to stderr
 	// https://stackoverflow.com/questions/29721449/how-can-i-print-to-stderr-in-go-without-using-log
@@ -393,17 +373,10 @@ func (ds *DataStore) _processExecParams(args []interface{}, onRowArr *[]func(map
 }
 
 func (ds *DataStore) _queryAllImplicitRcOracle(sqlStr string, onRowArr []func(map[string]interface{}), queryArgs ...interface{}) {
-	stmt, err := ds._prepare(sqlStr)
+	rows, err := ds._query(sqlStr, queryArgs...)
 	if err != nil {
 		panic(err)
 	}
-	defer func() {
-		err := stmt.Close()
-		if err != nil {
-			panic(err)
-		}
-	}()
-	rows, err := stmt.Query(queryArgs...)
 	defer func() {
 		err := rows.Close()
 		if err != nil {
@@ -467,19 +440,8 @@ func (ds *DataStore) _queryAllImplicitRcMySQL(sqlStr string, onRowArr []func(map
 	}
 }
 
-func (ds *DataStore) _exec(sqlStr string, onRowArr []func(map[string]interface{}), args ...interface{}) int64 {
-	// === Prepare -> Exec to access RowsAffected
-	stmt, err := ds._prepare(sqlStr)
-	if err != nil {
-		panic(err)
-	}
-	defer func() {
-		err = stmt.Close()
-		if err != nil {
-			panic(err)
-		}
-	}()
-	res, err := stmt.Exec(args...)
+func (ds *DataStore) _exec2(sqlStr string, onRowArr []func(map[string]interface{}), args ...interface{}) int64 {
+	res, err := ds._exec(sqlStr, args...)
 	if err != nil {
 		panic(err)
 	}
@@ -544,7 +506,7 @@ func (ds *DataStore) Exec(sqlStr string, args ...interface{}) int64 {
 		}
 		return 0
 	}
-	return ds._exec(sqlStr, onRowArr, queryArgs...)
+	return ds._exec2(sqlStr, onRowArr, queryArgs...)
 }
 
 func (ds *DataStore) _queryRowValues(sqlStr string, queryArgs ...interface{}) []interface{} {
@@ -754,6 +716,10 @@ func _assignInt64(d *int64, value interface{}) bool {
 		*d = value.(int64)
 	case int32:
 		*d = int64(value.(int32)) // MySQL
+	case float64:
+		*d = int64(value.(float64))
+	case float32:
+		*d = int64(value.(float32))
 	case []byte:
 		str := string(value.([]byte))
 		*d, _ = strconv.ParseInt(str, 10, 64)
@@ -772,6 +738,10 @@ func _assignInt32(d *int32, value interface{}) bool {
 		*d = value.(int32)
 	case int64:
 		*d = int32(value.(int64))
+	case float64:
+		*d = value.(int32)
+	case float32:
+		*d = int32(value.(float32))
 	case []byte:
 		str := string(value.([]byte))
 		d64, err := strconv.ParseInt(str, 10, 32)
@@ -861,50 +831,35 @@ func AssignValue(fieldAddr interface{}, value interface{}) {
 		}
 		return // leave as-is
 	}
-	switch value.(type) {
-	case []interface{}:
-		panic("value of type []interface{} is not allowed here")
-	}
+	assigned := false
 	switch d := fieldAddr.(type) {
 	case *string:
-		if _assignString(d, value) {
-			return
-		}
+		assigned = _assignString(d, value)
 	case *int32:
-		if _assignInt32(d, value) {
-			return
-		}
+		assigned = _assignInt32(d, value)
 	case *int64:
-		if _assignInt64(d, value) {
-			return
-		}
+		assigned = _assignInt64(d, value)
 	case *float64:
-		if _assignFloat64(d, value) {
-			return
-		}
+		assigned = _assignFloat64(d, value)
 	case *float32:
-		if _assignFloat32(d, value) {
-			return
-		}
+		assigned = _assignFloat32(d, value)
 	case *time.Time:
-		if _assignTime(d, value) {
-			return
-		}
+		assigned = _assignTime(d, value)
 	case *bool:
-		if _assignBoolean(d, value) {
-			return
-		}
+		assigned = _assignBoolean(d, value)
 	case *[]byte: // the same as uint8
 		switch value.(type) {
 		case []byte:
 			*d = value.([]byte)
-			return
+			assigned = true
 		}
 	case *interface{}:
 		*d = value
-		return
+		assigned = true
 	}
-	panic(fmt.Sprintf("Unexpected params in AssignValue(%T, %T)", fieldAddr, value))
+	if !assigned {
+		panic(fmt.Sprintf("Unexpected params in AssignValue(%T, %T)", fieldAddr, value))
+	}
 }
 
 // Extend/improve method Assign and related functions on demand:
