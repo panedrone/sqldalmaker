@@ -739,7 +739,7 @@ func _assignInt32(d *int32, value interface{}) bool {
 	case int64:
 		*d = int32(value.(int64))
 	case float64:
-		*d = value.(int32)
+		*d = int32(value.(float64))
 	case float32:
 		*d = int32(value.(float32))
 	case []byte:
