@@ -187,7 +187,7 @@ public class UIEditorPageAdmin extends Composite {
 						"DataStore_PDO_Oracle.php");
 			}
 		});
-		btnDatastorephppdoOracle.setText("PDO, Oracle");
+		btnDatastorephppdoOracle.setText("PDO, oracle");
 		toolkit.adapt(btnDatastorephppdoOracle, true, true);
 
 		Button btnDatastorephpociOracle = new Button(composite, SWT.NONE);
@@ -198,7 +198,7 @@ public class UIEditorPageAdmin extends Composite {
 						"DataStore_oci8.php");
 			}
 		});
-		btnDatastorephpociOracle.setText("OCI8, Oracle");
+		btnDatastorephpociOracle.setText("oci8");
 		toolkit.adapt(btnDatastorephpociOracle, true, true);
 
 		Button btnDatastorephppdoPostgresql = new Button(composite, SWT.NONE);
@@ -209,7 +209,7 @@ public class UIEditorPageAdmin extends Composite {
 						"DataStore_PDO_PostgreSQL.php");
 			}
 		});
-		btnDatastorephppdoPostgresql.setText("PDO, pg");
+		btnDatastorephppdoPostgresql.setText("PDO, postgresql");
 		toolkit.adapt(btnDatastorephppdoPostgresql, true, true);
 
 		Button btnDatastorephppdoSql = new Button(composite, SWT.NONE);
@@ -235,6 +235,7 @@ public class UIEditorPageAdmin extends Composite {
 		btnNewButton_12.setText("PDO, sqlite3");
 
 		Composite composite_4 = new Composite(composite_2, SWT.NONE);
+		composite_4.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false, 1, 1));
 		toolkit.adapt(composite_4);
 		toolkit.paintBordersFor(composite_4);
 		composite_4.setLayout(new GridLayout(10, false));
@@ -291,7 +292,7 @@ public class UIEditorPageAdmin extends Composite {
 			}
 		});
 		toolkit.adapt(btnDatastoreCQt, true, true);
-		btnDatastoreCQt.setText("Qt Sql");
+		btnDatastoreCQt.setText("QtSql");
 
 		Button btnDatastoreCStl = new Button(composite_4, SWT.NONE);
 		btnDatastoreCStl.addSelectionListener(new SelectionAdapter() {
@@ -331,6 +332,7 @@ public class UIEditorPageAdmin extends Composite {
 		btnNewButton_8.setText("DBI");
 
 		Composite composite_5 = new Composite(composite_2, SWT.NONE);
+		composite_5.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false, 1, 1));
 		toolkit.adapt(composite_5);
 		toolkit.paintBordersFor(composite_5);
 		composite_5.setLayout(new GridLayout(8, false));
@@ -369,7 +371,7 @@ public class UIEditorPageAdmin extends Composite {
 						"data_store_psycopg2.py");
 			}
 		});
-		btnNewButton_7_1_1.setText("psycopg2, pg");
+		btnNewButton_7_1_1.setText("psycopg2");
 		toolkit.adapt(btnNewButton_7_1_1, true, true);
 
 		Button btnNewButton_7_1 = new Button(composite_5, SWT.NONE);

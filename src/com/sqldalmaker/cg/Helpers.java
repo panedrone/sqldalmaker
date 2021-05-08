@@ -1,7 +1,7 @@
 /*
- * Copyright 2011-2021 sqldalmaker@gmail.com
- * Read LICENSE.txt in the root of this project/archive.
- * Project web-site: http://sqldalmaker.sourceforge.net
+    Copyright 2011-2021 sqldalmaker@gmail.com
+    SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
+    Read LICENSE.txt in the root of this project/archive for details.
  */
 package com.sqldalmaker.cg;
 
@@ -238,7 +238,7 @@ public class Helpers {
             }
             if (last_arr != null) {
                 int n = items.length;
-                String []newarr = new String[n + 1];
+                String[] newarr = new String[n + 1];
                 for (int i = 0; i < n; i++)
                     newarr[i] = items[i];
                 newarr[n] = last_arr;

@@ -15,7 +15,7 @@ import (
    This is an example of how to implement DataStore in Go + "database/sql".
    Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store.go
    Copy-paste this code to your project and change it for your needs.
-   Improvements are welcome: sdm@gmail.com
+   Improvements are welcome: sqldalmaker@gmail.com
 */
 
 type OutParam struct {

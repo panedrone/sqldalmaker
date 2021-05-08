@@ -1,7 +1,7 @@
 /*
- * Copyright 2011-2021 sqldalmaker@gmail.com
- * Read LICENSE.txt in the root of this project/archive.
- * Project web-site: http://sqldalmaker.sourceforge.net
+    Copyright 2011-2021 sqldalmaker@gmail.com
+    SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
+    Read LICENSE.txt in the root of this project/archive for details.
  */
 package com.sqldalmaker.cg;
 
@@ -66,8 +66,11 @@ public class JaxbUtils {
         }
     }
 
-    private static boolean process_jaxb_crud_create(IDaoCG dao_cg, TypeCrud jaxb_type_crud, String dto_class_name,
-                                                    String table_name, FieldNamesMode field_names_mode, StringBuilder code_buff) throws Exception {
+    private static boolean process_jaxb_crud_create(IDaoCG dao_cg,
+                                                    TypeCrud jaxb_type_crud, String dto_class_name,
+                                                    String table_name,
+                                                    FieldNamesMode field_names_mode,
+                                                    StringBuilder code_buff) throws Exception {
         String method_name = null;
         if (jaxb_type_crud.getCreate() != null) {
             method_name = jaxb_type_crud.getCreate().getMethod();
@@ -88,8 +91,12 @@ public class JaxbUtils {
         return true;
     }
 
-    private static boolean process_jaxb_crud_read_all(IDaoCG dao_cg, TypeCrud jaxb_type_crud, String dto_class_name,
-                                                      String table_name, FieldNamesMode field_names_mode, StringBuilder code_buff) throws Exception {
+    private static boolean process_jaxb_crud_read_all(IDaoCG dao_cg,
+                                                      TypeCrud jaxb_type_crud,
+                                                      String dto_class_name,
+                                                      String table_name,
+                                                      FieldNamesMode field_names_mode,
+                                                      StringBuilder code_buff) throws Exception {
         String method_name = null;
         if (jaxb_type_crud.getReadAll() != null) {
             method_name = jaxb_type_crud.getReadAll().getMethod();
@@ -107,8 +114,12 @@ public class JaxbUtils {
         return true;
     }
 
-    private static boolean process_jaxb_crud_read(IDaoCG dao_cg, TypeCrud jaxb_type_crud, String dto_class_name,
-                                                  String table_name, String explicit_pk, FieldNamesMode field_names_mode,
+    private static boolean process_jaxb_crud_read(IDaoCG dao_cg,
+                                                  TypeCrud jaxb_type_crud,
+                                                  String dto_class_name,
+                                                  String table_name,
+                                                  String explicit_pk,
+                                                  FieldNamesMode field_names_mode,
                                                   StringBuilder code_buff) throws Exception {
         String method_name = null;
         if (jaxb_type_crud.getRead() != null) {
@@ -127,8 +138,11 @@ public class JaxbUtils {
         return true;
     }
 
-    private static boolean process_jaxb_crud_update(IDaoCG dao_cg, TypeCrud jaxb_type_crud, String dto_class_name,
-                                                    String table_name, String explicit_primary_keys,
+    private static boolean process_jaxb_crud_update(IDaoCG dao_cg,
+                                                    TypeCrud jaxb_type_crud,
+                                                    String dto_class_name,
+                                                    String table_name,
+                                                    String explicit_primary_keys,
                                                     FieldNamesMode field_names_mode,
                                                     StringBuilder code_buff) throws Exception {
         String method_name = null;
@@ -149,8 +163,11 @@ public class JaxbUtils {
         return true;
     }
 
-    private static boolean process_jaxb_crud_delete(IDaoCG dao_cg, TypeCrud jaxb_type_crud, String dto_class_name,
-                                                    String table_name, String explicit_pk,
+    private static boolean process_jaxb_crud_delete(IDaoCG dao_cg,
+                                                    TypeCrud jaxb_type_crud,
+                                                    String dto_class_name,
+                                                    String table_name,
+                                                    String explicit_pk,
                                                     FieldNamesMode field_names_mode,
                                                     StringBuilder code_buff) throws Exception {
         String method_name = null;
@@ -170,9 +187,11 @@ public class JaxbUtils {
         return true;
     }
 
-    public static StringBuilder process_jaxb_crud(IDaoCG dao_cg, FieldNamesMode field_names_mode,
+    public static StringBuilder process_jaxb_crud(IDaoCG dao_cg,
+                                                  FieldNamesMode field_names_mode,
                                                   TypeCrud jaxb_type_crud,
                                                   String dto_class_name) throws Exception {
+
         String table_name = jaxb_type_crud.getTable();
         String explicit_primary_keys = jaxb_type_crud.getPk();
         boolean is_empty = true;

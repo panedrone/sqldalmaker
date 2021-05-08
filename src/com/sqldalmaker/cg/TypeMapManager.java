@@ -1,3 +1,8 @@
+/*
+    Copyright 2011-2021 sqldalmaker@gmail.com
+    SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
+    Read LICENSE.txt in the root of this project/archive for details.
+ */
 package com.sqldalmaker.cg;
 
 import com.sqldalmaker.jaxb.settings.Type;
@@ -6,6 +11,9 @@ import com.sqldalmaker.jaxb.settings.TypeMap;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * @author sqldalmaker@gmail.com
+ */
 class TypeMapManager {
 
     private final Map<String, String> detected = new HashMap<String, String>();

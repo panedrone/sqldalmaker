@@ -211,48 +211,48 @@
                     </Component>
                     <Component class="javax.swing.JButton" name="jButton28">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="PDO, MySQL"/>
+                        <Property name="text" type="java.lang.String" value="PDO, mysql"/>
                       </Properties>
                       <Events>
                         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton28ActionPerformed"/>
                       </Events>
                     </Component>
-                    <Component class="javax.swing.JButton" name="jButton33">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="OCI8"/>
-                      </Properties>
-                      <Events>
-                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton33ActionPerformed"/>
-                      </Events>
-                    </Component>
                     <Component class="javax.swing.JButton" name="jButton29">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="PDO, Oracle"/>
+                        <Property name="text" type="java.lang.String" value="PDO, oracle"/>
                       </Properties>
                       <Events>
                         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton29ActionPerformed"/>
                       </Events>
                     </Component>
+                    <Component class="javax.swing.JButton" name="jButton33">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="oci8"/>
+                      </Properties>
+                      <Events>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton33ActionPerformed"/>
+                      </Events>
+                    </Component>
+                    <Component class="javax.swing.JButton" name="jButton30">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="PDO, mssql"/>
+                      </Properties>
+                      <Events>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton30ActionPerformed"/>
+                      </Events>
+                    </Component>
                     <Component class="javax.swing.JButton" name="jButton26">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="PDO, PostgreSQL"/>
+                        <Property name="text" type="java.lang.String" value="PDO, postgresql"/>
                         <Property name="focusPainted" type="boolean" value="false"/>
                       </Properties>
                       <Events>
                         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton26ActionPerformed"/>
                       </Events>
                     </Component>
-                    <Component class="javax.swing.JButton" name="jButton30">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="PDO, SQL Server"/>
-                      </Properties>
-                      <Events>
-                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton30ActionPerformed"/>
-                      </Events>
-                    </Component>
                     <Component class="javax.swing.JButton" name="jButton11">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="PDO, SQLite3"/>
+                        <Property name="text" type="java.lang.String" value="PDO, sqlite3"/>
                         <Property name="focusPainted" type="boolean" value="false"/>
                       </Properties>
                       <Events>
@@ -263,9 +263,7 @@
                 </Container>
                 <Container class="javax.swing.JPanel" name="jPanel2">
 
-                  <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
-                    <Property name="alignment" type="int" value="0"/>
-                  </Layout>
+                  <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout"/>
                   <SubComponents>
                     <Component class="javax.swing.JLabel" name="jLabel8">
                       <Properties>
@@ -306,7 +304,7 @@
                     </Component>
                     <Component class="javax.swing.JButton" name="jButton24">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="Qt, QtSql"/>
+                        <Property name="text" type="java.lang.String" value="QtSql"/>
                         <Property name="focusPainted" type="boolean" value="false"/>
                       </Properties>
                       <Events>
@@ -315,7 +313,7 @@
                     </Component>
                     <Component class="javax.swing.JButton" name="jButton14">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="STL, SQLite3"/>
+                        <Property name="text" type="java.lang.String" value="STL, sqlite3"/>
                         <Property name="focusPainted" type="boolean" value="false"/>
                       </Properties>
                       <Events>
@@ -324,7 +322,7 @@
                     </Component>
                     <Component class="javax.swing.JButton" name="jButton12">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="ATL, SQLite3"/>
+                        <Property name="text" type="java.lang.String" value="ATL, sqlite3"/>
                         <Property name="focusPainted" type="boolean" value="false"/>
                       </Properties>
                       <Events>
@@ -344,7 +342,7 @@
                     </Component>
                     <Component class="javax.swing.JButton" name="jButton16">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="MySQL"/>
+                        <Property name="text" type="java.lang.String" value="mysql"/>
                         <Property name="toolTipText" type="java.lang.String" value=""/>
                         <Property name="focusPainted" type="boolean" value="false"/>
                       </Properties>
@@ -370,7 +368,7 @@
                     </Component>
                     <Component class="javax.swing.JButton" name="jButton9">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="pyodbc, SQL Server"/>
+                        <Property name="text" type="java.lang.String" value="pyodbc, mssql"/>
                         <Property name="actionCommand" type="java.lang.String" value="DataStore (pyodbc, SQL Server)"/>
                       </Properties>
                       <Events>
@@ -379,7 +377,7 @@
                     </Component>
                     <Component class="javax.swing.JButton" name="jButton15">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="SQLite3"/>
+                        <Property name="text" type="java.lang.String" value="sqlite3"/>
                         <Property name="focusPainted" type="boolean" value="false"/>
                       </Properties>
                       <Events>

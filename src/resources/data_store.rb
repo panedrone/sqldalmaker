@@ -6,7 +6,7 @@ class DataStore
   #  This is an example of how to implement DataStore in Rubi + DBI.
   #  Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store.rb
   #  Copy-paste this code to your project and change it for your needs.
-  #  Improvements are welcome: sdm@gmail.com
+  #  Improvements are welcome: sqldalmaker@gmail.com
 
   #  This is an example of how to implement DataStore in Ruby + DBI.
   #  Copy-paste this code to your project and change it for your needs.
