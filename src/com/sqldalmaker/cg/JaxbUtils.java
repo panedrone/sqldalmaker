@@ -24,7 +24,9 @@ public class JaxbUtils {
         return attr.name();
     }
 
-    public static DtoClass find_jaxb_dto_class(String dto_class_name, DtoClasses jaxb_dto_classes) throws Exception {
+    public static DtoClass find_jaxb_dto_class(String dto_class_name,
+                                               DtoClasses jaxb_dto_classes) throws Exception {
+
         if (dto_class_name == null || dto_class_name.length() == 0) {
             throw new Exception("Invalid name of DTO class: " + dto_class_name);
         }
@@ -45,7 +47,10 @@ public class JaxbUtils {
         return res;
     }
 
-    public static void process_jaxb_dao_class(IDaoCG dao_cg, DaoClass jaxb_dao_class, List<String> methods) throws Exception {
+    public static void process_jaxb_dao_class(IDaoCG dao_cg,
+                                              DaoClass jaxb_dao_class,
+                                              List<String> methods) throws Exception {
+
         if (jaxb_dao_class.getCrudOrCrudAutoOrQuery() != null) {
             for (int i = 0; i < jaxb_dao_class.getCrudOrCrudAutoOrQuery().size(); i++) {
                 Object jaxb_element = jaxb_dao_class.getCrudOrCrudAutoOrQuery().get(i);

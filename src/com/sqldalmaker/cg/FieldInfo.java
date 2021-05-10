@@ -103,7 +103,7 @@ public class FieldInfo {
         }
     }
 
-    public String _type_name_from_jaxb_type_name() {
+    public String type_name_from_jaxb_type_name() {
         if (this.jaxb_type == null) {
             return "";
         }
@@ -124,7 +124,7 @@ public class FieldInfo {
             throw new Exception("Invalid <field type...");
         }
         this.jaxb_type = jaxb_type.trim().replace("'", "\"");
-        jaxb_type = _type_name_from_jaxb_type_name();
+        jaxb_type = type_name_from_jaxb_type_name();
         if (!jaxb_type.equals("*")) {
             this.target_type_name = jaxb_type;
         }

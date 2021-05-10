@@ -22,6 +22,7 @@
 			</xs:sequence>
 			<xs:attribute name="name" use="required" type="xs:NCName" />
 			<xs:attribute name="ref" use="required" type="xs:string" />
+			<xs:attribute name="field-comment" type="xs:string" />
 		</xs:complexType>
 	</xs:element>
 </xs:schema>

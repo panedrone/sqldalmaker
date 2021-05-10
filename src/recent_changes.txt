@@ -1,6 +1,20 @@
+2021-05-10
+
+    New xml attribute "field-comment" to simplify type-comments for Go:
+
+    <dto-class name="Group" ref="get_groups.sql" field-comment="`json:&quot;{snake_case(column)}&quot;`">
+        <field type="int64" column="g_id"/>
+        <field type="string" column="g_name"/>
+        <field type="int64" column="tasks_count"/>
+    </dto-class>
+
+    <dto-class name="Task" ref="tasks" field-comment="`json:&quot;{snake_case(column)}&quot;`"/>
+
+    ----- overwride XSD files from plugin GUI -> tab 'Admin'
+
 2021-05-01
 
-    JSON and XML comments for Go
+    Type-comments for Go
 
     <dto-class name="Group" ref="get_groups.sql">
         <field type='int64 `json:"g_id"`' column="g_id"/>

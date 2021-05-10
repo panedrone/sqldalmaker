@@ -238,7 +238,7 @@ public class UIEditorPageAdmin extends Composite {
 		composite_4.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false, 1, 1));
 		toolkit.adapt(composite_4);
 		toolkit.paintBordersFor(composite_4);
-		composite_4.setLayout(new GridLayout(10, false));
+		composite_4.setLayout(new GridLayout(8, false));
 
 		Label lblJava = new Label(composite_4, SWT.NONE);
 		toolkit.adapt(lblJava, true, true);
@@ -317,25 +317,11 @@ public class UIEditorPageAdmin extends Composite {
 		toolkit.adapt(btnNewButton_11, true, true);
 		btnNewButton_11.setText("ATL, sqlite3");
 
-		Label lblRuby = new Label(composite_4, SWT.NONE);
-		toolkit.adapt(lblRuby, true, true);
-		lblRuby.setText("Ruby");
-
-		Button btnNewButton_8 = new Button(composite_4, SWT.NONE);
-		btnNewButton_8.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/data_store.rb", "data_store.rb");
-			}
-		});
-		toolkit.adapt(btnNewButton_8, true, true);
-		btnNewButton_8.setText("DBI");
-
 		Composite composite_5 = new Composite(composite_2, SWT.NONE);
 		composite_5.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false, 1, 1));
 		toolkit.adapt(composite_5);
 		toolkit.paintBordersFor(composite_5);
-		composite_5.setLayout(new GridLayout(8, false));
+		composite_5.setLayout(new GridLayout(10, false));
 
 		Label lblPython = new Label(composite_5, SWT.NONE);
 		toolkit.adapt(lblPython, true, true);
@@ -395,6 +381,20 @@ public class UIEditorPageAdmin extends Composite {
 		});
 		toolkit.adapt(btnNewButton_6, true, true);
 		btnNewButton_6.setText("sqlite3");
+		
+				Label lblRuby = new Label(composite_5, SWT.NONE);
+				toolkit.adapt(lblRuby, true, true);
+				lblRuby.setText("Ruby");
+		
+				Button btnNewButton_8 = new Button(composite_5, SWT.NONE);
+				btnNewButton_8.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(SelectionEvent e) {
+						EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/data_store.rb", "data_store.rb");
+					}
+				});
+				toolkit.adapt(btnNewButton_8, true, true);
+				btnNewButton_8.setText("DBI");
 
 		Label lblGo = new Label(composite_5, SWT.NONE);
 		toolkit.adapt(lblGo, true, true);

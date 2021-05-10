@@ -1,7 +1,7 @@
 /*
- * Copyright 2011-2021 sqldalmaker@gmail.com
- * Read LICENSE.txt in the root of this project/archive.
- * Project web-site: http://sqldalmaker.sourceforge.net
+    Copyright 2011-2021 sqldalmaker@gmail.com
+    SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
+    Read LICENSE.txt in the root of this project/archive for details.
  */
 package com.sqldalmaker.intellij.ui;
 
@@ -186,7 +186,7 @@ public class UITabDAO {
         });
         {
             TableColumn col = table.getColumnModel().getColumn(0);
-            col.setPreferredWidth(416);
+            col.setPreferredWidth(220);
         }
         {
             TableColumn col = table.getColumnModel().getColumn(1);
