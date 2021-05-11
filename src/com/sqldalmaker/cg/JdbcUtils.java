@@ -166,7 +166,7 @@ public class JdbcUtils {
 
         TableFieldInfo(final String table_name, String explicit_pk) throws Exception {
             _init_by_jdbc_sql(table_name, explicit_pk);
-            _refine_by_jdbc_table(table_name, fields_map);
+            _refine_field_info_by_jdbc_table(table_name, fields_map);
             _refine_by_type_map();
         }
 
@@ -322,6 +322,25 @@ public class JdbcUtils {
         }
     }
 
+    private void _get_param_info_for_sql_shortcut(
+            FieldNamesMode param_names_mode,
+            String[] method_param_descriptors,
+            List<FieldInfo> fields_pk,
+            List<FieldInfo> _params) throws Exception {
+
+        // assign param types from table!! without dto-refinement!!!
+        if (method_param_descriptors.length != fields_pk.size()) {
+            throw new Exception("Invalid SQL-shortcut. Keys declared: " + method_param_descriptors.length
+                    + ", keys expected: " + fields_pk.size());
+        }
+        for (int i = 0; i < method_param_descriptors.length; i++) {
+            String param_descriptor = method_param_descriptors[i];
+            String default_param_type_name = fields_pk.get(i).calc_target_type_name();
+            FieldInfo pi = _create_param_info(param_names_mode, param_descriptor, default_param_type_name);
+            _params.add(pi);
+        }
+    }
+
     private FieldInfo _create_param_info(
             FieldNamesMode param_names_mode,
             String param_descriptor,
@@ -352,11 +371,11 @@ public class JdbcUtils {
         _get_field_info_by_jdbc_sql(jdbc_sql, dto_fields_map, _dto_fields);
         if (SqlUtils.is_table_ref(jaxb_dto_ref)) {
             String table_name = jaxb_dto_ref;
-            _refine_by_jdbc_table(table_name, dto_fields_map);
+            _refine_field_info_by_jdbc_table(table_name, dto_fields_map);
         } else if (SqlUtils.is_sql_shortcut_ref(jaxb_dto_ref)) {
             String[] parts = SqlUtils.parse_sql_shortcut_ref(jaxb_dto_ref);
             String table_name = parts[0];
-            _refine_by_jdbc_table(table_name, dto_fields_map);
+            _refine_field_info_by_jdbc_table(table_name, dto_fields_map);
         }
     }
 
@@ -453,14 +472,7 @@ public class JdbcUtils {
         }
     }
 
-    private void _refine_by_jdbc_table(
-            String table_name,
-            Map<String, FieldInfo> fields_map) throws Exception {
-
-        if (!SqlUtils.is_table_ref(table_name)) {
-            throw new Exception("Table name expected: " + table_name);
-        }
-        DatabaseMetaData md = conn.getMetaData();
+    private static ResultSet _get_columns_rs(DatabaseMetaData md, String table_name) throws SQLException {
         String[] parts = table_name.split("\\.", -1); // -1 to leave empty strings
         ResultSet rs_columns;
         if (parts.length == 1) {
@@ -470,11 +482,23 @@ public class JdbcUtils {
             String table_nm = parts[parts.length - 1];
             rs_columns = md.getColumns(null, schema_nm, table_nm, "%");
         }
+        return rs_columns;
+    }
+
+    private void _refine_field_info_by_jdbc_table(
+            String table_name,
+            Map<String, FieldInfo> fields_map) throws Exception {
+
+        if (!SqlUtils.is_table_ref(table_name)) {
+            throw new Exception("Table name expected: " + table_name);
+        }
+        DatabaseMetaData md = conn.getMetaData();
+        ResultSet columns_rs = _get_columns_rs(md, table_name);
         try {
-            while (rs_columns.next()) {
-                String db_col_name = rs_columns.getString("COLUMN_NAME");
+            while (columns_rs.next()) {
+                String db_col_name = columns_rs.getString("COLUMN_NAME");
                 if (fields_map.containsKey(db_col_name)) {
-                    int type = rs_columns.getInt("DATA_TYPE");
+                    int type = columns_rs.getInt("DATA_TYPE");
                     String java_type_name = TypesMapping.getJavaBySqlType(type);
                     FieldInfo fi = fields_map.get(db_col_name);
                     fi.refine_jdbc_java_type_name(java_type_name);
@@ -482,7 +506,7 @@ public class JdbcUtils {
                 }
             }
         } finally {
-            rs_columns.close();
+            columns_rs.close();
         }
     }
 
@@ -652,7 +676,8 @@ public class JdbcUtils {
             String sql_root_abs_path,
             String dao_jaxb_ref,
             String[] method_param_descriptors,
-            FieldNamesMode param_names_mode, String jaxb_dto_or_return_type,
+            FieldNamesMode param_names_mode,
+            String jaxb_dto_or_return_type,
             boolean jaxb_return_type_is_dto,
             DtoClasses jaxb_dto_classes,
             List<FieldInfo> _fields,
@@ -662,33 +687,21 @@ public class JdbcUtils {
         String dao_table_name = parts[0];
         String explicit_keys = parts[1];
         TableFieldInfo tfi = new TableFieldInfo(dao_table_name, explicit_keys);
-        List<FieldInfo> dao_all_fields = tfi.fields_all;
-        List<FieldInfo> dao_key_fields = tfi.fields_pk;
-        // assign param types from table!! without dto-refinement!!!
-        if (method_param_descriptors.length != dao_key_fields.size()) {
-            throw new Exception("Invalid SQL-shortcut. Keys declared: " + method_param_descriptors.length
-                    + ", keys expected: " + dao_key_fields.size());
-        }
-        for (int i = 0; i < method_param_descriptors.length; i++) {
-            String param_descriptor = method_param_descriptors[i];
-            String default_param_type_name = dao_key_fields.get(i).calc_target_type_name();
-            FieldInfo pi = _create_param_info(param_names_mode, param_descriptor, default_param_type_name);
-            _params.add(pi);
-        }
         if (jaxb_return_type_is_dto) {
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(jaxb_dto_or_return_type, jaxb_dto_classes);
-            _refine_dao_fields_by_dto_fields(jaxb_dto_class, sql_root_abs_path, dao_all_fields);
-            _fields.addAll(dao_all_fields);
+            _refine_dao_fields_by_dto_fields(jaxb_dto_class, sql_root_abs_path, tfi.fields_all);
+            _fields.addAll(tfi.fields_all);
         } else {
-            _fields.add(_get_ret_field_info(dto_field_names_mode, jaxb_dto_or_return_type, dao_all_fields));
+            _fields.add(_get_ret_field_info(dto_field_names_mode, jaxb_dto_or_return_type, tfi.fields_all));
         }
         if (_fields.size() > 0) {
             String comment = _fields.get(0).getComment();
             _fields.get(0).setComment(comment + " [INFO] SQL-shortcut");
         }
+        _get_param_info_for_sql_shortcut(param_names_mode, method_param_descriptors, tfi.fields_pk, _params);
     }
 
-    private void _get_free_sql_info(
+    private void _get_free_sql_fields_info(
             String sql_root_abs_path,
             String dao_query_jdbc_sql,
             String[] method_param_descriptors,
@@ -696,8 +709,7 @@ public class JdbcUtils {
             String jaxb_dto_or_return_type,
             boolean jaxb_return_type_is_dto,
             DtoClasses jaxb_dto_classes,
-            List<FieldInfo> _fields,
-            List<FieldInfo> _params) throws Exception {
+            List<FieldInfo> _fields) throws Exception {
 
         Map<String, FieldInfo> dao_fields_map = new HashMap<String, FieldInfo>();
         List<FieldInfo> dao_fields = new ArrayList<FieldInfo>();
@@ -751,7 +763,6 @@ public class JdbcUtils {
         } else { // jaxb_return_type_is_dto == false
             _fields.add(_get_ret_field_info(dto_field_names_mode, jaxb_dto_or_return_type, dao_fields));
         }
-        _get_free_sql_params_info(dao_query_jdbc_sql, param_names_mode, method_param_descriptors, _params);
     }
 
     private String _get_column_names(List<FieldInfo> fields) {
@@ -815,7 +826,6 @@ public class JdbcUtils {
             List<FieldInfo> _fields) throws Exception {
 
         JaxbUtils.validate_jaxb_dto_class(jaxb_dto_class);
-        _fields.clear();
         _get_dto_fields(jaxb_dto_class, sql_root_abs_path, _fields);
     }
 
@@ -868,17 +878,13 @@ public class JdbcUtils {
         Helpers.check_duplicates(method_param_descriptors);
         String dao_query_jdbc_sql = SqlUtils.jdbc_sql_by_query_ref(dao_jaxb_ref, sql_root_abs_path);
         FieldNamesMode param_names_mode = _refine_method_params_names_mode(dto_param_type);
-        /*
-         * if (SqlUtils.is_table_ref(dao_jaxb_ref)) { throw new
-         * Exception("Table name as a value of 'ref' is not allowed in <query..."); }
-         * else
-         */
         if (SqlUtils.is_sql_shortcut_ref(dao_jaxb_ref)) {
             _get_sql_shortcut_info(sql_root_abs_path, dao_jaxb_ref, method_param_descriptors, param_names_mode,
                     jaxb_dto_or_return_type, jaxb_return_type_is_dto, jaxb_dto_classes, _fields, _params);
         } else {
-            _get_free_sql_info(sql_root_abs_path, dao_query_jdbc_sql, method_param_descriptors, param_names_mode,
-                    jaxb_dto_or_return_type, jaxb_return_type_is_dto, jaxb_dto_classes, _fields, _params);
+            _get_free_sql_fields_info(sql_root_abs_path, dao_query_jdbc_sql, method_param_descriptors, param_names_mode,
+                    jaxb_dto_or_return_type, jaxb_return_type_is_dto, jaxb_dto_classes, _fields);
+            _get_free_sql_params_info(dao_query_jdbc_sql, param_names_mode, method_param_descriptors, _params);
         }
         if (type_map.is_defined()) {
             for (FieldInfo fi : _fields) {
