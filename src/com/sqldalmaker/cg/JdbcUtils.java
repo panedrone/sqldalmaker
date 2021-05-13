@@ -137,6 +137,10 @@ public class JdbcUtils {
         PreparedStatement ps = _prepare_jdbc_sql(jdbc_sql);
         try {
             ResultSetMetaData rsmd = _get_rs_md(ps);
+            // Columns count is 0:
+            // 1) for 'call my_sp(...)' including SP returning ResultSet (MySQL).
+            // 2) for 'begin ?:=my_udf_rc(...); end;' (Oracle).
+            // 3) for 'select my_func(?)' (PostgreSQL). etc.
             int column_count = _get_col_count(rsmd);
             _fields.clear();
             _fields_map.clear();
@@ -401,11 +405,7 @@ public class JdbcUtils {
         return dto_fields_map;
     }
 
-    interface IMacro {
-        String exec();
-    }
-
-    private void _refine_field_types_by_jaxb(
+    private void _refine_field_info_by_jaxb(
             DtoClass jaxb_dto_class,
             Map<String, FieldInfo> fields_map,
             List<FieldInfo> fields) throws Exception {
@@ -427,6 +427,13 @@ public class JdbcUtils {
                 fields_map.put(jaxb_field_col_name, fi);
             }
         }
+    }
+
+    interface IMacro {
+        String exec();
+    }
+
+    private void _refine_field_type_comments(DtoClass jaxb_dto_class, List<FieldInfo> fields) throws Exception {
         final String field_comment_template = jaxb_dto_class.getFieldComment();
         if (field_comment_template == null) {
             return;
@@ -438,38 +445,48 @@ public class JdbcUtils {
             }
             String type_comment = fi.type_comment_from_jaxb_type_name();
             String col_nm = fi.getColumnName();
-            if (type_comment.length() == 0) {
-                String field_comment = field_comment_template;
-                Map<String, IMacro> macro = new HashMap<String, IMacro>();
-                macro.put("{snake_case(column)}", new IMacro() {
-                    public String exec() {
-                        return Helpers.camel_case_to_snake_case(col_nm);
-                    }
-                });
-                macro.put("{camelCase(column)}", new IMacro() {
-                    public String exec() {
-                        return Helpers.to_lower_camel_or_title_case(col_nm, false);
-                    }
-                });
-                macro.put("{TitleCase(column)}", new IMacro() {
-                    public String exec() {
-                        return Helpers.to_lower_camel_or_title_case(col_nm, true);
-                    }
-                });
-                macro.put("{column}", new IMacro() {
-                    public String exec() {
-                        return col_nm;
-                    }
-                });
-                for (String k : macro.keySet()) {
-                    if (field_comment_template.contains(k)) {
-                        String value = macro.get(k).exec();
-                        field_comment = field_comment_template.replace(k, value);
-                    }
-                }
-                fi.assign_jaxb_type(type_name + " " + field_comment);
+            if (type_comment.length() != 0) {
+                continue;
             }
+            String field_comment = field_comment_template;
+            Map<String, IMacro> macro = new HashMap<String, IMacro>();
+            macro.put("{snake_case(column)}", new IMacro() {
+                public String exec() {
+                    return Helpers.camel_case_to_snake_case(col_nm);
+                }
+            });
+            macro.put("{camelCase(column)}", new IMacro() {
+                public String exec() {
+                    return Helpers.to_lower_camel_or_title_case(col_nm, false);
+                }
+            });
+            macro.put("{TitleCase(column)}", new IMacro() {
+                public String exec() {
+                    return Helpers.to_lower_camel_or_title_case(col_nm, true);
+                }
+            });
+            macro.put("{column}", new IMacro() {
+                public String exec() {
+                    return col_nm;
+                }
+            });
+            for (String k : macro.keySet()) {
+                if (field_comment_template.contains(k)) {
+                    String value = macro.get(k).exec();
+                    field_comment = field_comment_template.replace(k, value);
+                }
+            }
+            fi.assign_jaxb_type(type_name + " " + field_comment);
         }
+    }
+
+    private void _refine_field_types_by_jaxb(
+            DtoClass jaxb_dto_class,
+            Map<String, FieldInfo> fields_map,
+            List<FieldInfo> fields) throws Exception {
+
+        _refine_field_info_by_jaxb(jaxb_dto_class, fields_map, fields);
+        _refine_field_type_comments(jaxb_dto_class, fields);
     }
 
     private static ResultSet _get_columns_rs(DatabaseMetaData md, String table_name) throws SQLException {
@@ -624,8 +641,8 @@ public class JdbcUtils {
         for (FieldInfo dao_field : dao_fields_all) {
             String dao_col_name = dao_field.getColumnName();
             if (dto_fields_map.containsKey(dao_col_name) == false) {
-                throw new Exception(
-                        "Cannot create mapping for DAO column '" + dao_col_name + "'. Ensure lower/upper case.");
+                throw new Exception("Cannot create mapping for DAO column '" +
+                        dao_col_name + "'. Ensure lower/upper case.");
             }
             dao_field.set_target_type_by_map(dto_fields_map.get(dao_col_name).calc_target_type_name());
             String gen_dao_col_name = dao_col_name.toLowerCase();
@@ -701,6 +718,70 @@ public class JdbcUtils {
         _get_param_info_for_sql_shortcut(param_names_mode, method_param_descriptors, tfi.fields_pk, _params);
     }
 
+    private void _fill_by_dto(
+            List<FieldInfo> dto_fields,
+            List<FieldInfo> _fields,
+            StringBuilder error) {
+
+        // no fields from DAO SQL (e.g. for CALL statement) --> just use fields of DTO class:
+        _fields.addAll(dto_fields);
+        if (error.length() > 0 && _fields.size() > 0) {
+            String comment = _fields.get(0).getComment();
+            _fields.get(0).setComment(
+                    comment + " [INFO] " + error.toString().trim().replace('\r', ' ').replace('\n', ' '));
+        }
+    }
+
+    private void _fill_by_dao_and_dto(
+            Map<String, FieldInfo> dto_fields_map,
+            List<FieldInfo> dto_fields,
+            List<FieldInfo> dao_fields,
+            List<FieldInfo> _fields,
+            StringBuilder error) throws Exception {
+
+        if (ResultSet.class.getName().equals(dao_fields.get(0).calc_target_type_name())) {
+            // the story about PostgreSQL + 'select * from get_tests_by_rating_rc(?)' (UDF
+            // returning REFCURSOR)
+            _fields.addAll(dto_fields);
+            String comment = _fields.get(0).getComment() + " [INFO] Column 0 is of type ResultSet";
+            if (error.length() > 0) {
+                comment += ", " + error;
+            }
+            _fields.get(0).setComment(comment);
+        } else {
+            for (FieldInfo dao_fi : dao_fields) {
+                String dao_col_name = dao_fi.getColumnName();
+                if (dto_fields_map.containsKey(dao_col_name)) {
+                    FieldInfo dto_fi = dto_fields_map.get(dao_col_name);
+                    dto_fi.setComment(dto_fi.getComment() + " <- " + dao_fi.getComment());
+                    _fields.add(dto_fi);
+                }
+            }
+        }
+    }
+
+    private void _get_free_sql_fields_info_ret_dto(
+            String sql_root_abs_path,
+            String jaxb_dto_or_return_type,
+            DtoClasses jaxb_dto_classes,
+            List<FieldInfo> _fields,
+            List<FieldInfo> dao_fields,
+            StringBuilder error) throws Exception {
+
+        List<FieldInfo> dto_fields = new ArrayList<FieldInfo>();
+        DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(jaxb_dto_or_return_type, jaxb_dto_classes);
+        Map<String, FieldInfo> dto_fields_map = _get_dto_fields(jaxb_dto_class, sql_root_abs_path, dto_fields);
+        if (dao_fields.isEmpty()) {
+            _fill_by_dto(dto_fields, _fields, error);
+        } else {
+            _fill_by_dao_and_dto(dto_fields_map,dto_fields,dao_fields,_fields,error);
+        }
+        if (_fields.isEmpty()) {
+            String msg = _get_mapping_error_msg(dto_fields, dao_fields);
+            throw new Exception(msg);
+        }
+    }
+
     private void _get_free_sql_fields_info(
             String sql_root_abs_path,
             String dao_query_jdbc_sql,
@@ -719,48 +800,9 @@ public class JdbcUtils {
         } catch (Exception e) {
             error.append(e.getMessage());
         }
-        // Columns count is 0:
-        // 1) for 'call my_sp(...)' including SP returning ResultSet (MySQL).
-        // 2) for 'begin ?:=my_udf_rc(...); end;' (Oracle).
-        // 3) for 'select my_func(?)' (PostgreSQL). etc.
         if (jaxb_return_type_is_dto) {
-            List<FieldInfo> dto_fields = new ArrayList<FieldInfo>();
-            DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(jaxb_dto_or_return_type, jaxb_dto_classes);
-            Map<String, FieldInfo> dto_fields_map = _get_dto_fields(jaxb_dto_class, sql_root_abs_path, dto_fields);
-            // no fields from DAO SQL (e.g. for CALL statement). just use fields of DTO class:
-            if (dao_fields.isEmpty()) {
-                _fields.addAll(dto_fields);
-                if (error.length() > 0 && _fields.size() > 0) {
-                    String comment = _fields.get(0).getComment();
-                    _fields.get(0).setComment(
-                            comment + " [INFO] " + error.toString().trim().replace('\r', ' ').replace('\n', ' '));
-                }
-            } else {
-                if (ResultSet.class.getName().equals(dao_fields.get(0).calc_target_type_name())) {
-                    // the story about PostgreSQL + 'select * from get_tests_by_rating_rc(?)' (UDF
-                    // returning REFCURSOR)
-                    _fields.addAll(dto_fields);
-                    String comment = _fields.get(0).getComment() + " [INFO] Column 0 is of type ResultSet";
-                    if (error.length() > 0) {
-                        comment += ", " + error;
-                    }
-                    _fields.get(0).setComment(comment);
-                } else {
-                    for (FieldInfo dao_fi : dao_fields) {
-                        String dao_col_name = dao_fi.getColumnName();
-                        if (dto_fields_map.containsKey(dao_col_name)) {
-                            FieldInfo dto_fi = dto_fields_map.get(dao_col_name);
-                            dto_fi.setComment(dto_fi.getComment() + " <- " + dao_fi.getComment());
-                            _fields.add(dto_fi);
-                        }
-                    }
-                }
-            }
-            if (_fields.isEmpty()) {
-                String msg = _get_mapping_error_msg(dto_fields, dao_fields);
-                throw new Exception(msg);
-            }
-        } else { // jaxb_return_type_is_dto == false
+            _get_free_sql_fields_info_ret_dto(sql_root_abs_path, jaxb_dto_or_return_type, jaxb_dto_classes, _fields, dao_fields, error);
+        } else {
             _fields.add(_get_ret_field_info(dto_field_names_mode, jaxb_dto_or_return_type, dao_fields));
         }
     }
