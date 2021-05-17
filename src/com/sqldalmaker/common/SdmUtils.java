@@ -1,7 +1,7 @@
 /*
- * Copyright 2011-2021 sqldalmaker@gmail.com
- * Read LICENSE.txt in the root of this project/archive.
- * Project web-site: http://sqldalmaker.sourceforge.net
+    Copyright 2011-2021 sqldalmaker@gmail.com
+    SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
+    Read LICENSE.txt in the root of this project/archive for details.
  */
 package com.sqldalmaker.common;
 
@@ -28,7 +28,10 @@ public class SdmUtils {
     /*
         Used in XML assistants
      */
-    public static Set<String> find_dto_used_in_dao_xml_crud(String metaprogram_abs_path, List<String> dao_xml_file_name_list) throws Exception {
+    public static Set<String> find_dto_used_in_dao_xml_crud(
+            String metaprogram_abs_path,
+            List<String> dao_xml_file_name_list) throws Exception {
+
         String context_path = DaoClass.class.getPackage().getName();
         XmlParser xml_parser = new XmlParser(context_path, Helpers.concat_path(metaprogram_abs_path, Const.DAO_XSD));
         Set<String> res = new HashSet<String>();
@@ -40,7 +43,10 @@ public class SdmUtils {
         return res;
     }
 
-    private static Set<String> find_dto_used_in_dao_xml_crud(XmlParser xml_parser, String xml_file_abs_path) throws Exception {
+    private static Set<String> find_dto_used_in_dao_xml_crud(
+            XmlParser xml_parser,
+            String xml_file_abs_path) throws Exception {
+
         Set<String> res = new HashSet<String>();
         DaoClass dao_class = xml_parser.unmarshal(xml_file_abs_path);
         if (dao_class.getCrudOrCrudAutoOrQuery() != null) {
@@ -61,9 +67,15 @@ public class SdmUtils {
     /*
         Used in XML assistants
      */
-    public static void add_fk_access(FieldNamesMode field_names_mode, Connection conn, boolean schema_in_xml,
-                                     String selected_schema, DatabaseMetaData db_info, ResultSet rs_tables, List<Object> nodes,
-                                     boolean plural_to_singular) throws SQLException {
+    public static void add_fk_access(
+            FieldNamesMode field_names_mode, Connection conn,
+            boolean schema_in_xml,
+            String selected_schema,
+            DatabaseMetaData db_info,
+            ResultSet rs_tables,
+            List<Object> nodes,
+            boolean plural_to_singular) throws SQLException {
+
         String fk_table_name = rs_tables.getString("TABLE_NAME");
         ResultSet rs = db_info.getImportedKeys(conn.getCatalog(), selected_schema, fk_table_name);
         // [pk_table_name - list of fk_column_name]
@@ -109,9 +121,6 @@ public class SdmUtils {
             if (field_names_mode == FieldNamesMode.SNAKE_CASE) {
                 method_name = Helpers.camel_case_to_snake_case(method_name);
             }
-//            } else if (field_names_mode == FieldNamesMode.LOWER_CAMEL_CASE) {
-//                method_name = to_lower_camel_or_title_case(method_name);
-//            }
             String method = method_name + "(" + params + ")";
             node.setMethod(method);
             if (schema_in_xml && selected_schema != null && selected_schema.length() > 0) {
@@ -159,11 +168,13 @@ public class SdmUtils {
         return word;
     }
 
-    public static DaoClass create_crud_xml_jaxb_dao_class(com.sqldalmaker.jaxb.dao.ObjectFactory object_factory,
-                                                          Connection conn, Set<String> in_use, boolean schema_in_xml, String selected_schema,
-                                                          boolean include_views, boolean crud_auto,
-                                                          boolean add_fk_access, boolean plural_to_singular,
-                                                          FieldNamesMode field_names_mode) throws SQLException {
+    public static DaoClass create_crud_xml_jaxb_dao_class(
+            com.sqldalmaker.jaxb.dao.ObjectFactory object_factory,
+            Connection conn, Set<String> in_use, boolean schema_in_xml, String selected_schema,
+            boolean include_views, boolean crud_auto,
+            boolean add_fk_access, boolean plural_to_singular,
+            FieldNamesMode field_names_mode) throws SQLException {
+
         DaoClass root = object_factory.createDaoClass();
         List<Object> nodes = root.getCrudOrCrudAutoOrQuery();
         DatabaseMetaData db_info = conn.getMetaData();
@@ -248,8 +259,14 @@ public class SdmUtils {
         return root;
     }
 
-    public static DaoClass get_fk_access_xml(Connection conn, ObjectFactory object_factory, boolean schema_in_xml,
-                                             String selected_schema, boolean plural_to_singular, FieldNamesMode field_names_mode) throws SQLException {
+    public static DaoClass get_fk_access_xml(
+            Connection conn,
+            ObjectFactory object_factory,
+            boolean schema_in_xml,
+            String selected_schema,
+            boolean plural_to_singular,
+            FieldNamesMode field_names_mode) throws SQLException {
+
         DaoClass root = object_factory.createDaoClass();
         List<Object> nodes = root.getCrudOrCrudAutoOrQuery();
         DatabaseMetaData db_info = conn.getMetaData();
@@ -265,9 +282,15 @@ public class SdmUtils {
         return root;
     }
 
-    public static DtoClasses get_crud_dto_xml(com.sqldalmaker.jaxb.dto.ObjectFactory object_factory, Connection conn,
-                                              Set<String> in_use, boolean schema_in_xml, String selected_schema, boolean include_views,
-                                              boolean plural_to_singular) throws SQLException {
+    public static DtoClasses get_crud_dto_xml(
+            com.sqldalmaker.jaxb.dto.ObjectFactory object_factory,
+            Connection conn,
+            Set<String> in_use,
+            boolean schema_in_xml,
+            String selected_schema,
+            boolean include_views,
+            boolean plural_to_singular) throws SQLException {
+
         DtoClasses root = object_factory.createDtoClasses();
         List<DtoClass> items = root.getDtoClass();
         DatabaseMetaData db_info = conn.getMetaData();
@@ -301,8 +324,12 @@ public class SdmUtils {
         return Helpers.concat_path(source_folder, package_name.replace(".", "/"));
     }
 
-    public static void gen_tmp_field_tags(Connection connection, com.sqldalmaker.jaxb.dto.ObjectFactory object_factory,
-                                          DtoClass dto_class, String sql_root_abs_path) throws Exception {
+    public static void gen_tmp_field_tags(
+            Connection connection,
+            com.sqldalmaker.jaxb.dto.ObjectFactory object_factory,
+            DtoClass dto_class,
+            String sql_root_abs_path) throws Exception {
+
         JdbcUtils db_utils = new JdbcUtils(connection, FieldNamesMode.AS_IS, FieldNamesMode.AS_IS, null);
         ArrayList<FieldInfo> fields = new ArrayList<FieldInfo>();
         db_utils.get_dto_field_info(dto_class, sql_root_abs_path, fields);
@@ -314,7 +341,10 @@ public class SdmUtils {
         }
     }
 
-    public static List<DtoClass> get_dto_classes(String dto_xml_abs_file_path, String dto_xsd_abs_file_path) throws Exception {
+    public static List<DtoClass> get_dto_classes(
+            String dto_xml_abs_file_path,
+            String dto_xsd_abs_file_path) throws Exception {
+
         String context_path = DtoClasses.class.getPackage().getName();
         XmlParser xml_parser = new XmlParser(context_path, dto_xsd_abs_file_path);
         DtoClasses elements = xml_parser.unmarshal(dto_xml_abs_file_path);
@@ -322,8 +352,10 @@ public class SdmUtils {
         return res;
     }
 
-    public static Set<String> get_dto_class_names_used_in_dto_xml(String dto_xml_abs_file_path,
-                                                                  String dto_xsd_abs_file_path) throws Exception {
+    public static Set<String> get_dto_class_names_used_in_dto_xml(
+            String dto_xml_abs_file_path,
+            String dto_xsd_abs_file_path) throws Exception {
+
         Set<String> res = new HashSet<String>();
         List<DtoClass> list = SdmUtils.get_dto_classes(dto_xml_abs_file_path, dto_xsd_abs_file_path);
         for (DtoClass cls : list) {

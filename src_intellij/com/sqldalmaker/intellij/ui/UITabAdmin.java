@@ -516,6 +516,8 @@ public class UITabAdmin {
         dataStorePhpOCI8Button.setText("oci8");
         panel5.add(dataStorePhpOCI8Button, new GridConstraints(0, 3, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         dataStorePhpButton = new JButton();
+        dataStorePhpButton.setBorderPainted(true);
+        dataStorePhpButton.setContentAreaFilled(true);
         dataStorePhpButton.setText("Base");
         panel5.add(dataStorePhpButton, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JPanel panel6 = new JPanel();

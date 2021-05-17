@@ -1,3 +1,9 @@
+2021-05-17
+
+    - IntelliJ -> prevented asking for children if SDM toolbar drop-down is hidden.
+    - Kebab-case for field-comment
+        <dto-class name="Task" ref="tasks" field-comment="`xml:&quot;{kebab-case(column)}&quot;`"/>
+
 2021-05-10
 
     New xml attribute "field-comment" to simplify type-comments for Go:

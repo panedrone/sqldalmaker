@@ -22,7 +22,7 @@ public class JdbcUtils {
     private final Connection conn;
     private final FieldNamesMode dto_field_names_mode;
     private final FieldNamesMode method_params_names_mode;
-    private final TypeMapCache type_map;
+    private final JaxbTypeMap type_map;
 
     public JdbcUtils(
             Connection conn,
@@ -33,19 +33,19 @@ public class JdbcUtils {
         this.conn = conn;
         this.dto_field_names_mode = field_names_mode;
         this.method_params_names_mode = method_params_names_mode;
-        this.type_map = new TypeMapCache(type_map);
+        this.type_map = new JaxbTypeMap(type_map);
     }
 
     public FieldNamesMode get_dto_field_names_mode() {
         return this.dto_field_names_mode;
     }
 
-    private static class TypeMapCache {
+    private static class JaxbTypeMap {
 
         private final Map<String, String> detected = new HashMap<String, String>();
         private final String default_type;
 
-        TypeMapCache(TypeMap jaxb_type_map) throws Exception {
+        JaxbTypeMap(TypeMap jaxb_type_map) throws Exception {
             if (jaxb_type_map == null) {
                 default_type = null;
                 return;
@@ -86,7 +86,7 @@ public class JdbcUtils {
             return default_type;
         }
 
-    } // class TypeMapCache
+    } // class JaxbTypeMap
 
     private String _jdbc_sql_by_table_name(String table_name) {
         return "select * from " + table_name + " where 1 = 0";
@@ -121,9 +121,13 @@ public class JdbcUtils {
         try {
             column_count = rsmd.getColumnCount();
         } catch (SQLException e) {
-            throw new Exception("Exception in getColumnCount():" + e.getMessage());
+            throw new Exception("Exception in getColumnCount(): " + e.getMessage());
         }
         if (column_count < 1) {
+            // Columns count is 0:
+            // 1) for 'call my_sp(...)' including SP returning ResultSet (MySQL).
+            // 2) for 'begin ?:=my_udf_rc(...); end;' (Oracle).
+            // 3) for 'select my_func(?)' (PostgreSQL). etc.
             throw new Exception("getColumnCount() == " + column_count);
         }
         return column_count;
@@ -137,10 +141,6 @@ public class JdbcUtils {
         PreparedStatement ps = _prepare_jdbc_sql(jdbc_sql);
         try {
             ResultSetMetaData rsmd = _get_rs_md(ps);
-            // Columns count is 0:
-            // 1) for 'call my_sp(...)' including SP returning ResultSet (MySQL).
-            // 2) for 'begin ?:=my_udf_rc(...); end;' (Oracle).
-            // 3) for 'select my_func(?)' (PostgreSQL). etc.
             int column_count = _get_col_count(rsmd);
             _fields.clear();
             _fields_map.clear();
@@ -433,7 +433,10 @@ public class JdbcUtils {
         String exec();
     }
 
-    private void _refine_field_type_comments(DtoClass jaxb_dto_class, List<FieldInfo> fields) throws Exception {
+    private void _refine_field_type_comments(
+            DtoClass jaxb_dto_class,
+            List<FieldInfo> fields) throws Exception {
+        
         final String field_comment_template = jaxb_dto_class.getFieldComment();
         if (field_comment_template == null) {
             return;
@@ -463,6 +466,11 @@ public class JdbcUtils {
             macro.put("{TitleCase(column)}", new IMacro() {
                 public String exec() {
                     return Helpers.to_lower_camel_or_title_case(col_nm, true);
+                }
+            });
+            macro.put("{kebab-case(column)}", new IMacro() {
+                public String exec() {
+                    return Helpers.to_kebab_case(col_nm);
                 }
             });
             macro.put("{column}", new IMacro() {

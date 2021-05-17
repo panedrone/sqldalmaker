@@ -5,10 +5,7 @@
  */
 package com.sqldalmaker.intellij;
 
-import com.intellij.openapi.actionSystem.ActionGroup;
-import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.Separator;
+import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.TextEditor;
@@ -115,18 +112,22 @@ public class SdmActionGroup extends ActionGroup {
 
     @NotNull
     @Override
-    public AnAction[] getChildren(@Nullable AnActionEvent anActionEvent) {
+    public AnAction @NotNull [] getChildren(@Nullable AnActionEvent anActionEvent) {
         try {
             if (anActionEvent == null) {
-                return new AnAction[0];
+                return AnAction.EMPTY_ARRAY;
+            }
+            if (anActionEvent.isFromActionToolbar()) {
+                // === panedrone: this trick is aimed to prevent asking for children if SDM toolbar drop-down is hidden
+                return AnAction.EMPTY_ARRAY;
             }
             Project project = anActionEvent.getProject(); // @Nullable
             if (project == null) {
-                return new AnAction[0];
+                return AnAction.EMPTY_ARRAY;
             }
             List<String> titles = get_root_file_titles(project);
             if (titles.isEmpty()) {
-                return new AnAction[0];
+                return AnAction.EMPTY_ARRAY;
             }
             List<AnAction> drop_down_actions_list = new ArrayList<AnAction>();
             FileEditorManager fm = FileEditorManager.getInstance(project);
@@ -174,8 +175,8 @@ public class SdmActionGroup extends ActionGroup {
             return drop_down_actions_list.toArray(arr);
         } catch (/*Exception*/ Throwable e) {
             IdeaMessageHelpers.add_error_to_ide_log("ERROR", e.getMessage());
-            e.printStackTrace();
-            return new AnAction[0];
+            // e.printStackTrace();
+            return AnAction.EMPTY_ARRAY;
         }
     }
 

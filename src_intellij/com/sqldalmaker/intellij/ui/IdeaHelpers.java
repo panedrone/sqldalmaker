@@ -12,7 +12,6 @@ import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.NavigatableFileEditor;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.pom.Navigatable;
@@ -52,19 +51,19 @@ public class IdeaHelpers {
         if (project_path == null) {
             throw new Exception("Cannot detect the project base path");
         }
-        boolean found = false;
-        String content_root_list = "";
-        // https://jetbrains.org/intellij/sdk/docs/reference_guide/project_model/project.html
-        List<String> content_roots = ProjectRootManager.getInstance(project).getContentRootUrls();
-        for (String content_root_path : content_roots) {
-            if (content_root_path.endsWith(project_path)) {
-                found = true;
-            }
-            content_root_list += "[" + content_root_path + "]";
-        }
-        if (!found) {
-            throw new Exception("Something is wrong with project structure.\r\nProject base path '" + project_path + "' not found among content roots:\r\n" + content_root_list);
-        }
+//        boolean found = false;
+//        String content_root_list = "";
+//        // https://jetbrains.org/intellij/sdk/docs/reference_guide/project_model/project.html
+//        List<String> content_roots = ProjectRootManager.getInstance(project).getContentRootUrls();
+//        for (String content_root_path : content_roots) {
+//            if (content_root_path.endsWith(project_path)) {
+//                found = true;
+//            }
+//            content_root_list += "[" + content_root_path + "]";
+//        }
+//        if (!found) {
+//            throw new Exception("Something is wrong with project structure.\r\nProject base path '" + project_path + "' not found among content roots:\r\n" + content_root_list);
+//        }
         File file = new File(project_path);
         // https://intellij-support.jetbrains.com/hc/en-us/community/posts/360001957360-Get-file-from-path-to-have-a-virtual-file
         VirtualFile res = VfsUtil.findFileByIoFile(file, true);
@@ -242,7 +241,8 @@ public class IdeaHelpers {
                 file = dir.createChildData(null, gf.file_name);
             } else {
                 // rename if the case differs
-                if (file.getName() != gf.file_name) {
+                // file.getName() is @NotNull
+                if (!file.getName().equals(gf.file_name)) {
                     // https://www.programcreek.com/java-api-examples/?class=com.intellij.openapi.vfs.VirtualFile&method=delete
                     file.rename(LocalHistory.VFS_EVENT_REQUESTOR, gf.file_name);
                 }

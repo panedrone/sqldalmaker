@@ -69,6 +69,13 @@ public class Helpers {
         return src.replaceAll(regex, replacement).toLowerCase();
     }
 
+    public static String to_kebab_case(String src) {
+        String sc = camel_case_to_snake_case(src);
+        String []parts = sc.split("_");
+        String kc = String.join("-", parts);
+        return kc;
+    }
+
     public static String convert_file_name_to_snake_case(String class_name, String ext) {
         // http://stackoverflow.com/questions/221320/standard-file-naming-conventions-in-ruby
         // In Rails the convention of using underscores is necessary (almost).
