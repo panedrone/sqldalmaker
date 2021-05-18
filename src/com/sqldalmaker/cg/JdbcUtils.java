@@ -7,7 +7,6 @@ package com.sqldalmaker.cg;
 
 import com.sqldalmaker.jaxb.dto.DtoClass;
 import com.sqldalmaker.jaxb.dto.DtoClasses;
-import com.sqldalmaker.jaxb.settings.Type;
 import com.sqldalmaker.jaxb.settings.TypeMap;
 import org.apache.cayenne.dba.TypesMapping;
 
@@ -22,7 +21,7 @@ public class JdbcUtils {
     private final Connection conn;
     private final FieldNamesMode dto_field_names_mode;
     private final FieldNamesMode method_params_names_mode;
-    private final JaxbTypeMap type_map;
+    private final JaxbUtils.JaxbTypeMap type_map;
 
     public JdbcUtils(
             Connection conn,
@@ -33,60 +32,12 @@ public class JdbcUtils {
         this.conn = conn;
         this.dto_field_names_mode = field_names_mode;
         this.method_params_names_mode = method_params_names_mode;
-        this.type_map = new JaxbTypeMap(type_map);
+        this.type_map = new JaxbUtils.JaxbTypeMap(type_map);
     }
 
     public FieldNamesMode get_dto_field_names_mode() {
         return this.dto_field_names_mode;
     }
-
-    private static class JaxbTypeMap {
-
-        private final Map<String, String> detected = new HashMap<String, String>();
-        private final String default_type;
-
-        JaxbTypeMap(TypeMap jaxb_type_map) throws Exception {
-            if (jaxb_type_map == null) {
-                default_type = null;
-                return;
-            }
-            default_type = jaxb_type_map.getDefault();
-            for (Type t : jaxb_type_map.getType()) {
-                String detected_type = t.getDetected();
-                if (detected.containsKey(detected_type)) {
-                    throw new Exception("Duplicated in settings.xml -> type-map: " + detected_type);
-                }
-                String target_type = t.getTarget();
-                detected.put(detected_type, target_type);
-            }
-        }
-
-        boolean is_defined() {
-            if (detected.size() > 0) {
-                return true;
-            }
-            return false;
-        }
-
-        // 'detected' in here means
-        //      1) detected using JDBC or
-        //      2) detected from explicit declarations in XML meta-program
-
-        public String get_target_type_name(String detected_type_name) {
-            if (detected.size() == 0) {
-                // if no re-definitions, pass any type as-is (independently of 'default')
-                return detected_type_name;
-            }
-            if (detected.containsKey(detected_type_name)) {
-                return detected.get(detected_type_name);
-            }
-            if (default_type == null || default_type.trim().length() == 0) {
-                return detected_type_name; // rendered as-is if not found besides of "detected"
-            }
-            return default_type;
-        }
-
-    } // class JaxbTypeMap
 
     private String _jdbc_sql_by_table_name(String table_name) {
         return "select * from " + table_name + " where 1 = 0";
@@ -319,8 +270,7 @@ public class JdbcUtils {
             List<FieldInfo> _params) throws Exception {
 
         _params.clear();
-        for (int i = 0; i < method_param_descriptors.length; i++) {
-            String param_descriptor = method_param_descriptors[i];
+        for (String param_descriptor : method_param_descriptors) {
             FieldInfo pi = _create_param_info(param_names_mode, param_descriptor, Object.class.getName());
             _params.add(pi);
         }
@@ -429,14 +379,14 @@ public class JdbcUtils {
         }
     }
 
-    interface IMacro {
+    private interface IMacro {
         String exec();
     }
 
     private void _refine_field_type_comments(
             DtoClass jaxb_dto_class,
             List<FieldInfo> fields) throws Exception {
-        
+
         final String field_comment_template = jaxb_dto_class.getFieldComment();
         if (field_comment_template == null) {
             return;
@@ -447,33 +397,38 @@ public class JdbcUtils {
                 throw new Exception("<field type=... is empty");
             }
             String type_comment = fi.type_comment_from_jaxb_type_name();
-            String col_nm = fi.getColumnName();
+            final String col_nm = fi.getColumnName();
             if (type_comment.length() != 0) {
                 continue;
             }
             String field_comment = field_comment_template;
             Map<String, IMacro> macro = new HashMap<String, IMacro>();
             macro.put("{snake_case(column)}", new IMacro() {
+                @Override
                 public String exec() {
                     return Helpers.camel_case_to_snake_case(col_nm);
                 }
             });
             macro.put("{camelCase(column)}", new IMacro() {
+                @Override
                 public String exec() {
                     return Helpers.to_lower_camel_or_title_case(col_nm, false);
                 }
             });
             macro.put("{TitleCase(column)}", new IMacro() {
+                @Override
                 public String exec() {
                     return Helpers.to_lower_camel_or_title_case(col_nm, true);
                 }
             });
             macro.put("{kebab-case(column)}", new IMacro() {
+                @Override
                 public String exec() {
                     return Helpers.to_kebab_case(col_nm);
                 }
             });
             macro.put("{column}", new IMacro() {
+                @Override
                 public String exec() {
                     return col_nm;
                 }
@@ -782,7 +737,7 @@ public class JdbcUtils {
         if (dao_fields.isEmpty()) {
             _fill_by_dto(dto_fields, _fields, error);
         } else {
-            _fill_by_dao_and_dto(dto_fields_map,dto_fields,dao_fields,_fields,error);
+            _fill_by_dao_and_dto(dto_fields_map, dto_fields, dao_fields, _fields, error);
         }
         if (_fields.isEmpty()) {
             String msg = _get_mapping_error_msg(dto_fields, dao_fields);
@@ -793,8 +748,6 @@ public class JdbcUtils {
     private void _get_free_sql_fields_info(
             String sql_root_abs_path,
             String dao_query_jdbc_sql,
-            String[] method_param_descriptors,
-            FieldNamesMode param_names_mode,
             String jaxb_dto_or_return_type,
             boolean jaxb_return_type_is_dto,
             DtoClasses jaxb_dto_classes,
@@ -932,7 +885,7 @@ public class JdbcUtils {
             _get_sql_shortcut_info(sql_root_abs_path, dao_jaxb_ref, method_param_descriptors, param_names_mode,
                     jaxb_dto_or_return_type, jaxb_return_type_is_dto, jaxb_dto_classes, _fields, _params);
         } else {
-            _get_free_sql_fields_info(sql_root_abs_path, dao_query_jdbc_sql, method_param_descriptors, param_names_mode,
+            _get_free_sql_fields_info(sql_root_abs_path, dao_query_jdbc_sql,
                     jaxb_dto_or_return_type, jaxb_return_type_is_dto, jaxb_dto_classes, _fields);
             _get_free_sql_params_info(dao_query_jdbc_sql, param_names_mode, method_param_descriptors, _params);
         }

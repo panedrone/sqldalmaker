@@ -1,7 +1,7 @@
 /*
- * Copyright 2011-2021 sqldalmaker@gmail.com
- * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
- * Read LICENSE.txt in the root of this project/archive for details.
+    Copyright 2011-2021 sqldalmaker@gmail.com
+    SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
+    Read LICENSE.txt in the root of this project/archive for details.
  */
 package com.sqldalmaker.netbeans;
 
@@ -475,7 +475,7 @@ public final class SdmTabDAO extends SdmMultiViewCloneableEditor {
                                 try {
                                     Thread.sleep(50);
                                 } catch (InterruptedException e) {
-                                    e.printStackTrace();
+                                    // e.printStackTrace();
                                 }
                                 // myTableModel.refresh(); cleares selection
                                 // table.updateUI();       throws NullPointerException without SwingUtilities.invokeLater 

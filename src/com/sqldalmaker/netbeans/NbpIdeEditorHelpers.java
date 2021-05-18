@@ -1,26 +1,20 @@
 /*
- * Copyright 2011-2020 sqldalmaker@gmail.com
- * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
- * Read LICENSE.txt in the root of this project/archive for details.
+    Copyright 2011-2021 sqldalmaker@gmail.com
+    SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
+    Read LICENSE.txt in the root of this project/archive for details.
  */
 package com.sqldalmaker.netbeans;
 
-import com.sqldalmaker.cg.JdbcUtils;
-import com.sqldalmaker.cg.FieldInfo;
-import com.sqldalmaker.cg.FieldNamesMode;
 import com.sqldalmaker.common.Const;
 import com.sqldalmaker.common.SdmUtils;
 import com.sqldalmaker.common.XmlHelpers;
 import com.sqldalmaker.jaxb.dao.DaoClass;
 import com.sqldalmaker.jaxb.dto.DtoClass;
 import com.sqldalmaker.jaxb.dto.DtoClasses;
-import com.sqldalmaker.jaxb.dto.ObjectFactory;
 import com.sqldalmaker.jaxb.settings.Settings;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 import org.openide.cookies.OpenCookie;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileSystem;

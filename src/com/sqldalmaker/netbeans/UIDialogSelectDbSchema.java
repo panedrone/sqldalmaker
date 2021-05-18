@@ -1,8 +1,7 @@
 /*
- * Copyright 2011-2020 sqldalmaker@gmail.com
- * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
- * Read LICENSE.txt in the root of this project/archive for details.
- *
+    Copyright 2011-2021 sqldalmaker@gmail.com
+    SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
+    Read LICENSE.txt in the root of this project/archive for details.
  */
 package com.sqldalmaker.netbeans;
 
@@ -204,7 +203,7 @@ public final class UIDialogSelectDbSchema extends JDialog {
                 con.close();
             }
 
-            if (schemas.size() == 0) {
+            if (schemas.isEmpty()) {
                 lbl_hint.setText("This database doesn't have schemas. Just provide options.");
                 radio_selected_schema.setText("Without schema");
             } else {

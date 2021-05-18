@@ -8,16 +8,61 @@ package com.sqldalmaker.cg;
 import com.sqldalmaker.jaxb.dao.*;
 import com.sqldalmaker.jaxb.dto.DtoClass;
 import com.sqldalmaker.jaxb.dto.DtoClasses;
+import com.sqldalmaker.jaxb.settings.Type;
+import com.sqldalmaker.jaxb.settings.TypeMap;
 
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author sqldalmaker@gmail.com
  */
 public class JaxbUtils {
+
+    public static class JaxbTypeMap {
+
+        private final Map<String, String> detected = new HashMap<String, String>();
+        private final String default_type;
+
+        public JaxbTypeMap(TypeMap jaxb_type_map) throws Exception {
+            if (jaxb_type_map == null) {
+                default_type = null;
+                return;
+            }
+            default_type = jaxb_type_map.getDefault();
+            for (Type t : jaxb_type_map.getType()) {
+                String detected_type = t.getDetected();
+                if (detected.containsKey(detected_type)) {
+                    throw new Exception("Duplicated in type-map: " + detected_type);
+                }
+                String target_type = t.getTarget();
+                detected.put(detected_type, target_type);
+            }
+        }
+
+        public boolean is_defined() {
+            return detected.size() > 0;
+        }
+
+        // 'detected' in here means
+        //      1) detected using JDBC or
+        //      2) detected from explicit declarations in XML meta-program
+
+        public String get_target_type_name(String detected_type_name) {
+            if (detected.isEmpty()) {
+                // if no re-definitions, pass any type as-is (independently of 'default')
+                return detected_type_name;
+            }
+            if (detected.containsKey(detected_type_name)) {
+                return detected.get(detected_type_name);
+            }
+            if (default_type == null || default_type.trim().length() == 0) {
+                return detected_type_name; // rendered as-is if not found besides of "detected"
+            }
+            return default_type;
+        }
+
+    } // class JaxbTypeMap
 
     public static String get_jaxb_node_name(Object jaxb_node) {
         XmlRootElement attr = jaxb_node.getClass().getAnnotation(XmlRootElement.class);
@@ -73,7 +118,7 @@ public class JaxbUtils {
         }
     }
 
-    private static boolean process_jaxb_crud_create(
+    private static boolean _process_jaxb_crud_create(
             IDaoCG dao_cg,
             TypeCrud jaxb_type_crud,
             String dto_class_name,
@@ -101,7 +146,7 @@ public class JaxbUtils {
         return true;
     }
 
-    private static boolean process_jaxb_crud_read_all(
+    private static boolean _process_jaxb_crud_read_all(
             IDaoCG dao_cg,
             TypeCrud jaxb_type_crud,
             String dto_class_name,
@@ -126,7 +171,7 @@ public class JaxbUtils {
         return true;
     }
 
-    private static boolean process_jaxb_crud_read(
+    private static boolean _process_jaxb_crud_read(
             IDaoCG dao_cg,
             TypeCrud jaxb_type_crud,
             String dto_class_name,
@@ -152,7 +197,7 @@ public class JaxbUtils {
         return true;
     }
 
-    private static boolean process_jaxb_crud_update(
+    private static boolean _process_jaxb_crud_update(
             IDaoCG dao_cg,
             TypeCrud jaxb_type_crud,
             String dto_class_name,
@@ -179,7 +224,7 @@ public class JaxbUtils {
         return true;
     }
 
-    private static boolean process_jaxb_crud_delete(
+    private static boolean _process_jaxb_crud_delete(
             IDaoCG dao_cg,
             TypeCrud jaxb_type_crud,
             String dto_class_name,
@@ -215,23 +260,23 @@ public class JaxbUtils {
         String explicit_primary_keys = jaxb_type_crud.getPk();
         boolean is_empty = true;
         StringBuilder code_buff = new StringBuilder();
-        if (process_jaxb_crud_create(dao_cg, jaxb_type_crud, dto_class_name, table_name, field_names_mode,
+        if (_process_jaxb_crud_create(dao_cg, jaxb_type_crud, dto_class_name, table_name, field_names_mode,
                 code_buff)) {
             is_empty = false;
         }
-        if (process_jaxb_crud_read_all(dao_cg, jaxb_type_crud, dto_class_name, table_name, field_names_mode,
+        if (_process_jaxb_crud_read_all(dao_cg, jaxb_type_crud, dto_class_name, table_name, field_names_mode,
                 code_buff)) {
             is_empty = false;
         }
-        if (process_jaxb_crud_read(dao_cg, jaxb_type_crud, dto_class_name, table_name, explicit_primary_keys,
+        if (_process_jaxb_crud_read(dao_cg, jaxb_type_crud, dto_class_name, table_name, explicit_primary_keys,
                 field_names_mode, code_buff)) {
             is_empty = false;
         }
-        if (process_jaxb_crud_update(dao_cg, jaxb_type_crud, dto_class_name, table_name, explicit_primary_keys,
+        if (_process_jaxb_crud_update(dao_cg, jaxb_type_crud, dto_class_name, table_name, explicit_primary_keys,
                 field_names_mode, code_buff)) {
             is_empty = false;
         }
-        if (process_jaxb_crud_delete(dao_cg, jaxb_type_crud, dto_class_name, table_name, explicit_primary_keys,
+        if (_process_jaxb_crud_delete(dao_cg, jaxb_type_crud, dto_class_name, table_name, explicit_primary_keys,
                 field_names_mode, code_buff)) {
             is_empty = false;
         }
