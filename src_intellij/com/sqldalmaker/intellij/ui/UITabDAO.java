@@ -184,6 +184,7 @@ public class UITabDAO {
                 }
             }
         });
+        // table.setTableHeader(null);
         {
             TableColumn col = table.getColumnModel().getColumn(0);
             col.setPreferredWidth(220);

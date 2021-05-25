@@ -252,14 +252,14 @@ func (ds *DataStore) _mssqlInsert(sqlStr string, args ...interface{}) interface{
 	return nil
 }
 
-func (ds *DataStore) _execInsertBuiltin(sqlStr string, args ...interface{}) *int64 {
+func (ds *DataStore) _defaultInsert(sqlStr string, args ...interface{}) interface{} {
 	res, err := ds._exec(sqlStr, args...)
 	if err != nil {
 		panic(err)
 	}
 	id, err := res.LastInsertId()
 	if err == nil {
-		return &id
+		return id
 	}
 	// The Go builtin functions print and println print to stderr
 	// https://stackoverflow.com/questions/29721449/how-can-i-print-to-stderr-in-go-without-using-log
@@ -284,7 +284,7 @@ func (ds *DataStore) Insert(sqlStr string, aiNames string, args ...interface{}) 
 		// <crud-auto dto="ProjectInfo" table="PROJECTS" generated="P_ID"/>
 		return ds._oracleInsert(sqlStr, aiNames, args...)
 	}
-	return ds._execInsertBuiltin(sqlStr, args...)
+	return ds._defaultInsert(sqlStr, args...)
 }
 
 func _isPtr(p interface{}) bool {
