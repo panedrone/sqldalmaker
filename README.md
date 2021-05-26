@@ -12,7 +12,7 @@ Demo-Projects:
 * [Java/JDBC/Jasper-Reports](https://github.com/panedrone/sdm_demo_jasper_reports_northwindEF)
 * [Java/Android](https://github.com/panedrone/sdm_demo_android_thesaurus)
 * [C++/Qt6](https://github.com/panedrone/sdm_demo_qt6_thesaurus)
-* [Python/Flask](https://github.com/panedrone/sdm_demo_python_flask_todolist)
+* [Python/Flask-RESTful](https://github.com/panedrone/sdm_demo_python_flask_todolist)
 * [Python/Tkinter](https://github.com/panedrone/sdm_demo_python_tkinter_github_stat)
 * [Go/REST](https://github.com/panedrone/sdm_demo_go_todolist)
 
