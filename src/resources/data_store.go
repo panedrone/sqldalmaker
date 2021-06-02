@@ -12,7 +12,7 @@ import (
 
 /*
    SQL DAL Maker Web-Site: http://sqldalmaker.sourceforge.net
-   This is an example of how to implement DataStore in Go + "database/sql".
+   This is an example of how to implement the class DataStore for Go + "database/sql".
    Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store.go
    Copy-paste this code to your project and change it for your needs.
    Improvements are welcome: sqldalmaker@gmail.com
@@ -20,12 +20,10 @@ import (
 
 type OutParam struct {
 	/*
-
-		var outRating float64 // <- no need to init it for OUT parameter
-		cxDao.SpTestOutParams(47, OutParam{Dest: &inOut})
-		// cxDao.SpTestOutParams(47, &outRating) // <- this one is also ok for OUT parameters
-		fmt.Println(outRating)
-
+		var outParam float64 // no need to init it for OutParam
+		cxDao.SpTestOutParams(47, OutParam{Dest: &outParam})
+		// cxDao.SpTestOutParams(47, &outParam) // <- this one is also ok for OUT parameters
+		fmt.Println(outParam)
 	*/
 
 	// Dest is a pointer to the value that will be set to the result of the
@@ -35,11 +33,9 @@ type OutParam struct {
 
 type InOutParam struct {
 	/*
-
-		inOut := 123.0 // INOUT parameter must be initialised
-		cxDao.SpTestInoutParams(InOutParam{Dest: &inOut})
-		fmt.Println(inOut)
-
+		inOutParam := 123.0 // INOUT parameter must be initialized
+		cxDao.SpTestInoutParams(InOutParam{Dest: &inOutParam})
+		fmt.Println(inOutParam)
 	*/
 
 	// Dest is a pointer to the value that will be set to the result of the
@@ -49,7 +45,7 @@ type InOutParam struct {
 
 type DataStore struct {
 	paramPrefix string
-	handle      *sql.DB
+	db          *sql.DB
 	tx          *sql.Tx
 }
 
@@ -60,6 +56,7 @@ func (ds *DataStore) isPostgreSQL() bool {
 func (ds *DataStore) isOracle() bool {
 	return ds.paramPrefix == ":"
 }
+
 func (ds *DataStore) isSqlServer() bool {
 	return ds.paramPrefix == "@p"
 }
@@ -87,27 +84,27 @@ func initDb(ds *DataStore) {
 	var err error
 	// === PostgeSQL ===========================
 	ds.paramPrefix = "$"
-	ds.handle, err = sql.Open("postgres", "postgres://postgres:sa@localhost/my-tests?sslmode=disable")
-	// ds.handle, err = sql.Open("postgres", "postgres://postgres:sa@localhost/my-tests?sslmode=verify-full")
+	ds.db, err = sql.Open("postgres", "postgres://postgres:sa@localhost/my-tests?sslmode=disable")
+	// ds.db, err = sql.Open("postgres", "postgres://postgres:sa@localhost/my-tests?sslmode=verify-full")
 	// === SQLite3 =============================
-	// ds.handle, err = sql.Open("sqlite3", "./log.sqlite")
-	// ds.handle, err = sql.Open("sqlite3", "./northwindEF.sqlite")
+	// ds.db, err = sql.Open("sqlite3", "./log.sqlite")
+	// ds.db, err = sql.Open("sqlite3", "./northwindEF.sqlite")
 	// === MySQL ===============================
-	// ds.handle, err = sql.Open("mysql", "root:root@/sakila")
-	// ds.handle, err = sql.Open("mymysql", "sakila/root/root")
+	// ds.db, err = sql.Open("mysql", "root:root@/sakila")
+	// ds.db, err = sql.Open("mymysql", "sakila/root/root")
 	// === SQL Server ==========================
 	// https://github.com/denisenkom/go-mssqldb
 	// The sqlserver driver uses normal MS SQL Server syntax and expects parameters in the
 	// sql query to be in the form of either @Name or @p1 to @pN (ordinal position).
 	// ensure sqlserver:// in beginning. this one is not valid:
-	// ------ ds.handle, err = sql.Open("sqlserver", "sa:root@/localhost:1433/SQLExpress?database=AdventureWorks2014")
+	// ------ ds.db, err = sql.Open("sqlserver", "sa:root@/localhost:1433/SQLExpress?database=AdventureWorks2014")
 	// this one is ok:
 	ds.paramPrefix = "@p"
-	ds.handle, err = sql.Open("sqlserver", "sqlserver://sa:root@localhost:1433?database=AdventureWorks2014")
+	ds.db, err = sql.Open("sqlserver", "sqlserver://sa:root@localhost:1433?database=AdventureWorks2014")
 	// === Oracle =============================
 	// "github.com/godror/godror"
 	//ds.paramPrefix = ":"
-	//ds.handle, err = sql.Open("godror", `user="ORDERS" password="root" connectString="localhost:1521/orcl"`)
+	//ds.db, err = sql.Open("godror", `user="ORDERS" password="root" connectString="localhost:1521/orcl"`)
 	if err != nil {
 		panic(err)
 	}
@@ -120,7 +117,7 @@ func (ds *DataStore) Open() {
 }
 
 func (ds *DataStore) Close() {
-	err := ds.handle.Close()
+	err := ds.db.Close()
 	if err != nil {
 		panic(err)
 	}
@@ -131,7 +128,7 @@ func (ds *DataStore) Begin() {
 		panic("Tx already started")
 	}
 	var err error
-	ds.tx, err = ds.handle.Begin()
+	ds.tx, err = ds.db.Begin()
 	if err != nil {
 		panic(err)
 	}
@@ -140,20 +137,17 @@ func (ds *DataStore) Begin() {
 func (ds *DataStore) Commit() {
 	if ds.tx == nil {
 		panic("Tx not started")
-		// return
 	}
 	err := ds.tx.Commit()
 	if err != nil {
 		panic(err)
 	}
-	// to prevent ds.tx.Rollback() in defer
-	ds.tx = nil
+	ds.tx = nil // to prevent ds.tx.Rollback() in defer
 }
 
 func (ds *DataStore) Rollback() {
 	if ds.tx == nil {
-		// commit() was called, just do nothing:
-		return
+		return // commit() was called, just do nothing:
 	}
 	err := ds.tx.Rollback()
 	if err != nil {
@@ -164,14 +158,14 @@ func (ds *DataStore) Rollback() {
 
 func (ds *DataStore) _query(sqlStr string, args ...interface{}) (*sql.Rows, error) {
 	if ds.tx == nil {
-		return ds.handle.Query(sqlStr, args...)
+		return ds.db.Query(sqlStr, args...)
 	}
 	return ds.tx.Query(sqlStr, args...)
 }
 
 func (ds *DataStore) _exec(sqlStr string, args ...interface{}) (sql.Result, error) {
 	if ds.tx == nil {
-		return ds.handle.Exec(sqlStr, args...)
+		return ds.db.Exec(sqlStr, args...)
 	}
 	return ds.tx.Exec(sqlStr, args...)
 }
@@ -248,7 +242,7 @@ func (ds *DataStore) _mssqlInsert(sqlStr string, args ...interface{}) interface{
 		}
 		return data
 	}
-	println("rows.Next() FAILED: " + sqlStr)
+	println("SELECT @@IDENTITY FAILED: " + sqlStr)
 	return nil
 }
 
@@ -269,8 +263,7 @@ func (ds *DataStore) _defaultInsert(sqlStr string, args ...interface{}) interfac
 }
 
 func (ds *DataStore) Insert(sqlStr string, aiNames string, args ...interface{}) interface{} {
-	// len(nil) == 0
-	if len(aiNames) == 0 {
+	if len(aiNames) == 0 { // len(nil) == 0
 		panic("DataStore.insert is not applicable for aiNames = " + aiNames)
 	}
 	// Builtin LastInsertId works only with MySQL and SQLite3
