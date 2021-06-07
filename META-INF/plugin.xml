@@ -2,10 +2,9 @@
     <id>dal-mpe</id>
     <name>SQL DAL Maker</name>
     <category>Database</category>
-    <version>1.203.2105</version>
+    <version>1.204.2106</version>
     <vendor email="sqldalmaker@gmail.com"/>
-    <!-- please see http://confluence.intellij.net/display/IDEADEV/Build+Number+Ranges for description -->
-    <idea-version since-build="173.2099.1"/>
+    <idea-version since-build="181.5684.4"/>
 
     <depends>com.intellij.modules.lang</depends>
 

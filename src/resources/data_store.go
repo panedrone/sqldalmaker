@@ -171,7 +171,7 @@ func (ds *DataStore) _exec(sqlStr string, args ...interface{}) (sql.Result, erro
 }
 
 func (ds *DataStore) PGFetch(cursor string) string {
-	return fmt.Sprintf("fetch all from \"%s\"", cursor)
+	return fmt.Sprintf(`fetch all from "%s"`, cursor)
 }
 
 func (ds *DataStore) _pgInsert(sqlStr string, aiNames string, args ...interface{}) interface{} {
