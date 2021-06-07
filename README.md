@@ -6,7 +6,7 @@ Implemented as plug-ins for Eclipse IDE, IntelliJ-Platform, and NetBeans 11+.
 Quick-Demo in mp4: [https://github.com/panedrone/sqldalmaker/releases/tag/latest](https://github.com/panedrone/sqldalmaker/releases/tag/latest)
 
 Demo-Projects:
-* [PHP/PDO](https://github.com/panedrone/sdm_demo_php_todolist) 
+* [PHP/PDO/REST](https://github.com/panedrone/sdm_demo_php_todolist) 
 * [Java/JDBC/Swing](https://github.com/panedrone/sdm_demo_swing_thesaurus)
 * [Java/JDBC/JSF](https://github.com/panedrone/sdm_demo_jsf_todolist)
 * [Java/JDBC/Jasper-Reports](https://github.com/panedrone/sdm_demo_jasper_reports_northwindEF)
