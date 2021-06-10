@@ -58,13 +58,13 @@ public class SqlUtils {
         for (int i = 0; i < parts.length; i++) {
             String j_str = parts[i];
             // packed into Velocity JAR:
-            j_str = org.apache.commons.lang.StringEscapeUtils.escapeJava(j_str);
+            //j_str = org.apache.commons.lang.StringEscapeUtils.escapeJava(j_str);
             // fix the bug in StringEscapeUtils:
             // case '/':
             // out.write('\\');
             // out.write('/');
             // break;
-            j_str = j_str.replace("\\/", "/");
+            // j_str = j_str.replace("\\/", "/");
             if (i == 0) {
                 // j_str = j_str;
             } else {

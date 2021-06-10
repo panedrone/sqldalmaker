@@ -29,6 +29,12 @@
                 <properties/>
                 <border type="none"/>
                 <children>
+                  <component id="9578a" class="javax.swing.JButton" binding="editSettingsXmlButton" default-binding="true">
+                    <constraints/>
+                    <properties>
+                      <text value="Edit settings.xml"/>
+                    </properties>
+                  </component>
                   <component id="9a86e" class="javax.swing.JButton" binding="referenceSettingsXmlButton" default-binding="true">
                     <constraints/>
                     <properties>
@@ -45,12 +51,6 @@
                     <constraints/>
                     <properties>
                       <text value="Recent changes"/>
-                    </properties>
-                  </component>
-                  <component id="9578a" class="javax.swing.JButton" binding="editSettingsXmlButton" default-binding="true">
-                    <constraints/>
-                    <properties>
-                      <text value="Edit settings.xml"/>
                     </properties>
                   </component>
                   <component id="6d08f" class="javax.swing.JTextField" binding="vTextField" default-binding="true">

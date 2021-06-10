@@ -2,7 +2,7 @@
     <id>dal-mpe</id>
     <name>SQL DAL Maker</name>
     <category>Database</category>
-    <version>1.204.2106</version>
+    <version>1.205.2106</version>
     <vendor email="sqldalmaker@gmail.com"/>
     <idea-version since-build="181.5684.4"/>
 
@@ -12,7 +12,7 @@
 SQL DAL Maker is a generator of DTO and DAO classes to access relational databases. Target programming languages:
 PHP, Java, C++, Python, Ruby, and Go. To generate the class, you declare it in XML meta-program.<br/>
 <br/>
-<a href="https://github.com/panedrone/sqldalmaker/releases/tag/latest">Download mp4</a>
+<a href="https://github.com/panedrone/sqldalmaker/releases/tag/latest">Quick-Demo in mp4</a>
     ]]></description>
 
     <change-notes>

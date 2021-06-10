@@ -67,12 +67,16 @@ type ${class_name} struct {
 // (C)RUD: ${table_name}
 // Generated values are passed to DTO.
 
-func (dao *${class_name}) ${method_name}(p *${dto_param}) {
+func (dao *${class_name}) ${method_name}(p *${dto_param}) (err error) {
 #sql_var(false $sql)
-	res := dao.ds.Insert(sql, "${ai_names}"#foreach($param in ${params}), p.${param.getName()}#end)
+	res, err := dao.ds.Insert(sql, "${ai_names}"#foreach($param in ${params}), p.${param.getName()}#end)
+	if err != nil {
+		return
+	}
 #foreach ($ai in ${fields_ai})
 	dao.ds.Assign(&p.${ai.getName()}, res)
 #end
+	return
 }
 ## ====================================================================================================================
 #elseif($mode=="dao_query")
@@ -83,9 +87,8 @@ func (dao *${class_name}) ${method_name}(p *${dto_param}) {
 #end
 #if($fetch_list)
 #if($use_dto)
-func (dao *${class_name}) ${method_name}(#if(${dto_param} != "")#param_decls_dto($is_external_sql)${dto_param} p#else#param_decls($is_external_sql $params)#end) []*${returned_type_name} {
+func (dao *${class_name}) ${method_name}(#if(${dto_param} != "")#param_decls_dto($is_external_sql)${dto_param} p#else#param_decls($is_external_sql $params)#end) (res []*${returned_type_name}, err error) {
 #sql_var($is_external_sql $sql)
-	var res []*${returned_type_name}
 	onDto := func(rd map[string]interface{}) {
 		obj := ${returned_type_name}{}
 #foreach($f in ${fields})
@@ -94,48 +97,54 @@ func (dao *${class_name}) ${method_name}(#if(${dto_param} != "")#param_decls_dto
 #end
 		res = append(res, &obj)
 	}
-	dao.ds.QueryAllRows(sql, onDto#if(${dto_param} != "")#foreach($param in ${params}), p.${param.getterMethod()}()#end)#else#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
-	return res
+	err = dao.ds.QueryAllRows(sql, onDto#if(${dto_param} != "")#foreach($param in ${params}), p.${param.getterMethod()}()#end)#else#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
+	return
 }
 #end
 #else
-func (dao *${class_name}) ${method_name}(#if(${dto_param} != "")#param_decls_dto($is_external_sql)${dto_param} p#else#param_decls($is_external_sql $params)#end) []${returned_type_name} {
+func (dao *${class_name}) ${method_name}(#if(${dto_param} != "")#param_decls_dto($is_external_sql)${dto_param} p#else#param_decls($is_external_sql $params)#end) (res []${returned_type_name}, err error) {
 #sql_var($is_external_sql $sql)
-	var res []${returned_type_name}
-	onRow := func(rawData interface{}) {
+	onRow := func(rd interface{}) {
 		var data ${returned_type_name}
-		dao.ds.Assign(&data, rawData)
+		dao.ds.Assign(&data, rd)
 		res = append(res, data)
 	}
 #if(${dto_param} != "")
-	dao.ds.QueryAll(sql, onRow#foreach($param in ${params}), p.${param.getName()}#end)
+	err = dao.ds.QueryAll(sql, onRow#foreach($param in ${params}), p.${param.getName()}#end)
 #else
-	dao.ds.QueryAll(sql, onRow#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
+	err = dao.ds.QueryAll(sql, onRow#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
 #end
-	return res
+	return
 }
 #end
 #else
-func (dao *${class_name}) ${method_name}(#if(${dto_param} != "")#param_decls_dto($is_external_sql)${dto_param} p#else#param_decls($is_external_sql $params)#end) ${returned_type_name} {
+func (dao *${class_name}) ${method_name}(#if(${dto_param} != "")#param_decls_dto($is_external_sql)${dto_param} p#else#param_decls($is_external_sql $params)#end) (res ${returned_type_name}, err error) {
 #sql_var($is_external_sql $sql)
 #if($use_dto)
-	rd := dao.ds.QueryRow(sql#if(${dto_param} != "")#foreach($param in ${params}), p.${param.getterMethod()}()#end)#else#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
-	obj := ${returned_type_name}{}
+	rd, err := dao.ds.QueryRow(sql#if(${dto_param} != "")#foreach($param in ${params}), p.${param.getterMethod()}()#end)#else#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
+	if err != nil {
+		return
+	}
+	res = ${returned_type_name}{}
 #foreach($f in ${fields})
 #set($i = ${velocityCount} - 1)
-	dao.ds.Assign(&obj.${f.getName()}, rd["${f.getColumnName()}"] /* ${f.getComment()} */)
+	dao.ds.Assign(&res.${f.getName()}, rd["${f.getColumnName()}"] /* ${f.getComment()} */)
 #end
-	return obj
+	return
 #end
 #else
 #if(${dto_param} != "")
-	r := dao.ds.Query(sql#foreach($param in ${params}), p.${param.getterMethod()}()#end)
+	r, err := dao.ds.Query(sql#foreach($param in ${params}), p.${param.getterMethod()}()#end)
 #else
-	r := dao.ds.Query(sql#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
+	r, err := dao.ds.Query(sql#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
 #end
-	var res ${returned_type_name}
-	dao.ds.Assign(&res, r)
-	return res
+	if err != nil {
+		return
+	}
+	var v ${returned_type_name}
+	dao.ds.Assign(&v, r)
+	res = v
+	return
 #end
 }
 #end
@@ -152,9 +161,10 @@ func (dao *${class_name}) ${method_name}(#if(${dto_param} != "")#param_decls_dto
 #end
 // Returns the number of affected rows or -1 on error.
 
-func (dao *${class_name}) ${method_name}(#param_decls_dto($is_external_sql)p *${dto_param}) int64 {
+func (dao *${class_name}) ${method_name}(#param_decls_dto($is_external_sql)p *${dto_param}) (res int64, err error) {
 #sql_var($is_external_sql $sql)
-	return dao.ds.Exec(sql#foreach($param in ${params}), p.${param.getName()}#end)
+	res, err = dao.ds.Exec(sql#foreach($param in ${params}), p.${param.getName()}#end)
+	return
 }
 #end
 #if($plain_params)
@@ -168,7 +178,7 @@ func (dao *${class_name}) ${method_name}(#param_decls_dto($is_external_sql)p *${
 #end
 // Returns the number of affected rows or -1 on error.
 
-func (dao *${class_name}) ${method_name}(#param_decls($is_external_sql $params)) int64 {
+func (dao *${class_name}) ${method_name}(#param_decls($is_external_sql $params)) (res int64, err error) {
 #sql_var($is_external_sql $sql)
 #foreach($m in ${mappings})
 	${m.get_exec_dml_param_name()} := func(rd map[string]interface{}) {
@@ -180,10 +190,11 @@ func (dao *${class_name}) ${method_name}(#param_decls($is_external_sql $params))
 	}
 #end
 #if ($method_type == "CREATE" || $method_type == "UPDATE" || $method_type == "DELETE")
-	return dao.ds.Exec(sql#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
+	res, err = dao.ds.Exec(sql#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
 #else
-	return dao.ds.Exec(sql#foreach($param in ${params2}), ${param.getLowerCamelCaseName()}#end)
+	res, err = dao.ds.Exec(sql#foreach($param in ${params2}), ${param.getLowerCamelCaseName()}#end)
 #end
+	return
 }
 #end
 #end

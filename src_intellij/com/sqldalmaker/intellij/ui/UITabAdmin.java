@@ -462,6 +462,9 @@ public class UITabAdmin {
         final JPanel panel2 = new JPanel();
         panel2.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
         panel1.add(panel2, new GridConstraints(0, 0, 1, 2, GridConstraints.ANCHOR_NORTHWEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        editSettingsXmlButton = new JButton();
+        editSettingsXmlButton.setText("Edit settings.xml");
+        panel2.add(editSettingsXmlButton);
         referenceSettingsXmlButton = new JButton();
         referenceSettingsXmlButton.setText("Reference settings.xml");
         panel2.add(referenceSettingsXmlButton);
@@ -471,9 +474,6 @@ public class UITabAdmin {
         recentChangesButton = new JButton();
         recentChangesButton.setText("Recent changes");
         panel2.add(recentChangesButton);
-        editSettingsXmlButton = new JButton();
-        editSettingsXmlButton.setText("Edit settings.xml");
-        panel2.add(editSettingsXmlButton);
         vTextField = new JTextField();
         vTextField.setBackground(new Color(-855310));
         vTextField.setEditable(false);
