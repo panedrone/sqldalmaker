@@ -683,20 +683,17 @@ func (ds *DataStore) _formatSQL(sqlStr string) string {
 }
 
 func _assignString(d *string, value interface{}) bool {
-	switch value.(type) {
+	switch v := value.(type) {
 	case []byte:
-		*d = string(value.([]byte))
-	case int64:
-		i64 := value.(int64) // MySQL
-		*d = strconv.FormatInt(i64, 10)
-	case int32:
-		i64 := int64(value.(int32)) // MySQL
-		*d = strconv.FormatInt(i64, 10)
+		*d = string(v)
+	case int, int32, int64:
+		*d = fmt.Sprintf("%d", v)
+	case float64, float32:
+		*d = fmt.Sprintf("%f", v)
 	case string:
-		*d = value.(string)
+		*d = v
 	case time.Time:
-		t := value.(time.Time)
-		*d = t.Format("2006-01-02 15:04:05")
+		*d = v.Format("2006-01-02 15:04:05")
 	default:
 		return false
 	}
@@ -704,17 +701,17 @@ func _assignString(d *string, value interface{}) bool {
 }
 
 func _assignInt64(d *int64, value interface{}) bool {
-	switch value.(type) {
+	switch v := value.(type) {
 	case int64:
-		*d = value.(int64)
+		*d = v
 	case int32:
-		*d = int64(value.(int32)) // MySQL
+		*d = int64(v) // MySQL
 	case float64:
-		*d = int64(value.(float64))
+		*d = int64(v)
 	case float32:
-		*d = int64(value.(float32))
+		*d = int64(v)
 	case []byte:
-		str := string(value.([]byte))
+		str := string(v)
 		*d, _ = strconv.ParseInt(str, 10, 64)
 	case string:
 		str := value.(string)
@@ -726,24 +723,23 @@ func _assignInt64(d *int64, value interface{}) bool {
 }
 
 func _assignInt32(d *int32, value interface{}) bool {
-	switch value.(type) {
+	switch v := value.(type) {
 	case int32:
-		*d = value.(int32)
+		*d = v
 	case int64:
-		*d = int32(value.(int64))
+		*d = int32(v)
 	case float64:
-		*d = int32(value.(float64))
+		*d = int32(v)
 	case float32:
-		*d = int32(value.(float32))
+		*d = int32(v)
 	case []byte:
-		str := string(value.([]byte))
+		str := string(v)
 		d64, err := strconv.ParseInt(str, 10, 32)
 		if err == nil {
 			*d = int32(d64)
 		}
 	case string:
-		str := value.(string)
-		d64, err := strconv.ParseInt(str, 10, 32)
+		d64, err := strconv.ParseInt(v, 10, 32)
 		if err == nil {
 			*d = int32(d64)
 		}
@@ -754,18 +750,17 @@ func _assignInt32(d *int32, value interface{}) bool {
 }
 
 func _assignFloat32(d *float32, value interface{}) bool {
-	switch value.(type) {
+	switch v := value.(type) {
 	case float32:
-		*d = value.(float32)
+		*d = v
 	case float64:
-		*d = float32(value.(float64))
+		*d = float32(v)
 	case []byte:
-		str := string(value.([]byte)) // PostgeSQL
+		str := string(v) // PostgeSQL
 		d64, _ := strconv.ParseFloat(str, 64)
 		*d = float32(d64)
 	case string:
-		str := value.(string) // Oracle
-		d64, _ := strconv.ParseFloat(str, 64)
+		d64, _ := strconv.ParseFloat(v, 64) // Oracle
 		*d = float32(d64)
 	default:
 		return false
@@ -774,17 +769,16 @@ func _assignFloat32(d *float32, value interface{}) bool {
 }
 
 func _assignFloat64(d *float64, value interface{}) bool {
-	switch value.(type) {
+	switch v := value.(type) {
 	case float64:
-		*d = value.(float64)
+		*d = v
 	case float32:
-		*d = float64(value.(float32))
+		*d = float64(v)
 	case []byte:
-		str := string(value.([]byte)) // PostgeSQL, MySQL
+		str := string(v) // PostgeSQL, MySQL
 		*d, _ = strconv.ParseFloat(str, 64)
 	case string:
-		str := value.(string) // Oracle
-		*d, _ = strconv.ParseFloat(str, 64)
+		*d, _ = strconv.ParseFloat(v, 64) // Oracle
 	default:
 		return false
 	}
@@ -792,9 +786,9 @@ func _assignFloat64(d *float64, value interface{}) bool {
 }
 
 func _assignTime(d *time.Time, value interface{}) bool {
-	switch value.(type) {
+	switch v := value.(type) {
 	case time.Time:
-		*d = value.(time.Time)
+		*d = v
 	default:
 		return false
 	}
@@ -802,27 +796,27 @@ func _assignTime(d *time.Time, value interface{}) bool {
 }
 
 func _assignBoolean(d *bool, value interface{}) bool {
-	switch value.(type) {
+	switch v := value.(type) {
 	case []byte:
-		str := string(value.([]byte)) // MySQL
+		str := string(v) // MySQL
 		db, _ := strconv.ParseBool(str)
 		*d = db
 	case bool:
-		*d = value.(bool)
+		*d = v
 	default:
 		return false
 	}
 	return true
 }
 
-func AssignValue(fieldAddr interface{}, value interface{}) {
+func AssignValue(fieldAddr interface{}, value interface{}) error {
 	if value == nil {
 		switch d := fieldAddr.(type) {
 		case *interface{}:
 			*d = nil
-			return
+			return nil
 		}
-		return // leave as-is
+		return nil // leave as-is
 	}
 	assigned := false
 	switch d := fieldAddr.(type) {
@@ -851,8 +845,9 @@ func AssignValue(fieldAddr interface{}, value interface{}) {
 		assigned = true
 	}
 	if !assigned {
-		panic(fmt.Sprintf("Unexpected params in AssignValue(%T, %T)", fieldAddr, value))
+		return errors.New(fmt.Sprintf("Unexpected params in AssignValue(%T, %T)", fieldAddr, value))
 	}
+	return nil
 }
 
 // Extend/improve method Assign and related functions on demand:
@@ -867,10 +862,37 @@ func (ds *DataStore) Assign(fieldAddr interface{}, value interface{}) {
 			arr := value.([]interface{})
 			v0 := arr[0]
 			// it includes processing of v0 == nil
-			AssignValue(fieldAddr, v0)
+			err := AssignValue(fieldAddr, v0)
+			if err != nil {
+				panic(err)
+			}
 		}
 	default:
 		// it includes processing of value == nil
-		AssignValue(fieldAddr, value)
+		err := AssignValue(fieldAddr, value)
+		if err != nil {
+			panic(err)
+		}
 	}
+}
+
+func FieldValuesToStringArray(m interface{}) (record []string, err error) {
+	v := reflect.ValueOf(m)
+	if v.Type().Kind() != reflect.Ptr {
+		return nil, errors.New("reflect.Ptr expected")
+	}
+	el := v.Elem()
+	if el.Type().Kind() != reflect.Struct {
+		return nil, errors.New("reflect.Struct expected")
+	}
+	for i := 0; i < el.NumField(); i++ {
+		fi := el.Field(i).Interface()
+		var str string
+		err = AssignValue(&str, fi)
+		if err != nil {
+			return nil, err
+		}
+		record = append(record, str)
+	}
+	return record, nil
 }
