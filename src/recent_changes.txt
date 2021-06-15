@@ -1,3 +1,7 @@
+2021-06-15
+
+    - Go -> title case for DataStore.Ds
+
 2021-06-10
 
     - Go -> return error instead of panic

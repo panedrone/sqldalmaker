@@ -267,11 +267,9 @@ func _pointsToNil(p interface{}) bool {
 func _validateDest(dest interface{}) (err error) {
 	if dest == nil {
 		err = errors.New("OutParam/InOutParam -> Dest is nil")
-	}
-	if !_isPtr(dest) {
+	} else if !_isPtr(dest) {
 		err = errors.New("OutParam/InOutParam -> Dest must be a Ptr")
-	}
-	if _pointsToNil(dest) {
+	} else if _pointsToNil(dest) {
 		err = errors.New("OutParam/InOutParam -> Dest points to nil")
 	}
 	return
@@ -282,54 +280,47 @@ func (ds *DataStore) _processExecParams(args []interface{}, onRowArr *[]func(map
 	implicitCursors = false
 	outCursors = false
 	for _, arg := range args {
-		switch arg.(type) {
+		switch param := arg.(type) {
 		case []func(map[string]interface{}):
 			if outCursors {
 				err = errors.New(fmt.Sprintf("Forbidden: %v", args))
 				return
 			}
 			implicitCursors = true
-			funcArr := arg.([]func(map[string]interface{}))
-			*onRowArr = append(*onRowArr, funcArr...)
+			*onRowArr = append(*onRowArr, param...) // add an array of func
 		case func(map[string]interface{}):
 			if implicitCursors {
 				err = errors.New(fmt.Sprintf("Forbidden: %v", args))
 				return
 			}
 			outCursors = true
-			onRow := arg.(func(map[string]interface{}))
-			*onRowArr = append(*onRowArr, onRow)
-			//var cursor interface{}
+			*onRowArr = append(*onRowArr, param) // add single func
 			var rows driver.Rows
 			*queryArgs = append(*queryArgs, sql.Out{Dest: &rows, In: false})
 		case *OutParam:
-			p := arg.(*OutParam)
-			err = _validateDest(p.Dest)
+			err = _validateDest(param.Dest)
 			if err != nil {
 				return
 			}
-			*queryArgs = append(*queryArgs, sql.Out{Dest: p.Dest, In: false})
+			*queryArgs = append(*queryArgs, sql.Out{Dest: param.Dest, In: false})
 		case OutParam:
-			p := arg.(OutParam)
-			err = _validateDest(p.Dest)
+			err = _validateDest(param.Dest)
 			if err != nil {
 				return
 			}
-			*queryArgs = append(*queryArgs, sql.Out{Dest: p.Dest, In: false})
+			*queryArgs = append(*queryArgs, sql.Out{Dest: param.Dest, In: false})
 		case *InOutParam:
-			p := arg.(*InOutParam)
-			err = _validateDest(p.Dest)
+			err = _validateDest(param.Dest)
 			if err != nil {
 				return
 			}
-			*queryArgs = append(*queryArgs, sql.Out{Dest: p.Dest, In: true})
+			*queryArgs = append(*queryArgs, sql.Out{Dest: param.Dest, In: true})
 		case InOutParam:
-			p := arg.(InOutParam)
-			err = _validateDest(p.Dest)
+			err = _validateDest(param.Dest)
 			if err != nil {
 				return
 			}
-			*queryArgs = append(*queryArgs, sql.Out{Dest: p.Dest, In: true})
+			*queryArgs = append(*queryArgs, sql.Out{Dest: param.Dest, In: true})
 		default:
 			if _isPtr(arg) {
 				if _pointsToNil(arg) {
@@ -427,13 +418,12 @@ func (ds *DataStore) _exec2(sqlStr string, onRowArr []func(map[string]interface{
 	}
 	onRowIndex := 0
 	for _, arg := range args {
-		switch arg.(type) {
+		switch param := arg.(type) {
 		case sql.Out:
-			out := arg.(sql.Out)
-			if out.Dest != nil {
-				switch out.Dest.(type) {
+			if param.Dest != nil {
+				switch param.Dest.(type) {
 				case *driver.Rows:
-					rows := out.Dest.(*driver.Rows)
+					rows := param.Dest.(*driver.Rows)
 					onRow := onRowArr[onRowIndex]
 					err = _fetchAllFromCursor(*rows, onRow)
 					if err != nil {
