@@ -110,13 +110,12 @@ func initDb(ds *DataStore) (err error) {
 
 */
 
-func (ds *DataStore) Open() (err error) {
+func (ds *DataStore) Open() error {
 	return initDb(ds)
 }
 
-func (ds *DataStore) Close() (err error) {
-	err = ds.db.Close()
-	return
+func (ds *DataStore) Close() error {
+	return ds.db.Close()
 }
 
 func (ds *DataStore) Begin() (err error) {
@@ -677,9 +676,9 @@ func _assignString(d *string, value interface{}) bool {
 	case []byte:
 		*d = string(v)
 	case int, int32, int64:
-		*d = fmt.Sprintf("%d", v)
+		*d = fmt.Sprintf("%v", v)
 	case float64, float32:
-		*d = fmt.Sprintf("%f", v)
+		*d = fmt.Sprintf("%v", v) // %v prints just 0.12 instead of 0.120000
 	case string:
 		*d = v
 	case time.Time:
@@ -825,14 +824,14 @@ func AssignValue(fieldAddr interface{}, value interface{}) error {
 	case *bool:
 		assigned = _assignBoolean(d, value)
 	case *[]byte: // the same as uint8
-		switch value.(type) {
+		switch bv := value.(type) {
 		case []byte:
-			*d = value.([]byte)
-			assigned = true
+			*d = bv
+			return nil
 		}
 	case *interface{}:
 		*d = value
-		assigned = true
+		return nil
 	}
 	if !assigned {
 		return errors.New(fmt.Sprintf("Unexpected params in AssignValue(%T, %T)", fieldAddr, value))
@@ -843,26 +842,21 @@ func AssignValue(fieldAddr interface{}, value interface{}) error {
 // Extend/improve method Assign and related functions on demand:
 
 func (ds *DataStore) Assign(fieldAddr interface{}, value interface{}) {
-	switch value.(type) {
+	var err error
+	switch v := value.(type) {
 	case []interface{}:
 		switch d := fieldAddr.(type) {
 		case *[]interface{}:
-			*d = value.([]interface{})
-		default:
-			arr := value.([]interface{})
-			v0 := arr[0]
-			// it includes processing of v0 == nil
-			err := AssignValue(fieldAddr, v0)
-			if err != nil {
-				panic(err)
-			}
+			*d = v
+		case []interface{}:
+			v0 := v[0]
+			err = AssignValue(fieldAddr, v0)
 		}
 	default:
-		// it includes processing of value == nil
-		err := AssignValue(fieldAddr, value)
-		if err != nil {
-			panic(err)
-		}
+		err = AssignValue(fieldAddr, value)
+	}
+	if err != nil {
+		panic(err)
 	}
 }
 
