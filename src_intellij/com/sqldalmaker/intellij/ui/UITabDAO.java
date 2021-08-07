@@ -9,23 +9,21 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.JBColor;
-import com.intellij.uiDesigner.core.GridConstraints;
-import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.sqldalmaker.cg.Helpers;
 import com.sqldalmaker.cg.IDaoCG;
-import com.sqldalmaker.common.*;
+import com.sqldalmaker.common.Const;
+import com.sqldalmaker.common.FileSearchHelpers;
+import com.sqldalmaker.common.InternalException;
+import com.sqldalmaker.common.XmlParser;
 import com.sqldalmaker.jaxb.dao.DaoClass;
 import com.sqldalmaker.jaxb.settings.Settings;
 
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.sql.Connection;
 import java.util.ArrayList;
-import java.util.regex.PatternSyntaxException;
 
 /**
  * Created with IntelliJ IDEA.
@@ -36,7 +34,6 @@ public class UITabDAO {
     private JButton btn_NewXML;
     private JTable table;
     protected JPanel rootPanel;
-    private JTextField textField1;
     private JButton btn_Refresh;
     private JButton btn_SelAll;
     private JButton btn_DeselAll;
@@ -49,7 +46,6 @@ public class UITabDAO {
     private JButton button_fk_assistant;
     private JPanel tool_panel;
 
-    private TableRowSorter<AbstractTableModel> sorter;
     private Project project;
     private VirtualFile root_file;
     private MyTableModel my_table_model;
@@ -61,19 +57,6 @@ public class UITabDAO {
     public UITabDAO() {
         $$$setupUI$$$();
         rootPanel.remove(top_panel_1);
-        textField1.getDocument().addDocumentListener(new DocumentListener() {
-            public void changedUpdate(DocumentEvent e) {
-                set_filter();
-            }
-
-            public void removeUpdate(DocumentEvent e) {
-                set_filter();
-            }
-
-            public void insertUpdate(DocumentEvent e) {
-                set_filter();
-            }
-        });
         btn_Refresh.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -167,8 +150,6 @@ public class UITabDAO {
         table.setModel(my_table_model);
         table.getTableHeader().setReorderingAllowed(false);
 
-        sorter = new TableRowSorter<AbstractTableModel>(my_table_model);
-        table.setRowSorter(sorter);
         table.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
@@ -434,18 +415,16 @@ public class UITabDAO {
     private void $$$setupUI$$$() {
         createUIComponents();
         rootPanel = new JPanel();
-        rootPanel.setLayout(new GridLayoutManager(3, 1, new Insets(0, 0, 0, 0), -1, -1));
-        textField1 = new JTextField();
-        rootPanel.add(textField1, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
+        rootPanel.setLayout(new BorderLayout(0, 0));
         final JScrollPane scrollPane1 = new JScrollPane();
-        rootPanel.add(scrollPane1, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        rootPanel.add(scrollPane1, BorderLayout.CENTER);
         table.setAutoResizeMode(0);
         table.setFillsViewportHeight(true);
         scrollPane1.setViewportView(table);
         top_panel_1 = new JPanel();
-        top_panel_1.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
+        top_panel_1.setLayout(new FlowLayout(FlowLayout.LEADING, 5, 5));
         top_panel_1.setOpaque(false);
-        rootPanel.add(top_panel_1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        rootPanel.add(top_panel_1, BorderLayout.NORTH);
         tool_panel = new JPanel();
         tool_panel.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
         tool_panel.setOpaque(false);
@@ -592,16 +571,6 @@ public class UITabDAO {
                 c.setForeground(JBColor.RED);
             }
             return c;
-        }
-    }
-
-    private void set_filter() {
-        // If current expression doesn't parse, don't update.
-        try {
-            RowFilter<AbstractTableModel, Object> rf = RowFilter.regexFilter(textField1.getText(), 0);
-            sorter.setRowFilter(rf);
-        } catch (PatternSyntaxException e) {
-            sorter.setRowFilter(null);
         }
     }
 

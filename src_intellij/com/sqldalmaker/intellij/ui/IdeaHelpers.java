@@ -152,7 +152,14 @@ public class IdeaHelpers {
             throws InternalException {
         // swing app wants 'resources/' but plug-in wants '/resources/' WHY?
         ClassLoader cl = IdeaHelpers.class.getClassLoader();
-        InputStream is = cl.getResourceAsStream(path + "/" + res_name);
+        InputStream is;
+        if (path == null || path.trim().length() == 0) {
+            // to avoid Warning
+            // Do not request resource from classloader using path with leading slash
+            is = cl.getResourceAsStream(res_name);
+        } else {
+            is = cl.getResourceAsStream(path + "/" + res_name);
+        }
         if (is == null) {
             is = cl.getResourceAsStream("/" + path + "/" + res_name);
         }
