@@ -21,7 +21,7 @@
           </component>
         </children>
       </scrollpane>
-      <grid id="a0a9b" binding="top_panel_1" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="3">
+      <grid id="a0a9b" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="3">
         <constraints border-constraint="North"/>
         <properties>
           <opaque value="false"/>

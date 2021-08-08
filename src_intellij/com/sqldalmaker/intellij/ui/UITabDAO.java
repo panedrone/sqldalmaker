@@ -50,13 +50,8 @@ public class UITabDAO {
     private VirtualFile root_file;
     private MyTableModel my_table_model;
 
-    public JComponent get_tool_bar() {
-        return tool_panel;
-    }
-
     public UITabDAO() {
         $$$setupUI$$$();
-        rootPanel.remove(top_panel_1);
         btn_Refresh.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -145,7 +140,6 @@ public class UITabDAO {
                 return super.getCellRenderer(row, column);
             }
         };
-        // createUIComponents() is called before constructors
         my_table_model = new MyTableModel();
         table.setModel(my_table_model);
         table.getTableHeader().setReorderingAllowed(false);
@@ -421,14 +415,14 @@ public class UITabDAO {
         table.setAutoResizeMode(0);
         table.setFillsViewportHeight(true);
         scrollPane1.setViewportView(table);
-        top_panel_1 = new JPanel();
-        top_panel_1.setLayout(new FlowLayout(FlowLayout.LEADING, 5, 5));
-        top_panel_1.setOpaque(false);
-        rootPanel.add(top_panel_1, BorderLayout.NORTH);
+        final JPanel panel1 = new JPanel();
+        panel1.setLayout(new FlowLayout(FlowLayout.LEADING, 5, 5));
+        panel1.setOpaque(false);
+        rootPanel.add(panel1, BorderLayout.NORTH);
         tool_panel = new JPanel();
         tool_panel.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
         tool_panel.setOpaque(false);
-        top_panel_1.add(tool_panel);
+        panel1.add(tool_panel);
         btn_NewXML = new JButton();
         btn_NewXML.setBorderPainted(false);
         btn_NewXML.setContentAreaFilled(false);

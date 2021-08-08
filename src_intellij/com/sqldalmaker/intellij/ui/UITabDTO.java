@@ -47,7 +47,6 @@ public class UITabDTO {
     private JButton btn_OpenJava;
     private JButton btn_genTmpFieldTags;
     private JButton btn_CrudXML;
-    private JPanel top_panel_1;
     private JPanel tool_panel;
     private Project project;
     private VirtualFile root_file;
@@ -57,13 +56,8 @@ public class UITabDTO {
         return rootPanel;
     }
 
-    public JComponent get_tool_bar() {
-        return tool_panel;
-    }
-
     public UITabDTO() {
         $$$setupUI$$$();
-        rootPanel.remove(top_panel_1);
         btn_Refresh.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -168,15 +162,15 @@ public class UITabDTO {
         createUIComponents();
         rootPanel = new JPanel();
         rootPanel.setLayout(new BorderLayout(0, 0));
-        top_panel_1 = new JPanel();
-        top_panel_1.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
-        top_panel_1.setAutoscrolls(false);
-        top_panel_1.setOpaque(true);
-        rootPanel.add(top_panel_1, BorderLayout.NORTH);
+        final JPanel panel1 = new JPanel();
+        panel1.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
+        panel1.setAutoscrolls(false);
+        panel1.setOpaque(true);
+        rootPanel.add(panel1, BorderLayout.NORTH);
         tool_panel = new JPanel();
         tool_panel.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
         tool_panel.setOpaque(false);
-        top_panel_1.add(tool_panel);
+        panel1.add(tool_panel);
         btn_OpenXML = new JButton();
         btn_OpenXML.setBorderPainted(false);
         btn_OpenXML.setContentAreaFilled(false);
