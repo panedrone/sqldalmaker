@@ -16,6 +16,6 @@ Demo-Projects:
 * [Python/Tkinter](https://github.com/panedrone/sdm_demo_python_tkinter_github_stat)
 * [Go/REST](https://github.com/panedrone/sdm_demo_go_todolist)
 
-All the details are here: [sqldalmaker.sourceforge.net](sqldalmaker.sourceforge.net)
+All the details are here: [http://sqldalmaker.sourceforge.net/](http://sqldalmaker.sourceforge.net/)
 
 ![SQL DAL Maker](sqldalmaker-idea.png)
