@@ -19,7 +19,7 @@ PHP, Java, C++, Python, Ruby, and Go. To generate the class, you declare it in X
         <![CDATA[
 <ul>
 <li>Disabled Warning -> Do not request resource from classloader using path with leading slash</li>
-<li>Further improvements for Go.</li>
+<li>Further improvements for Go</li>
 </ul>]]></change-notes>
 
     <application-components>

@@ -19,7 +19,7 @@ import java.awt.event.ActionListener;
  * Date: 21.06.12
  */
 public class UIProfileEditor {
-    protected JPanel root;
+    private JPanel root;
     private JPanel cards1;
     private JPanel panel_1;
 
@@ -35,7 +35,6 @@ public class UIProfileEditor {
 
     private static JButton createSimpleButton(String text) {
         JButton button = new JButton(text);
-        //button.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
         button.setCursor(hand);
         button.setFocusPainted(false);
         button.setOpaque(false);
@@ -44,7 +43,7 @@ public class UIProfileEditor {
         return button;
     }
 
-    void makeUnderline(JButton b, String text, boolean underline) {
+    private static void makeUnderline(JButton b, String text, boolean underline) {
         if (underline) {
             b.setText("<html><u>" + text + "</u></html>");
         } else {
@@ -79,11 +78,8 @@ public class UIProfileEditor {
     public UIProfileEditor() {
         $$$setupUI$$$();
         buttonDto = createSimpleButton(DTO);
-        //buttonDto.setPreferredSize(new Dimension(50, 30));
         buttonDao = createSimpleButton(DAO);
-        //buttonDao.setPreferredSize(new Dimension(50, 30));
         buttonAdmin = createSimpleButton(Admin);
-        //buttonAdmin.setPreferredSize(new Dimension(60, 30));
         buttonDto.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -105,18 +101,12 @@ public class UIProfileEditor {
         panel_1.add(buttonDto);
         panel_1.add(buttonDao);
         panel_1.add(buttonAdmin);
-        makeUnderline(buttonDto, DTO, true);
-        makeUnderline(buttonDao, DAO, false);
-        makeUnderline(buttonAdmin, Admin, false);
-        CardLayout cl = (CardLayout) (cards1.getLayout());
-        cl.show(cards1, DTO);
+        openDTO();
     }
 
     public JComponent getRootPanel() {
         return root;
     }
-
-    protected UITabAdmin tabAdmin; // protected to supress warning
 
     public void init(Project project, VirtualFile file) {
         try {
@@ -130,7 +120,7 @@ public class UIProfileEditor {
             tabDAO1.set_project(project);
             tabDAO1.set_file(file);
             tabDAO1.reload_table(false);
-            tabAdmin = new UITabAdmin();
+            UITabAdmin tabAdmin = new UITabAdmin();
             cards1.add(tabAdmin.getRootPanel(), Admin);
             tabAdmin.setProject(project);
             tabAdmin.setFile(file);
