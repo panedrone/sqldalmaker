@@ -1,3 +1,7 @@
+2021-09-13
+
+    Disabled IntelliJ warnings about deprecated API usage
+
 2021-08-07
 
     Disabled Warning -> Do not request resource from classloader using path with leading slash

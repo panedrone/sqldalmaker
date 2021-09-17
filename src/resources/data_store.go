@@ -72,13 +72,12 @@ package main
 import (
 	"database/sql"
 
-   	// _ "github.com/mattn/go-sqlite3" // SQLite3
+   	// _ "github.com/mattn/go-sqlite3"      // SQLite3
    	// _ "github.com/denisenkom/go-mssqldb" // SQL Server
    	// _ "github.com/godror/godror"			// Oracle
-   	// only strings for MySQL (so far). see _prepareFetch below and related comments.
-   	_ "github.com/go-sql-driver/mysql" // MySQL
-   	// _ "github.com/ziutek/mymysql/godrv" // MySQL
-   	// _ "github.com/lib/pq" // PostgeSQL
+   	_ "github.com/go-sql-driver/mysql"      // MySQL
+   	// _ "github.com/ziutek/mymysql/godrv"  // MySQL
+   	// _ "github.com/lib/pq"                // PostgeSQL
 )
 
 func initDb(ds *DataStore) (err error) {
@@ -858,25 +857,4 @@ func (ds *DataStore) Assign(fieldAddr interface{}, value interface{}) {
 	if err != nil {
 		panic(err)
 	}
-}
-
-func FieldValuesToStringArray(m interface{}) (record []string, err error) {
-	v := reflect.ValueOf(m)
-	if v.Type().Kind() != reflect.Ptr {
-		return nil, errors.New("reflect.Ptr expected")
-	}
-	el := v.Elem()
-	if el.Type().Kind() != reflect.Struct {
-		return nil, errors.New("reflect.Struct expected")
-	}
-	for i := 0; i < el.NumField(); i++ {
-		fi := el.Field(i).Interface()
-		var str string
-		err = AssignValue(&str, fi)
-		if err != nil {
-			return nil, err
-		}
-		record = append(record, str)
-	}
-	return record, nil
 }
