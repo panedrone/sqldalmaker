@@ -1,6 +1,6 @@
 2021-09-20
 
-    Initial implementation of data_store_django.py (sqlite3, mysql.connector, postgresql_psycopg2)
+    Single data_store.py for sqlite3, mysql.connector, postgresql_psycopg2, and django
 
 2021-09-13
 

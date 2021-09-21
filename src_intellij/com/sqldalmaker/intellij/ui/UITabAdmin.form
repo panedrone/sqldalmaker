@@ -2,7 +2,7 @@
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="com.sqldalmaker.intellij.ui.UITabAdmin">
   <grid id="27dc6" binding="rootPanel" layout-manager="BorderLayout" hgap="0" vgap="0">
     <constraints>
-      <xy x="20" y="20" width="926" height="567"/>
+      <xy x="20" y="20" width="740" height="333"/>
     </constraints>
     <properties/>
     <border type="none">
@@ -160,6 +160,8 @@
                             <constraints/>
                             <properties>
                               <font size="14"/>
+                              <horizontalAlignment value="4"/>
+                              <preferredSize width="52" height="20"/>
                               <text value=" PHP "/>
                             </properties>
                           </component>
@@ -221,6 +223,8 @@
                             <constraints/>
                             <properties>
                               <font size="14"/>
+                              <horizontalAlignment value="4"/>
+                              <preferredSize width="52" height="20"/>
                               <text value=" Java "/>
                             </properties>
                           </component>
@@ -297,14 +301,15 @@
                             <constraints/>
                             <properties>
                               <font size="14"/>
+                              <horizontalAlignment value="4"/>
+                              <preferredSize width="52" height="20"/>
                               <text value=" Python "/>
                             </properties>
                           </component>
-                          <component id="816bb" class="javax.swing.JButton" binding="dataStorePyMySQLButton" default-binding="true">
+                          <component id="85bc6" class="javax.swing.JButton" binding="sqlite3MysqlConnectorPsycopg2Button" default-binding="true">
                             <constraints/>
                             <properties>
-                              <preferredSize width="56" height="30"/>
-                              <text value="mysql"/>
+                              <text value="sqlite3, mysql.connector, psycopg2, django.db"/>
                             </properties>
                           </component>
                           <component id="df46c" class="javax.swing.JButton" binding="btn_cx_Oracle">
@@ -313,29 +318,10 @@
                               <text value="cx_Oracle"/>
                             </properties>
                           </component>
-                          <component id="7e9ab" class="javax.swing.JButton" binding="dataStorePsycopg2Button" default-binding="true">
-                            <constraints/>
-                            <properties>
-                              <text value="psycopg2"/>
-                            </properties>
-                          </component>
                           <component id="f94b3" class="javax.swing.JButton" binding="datastore_pyodbc">
                             <constraints/>
                             <properties>
                               <text value="pyodbc, mssql"/>
-                            </properties>
-                          </component>
-                          <component id="83e2c" class="javax.swing.JButton" binding="dataStorePySQLite3Button" default-binding="true">
-                            <constraints/>
-                            <properties>
-                              <preferredSize width="56" height="30"/>
-                              <text value="sqlite3"/>
-                            </properties>
-                          </component>
-                          <component id="677bb" class="javax.swing.JButton" binding="djangoDbButton" default-binding="true">
-                            <constraints/>
-                            <properties>
-                              <text value="django.db"/>
                             </properties>
                           </component>
                           <component id="e84a2" class="javax.swing.JLabel">

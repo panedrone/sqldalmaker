@@ -39,7 +39,7 @@ public class UITabAdmin {
     // private JButton dataStoreGroovyButton;
     private JButton dataStoreJavaAndroidButton;
     private JButton dataStorePhpButton;
-    private JButton dataStorePyMySQLButton;
+    //private JButton dataStorePyMySQLButton;
     private JButton PDODataStorePhpButton;
     private JButton dataStoreCSTLButton;
     private JButton dataStoreCATLButton;
@@ -57,7 +57,7 @@ public class UITabAdmin {
     private JButton referenceSettingsXmlButton;
     private JScrollPane scroll_pane;
     private JButton datastore_pyodbc;
-    private JButton dataStorePsycopg2Button;
+    //private JButton dataStorePsycopg2Button;
     private JButton btn_php_pg;
     private JButton btn_mysql;
     private JButton dataStorePhpPDOSQLButton;
@@ -66,7 +66,8 @@ public class UITabAdmin {
     private JButton dataStorePhpOCI8Button;
     private JButton btn_golang;
     private JButton btn_golangVM;
-    private JButton djangoDbButton;
+    // private JButton djangoDbButton;
+    private JButton sqlite3MysqlConnectorPsycopg2Button;
 
     private Project project;
     private VirtualFile root_file;
@@ -246,18 +247,18 @@ public class UITabAdmin {
                 IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "DataStore.h", "DataStore.h");
             }
         });
-        dataStorePySQLite3Button.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "data_store_sqlite3.py", "data_store.py");
-            }
-        });
-        dataStorePyMySQLButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "data_store_mysql.py", "data_store.py");
-            }
-        });
+//        dataStorePySQLite3Button.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "data_store_sqlite3.py", "data_store.py");
+//            }
+//        });
+//        dataStorePyMySQLButton.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "data_store_mysql.py", "data_store.py");
+//            }
+//        });
         dataStoreRUBYDBIButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -286,15 +287,15 @@ public class UITabAdmin {
         datastore_pyodbc.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "data_store_pyodbc.py", "data_store.py");
+                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "data_store_pyodbc.py", "data_store_pyodbc.py");
             }
         });
-        dataStorePsycopg2Button.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "data_store_psycopg2.py", "data_store.py");
-            }
-        });
+//        dataStorePsycopg2Button.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "data_store_psycopg2.py", "data_store.py");
+//            }
+//        });
         btn_php_pg.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -322,7 +323,7 @@ public class UITabAdmin {
         btn_cx_Oracle.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "data_store_cx_oracle.py", "data_store.py");
+                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "data_store_cx_oracle.py", "data_store_cx_oracle.py");
             }
         });
         dataStorePhpOCI8Button.addActionListener(new ActionListener() {
@@ -343,10 +344,16 @@ public class UITabAdmin {
                 IdeaEditorHelpers.open_or_activate_jar_file_in_editor(project, "com/sqldalmaker/cg/go", "go.vm", "go.vm");
             }
         });
-        djangoDbButton.addActionListener(new ActionListener() {
+//        djangoDbButton.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "data_store_django.py", "data_store_django.py");
+//            }
+//        });
+        sqlite3MysqlConnectorPsycopg2Button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "data_store_django.py", "data_store_django.py");
+                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "data_store.py", "data_store.py");
             }
         });
     }
@@ -556,6 +563,8 @@ public class UITabAdmin {
         final JLabel label1 = new JLabel();
         Font label1Font = this.$$$getFont$$$(null, -1, 14, label1.getFont());
         if (label1Font != null) label1.setFont(label1Font);
+        label1.setHorizontalAlignment(4);
+        label1.setPreferredSize(new Dimension(52, 20));
         label1.setText(" PHP ");
         panel7.add(label1);
         dataStorePhpButton = new JButton();
@@ -590,6 +599,8 @@ public class UITabAdmin {
         final JLabel label2 = new JLabel();
         Font label2Font = this.$$$getFont$$$(null, -1, 14, label2.getFont());
         if (label2Font != null) label2.setFont(label2Font);
+        label2.setHorizontalAlignment(4);
+        label2.setPreferredSize(new Dimension(52, 20));
         label2.setText(" Java ");
         panel8.add(label2);
         dataStoreJavaButton = new JButton();
@@ -634,28 +645,19 @@ public class UITabAdmin {
         final JLabel label5 = new JLabel();
         Font label5Font = this.$$$getFont$$$(null, -1, 14, label5.getFont());
         if (label5Font != null) label5.setFont(label5Font);
+        label5.setHorizontalAlignment(4);
+        label5.setPreferredSize(new Dimension(52, 20));
         label5.setText(" Python ");
         panel9.add(label5);
-        dataStorePyMySQLButton = new JButton();
-        dataStorePyMySQLButton.setPreferredSize(new Dimension(56, 30));
-        dataStorePyMySQLButton.setText("mysql");
-        panel9.add(dataStorePyMySQLButton);
+        sqlite3MysqlConnectorPsycopg2Button = new JButton();
+        sqlite3MysqlConnectorPsycopg2Button.setText("sqlite3, mysql.connector, psycopg2, django.db");
+        panel9.add(sqlite3MysqlConnectorPsycopg2Button);
         btn_cx_Oracle = new JButton();
         btn_cx_Oracle.setText("cx_Oracle");
         panel9.add(btn_cx_Oracle);
-        dataStorePsycopg2Button = new JButton();
-        dataStorePsycopg2Button.setText("psycopg2");
-        panel9.add(dataStorePsycopg2Button);
         datastore_pyodbc = new JButton();
         datastore_pyodbc.setText("pyodbc, mssql");
         panel9.add(datastore_pyodbc);
-        dataStorePySQLite3Button = new JButton();
-        dataStorePySQLite3Button.setPreferredSize(new Dimension(56, 30));
-        dataStorePySQLite3Button.setText("sqlite3");
-        panel9.add(dataStorePySQLite3Button);
-        djangoDbButton = new JButton();
-        djangoDbButton.setText("django.db");
-        panel9.add(djangoDbButton);
         final JLabel label6 = new JLabel();
         Font label6Font = this.$$$getFont$$$(null, -1, 14, label6.getFont());
         if (label6Font != null) label6.setFont(label6Font);
