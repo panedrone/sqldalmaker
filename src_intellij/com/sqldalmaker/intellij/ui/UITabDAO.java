@@ -128,6 +128,14 @@ public class UITabDAO {
                 IdeaCrudXmlHelpers.get_fk_access_xml(project, root_file);
             }
         });
+
+        // === panedrone:
+        // Set up columns after $$$setupUI$$$().
+        // Do not do it in createUIComponents() which is called in beginning of $$$setupUI$$$();
+        table.getColumnModel().getColumn(0).setPreferredWidth(220);
+        table.getColumnModel().getColumn(0).setMaxWidth(2000); // === panedrone: AUTO_RESIZE_LAST_COLUMN not working without it
+        /* During UI adjustment, change subsequent columns to preserve the total width */
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
     }
 
     private void createUIComponents() {
@@ -159,15 +167,6 @@ public class UITabDAO {
                 }
             }
         });
-        // table.setTableHeader(null);
-        {
-            TableColumn col = table.getColumnModel().getColumn(0);
-            col.setPreferredWidth(220);
-        }
-        {
-            TableColumn col = table.getColumnModel().getColumn(1);
-            col.setPreferredWidth(300);
-        }
     }
 
     private void generate_crud_dao() {
@@ -413,7 +412,7 @@ public class UITabDAO {
         final JScrollPane scrollPane1 = new JScrollPane();
         rootPanel.add(scrollPane1, BorderLayout.CENTER);
         table.setAutoResizeMode(0);
-        table.setFillsViewportHeight(true);
+        table.setFillsViewportHeight(false);
         scrollPane1.setViewportView(table);
         final JPanel panel1 = new JPanel();
         panel1.setLayout(new FlowLayout(FlowLayout.LEADING, 5, 5));

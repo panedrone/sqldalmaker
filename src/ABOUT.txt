@@ -6,7 +6,7 @@ To generate the class, you declare it in XML meta-program.
 
 SQL DAL Maker for Eclipse: http://marketplace.eclipse.org/content/sql-dal-maker
 SQL DAL Maker for IntelliJ-Platform: https://plugins.jetbrains.com/plugin/7092
-SQL DAL Maker for NetBeans: http://plugins.netbeans.org/plugin/73614
+SQL DAL Maker for NetBeans: https://sourceforge.net/projects/sqldalmaker/files/NetBeans
 
 Project Website: http://sqldalmaker.sourceforge.net
 Source Code: https://github.com/panedrone/sqldalmaker

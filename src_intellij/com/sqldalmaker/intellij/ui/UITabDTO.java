@@ -134,6 +134,21 @@ public class UITabDTO {
                 b.setBorder(null);
             }
         }
+
+        // === panedrone:
+        // Set up columns after $$$setupUI$$$().
+        // Do not do it in createUIComponents() which is called in beginning of $$$setupUI$$$();
+        table.getColumnModel().getColumn(0).setPreferredWidth(220);
+        table.getColumnModel().getColumn(0).setMaxWidth(2000); // === panedrone: AUTO_RESIZE_LAST_COLUMN not working without it
+        table.getColumnModel().getColumn(1).setPreferredWidth(300);
+        table.getColumnModel().getColumn(1).setMaxWidth(2000); // === panedrone: AUTO_RESIZE_LAST_COLUMN not working without it
+        // table.getColumnModel().getColumn(2).setPreferredWidth(300);
+        // https://stackoverflow.com/questions/953972/java-jtable-setting-column-width
+        // JTable.AUTO_RESIZE_LAST_COLUMN is defined as "During all resize operations,
+        // apply adjustments to the last column only" which means you have to set the autoresizemode
+        // at the end of your code, otherwise setPreferredWidth() won't affect anything!
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
+        table.doLayout();
     }
 
     private void open_dto_xml() {
@@ -286,7 +301,7 @@ public class UITabDTO {
         final JScrollPane scrollPane1 = new JScrollPane();
         rootPanel.add(scrollPane1, BorderLayout.CENTER);
         table.setAutoResizeMode(0);
-        table.setFillsViewportHeight(true);
+        table.setFillsViewportHeight(false);
         scrollPane1.setViewportView(table);
     }
 
@@ -397,19 +412,6 @@ public class UITabDTO {
                 }
             }
         });
-
-        {
-            TableColumn col = table.getColumnModel().getColumn(0);
-            col.setPreferredWidth(220);
-        }
-        {
-            TableColumn col = table.getColumnModel().getColumn(1);
-            col.setPreferredWidth(300);
-        }
-        {
-            TableColumn col = table.getColumnModel().getColumn(2);
-            col.setPreferredWidth(300);
-        }
     }
 
     private void create_crud_xml() {
