@@ -1,3 +1,7 @@
+2021-09-23
+
+    SQLAlchemy Raw SQL --> data_store_sqlalchemy.py
+
 2021-09-20
 
     Single data_store.py for sqlite3, mysql.connector, postgresql_psycopg2, and django

@@ -2,7 +2,7 @@
     <id>dal-mpe</id>
     <name>SQL DAL Maker</name>
     <category>Database</category>
-    <version>1.213.2109</version>
+    <version>1.214.2109</version>
     <vendor email="sqldalmaker@gmail.com"/>
     <idea-version since-build="181.5684.4"/>
 
@@ -18,6 +18,7 @@ PHP, Java, C++, Python, Ruby, and Go. To generate the class, you declare it in X
     <change-notes>
         <![CDATA[
 <ul>
+<li>SQLAlchemy Raw SQL --> data_store_sqlalchemy.py</li>
 <li>Single data_store.py for sqlite3, mysql.connector, postgresql_psycopg2, and django</li>
 <li>Further improvements for Go</li>
 </ul>]]></change-notes>

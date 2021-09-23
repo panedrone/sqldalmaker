@@ -2,7 +2,7 @@
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="com.sqldalmaker.intellij.ui.UITabAdmin">
   <grid id="27dc6" binding="rootPanel" layout-manager="BorderLayout" hgap="0" vgap="0">
     <constraints>
-      <xy x="20" y="20" width="740" height="333"/>
+      <xy x="20" y="20" width="740" height="422"/>
     </constraints>
     <properties/>
     <border type="none">
@@ -97,9 +97,237 @@
                       </component>
                     </children>
                   </grid>
+                  <grid id="a3e0c" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="0">
+                    <constraints>
+                      <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                      <gridbag weightx="0.0" weighty="0.0"/>
+                    </constraints>
+                    <properties/>
+                    <border type="none"/>
+                    <children>
+                      <component id="7c1f7" class="javax.swing.JLabel">
+                        <constraints/>
+                        <properties>
+                          <font size="14"/>
+                          <horizontalAlignment value="4"/>
+                          <preferredSize width="52" height="20"/>
+                          <text value=" PHP "/>
+                        </properties>
+                      </component>
+                      <component id="687f5" class="javax.swing.JButton" binding="dataStorePhpButton" default-binding="true">
+                        <constraints/>
+                        <properties>
+                          <borderPainted value="true"/>
+                          <contentAreaFilled value="true"/>
+                          <minimumSize width="40" height="30"/>
+                          <preferredSize width="42" height="30"/>
+                          <text value="Base"/>
+                        </properties>
+                      </component>
+                      <component id="64c00" class="javax.swing.JButton" binding="btn_mysql">
+                        <constraints/>
+                        <properties>
+                          <text value="PDO, mysql"/>
+                        </properties>
+                      </component>
+                      <component id="45f42" class="javax.swing.JButton" binding="btn_php_oracle">
+                        <constraints/>
+                        <properties>
+                          <text value="PDO, oracle"/>
+                        </properties>
+                      </component>
+                      <component id="aff6" class="javax.swing.JButton" binding="dataStorePhpOCI8Button" default-binding="true">
+                        <constraints/>
+                        <properties>
+                          <preferredSize width="50" height="30"/>
+                          <text value="oci8"/>
+                        </properties>
+                      </component>
+                      <component id="cc5cf" class="javax.swing.JButton" binding="dataStorePhpPDOSQLButton" default-binding="true">
+                        <constraints/>
+                        <properties>
+                          <text value="PDO, mssql"/>
+                        </properties>
+                      </component>
+                      <component id="d5492" class="javax.swing.JButton" binding="btn_php_pg">
+                        <constraints/>
+                        <properties>
+                          <text value="PDO, postgesql"/>
+                        </properties>
+                      </component>
+                      <component id="ca4d1" class="javax.swing.JButton" binding="PDODataStorePhpButton" default-binding="true">
+                        <constraints/>
+                        <properties>
+                          <text value="PDO, sqlite3"/>
+                        </properties>
+                      </component>
+                    </children>
+                  </grid>
+                  <grid id="f31f1" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="0">
+                    <constraints>
+                      <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                      <gridbag weightx="0.0" weighty="0.0"/>
+                    </constraints>
+                    <properties/>
+                    <border type="none"/>
+                    <children>
+                      <component id="1874d" class="javax.swing.JLabel">
+                        <constraints/>
+                        <properties>
+                          <font size="14"/>
+                          <horizontalAlignment value="4"/>
+                          <preferredSize width="52" height="20"/>
+                          <text value=" Java "/>
+                        </properties>
+                      </component>
+                      <component id="d85b8" class="javax.swing.JButton" binding="dataStoreJavaButton" default-binding="true">
+                        <constraints/>
+                        <properties>
+                          <minimumSize width="40" height="30"/>
+                          <preferredSize width="42" height="30"/>
+                          <text value="Base"/>
+                        </properties>
+                      </component>
+                      <component id="a585c" class="javax.swing.JButton" binding="dataStoreJavaDbUtilsButton" default-binding="true">
+                        <constraints/>
+                        <properties>
+                          <preferredSize width="56" height="30"/>
+                          <text value="JDBC"/>
+                        </properties>
+                      </component>
+                      <component id="ffbb4" class="javax.swing.JButton" binding="dataStoreJavaAndroidButton" default-binding="true">
+                        <constraints/>
+                        <properties>
+                          <text value="Android"/>
+                        </properties>
+                      </component>
+                    </children>
+                  </grid>
+                  <grid id="b7f77" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="0">
+                    <constraints>
+                      <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                      <gridbag weightx="0.0" weighty="0.0"/>
+                    </constraints>
+                    <properties/>
+                    <border type="none"/>
+                    <children>
+                      <component id="df8bc" class="javax.swing.JLabel">
+                        <constraints/>
+                        <properties>
+                          <font size="14"/>
+                          <horizontalAlignment value="4"/>
+                          <preferredSize width="52" height="20"/>
+                          <text value=" C++ "/>
+                        </properties>
+                      </component>
+                      <component id="7efb0" class="javax.swing.JButton" binding="dataStoreQt5CButton" default-binding="true">
+                        <constraints/>
+                        <properties>
+                          <preferredSize width="56" height="30"/>
+                          <text value="QtSql"/>
+                        </properties>
+                      </component>
+                      <component id="ac058" class="javax.swing.JButton" binding="dataStoreCSTLButton" default-binding="true">
+                        <constraints/>
+                        <properties>
+                          <text value="STL, sqlite3"/>
+                        </properties>
+                      </component>
+                      <component id="660" class="javax.swing.JButton" binding="dataStoreCATLButton" default-binding="true">
+                        <constraints/>
+                        <properties>
+                          <text value="ATL, sqlite3"/>
+                        </properties>
+                      </component>
+                    </children>
+                  </grid>
+                  <grid id="e5ea7" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="0">
+                    <constraints>
+                      <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                      <gridbag weightx="0.0" weighty="0.0"/>
+                    </constraints>
+                    <properties>
+                      <minimumSize width="40" height="40"/>
+                    </properties>
+                    <border type="none"/>
+                    <children>
+                      <component id="53d45" class="javax.swing.JLabel">
+                        <constraints/>
+                        <properties>
+                          <font size="14"/>
+                          <horizontalAlignment value="4"/>
+                          <preferredSize width="52" height="20"/>
+                          <text value=" Python "/>
+                        </properties>
+                      </component>
+                      <component id="85bc6" class="javax.swing.JButton" binding="sqlite3MysqlConnectorPsycopg2Button" default-binding="true">
+                        <constraints/>
+                        <properties>
+                          <text value="sqlite3, mysql.connector, psycopg2, django.db"/>
+                        </properties>
+                      </component>
+                      <component id="b2f0d" class="javax.swing.JButton" binding="SQLAlchemyButton" default-binding="true">
+                        <constraints/>
+                        <properties>
+                          <text value="SQLAlchemy"/>
+                        </properties>
+                      </component>
+                      <component id="df46c" class="javax.swing.JButton" binding="btn_cx_Oracle">
+                        <constraints/>
+                        <properties>
+                          <text value="cx_Oracle"/>
+                        </properties>
+                      </component>
+                      <component id="f94b3" class="javax.swing.JButton" binding="datastore_pyodbc">
+                        <constraints/>
+                        <properties>
+                          <text value="pyodbc, mssql"/>
+                        </properties>
+                      </component>
+                    </children>
+                  </grid>
+                  <grid id="cf6d9" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="0">
+                    <constraints>
+                      <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                      <gridbag weightx="0.0" weighty="0.0"/>
+                    </constraints>
+                    <properties/>
+                    <border type="none"/>
+                    <children>
+                      <component id="e84a2" class="javax.swing.JLabel">
+                        <constraints/>
+                        <properties>
+                          <font size="14"/>
+                          <horizontalAlignment value="4"/>
+                          <preferredSize width="52" height="20"/>
+                          <text value=" Ruby "/>
+                        </properties>
+                      </component>
+                      <component id="6a2a4" class="javax.swing.JButton" binding="dataStoreRUBYDBIButton" default-binding="true">
+                        <constraints/>
+                        <properties>
+                          <preferredSize width="42" height="30"/>
+                          <text value="DBI"/>
+                        </properties>
+                      </component>
+                      <component id="114d7" class="javax.swing.JLabel">
+                        <constraints/>
+                        <properties>
+                          <font size="14"/>
+                          <text value=" Go "/>
+                        </properties>
+                      </component>
+                      <component id="e9ae5" class="javax.swing.JButton" binding="btn_golang">
+                        <constraints/>
+                        <properties>
+                          <text value="database/sql"/>
+                        </properties>
+                      </component>
+                    </children>
+                  </grid>
                   <grid id="4187c" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="1">
                     <constraints>
-                      <grid row="2" column="0" row-span="1" col-span="2" vsize-policy="3" hsize-policy="3" anchor="9" fill="0" indent="0" use-parent-layout="false"/>
+                      <grid row="7" column="0" row-span="1" col-span="2" vsize-policy="3" hsize-policy="3" anchor="9" fill="0" indent="0" use-parent-layout="false"/>
                       <gridbag weightx="1.0" weighty="1.0"/>
                     </constraints>
                     <properties/>
@@ -143,208 +371,9 @@
                       </component>
                     </children>
                   </grid>
-                  <grid id="9b97c" layout-manager="BorderLayout" hgap="0" vgap="0">
-                    <constraints>
-                      <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="8" fill="2" indent="0" use-parent-layout="false"/>
-                      <gridbag weightx="1.0" weighty="1.0"/>
-                    </constraints>
-                    <properties/>
-                    <border type="none"/>
-                    <children>
-                      <grid id="a3e0c" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="0">
-                        <constraints border-constraint="North"/>
-                        <properties/>
-                        <border type="none"/>
-                        <children>
-                          <component id="7c1f7" class="javax.swing.JLabel">
-                            <constraints/>
-                            <properties>
-                              <font size="14"/>
-                              <horizontalAlignment value="4"/>
-                              <preferredSize width="52" height="20"/>
-                              <text value=" PHP "/>
-                            </properties>
-                          </component>
-                          <component id="687f5" class="javax.swing.JButton" binding="dataStorePhpButton" default-binding="true">
-                            <constraints/>
-                            <properties>
-                              <borderPainted value="true"/>
-                              <contentAreaFilled value="true"/>
-                              <minimumSize width="40" height="30"/>
-                              <preferredSize width="42" height="30"/>
-                              <text value="Base"/>
-                            </properties>
-                          </component>
-                          <component id="64c00" class="javax.swing.JButton" binding="btn_mysql">
-                            <constraints/>
-                            <properties>
-                              <text value="PDO, mysql"/>
-                            </properties>
-                          </component>
-                          <component id="45f42" class="javax.swing.JButton" binding="btn_php_oracle">
-                            <constraints/>
-                            <properties>
-                              <text value="PDO, oracle"/>
-                            </properties>
-                          </component>
-                          <component id="aff6" class="javax.swing.JButton" binding="dataStorePhpOCI8Button" default-binding="true">
-                            <constraints/>
-                            <properties>
-                              <preferredSize width="50" height="30"/>
-                              <text value="oci8"/>
-                            </properties>
-                          </component>
-                          <component id="cc5cf" class="javax.swing.JButton" binding="dataStorePhpPDOSQLButton" default-binding="true">
-                            <constraints/>
-                            <properties>
-                              <text value="PDO, mssql"/>
-                            </properties>
-                          </component>
-                          <component id="d5492" class="javax.swing.JButton" binding="btn_php_pg">
-                            <constraints/>
-                            <properties>
-                              <text value="PDO, postgesql"/>
-                            </properties>
-                          </component>
-                          <component id="ca4d1" class="javax.swing.JButton" binding="PDODataStorePhpButton" default-binding="true">
-                            <constraints/>
-                            <properties>
-                              <text value="PDO, sqlite3"/>
-                            </properties>
-                          </component>
-                        </children>
-                      </grid>
-                      <grid id="f31f1" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="0">
-                        <constraints border-constraint="Center"/>
-                        <properties/>
-                        <border type="none"/>
-                        <children>
-                          <component id="1874d" class="javax.swing.JLabel">
-                            <constraints/>
-                            <properties>
-                              <font size="14"/>
-                              <horizontalAlignment value="4"/>
-                              <preferredSize width="52" height="20"/>
-                              <text value=" Java "/>
-                            </properties>
-                          </component>
-                          <component id="d85b8" class="javax.swing.JButton" binding="dataStoreJavaButton" default-binding="true">
-                            <constraints/>
-                            <properties>
-                              <minimumSize width="40" height="30"/>
-                              <preferredSize width="42" height="30"/>
-                              <text value="Base"/>
-                            </properties>
-                          </component>
-                          <component id="a585c" class="javax.swing.JButton" binding="dataStoreJavaDbUtilsButton" default-binding="true">
-                            <constraints/>
-                            <properties>
-                              <preferredSize width="56" height="30"/>
-                              <text value="JDBC"/>
-                            </properties>
-                          </component>
-                          <component id="ffbb4" class="javax.swing.JButton" binding="dataStoreJavaAndroidButton" default-binding="true">
-                            <constraints/>
-                            <properties>
-                              <text value="Android"/>
-                            </properties>
-                          </component>
-                          <component id="df8bc" class="javax.swing.JLabel">
-                            <constraints/>
-                            <properties>
-                              <font size="14"/>
-                              <text value=" C++ "/>
-                            </properties>
-                          </component>
-                          <component id="7efb0" class="javax.swing.JButton" binding="dataStoreQt5CButton" default-binding="true">
-                            <constraints/>
-                            <properties>
-                              <preferredSize width="56" height="30"/>
-                              <text value="QtSql"/>
-                            </properties>
-                          </component>
-                          <component id="ac058" class="javax.swing.JButton" binding="dataStoreCSTLButton" default-binding="true">
-                            <constraints/>
-                            <properties>
-                              <text value="STL, sqlite3"/>
-                            </properties>
-                          </component>
-                          <component id="660" class="javax.swing.JButton" binding="dataStoreCATLButton" default-binding="true">
-                            <constraints/>
-                            <properties>
-                              <text value="ATL, sqlite3"/>
-                            </properties>
-                          </component>
-                          <component id="114d7" class="javax.swing.JLabel">
-                            <constraints/>
-                            <properties>
-                              <font size="14"/>
-                              <text value=" Go "/>
-                            </properties>
-                          </component>
-                          <component id="e9ae5" class="javax.swing.JButton" binding="btn_golang">
-                            <constraints/>
-                            <properties>
-                              <text value="database/sql"/>
-                            </properties>
-                          </component>
-                        </children>
-                      </grid>
-                      <grid id="e5ea7" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="0">
-                        <constraints border-constraint="South"/>
-                        <properties>
-                          <minimumSize width="40" height="40"/>
-                        </properties>
-                        <border type="none"/>
-                        <children>
-                          <component id="53d45" class="javax.swing.JLabel">
-                            <constraints/>
-                            <properties>
-                              <font size="14"/>
-                              <horizontalAlignment value="4"/>
-                              <preferredSize width="52" height="20"/>
-                              <text value=" Python "/>
-                            </properties>
-                          </component>
-                          <component id="85bc6" class="javax.swing.JButton" binding="sqlite3MysqlConnectorPsycopg2Button" default-binding="true">
-                            <constraints/>
-                            <properties>
-                              <text value="sqlite3, mysql.connector, psycopg2, django.db"/>
-                            </properties>
-                          </component>
-                          <component id="df46c" class="javax.swing.JButton" binding="btn_cx_Oracle">
-                            <constraints/>
-                            <properties>
-                              <text value="cx_Oracle"/>
-                            </properties>
-                          </component>
-                          <component id="f94b3" class="javax.swing.JButton" binding="datastore_pyodbc">
-                            <constraints/>
-                            <properties>
-                              <text value="pyodbc, mssql"/>
-                            </properties>
-                          </component>
-                          <component id="e84a2" class="javax.swing.JLabel">
-                            <constraints/>
-                            <properties>
-                              <font size="14"/>
-                              <text value=" Ruby "/>
-                            </properties>
-                          </component>
-                          <component id="6a2a4" class="javax.swing.JButton" binding="dataStoreRUBYDBIButton" default-binding="true">
-                            <constraints/>
-                            <properties>
-                              <preferredSize width="42" height="30"/>
-                              <text value="DBI"/>
-                            </properties>
-                          </component>
-                        </children>
-                      </grid>
-                    </children>
-                  </grid>
                   <grid id="22f6d" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="0">
                     <constraints>
-                      <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="1" fill="1" indent="0" use-parent-layout="false"/>
+                      <grid row="8" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="1" fill="1" indent="0" use-parent-layout="false"/>
                       <gridbag weightx="1.0" weighty="1.0"/>
                     </constraints>
                     <properties/>
