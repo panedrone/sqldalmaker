@@ -173,6 +173,7 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         jPanel9 = new javax.swing.JPanel();
         jLabel9 = new javax.swing.JLabel();
         jButton7 = new javax.swing.JButton();
+        jButton15 = new javax.swing.JButton();
         jButton32 = new javax.swing.JButton();
         jButton9 = new javax.swing.JButton();
         jLabel10 = new javax.swing.JLabel();
@@ -458,6 +459,14 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
             }
         });
         jPanel9.add(jButton7);
+
+        jButton15.setText("SQLAlchemy");
+        jButton15.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton15ActionPerformed(evt);
+            }
+        });
+        jPanel9.add(jButton15);
 
         jButton32.setText("cx_Oracle");
         jButton32.addActionListener(new java.awt.event.ActionListener() {
@@ -747,6 +756,10 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         NbpIdeEditorHelpers.open_resource_file_in_editor_async("data_store.py", "data_store.py");
     }//GEN-LAST:event_jButton7ActionPerformed
 
+    private void jButton15ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton15ActionPerformed
+        NbpIdeEditorHelpers.open_resource_file_in_editor_async("data_store_sqlalchemy.py", "data_store_sqlalchemy.py");
+    }//GEN-LAST:event_jButton15ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton10;
@@ -754,6 +767,7 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
     private javax.swing.JButton jButton12;
     private javax.swing.JButton jButton13;
     private javax.swing.JButton jButton14;
+    private javax.swing.JButton jButton15;
     private javax.swing.JButton jButton17;
     private javax.swing.JButton jButton18;
     private javax.swing.JButton jButton19;
