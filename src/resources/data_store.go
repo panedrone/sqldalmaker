@@ -1,4 +1,4 @@
-package main
+package dal
 
 import (
 	"database/sql"
@@ -253,11 +253,18 @@ func _isPtr(p interface{}) bool {
 	return kindOfJ == reflect.Ptr
 }
 
-func _pointsToNil(p interface{}) bool {
-	switch d := p.(type) {
-	case *interface{}:
-		pointsTo := *d
-		return pointsTo == nil
+func _isPtrToNil(p interface{}) bool {
+	// https://stackoverflow.com/questions/13476349/check-for-nil-and-nil-interface-in-go
+	if p == nil {
+		return false
+	}
+	val := reflect.ValueOf(p)
+	kindOfJ := val.Kind()
+	if kindOfJ != reflect.Ptr {
+		return false
+	}
+	if val.IsNil() {
+		return true
 	}
 	return false
 }
@@ -266,9 +273,9 @@ func _validateDest(dest interface{}) (err error) {
 	if dest == nil {
 		err = errors.New("OutParam/InOutParam -> Dest is nil")
 	} else if !_isPtr(dest) {
-		err = errors.New("OutParam/InOutParam -> Dest must be a Ptr")
-	} else if _pointsToNil(dest) {
-		err = errors.New("OutParam/InOutParam -> Dest points to nil")
+		err = errors.New("OutParam/InOutParam -> Dest must be a pointer")
+	} else if _isPtrToNil(dest) {
+		err = errors.New("OutParam/InOutParam -> Dest is a pointer to nil")
 	}
 	return
 }
@@ -321,7 +328,7 @@ func (ds *DataStore) _processExecParams(args []interface{}, onRowArr *[]func(map
 			*queryArgs = append(*queryArgs, sql.Out{Dest: param.Dest, In: true})
 		default:
 			if _isPtr(arg) {
-				if _pointsToNil(arg) {
+				if _isPtrToNil(arg) {
 					err = errors.New("arg points to nil")
 					return
 				}

@@ -1,3 +1,11 @@
+2022-03-12
+
+    UI adapted for NetBeans 13
+
+2021-10-01
+
+    [FIX] data_store.go --> _isPtrToNil
+
 2021-09-23
 
     SQLAlchemy Raw SQL --> data_store_sqlalchemy.py

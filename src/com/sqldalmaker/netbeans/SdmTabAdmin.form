@@ -69,11 +69,11 @@
             <Container class="javax.swing.JPanel" name="jPanel8">
               <Properties>
                 <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                  <Dimension value="[700, 436]"/>
+                  <Dimension value="[760, 436]"/>
                 </Property>
                 <Property name="name" type="java.lang.String" value="" noResource="true"/>
                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                  <Dimension value="[700, 436]"/>
+                  <Dimension value="[760, 436]"/>
                 </Property>
               </Properties>
 
@@ -195,7 +195,7 @@
                         <Property name="horizontalAlignment" type="int" value="4"/>
                         <Property name="text" type="java.lang.String" value="PHP"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                          <Dimension value="[36, 14]"/>
+                          <Dimension value="[40, 14]"/>
                         </Property>
                       </Properties>
                     </Component>
@@ -280,7 +280,7 @@
                         <Property name="horizontalAlignment" type="int" value="4"/>
                         <Property name="text" type="java.lang.String" value="Java"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                          <Dimension value="[36, 14]"/>
+                          <Dimension value="[40, 14]"/>
                         </Property>
                       </Properties>
                     </Component>
@@ -389,7 +389,7 @@
                         <Property name="horizontalAlignment" type="int" value="4"/>
                         <Property name="text" type="java.lang.String" value="Python"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                          <Dimension value="[36, 14]"/>
+                          <Dimension value="[40, 14]"/>
                         </Property>
                       </Properties>
                     </Component>
