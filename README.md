@@ -14,7 +14,7 @@ Demo-Projects:
 * [C++/Qt6](https://github.com/panedrone/sdm_demo_qt6_thesaurus)
 * [Python/Flask-RESTful](https://github.com/panedrone/sdm_demo_python_flask_todolist)
 * [Python/Tkinter](https://github.com/panedrone/sdm_demo_python_tkinter_github_stat)
-* [Go/REST](https://github.com/panedrone/sdm_demo_go_todolist)
+* [Go/Gin](https://github.com/panedrone/sdm_demo_go_todolist)
 
 All the details are here: [http://sqldalmaker.sourceforge.net/](http://sqldalmaker.sourceforge.net/)
 
