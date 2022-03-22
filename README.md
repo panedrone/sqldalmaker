@@ -1,6 +1,9 @@
 # SQL DAL Maker
 SQL DAL Maker is a generator of DTO and DAO classes to access relational databases. Target programming languages: PHP, Java, C++, Python, Ruby, and Go. To generate the class, you declare it in XML meta-program.
 
+At the stage of code generation, the target database must exist and be available for JDBC connection.
+Code generator uses "live" JDBC metadata to make generated code relevant to the current database schema. 
+
 Implemented as plug-ins for Eclipse IDE, IntelliJ-Platform, and NetBeans 11+.
 
 Quick-Demo in mp4: [https://github.com/panedrone/sqldalmaker/releases/tag/latest](https://github.com/panedrone/sqldalmaker/releases/tag/latest)
