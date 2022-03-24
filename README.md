@@ -21,4 +21,4 @@ Demo-Projects:
 * [Python/Tkinter](https://github.com/panedrone/sdm_demo_python_tkinter_github_stat)
 * [Go/Gin](https://github.com/panedrone/sdm_demo_go_todolist)
 
-[SQL DAL Maker](sqldalmaker-idea.png)
+![SQL DAL Maker](sqldalmaker-idea.png)
