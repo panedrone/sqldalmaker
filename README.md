@@ -8,7 +8,7 @@ Code generator uses "live" JDBC metadata to make generated code relevant to the 
 
 Implemented as plug-ins for [Eclipse IDE](http://marketplace.eclipse.org/content/sql-dal-maker), [IntelliJ-Platform](http://plugins.jetbrains.com/plugin/7092), and [NetBeans 11+](https://github.com/panedrone/sqldalmaker/releases/tag/latest).
 
-All the details are here: [http://sqldalmaker.sourceforge.net/](http://sqldalmaker.sourceforge.net/)
+Project Website: [http://sqldalmaker.sourceforge.net/](http://sqldalmaker.sourceforge.net/)
 
 Quick-Demo in mp4: [https://github.com/panedrone/sqldalmaker/releases/tag/latest](https://github.com/panedrone/sqldalmaker/releases/tag/latest)
 
