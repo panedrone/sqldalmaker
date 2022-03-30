@@ -1,3 +1,7 @@
+2022-03-30
+
+    Allowed not-PK/FK columns in SQL-shortcuts
+
 2022-03-12
 
     UI adapted for NetBeans 13

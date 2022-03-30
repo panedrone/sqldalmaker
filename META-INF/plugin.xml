@@ -2,14 +2,14 @@
     <id>dal-mpe</id>
     <name>SQL DAL Maker</name>
     <category>Database</category>
-    <version>1.215.2110</version>
+    <version>1.216.2110</version>
     <vendor email="sqldalmaker@gmail.com"/>
     <idea-version since-build="181.5684.4"/>
 
     <depends>com.intellij.modules.lang</depends>
 
     <description><![CDATA[
-A generator of DTO and DAO classes to access relational databases. Target programming languages:
+SQL DAL Maker is a generator of DTO and DAO classes to access relational databases. Target programming languages:
 PHP, Java, C++, Python, Ruby, and Go. To generate the class, you declare it in XML meta-program.<br/>
 <br/>
 <a href="https://github.com/panedrone/sqldalmaker/releases/tag/latest">Quick-Demo in mp4</a>
@@ -18,9 +18,7 @@ PHP, Java, C++, Python, Ruby, and Go. To generate the class, you declare it in X
     <change-notes>
         <![CDATA[
 <ul>
-<li>SQLAlchemy Raw SQL --> data_store_sqlalchemy.py</li>
-<li>Single data_store.py for sqlite3, mysql.connector, postgresql_psycopg2, and Django Raw SQL</li>
-<li>Further improvements for Go</li>
+<li>Allowed not-PK/FK columns in SQL-shortcuts</li>
 </ul>]]></change-notes>
 
     <application-components>

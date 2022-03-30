@@ -1,6 +1,12 @@
+/*
+ * Copyright 2011-2022 sqldalmaker@gmail.com
+ * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
+ * Read LICENSE.txt in the root of this project/archive for details.
+ */
 package com.sqldalmaker.intellij.ui;
 
 import com.intellij.openapi.fileTypes.FileType;
+import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -35,8 +41,12 @@ public class RootFileType implements FileType {
         return "dal";
     }
 
+    // deprecated with no class --> Deprecated method IconLoader.findIcon
+    // https://plugins.jetbrains.com/docs/intellij/work-with-icons-and-images.html#how-to-organize-and-how-to-use-icons
+    private static final Icon SDM_ICON = IconLoader.findIcon("/img/sqldalmaker.png", RootFileType.class);
+
     public Icon getIcon() {
-        return SdmIcons.FILE;
+        return SDM_ICON;
     }
 
     @Override
@@ -52,7 +62,7 @@ public class RootFileType implements FileType {
     @NonNls
     @Nullable
     @Override
-    public String getCharset(@NotNull VirtualFile file, byte[] content) {
+    public String getCharset(@NotNull VirtualFile file, @NotNull byte[] content) {
         return null;
     }
 }
