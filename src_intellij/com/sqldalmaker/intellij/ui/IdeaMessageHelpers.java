@@ -5,20 +5,17 @@
  */
 package com.sqldalmaker.intellij.ui;
 
-import com.intellij.notification.*;
-import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.notification.Notification;
+import com.intellij.notification.NotificationGroup;
+import com.intellij.notification.NotificationType;
+import com.intellij.notification.Notifications;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.sqldalmaker.common.InternalException;
 import com.sqldalmaker.jaxb.settings.Ide;
 import com.sqldalmaker.jaxb.settings.Settings;
-import org.jetbrains.annotations.NotNull;
-
-import javax.swing.event.HyperlinkEvent;
 
 /**
  * Created with IntelliJ IDEA.
