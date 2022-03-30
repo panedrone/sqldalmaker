@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2021 sqldalmaker@gmail.com
+    Copyright 2011-2022 sqldalmaker@gmail.com
     SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -267,7 +267,7 @@ public class UITabDAO {
                             } catch (Throwable e) {
                                 String msg = e.getMessage();
                                 table.setValueAt(msg, row, 1);
-                                IdeaMessageHelpers.add_dao_error_message(settings, project, root_file, dao_xml_rel_path, msg);
+                                IdeaMessageHelpers.add_dao_error_message(settings, root_file, dao_xml_rel_path, msg);
                                 // break; // exit the loop
                             }
                         }
@@ -362,13 +362,13 @@ public class UITabDAO {
                                 model.setValueAt(Const.STATUS_OK, i, 1);
                             } else {
                                 model.setValueAt(status, i, 1);
-                                IdeaMessageHelpers.add_dao_error_message(settings, project, root_file, dao_xml_rel_path, status);
+                                IdeaMessageHelpers.add_dao_error_message(settings, root_file, dao_xml_rel_path, status);
                             }
                         } catch (Throwable ex) {
                             // ex.printStackTrace();
                             String msg = ex.getMessage();
                             model.setValueAt(msg, i, 1);
-                            IdeaMessageHelpers.add_dao_error_message(settings, project, root_file, dao_xml_rel_path, msg);
+                            IdeaMessageHelpers.add_dao_error_message(settings, root_file, dao_xml_rel_path, msg);
                         }
                         SwingUtilities.invokeLater(new Runnable() {
                             public void run() {

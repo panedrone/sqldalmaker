@@ -110,9 +110,44 @@ public class SdmActionGroup extends ActionGroup {
         drop_down_actions_list.add(Separator.create());
     }
 
+    private List<AnAction> get_drop_down_actions(Project project, List<String> titles) throws Exception {
+        List<AnAction> drop_down_actions_list = new ArrayList<AnAction>();
+        FileEditorManager fm = FileEditorManager.getInstance(project);
+        // FileEditor editor = fm.getSelectedEditor(); // since 182.711
+        VirtualFile[] files = fm.getSelectedFiles();
+        FileEditor editor = files.length == 0 ? null : fm.getSelectedEditor(files[0]);
+        if (!(editor instanceof TextEditor)) {
+            return drop_down_actions_list;
+        }
+        VirtualFile xml_file = editor.getFile(); // @Nullable
+        if (xml_file == null) {
+            return drop_down_actions_list;
+        }
+        VirtualFile xml_file_dir = xml_file.getParent();
+        if (xml_file_dir == null) {
+            return drop_down_actions_list;
+        }
+        List<VirtualFile> root_files = IdeaTargetLanguageHelpers.find_root_files(xml_file_dir);
+        if (root_files.size() != 1) {
+            return drop_down_actions_list;
+        }
+        String name = xml_file.getName();
+        if (FileSearchHelpers.is_dto_xml(name)) {
+            add_dto_actions(project, drop_down_actions_list, xml_file);
+        } else if (FileSearchHelpers.is_dao_xml(name)) {
+            add_dao_actions(project, drop_down_actions_list, xml_file);
+        }
+        if (FileSearchHelpers.is_dto_xml(name) || FileSearchHelpers.is_dao_xml(name)) {
+            if (titles.size() > 1) {
+                add_common_actions(project, drop_down_actions_list, root_files);
+            }
+        }
+        return drop_down_actions_list;
+    }
+
     @NotNull
     @Override
-    public AnAction [] getChildren(@Nullable AnActionEvent anActionEvent) {
+    public AnAction[] getChildren(@Nullable AnActionEvent anActionEvent) {
         try {
             if (anActionEvent == null) {
                 return AnAction.EMPTY_ARRAY;
@@ -129,39 +164,13 @@ public class SdmActionGroup extends ActionGroup {
             if (titles.isEmpty()) {
                 return AnAction.EMPTY_ARRAY;
             }
-            List<AnAction> drop_down_actions_list = new ArrayList<AnAction>();
-            FileEditorManager fm = FileEditorManager.getInstance(project);
-            // FileEditor editor = fm.getSelectedEditor(); // since 182.711
-            VirtualFile[] files = fm.getSelectedFiles();
-            FileEditor editor = files.length == 0 ? null : fm.getSelectedEditor(files[0]);
-            if (editor instanceof TextEditor) {
-                VirtualFile xml_file = editor.getFile(); // @Nullable
-                if (xml_file != null) {
-                    VirtualFile xml_file_dir = xml_file.getParent();
-                    if (xml_file_dir != null) {
-                        List<VirtualFile> root_files = IdeaTargetLanguageHelpers.find_root_files(xml_file_dir);
-                        if (root_files.size() == 1) {
-                            String name = xml_file.getName();
-                            if (FileSearchHelpers.is_dto_xml(name)) {
-                                add_dto_actions(project, drop_down_actions_list, xml_file);
-                            } else if (FileSearchHelpers.is_dao_xml(name)) {
-                                add_dao_actions(project, drop_down_actions_list, xml_file);
-                            }
-                            if (FileSearchHelpers.is_dto_xml(name) || FileSearchHelpers.is_dao_xml(name)) {
-                                if (titles.size() > 1) {
-                                    add_common_actions(project, drop_down_actions_list, root_files);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            List<AnAction> drop_down_actions_list = get_drop_down_actions(project, titles);
             for (String title : titles) {
                 SdmAction action = new SdmAction(title) {
                     @Override
                     public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
                         try {
-                            String rel_path = this.getTemplatePresentation().getText();
+                            String rel_path = getTemplatePresentation().getText();
                             IdeaEditorHelpers.open_project_file_in_editor_sync(anActionEvent.getProject(), rel_path);
                         } catch (Throwable e) {
                             e.printStackTrace();

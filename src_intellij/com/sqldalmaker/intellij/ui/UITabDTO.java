@@ -503,13 +503,13 @@ public class UITabDTO {
                             model.setValueAt(Const.STATUS_OK, i, 2);
                         } else {
                             model.setValueAt(status, i, 2);
-                            IdeaMessageHelpers.add_dto_error_message(settings, project, root_file, dto_class_name, status);
+                            IdeaMessageHelpers.add_dto_error_message(settings, root_file, dto_class_name, status);
                         }
                     } catch (Throwable e) {
                         // e.printStackTrace();
                         String msg = e.getMessage();
                         model.setValueAt(msg, i, 2);
-                        IdeaMessageHelpers.add_dto_error_message(settings, project, root_file, dto_class_name, msg);
+                        IdeaMessageHelpers.add_dto_error_message(settings, root_file, dto_class_name, msg);
                     }
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
@@ -575,7 +575,7 @@ public class UITabDTO {
                             } catch (Throwable e) {
                                 String msg = e.getMessage();
                                 table.setValueAt(msg, row, 2);
-                                IdeaMessageHelpers.add_dto_error_message(settings, project, root_file, dto_class_name, msg);
+                                IdeaMessageHelpers.add_dto_error_message(settings, root_file, dto_class_name, msg);
                             }
                         }
                     } finally {

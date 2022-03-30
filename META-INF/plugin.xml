@@ -2,7 +2,7 @@
     <id>dal-mpe</id>
     <name>SQL DAL Maker</name>
     <category>Database</category>
-    <version>1.216.2110</version>
+    <version>1.216.2203</version>
     <vendor email="sqldalmaker@gmail.com"/>
     <idea-version since-build="181.5684.4"/>
 
@@ -43,7 +43,7 @@ PHP, Java, C++, Python, Ruby, and Go. To generate the class, you declare it in X
         https://plugins.jetbrains.com/docs/intellij/notifications.html
         notificationGroup and fileType are not available in 2017.3, but errors are silent...
         -->
-        <notificationGroup id="SQL DAL Maker" displayType="NONE"/>
+        <notificationGroup id="SDM" displayType="BALLOON"/>
         <!--
         Register the FileType Directly
         Direct registration is possible when targeting version 2019.2 (and later) of the IntelliJ Platform - no FileTypeFactory is required.

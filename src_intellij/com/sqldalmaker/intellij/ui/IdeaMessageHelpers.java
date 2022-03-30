@@ -1,11 +1,13 @@
 /*
-    Copyright 2011-2021 sqldalmaker@gmail.com
+    Copyright 2011-2022 sqldalmaker@gmail.com
     SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
     Read LICENSE.txt in the root of this project/archive for details.
  */
 package com.sqldalmaker.intellij.ui;
 
 import com.intellij.notification.*;
+import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.MessageType;
@@ -14,6 +16,9 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.sqldalmaker.common.InternalException;
 import com.sqldalmaker.jaxb.settings.Ide;
 import com.sqldalmaker.jaxb.settings.Settings;
+import org.jetbrains.annotations.NotNull;
+
+import javax.swing.event.HyperlinkEvent;
 
 /**
  * Created with IntelliJ IDEA.
@@ -23,70 +28,65 @@ import com.sqldalmaker.jaxb.settings.Settings;
 public class IdeaMessageHelpers {
 
     // https://stackoverflow.com/questions/32928914/how-do-i-show-a-notification-in-intellij
-
     // https://plugins.jetbrains.com/docs/intellij/notifications.html#editor-hints
 
-    @SuppressWarnings("CommentedOutCode")
+    // @SuppressWarnings("CommentedOutCode")
     private static NotificationGroup getNotificationGroup() {
-//        for (NotificationGroup gr : NotificationGroup.getAllRegisteredGroups()) {
-//            String id = gr.getDisplayId();
-//            System.out.println(id);
-//        }
-        NotificationGroup res = NotificationGroup.findRegisteredGroup("SQL DAL Maker"); // not available in 2017.3
-//        if (res == null) {
-//            // https://www.plugin-dev.com/intellij-notifications.pdf
-//            // https://plugins.jetbrains.com/docs/intellij/notifications.html
-//            // inbound NONE, working in in 2017.3, deprecated in 2021.3
-//            // @NotNull
-//            res = NotificationGroup.logOnlyGroup("SQL DAL Maker");
-//        }
-        //noinspection ConstantConditions
-        if (res == null) {
-            // NONE is prefferable
-            res = NotificationGroup.findRegisteredGroup("Compiler");  // inbound, NONE, available in 2017.3
-            if (res == null) {
-                res = NotificationGroup.findRegisteredGroup("Run Anything"); // inbound, BALOON, not available in 2017.3
-                if (res == null) {
-                    res = NotificationGroup.findRegisteredGroup("Error Report");  // inbound, BALOON, not available in 2017.3
-                }
-            }
+        // plugin.xml:
+        // <notificationGroup id="SDM Errors" displayType="STICKY_BALLOON"/>
+        NotificationGroup res = NotificationGroup.findRegisteredGroup("SDM"); // not available in 2017.3
+        if (res != null) {
+            return res;
         }
+        // "Error Report" BALOON, not available in 2017.3    // BALOON is prefferable
+        // "Compiler" NONE, available in 2017.3
+        // "Run Anything" BALOON, not available in 2017.3
+        res = findRegisteredGroup(new String[]{"Error Report", "Compiler", "Run Anything"});
         return res;
     }
 
-    private static final NotificationGroup GROUP_DISPLAY_ID_INFO = getNotificationGroup();
+    private static NotificationGroup findRegisteredGroup(String[] names) {
+        for (int i = 0; i < names.length; i++) {
+            NotificationGroup res = NotificationGroup.findRegisteredGroup(names[i]);
+            if (res != null) {
+                return res;
+            }
+        }
+        return null;
+    }
+
+    private static final NotificationGroup GROUP_DISPLAY_ID = getNotificationGroup();
     // new NotificationGroup("sqldalmaker", NotificationDisplayType.NONE, true);  // Scheduled for removal constructor usage (1)
 
     public static void add_warning_to_ide_log(String msg) {
-        if (GROUP_DISPLAY_ID_INFO == null) {
+        if (GROUP_DISPLAY_ID == null) {
             return;
         }
-        Notifications.Bus.notify(GROUP_DISPLAY_ID_INFO.createNotification(msg, MessageType.WARNING));
+        Notifications.Bus.notify(GROUP_DISPLAY_ID.createNotification(msg, MessageType.WARNING));
     }
 
     public static void add_info_to_ide_log(String msg) {
-        if (GROUP_DISPLAY_ID_INFO == null) {
+        if (GROUP_DISPLAY_ID == null) {
             return;
         }
-        Notifications.Bus.notify(GROUP_DISPLAY_ID_INFO.createNotification(msg, MessageType.INFO));
+        add_to_ide_log("INFO", msg, NotificationType.INFORMATION);
     }
 
-    public static void add_error_to_ide_log(String title, String msg) {
-        if (GROUP_DISPLAY_ID_INFO == null) {
+    public static void add_to_ide_log(String title, String msg, NotificationType nt) {
+        if (GROUP_DISPLAY_ID == null) {
             return;
         }
-        Notification notification = GROUP_DISPLAY_ID_INFO.createNotification(title + ": " + msg, NotificationType.ERROR);
+        msg = msg.replace("<", "&lt;").replace(">", "&gt;");
+        //    public final fun createNotification(title: kotlin.String, content: kotlin.String, type: com.intellij.notification.NotificationType): com.intellij.notification.Notification { /* compiled code */ }
+        Notification notification = GROUP_DISPLAY_ID.createNotification("<b>" + title + ":</b> " + msg, nt);
         Notifications.Bus.notify(notification);
     }
 
-    public static void add_dto_error_message(Settings settings, Project project,
-                                             final VirtualFile root_file,
-                                             final String dto_class_name,
-                                             String msg) {
+    public static void add_error_to_ide_log(String title, String msg) {
+        add_to_ide_log(title, msg, NotificationType.ERROR);
+    }
 
-        if (GROUP_DISPLAY_ID_INFO == null) {
-            return;
-        }
+    public static void add_dto_error_message(Settings settings, final VirtualFile root_file, final String dto_class_name, String msg) {
         Ide ide = settings.getIde();
         if (ide != null) {
             if (!ide.isEventLog()) {
@@ -96,21 +96,12 @@ public class IdeaMessageHelpers {
         ApplicationManager.getApplication().invokeLater(new Runnable() {
             @Override
             public void run() {
-                Notification notification = GROUP_DISPLAY_ID_INFO.createNotification(dto_class_name + ": " + msg, NotificationType.ERROR);
-                Notifications.Bus.notify(notification);
+                add_error_to_ide_log(dto_class_name, msg);
             }
         });
     }
 
-    public static void add_dao_error_message(Settings settings,
-                                             Project project,
-                                             VirtualFile root_file,
-                                             String dao_xml_rel_path,
-                                             String msg) {
-
-        if (GROUP_DISPLAY_ID_INFO == null) {
-            return;
-        }
+    public static void add_dao_error_message(Settings settings, VirtualFile root_file, String dao_xml_rel_path, String msg) {
         Ide ide = settings.getIde();
         if (ide != null) {
             if (!ide.isEventLog()) {
@@ -120,8 +111,7 @@ public class IdeaMessageHelpers {
         ApplicationManager.getApplication().invokeLater(new Runnable() {
             @Override
             public void run() {
-                Notification notification = GROUP_DISPLAY_ID_INFO.createNotification(dao_xml_rel_path + ": " + msg, NotificationType.ERROR);
-                Notifications.Bus.notify(notification);
+                add_error_to_ide_log(dao_xml_rel_path, msg);
             }
         });
     }
