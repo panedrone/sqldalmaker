@@ -18,7 +18,7 @@ PHP, Java, C++, Python, Ruby, and Go. To generate the class, you declare it in X
     <change-notes>
         <![CDATA[
 <ul>
-<li>Improvements of error handling for Golang</li>
+<li>Go: enhanced error processing</li>
 <li>Allowed not-PK/FK columns in SQL-shortcuts</li>
 </ul>]]></change-notes>
 
