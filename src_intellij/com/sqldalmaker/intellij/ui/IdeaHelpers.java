@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2021 sqldalmaker@gmail.com
+    Copyright 2011-2022 sqldalmaker@gmail.com
     SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -74,12 +74,19 @@ public class IdeaHelpers {
     }
 
     public static String get_relative_path(Project project, VirtualFile file) throws Exception {
-
         String base_abs_path = project.getBasePath();
         if (base_abs_path == null) {
             throw new Exception("Cannot detect the project base path");
         }
         String file_abs_path = file.getPath();
+        return get_relative_path(base_abs_path, file_abs_path);
+    }
+
+    public static String get_relative_path(Project project, String file_abs_path) throws Exception {
+        String base_abs_path = project.getBasePath();
+        if (base_abs_path == null) {
+            throw new Exception("Cannot detect the project base path");
+        }
         return get_relative_path(base_abs_path, file_abs_path);
     }
 

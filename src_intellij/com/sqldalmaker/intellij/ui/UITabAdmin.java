@@ -432,7 +432,7 @@ public class UITabAdmin {
         buff.append("\r\n");
         buff.append(msg);
         buff.append(" -> OK");
-        IdeaMessageHelpers.add_info_to_ide_log(msg + " -> OK");
+        IdeaMessageHelpers.add_info_to_ide_log("INFO", msg + " -> OK");
     }
 
     private void add_err_msg(StringBuilder buff, String msg) {

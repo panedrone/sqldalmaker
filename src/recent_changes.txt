@@ -1,3 +1,7 @@
+2022-04-01
+
+    Improvements of error handling for Golang
+
 2022-03-30
 
     Allowed not-PK/FK columns in SQL-shortcuts

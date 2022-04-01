@@ -62,11 +62,11 @@ public class IdeaMessageHelpers {
         Notifications.Bus.notify(GROUP_DISPLAY_ID.createNotification(msg, MessageType.WARNING));
     }
 
-    public static void add_info_to_ide_log(String msg) {
+    public static void add_info_to_ide_log(String title, String msg) {
         if (GROUP_DISPLAY_ID == null) {
             return;
         }
-        add_to_ide_log("INFO", msg, NotificationType.INFORMATION);
+        add_to_ide_log(title, msg, NotificationType.INFORMATION);
     }
 
     public static void add_to_ide_log(String title, String msg, NotificationType nt) {

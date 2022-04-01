@@ -11,6 +11,8 @@ import com.sqldalmaker.jaxb.dao.DaoClass;
 import com.sqldalmaker.jaxb.dto.DtoClass;
 import com.sqldalmaker.jaxb.settings.Settings;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
@@ -68,7 +70,7 @@ public class IdeaCG {
                         }
                         if (!error) {
                             String xml_file_rel_path = IdeaHelpers.get_relative_path(project, xml_file);
-                            IdeaMessageHelpers.add_info_to_ide_log(xml_file_rel_path + " -> OK");
+                            IdeaMessageHelpers.add_info_to_ide_log(xml_file_rel_path,"OK");
                         }
                     } finally {
                         con.close();
@@ -144,7 +146,7 @@ public class IdeaCG {
                 String xml_file_rel_path = IdeaHelpers.get_relative_path(project, xml_file);
                 IdeaHelpers.run_write_action_to_generate_source_file(output_dir.toString(), list, project);
                 if (!error.happend) {
-                    IdeaMessageHelpers.add_info_to_ide_log(xml_file_rel_path + " -> Generated successfully");
+                    IdeaMessageHelpers.add_info_to_ide_log(xml_file_rel_path, "Generated successfully");
                 }
             }
         } catch (Exception e) {
@@ -177,27 +179,27 @@ public class IdeaCG {
             String xml_metaprogram_abs_path = root_file.getParent().getPath();
             String contextPath = DaoClass.class.getPackage().getName();
             XmlParser xml_parser = new XmlParser(contextPath, Helpers.concat_path(xml_metaprogram_abs_path, Const.DAO_XSD));
-            String dao_xml_rel_path = IdeaHelpers.get_relative_path(project, xml_file);
-            String dao_class_name = Helpers.get_dao_class_name(dao_xml_rel_path);
-//            String xml_file_rel_path = IdeaHelpers.get_relative_path(project, xml_file);
+            String dao_xml_abs_path = xml_file.getPath();
+            Path path = Paths.get(dao_xml_abs_path);
+            String dao_xml_file_name = path.getFileName().toString();
+            String dao_class_name = Helpers.get_dao_class_name(dao_xml_file_name);
             Connection con = IdeaHelpers.get_connection(project, settings);
             try {
                 IDaoCG gen = IdeaTargetLanguageHelpers.create_dao_cg(con, project, root_file, settings, output_dir);
                 try {
-                    String dao_xml_abs_path = xml_file.getPath();//  Helpers.concat_path(local_abs_path, dao_xml_rel_path);
                     DaoClass dao_class = xml_parser.unmarshal(dao_xml_abs_path);
                     String[] file_content = gen.translate(dao_class_name, dao_class);
                     StringBuilder validationBuff = new StringBuilder();
                     IdeaTargetLanguageHelpers.validate_dao(project, root_file, settings, dao_class_name, file_content, validationBuff);
                     String status = validationBuff.toString();
                     if (status.length() == 0) {
-                        IdeaMessageHelpers.add_info_to_ide_log(dao_class_name + " -> OK");
+                        IdeaMessageHelpers.add_info_to_ide_log(dao_xml_file_name, "OK");
                     } else {
-                        IdeaMessageHelpers.add_error_to_ide_log(dao_class_name, " " + xml_file.getNameWithoutExtension() + ". " + status);
+                        IdeaMessageHelpers.add_error_to_ide_log(dao_xml_file_name, " " + xml_file.getNameWithoutExtension() + ". " + status);
                     }
                 } catch (Throwable e) {
                     String msg = e.getMessage();
-                    IdeaMessageHelpers.add_error_to_ide_log(dao_class_name, msg);
+                    IdeaMessageHelpers.add_error_to_ide_log(dao_xml_file_name, msg);
                 }
             } finally {
                 con.close();
@@ -234,19 +236,20 @@ public class IdeaCG {
             String contextPath = DaoClass.class.getPackage().getName();
             XmlParser xml_parser = new XmlParser(contextPath, Helpers.concat_path(xml_metaprogram_abs_path, Const.DAO_XSD));
             boolean error = false;
-            String dao_xml_rel_path = IdeaHelpers.get_relative_path(project, xml_file);
-            String dao_class_name = Helpers.get_dao_class_name(dao_xml_rel_path);
+            String dao_xml_abs_path = xml_file.getPath();
+            Path path = Paths.get(dao_xml_abs_path);
+            String dao_xml_file_name = path.getFileName().toString();
+            String dao_class_name = Helpers.get_dao_class_name(dao_xml_file_name);
             Connection con = IdeaHelpers.get_connection(project, settings);
             try {
                 IDaoCG gen = IdeaTargetLanguageHelpers.create_dao_cg(con, project, root_file, settings, output_dir);
                 try {
-                    String dao_xml_abs_path = xml_file.getPath();
                     DaoClass dao_class = xml_parser.unmarshal(dao_xml_abs_path);
                     String[] file_content = gen.translate(dao_class_name, dao_class);
                     IdeaTargetLanguageHelpers.prepare_generated_file_data(root_file, dao_class_name, file_content, list);
                 } catch (Throwable e) {
                     String msg = e.getMessage();
-                    IdeaMessageHelpers.add_error_to_ide_log(dao_class_name, msg);
+                    IdeaMessageHelpers.add_error_to_ide_log(dao_xml_file_name, msg);
                     error = true;
                 }
             } finally {
@@ -256,13 +259,12 @@ public class IdeaCG {
                 if (list.size() > 0) {
                     IdeaHelpers.run_write_action_to_generate_source_file(output_dir.toString(), list, project);
                     if (!error) {
-                        String xml_file_rel_path = IdeaHelpers.get_relative_path(project, xml_file);
-                        IdeaMessageHelpers.add_info_to_ide_log(xml_file_rel_path + " -> Generated successfully");
+                        IdeaMessageHelpers.add_info_to_ide_log(dao_xml_file_name, "Generated successfully");
                     }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                IdeaMessageHelpers.add_error_to_ide_log(dao_class_name, e.getMessage());
+                IdeaMessageHelpers.add_error_to_ide_log(dao_xml_file_name, e.getMessage());
             }
         } catch (Exception e) {
             e.printStackTrace();

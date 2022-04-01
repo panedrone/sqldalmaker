@@ -70,12 +70,11 @@ type ${class_name} struct {
 func (dao *${class_name}) ${method_name}(p *${dto_param}) (err error) {
 #sql_var(false $sql)
 	res, err := dao.Ds.Insert(sql, "${ai_names}"#foreach($param in ${params}), p.${param.getName()}#end)
-	if err != nil {
-		return
-	}
+	if err == nil {
 #foreach ($ai in ${fields_ai})
-	dao.Ds.Assign(&p.${ai.getName()}, res)
+		err = assign(&p.${ai.getName()}, res)
 #end
+	}
 	return
 }
 ## ====================================================================================================================
@@ -89,24 +88,29 @@ func (dao *${class_name}) ${method_name}(p *${dto_param}) (err error) {
 #if($use_dto)
 func (dao *${class_name}) ${method_name}(#if(${dto_param} != "")#param_decls_dto($is_external_sql)${dto_param} p#else#param_decls($is_external_sql $params)#end) (res []*${returned_type_name}, err error) {
 #sql_var($is_external_sql $sql)
-	onDto := func(rd map[string]interface{}) {
+	errMap := make(map[string]int)
+	onDto := func(row map[string]interface{}) {
 		obj := ${returned_type_name}{}
 #foreach($f in ${fields})
 #set($i = ${velocityCount} - 1)
-		dao.Ds.Assign(&obj.${f.getName()}, rd["${f.getColumnName()}"] /* ${f.getComment()} */)
+		fromRow(&obj.${f.getName()}, row, "${f.getColumnName()}", errMap)
 #end
 		res = append(res, &obj)
 	}
 	err = dao.Ds.QueryAllRows(sql, onDto#if(${dto_param} != "")#foreach($param in ${params}), p.${param.getterMethod()}()#end)#else#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
+	if err == nil {
+		err = errMapToErr(errMap)
+	}
 	return
 }
 #end
 #else
 func (dao *${class_name}) ${method_name}(#if(${dto_param} != "")#param_decls_dto($is_external_sql)${dto_param} p#else#param_decls($is_external_sql $params)#end) (res []${returned_type_name}, err error) {
 #sql_var($is_external_sql $sql)
-	onRow := func(rd interface{}) {
+	errMap := make(map[string]int)
+	onRow := func(val interface{}) {
 		var data ${returned_type_name}
-		dao.Ds.Assign(&data, rd)
+		fromVal(&data, val, errMap)
 		res = append(res, data)
 	}
 #if(${dto_param} != "")
@@ -114,6 +118,9 @@ func (dao *${class_name}) ${method_name}(#if(${dto_param} != "")#param_decls_dto
 #else
 	err = dao.Ds.QueryAll(sql, onRow#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
 #end
+	if err == nil {
+		err = errMapToErr(errMap)
+	}
 	return
 }
 #end
@@ -121,15 +128,17 @@ func (dao *${class_name}) ${method_name}(#if(${dto_param} != "")#param_decls_dto
 func (dao *${class_name}) ${method_name}(#if(${dto_param} != "")#param_decls_dto($is_external_sql)${dto_param} p#else#param_decls($is_external_sql $params)#end) (res ${returned_type_name}, err error) {
 #sql_var($is_external_sql $sql)
 #if($use_dto)
-	rd, err := dao.Ds.QueryRow(sql#if(${dto_param} != "")#foreach($param in ${params}), p.${param.getterMethod()}()#end)#else#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
+	row, err := dao.Ds.QueryRow(sql#if(${dto_param} != "")#foreach($param in ${params}), p.${param.getterMethod()}()#end)#else#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
 	if err != nil {
 		return
 	}
 	res = ${returned_type_name}{}
+	errMap := make(map[string]int)
 #foreach($f in ${fields})
 #set($i = ${velocityCount} - 1)
-	dao.Ds.Assign(&res.${f.getName()}, rd["${f.getColumnName()}"] /* ${f.getComment()} */)
+	fromRow(&res.${f.getName()}, row, "${f.getColumnName()}", errMap)
 #end
+	err = errMapToErr(errMap)
 	return
 #end
 #else
@@ -138,12 +147,9 @@ func (dao *${class_name}) ${method_name}(#if(${dto_param} != "")#param_decls_dto
 #else
 	r, err := dao.Ds.Query(sql#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
 #end
-	if err != nil {
-		return
+	if err == nil {
+		err = assign(&res, r)
 	}
-	var v ${returned_type_name}
-	dao.Ds.Assign(&v, r)
-	res = v
 	return
 #end
 }
@@ -180,11 +186,12 @@ func (dao *${class_name}) ${method_name}(#param_decls_dto($is_external_sql)p *${
 
 func (dao *${class_name}) ${method_name}(#param_decls($is_external_sql $params)) (res int64, err error) {
 #sql_var($is_external_sql $sql)
+	errMap := make(map[string]int)
 #foreach($m in ${mappings})
 	${m.get_exec_dml_param_name()} := func(rd map[string]interface{}) {
 		obj := ${m.get_dto_class_name()}{}
 #foreach($f in ${m.get_fields()})
-		dao.Ds.Assign(&obj.${f.getName()}, rd["${f.getColumnName()}"] /* ${f.getComment()} */)
+		fromRow(&obj.${f.getName()}, rd, "${f.getColumnName()}", errMap)
 #end
 		${m.get_method_param_name()}(&obj)
 	}
@@ -194,6 +201,9 @@ func (dao *${class_name}) ${method_name}(#param_decls($is_external_sql $params))
 #else
 	res, err = dao.Ds.Exec(sql#foreach($param in ${params2}), ${param.getLowerCamelCaseName()}#end)
 #end
+	if err == nil {
+		err = errMapToErr(errMap)
+	}
 	return
 }
 #end

@@ -1,4 +1,4 @@
-package dal
+package main
 
 import (
 	"database/sql"
@@ -21,7 +21,7 @@ import (
 
 type OutParam struct {
 	/*
-		var outParam float64 // no need to init it for OutParam
+		var outParam float64 // no need to init
 		cxDao.SpTestOutParams(47, OutParam{Dest: &outParam})
 		// cxDao.SpTestOutParams(47, &outParam) // <- this one is also ok for OUT parameters
 		fmt.Println(outParam)
@@ -34,7 +34,7 @@ type OutParam struct {
 
 type InOutParam struct {
 	/*
-		inOutParam := 123.0 // INOUT parameter must be initialized
+		inOutParam := 123.0 // must be initialized for INOUT
 		cxDao.SpTestInoutParams(InOutParam{Dest: &inOutParam})
 		fmt.Println(inOutParam)
 	*/
@@ -253,18 +253,11 @@ func _isPtr(p interface{}) bool {
 	return kindOfJ == reflect.Ptr
 }
 
-func _isPtrToNil(p interface{}) bool {
-	// https://stackoverflow.com/questions/13476349/check-for-nil-and-nil-interface-in-go
-	if p == nil {
-		return false
-	}
-	val := reflect.ValueOf(p)
-	kindOfJ := val.Kind()
-	if kindOfJ != reflect.Ptr {
-		return false
-	}
-	if val.IsNil() {
-		return true
+func _pointsToNil(p interface{}) bool {
+	switch d := p.(type) {
+	case *interface{}:
+		pointsTo := *d
+		return pointsTo == nil
 	}
 	return false
 }
@@ -273,9 +266,9 @@ func _validateDest(dest interface{}) (err error) {
 	if dest == nil {
 		err = errors.New("OutParam/InOutParam -> Dest is nil")
 	} else if !_isPtr(dest) {
-		err = errors.New("OutParam/InOutParam -> Dest must be a pointer")
-	} else if _isPtrToNil(dest) {
-		err = errors.New("OutParam/InOutParam -> Dest is a pointer to nil")
+		err = errors.New("OutParam/InOutParam -> Dest must be a Ptr")
+	} else if _pointsToNil(dest) {
+		err = errors.New("OutParam/InOutParam -> Dest points to nil")
 	}
 	return
 }
@@ -328,7 +321,7 @@ func (ds *DataStore) _processExecParams(args []interface{}, onRowArr *[]func(map
 			*queryArgs = append(*queryArgs, sql.Out{Dest: param.Dest, In: true})
 		default:
 			if _isPtr(arg) {
-				if _isPtrToNil(arg) {
+				if _pointsToNil(arg) {
 					err = errors.New("arg points to nil")
 					return
 				}
@@ -500,7 +493,7 @@ func (ds *DataStore) _queryRowValues(sqlStr string, queryArgs ...interface{}) (v
 		return
 	}
 	if !rows.Next() {
-		err = errors.New(fmt.Sprintf("Rows found 0 for %s", sqlStr))
+		err = sql.ErrNoRows
 		return
 	}
 	err = rows.Scan(valuePointers...)
@@ -509,7 +502,10 @@ func (ds *DataStore) _queryRowValues(sqlStr string, queryArgs ...interface{}) (v
 	}
 	for _, arg := range queryArgs {
 		if _isPtr(arg) {
-			ds.Assign(arg, values[outParamIndex])
+			err = assign(arg, values[outParamIndex])
+			if err != nil {
+				return
+			}
 		}
 	}
 	outParamIndex++
@@ -529,7 +525,8 @@ func (ds *DataStore) Query(sqlStr string, args ...interface{}) (arr interface{},
 		return
 	}
 	if implicitCursors || outCursors {
-		panic("Not supported in Query: implicitCursors || outCursors")
+		err = errors.New("not supported in Query: implicitCursors || outCursors")
+		return
 	}
 	arr, err = ds._queryRowValues(sqlStr, queryArgs...)
 	return // it returns []interface{} for cases like 'SELECT @value, @name;'
@@ -542,9 +539,9 @@ func (ds *DataStore) QueryAll(sqlStr string, onRow func(interface{}), args ...in
 		return
 	}
 	defer func() {
-		err = rows.Close()
-		if err != nil {
-			panic(err)
+		err1 := rows.Close()
+		if err1 != nil {
+			err = err1
 		}
 	}()
 	for {
@@ -585,7 +582,7 @@ func (ds *DataStore) QueryRow(sqlStr string, args ...interface{}) (data map[stri
 		return
 	}
 	if !rows.Next() {
-		err = errors.New(fmt.Sprintf("Rows found 0 for %s", sqlStr))
+		err = sql.ErrNoRows
 		return
 	}
 	err = rows.Scan(valuePointers...)
@@ -804,9 +801,9 @@ func _assignBoolean(d *bool, value interface{}) bool {
 	return true
 }
 
-func AssignValue(fieldAddr interface{}, value interface{}) error {
+func _assign(dstRef interface{}, value interface{}) error {
 	if value == nil {
-		switch d := fieldAddr.(type) {
+		switch d := dstRef.(type) {
 		case *interface{}:
 			*d = nil
 			return nil
@@ -814,7 +811,7 @@ func AssignValue(fieldAddr interface{}, value interface{}) error {
 		return nil // leave as-is
 	}
 	assigned := false
-	switch d := fieldAddr.(type) {
+	switch d := dstRef.(type) {
 	case *string:
 		assigned = _assignString(d, value)
 	case *int32:
@@ -840,28 +837,73 @@ func AssignValue(fieldAddr interface{}, value interface{}) error {
 		return nil
 	}
 	if !assigned {
-		return errors.New(fmt.Sprintf("Unexpected params in AssignValue(%T, %T)", fieldAddr, value))
+		return errors.New(fmt.Sprintf("%T <- %T", dstRef, value))
 	}
 	return nil
 }
 
-// Extend/improve method Assign and related functions on demand:
+func fromVal(dstRef interface{}, value interface{}, errMap map[string]int) {
+	err := assign(dstRef, value)
+	if err == nil {
+		return
+	}
+	key := err.Error()
+	count, ok := errMap[key]
+	if ok {
+		errMap[key] = count + 1
+	} else {
+		errMap[key] = 1
+	}
+}
 
-func (ds *DataStore) Assign(fieldAddr interface{}, value interface{}) {
+func assign(dstRef interface{}, value interface{}) error {
 	var err error
 	switch v := value.(type) {
 	case []interface{}:
-		switch d := fieldAddr.(type) {
+		switch d := dstRef.(type) {
 		case *[]interface{}:
 			*d = v
-		case []interface{}:
+		default:
+			// use "default:" instead of "case []interface{}":
+			// because "dstRef" may be like "*float64" with a "value" like
+			// []interface{}{[]uint16{49, 46, 50, 48}} // []uint16 in here is a string like 1.20
+			// (e.g. PG + Query(`select get_test_rating(?)`, tId))
 			v0 := v[0]
-			err = AssignValue(fieldAddr, v0)
+			err = _assign(dstRef, v0)
 		}
 	default:
-		err = AssignValue(fieldAddr, value)
+		err = _assign(dstRef, value)
 	}
+	return err
+}
+
+func fromRow(dstRef interface{}, row map[string]interface{}, colName string, errMap map[string]int) {
+	value, ok := row[colName]
+	if !ok {
+		key := fmt.Sprintf("%s: no such column", colName)
+		count, ok := errMap[key]
+		if ok {
+			errMap[key] = count + 1
+		} else {
+			errMap[key] = 1
+		}
+		return
+	}
+	err := assign(dstRef, value)
 	if err != nil {
-		panic(err)
+		key := fmt.Sprintf("%s: %s", colName, err.Error())
+		count, ok := errMap[key]
+		if ok {
+			errMap[key] = count + 1
+		} else {
+			errMap[key] = 1
+		}
 	}
+}
+
+func errMapToErr(errMap map[string]int) (err error) {
+	if len(errMap) > 0 {
+		err = errors.New(fmt.Sprintf("%v", errMap))
+	}
+	return
 }
