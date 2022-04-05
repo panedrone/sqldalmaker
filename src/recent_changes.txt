@@ -1,6 +1,6 @@
 2022-04-01
 
-    Go: enhanced error handling
+    Improvements of error handling for Golang
 
 2022-03-30
 
