@@ -82,9 +82,7 @@ class DataStore:
     # def start_transaction(self):
     #     self.conn.execute('begin')  # sqlite3
     #     self.conn.start_transaction() # mysql
-    #     psycopg2 -->
-    #       https://www.psycopg.org/psycopg3/docs/basic/transactions.html
-    #       1st call of self.conn.execute(...) executes BEGIN
+    #     self.conn.begin() # psycopg2
     #
     # # uncomment to use without django.db:
     # def commit(self):
