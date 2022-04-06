@@ -1,3 +1,8 @@
+/*
+    Copyright 2011-2022 sqldalmaker@gmail.com
+    SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
+    Read LICENSE.txt in the root of this project/archive for details.
+ */
 package com.sqldalmaker.intellij.ui;
 
 import com.intellij.openapi.progress.ProgressManager;
@@ -70,7 +75,7 @@ public class IdeaCG {
                         }
                         if (!error) {
                             String xml_file_rel_path = IdeaHelpers.get_relative_path(project, xml_file);
-                            IdeaMessageHelpers.add_info_to_ide_log(xml_file_rel_path,"OK");
+                            IdeaMessageHelpers.add_info_to_ide_log(xml_file_rel_path, "OK");
                         }
                     } finally {
                         con.close();

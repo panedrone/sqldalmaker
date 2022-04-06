@@ -1,7 +1,7 @@
 /*
- * Copyright 2011-2022 sqldalmaker@gmail.com
- * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
- * Read LICENSE.txt in the root of this project/archive for details.
+    Copyright 2011-2022 sqldalmaker@gmail.com
+    SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
+    Read LICENSE.txt in the root of this project/archive for details.
  */
 package com.sqldalmaker.intellij;
 
@@ -11,8 +11,10 @@ import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.TextEditor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.sqldalmaker.cg.Helpers;
 import com.sqldalmaker.common.FileSearchHelpers;
 import com.sqldalmaker.intellij.ui.*;
+import com.sqldalmaker.jaxb.settings.Settings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -92,6 +94,38 @@ public class SdmActionGroup extends ActionGroup {
         };
         drop_down_actions_list.add(action_validate);
         drop_down_actions_list.add(Separator.create());
+        SdmAction action_goto_target = create_action_goto_target(project, xml_file);
+        if (action_goto_target != null) {
+            drop_down_actions_list.add(action_goto_target);
+        }
+    }
+
+    private SdmAction create_action_goto_target(Project project, VirtualFile xml_file) throws Exception {
+        VirtualFile xml_file_dir = xml_file.getParent();
+        if (xml_file_dir == null) {
+            return null;
+        }
+        List<VirtualFile> root_files = IdeaTargetLanguageHelpers.find_root_files(xml_file_dir);
+        if (root_files.size() != 1) {
+            return null;
+        }
+        VirtualFile root_file = root_files.get(0);
+        Settings settings = IdeaHelpers.load_settings(root_file);
+        String xml_file_path = xml_file.getPath();
+        String dao_class_name = Helpers.get_dao_class_name(xml_file_path);
+        String fn = IdeaTargetLanguageHelpers.file_name_from_class_name(root_file, dao_class_name);
+        SdmAction action_goto_target = new SdmAction(fn) {
+            @Override
+            public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
+                try {
+                    IdeaTargetLanguageHelpers.open_editor(project, root_file, dao_class_name, settings, settings.getDao().getScope());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    IdeaMessageHelpers.show_error_in_ui_thread(e);
+                }
+            }
+        };
+        return action_goto_target;
     }
 
     private void add_common_actions(Project project, List<AnAction> drop_down_actions_list, List<VirtualFile> root_files) throws Exception {

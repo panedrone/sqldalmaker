@@ -1,7 +1,7 @@
 /*
- * Copyright 2011-2021 sqldalmaker@gmail.com
- * Read LICENSE.txt in the root of this project/archive.
- * Project web-site: http://sqldalmaker.sourceforge.net
+    Copyright 2011-2022 sqldalmaker@gmail.com
+    SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
+    Read LICENSE.txt in the root of this project/archive for details.
  */
 package com.sqldalmaker.intellij.references;
 
@@ -33,9 +33,8 @@ public class PsiReferenceDtoClass extends PsiReferenceBase<PsiElement> {
     @Nullable
     @Override
     public PsiElement resolve() {
-
-        String canonical_text = getCanonicalText();  // @NotNull
-        if (canonical_text.trim().length() == 0) {
+        String canonical_text = getCanonicalText().trim();  // @NotNull
+        if (canonical_text.length() == 0) {
             return null;
         }
         final PsiFile containing_file = myElement.getContainingFile();
@@ -54,8 +53,16 @@ public class PsiReferenceDtoClass extends PsiReferenceBase<PsiElement> {
         if (dto_xml_file == null) {
             return null;
         }
-        Project project = containing_file.getProject(); // @NotNull
-        return IdeaReferenceCompletion.find_dto_class_xml_tag(project, dto_xml_file, canonical_text);
+        String this_file_name = containing_file.getName();
+        if (FileSearchHelpers.is_dao_xml(this_file_name)) {
+            Project project = containing_file.getProject(); // @NotNull
+            return IdeaReferenceCompletion.find_dto_class_xml_tag(project, dto_xml_file, canonical_text);
+        } else if (FileSearchHelpers.is_dto_xml(this_file_name)) {
+            Project project = containing_file.getProject(); // @NotNull
+            String dto_class_name = canonical_text;
+            return IdeaReferenceCompletion.find_dto_class_target_file(project, dto_xml_file, dto_class_name);
+        }
+        return null;
     }
 
     @NotNull

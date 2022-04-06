@@ -36,7 +36,7 @@ public class IdeaEditorHelpers {
         fem.openFile(file, true, true);
     }
 
-    private static VirtualFile find_case_sensitive(VirtualFile dir, String rel_path) throws Exception {
+    public static VirtualFile find_case_sensitive(VirtualFile dir, String rel_path) throws Exception {
         VirtualFile file = dir.findFileByRelativePath(rel_path);
         if (file == null) {
             throw new Exception("File not found: " + rel_path);

@@ -51,6 +51,7 @@ public class IdeaHelpers {
         if (project_path == null) {
             throw new Exception("Cannot detect the project base path");
         }
+        /*
 //        boolean found = false;
 //        String content_root_list = "";
 //        // https://jetbrains.org/intellij/sdk/docs/reference_guide/project_model/project.html
@@ -64,6 +65,7 @@ public class IdeaHelpers {
 //        if (!found) {
 //            throw new Exception("Something is wrong with project structure.\r\nProject base path '" + project_path + "' not found among content roots:\r\n" + content_root_list);
 //        }
+         */
         File file = new File(project_path);
         // https://intellij-support.jetbrains.com/hc/en-us/community/posts/360001957360-Get-file-from-path-to-have-a-virtual-file
         VirtualFile res = VfsUtil.findFileByIoFile(file, true);
@@ -121,7 +123,7 @@ public class IdeaHelpers {
      */
     private static void start_write_action_from_ui_thread_and_refresh_folder(final VirtualFile folder) {
         // com.intellij.openapi.vfs.VirtualFile
-        // public void refresh(boolean asynchronous, boolean recursive) {
+        // public void refresh(boolean asynchronous, boolean recursive) ...
         // This method should be only called within write-action.
         ApplicationManager.getApplication().runWriteAction(new Runnable() {
             @Override

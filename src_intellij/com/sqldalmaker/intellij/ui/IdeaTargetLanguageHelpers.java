@@ -1,7 +1,7 @@
 /*
- * Copyright 2011-2021 sqldalmaker@gmail.com
- * Read LICENSE.txt in the root of this project/archive.
- * Project web-site: http://sqldalmaker.sourceforge.net
+    Copyright 2011-2022 sqldalmaker@gmail.com
+    SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
+    Read LICENSE.txt in the root of this project/archive for details.
  */
 package com.sqldalmaker.intellij.ui;
 
@@ -100,46 +100,34 @@ public class IdeaTargetLanguageHelpers {
     }
 
     public static void open_editor(Project project, VirtualFile root_file,
-                                   String value, Settings settings, String java_package) throws Exception {
-        String rel_path;
-        String fn = root_file.getName();
-        if (RootFileName.JAVA.equals(fn)) {
-            rel_path = SdmUtils.get_package_relative_path(settings, java_package) + "/" + value + ".java";
-        } else if (RootFileName.PHP.equals(fn)) {
-            rel_path = settings.getFolders().getTarget() + "/" + value + ".php";
-        } else if (RootFileName.PYTHON.equals(fn)) {
-            rel_path = settings.getFolders().getTarget() + "/" + Helpers.convert_file_name_to_snake_case(value, "py");
-        } else if (RootFileName.RUBY.equals(fn)) {
-            rel_path = settings.getFolders().getTarget() + "/" + Helpers.convert_file_name_to_snake_case(value, "rb");
-        } else if (RootFileName.CPP.equals(fn)) {
-            rel_path = settings.getFolders().getTarget() + "/" + value + ".h";
-        } else if (RootFileName.GO.equals(fn)) {
-            rel_path = settings.getFolders().getTarget() + "/" + Helpers.convert_file_name_to_snake_case(value, "go");
-        } else {
-            throw new Exception(_get_unknown_root_file_msg(fn));
-        }
+                                   String class_name, Settings settings, String java_package) throws Exception {
+        String file_name = file_name_from_class_name(root_file, class_name);
+        String rel_path = Helpers.concat_path(settings.getFolders().getTarget(), file_name);
         IdeaEditorHelpers.open_project_file_in_editor_sync(project, rel_path);
+    }
+
+    public static String file_name_from_class_name(VirtualFile root_file, String class_name) throws Exception {
+        String root_file_nm = root_file.getName();
+        if (RootFileName.JAVA.equals(root_file_nm)) {
+            return class_name + ".java";
+        } else if (RootFileName.PHP.equals(root_file_nm)) {
+            return class_name + ".php";
+        } else if (RootFileName.PYTHON.equals(root_file_nm)) {
+            return Helpers.convert_file_name_to_snake_case(class_name, "py");
+        } else if (RootFileName.RUBY.equals(root_file_nm)) {
+            return Helpers.convert_file_name_to_snake_case(class_name, "rb");
+        } else if (RootFileName.CPP.equals(root_file_nm)) {
+            return class_name + ".h";
+        } else if (RootFileName.GO.equals(root_file_nm)) {
+            return Helpers.convert_file_name_to_snake_case(class_name, "go");
+        } else {
+            throw new Exception(_get_unknown_root_file_msg(root_file_nm));
+        }
     }
 
     public static void prepare_generated_file_data(VirtualFile root_file, String class_name, String[] file_content,
                                                    List<IdeaHelpers.GeneratedFileData> list) throws Exception {
-        String fn = root_file.getName();
-        String file_name;
-        if (RootFileName.JAVA.equals(fn)) {
-            file_name = class_name + ".java";
-        } else if (RootFileName.PHP.equals(fn)) {
-            file_name = class_name + ".php";
-        } else if (RootFileName.PYTHON.equals(fn)) {
-            file_name = Helpers.convert_file_name_to_snake_case(class_name, "py");
-        } else if (RootFileName.RUBY.equals(fn)) {
-            file_name = Helpers.convert_file_name_to_snake_case(class_name, "rb");
-        } else if (RootFileName.CPP.equals(fn)) {
-            file_name = class_name + ".h";
-        } else if (RootFileName.GO.equals(fn)) {
-            file_name = Helpers.convert_file_name_to_snake_case(class_name, "go");
-        } else {
-            throw new Exception(_get_unknown_root_file_msg(fn));
-        }
+        String file_name = file_name_from_class_name(root_file, class_name);
         IdeaHelpers.GeneratedFileData gf = new IdeaHelpers.GeneratedFileData();
         gf.file_name = file_name;
         gf.file_content = file_content[0];
@@ -149,34 +137,11 @@ public class IdeaTargetLanguageHelpers {
     public static void validate_dto(Project project, VirtualFile root_file, Settings settings,
                                     String class_name, String[] file_content,
                                     StringBuilder validation_buff) throws Exception {
-        String source_folder = settings.getFolders().getTarget();
-        String module_root = IdeaHelpers.get_project_base_dir(project).getPath();
-        String fn = root_file.getName();
-        String file_name;
-        if (RootFileName.JAVA.equals(fn)) {
-            String dao_destination = Helpers.concat_path(
-                    module_root, source_folder, settings.getDto().getScope().replace('.', '/'));
-            file_name = Helpers.concat_path(dao_destination, class_name + ".java");
-        } else if (RootFileName.PHP.equals(fn)) {
-            String dao_destination = Helpers.concat_path(module_root, source_folder);
-            file_name = Helpers.concat_path(dao_destination, class_name + ".php");
-        } else if (RootFileName.PYTHON.equals(fn)) {
-            String dao_destination = Helpers.concat_path(module_root, source_folder);
-            file_name = Helpers.concat_path(dao_destination, Helpers.convert_file_name_to_snake_case(class_name, "py"));
-        } else if (RootFileName.RUBY.equals(fn)) {
-            String dao_destination = Helpers.concat_path(module_root, source_folder);
-            file_name = Helpers.concat_path(dao_destination, Helpers.convert_file_name_to_snake_case(class_name, "rb"));
-        } else if (RootFileName.CPP.equals(fn)) {
-            String dao_destination = Helpers.concat_path(module_root, source_folder);
-            file_name = Helpers.concat_path(dao_destination, class_name + ".h");
-        } else if (RootFileName.GO.equals(fn)) {
-            String dao_destination = Helpers.concat_path(module_root, source_folder);
-            file_name = Helpers.concat_path(dao_destination, Helpers.convert_file_name_to_snake_case(class_name, "go"));
-        } else {
-            throw new Exception(_get_unknown_root_file_msg(fn));
-        }
-        ////////////////////////////////
-        String old_text = Helpers.load_text_from_file(file_name);
+
+        String target_folder_path = get_target_folder_path(project, root_file, settings);
+        String target_file_name = file_name_from_class_name(root_file, class_name);
+        String target_file_path = Helpers.concat_path(target_folder_path, target_file_name);
+        String old_text = Helpers.load_text_from_file(target_file_path);
         if (old_text.length() == 0) {
             validation_buff.append(Const.OUTPUT_FILE_IS_MISSING);
         } else {
@@ -187,44 +152,47 @@ public class IdeaTargetLanguageHelpers {
         }
     }
 
+    public static String get_target_folder_path(Project project, VirtualFile root_file,
+                                                 Settings settings) throws Exception {
+
+        String target_folder = settings.getFolders().getTarget();
+        String module_root = IdeaHelpers.get_project_base_dir(project).getPath();
+        String root_file_fn = root_file.getName();
+        String res;
+        if (RootFileName.JAVA.equals(root_file_fn)) {
+            res = Helpers.concat_path(module_root, target_folder, settings.getDao().getScope().replace('.', '/'));
+        } else if (RootFileName.PHP.equals(root_file_fn)) {
+            res = Helpers.concat_path(module_root, target_folder);
+        } else if (RootFileName.PYTHON.equals(root_file_fn)) {
+            res = Helpers.concat_path(module_root, target_folder);
+        } else if (RootFileName.RUBY.equals(root_file_fn)) {
+            res = Helpers.concat_path(module_root, target_folder);
+        } else if (RootFileName.CPP.equals(root_file_fn)) {
+            res = Helpers.concat_path(module_root, target_folder);
+        } else if (RootFileName.GO.equals(root_file_fn)) {
+            res = Helpers.concat_path(module_root, target_folder);
+        } else {
+            throw new Exception(_get_unknown_root_file_msg(root_file_fn));
+        }
+        return res;
+    }
+
     public static void validate_dao(Project project, VirtualFile root_file,
                                     Settings settings, String dao_class_name,
                                     String[] file_content,
                                     StringBuilder validation_buff) throws Exception {
-        String source_folder = settings.getFolders().getTarget();
-        String module_root = IdeaHelpers.get_project_base_dir(project).getPath();
-        String fn = root_file.getName();
-        String file_name;
-        if (RootFileName.JAVA.equals(fn)) {
-            String dao_destination = Helpers.concat_path(
-                    module_root, source_folder, settings.getDao().getScope().replace('.', '/'));
-            file_name = Helpers.concat_path(dao_destination, dao_class_name + ".java");
-        } else if (RootFileName.PHP.equals(fn)) {
-            String dao_destination = Helpers.concat_path(module_root, source_folder);
-            file_name = Helpers.concat_path(dao_destination, dao_class_name + ".php");
-        } else if (RootFileName.PYTHON.equals(fn)) {
-            String dao_destination = Helpers.concat_path(module_root, source_folder);
-            file_name = Helpers.concat_path(dao_destination, Helpers.convert_file_name_to_snake_case(dao_class_name, "py"));
-        } else if (RootFileName.RUBY.equals(fn)) {
-            String dao_destination = Helpers.concat_path(module_root, source_folder);
-            file_name = Helpers.concat_path(dao_destination, Helpers.convert_file_name_to_snake_case(dao_class_name, "rb"));
-        } else if (RootFileName.CPP.equals(fn)) {
-            String dao_destination = Helpers.concat_path(module_root, source_folder);
-            file_name = Helpers.concat_path(dao_destination, dao_class_name + ".h");
-        } else if (RootFileName.GO.equals(fn)) {
-            String dao_destination = Helpers.concat_path(module_root, source_folder);
-            file_name = Helpers.concat_path(dao_destination, Helpers.convert_file_name_to_snake_case(dao_class_name, "go"));
+
+        String target_folder_path = get_target_folder_path(project, root_file, settings);
+        String target_file_name = file_name_from_class_name(root_file, dao_class_name);
+        String target_file_path = Helpers.concat_path(target_folder_path, target_file_name);
+        String old_text = Helpers.load_text_from_file(target_file_path);
+        if (old_text.length() == 0) {
+            validation_buff.append(Const.OUTPUT_FILE_IS_MISSING);
         } else {
-            throw new Exception(_get_unknown_root_file_msg(fn));
-        }
-        String old_text = Helpers.load_text_from_file(file_name);
-//        if (old_text == null) {
-//            validation_buff.append(Const.OUTPUT_FILE_IS_MISSING);
-//        } else {
-        String text = file_content[0];
-        if (!old_text.equals(text)) {
-            validation_buff.append(Const.OUTPUT_FILE_IS_OUT_OF_DATE);
-//            }
+            String text = file_content[0];
+            if (!old_text.equals(text)) {
+                validation_buff.append(Const.OUTPUT_FILE_IS_OUT_OF_DATE);
+            }
         }
     }
 
