@@ -119,7 +119,7 @@ public class IdeaReferenceCompletion {
         }
         String target_folder_abs_path;
         try {
-            target_folder_abs_path = IdeaTargetLanguageHelpers.get_target_folder_path(project, root_file, settings);
+            target_folder_abs_path = IdeaTargetLanguageHelpers.get_target_folder_abs_path(project, root_file, settings, settings.getDto().getScope());
         } catch (Exception e) {
             return null;
         }

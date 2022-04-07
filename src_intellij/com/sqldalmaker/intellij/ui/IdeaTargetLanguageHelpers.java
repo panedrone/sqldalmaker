@@ -100,9 +100,11 @@ public class IdeaTargetLanguageHelpers {
     }
 
     public static void open_editor(Project project, VirtualFile root_file,
-                                   String class_name, Settings settings, String java_package) throws Exception {
+                                   String class_name, Settings settings, String class_scope) throws Exception {
+        String target_folder_abs_path = get_target_folder_abs_path(project, root_file, settings, class_scope);
         String file_name = file_name_from_class_name(root_file, class_name);
-        String rel_path = Helpers.concat_path(settings.getFolders().getTarget(), file_name);
+        String target_file_abs_path = Helpers.concat_path(target_folder_abs_path, file_name);
+        String rel_path = IdeaHelpers.get_relative_path(project, target_file_abs_path);
         IdeaEditorHelpers.open_project_file_in_editor_sync(project, rel_path);
     }
 
@@ -138,7 +140,7 @@ public class IdeaTargetLanguageHelpers {
                                     String class_name, String[] file_content,
                                     StringBuilder validation_buff) throws Exception {
 
-        String target_folder_path = get_target_folder_path(project, root_file, settings);
+        String target_folder_path = get_target_folder_abs_path(project, root_file, settings, settings.getDto().getScope());
         String target_file_name = file_name_from_class_name(root_file, class_name);
         String target_file_path = Helpers.concat_path(target_folder_path, target_file_name);
         String old_text = Helpers.load_text_from_file(target_file_path);
@@ -152,25 +154,25 @@ public class IdeaTargetLanguageHelpers {
         }
     }
 
-    public static String get_target_folder_path(Project project, VirtualFile root_file,
-                                                 Settings settings) throws Exception {
+    public static String get_target_folder_abs_path(Project project, VirtualFile root_file,
+                                                    Settings settings, String class_scope) throws Exception {
 
-        String target_folder = settings.getFolders().getTarget();
+        String target_folder_rel_path = settings.getFolders().getTarget();
         String module_root = IdeaHelpers.get_project_base_dir(project).getPath();
         String root_file_fn = root_file.getName();
         String res;
         if (RootFileName.JAVA.equals(root_file_fn)) {
-            res = Helpers.concat_path(module_root, target_folder, settings.getDao().getScope().replace('.', '/'));
+            res = Helpers.concat_path(module_root, target_folder_rel_path, class_scope.replace('.', '/'));
         } else if (RootFileName.PHP.equals(root_file_fn)) {
-            res = Helpers.concat_path(module_root, target_folder);
+            res = Helpers.concat_path(module_root, target_folder_rel_path);
         } else if (RootFileName.PYTHON.equals(root_file_fn)) {
-            res = Helpers.concat_path(module_root, target_folder);
+            res = Helpers.concat_path(module_root, target_folder_rel_path);
         } else if (RootFileName.RUBY.equals(root_file_fn)) {
-            res = Helpers.concat_path(module_root, target_folder);
+            res = Helpers.concat_path(module_root, target_folder_rel_path);
         } else if (RootFileName.CPP.equals(root_file_fn)) {
-            res = Helpers.concat_path(module_root, target_folder);
+            res = Helpers.concat_path(module_root, target_folder_rel_path);
         } else if (RootFileName.GO.equals(root_file_fn)) {
-            res = Helpers.concat_path(module_root, target_folder);
+            res = Helpers.concat_path(module_root, target_folder_rel_path);
         } else {
             throw new Exception(_get_unknown_root_file_msg(root_file_fn));
         }
@@ -182,7 +184,7 @@ public class IdeaTargetLanguageHelpers {
                                     String[] file_content,
                                     StringBuilder validation_buff) throws Exception {
 
-        String target_folder_path = get_target_folder_path(project, root_file, settings);
+        String target_folder_path = get_target_folder_abs_path(project, root_file, settings, settings.getDao().getScope());
         String target_file_name = file_name_from_class_name(root_file, dao_class_name);
         String target_file_path = Helpers.concat_path(target_folder_path, target_file_name);
         String old_text = Helpers.load_text_from_file(target_file_path);
