@@ -1,11 +1,13 @@
 /*
-    Copyright 2011-2021 sqldalmaker@gmail.com
+    Copyright 2011-2022 sqldalmaker@gmail.com
     SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
     Read LICENSE.txt in the root of this project/archive for details.
  */
 package com.sqldalmaker.netbeans;
 
+import com.sqldalmaker.cg.Helpers;
 import com.sqldalmaker.common.FileSearchHelpers;
+import com.sqldalmaker.jaxb.settings.Settings;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -33,6 +35,8 @@ import org.openide.awt.ActionRegistration;
 import org.openide.awt.DropDownButtonFactory;
 import org.openide.filesystems.FileObject;
 import org.openide.loaders.DataObject;
+import org.openide.loaders.DataObjectNotFoundException;
+import org.openide.util.Exceptions;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbBundle;
 import org.openide.util.NbBundle.Messages;
@@ -174,92 +178,126 @@ public final class SdmAction extends AbstractAction implements Presenter.Toolbar
         popup.add(item_val);
     }
 
-    private void build_popup(final JPopupMenu popup) {
+    private void add_xml_file_items(JPopupMenu popup, Project[] projects) throws DataObjectNotFoundException {
+        JTextComponent text_component = EditorRegistry.focusedComponent();
+        if (text_component == null) {
+            return;
+        }
+        Document doc = text_component.getDocument();
+        DataObject data_object = NbEditorUtilities.getDataObject(doc);
+        if (data_object == null) {
+            return;
+        }
+        final FileObject this_file_object = data_object.getPrimaryFile();
+        if (this_file_object == null) {
+            return;
+        }
+        Project this_project = NbpPathHelpers.get_project(this_file_object);
+        if (this_project == null) {
+            return;
+        }
+        FileObject xml_mp_dir = this_file_object.getParent();
+        List<FileObject> root_files = NbpTargetLanguageHelpers.find_root_files(xml_mp_dir);
+        if (root_files.size() != 1) {
+            return;
+        }
+        FileObject root_file = root_files.get(0);
+        DataObject root_file_data_object = DataObject.find(root_file);
+        if (!(root_file_data_object instanceof SdmDataObject)) {
+            return;
+        }
+        SdmDataObject root_data_object = (SdmDataObject) root_file_data_object;
+        FileObject project_dir = this_project.getProjectDirectory();
+        String this_file_rel_path = NbpPathHelpers.get_relative_path(project_dir, this_file_object);
+        String this_file_title = get_title(this_project, this_file_rel_path);
+        String doc_name = this_file_object.getNameExt();
+        if (FileSearchHelpers.is_dto_xml(doc_name)) {
+            build_popup_dto(popup, root_data_object, this_file_object, this_file_title);
+        } else if (FileSearchHelpers.is_dao_xml(doc_name)) {
+            build_popup_dao(popup, root_data_object, this_file_object, this_file_title);
+        }
+        ///////////////////////////////////////
+        if (FileSearchHelpers.is_dto_xml(doc_name) || FileSearchHelpers.is_dao_xml(doc_name)) {
+            String root_file_rel_path = NbpPathHelpers.get_relative_path(project_dir, root_file);
+            final String root_file_title = get_title(this_project, root_file_rel_path);
+            JMenuItem item = new JMenuItem(new AbstractAction(root_file_title) {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    open_root_file(root_file_title, projects);
+                }
+            });
+            item.setText(root_file_title);
+            popup.add(item);
+        }
+        if (FileSearchHelpers.is_dao_xml(doc_name)) {
+            try {
+                Settings settings = NbpHelpers.load_settings(root_data_object);
+                String dao_class_name = Helpers.get_dao_class_name(this_file_object.getNameExt());
+                String file_title = NbpTargetLanguageHelpers.get_rel_path(root_data_object, settings, dao_class_name, settings.getDao().getScope());
+                JMenuItem item = new JMenuItem(new AbstractAction(file_title) {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        try {
+                            NbpTargetLanguageHelpers.open_in_editor_async(root_data_object, settings, dao_class_name, settings.getDao().getScope());
+                        } catch (Exception ex) {
+                            // ex.printStackTrace();
+                            NbpIdeMessageHelpers.show_error_in_ui_thread(ex);
+                        }
+                    }
+                });
+                item.setText(file_title);
+                popup.add(item);
+            } catch (Exception ex) {
+                Exceptions.printStackTrace(ex);
+            }
+        }
+    }
+
+    private void build_popup(JPopupMenu popup) {
         // TODO: async?
-        // popup.removeAll(); // remove only if there will be items
+        popup.removeAll();
         try {
             // Google: netbeans enumerate open projects
             // https://netbeans.org/download/5_5/org-netbeans-modules-projectuiapi/org/netbeans/api/project/ui/OpenProjects.html
             // org.netbeans.api.project.ui.OpenProjects
             OpenProjects open_projects = OpenProjects.getDefault();
-            final Project[] projects = open_projects.getOpenProjects();
+            Project[] projects = open_projects.getOpenProjects();
+            // there may be projects without SDM:
             List<String> root_file_titles = get_root_file_titles(projects);
             if (root_file_titles.isEmpty()) {
-                // add_list_is_empty_item(popup); already added
-            } else {
-                popup.removeAll();
-                JTextComponent text_comonent = EditorRegistry.focusedComponent();
-                if (text_comonent != null) {
-                    Document doc = text_comonent.getDocument();
-                    DataObject data_object = NbEditorUtilities.getDataObject(doc);
-                    if (data_object != null) {
-                        final FileObject this_file_object = data_object.getPrimaryFile();
-                        if (this_file_object != null) {
-                            Project this_project = NbpPathHelpers.get_project(this_file_object);
-                            if (this_project != null) {
-                                FileObject xml_mp_dir = this_file_object.getParent();
-                                List<FileObject> root_files = NbpTargetLanguageHelpers.find_root_files(xml_mp_dir);
-                                if (root_files.size() == 1) {
-                                    FileObject root_file = root_files.get(0);
-                                    DataObject root_file_data_object = DataObject.find(root_file);
-                                    if (root_file_data_object instanceof SdmDataObject) {
-                                        SdmDataObject root_data_object = (SdmDataObject) root_file_data_object;
-                                        FileObject project_dir = this_project.getProjectDirectory();
-                                        String this_file_rel_path = NbpPathHelpers.get_relative_path(project_dir, this_file_object);
-                                        String this_file_title = get_title(this_project, this_file_rel_path);
-                                        String doc_name = this_file_object.getNameExt();
-                                        if (FileSearchHelpers.is_dto_xml(doc_name)) {
-                                            build_popup_dto(popup, root_data_object, this_file_object, this_file_title);
-                                        } else if (FileSearchHelpers.is_dao_xml(doc_name)) {
-                                            build_popup_dao(popup, root_data_object, this_file_object, this_file_title);
-                                        }
-                                        ///////////////////////////////////////
-                                        if (FileSearchHelpers.is_dto_xml(doc_name) || FileSearchHelpers.is_dao_xml(doc_name)) {
-                                            // popup.add(new JPopupMenu.Separator());
-                                            if (root_file_titles.size() > 1) {
-                                                String root_file_rel_path = NbpPathHelpers.get_relative_path(project_dir, root_file);
-                                                final String root_file_title = get_title(this_project, root_file_rel_path);
-                                                JMenuItem item = new JMenuItem(new AbstractAction(root_file_title) {
-                                                    @Override
-                                                    public void actionPerformed(ActionEvent e) {
-                                                        open_root_file(root_file_title, projects);
-                                                    }
-                                                });
-                                                item.setText(root_file_title);
-                                                popup.add(item);
-                                                popup.add(new JPopupMenu.Separator());
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                for (final String root_file_title : root_file_titles) {
-                    JMenuItem item = new JMenuItem(new AbstractAction(root_file_title) {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            open_root_file(root_file_title, projects);
-                        }
-                    });
-                    item.setText(root_file_title);
-                    popup.add(item);
-                }
+                return;
             }
+            add_xml_file_items(popup, projects);
+            add_root_file_items(popup, projects, root_file_titles);
         } catch (Exception ex) {
             // Exceptions.printStackTrace(e); // // === panedrone: it shows banner!!!
+        }
+    }
+
+    private void add_root_file_items(JPopupMenu popup, Project[] projects, List<String> root_file_titles) {
+        if (root_file_titles.size() < 2) {
+            return;
+        }
+        popup.add(new JPopupMenu.Separator());
+        for (final String root_file_title : root_file_titles) {
+            JMenuItem item = new JMenuItem(new AbstractAction(root_file_title) {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    open_root_file(root_file_title, projects);
+                }
+            });
+            item.setText(root_file_title);
+            popup.add(item);
         }
     }
 
     @Override
     public Component getToolbarPresenter() {
         final JPopupMenu popup = new JPopupMenu();
-        
+
         // === panedrone: it will make triggering popupMenuWillBecomeVisible with even empty dropdown
-        
         add_list_is_empty_item(popup);
-        
+
         // add_empty_item(popup);
         popup.addPopupMenuListener(new PopupMenuListener() {
             @Override
@@ -297,7 +335,7 @@ public final class SdmAction extends AbstractAction implements Presenter.Toolbar
                 }
             }
         });
- // DROPDOWN WORKS WITHOUT THIS CODE:
+        // DROPDOWN WORKS WITHOUT THIS CODE:
         drop_down_button.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -307,7 +345,7 @@ public final class SdmAction extends AbstractAction implements Presenter.Toolbar
                     popup.show(drop_down_button, 0, drop_down_button.getHeight());
                 }
             }
-        });        
+        });
         return drop_down_button;
     }
 }

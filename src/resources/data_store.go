@@ -1,4 +1,4 @@
-ppackage dal
+package dal
 
  import (
  	"database/sql"

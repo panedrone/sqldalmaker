@@ -411,12 +411,31 @@
                     <Property name="alignment" type="int" value="0"/>
                   </Layout>
                   <SubComponents>
+                    <Component class="javax.swing.JLabel" name="jLabel10">
+                      <Properties>
+                        <Property name="horizontalAlignment" type="int" value="4"/>
+                        <Property name="text" type="java.lang.String" value="Ruby"/>
+                        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                          <Dimension value="[40, 14]"/>
+                        </Property>
+                      </Properties>
+                    </Component>
+                    <Component class="javax.swing.JButton" name="jButton18">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="DBI"/>
+                        <Property name="toolTipText" type="java.lang.String" value=""/>
+                        <Property name="focusPainted" type="boolean" value="false"/>
+                      </Properties>
+                      <Events>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton18ActionPerformed"/>
+                      </Events>
+                    </Component>
                     <Component class="javax.swing.JLabel" name="jLabel11">
                       <Properties>
                         <Property name="horizontalAlignment" type="int" value="4"/>
                         <Property name="text" type="java.lang.String" value="Go"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                          <Dimension value="[40, 14]"/>
+                          <Dimension value="[18, 14]"/>
                         </Property>
                       </Properties>
                     </Component>
@@ -428,21 +447,6 @@
                       </Properties>
                       <Events>
                         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton34ActionPerformed"/>
-                      </Events>
-                    </Component>
-                    <Component class="javax.swing.JLabel" name="jLabel10">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="Ruby"/>
-                      </Properties>
-                    </Component>
-                    <Component class="javax.swing.JButton" name="jButton18">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="DBI"/>
-                        <Property name="toolTipText" type="java.lang.String" value=""/>
-                        <Property name="focusPainted" type="boolean" value="false"/>
-                      </Properties>
-                      <Events>
-                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton18ActionPerformed"/>
                       </Events>
                     </Component>
                   </SubComponents>

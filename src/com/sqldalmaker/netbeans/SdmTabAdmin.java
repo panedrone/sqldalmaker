@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2021 sqldalmaker@gmail.com
+    Copyright 2011-2022 sqldalmaker@gmail.com
     SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -175,10 +175,10 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         jButton32 = new javax.swing.JButton();
         jButton9 = new javax.swing.JButton();
         jPanel5 = new javax.swing.JPanel();
-        jLabel11 = new javax.swing.JLabel();
-        jButton34 = new javax.swing.JButton();
         jLabel10 = new javax.swing.JLabel();
         jButton18 = new javax.swing.JButton();
+        jLabel11 = new javax.swing.JLabel();
+        jButton34 = new javax.swing.JButton();
         jPanel7 = new javax.swing.JPanel();
         jButton19 = new javax.swing.JButton();
         jButton20 = new javax.swing.JButton();
@@ -478,22 +478,9 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
 
         jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jLabel11.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel11.setText("Go");
-        jLabel11.setPreferredSize(new java.awt.Dimension(40, 14));
-        jPanel5.add(jLabel11);
-
-        jButton34.setText("database/sql");
-        jButton34.setToolTipText("");
-        jButton34.setFocusPainted(false);
-        jButton34.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton34ActionPerformed(evt);
-            }
-        });
-        jPanel5.add(jButton34);
-
+        jLabel10.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel10.setText("Ruby");
+        jLabel10.setPreferredSize(new java.awt.Dimension(40, 14));
         jPanel5.add(jLabel10);
 
         jButton18.setText("DBI");
@@ -505,6 +492,21 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
             }
         });
         jPanel5.add(jButton18);
+
+        jLabel11.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLabel11.setText("Go");
+        jLabel11.setPreferredSize(new java.awt.Dimension(18, 14));
+        jPanel5.add(jLabel11);
+
+        jButton34.setText("database/sql");
+        jButton34.setToolTipText("");
+        jButton34.setFocusPainted(false);
+        jButton34.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton34ActionPerformed(evt);
+            }
+        });
+        jPanel5.add(jButton34);
 
         jPanel8.add(jPanel5);
 

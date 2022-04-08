@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2021 sqldalmaker@gmail.com
+    Copyright 2011-2022 sqldalmaker@gmail.com
     SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -176,25 +176,41 @@ public class NbpTargetLanguageHelpers {
             }
         }
     }
-
-    public static void open_in_editor(SdmDataObject obj, String value, Settings settings, String scope) throws Exception {
-        String fn = obj.getPrimaryFile().getNameExt();
-        String rel_path;
-        if (RootFileName.JAVA.equals(fn)) {
-            rel_path = SdmUtils.get_package_relative_path(settings, scope) + "/" + value + ".java";
-        } else if (RootFileName.PHP.equals(fn)) {
-            rel_path = settings.getFolders().getTarget() + "/" + value + ".php";
-        } else if (RootFileName.PYTHON.equals(fn)) {
-            rel_path = settings.getFolders().getTarget() + "/" + Helpers.convert_file_name_to_snake_case(value, "py");
-        } else if (RootFileName.RUBY.equals(fn)) {
-            rel_path = settings.getFolders().getTarget() + "/" + Helpers.convert_file_name_to_snake_case(value, "rb");
-        } else if (RootFileName.GO.equals(fn)) {
-            rel_path = settings.getFolders().getTarget() + "/" + Helpers.convert_file_name_to_snake_case(value, "go");
-        } else if (RootFileName.CPP.equals(fn)) {
-            rel_path = settings.getFolders().getTarget() + "/" + value + ".h";
+    
+    public static String get_target_file_name(String root_fn, String class_name) throws Exception {
+        if (RootFileName.JAVA.equals(root_fn)) {
+            return class_name + ".java";
+        } else if (RootFileName.PHP.equals(root_fn)) {
+            return class_name + ".php";
+        } else if (RootFileName.CPP.equals(root_fn)) {
+            return class_name + ".h";
+        } else if (RootFileName.PYTHON.equals(root_fn)) {
+            return Helpers.convert_file_name_to_snake_case(class_name, "py");
+        } else if (RootFileName.RUBY.equals(root_fn)) {
+            return Helpers.convert_file_name_to_snake_case(class_name, "rb");
+        } else if (RootFileName.GO.equals(root_fn)) {
+            return Helpers.convert_file_name_to_snake_case(class_name, "go");
+        } 
+        throw new Exception(get_unknown_root_file_msg(root_fn));
+    }
+    
+    public static String get_rel_path(Settings settings, String root_fn, String file_name, String scope) {
+        if (RootFileName.JAVA.equals(root_fn)) {
+            return Helpers.concat_path(SdmUtils.get_package_relative_path(settings, scope), file_name);
         } else {
-            throw new Exception(get_unknown_root_file_msg(fn));
+            return Helpers.concat_path(settings.getFolders().getTarget(), file_name);
         }
+    } 
+
+    public static String get_rel_path(SdmDataObject obj, Settings settings, String class_name, String scope) throws Exception {
+        String root_fn = obj.getPrimaryFile().getNameExt();
+        String target_file_name = get_target_file_name(root_fn, class_name);
+        String rel_path = get_rel_path(settings, root_fn, target_file_name, scope);
+        return rel_path;
+    } 
+
+    public static void open_in_editor_async(SdmDataObject obj, Settings settings, String class_name, String scope) throws Exception {
+        String rel_path = get_rel_path(obj, settings, class_name, scope);
         NbpIdeEditorHelpers.open_project_file_in_editor_async(obj, rel_path);
     }
 

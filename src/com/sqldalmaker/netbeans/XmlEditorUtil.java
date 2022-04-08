@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2021 sqldalmaker@gmail.com
+    Copyright 2011-2022 sqldalmaker@gmail.com
     SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -33,6 +33,7 @@ public class XmlEditorUtil {
 
     public class ATTRIBUTE {
 
+        public static final String NAME = "name";
         public static final String REF = "ref";
         public static final String DTO = "dto";
         public static final String TABLE = "table";
@@ -65,9 +66,8 @@ public class XmlEditorUtil {
                         switch (prev_id) {
                             case ARGUMENT:
                                 String attribute_name = prev.text().toString();
-                                if (ATTRIBUTE.REF.equals(attribute_name)
-                                        || ATTRIBUTE.DTO.equals(attribute_name)
-                                        || ATTRIBUTE.TABLE.equals(attribute_name)) {
+                                if (ATTRIBUTE.NAME.equals(attribute_name) || ATTRIBUTE.REF.equals(attribute_name)
+                                        || ATTRIBUTE.DTO.equals(attribute_name) || ATTRIBUTE.TABLE.equals(attribute_name)) {
                                     CharSequence cs = tok.text();
                                     if (cs == null) {
                                         attribute_value = "";
@@ -127,7 +127,7 @@ public class XmlEditorUtil {
         } // while
         return 0;
     }
-    
+
     private static int process_tag(TokenSequence<XMLTokenId> ts, Token<XMLTokenId> tag_token, String search_pattern) {
         String tag_text = tag_token.text().toString();
         if (!(tag_token.id() == XMLTokenId.TAG && tag_text.equals("<dto-class"))) {

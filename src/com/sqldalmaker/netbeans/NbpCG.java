@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2021 sqldalmaker@gmail.com
+    Copyright 2011-2022 sqldalmaker@gmail.com
     SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -60,12 +60,12 @@ public class NbpCG {
                         String dto_xml_abs_path = xml_file.getPath();
                         String dto_xsd_abs_path = Helpers.concat_path(xml_metaprogram_abs_path, Const.DTO_XSD);
                         List<DtoClass> dto_classes = SdmUtils.get_dto_classes(dto_xml_abs_path, dto_xsd_abs_path);
-                        ide_log.add_debug_message("STARTED...");
-                        try {
-                            Thread.sleep(200);
-                        } catch (InterruptedException e) {
-                            Exceptions.printStackTrace(e);
-                        }
+//                        ide_log.add_debug_message("STARTED...");
+//                        try {
+//                            Thread.sleep(200);
+//                        } catch (InterruptedException e) {
+//                            Exceptions.printStackTrace(e);
+//                        }
                         boolean error = false;
                         for (DtoClass cls : dto_classes) {
                             try {
@@ -81,7 +81,7 @@ public class NbpCG {
                         if (!error) {
                             ide_log.add_success_message(xml_file_title + " -> Generated successfully");
                         }
-                        ide_log.add_debug_message("COMPLETED.");
+                        //ide_log.add_debug_message("DONE");
                     } finally {
                         conn.close();
                     }
@@ -111,7 +111,7 @@ public class NbpCG {
                 try {
                     Settings settings = SdmUtils.load_settings(xml_mp_dir.getPath());
                     NbpIdeConsoleUtil ide_log = new NbpIdeConsoleUtil(settings, root_data_object);
-                    ide_log.add_debug_message("STARTED...");
+//                    ide_log.add_debug_message("STARTED...");
                     StringBuilder output_dir = new StringBuilder();
                     String xml_metaprogram_abs_path = xml_mp_dir.getPath();
                     Connection conn = NbpHelpers.get_connection(root_data_object);
@@ -148,7 +148,7 @@ public class NbpCG {
                         }
                     } finally {
                         conn.close();
-                        ide_log.add_debug_message("COMPLETED.");
+//                        ide_log.add_debug_message("COMPLETED.");
                     }
                 } catch (Exception e) {
                     NbpIdeMessageHelpers.show_error_in_ui_thread(e);
@@ -176,7 +176,7 @@ public class NbpCG {
                 try {
                     Settings settings = SdmUtils.load_settings(xml_mp_dir.getPath());
                     NbpIdeConsoleUtil ide_log = new NbpIdeConsoleUtil(settings, root_data_object);
-                    ide_log.add_debug_message("STARTED...");
+//                    ide_log.add_debug_message("STARTED...");
                     StringBuilder output_dir = new StringBuilder();
                     String xml_mp_abs_path = xml_mp_dir.getPath();
                     Connection conn = NbpHelpers.get_connection(root_data_object);
@@ -208,7 +208,7 @@ public class NbpCG {
                         }
                     } finally {
                         conn.close();
-                        ide_log.add_debug_message("COMPLETED.");
+//                        ide_log.add_debug_message("COMPLETED.");
                     }
                 } catch (Exception e) {
                     NbpIdeMessageHelpers.show_error_in_ui_thread(e);
@@ -235,7 +235,7 @@ public class NbpCG {
                 try {
                     Settings settings = SdmUtils.load_settings(xml_mp_dir.getPath());
                     NbpIdeConsoleUtil ide_log = new NbpIdeConsoleUtil(settings, root_data_object);
-                    ide_log.add_debug_message("STARTED...");
+//                    ide_log.add_debug_message("STARTED...");
                     StringBuilder output_dir = new StringBuilder();
                     String xml_mp_abs_path = xml_mp_dir.getPath();
                     Connection conn = NbpHelpers.get_connection(root_data_object);
@@ -271,7 +271,7 @@ public class NbpCG {
                         }
                     } finally {
                         conn.close();
-                        ide_log.add_debug_message("COMPLETED.");
+//                        ide_log.add_debug_message("DONE");
                     }
                 } catch (Exception e) {
                     NbpIdeMessageHelpers.show_error_in_ui_thread(e);

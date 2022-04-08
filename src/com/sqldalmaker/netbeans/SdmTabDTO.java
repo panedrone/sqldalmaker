@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2021 sqldalmaker@gmail.com
+    Copyright 2011-2022 sqldalmaker@gmail.com
     SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -166,7 +166,7 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
                     return;
                 }
                 NbpIdeConsoleUtil ide_log = new NbpIdeConsoleUtil(settings, obj);
-                ide_log.add_debug_message("STARTED...");
+//                ide_log.add_debug_message("STARTED...");
                 try {
                     //ph.progress("Connecting...");
                     Connection con = NbpHelpers.get_connection(obj); // !!! inside try/finally to ensure ph.finish()!!!
@@ -225,7 +225,7 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
                     // ex.printStackTrace();
                     NbpIdeMessageHelpers.show_error_in_ui_thread(ex);
                 } finally {
-                    ide_log.add_debug_message("COMPLETED.");
+                    ide_log.add_debug_message("DONE");
                     // ph.finish();
                     // errLog.close();
                 }
@@ -270,7 +270,7 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
             public void run() {
                 // ph.start();
                 NbpIdeConsoleUtil ide_log = new NbpIdeConsoleUtil(settings, obj);
-                ide_log.add_debug_message("STARTED...");
+//                ide_log.add_debug_message("STARTED...");
                 try {
                     // ph.progress("Connecting...");
                     Connection con = NbpHelpers.get_connection(obj); // !!! inside try/finally to ensure ph.finish()!!!
@@ -338,7 +338,7 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
                     // ex.printStackTrace();
                     NbpIdeMessageHelpers.show_error_in_ui_thread(ex);
                 } finally {
-                    ide_log.add_debug_message("COMPLETED.");
+//                    ide_log.add_debug_message("DONE");
                     // ph.finish();
                     // errLog.close();
                 }
@@ -545,8 +545,8 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
         try {
             int[] selected_rows = get_selection();
             Settings settings = NbpHelpers.load_settings(obj);
-            String value = (String) table.getValueAt(selected_rows[0], 0);
-            NbpTargetLanguageHelpers.open_in_editor(obj, value, settings, settings.getDto().getScope());
+            String dto_class_name = (String) table.getValueAt(selected_rows[0], 0);
+            NbpTargetLanguageHelpers.open_in_editor_async(obj, settings, dto_class_name, settings.getDto().getScope());
         } catch (Exception e) {
             // e.printStackTrace();
             NbpIdeMessageHelpers.show_error_in_ui_thread(e);

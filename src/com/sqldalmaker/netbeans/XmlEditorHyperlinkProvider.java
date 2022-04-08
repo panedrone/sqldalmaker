@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2021 sqldalmaker@gmail.com
+    Copyright 2011-2022 sqldalmaker@gmail.com
     SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -8,9 +8,11 @@ package com.sqldalmaker.netbeans;
 import com.sqldalmaker.common.FileSearchHelpers;
 import com.sqldalmaker.jaxb.settings.Settings;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Set;
 import javax.swing.text.Document;
 import org.netbeans.api.editor.mimelookup.MimeRegistration;
+import org.netbeans.api.project.Project;
 import org.netbeans.lib.editor.hyperlink.spi.HyperlinkProviderExt;
 import org.netbeans.lib.editor.hyperlink.spi.HyperlinkType;
 import org.netbeans.modules.editor.NbEditorUtilities;
@@ -21,12 +23,10 @@ import org.openide.loaders.DataObject;
  *
  * @author sqldalmaker@gmail.com
  *
- * === panedrone: for NB 11, use HyperlinkProviderExt instead of
- * HyperlinkProvider
- *
  */
 @MimeRegistration(mimeType = "text/xml", service = HyperlinkProviderExt.class)
 public class XmlEditorHyperlinkProvider implements HyperlinkProviderExt {
+
     // Google: netbeans platform xml navigation api
     // basic link for NetBeans IDE version version 6.1 or version 6.0
     // https://platform.netbeans.org/tutorials/60/nbm-hyperlink.html
@@ -91,6 +91,13 @@ public class XmlEditorHyperlinkProvider implements HyperlinkProviderExt {
                 attribute_value = checker.get_attribute_value();
                 return true;
             }
+        } else if (XmlEditorUtil.ATTRIBUTE.NAME.equals(attribute_name)) {
+            if (FileSearchHelpers.is_dto_xml(doc_name)) {
+                start_offset = checker.get_start_offset() + 1;
+                end_offset = checker.get_end_offset() + 1;
+                attribute_value = checker.get_attribute_value();
+                return true;
+            }
         }
         attribute_name = "";
         return false;
@@ -129,7 +136,7 @@ public class XmlEditorHyperlinkProvider implements HyperlinkProviderExt {
         if (attribute_value == null || attribute_value.length() == 0) {
             return;
         }
-        DataObject data_object = NbEditorUtilities.getDataObject(doc);
+        DataObject data_object = NbEditorUtilities.getDataObject(doc); // it is XMLDataObject
         if (data_object == null) {
             return;
         }
@@ -137,7 +144,35 @@ public class XmlEditorHyperlinkProvider implements HyperlinkProviderExt {
         if (this_doc_file == null) {
             return;
         }
-        if (XmlEditorUtil.ATTRIBUTE.REF.equals(attribute_name)) {
+        if (XmlEditorUtil.ATTRIBUTE.NAME.equals(attribute_name)) {
+            try {
+                Settings settings = NbpHelpers.load_settings(this_doc_file);
+                String dto_class_name = attribute_value;
+                final FileObject this_file_object = data_object.getPrimaryFile();
+                if (this_file_object == null) {
+                    return;
+                }
+                Project this_project = NbpPathHelpers.get_project(this_file_object);
+                if (this_project == null) {
+                    return;
+                }
+                FileObject xml_mp_dir = this_file_object.getParent();
+                List<FileObject> root_files = NbpTargetLanguageHelpers.find_root_files(xml_mp_dir);
+                if (root_files.size() != 1) {
+                    return;
+                }
+                FileObject root_file = root_files.get(0);
+                DataObject root_file_data_object = DataObject.find(root_file);
+                if (!(root_file_data_object instanceof SdmDataObject)) {
+                    return;
+                }
+                SdmDataObject root_data_object = (SdmDataObject) root_file_data_object;
+                NbpTargetLanguageHelpers.open_in_editor_async(root_data_object, settings, dto_class_name, settings.getDto().getScope());
+            } catch (Exception ex) {
+                // ex.printStackTrace();
+                NbpIdeMessageHelpers.show_error_in_ui_thread(ex);
+            }
+        } else if (XmlEditorUtil.ATTRIBUTE.REF.equals(attribute_name)) {
             if (!attribute_value.endsWith(".sql")) {
                 return;
             }
