@@ -41,7 +41,7 @@ public class IdeaTargetLanguageHelpers {
 
     public static List<VirtualFile> find_root_files(VirtualFile xml_metaprogram_dir) {
         List<VirtualFile> root_files = new ArrayList<VirtualFile>();
-        String[] rf_names = {RootFileName.PHP, RootFileName.JAVA, RootFileName.CPP, RootFileName.RUBY, RootFileName.GO};
+        String[] rf_names = {RootFileName.PHP, RootFileName.JAVA, RootFileName.CPP, RootFileName.PYTHON, RootFileName.RUBY, RootFileName.GO};
         for (String rf : rf_names) {
             VirtualFile root_file;
             root_file = xml_metaprogram_dir.findFileByRelativePath(rf);
