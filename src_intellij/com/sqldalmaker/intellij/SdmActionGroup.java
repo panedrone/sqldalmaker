@@ -113,7 +113,7 @@ public class SdmActionGroup extends ActionGroup {
         Settings settings = IdeaHelpers.load_settings(root_file);
         String xml_file_path = xml_file.getPath();
         String dao_class_name = Helpers.get_dao_class_name(xml_file_path);
-        String fn = IdeaTargetLanguageHelpers.file_name_from_class_name(root_file, dao_class_name);
+        String fn = IdeaTargetLanguageHelpers.file_name_from_class_name(root_file.getName(), dao_class_name);
         SdmAction action_goto_target = new SdmAction(fn) {
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {

@@ -1,8 +1,8 @@
 /*
- * Copyright 2011-2021 sqldalmaker@gmail.com
- * Read LICENSE.txt in the root of this project/archive.
- * Project web-site: http://sqldalmaker.sourceforge.net
- */
+	Copyright 2011-2022 sqldalmaker@gmail.com
+	Read LICENSE.txt in the root of this project/archive.
+	Project web-site: http://sqldalmaker.sourceforge.net
+*/
 package com.sqldalmaker.eclipse;
 
 import java.io.BufferedWriter;
@@ -38,8 +38,8 @@ import com.sqldalmaker.jaxb.settings.Settings;
 public class EclipseHelpers {
 
 	public static Settings load_settings(IEditor2 ed) throws Exception {
-		String xml_metaprogram_folder_full_path = ed.get_metaprogram_folder_abs_path();
-		return SdmUtils.load_settings(xml_metaprogram_folder_full_path);
+		String xml_mp_folder_abs_path = ed.get_metaprogram_folder_abs_path();
+		return SdmUtils.load_settings(xml_mp_folder_abs_path);
 	}
 
 	public static String get_absolute_dir_path_str(IProject project, String rel_dir_path) {

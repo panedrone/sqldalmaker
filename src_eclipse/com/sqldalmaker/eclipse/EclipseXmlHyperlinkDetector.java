@@ -1,8 +1,8 @@
 /*
- * Copyright 2011-2021 sqldalmaker@gmail.com
- * Read LICENSE.txt in the root of this project/archive.
- * Project web-site: http://sqldalmaker.sourceforge.net
- */
+	Copyright 2011-2022 sqldalmaker@gmail.com
+	Read LICENSE.txt in the root of this project/archive.
+	Project web-site: http://sqldalmaker.sourceforge.net
+*/
 package com.sqldalmaker.eclipse;
 
 import org.eclipse.core.resources.IContainer;
@@ -23,7 +23,7 @@ import com.sqldalmaker.jaxb.settings.Settings;
  * @author sqldalmaker@gmail.com
  *
  */
-public class ProjectFileHyperlinkDetector extends AbstractHyperlinkDetector {
+public class EclipseXmlHyperlinkDetector extends AbstractHyperlinkDetector {
 
 	/**
 	 * Tries to detect hyperlinks for the given region in the given text viewer and
@@ -57,7 +57,7 @@ public class ProjectFileHyperlinkDetector extends AbstractHyperlinkDetector {
 			if (region == null || textViewer == null) {
 				return NONE;
 			}
-			IFile this_xml_file = XmlAttributeHelpers.get_current_file();
+			IFile this_xml_file = EclipseXmlAttrHelpers.get_current_file();
 			if (this_xml_file == null) {
 				return NONE;
 			}
@@ -71,7 +71,7 @@ public class ProjectFileHyperlinkDetector extends AbstractHyperlinkDetector {
 				return NONE;
 			}
 			String text = doc.get();
-			IRegion hyperlink_region = XmlAttributeHelpers.get_attribute_value_region(offset, text);
+			IRegion hyperlink_region = EclipseXmlAttrHelpers.get_attribute_value_region(offset, text);
 			if (hyperlink_region == null) {
 				return NONE;
 			}
@@ -90,7 +90,7 @@ public class ProjectFileHyperlinkDetector extends AbstractHyperlinkDetector {
 			Settings settings = SdmUtils.load_settings(xml_metaprogram_folder_full_path);
 			IFile file = null;
 			int attr_offset = hyperlink_region.getOffset() - 2;
-			if (XmlAttributeHelpers.is_value_of("ref", attr_offset, text)) {
+			if (EclipseXmlAttrHelpers.is_value_of("ref", attr_offset, text)) {
 				if (dto_xml || dao_xml) {
 					if (value.toLowerCase().endsWith(".sql") == false) {
 						return NONE;
@@ -102,14 +102,14 @@ public class ProjectFileHyperlinkDetector extends AbstractHyperlinkDetector {
 					}
 				}
 			} else if (dto_xml) {
-				if (XmlAttributeHelpers.is_value_of("name", attr_offset, text)) {
+				if (EclipseXmlAttrHelpers.is_value_of("name", attr_offset, text)) {
 					file = EclipseTargetLanguageHelpers.find_source_file_in_project_tree(this_xml_file.getProject(),
 							settings, value, settings.getDto().getScope(), profile.getName());
 				}
 
 			} else if (dao_xml) {
 				try {
-					if (XmlAttributeHelpers.is_value_of("dto", attr_offset, text)) {
+					if (EclipseXmlAttrHelpers.is_value_of("dto", attr_offset, text)) {
 						IResource res = this_folder.findMember(Const.DTO_XML);
 						if (res instanceof IFile) {
 							file = (IFile) res;
@@ -123,7 +123,7 @@ public class ProjectFileHyperlinkDetector extends AbstractHyperlinkDetector {
 			if (file == null) {
 				return NONE;
 			}
-			ProjectFileHyperlink link = new ProjectFileHyperlink(hyperlink_region, file,  dto_class_name);
+			EclipseXmlHyperlink link = new EclipseXmlHyperlink(hyperlink_region, file,  dto_class_name);
 			return new IHyperlink[] { link };
 		} catch (Throwable e) {
 			e.printStackTrace();

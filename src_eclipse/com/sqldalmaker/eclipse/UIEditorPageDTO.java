@@ -1,8 +1,8 @@
 /*
- * Copyright 2011-2021 sqldalmaker@gmail.com
- * Read LICENSE.txt in the root of this project/archive.
- * Project web-site: http://sqldalmaker.sourceforge.net
- */
+	Copyright 2011-2022 sqldalmaker@gmail.com
+	Read LICENSE.txt in the root of this project/archive.
+	Project web-site: http://sqldalmaker.sourceforge.net
+*/
 package com.sqldalmaker.eclipse;
 
 import java.io.FileInputStream;
@@ -387,7 +387,7 @@ public class UIEditorPageDTO extends Composite {
 						monitor.subTask(dto_class_name);
 						try {
 							String file_content[] = gen.translate(dto_class_name);
-							String file_name = EclipseTargetLanguageHelpers.get_rel_path(editor2, output_dir,
+							String file_name = EclipseTargetLanguageHelpers.get_rel_path(editor2, output_dir.toString(),
 									dto_class_name);
 							String old_text = Helpers.load_text_from_file(file_name);
 							StringBuilder validation_buff = new StringBuilder();
@@ -494,7 +494,7 @@ public class UIEditorPageDTO extends Composite {
 						monitor.subTask(dto_class_name);
 						try {
 							String fileContent[] = gen.translate(dto_class_name);
-							String fileName = EclipseTargetLanguageHelpers.get_rel_path(editor2, output_dir,
+							String fileName = EclipseTargetLanguageHelpers.get_rel_path(editor2, output_dir.toString(),
 									dto_class_name);
 							EclipseHelpers.save_text_to_file(fileName, fileContent[0]);
 							item.setStatus(Const.STATUS_GENERATED);
@@ -571,7 +571,7 @@ public class UIEditorPageDTO extends Composite {
 				EclipseEditorHelpers.open_editor_sync(getShell(), file);
 				return;
 			}
-			EclipseXmlUtils.goto_dto_class_declaration(getShell(), file, items.get(0).get_name());
+			EclipseXmlAttrHelpers.goto_dto_class_declaration(getShell(), file, items.get(0).get_name());
 		} catch (Throwable e) {
 			e.printStackTrace();
 			EclipseMessageHelpers.show_error(e);
@@ -585,10 +585,10 @@ public class UIEditorPageDTO extends Composite {
 				return;
 			}
 			IFile file = null;
-			String value = items.get(0).get_name();
+			String dto_class_name = items.get(0).get_name();
 			Settings settings = EclipseHelpers.load_settings(editor2);
-			file = EclipseTargetLanguageHelpers.find_source_file_in_project_tree(editor2.get_project(), settings, value,
-					settings.getDto().getScope(), editor2.get_root_file_name());
+			file = EclipseTargetLanguageHelpers.find_source_file_in_project_tree(editor2.get_project(), settings,
+					dto_class_name, settings.getDto().getScope(), editor2.get_root_file_name());
 			EclipseEditorHelpers.open_editor_sync(getShell(), file);
 		} catch (Throwable e) {
 			e.printStackTrace();

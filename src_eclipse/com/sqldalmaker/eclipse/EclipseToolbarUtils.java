@@ -1,8 +1,8 @@
 /*
- * Copyright 2011-2021 sqldalmaker@gmail.com
- * Read LICENSE.txt in the root of this project/archive.
- * Project web-site: http://sqldalmaker.sourceforge.net
- */
+	Copyright 2011-2022 sqldalmaker@gmail.com
+	Read LICENSE.txt in the root of this project/archive.
+	Project web-site: http://sqldalmaker.sourceforge.net
+*/
 package com.sqldalmaker.eclipse;
 
 import java.util.ArrayList;
@@ -22,16 +22,16 @@ import com.sqldalmaker.common.InternalException;
  * @author sqldalmaker@gmail.com
  *
  */
-public class MyToolbarUtils {
+public class EclipseToolbarUtils {
 
-	private static void enum_dal_files(final IContainer dir, final List<String> res) {
+	private static void enum_root_files(final IContainer dir, final List<String> res) {
 		try {
 			IResource[] members = dir.members(); // throws
 			for (IResource r : members) {
 				if (r instanceof IFolder) {
 					if (!r.isHidden()) {
 						if (!r.getName().equals("bin")) {
-							enum_dal_files((IFolder) r, res);
+							enum_root_files((IFolder) r, res);
 						}
 					}
 				} else if (r instanceof IFile) {
@@ -46,7 +46,7 @@ public class MyToolbarUtils {
 		}
 	}
 
-	public static List<String> get_dal_file_titles(final IProject[] projects) {
+	public static List<String> get_root_file_titles(final IProject[] projects) {
 		List<String> res = new ArrayList<String>();
 		for (IProject pr : projects) {
 			if (!(pr instanceof IContainer)) {
@@ -54,7 +54,7 @@ public class MyToolbarUtils {
 			}
 			IContainer project_root = (IContainer) pr;
 			List<String> rel_path_names = new ArrayList<String>();
-			enum_dal_files(project_root, rel_path_names);
+			enum_root_files(project_root, rel_path_names);
 			for (String name : rel_path_names) {
 				res.add(name.substring(1));
 			}
@@ -62,7 +62,7 @@ public class MyToolbarUtils {
 		return res;
 	}
 
-	public static void open_dal_file(String dal_title, IProject[] projects)
+	public static void open_root_file(String dal_title, IProject[] projects)
 			throws Exception {
 		String dal_file_path = dal_title.replace("\\", "/");
 		String[] segments = dal_file_path.split("/");

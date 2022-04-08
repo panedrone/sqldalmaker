@@ -1,8 +1,8 @@
 /*
- * Copyright 2011-2021 sqldalmaker@gmail.com
- * Read LICENSE.txt in the root of this project/archive.
- * Project web-site: http://sqldalmaker.sourceforge.net
- */
+	Copyright 2011-2022 sqldalmaker@gmail.com
+	Read LICENSE.txt in the root of this project/archive.
+	Project web-site: http://sqldalmaker.sourceforge.net
+*/
 package com.sqldalmaker.eclipse;
 
 import java.sql.Connection;
@@ -460,7 +460,7 @@ public class UIEditorPageDAO extends Composite {
 							String dao_xml_abs_path = editor2.get_metaprogram_file_abs_path(dao_xml_rel_path);
 							DaoClass dao_class = dao_xml_parser.unmarshal(dao_xml_abs_path);
 							String[] fileContent = gen.translate(dao_class_name, dao_class);
-							String fileName = EclipseTargetLanguageHelpers.get_rel_path(editor2, output_dir,
+							String fileName = EclipseTargetLanguageHelpers.get_rel_path(editor2, output_dir.toString(),
 									dao_class_name);
 							EclipseHelpers.save_text_to_file(fileName, fileContent[0]);
 							item.setStatus(Const.STATUS_GENERATED);
@@ -540,7 +540,7 @@ public class UIEditorPageDAO extends Composite {
 							String dao_xml_abs_path = editor2.get_metaprogram_file_abs_path(dao_xml_rel_path);
 							DaoClass dao_class = daoXml_Parser.unmarshal(dao_xml_abs_path);
 							String[] file_content = gen.translate(dao_class_name, dao_class);
-							String file_name = EclipseTargetLanguageHelpers.get_rel_path(editor2, output_dir,
+							String file_name = EclipseTargetLanguageHelpers.get_rel_path(editor2, output_dir.toString(),
 									dao_class_name);
 							StringBuilder validation_buff = new StringBuilder();
 							String oldText = Helpers.load_text_from_file(file_name);

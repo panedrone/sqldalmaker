@@ -1,8 +1,8 @@
 /*
- * Copyright 2011-2020 sqldalmaker@gmail.com
- * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
- * Read LICENSE.txt in the root of this project/archive for details.
- */
+	Copyright 2011-2022 sqldalmaker@gmail.com
+	Read LICENSE.txt in the root of this project/archive.
+	Project web-site: http://sqldalmaker.sourceforge.net
+*/
 package com.sqldalmaker.eclipse;
 
 import java.sql.Connection;
@@ -50,9 +50,9 @@ public class EclipseCG {
 					try {
 						// ProgressManager.progress(cls.getName());
 						String[] file_content = gen.translate(cls.getName());
-						String file_name = EclipseTargetLanguageHelpers.get_rel_path(root_file.getName(), output_dir,
-								cls.getName());
-						EclipseHelpers.save_text_to_file(file_name, file_content[0]);
+						String target_file_path = EclipseTargetLanguageHelpers.get_target_file_path(root_file.getName(),
+								output_dir.toString(), cls.getName());
+						EclipseHelpers.save_text_to_file(target_file_path, file_content[0]);
 					} catch (Throwable e) {
 						String msg = e.getMessage();
 						EclipseConsoleHelpers.add_error_msg(cls.getName() + ": " + msg);
@@ -94,9 +94,9 @@ public class EclipseCG {
 					try {
 						// ProgressManager.progress(cls.getName());
 						String[] file_content = gen.translate(cls.getName());
-						String file_name = EclipseTargetLanguageHelpers.get_rel_path(root_file.getName(), output_dir,
-								cls.getName());
-						String old_text = Helpers.load_text_from_file(file_name);
+						String target_file_path = EclipseTargetLanguageHelpers.get_target_file_path(root_file.getName(),
+								output_dir.toString(), cls.getName());
+						String old_text = Helpers.load_text_from_file(target_file_path);
 						StringBuilder validation_buff = new StringBuilder();
 						if (old_text == null) {
 							validation_buff.append("Generated file is missing");
@@ -155,9 +155,9 @@ public class EclipseCG {
 				DaoClass dao_class = dao_xml_parser.unmarshal(dao_xml_abs_path);
 				try {
 					String[] file_content = gen.translate(dao_class_name, dao_class);
-					String file_name = EclipseTargetLanguageHelpers.get_rel_path(root_file.getName(), output_dir,
-							dao_class_name);
-					EclipseHelpers.save_text_to_file(file_name, file_content[0]);
+					String target_file_path = EclipseTargetLanguageHelpers.get_target_file_path(root_file.getName(),
+							output_dir.toString(), dao_class_name);
+					EclipseHelpers.save_text_to_file(target_file_path, file_content[0]);
 				} catch (Throwable e) {
 					String msg = e.getMessage();
 					EclipseConsoleHelpers.add_error_msg(dao_class_name + ": " + msg);
@@ -205,10 +205,10 @@ public class EclipseCG {
 				DaoClass dao_class = dao_xml_parser.unmarshal(dao_xml_abs_path);
 				try {
 					String[] file_content = gen.translate(dao_class_name, dao_class);
-					String file_name = EclipseTargetLanguageHelpers.get_rel_path(root_file.getName(), output_dir,
-							dao_class_name);
+					String target_file_path = EclipseTargetLanguageHelpers.get_target_file_path(root_file.getName(),
+							output_dir.toString(), dao_class_name);
 					StringBuilder validation_buff = new StringBuilder();
-					String oldText = Helpers.load_text_from_file(file_name);
+					String oldText = Helpers.load_text_from_file(target_file_path);
 					if (oldText == null) {
 						validation_buff.append("Generated file is missing");
 					} else {

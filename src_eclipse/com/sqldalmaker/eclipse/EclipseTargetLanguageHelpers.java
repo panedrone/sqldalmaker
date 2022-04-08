@@ -1,8 +1,8 @@
 /*
- * Copyright 2011-2021 sqldalmaker@gmail.com
- * Read LICENSE.txt in the root of this project/archive.
- * Project web-site: http://sqldalmaker.sourceforge.net
- */
+	Copyright 2011-2022 sqldalmaker@gmail.com
+	Read LICENSE.txt in the root of this project/archive.
+	Project web-site: http://sqldalmaker.sourceforge.net
+*/
 package com.sqldalmaker.eclipse;
 
 import java.sql.Connection;
@@ -53,45 +53,90 @@ public class EclipseTargetLanguageHelpers {
 		return false;
 	}
 
+	private static String _get_unknown_root_file_msg(String fn) {
+		return "Unknown root file: " + fn;
+	}
+
 	public static List<IFile> get_root_files(IContainer xml_mp_folder) throws Exception {
 		if (!(xml_mp_folder instanceof IFolder)) {
 			throw new Exception("IFolder expected");
 		}
 		List<IFile> root_files = new ArrayList<IFile>();
-		IResource res;
-		res = xml_mp_folder.findMember(RootFileName.PHP);
-		if (res instanceof IFile) {
-			root_files.add((IFile) res);
-		}
-		res = xml_mp_folder.findMember(RootFileName.JAVA);
-		if (res instanceof IFile) {
-			root_files.add((IFile) res);
-		}
-		res = xml_mp_folder.findMember(RootFileName.CPP);
-		if (res instanceof IFile) {
-			root_files.add((IFile) res);
-		}
-		res = xml_mp_folder.findMember(RootFileName.PYTHON);
-		if (res instanceof IFile) {
-			root_files.add((IFile) res);
-		}
-		res = xml_mp_folder.findMember(RootFileName.RUBY);
-		if (res instanceof IFile) {
-			root_files.add((IFile) res);
-		}
-		res = xml_mp_folder.findMember(RootFileName.GO);
-		if (res instanceof IFile) {
-			root_files.add((IFile) res);
+		String[] rf_names = { RootFileName.PHP, RootFileName.JAVA, RootFileName.CPP, RootFileName.RUBY,
+				RootFileName.GO };
+		for (String rf : rf_names) {
+			IResource res = xml_mp_folder.findMember(rf);
+			if (res instanceof IFile) {
+				root_files.add((IFile) res);
+			}
 		}
 		return root_files;
 	}
 
-	private static String get_unknown_root_file_msg(String fn) {
-		return "Unknown root file: " + fn;
+	public static IFile find_root_file(IContainer xml_mp_folder) throws Exception {
+		List<IFile> root_files = get_root_files(xml_mp_folder);
+		if (root_files.size() == 0) {
+			throw new Exception("Root files not found");
+		}
+		return root_files.get(0);
+	}
+
+	public static String get_rel_path(IEditor2 editor2, String output_dir, String class_name) throws Exception {
+		String fn = editor2.get_root_file_name();
+		return get_target_file_path(fn, output_dir, class_name);
+	}
+
+	public static IFile find_source_file_in_project_tree(IProject project, Settings settings, String class_name,
+			String class_scope, String root_fn) throws Exception {
+
+		String output_dir;
+		if (RootFileName.JAVA.equals(root_fn)) {
+			output_dir = SdmUtils.get_package_relative_path(settings, class_scope);
+		} else {
+			output_dir = settings.getFolders().getTarget();
+		}
+		String rel_path = get_target_file_path(root_fn, output_dir, class_name);
+		return project.getFile(rel_path);
+	}
+
+	public static String get_target_file_path(String root_fn, String output_dir, String class_name) throws Exception {
+		String file_name = file_name_from_class_name(root_fn, class_name);
+		return Helpers.concat_path(output_dir, file_name);
+	}
+
+	public static String file_name_from_class_name(String root_fn, String class_name) throws Exception {
+		if (RootFileName.PHP.equals(root_fn)) {
+			return class_name + ".php";
+		} else if (RootFileName.JAVA.equals(root_fn)) {
+			return class_name + ".java";
+		} else if (RootFileName.CPP.equals(root_fn)) {
+			return class_name + ".h";
+		} else if (RootFileName.RUBY.equals(root_fn)) {
+			return Helpers.convert_file_name_to_snake_case(class_name, "rb");
+		} else if (RootFileName.PYTHON.equals(root_fn)) {
+			return Helpers.convert_file_name_to_snake_case(class_name, "py");
+		} else if (RootFileName.GO.equals(root_fn)) {
+			return Helpers.convert_file_name_to_snake_case(class_name, "go");
+		}
+		throw new Exception(_get_unknown_root_file_msg(root_fn));
+	}
+
+	public static String get_root_file_relative_path(final IFile file) {
+		String fn = file.getName();
+		if (RootFileName.JAVA.equals(fn) || RootFileName.CPP.equals(fn) || RootFileName.PHP.equals(fn)
+				|| RootFileName.PYTHON.equals(fn) || RootFileName.RUBY.equals(fn) || RootFileName.GO.equals(fn)) {
+			try {
+				return file.getFullPath().toPortableString();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return null;
 	}
 
 	public static IDtoCG create_dto_cg(Connection conn, IEditor2 editor2, Settings settings, StringBuilder output_dir)
 			throws Exception {
+
 		IProject project = editor2.get_project();
 		String root_file_name = editor2.get_root_file_name();
 		String dto_xml_abs_path = editor2.get_dto_xml_abs_path();
@@ -101,6 +146,7 @@ public class EclipseTargetLanguageHelpers {
 
 	public static IDtoCG create_dto_cg(Connection conn, IProject project, Settings settings, String root_file_name,
 			String dto_xml_abs_path, String dto_xsd_abs_path, StringBuilder output_dir) throws Exception {
+		
 		String sql_root_abs_path = EclipseHelpers.get_absolute_dir_path_str(project, settings.getFolders().getSql());
 		String vm_file_system_path;
 		if (settings.getExternalVmFile().getPath().length() == 0) {
@@ -174,12 +220,13 @@ public class EclipseTargetLanguageHelpers {
 					field_names_mode, vm_file_system_path);
 			return gen;
 		} else {
-			throw new Exception(get_unknown_root_file_msg(root_file_name));
+			throw new Exception(_get_unknown_root_file_msg(root_file_name));
 		}
 	}
 
 	public static IDaoCG create_dao_cg(Connection conn, IProject project, IEditor2 editor2, Settings settings,
 			StringBuilder output_dir) throws Exception {
+		
 		String root_fn = editor2.get_root_file_name();
 		String dto_xml_abs_path = editor2.get_dto_xml_abs_path();
 		String dto_xsd_abs_path = editor2.get_dto_xsd_abs_path();
@@ -265,91 +312,7 @@ public class EclipseTargetLanguageHelpers {
 					field_names_mode, vm_file_system_path);
 			return gen;
 		} else {
-			throw new Exception(get_unknown_root_file_msg(root_fn));
+			throw new Exception(_get_unknown_root_file_msg(root_fn));
 		}
-	}
-
-	public static IFile find_source_file_in_project_tree(IProject project, Settings settings, String class_name,
-			String java_package, String root_fn) throws Exception {
-		String path;
-		if (RootFileName.JAVA.equals(root_fn)) {
-			path = SdmUtils.get_package_relative_path(settings, java_package) + "/" + class_name + ".java";
-		} else if (RootFileName.PHP.equals(root_fn)) {
-			path = settings.getFolders().getTarget() + "/" + class_name + ".php";
-		} else if (RootFileName.CPP.equals(root_fn)) {
-			path = settings.getFolders().getTarget() + "/" + class_name + ".h";
-		} else if (RootFileName.PYTHON.equals(root_fn)) {
-			path = settings.getFolders().getTarget() + "/" + Helpers.convert_file_name_to_snake_case(class_name, "py");
-		} else if (RootFileName.RUBY.equals(root_fn)) {
-			path = settings.getFolders().getTarget() + "/" + Helpers.convert_file_name_to_snake_case(class_name, "rb");
-		} else if (RootFileName.GO.equals(root_fn)) {
-			path = settings.getFolders().getTarget() + "/" + Helpers.convert_file_name_to_snake_case(class_name, "go");
-		} else {
-			throw new Exception(get_unknown_root_file_msg(root_fn));
-		}
-		return project.getFile(path);
-	}
-
-	public static IResource find_root_file(IContainer meta_program_location) throws Exception {
-		IResource res = meta_program_location.findMember(RootFileName.PHP);
-		if (res instanceof IFile) {
-			return res;
-		}
-		res = meta_program_location.findMember(RootFileName.JAVA);
-		if (res instanceof IFile) {
-			return res;
-		}
-		res = meta_program_location.findMember(RootFileName.CPP);
-		if (res instanceof IFile) {
-			return res;
-		}
-		res = meta_program_location.findMember(RootFileName.PYTHON);
-		if (res instanceof IFile) {
-			return res;
-		}
-		res = meta_program_location.findMember(RootFileName.RUBY);
-		if (res instanceof IFile) {
-			return res;
-		}
-		res = meta_program_location.findMember(RootFileName.GO);
-		if (res instanceof IFile) {
-			return res;
-		}
-		throw new Exception("Root file not found");
-	}
-
-	public static String get_rel_path(IEditor2 editor2, StringBuilder output_dir, String class_name) {
-		String fn = editor2.get_root_file_name();
-		return get_rel_path(fn, output_dir, class_name);
-	}
-
-	public static String get_rel_path(String fn, StringBuilder output_dir, String class_name) {
-		if (RootFileName.RUBY.equals(fn)) {
-			return output_dir + "/" + Helpers.convert_file_name_to_snake_case(class_name, "rb");
-		} else if (RootFileName.PYTHON.equals(fn)) {
-			return output_dir + "/" + Helpers.convert_file_name_to_snake_case(class_name, "py");
-		} else if (RootFileName.PHP.equals(fn)) {
-			return output_dir + "/" + class_name + ".php";
-		} else if (RootFileName.JAVA.equals(fn)) {
-			return output_dir + "/" + class_name + ".java";
-		} else if (RootFileName.CPP.equals(fn)) {
-			return output_dir + "/" + class_name + ".h";
-		} else if (RootFileName.GO.equals(fn)) {
-			return output_dir + "/" + Helpers.convert_file_name_to_snake_case(class_name, "go");
-		}
-		return null;
-	}
-
-	public static String get_root_file_relative_path(final IFile file) {
-		String fn = file.getName();
-		if (RootFileName.JAVA.equals(fn) || RootFileName.CPP.equals(fn) || RootFileName.PHP.equals(fn)
-				|| RootFileName.PYTHON.equals(fn) || RootFileName.RUBY.equals(fn) || RootFileName.GO.equals(fn)) {
-			try {
-				return file.getFullPath().toPortableString();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-		return null;
 	}
 }

@@ -125,7 +125,7 @@ public class IdeaReferenceCompletion {
         }
         String target_file_name;
         try {
-            target_file_name = IdeaTargetLanguageHelpers.file_name_from_class_name(root_file, dto_class_name);
+            target_file_name = IdeaTargetLanguageHelpers.file_name_from_class_name(root_file.getName(), dto_class_name);
         } catch (Exception e) {
             return null;
         }

@@ -18,9 +18,9 @@
          point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectors">
       <hyperlinkDetector
             activate="true"
-            class="com.sqldalmaker.eclipse.ProjectFileHyperlinkDetector"
-            id="com.sqldalmaker.eclipse.projectFileHyperlinkDetector"
-            name="SQL DAL Maker SQL Hyperlinks Detector"
+            class="com.sqldalmaker.eclipse.EclipseXmlHyperlinkDetector"
+            id="com.sqldalmaker.eclipse.EclipseXmlHyperlinkDetector"
+            name="SDM Hyperlinks Detector"
             targetId="org.eclipse.core.runtime.xml">
       </hyperlinkDetector>
    </extension>
@@ -31,14 +31,14 @@
       
   <proposalCategory
            id="com.sqldalmaker.xml.completionProposal.category"
-           name="SQL DAL Maker Completion Proposals">
+           name="SDM Completion Proposals">
   </proposalCategory>
  
   <proposalComputer
        activate="true"
        categoryId="com.sqldalmaker.xml.completionProposal.category"
-       class="com.sqldalmaker.eclipse.XmlCompletionProposalComputer"
-       id="com.sqldalmaker.xml.completionProposal.computer">     
+       class="com.sqldalmaker.eclipse.EclipseXmlCompletionProposalComputer"
+       id="com.sqldalmaker.xml.completionProposalComputer">     
     <contentType id="org.eclipse.core.runtime.xml"/>     
   </proposalComputer>        
  </extension>
@@ -54,7 +54,7 @@
            categoryId="com.sqldalmaker.commands.category"
            id="com.sqldalmaker.open_dal_file.command_id"
            name="SDM Command"
-           defaultHandler="com.sqldalmaker.eclipse.MyToolbarActionHandler">
+           defaultHandler="com.sqldalmaker.eclipse.EclipseToolbarActionHandler">
      </command>
   </extension>
   <!--extension
@@ -70,37 +70,30 @@
      <menuContribution
            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
 
-<toolbar
-      id="com.sqldalmaker.toolbar">
-      
-      <command
+	<toolbar
+	      id="com.sqldalmaker.toolbar">
+	      <command
                  commandId="com.sqldalmaker.open_dal_file.command_id"
                  icon="icons/sqldalmaker.gif"
                  id="com.sqldalmaker.toolbar.command_id"
                  style="pulldown"
                  tooltip="SDM">
            </command>
-      
-</toolbar>
+	</toolbar>
 
      </menuContribution>
   </extension>
   
-  <extension
-         point="org.eclipse.ui.menus">
-      <menuContribution 
-            locationURI="menu:com.sqldalmaker.toolbar.command_id">
-            
-	      <dynamic
-	      		id="com.sqldalmaker.dynamic_menu">
-	      		
-				<class
-				    class="com.sqldalmaker.eclipse.MyDynamicMenu">
-				</class>
-	      
-		  </dynamic>
-
-      </menuContribution>
+  <extension point="org.eclipse.ui.menus">
+  <menuContribution 
+      locationURI="menu:com.sqldalmaker.toolbar.command_id">
+      <dynamic
+      		id="com.sqldalmaker.dynamic_menu">
+			<class
+			    class="com.sqldalmaker.eclipse.EclipseToolbarDynamicMenu">
+			</class>
+	  </dynamic>
+  </menuContribution>
 </extension>
    
 </plugin>

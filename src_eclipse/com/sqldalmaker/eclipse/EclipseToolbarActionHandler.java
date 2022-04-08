@@ -1,8 +1,8 @@
 /*
- * Copyright 2011-2020 sqldalmaker@gmail.com
- * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
- * Read LICENSE.txt in the root of this project/archive for details.
- */
+	Copyright 2011-2022 sqldalmaker@gmail.com
+	Read LICENSE.txt in the root of this project/archive.
+	Project web-site: http://sqldalmaker.sourceforge.net
+*/
 package com.sqldalmaker.eclipse;
 
 import java.util.List;
@@ -18,17 +18,17 @@ import org.eclipse.core.resources.ResourcesPlugin;
  * @author sqldalmaker@gmail.com
  *
  */
-public class MyToolbarActionHandler extends AbstractHandler {
+public class EclipseToolbarActionHandler extends AbstractHandler {
 
-	public MyToolbarActionHandler() {
+	public EclipseToolbarActionHandler() {
 	}
 
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		final IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
-		List<String> dal_file_titles = MyToolbarUtils.get_dal_file_titles(projects);
+		List<String> dal_file_titles = EclipseToolbarUtils.get_root_file_titles(projects);
 		if (dal_file_titles.size() >= 1) {
 			try {
-				MyToolbarUtils.open_dal_file(dal_file_titles.get(0), projects);
+				EclipseToolbarUtils.open_root_file(dal_file_titles.get(0), projects);
 			} catch (Exception e) {
 				e.printStackTrace();
 				EclipseMessageHelpers.show_error(e);
