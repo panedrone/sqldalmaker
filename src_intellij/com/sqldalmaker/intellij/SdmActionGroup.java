@@ -34,28 +34,38 @@ public class SdmActionGroup extends ActionGroup {
         }
     }
 
-    private static void enum_root_files(Project project, VirtualFile current_folder, List<String> rel_path_names) {
+    private static void enum_root_files(Project project, VirtualFile current_folder, List<VirtualFile> root_files) {
         @SuppressWarnings("UnsafeVfsRecursion")
         VirtualFile[] children = current_folder.getChildren();
         for (VirtualFile c : children) {
             if (c.isDirectory()) {
                 if (!c.getName().equals("bin")) {
-                    enum_root_files(project, c, rel_path_names);
+                    enum_root_files(project, c, root_files);
                 }
             } else {
                 String path = IdeaTargetLanguageHelpers.get_root_file_relative_path(project, c);
                 if (path != null) {
-                    rel_path_names.add(path);
+                    root_files.add(c);
                 }
             }
         }
     }
 
-    private List<String> get_root_file_titles(Project project) throws Exception {
-        VirtualFile project_root_folder = IdeaHelpers.get_project_base_dir(project);
-        List<String> rel_path_names = new ArrayList<String>();
-        enum_root_files(project, project_root_folder, rel_path_names);
-        return rel_path_names;
+    private void add_common_actions(Project project, List<AnAction> drop_down_actions_list, List<VirtualFile> root_files) throws Exception {
+        for (VirtualFile root_file : root_files) {
+            String root_file_rel_path = IdeaHelpers.get_relative_path(project, root_file);
+            SdmAction action = new SdmAction(root_file_rel_path) {
+                @Override
+                public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
+                    try {
+                        IdeaEditorHelpers.open_project_file_in_editor_sync(anActionEvent.getProject(), root_file_rel_path);
+                    } catch (Exception e) {
+                        IdeaMessageHelpers.add_error_to_ide_log("ERROR", e.getMessage());
+                    }
+                }
+            };
+            drop_down_actions_list.add(action);
+        }
     }
 
     private void add_dto_actions(Project project, List<AnAction> drop_down_actions_list, VirtualFile xml_file) throws Exception {
@@ -74,7 +84,6 @@ public class SdmActionGroup extends ActionGroup {
             }
         };
         drop_down_actions_list.add(action_validate);
-        drop_down_actions_list.add(Separator.create());
     }
 
     private void add_dao_actions(Project project, List<AnAction> drop_down_actions_list, VirtualFile xml_file) throws Exception {
@@ -93,78 +102,51 @@ public class SdmActionGroup extends ActionGroup {
             }
         };
         drop_down_actions_list.add(action_validate);
-        drop_down_actions_list.add(Separator.create());
-        SdmAction action_goto_target = create_action_goto_target(project, xml_file);
-        if (action_goto_target != null) {
-            drop_down_actions_list.add(action_goto_target);
-        }
     }
 
-    private SdmAction create_action_goto_target(Project project, VirtualFile xml_file) throws Exception {
-        VirtualFile xml_file_dir = xml_file.getParent();
-        if (xml_file_dir == null) {
-            return null;
-        }
-        List<VirtualFile> root_files = IdeaTargetLanguageHelpers.find_root_files(xml_file_dir);
-        if (root_files.size() != 1) {
-            return null;
-        }
-        VirtualFile root_file = root_files.get(0);
+    private void add_open_dao_target_action(Project project, VirtualFile root_file, VirtualFile xml_file,
+                                            List<AnAction> drop_down_actions_list) throws Exception {
+
         Settings settings = IdeaHelpers.load_settings(root_file);
         String xml_file_path = xml_file.getPath();
         String dao_class_name = Helpers.get_dao_class_name(xml_file_path);
-        String fn = IdeaTargetLanguageHelpers.file_name_from_class_name(root_file.getName(), dao_class_name);
-        SdmAction action_goto_target = new SdmAction(fn) {
+        String rel_path = IdeaTargetLanguageHelpers.get_target_folder_rel_path(project, root_file, settings,
+                dao_class_name, settings.getDao().getScope());
+        SdmAction action_goto_target = new SdmAction(rel_path) {
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
                 try {
-                    IdeaTargetLanguageHelpers.open_editor(project, root_file, dao_class_name, settings, settings.getDao().getScope());
+                    IdeaTargetLanguageHelpers.open_editor_sync(project, root_file, settings, dao_class_name, settings.getDao().getScope());
                 } catch (Exception e) {
                     e.printStackTrace();
                     IdeaMessageHelpers.show_error_in_ui_thread(e);
                 }
             }
         };
-        return action_goto_target;
+        drop_down_actions_list.add(action_goto_target);
     }
 
-    private void add_common_actions(Project project, List<AnAction> drop_down_actions_list, List<VirtualFile> root_files) throws Exception {
-        String root_file_rel_path = IdeaHelpers.get_relative_path(project, root_files.get(0));
-        SdmAction action = new SdmAction(root_file_rel_path) {
-            @Override
-            public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
-                try {
-                    IdeaEditorHelpers.open_project_file_in_editor_sync(anActionEvent.getProject(), root_file_rel_path);
-                } catch (Exception e) {
-                    IdeaMessageHelpers.add_error_to_ide_log("ERROR", e.getMessage());
-                }
-            }
-        };
-        drop_down_actions_list.add(action);
-        drop_down_actions_list.add(Separator.create());
-    }
-
-    private List<AnAction> get_drop_down_actions(Project project, List<String> titles) throws Exception {
-        List<AnAction> drop_down_actions_list = new ArrayList<AnAction>();
+    private boolean add_xml_file_actions(Project project, List<AnAction> drop_down_actions_list) throws Exception {
         FileEditorManager fm = FileEditorManager.getInstance(project);
         // FileEditor editor = fm.getSelectedEditor(); // since 182.711
         VirtualFile[] files = fm.getSelectedFiles();
         FileEditor editor = files.length == 0 ? null : fm.getSelectedEditor(files[0]);
         if (!(editor instanceof TextEditor)) {
-            return drop_down_actions_list;
+            return false;
         }
         VirtualFile xml_file = editor.getFile(); // @Nullable
         if (xml_file == null) {
-            return drop_down_actions_list;
+            return false;
         }
         VirtualFile xml_file_dir = xml_file.getParent();
         if (xml_file_dir == null) {
-            return drop_down_actions_list;
+            return false;
         }
         List<VirtualFile> root_files = IdeaTargetLanguageHelpers.find_root_files(xml_file_dir);
-        if (root_files.size() != 1) {
-            return drop_down_actions_list;
+        if (root_files.size() < 1) {
+            return false;
         }
+        VirtualFile root_file = root_files.get(0);
         String name = xml_file.getName();
         if (FileSearchHelpers.is_dto_xml(name)) {
             add_dto_actions(project, drop_down_actions_list, xml_file);
@@ -172,11 +154,23 @@ public class SdmActionGroup extends ActionGroup {
             add_dao_actions(project, drop_down_actions_list, xml_file);
         }
         if (FileSearchHelpers.is_dto_xml(name) || FileSearchHelpers.is_dao_xml(name)) {
-            if (titles.size() > 1) {
-                add_common_actions(project, drop_down_actions_list, root_files);
-            }
+            String root_file_rel_path = IdeaHelpers.get_relative_path(project, root_file);
+            SdmAction action = new SdmAction(root_file_rel_path) {
+                @Override
+                public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
+                    try {
+                        IdeaEditorHelpers.open_project_file_in_editor_sync(anActionEvent.getProject(), root_file_rel_path);
+                    } catch (Exception e) {
+                        IdeaMessageHelpers.add_error_to_ide_log("ERROR", e.getMessage());
+                    }
+                }
+            };
+            drop_down_actions_list.add(action);
         }
-        return drop_down_actions_list;
+        if (FileSearchHelpers.is_dao_xml(name)) {
+            add_open_dao_target_action(project, root_file, xml_file, drop_down_actions_list);
+        }
+        return true;
     }
 
     @NotNull
@@ -194,25 +188,19 @@ public class SdmActionGroup extends ActionGroup {
             if (project == null) {
                 return AnAction.EMPTY_ARRAY;
             }
-            List<String> titles = get_root_file_titles(project);
-            if (titles.isEmpty()) {
-                return AnAction.EMPTY_ARRAY;
-            }
-            List<AnAction> drop_down_actions_list = get_drop_down_actions(project, titles);
-            for (String title : titles) {
-                SdmAction action = new SdmAction(title) {
-                    @Override
-                    public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
-                        try {
-                            String rel_path = getTemplatePresentation().getText();
-                            IdeaEditorHelpers.open_project_file_in_editor_sync(anActionEvent.getProject(), rel_path);
-                        } catch (Throwable e) {
-                            e.printStackTrace();
-                            IdeaMessageHelpers.show_error_in_ui_thread(e);
-                        }
-                    }
-                };
-                drop_down_actions_list.add(action);
+            List<AnAction> drop_down_actions_list = new ArrayList<AnAction>();
+            add_xml_file_actions(project, drop_down_actions_list);
+            // there may be severaal MP in one project. start searching from project_base_dir:
+            VirtualFile project_base_dir = IdeaHelpers.get_project_base_dir(project);
+            List<VirtualFile> root_files = new ArrayList<VirtualFile>();
+            enum_root_files(project, project_base_dir, root_files);
+            if (drop_down_actions_list.size() == 0) {
+                add_common_actions(project, drop_down_actions_list, root_files);
+            } else {
+                if (root_files.size() > 1) {
+                    drop_down_actions_list.add(Separator.create());
+                    add_common_actions(project, drop_down_actions_list, root_files);
+                }
             }
             AnAction[] arr = new AnAction[drop_down_actions_list.size()];
             return drop_down_actions_list.toArray(arr);
