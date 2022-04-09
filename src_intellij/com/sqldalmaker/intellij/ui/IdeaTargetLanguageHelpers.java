@@ -39,12 +39,12 @@ import java.util.List;
  */
 public class IdeaTargetLanguageHelpers {
 
-    public static List<VirtualFile> find_root_files(VirtualFile dir) {
+    public static List<VirtualFile> find_root_files(VirtualFile xml_metaprogram_dir) {
         List<VirtualFile> root_files = new ArrayList<VirtualFile>();
         String[] rf_names = {RootFileName.PHP, RootFileName.JAVA, RootFileName.CPP, RootFileName.PYTHON, RootFileName.RUBY, RootFileName.GO};
         for (String rf : rf_names) {
             VirtualFile root_file;
-            root_file = dir.findFileByRelativePath(rf);
+            root_file = xml_metaprogram_dir.findFileByRelativePath(rf);
             if (root_file != null) {
                 root_files.add(root_file);
             }
@@ -82,19 +82,12 @@ public class IdeaTargetLanguageHelpers {
         return "Unknown root file: " + fn;
     }
 
-    public static String get_target_folder_rel_path(Project project, VirtualFile root_file, Settings settings,
-                                                    String class_name, String class_scope) throws Exception {
+    public static void open_editor(Project project, VirtualFile root_file,
+                                   String class_name, Settings settings, String class_scope) throws Exception {
 
         String target_folder_abs_path = get_target_folder_abs_path(project, root_file, settings, class_scope);
         String target_file_abs_path = get_target_file_path(root_file.getName(), target_folder_abs_path, class_name);
         String rel_path = IdeaHelpers.get_relative_path(project, target_file_abs_path);
-        return rel_path;
-    }
-
-    public static void open_editor_sync(Project project, VirtualFile root_file, Settings settings,
-                                        String class_name, String class_scope) throws Exception {
-
-        String rel_path = get_target_folder_rel_path(project, root_file, settings, class_name, class_scope);
         IdeaEditorHelpers.open_project_file_in_editor_sync(project, rel_path);
     }
 
