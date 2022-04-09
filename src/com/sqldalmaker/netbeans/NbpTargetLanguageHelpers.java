@@ -38,25 +38,13 @@ public class NbpTargetLanguageHelpers {
         if (xml_mp_dir == null) {
             return root_files;
         }
-        FileObject root_file = xml_mp_dir.getFileObject(RootFileName.PHP);
-        if (root_file != null) {
-            root_files.add(root_file);
-        }
-        root_file = xml_mp_dir.getFileObject(RootFileName.JAVA);
-        if (root_file != null) {
-            root_files.add(root_file);
-        }
-        root_file = xml_mp_dir.getFileObject(RootFileName.CPP);
-        if (root_file != null) {
-            root_files.add(root_file);
-        }
-        root_file = xml_mp_dir.getFileObject(RootFileName.PYTHON);
-        if (root_file != null) {
-            root_files.add(root_file);
-        }
-        root_file = xml_mp_dir.getFileObject(RootFileName.RUBY);
-        if (root_file != null) {
-            root_files.add(root_file);
+        String[] rfn = {RootFileName.PHP, RootFileName.JAVA, RootFileName.CPP,
+            RootFileName.PYTHON, RootFileName.RUBY, RootFileName.GO};
+        for (String fn : rfn) {
+            FileObject root_file = xml_mp_dir.getFileObject(fn);
+            if (root_file != null) {
+                root_files.add(root_file);
+            }
         }
         return root_files;
     }
@@ -81,52 +69,13 @@ public class NbpTargetLanguageHelpers {
         return false;
     }
 
-    public static String get_target_file_name(SdmDataObject obj, String class_name) throws Exception {
-        String fn = obj.getPrimaryFile().getNameExt();
-        if (RootFileName.RUBY.equals(fn)) {
-            return Helpers.convert_file_name_to_snake_case(class_name, "rb");
-        } else if (RootFileName.PYTHON.equals(fn)) {
-            return Helpers.convert_file_name_to_snake_case(class_name, "py");
-        } else if (RootFileName.GO.equals(fn)) {
-            return Helpers.convert_file_name_to_snake_case(class_name, "go");
-        } else if (RootFileName.PHP.equals(fn)) {
-            return class_name + ".php";
-        } else if (RootFileName.JAVA.equals(fn)) {
-            return class_name + ".java";
-        } else if (RootFileName.CPP.equals(fn)) {
-            return class_name + ".h";
-        } else {
-            throw new Exception(get_unknown_root_file_msg(fn));
-        }
-    }
-
     public static void validate_dto(SdmDataObject obj, Settings settings, String dto_class_name,
             String[] file_content, StringBuilder res_buf) throws Exception {
-        String fn = obj.getPrimaryFile().getNameExt();
+        String root_fn = obj.getPrimaryFile().getNameExt();
         String source_folder_rel_path = settings.getFolders().getTarget();
         String project_root_abs_path = NbpPathHelpers.get_root_folder_abs_path(obj.getPrimaryFile());
-        String file_abs_path;
-        if (RootFileName.JAVA.equals(fn)) {
-            String destination = Helpers.concat_path(project_root_abs_path, source_folder_rel_path, settings.getDto().getScope().replace('.', '/'));
-            file_abs_path = Helpers.concat_path(destination, dto_class_name + ".java");
-        } else if (RootFileName.PHP.equals(fn)) {
-            String dao_destination = Helpers.concat_path(project_root_abs_path, source_folder_rel_path);
-            file_abs_path = Helpers.concat_path(dao_destination, dto_class_name + ".php");
-        } else if (RootFileName.PYTHON.equals(fn)) {
-            String dao_destination = Helpers.concat_path(project_root_abs_path, source_folder_rel_path);
-            file_abs_path = Helpers.concat_path(dao_destination, Helpers.convert_file_name_to_snake_case(dto_class_name, "py"));
-        } else if (RootFileName.RUBY.equals(fn)) {
-            String dao_destination = Helpers.concat_path(project_root_abs_path, source_folder_rel_path);
-            file_abs_path = Helpers.concat_path(dao_destination, Helpers.convert_file_name_to_snake_case(dto_class_name, "rb"));
-        } else if (RootFileName.GO.equals(fn)) {
-            String dao_destination = Helpers.concat_path(project_root_abs_path, source_folder_rel_path);
-            file_abs_path = Helpers.concat_path(dao_destination, Helpers.convert_file_name_to_snake_case(dto_class_name, "go"));
-        } else if (RootFileName.CPP.equals(fn)) {
-            String dao_destination = Helpers.concat_path(project_root_abs_path, source_folder_rel_path);
-            file_abs_path = Helpers.concat_path(dao_destination, dto_class_name + ".h");
-        } else {
-            throw new Exception(get_unknown_root_file_msg(fn));
-        }
+        String target_folder = get_target_folder(root_fn, project_root_abs_path, source_folder_rel_path, settings.getDto().getScope());
+        String file_abs_path = Helpers.concat_path(target_folder, get_target_file_name(root_fn, dto_class_name));
         /////////////////////////////////////////////////////////
         String old_text = Helpers.load_text_from_file(file_abs_path);
         if (old_text == null) {
@@ -139,34 +88,22 @@ public class NbpTargetLanguageHelpers {
         }
     }
 
+    public static String get_target_folder(String root_fn, String project_root_abs_path, String source_folder_rel_path, String scope) {
+        if (RootFileName.JAVA.equals(root_fn)) {
+            return Helpers.concat_path(project_root_abs_path, source_folder_rel_path, scope.replace('.', '/'));
+        } else {
+            return Helpers.concat_path(project_root_abs_path, source_folder_rel_path);
+        }
+    }
+
     public static void validate_dao(SdmDataObject obj, Settings settings, String dao_class_name, String[] file_content, StringBuilder res_buf) throws Exception {
-        String fn = obj.getPrimaryFile().getNameExt();
+        String root_fn = obj.getPrimaryFile().getNameExt();
         String source_folder_rel_path = settings.getFolders().getTarget();
         String project_root_abs_path = NbpPathHelpers.get_root_folder_abs_path(obj.getPrimaryFile());
-        String file_name;
-        if (RootFileName.JAVA.equals(fn)) {
-            String destination = Helpers.concat_path(project_root_abs_path, source_folder_rel_path, settings.getDao().getScope().replace('.', '/'));
-            file_name = Helpers.concat_path(destination, dao_class_name + ".java");
-        } else if (RootFileName.PHP.equals(fn)) {
-            String destination = Helpers.concat_path(project_root_abs_path, source_folder_rel_path);
-            file_name = Helpers.concat_path(destination, dao_class_name + ".php");
-        } else if (RootFileName.PYTHON.equals(fn)) {
-            String destination = Helpers.concat_path(project_root_abs_path, source_folder_rel_path);
-            file_name = Helpers.concat_path(destination, Helpers.convert_file_name_to_snake_case(dao_class_name, "py"));
-        } else if (RootFileName.RUBY.equals(fn)) {
-            String destination = Helpers.concat_path(project_root_abs_path, source_folder_rel_path);
-            file_name = Helpers.concat_path(destination, Helpers.convert_file_name_to_snake_case(dao_class_name, "rb"));
-        } else if (RootFileName.GO.equals(fn)) {
-            String destination = Helpers.concat_path(project_root_abs_path, source_folder_rel_path);
-            file_name = Helpers.concat_path(destination, Helpers.convert_file_name_to_snake_case(dao_class_name, "go"));
-        } else if (RootFileName.CPP.equals(fn)) {
-            String destination = Helpers.concat_path(project_root_abs_path, source_folder_rel_path);
-            file_name = Helpers.concat_path(destination, dao_class_name + ".h");
-        } else {
-            throw new Exception(get_unknown_root_file_msg(fn));
-        }
+        String target_folder = get_target_folder(root_fn, project_root_abs_path, source_folder_rel_path, settings.getDao().getScope());
+        String file_abs_path = Helpers.concat_path(target_folder, get_target_file_name(root_fn, dao_class_name));
         /////////////////////////////////////////////////////
-        String old_text = Helpers.load_text_from_file(file_name);
+        String old_text = Helpers.load_text_from_file(file_abs_path);
         if (old_text == null) {
             res_buf.append(Const.OUTPUT_FILE_IS_MISSING);
         } else {
@@ -176,7 +113,12 @@ public class NbpTargetLanguageHelpers {
             }
         }
     }
-    
+
+    public static String get_target_file_name(SdmDataObject obj, String class_name) throws Exception {
+        String root_fn = obj.getPrimaryFile().getNameExt();
+        return get_target_file_name(root_fn, class_name);
+    }
+
     public static String get_target_file_name(String root_fn, String class_name) throws Exception {
         if (RootFileName.JAVA.equals(root_fn)) {
             return class_name + ".java";
@@ -190,24 +132,24 @@ public class NbpTargetLanguageHelpers {
             return Helpers.convert_file_name_to_snake_case(class_name, "rb");
         } else if (RootFileName.GO.equals(root_fn)) {
             return Helpers.convert_file_name_to_snake_case(class_name, "go");
-        } 
+        }
         throw new Exception(get_unknown_root_file_msg(root_fn));
     }
-    
+
     public static String get_rel_path(Settings settings, String root_fn, String file_name, String scope) {
         if (RootFileName.JAVA.equals(root_fn)) {
             return Helpers.concat_path(SdmUtils.get_package_relative_path(settings, scope), file_name);
         } else {
             return Helpers.concat_path(settings.getFolders().getTarget(), file_name);
         }
-    } 
+    }
 
     public static String get_rel_path(SdmDataObject obj, Settings settings, String class_name, String scope) throws Exception {
         String root_fn = obj.getPrimaryFile().getNameExt();
         String target_file_name = get_target_file_name(root_fn, class_name);
         String rel_path = get_rel_path(settings, root_fn, target_file_name, scope);
         return rel_path;
-    } 
+    }
 
     public static void open_in_editor_async(SdmDataObject obj, Settings settings, String class_name, String scope) throws Exception {
         String rel_path = get_rel_path(obj, settings, class_name, scope);
@@ -359,11 +301,6 @@ public class NbpTargetLanguageHelpers {
         }
     }
 
-    /**
-     * @param root_folder
-     * @param file
-     * @return null if the file is not root-file
-     */
     public static String get_root_file_relative_path(final FileObject root_folder, FileObject file) {
         String fn = file.getNameExt();
         if (RootFileName.JAVA.equals(fn)

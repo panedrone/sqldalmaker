@@ -30,7 +30,7 @@ import org.openide.util.RequestProcessor;
  */
 public class NbpIdeEditorHelpers {
 
-    private static void open_in_editor_async(final FileObject file) {
+    public static void open_in_editor_async(final FileObject file) {
         // https://platform.netbeans.org/tutorials/60/nbm-hyperlink.html
         RequestProcessor.getDefault().post(new Runnable() {
             @Override
