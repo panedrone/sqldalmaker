@@ -5,6 +5,8 @@
  */
 package com.sqldalmaker.cg;
 
+import org.apache.cayenne.dba.TypesMapping;
+
 import java.sql.*;
 import java.util.*;
 
@@ -46,8 +48,50 @@ class InfoDbTable {
                 fi.setPK(false);
             }
         }
-        InfoFields.refine_field_info_by_jdbc_table(conn, table_name, fields_map);
+        refine_field_info_by_jdbc_table(conn, table_name, fields_map);
         _refine_by_type_map();
+    }
+
+    public static void refine_field_info_by_jdbc_table(
+            Connection conn,
+            String table_name,
+            Map<String, FieldInfo> fields_map) throws Exception {
+
+        if (!SqlUtils.is_table_ref(table_name)) {
+            throw new Exception("Table name expected: " + table_name);
+        }
+        DatabaseMetaData md = conn.getMetaData();
+        ResultSet columns_rs = _get_columns_rs(md, table_name);
+        try {
+            while (columns_rs.next()) {
+                String db_col_name = columns_rs.getString("COLUMN_NAME");
+                if (fields_map.containsKey(db_col_name)) {
+                    int type = columns_rs.getInt("DATA_TYPE");
+                    String apache_java_type_name = TypesMapping.getJavaBySqlType(type);
+                    FieldInfo fi = fields_map.get(db_col_name);
+                    fi.refine_rendered_type(apache_java_type_name);
+                    fi.setComment("t(" + db_col_name + ")");
+                }
+            }
+        } finally {
+            columns_rs.close();
+        }
+    }
+
+    private static ResultSet _get_columns_rs(
+            DatabaseMetaData md,
+            String table_name) throws SQLException {
+
+        String[] parts = table_name.split("\\.", -1); // -1 to leave empty strings
+        ResultSet rs_columns;
+        if (parts.length == 1) {
+            rs_columns = md.getColumns(null, null, table_name, "%");
+        } else {
+            String schema_nm = table_name.substring(0, table_name.lastIndexOf('.'));
+            String table_nm = parts[parts.length - 1];
+            rs_columns = md.getColumns(null, schema_nm, table_nm, "%");
+        }
+        return rs_columns;
     }
 
     private void _get_field_info_by_jdbc_sql(

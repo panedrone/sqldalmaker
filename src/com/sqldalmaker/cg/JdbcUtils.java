@@ -34,8 +34,13 @@ public class JdbcUtils {
         this.dto_field_names_mode = field_names_mode;
         this.method_params_names_mode = method_params_names_mode;
 
-        this.global_markers = new JaxbUtils.JaxbMacros(jaxb_settings.getGlobalMacros());
-        this.type_map = new JaxbUtils.JaxbTypeMap(jaxb_settings.getTypeMap());
+        if (jaxb_settings == null) {  // DTO XML wizard
+            this.global_markers = null;
+            this.type_map = null;
+        } else {
+            this.global_markers = new JaxbUtils.JaxbMacros(jaxb_settings.getGlobalMacros());
+            this.type_map = new JaxbUtils.JaxbTypeMap(jaxb_settings.getTypeMap());
+        }
     }
 
     public FieldNamesMode get_dto_field_names_mode() {

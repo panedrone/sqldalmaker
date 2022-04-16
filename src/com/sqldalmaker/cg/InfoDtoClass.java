@@ -30,8 +30,8 @@ class InfoDtoClass {
 
         this.conn = conn;
         this.type_map = type_map;
-        this.dto_field_names_mode = dto_field_names_mode;
         this.macros = macros;
+        this.dto_field_names_mode = dto_field_names_mode;
     }
 
     public Map<String, FieldInfo> get_dto_field_info(DtoClass jaxb_dto_class,
@@ -47,13 +47,17 @@ class InfoDtoClass {
             _get_field_info_by_jdbc_sql(jdbc_sql, dto_fields_map, _dto_fields);
             if (SqlUtils.is_table_ref(jaxb_dto_class_ref)) {
                 String table_name = jaxb_dto_class_ref;
-                InfoFields.refine_field_info_by_jdbc_table(conn, table_name, dto_fields_map);
+                InfoDbTable.refine_field_info_by_jdbc_table(conn, table_name, dto_fields_map);
             } else if (SqlUtils.is_sql_shortcut_ref(jaxb_dto_class_ref)) {
                 String[] parts = SqlUtils.parse_sql_shortcut_ref(jaxb_dto_class_ref);
                 String table_name = parts[0];
-                InfoFields.refine_field_info_by_jdbc_table(conn, table_name, dto_fields_map);
+                InfoDbTable.refine_field_info_by_jdbc_table(conn, table_name, dto_fields_map);
             }
         }
+        if (type_map == null) {
+            return dto_fields_map; // DTO XML wizard
+        }
+        // -------------------------
         Set<String> refined_by_field_jaxb = new HashSet<String>();
         // -------------------------
         List<DtoClass.Field> jaxb_fields = jaxb_dto_class.getField(); // not null!!
@@ -82,7 +86,7 @@ class InfoDtoClass {
             _refine_fi(fi, target_type);
         }
         // -------------------------
-        _refine_rendered_types_by_macros(_dto_fields);
+        _substitute_built_in_macros(_dto_fields);
         // -------------------------
         for (FieldInfo fi : _dto_fields) {
             this.macros.substitute_type_params(fi);
@@ -200,10 +204,23 @@ class InfoDtoClass {
                 return fi.getColumnName();
             }
         });
+        macros.put("{sqlalchemy-params}", new IMacro() {
+            @Override
+            public String exec(FieldInfo fi) {
+                String res = "";
+                if (fi.isPK()) {
+                    res += ", primary_key=True";
+                }
+                if (fi.isAI()) {
+                    res += ", autoincrement=True";
+                }
+                return res;
+            }
+        });
         return macros;
     }
 
-    private static void _refine_rendered_types_by_macros(List<FieldInfo> fields) {
+    private static void _substitute_built_in_macros(List<FieldInfo> fields) {
         Map<String, IMacro> macro = _get_macros();
         for (FieldInfo fi : fields) {
             String curr_type = fi.getType();
