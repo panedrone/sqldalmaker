@@ -214,7 +214,7 @@ public class SqlUtils {
 //        }
     }
 
-    static String jdbc_sql_by_dto_class_ref(String ref, String sql_root_abs_path) throws Exception {
+    public static String jdbc_sql_by_dto_class_ref(String ref, String sql_root_abs_path) throws Exception {
         String[] parts = ref.split(":");
         String table_name = null;
         if (parts.length >= 2) {

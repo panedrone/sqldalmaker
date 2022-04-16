@@ -2,7 +2,7 @@
     <id>dal-mpe</id>
     <name>SQL DAL Maker</name>
     <category>Database</category>
-    <version>1.218.2204</version>
+    <version>1.219.2204</version>
     <vendor email="sqldalmaker@gmail.com"/>
     <idea-version since-build="181.5684.4"/>
 
@@ -18,6 +18,7 @@ PHP, Java, C++, Python, Ruby, and Go. To generate the class, you declare it in X
     <change-notes>
         <![CDATA[
 <ul>
+<li>SQLAlchemy models</li>
 <li>Navigation from XML to generated files</li>
 <li>Reworked error handling for Golang</li>
 <li>Allowed not-PK/FK columns in SQL-shortcuts</li>

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema attributeFormDefault="unqualified"
-	elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	elementFormDefault="qualified"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
 	<xs:element name="settings">
 		<xs:complexType>
@@ -14,61 +15,65 @@
 				<xs:element ref="cpp" minOccurs="1" maxOccurs="1" />
 				<xs:element ref="jdbc" minOccurs="1" maxOccurs="1" />
 				<xs:element ref="type-map" minOccurs="1" maxOccurs="1" />
+				<xs:element ref="global-macros" minOccurs="0"
+					maxOccurs="1" />
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
-
 	<xs:element name="folders">
 		<xs:complexType>
-			<xs:attribute name="target" use="required" type="xs:string" />
+			<xs:attribute name="target" use="required"
+				type="xs:string" />
 			<xs:attribute name="sql" use="required" type="xs:string" />
 		</xs:complexType>
 	</xs:element>
-
 	<xs:element name="dto">
 		<xs:complexType>
-			<xs:attribute name="scope" use="required" type="xs:string" />
-			<xs:attribute name="inheritance" use="required" type="xs:string" />
+			<xs:attribute name="scope" use="required"
+				type="xs:string" />
+			<xs:attribute name="inheritance" use="required"
+				type="xs:string" />
 			<xs:attribute name="field-names-mode" use="required"
 				type="xs:int" />
-			<xs:attribute name="single-file" use="required" type="xs:string" />
+			<xs:attribute name="single-file" use="required"
+				type="xs:string" />
 		</xs:complexType>
 	</xs:element>
-
 	<xs:element name="dao">
 		<xs:complexType>
-			<xs:attribute name="scope" use="required" type="xs:string" />
+			<xs:attribute name="scope" use="required"
+				type="xs:string" />
 		</xs:complexType>
 	</xs:element>
-
 	<xs:element name="external-vm-file">
 		<xs:complexType>
-			<xs:attribute name="path" use="required" type="xs:string" />
+			<xs:attribute name="path" use="required"
+				type="xs:string" />
 		</xs:complexType>
 	</xs:element>
-
 	<xs:element name="ide">
 		<xs:complexType>
-			<xs:attribute name="event-log" use="required" type="xs:boolean" />
+			<xs:attribute name="event-log" use="required"
+				type="xs:boolean" />
 		</xs:complexType>
 	</xs:element>
-
 	<xs:element name="cpp">
 		<xs:complexType>
-			<xs:attribute name="class-prefix" use="required" type="xs:string" />
+			<xs:attribute name="class-prefix" use="required"
+				type="xs:string" />
 		</xs:complexType>
 	</xs:element>
-
 	<xs:element name="jdbc">
 		<xs:complexType>
 			<xs:attribute name="jar" use="required" type="xs:string" />
-			<xs:attribute name="class" use="required" type="xs:string" />
+			<xs:attribute name="class" use="required"
+				type="xs:string" />
 			<xs:attribute name="url" use="required" type="xs:string" />
-			<xs:attribute name="user" use="required" type="xs:string" />
+			<xs:attribute name="user" use="required"
+				type="xs:string" />
 			<xs:attribute name="pwd" use="required" type="xs:string" />
 		</xs:complexType>
 	</xs:element>
-
 	<xs:element name="type-map">
 		<xs:complexType>
 			<xs:sequence>
@@ -76,13 +81,41 @@
 					<xs:element ref="type" />
 				</xs:choice>
 			</xs:sequence>
-			<xs:attribute name="default" use="required" type="xs:string" />
+			<xs:attribute name="default" use="required"
+				type="xs:string" />
 		</xs:complexType>
+		<xs:unique name="type-detected">
+			<xs:selector xpath="./*" />
+			<xs:field xpath="@detected" />
+		</xs:unique>
 	</xs:element>
 	<xs:element name="type">
 		<xs:complexType>
-			<xs:attribute name="detected" use="required" type="xs:string" />
-			<xs:attribute name="target" use="required" type="xs:string" />
+			<xs:attribute name="detected" use="required"
+				type="xs:string" />
+			<xs:attribute name="target" use="required"
+				type="xs:string" />
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="global-macros">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:choice minOccurs="0" maxOccurs="unbounded">
+					<xs:element ref="global-macro" />
+				</xs:choice>
+			</xs:sequence>
+		</xs:complexType>
+		<xs:unique name="global-macro-id">
+			<xs:selector xpath="./*" />
+			<xs:field xpath="@name" />
+		</xs:unique>
+	</xs:element>
+	<xs:element name="global-macro">
+		<xs:complexType>
+			<xs:attribute name="name" use="required"
+				type="xs:string" />
+			<xs:attribute name="value" use="required"
+				type="xs:string" />
 		</xs:complexType>
 	</xs:element>
 

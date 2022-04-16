@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2021 sqldalmaker@gmail.com
+    Copyright 2011-2022 sqldalmaker@gmail.com
     SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -7,9 +7,9 @@ package com.sqldalmaker.cg.ruby;
 
 import com.sqldalmaker.cg.*;
 import com.sqldalmaker.jaxb.dao.*;
-import com.sqldalmaker.jaxb.settings.*;
 import com.sqldalmaker.jaxb.dto.DtoClass;
 import com.sqldalmaker.jaxb.dto.DtoClasses;
+import com.sqldalmaker.jaxb.settings.Settings;
 
 import java.io.StringWriter;
 import java.sql.Connection;
@@ -31,9 +31,10 @@ public class RubyCG {
         private final TemplateEngine te;
         private final JdbcUtils db_utils;
 
-        public DTO(DtoClasses jaxb_dto_classes, TypeMap jaxb_type_map,
+        public DTO(DtoClasses jaxb_dto_classes, Settings jaxb_settings,
                 Connection connection, String sql_root_abs_path,
                 String vm_file_system_dir) throws Exception {
+
             this.jaxb_dto_classes = jaxb_dto_classes.getDtoClass();
             this.sql_root_abs_path = sql_root_abs_path;
             if (vm_file_system_dir == null) {
@@ -46,7 +47,7 @@ public class RubyCG {
             // characters.
             // Class names and module names are constants, and follow the constant
             // naming conventions.
-            db_utils = new JdbcUtils(connection, FieldNamesMode.SNAKE_CASE, FieldNamesMode.SNAKE_CASE, jaxb_type_map);
+            db_utils = new JdbcUtils(connection, FieldNamesMode.SNAKE_CASE, FieldNamesMode.SNAKE_CASE, jaxb_settings);
         }
 
         @Override
@@ -84,9 +85,10 @@ public class RubyCG {
         private final TemplateEngine te;
         private final JdbcUtils db_utils;
 
-        public DAO(DtoClasses jaxb_dto_classes, TypeMap jaxb_type_map, 
+        public DAO(DtoClasses jaxb_dto_classes, Settings jaxb_settings,
                 Connection connection, String sql_root_abs_path,
                 String vm_file_system_dir) throws Exception {
+
             this.jaxb_dto_classes = jaxb_dto_classes;
             this.sql_root_abs_path = sql_root_abs_path;
             if (vm_file_system_dir == null) {
@@ -94,7 +96,7 @@ public class RubyCG {
             } else {
                 te = new TemplateEngine(vm_file_system_dir, true);
             }
-            db_utils = new JdbcUtils(connection, FieldNamesMode.SNAKE_CASE, FieldNamesMode.SNAKE_CASE, jaxb_type_map);
+            db_utils = new JdbcUtils(connection, FieldNamesMode.SNAKE_CASE, FieldNamesMode.SNAKE_CASE, jaxb_settings);
         }
 
         @Override
@@ -172,7 +174,13 @@ public class RubyCG {
             if (jaxb_return_type_is_dto) {
                 returned_type_name = _get_rendered_dto_class_name(jaxb_dto_or_return_type, fetch_list);
             } else {
-                returned_type_name = fields_all.get(0).calc_target_type_name();
+                if (fields_all.size() == 0) {
+                    returned_type_name = "?";
+                } else {
+                    FieldInfo fi = fields_all.get(0);
+                    String curr_type = fi.getType();
+                    returned_type_name = this.db_utils.get_target_type_by_type_map(curr_type);
+                }
             }
             String ruby_sql_str = SqlUtils.jdbc_sql_to_ruby_string(dao_query_jdbc_sql);
             Map<String, Object> context = new HashMap<String, Object>();

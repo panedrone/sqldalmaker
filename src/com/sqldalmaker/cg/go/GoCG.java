@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2021 sqldalmaker@gmail.com
+    Copyright 2011-2022 sqldalmaker@gmail.com
     SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -11,7 +11,7 @@ import com.sqldalmaker.jaxb.dao.ExecDml;
 import com.sqldalmaker.jaxb.dao.TypeCrud;
 import com.sqldalmaker.jaxb.dto.DtoClass;
 import com.sqldalmaker.jaxb.dto.DtoClasses;
-import com.sqldalmaker.jaxb.settings.TypeMap;
+import com.sqldalmaker.jaxb.settings.Settings;
 
 import java.io.StringWriter;
 import java.sql.Connection;
@@ -35,7 +35,7 @@ public class GoCG {
         private final TemplateEngine te;
         private final JdbcUtils db_utils;
 
-        public DTO(String dto_package, DtoClasses jaxb_dto_classes, TypeMap jaxb_type_map, Connection connection,
+        public DTO(String dto_package, DtoClasses jaxb_dto_classes, Settings jaxb_settings, Connection connection,
                    String sql_root_abs_path, FieldNamesMode field_names_mode, String vm_file_system_dir) throws Exception {
             this.dto_package = dto_package;
             this.jaxb_dto_classes = jaxb_dto_classes.getDtoClass();
@@ -45,7 +45,7 @@ public class GoCG {
             } else {
                 te = new TemplateEngine(vm_file_system_dir, true);
             }
-            db_utils = new JdbcUtils(connection, field_names_mode, FieldNamesMode.LOWER_CAMEL_CASE, jaxb_type_map);
+            db_utils = new JdbcUtils(connection, field_names_mode, FieldNamesMode.LOWER_CAMEL_CASE, jaxb_settings);
         }
 
         @Override
@@ -76,12 +76,12 @@ public class GoCG {
                 if (len > max_name_len) {
                     max_name_len = len;
                 }
-                if (fi.type_comment_from_jaxb_type_name().length() > 0) {
-                    int type_name_len = fi.calc_target_type_name().length();
-                    if (type_name_len > max_type_name_len) {
-                        max_type_name_len = type_name_len;
-                    }
-                }
+//                if (fi.type_comment_from_jaxb_field_type().length() > 0) {
+//                    int type_name_len = fi.calc_target_type_name().length();
+//                    if (type_name_len > max_type_name_len) {
+//                        max_type_name_len = type_name_len;
+//                    }
+//                }
             }
             String name_format = "%-" + max_name_len + "." + max_name_len + "s";
             String type_format = "%-" + max_type_name_len + "." + max_type_name_len + "s %s";
@@ -89,12 +89,12 @@ public class GoCG {
                 String name = fi.getName();
                 name = String.format(name_format, name);
                 fi.setName(name);
-                if (max_type_name_len > 0) {
-                    String type_name = fi.calc_target_type_name();
-                    String type_comment = fi.type_comment_from_jaxb_type_name();
-                    type_name = String.format(type_format, type_name, type_comment);
-                    fi.refine_rendered_type(type_name);
-                }
+//                if (max_type_name_len > 0) {
+//                    String type_name = fi.calc_target_type_name();
+//                    String type_comment = fi.type_comment_from_jaxb_field_type();
+//                    type_name = String.format(type_format, type_name, type_comment);
+//                    fi.refine_rendered_type(type_name);
+//                }
             }
             context.put("imports", imports);
             context.put("class_name", dto_class_name);
@@ -123,7 +123,7 @@ public class GoCG {
 
         private String dao_class_name;
 
-        public DAO(String dao_package, DtoClasses jaxb_dto_classes, TypeMap jaxb_type_map, Connection connection,
+        public DAO(String dao_package, DtoClasses jaxb_dto_classes, Settings jaxb_settings, Connection connection,
                    String sql_root_abs_path, FieldNamesMode field_names_mode, String vm_file_system_dir) throws Exception {
             //this.dto_package = dto_package;
             this.dao_package = dao_package;
@@ -134,7 +134,7 @@ public class GoCG {
             } else {
                 te = new TemplateEngine(vm_file_system_dir, true);
             }
-            db_utils = new JdbcUtils(connection, field_names_mode, FieldNamesMode.LOWER_CAMEL_CASE, jaxb_type_map);
+            db_utils = new JdbcUtils(connection, field_names_mode, FieldNamesMode.LOWER_CAMEL_CASE, jaxb_settings);
         }
 
         @Override
@@ -208,7 +208,7 @@ public class GoCG {
             if (jaxb_return_type_is_dto) {
                 returned_type_name = _get_rendered_dto_class_name(jaxb_dto_or_return_type);
             } else {
-                returned_type_name = fields.get(0).calc_target_type_name();
+                returned_type_name = fields.get(0).getType();
             }
             String go_sql_str = SqlUtils.format_jdbc_sql_for_go(dao_query_jdbc_sql);
             Map<String, Object> context = new HashMap<String, Object>();
@@ -320,10 +320,9 @@ public class GoCG {
                         MappingInfo m = _create_mapping(parts);
                         m_list.add(m);
                         String func_type = String.format("func(*%s)", m.dto_class_name);
-                        method_params.add(new FieldInfo(FieldNamesMode.LOWER_CAMEL_CASE,
-                                func_type, m.method_param_name, "parameter"));
-                        exec_dml_params.add(
-                                new FieldInfo(FieldNamesMode.AS_IS, p.calc_target_type_name(), m.exec_dml_param_name, "parameter"));
+                        method_params.add(new FieldInfo(FieldNamesMode.LOWER_CAMEL_CASE, func_type, m.method_param_name, "parameter"));
+                        String target_type_name = this.db_utils.get_target_type_by_type_map(p.getType());
+                        exec_dml_params.add(new FieldInfo(FieldNamesMode.AS_IS, target_type_name, m.exec_dml_param_name, "parameter"));
                     } else {
                         method_params.add(p);
                         exec_dml_params.add(p);

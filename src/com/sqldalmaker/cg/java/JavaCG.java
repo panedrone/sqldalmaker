@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2021 sqldalmaker@gmail.com
+    Copyright 2011-2022 sqldalmaker@gmail.com
     SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -9,7 +9,7 @@ import com.sqldalmaker.cg.*;
 import com.sqldalmaker.jaxb.dao.*;
 import com.sqldalmaker.jaxb.dto.DtoClass;
 import com.sqldalmaker.jaxb.dto.DtoClasses;
-import com.sqldalmaker.jaxb.settings.TypeMap;
+import com.sqldalmaker.jaxb.settings.Settings;
 
 import java.io.StringWriter;
 import java.sql.Connection;
@@ -33,7 +33,7 @@ public class JavaCG {
         private final TemplateEngine te;
         private final JdbcUtils db_utils;
 
-        public DTO(DtoClasses jaxb_dto_classes, TypeMap jaxb_type_map, Connection connection, String dto_package, String sql_root_abs_path,
+        public DTO(DtoClasses jaxb_dto_classes, Settings jaxb_settings, Connection connection, String dto_package, String sql_root_abs_path,
                    String dto_inheritance, FieldNamesMode field_names_mode, String vm_file_system_dir) throws Exception {
             this.jaxb_dto_classes = jaxb_dto_classes.getDtoClass();
             this.dto_package = dto_package;
@@ -44,7 +44,7 @@ public class JavaCG {
             } else {
                 te = new TemplateEngine(vm_file_system_dir, true);
             }
-            db_utils = new JdbcUtils(connection, field_names_mode, FieldNamesMode.AS_IS, jaxb_type_map);
+            db_utils = new JdbcUtils(connection, field_names_mode, FieldNamesMode.AS_IS, jaxb_settings);
         }
 
         @Override
@@ -86,8 +86,9 @@ public class JavaCG {
         private final TemplateEngine te;
         private final JdbcUtils db_utils;
 
-        public DAO(DtoClasses jaxb_dto_classes, TypeMap jaxb_type_map, Connection connection, String dto_package, String dao_package,
+        public DAO(DtoClasses jaxb_dto_classes, Settings jaxb_settings, Connection connection, String dto_package, String dao_package,
                    String sql_root_abs_path, FieldNamesMode field_names_mode, String vm_file_system_dir) throws Exception {
+
             this.jaxb_dto_classes = jaxb_dto_classes;
             this.dto_package = dto_package;
             this.dao_package = dao_package;
@@ -97,7 +98,7 @@ public class JavaCG {
             } else {
                 te = new TemplateEngine(vm_file_system_dir, true);
             }
-            db_utils = new JdbcUtils(connection, field_names_mode, FieldNamesMode.AS_IS, jaxb_type_map);
+            db_utils = new JdbcUtils(connection, field_names_mode, FieldNamesMode.AS_IS, jaxb_settings);
         }
 
         @Override
@@ -172,7 +173,13 @@ public class JavaCG {
                 }
                 returned_type_name = _get_rendered_dto_class_name(jaxb_dto_or_return_type);
             } else {
-                returned_type_name = fields.get(0).calc_target_type_name();
+                if (fields.size() == 0) {
+                    returned_type_name = "?";
+                } else {
+                    FieldInfo fi = fields.get(0);
+                    String curr_type = fi.getType();
+                    returned_type_name = this.db_utils.get_target_type_by_type_map(curr_type);
+                }
             }
             String java_sql_str = SqlUtils.format_jdbc_sql_for_java(dao_query_jdbc_sql);
             Map<String, Object> context = new HashMap<String, Object>();
@@ -275,7 +282,9 @@ public class JavaCG {
                         MappingInfo m = _create_mapping(parts);
                         m_list.add(m);
                         method_params.add(new FieldInfo(FieldNamesMode.AS_IS, String.format("final RecordHandler<%s>", m.dto_class_name), m.method_param_name, "parameter"));
-                        exec_dml_params.add(new FieldInfo(FieldNamesMode.AS_IS, p.calc_target_type_name(), m.exec_dml_param_name, "parameter"));
+                        String curr_type = p.getType();
+                        String target_type_name = this.db_utils.get_target_type_by_type_map(curr_type);
+                        exec_dml_params.add(new FieldInfo(FieldNamesMode.AS_IS, target_type_name, m.exec_dml_param_name, "parameter"));
                     } else {
                         method_params.add(p);
                         exec_dml_params.add(p);

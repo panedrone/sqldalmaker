@@ -1,3 +1,21 @@
+2022-04-10
+
+    SQLAlchemy models:
+
+    <dto-class name="sqlalchemy-Actor" ref="actor"/>
+    <dto-class name="sqlalchemy-ActorInfo" ref="actor_info.sql"/>
+
+    ds = DataStore()
+
+    res = db.fetch_all(Actor)  # orm-way
+    for r in res:
+        ai: ActorInfo = r
+        print(f"{ai.first_name}\t{ai.last_name}\n")
+
+    res = db.fetch_all_raw(ActorInfo, [50])  # raw sql, 50 is film_id
+    for r in res:
+        print("\n", r)
+
 2022-04-06
 
     Navigation from XML to generated files

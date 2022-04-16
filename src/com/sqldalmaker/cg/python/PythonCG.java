@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2021 sqldalmaker@gmail.com
+    Copyright 2011-2022 sqldalmaker@gmail.com
     SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -9,7 +9,7 @@ import com.sqldalmaker.cg.*;
 import com.sqldalmaker.jaxb.dao.*;
 import com.sqldalmaker.jaxb.dto.DtoClass;
 import com.sqldalmaker.jaxb.dto.DtoClasses;
-import com.sqldalmaker.jaxb.settings.TypeMap;
+import com.sqldalmaker.jaxb.settings.Settings;
 
 import java.io.StringWriter;
 import java.sql.Connection;
@@ -31,8 +31,9 @@ public class PythonCG {
         private final TemplateEngine te;
         private final JdbcUtils db_utils;
 
-        public DTO(DtoClasses jaxb_dto_classes, TypeMap jaxb_type_map, Connection connection, String sql_root_abs_path,
+        public DTO(DtoClasses jaxb_dto_classes, Settings jaxb_settings, Connection connection, String sql_root_abs_path,
                    String vm_file_system_dir) throws Exception {
+
             this.jaxb_dto_classes = jaxb_dto_classes.getDtoClass();
             this.sql_root_abs_path = sql_root_abs_path;
             if (vm_file_system_dir == null) {
@@ -40,7 +41,7 @@ public class PythonCG {
             } else {
                 te = new TemplateEngine(vm_file_system_dir, true);
             }
-            db_utils = new JdbcUtils(connection, FieldNamesMode.SNAKE_CASE, FieldNamesMode.SNAKE_CASE, jaxb_type_map);
+            db_utils = new JdbcUtils(connection, FieldNamesMode.SNAKE_CASE, FieldNamesMode.SNAKE_CASE, jaxb_settings);
         }
 
         @Override
@@ -58,6 +59,23 @@ public class PythonCG {
             List<FieldInfo> fields = new ArrayList<FieldInfo>();
             db_utils.get_dto_field_info(jaxb_dto_class, sql_root_abs_path, fields);
             Map<String, Object> context = new HashMap<String, Object>();
+            String name;
+            if (dto_class_name.startsWith("sqlalchemy-")) {
+                dto_class_name = dto_class_name.replace("sqlalchemy-", "");
+                context.put("model", "sqlalchemy");
+            }
+            String ref = jaxb_dto_class.getRef();
+            if (SqlUtils.is_table_ref(ref)) {
+                context.put("tablename", ref);
+            } else if (!SqlUtils.is_empty_ref(ref)) {
+                try {
+                    String sql = SqlUtils.jdbc_sql_by_dto_class_ref(ref, sql_root_abs_path);
+                    String python_sql_str = SqlUtils.jdbc_sql_to_python_string(sql);
+                    context.put("sql", python_sql_str);
+                } catch (Exception ex) {
+                    System.err.println(ex.getMessage());
+                }
+            }
             context.put("ref", jaxb_dto_class.getRef());
             context.put("class_name", dto_class_name);
             context.put("fields", fields);
@@ -97,8 +115,9 @@ public class PythonCG {
         private final TemplateEngine te;
         private final JdbcUtils db_utils;
 
-        public DAO(String dto_package, DtoClasses jaxb_dto_classes, TypeMap jaxb_type_map,
+        public DAO(String dto_package, DtoClasses jaxb_dto_classes, Settings jaxb_settings,
                    Connection connection, String sql_root_abs_path, String vm_file_system_dir) throws Exception {
+
             this.jaxb_dto_classes = jaxb_dto_classes;
             this.sql_root_abs_path = sql_root_abs_path;
             this.dto_package = dto_package;
@@ -107,7 +126,7 @@ public class PythonCG {
             } else {
                 te = new TemplateEngine(vm_file_system_dir, true);
             }
-            db_utils = new JdbcUtils(connection, FieldNamesMode.SNAKE_CASE, FieldNamesMode.SNAKE_CASE, jaxb_type_map);
+            db_utils = new JdbcUtils(connection, FieldNamesMode.SNAKE_CASE, FieldNamesMode.SNAKE_CASE, jaxb_settings);
         }
 
         @Override
@@ -187,7 +206,13 @@ public class PythonCG {
             if (jaxb_return_type_is_dto) {
                 returned_type_name = _get_rendered_dto_class_name(jaxb_dto_or_return_type, fetch_list);
             } else {
-                returned_type_name = fields_all.get(0).calc_target_type_name();
+                if (fields_all.size() == 0) {
+                    returned_type_name = "?";
+                } else {
+                    FieldInfo fi = fields_all.get(0);
+                    String curr_type = fi.getType();
+                    returned_type_name = this.db_utils.get_target_type_by_type_map(curr_type);
+                }
             }
             String python_sql_str = SqlUtils.jdbc_sql_to_python_string(dao_query_jdbc_sql);
             Map<String, Object> context = new HashMap<String, Object>();
@@ -215,7 +240,7 @@ public class PythonCG {
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
             if (add_to_import) {
                 String dto_class_nm = jaxb_dto_class.getName();
-                String python_fn = Helpers.camel_case_to_snake_case(dto_class_nm);
+                String python_fn = Helpers.camel_case_to_lower_snake_case(dto_class_nm);
                 if (dto_package != null && dto_package.length() > 0) {
                     python_fn = dto_package + "." + python_fn;
                 }

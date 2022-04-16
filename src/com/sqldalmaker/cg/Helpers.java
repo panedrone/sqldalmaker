@@ -62,7 +62,7 @@ public class Helpers {
         return new String[]{before_brackets, inside_brackets};
     }
 
-    public static String camel_case_to_snake_case(String src) {
+    public static String camel_case_to_lower_snake_case(String src) {
         // http://stackoverflow.com/questions/10310321/regex-for-converting-camelcase-to-camel-case-in-java
         String regex = "([a-z])([A-Z]+)";
         String replacement = "$1_$2";
@@ -70,7 +70,7 @@ public class Helpers {
     }
 
     public static String to_kebab_case(String src) {
-        String sc = camel_case_to_snake_case(src);
+        String sc = camel_case_to_lower_snake_case(src);
         String []parts = sc.split("_");
         String kc = String.join("-", parts);
         return kc;
@@ -79,7 +79,7 @@ public class Helpers {
     public static String convert_file_name_to_snake_case(String class_name, String ext) {
         // http://stackoverflow.com/questions/221320/standard-file-naming-conventions-in-ruby
         // In Rails the convention of using underscores is necessary (almost).
-        return Helpers.camel_case_to_snake_case(class_name) + "." + ext;
+        return Helpers.camel_case_to_lower_snake_case(class_name) + "." + ext;
     }
 
     private static String java_primitive_name_to_class_name(String name) {
@@ -157,7 +157,7 @@ public class Helpers {
         } else if (FieldNamesMode.TITLE_CASE.equals(field_names_mode)) {
             return to_lower_camel_or_title_case(method_name, true);
         } else if (FieldNamesMode.SNAKE_CASE.equals(field_names_mode)) {
-            return camel_case_to_snake_case(method_name);
+            return camel_case_to_lower_snake_case(method_name);
         }
         return method_name;
     }

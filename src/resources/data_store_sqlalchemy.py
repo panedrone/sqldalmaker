@@ -1,5 +1,10 @@
 import sqlalchemy
 
+import sqlalchemy.ext.declarative
+from sqlalchemy.orm import declarative_base
+
+Base = declarative_base()
+
 
 class OutParam:
     def __init__(self):

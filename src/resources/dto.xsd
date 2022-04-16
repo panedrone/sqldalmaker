@@ -9,6 +9,10 @@
                 </xs:choice>
             </xs:sequence>
         </xs:complexType>
+        <xs:unique name="dto-class-name">
+            <xs:selector xpath="./*"/>
+            <xs:field xpath="@name"/>
+        </xs:unique>
     </xs:element>
     <xs:element name="dto-class">
         <xs:complexType>
@@ -22,7 +26,6 @@
             </xs:sequence>
             <xs:attribute name="name" use="required" type="xs:NCName"/>
             <xs:attribute name="ref" use="required" type="xs:string"/>
-            <xs:attribute name="field-comment" type="xs:string"/>
         </xs:complexType>
     </xs:element>
 </xs:schema>

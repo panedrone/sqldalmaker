@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2021 sqldalmaker@gmail.com
+    Copyright 2011-2022 sqldalmaker@gmail.com
     SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -8,6 +8,8 @@ package com.sqldalmaker.cg;
 import com.sqldalmaker.jaxb.dao.*;
 import com.sqldalmaker.jaxb.dto.DtoClass;
 import com.sqldalmaker.jaxb.dto.DtoClasses;
+import com.sqldalmaker.jaxb.settings.GlobalMacro;
+import com.sqldalmaker.jaxb.settings.GlobalMacros;
 import com.sqldalmaker.jaxb.settings.Type;
 import com.sqldalmaker.jaxb.settings.TypeMap;
 
@@ -19,29 +21,119 @@ import java.util.*;
  */
 public class JaxbUtils {
 
+    public static class JaxbMacros {
+
+        private final Map<String, String> built_in = new HashMap<String, String>();
+        private final Map<String, String> custom = new HashMap<String, String>();
+        private final Map<String, String> custom_vm = new HashMap<String, String>();
+
+        public JaxbMacros(GlobalMacros jaxb_global_makros) {
+            if (jaxb_global_makros == null) {
+                return;
+            }
+            for (GlobalMacro m : jaxb_global_makros.getGlobalMacro()) {
+                String name = m.getName();
+                String value = m.getValue();
+                if (value.equals("-built-in–")) {
+                    built_in.put(name, value);
+                } else if (name.startsWith("{custom_vm:")) {
+                    custom_vm.put(name, value);
+                } else {
+                    custom.put(name, value);
+                }
+            }
+        }
+
+        public Set<String> get_built_in_names() {
+            return built_in.keySet();
+        }
+
+        public Set<String> get_custom_names() {
+            return custom.keySet();
+        }
+
+        public Set<String> get_custom_vm_names() {
+            return custom_vm.keySet();
+        }
+
+        public String get_custom(String name) {
+            return custom.get(name);
+        }
+
+        public String get_custom_vm(String name) {
+            return custom_vm.get(name);
+        }
+
+        public void substitute_type_params(FieldInfo fi) {
+            String type_name = fi.getType();
+            int local_field_type_params_start = type_name.indexOf('|');
+            Map<String, String> params = new HashMap<String, String>();
+            if (local_field_type_params_start != -1) {
+                String params_str = type_name.substring(local_field_type_params_start);
+                String[] parts = params_str.split("[|]");
+                for (String p : parts) {
+                    int param_value_start = p.indexOf(':');
+                    if (param_value_start == -1) {
+                        continue;
+                    }
+                    String param_name = p.substring(0, param_value_start);
+                    String param_value = p.substring(param_value_start + 1);
+                    params.put("{" + param_name + "}", param_value);
+                }
+                type_name = type_name.substring(0, local_field_type_params_start);
+                for (String name : params.keySet()) {
+                    if (type_name.contains(name)) {
+                        String param_value = params.get(name);
+                        type_name = type_name.replace(name, param_value);
+                    }
+                }
+            }
+            Set<String> macro_calls = _find_macro_calls(type_name);
+            for (String macro_call : macro_calls) {
+                type_name = type_name.replace(macro_call, "");
+            }
+            fi.refine_rendered_type(type_name);
+        }
+    }
+
+    private static Set<String> _find_macro_calls(String input) {
+        // https://stackoverflow.com/questions/53904144/regex-matching-even-amount-of-brackets
+        Set<String> res = new HashSet<String>();
+        int count = 0;
+        int start = 0;
+        int end;
+        for (int i=0; i < input.length(); ++i) {
+            if (input.charAt(i) == '{') {
+                ++count;
+                if (count == 1) {
+                    start = i;
+                }
+            }
+            if (input.charAt(i) == '}') {
+                --count;
+                if (count == 0) {
+                    res.add(input.substring(start, i+1));
+                    //System.out.println();
+                }
+            }
+        }
+        return res;
+    }
+
     public static class JaxbTypeMap {
 
         private final Map<String, String> detected = new HashMap<String, String>();
         private final String default_type;
 
-        public JaxbTypeMap(TypeMap jaxb_type_map) throws Exception {
+        public JaxbTypeMap(TypeMap jaxb_type_map) {
             if (jaxb_type_map == null) {
                 default_type = null;
                 return;
             }
             default_type = jaxb_type_map.getDefault();
             for (Type t : jaxb_type_map.getType()) {
-                String detected_type = t.getDetected();
-                if (detected.containsKey(detected_type)) {
-                    throw new Exception("Duplicated in type-map: " + detected_type);
-                }
-                String target_type = t.getTarget();
-                detected.put(detected_type, target_type);
+                detected.put(t.getDetected(), t.getTarget());
             }
-        }
-
-        public boolean is_defined() {
-            return detected.size() > 0;
         }
 
         // 'detected' in here means
@@ -285,20 +377,5 @@ public class JaxbUtils {
             throw new Exception("Element '" + node_name + "' is empty. Add the method declarations or change to 'crud-auto'");
         }
         return code_buff;
-    }
-
-    public static void validate_jaxb_dto_class(DtoClass jaxb_dto_class) throws Exception {
-        List<DtoClass.Field> fields = jaxb_dto_class.getField();
-        Set<String> col_names = new HashSet<String>();
-        for (DtoClass.Field fe : fields) {
-            String col = fe.getColumn();
-            if (col == null || col.trim().length() == 0) {
-                throw new Exception("Invalid column name: null");
-            }
-            if (col_names.contains(col)) {
-                throw new Exception("Duplicated <field column='" + col + "'...");
-            }
-            col_names.add(col);
-        }
     }
 }

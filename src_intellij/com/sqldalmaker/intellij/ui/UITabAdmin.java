@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2021 sqldalmaker@gmail.com
+    Copyright 2011-2022 sqldalmaker@gmail.com
     SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -544,27 +544,27 @@ public class UITabAdmin {
         dataStorePhpButton.setBorderPainted(true);
         dataStorePhpButton.setContentAreaFilled(true);
         dataStorePhpButton.setMinimumSize(new Dimension(40, 30));
-        dataStorePhpButton.setPreferredSize(new Dimension(42, 30));
+        dataStorePhpButton.setPreferredSize(new Dimension(78, 30));
         dataStorePhpButton.setText("Base");
         panel5.add(dataStorePhpButton);
         btn_mysql = new JButton();
-        btn_mysql.setText("PDO, mysql");
+        btn_mysql.setText("mysql");
         panel5.add(btn_mysql);
         btn_php_oracle = new JButton();
-        btn_php_oracle.setText("PDO, oracle");
+        btn_php_oracle.setText("oracle");
         panel5.add(btn_php_oracle);
         dataStorePhpOCI8Button = new JButton();
-        dataStorePhpOCI8Button.setPreferredSize(new Dimension(50, 30));
+        dataStorePhpOCI8Button.setPreferredSize(new Dimension(78, 30));
         dataStorePhpOCI8Button.setText("oci8");
         panel5.add(dataStorePhpOCI8Button);
         dataStorePhpPDOSQLButton = new JButton();
-        dataStorePhpPDOSQLButton.setText("PDO, mssql");
+        dataStorePhpPDOSQLButton.setText("mssql");
         panel5.add(dataStorePhpPDOSQLButton);
         btn_php_pg = new JButton();
-        btn_php_pg.setText("PDO, postgesql");
+        btn_php_pg.setText("postgesql");
         panel5.add(btn_php_pg);
         PDODataStorePhpButton = new JButton();
-        PDODataStorePhpButton.setText("PDO, sqlite3");
+        PDODataStorePhpButton.setText("sqlite3");
         panel5.add(PDODataStorePhpButton);
         final JPanel panel6 = new JPanel();
         panel6.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
@@ -582,11 +582,11 @@ public class UITabAdmin {
         panel6.add(label2);
         dataStoreJavaButton = new JButton();
         dataStoreJavaButton.setMinimumSize(new Dimension(40, 30));
-        dataStoreJavaButton.setPreferredSize(new Dimension(42, 30));
+        dataStoreJavaButton.setPreferredSize(new Dimension(78, 30));
         dataStoreJavaButton.setText("Base");
         panel6.add(dataStoreJavaButton);
         dataStoreJavaDbUtilsButton = new JButton();
-        dataStoreJavaDbUtilsButton.setPreferredSize(new Dimension(56, 30));
+        dataStoreJavaDbUtilsButton.setPreferredSize(new Dimension(78, 30));
         dataStoreJavaDbUtilsButton.setText("JDBC");
         panel6.add(dataStoreJavaDbUtilsButton);
         dataStoreJavaAndroidButton = new JButton();
@@ -596,11 +596,11 @@ public class UITabAdmin {
         Font label3Font = this.$$$getFont$$$(null, -1, 14, label3.getFont());
         if (label3Font != null) label3.setFont(label3Font);
         label3.setHorizontalAlignment(4);
-        label3.setPreferredSize(new Dimension(52, 20));
+        label3.setPreferredSize(new Dimension(40, 20));
         label3.setText(" C++ ");
         panel6.add(label3);
         dataStoreQt5CButton = new JButton();
-        dataStoreQt5CButton.setPreferredSize(new Dimension(56, 30));
+        dataStoreQt5CButton.setPreferredSize(new Dimension(78, 30));
         dataStoreQt5CButton.setText("QtSql");
         panel6.add(dataStoreQt5CButton);
         dataStoreCSTLButton = new JButton();
@@ -625,7 +625,7 @@ public class UITabAdmin {
         label4.setText(" Python ");
         panel7.add(label4);
         sqlite3MysqlConnectorPsycopg2Button = new JButton();
-        sqlite3MysqlConnectorPsycopg2Button.setText("sqlite3, mysql.connector, psycopg2, django.db");
+        sqlite3MysqlConnectorPsycopg2Button.setText("sqlite3, mysql.connector, psycopg2");
         panel7.add(sqlite3MysqlConnectorPsycopg2Button);
         SQLAlchemyButton = new JButton();
         SQLAlchemyButton.setText("SQLAlchemy");
@@ -651,14 +651,14 @@ public class UITabAdmin {
         label5.setText(" Ruby ");
         panel8.add(label5);
         dataStoreRUBYDBIButton = new JButton();
-        dataStoreRUBYDBIButton.setPreferredSize(new Dimension(42, 30));
+        dataStoreRUBYDBIButton.setPreferredSize(new Dimension(78, 30));
         dataStoreRUBYDBIButton.setText("DBI");
         panel8.add(dataStoreRUBYDBIButton);
         final JLabel label6 = new JLabel();
         Font label6Font = this.$$$getFont$$$(null, -1, 14, label6.getFont());
         if (label6Font != null) label6.setFont(label6Font);
         label6.setHorizontalAlignment(4);
-        label6.setPreferredSize(new Dimension(52, 20));
+        label6.setPreferredSize(new Dimension(30, 20));
         label6.setText(" Go ");
         panel8.add(label6);
         btn_golang = new JButton();

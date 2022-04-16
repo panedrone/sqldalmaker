@@ -122,4 +122,37 @@
     <!--        <type detected="java.lang.Object" target="Object"/>-->
     <!--    </type-map>-->
 
+    <!-- Example for Python + sqlalchemy -->
+
+<!--    <type-map default="">-->
+<!--        <type detected="java.lang.Short" target="{type}|0:SmallInteger"/>-->
+<!--        <type detected="java.lang.Integer" target="{type}|0:Integer"/>-->
+<!--        <type detected="java.lang.Long" target="{type}|0:BigInteger"/>-->
+
+<!--        <type detected="java.lang.Float" target="{type}|0:Float"/>-->
+<!--        <type detected="java.lang.Double" target="{type}|0:Float"/>-->
+<!--        <type detected="java.math.BigDecimal" target="{type}|0:Float"/>-->
+
+<!--        <type detected="java.util.Date" target="{type}|0:DateTime"/>-->
+<!--        <type detected="java.lang.String" target="{type}|0:String"/>-->
+<!--        <type detected="java.lang.Boolean" target="{type}|0:Boolean"/>-->
+<!--        <type detected="byte[]" target="{type}|0:LargeBinary"/>-->
+<!--    </type-map>-->
+
+    <global-macros>
+
+<!--        {auto} will be built-in. not implementd yet, just ignored and replaced with nothing.-->
+<!--        <global-marker name="{auto}" value="-built-in–"/> -->
+
+        <global-macro name="{snake_case(column)}" value="-built-in–"/>
+        <global-macro name="{camelCase(column)}" value="-built-in–"/>
+        <global-macro name="{TitleCase(column)}" value="-built-in–"/>
+        <global-macro name="{kebab-case(column)}" value="-built-in–"/>
+        <global-macro name="{column}" value="--built-in–"/>
+
+        <global-macro name="{json}" value=" `json:&quot;{snake_case(column)}{0}&quot;`"/>
+       <global-macro name="{type}" value="= Column('{column}', {0}{1})"/>
+
+    </global-macros>
+
 </settings>
