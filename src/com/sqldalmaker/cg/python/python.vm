@@ -38,7 +38,7 @@ http://sqldalmaker.sourceforge.net
 #if ($model=="sqlalchemy")
 from sqlalchemy import *
 
-from data_store import *
+from .data_store import *
 
 
 class $class_name(Base):

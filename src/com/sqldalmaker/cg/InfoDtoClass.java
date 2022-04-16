@@ -38,24 +38,24 @@ class InfoDtoClass {
                                                      String sql_root_abs_path,
                                                      List<FieldInfo> _dto_fields) throws Exception {
 
-        Map<String, FieldInfo> dto_fields_map = new HashMap<String, FieldInfo>();
+        Map<String, FieldInfo> fields_map = new HashMap<String, FieldInfo>();
         // -------------------------
         _dto_fields.clear();
         String jaxb_dto_class_ref = jaxb_dto_class.getRef();
         if (!SqlUtils.is_empty_ref(jaxb_dto_class_ref)) {
             String jdbc_sql = SqlUtils.jdbc_sql_by_dto_class_ref(jaxb_dto_class_ref, sql_root_abs_path);
-            _get_field_info_by_jdbc_sql(jdbc_sql, dto_fields_map, _dto_fields);
+            _get_field_info_by_jdbc_sql(jdbc_sql, fields_map, _dto_fields);
             if (SqlUtils.is_table_ref(jaxb_dto_class_ref)) {
                 String table_name = jaxb_dto_class_ref;
-                InfoDbTable.refine_field_info_by_jdbc_table(conn, table_name, dto_fields_map);
+                _fill_by_table(table_name, _dto_fields, fields_map);
             } else if (SqlUtils.is_sql_shortcut_ref(jaxb_dto_class_ref)) {
                 String[] parts = SqlUtils.parse_sql_shortcut_ref(jaxb_dto_class_ref);
                 String table_name = parts[0];
-                InfoDbTable.refine_field_info_by_jdbc_table(conn, table_name, dto_fields_map);
+                _fill_by_table(table_name, _dto_fields, fields_map);
             }
         }
         if (type_map == null) {
-            return dto_fields_map; // DTO XML wizard
+            return fields_map; // DTO XML wizard
         }
         // -------------------------
         Set<String> refined_by_field_jaxb = new HashSet<String>();
@@ -65,13 +65,13 @@ class InfoDtoClass {
             String jaxb_field_col_name = jaxb_field.getColumn();
             String jaxb_field_type_name = jaxb_field.getType();
             FieldInfo fi;
-            if (dto_fields_map.containsKey(jaxb_field_col_name)) {
-                fi = dto_fields_map.get(jaxb_field_col_name);
+            if (fields_map.containsKey(jaxb_field_col_name)) {
+                fi = fields_map.get(jaxb_field_col_name);
             } else { // add the field declared in XML, but missing in SQL
                 fi = new FieldInfo(dto_field_names_mode, jaxb_field_type_name, jaxb_field_col_name,
                         "xml(" + jaxb_field_col_name + ")");
                 _dto_fields.add(fi);
-                dto_fields_map.put(jaxb_field_col_name, fi);
+                fields_map.put(jaxb_field_col_name, fi);
             }
             _refine_fi(fi, jaxb_field_type_name);
             refined_by_field_jaxb.add(fi.getColumnName());
@@ -91,7 +91,16 @@ class InfoDtoClass {
         for (FieldInfo fi : _dto_fields) {
             this.macros.substitute_type_params(fi);
         }
-        return dto_fields_map;
+        return fields_map;
+    }
+
+    private void _fill_by_table(String table_name, List<FieldInfo> _dto_fields, Map<String, FieldInfo> fields_map) throws Exception {
+        String explicit_pk = "*";
+        InfoDbTable info = new InfoDbTable(conn, type_map, dto_field_names_mode, table_name, explicit_pk);
+        _dto_fields.clear();
+        _dto_fields.addAll(info.fields_all);
+        fields_map.clear();
+        fields_map.putAll(info.fields_map);
     }
 
     private void _refine_fi(FieldInfo fi, String type_name) throws Exception {

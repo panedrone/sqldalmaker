@@ -19,11 +19,14 @@ class InfoDbTable {
     public final List<FieldInfo> fields_not_pk = new ArrayList<FieldInfo>();
     public final List<FieldInfo> fields_pk = new ArrayList<FieldInfo>();
 
-    private final Map<String, FieldInfo> fields_map = new HashMap<String, FieldInfo>();
+    public final Map<String, FieldInfo> fields_map = new HashMap<String, FieldInfo>();
 
     private final Connection conn;
     private final JaxbUtils.JaxbTypeMap type_map;
     private final FieldNamesMode dto_field_names_mode;
+
+    private final String table_name;
+    private final String explicit_pk;
 
     public InfoDbTable(Connection conn,
                        JaxbUtils.JaxbTypeMap type_map,
@@ -34,6 +37,14 @@ class InfoDbTable {
         this.conn = conn;
         this.type_map = type_map;
         this.dto_field_names_mode = dto_field_names_mode;
+
+        this.table_name = table_name;
+        this.explicit_pk = explicit_pk;
+
+        _refine_field_info_by_jdbc_table();
+    }
+
+    private void _refine_field_info_by_jdbc_table() throws Exception {
         String jdbc_sql = _jdbc_sql_by_table_name(table_name);
         _get_field_info_by_jdbc_sql(jdbc_sql, fields_map, fields_all);
         Set<String> lower_case_pk_col_names = _get_lower_case_pk_col_names(table_name, explicit_pk);
@@ -48,11 +59,10 @@ class InfoDbTable {
                 fi.setPK(false);
             }
         }
-        refine_field_info_by_jdbc_table(conn, table_name, fields_map);
+        _refine_field_info_by_jdbc_table(conn, table_name, fields_map);
         _refine_by_type_map();
     }
-
-    public static void refine_field_info_by_jdbc_table(
+    private static void _refine_field_info_by_jdbc_table(
             Connection conn,
             String table_name,
             Map<String, FieldInfo> fields_map) throws Exception {
