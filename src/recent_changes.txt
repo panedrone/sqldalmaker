@@ -2,17 +2,25 @@
 
     SQLAlchemy models:
 
-    <dto-class name="sqlalchemy-Actor" ref="actor"/>
-    <dto-class name="ActorInfo" ref="actor_info.sql"/>
-
     ds = DataStore()
+    ds.open()
 
-    res = ds.fetch_all(Actor)  # orm-way
-    for r in res:
+    # orm-way ---------------------------------------------
+    # <dto-class name="sqlalchemy-TaskModel" ref="taskas"/>
+
+    tasks = self.ds.session.query(TaskModel).filter(TaskModel.g_id == g_id).all()
+    for t in tasks:
         ai: ActorInfo = r
-        print(f"{ai.first_name}\t{ai.last_name}\n")
+        print(f"{ai.t_date}\t{ai.t_subject}\n")
 
-    res = ds.fetch_all_raw(ActorInfo, [50])  # raw sql, 50 is film_id
+    group = self.ds.session.query(TaskModel).get(i_id)
+    group.t_subject = t_subject
+    ds.commit()
+
+    # raw sql --------------------------------------------
+    # <dto-class name="ActorInfo" ref="actor_info.sql"/>
+
+    res = ds.fetch_all_raw(ActorInfo, [50]) # 50 is film_id
     for r in res:
         print("\n", r)
 

@@ -97,17 +97,6 @@ public class FieldInfo {
         this.comment = comment;
     }
 
-    public String get_import() {
-        if (rendered_field_type == null) {
-            return null;
-        }
-        String[] parts = this.rendered_field_type.split(":");
-        if (parts.length < 2) {
-            return "";
-        }
-        return parts[0];
-    }
-
     // this method is for use in VM templates ONLY
     public String getterMethod() { // NO_UCD (unused code)
         String s = this.name_prefix + this.rendered_field_name;

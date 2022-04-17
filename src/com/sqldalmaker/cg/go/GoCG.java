@@ -26,6 +26,29 @@ public class GoCG {
         return Helpers.class.getPackage().getName().replace('.', '/') + "/go/go.vm";
     }
 
+    private static String _get_import(FieldInfo fi) {
+        String rendered_field_type = fi.getType();
+        if (rendered_field_type == null) {
+            return null;
+        }
+        String[] type_parts = rendered_field_type.trim().split("\\s+");
+        if (type_parts.length < 1) {
+            return null;
+        }
+        String type_part = type_parts[0];
+        String[] parts = type_part.split("[.]");
+        if (parts.length < 2) {
+            return null;
+        }
+        return parts[0];
+    }
+
+    private static String _get_just_type(FieldInfo fi) {
+        String[] type_parts = fi.getType().split("\\s+");
+        type_parts = type_parts[0].split("[$]"); // it returns whole string if there are no "\\s+"
+        return type_parts[0]; // it returns whole string if there are no "$"
+    }
+
     public static class DTO implements IDtoCG {
 
         private final String dto_package;
@@ -68,33 +91,39 @@ public class GoCG {
             int max_name_len = -1;
             int max_type_name_len = -1;
             for (FieldInfo fi : fields) {
-                String imp = fi.get_import();
-                if (imp.length() > 0) {
-                    imports.add(imp);
+                {
+                    String imp = _get_import(fi);
+                    if (imp != null) {
+                        imports.add(imp);
+                    }
                 }
-                int len = fi.getName().length();
-                if (len > max_name_len) {
-                    max_name_len = len;
+                int name_len = fi.getName().length();
+                if (name_len > max_name_len) {
+                    max_name_len = name_len;
                 }
-//                if (fi.type_comment_from_jaxb_field_type().length() > 0) {
-//                    int type_name_len = fi.calc_target_type_name().length();
-//                    if (type_name_len > max_type_name_len) {
-//                        max_type_name_len = type_name_len;
-//                    }
-//                }
+                String just_type = _get_just_type(fi);
+                if (just_type.length() > max_type_name_len) {
+                    max_type_name_len = just_type.length();
+                }
             }
             String name_format = "%-" + max_name_len + "." + max_name_len + "s";
-            String type_format = "%-" + max_type_name_len + "." + max_type_name_len + "s %s";
             for (FieldInfo fi : fields) {
-                String name = fi.getName();
-                name = String.format(name_format, name);
-                fi.setName(name);
-//                if (max_type_name_len > 0) {
-//                    String type_name = fi.calc_target_type_name();
-//                    String type_comment = fi.type_comment_from_jaxb_field_type();
-//                    type_name = String.format(type_format, type_name, type_comment);
-//                    fi.refine_rendered_type(type_name);
-//                }
+                {
+                    String name = fi.getName();
+                    name = String.format(name_format, name);
+                    fi.setName(name);
+                }
+                if (max_type_name_len > 0) {
+                    String type_name = fi.getType();
+                    String[] type_parts = type_name.split("\\s+");
+                    if (type_parts.length > 1) {
+                        String just_type = type_parts[0];
+                        String type_tag = type_parts[1];
+                        String type_format = "%-" + max_type_name_len + "." + max_type_name_len + "s %s";
+                        type_name = String.format(type_format, just_type, type_tag);
+                        fi.refine_rendered_type(type_name);
+                    }
+                }
             }
             context.put("imports", imports);
             context.put("class_name", dto_class_name);
@@ -238,11 +267,6 @@ public class GoCG {
         }
 
         private void _process_dto_class_name(String dto_class_name) {
-//            if (classes_package != null && classes_package.length() > 0) {
-//                imports.add(classes_package + "." + dto_class_name);
-//            } else {
-//                imports.add(dto_class_name);
-//            }
         }
 
         @Override
@@ -278,10 +302,12 @@ public class GoCG {
             List<FieldInfo> _params = new ArrayList<FieldInfo>();
             db_utils.get_dao_exec_dml_info(jdbc_dao_sql, dto_param_type, param_descriptors, _params);
             for (FieldInfo pi : _params) {
-                String imp = pi.get_import();
-                if (imp.length() > 0) {
+                String imp = _get_import(pi);
+                if (imp != null) {
                     imports.add(imp);
                 }
+                String just_type = _get_just_type(pi);
+                pi.refine_rendered_type(just_type);
             }
             String go_sql = SqlUtils.format_jdbc_sql_for_go(jdbc_dao_sql);
             List<MappingInfo> m_list = new ArrayList<MappingInfo>();
@@ -369,9 +395,6 @@ public class GoCG {
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(m.dto_class_name, jaxb_dto_classes);
             _process_dto_class_name(jaxb_dto_class.getName()); // extends imports
             db_utils.get_dto_field_info(jaxb_dto_class, sql_root_abs_path, fields);
-//            if (fields.size() > 0) {
-//                fields.get(0).setComment(fields.get(0).getComment() + " [INFO] REF CURSOR");
-//            }
             m.fields.addAll(fields);
             return m;
         }
@@ -394,10 +417,12 @@ public class GoCG {
             context.put("plain_params", plain_params);
             if (plain_params) {
                 for (FieldInfo pi : params) {
-                    String imp = pi.get_import();
-                    if (imp.length() > 0) {
+                    String imp = _get_import(pi);
+                    if (imp != null) {
                         imports.add(imp);
                     }
+                    String just_type = _get_just_type(pi);
+                    pi.refine_rendered_type(just_type);
                 }
             }
             context.put("params", params);

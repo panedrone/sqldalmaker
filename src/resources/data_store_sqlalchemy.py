@@ -1,7 +1,7 @@
 import sqlalchemy
 
 import sqlalchemy.ext.declarative
-from sqlalchemy.orm import declarative_base
+from sqlalchemy.orm import declarative_base, sessionmaker
 
 Base = declarative_base()
 
@@ -37,13 +37,14 @@ class DataStore:
     def __init__(self):
         self.conn = None
         self.transaction = None
-        # self.engine = sqlalchemy.create_engine('sqlite:///../log.sqlite3')
-        # self.engine_type = self.EngineType.sqlite3
+        self.engine = sqlalchemy.create_engine('sqlite:///todo-list.sqlite')
+        self.engine_type = self.EngineType.sqlite3
         # self.engine = sqlalchemy.create_engine('postgresql://postgres:sa@localhost/my-tests')
         # self.engine_type = self.EngineType.postgresql
         # https://www.tutorialguruji.com/dbms/how-do-i-execute-a-mysql-stored-procedure-in-a-sqlalchemy-scoped-session-to-return-a-single-result-set-of-data-for-flask-web-app/
-        self.engine = sqlalchemy.create_engine('mysql+mysqlconnector://root:root@localhost/sakila')
-        self.engine_type = self.EngineType.mysql
+        # self.engine = sqlalchemy.create_engine('mysql+mysqlconnector://root:root@localhost/sakila')
+        # self.engine_type = self.EngineType.mysql
+        self.session = sessionmaker(bind=self.engine)()
 
     def open(self):
         self.conn = self.engine.connect()
@@ -58,11 +59,18 @@ class DataStore:
         self.transaction = self.conn.begin()
 
     def commit(self):
+        if self.transaction is None:
+            self.session.commit()
+            return
         # https://docs.sqlalchemy.org/en/14/core/connections.html
         self.transaction.commit()
         self.transaction = None
 
     def rollback(self):
+        if self.transaction is None:
+            # https://docs.sqlalchemy.org/en/14/orm/session_basics.html
+            self.session.rollback()
+            return
         # https://docs.sqlalchemy.org/en/14/core/connections.html
         self.transaction.rollback()
         self.transaction = None

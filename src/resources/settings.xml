@@ -168,13 +168,15 @@
 
         <!-- go json tags: -->
 
-        <global-macro name="${json}" value=" `json:&quot;${lower_snake_case(column)}${more-params}&quot;`"/>
+        <global-macro name="${col}" value="${lower_snake_case(column)}"/>
+
+        <global-macro name="${json}" value=" `json:&quot;${col}${0}&quot;`"/>
 
         <!-- sqlalchemy Column: -->
 
-        <global-macro name="${type}" value="= Column('${column}', ${0}${sqlalchemy-params}${more-params})${comment}"/>
+        <global-macro name="${type}" value="= Column('${column}', ${0}${sqlalchemy-params}${1})${comment}"/>
 
-        <!-- TODO: for macros like "${vm:...}", the values are rendered by Velocity -->
+        <!-- TODO: for macros like "${vm:...}", the values are rendered by Apache Velocity -->
 
         <global-macro name="${vm:sqlalchemy-params}"
                       value="#if($fi.isPK()), primary_key=True#end#if($fi.isAI()), auto_increment=True#end"/>
