@@ -90,21 +90,6 @@
     <!--        <type detected="byte[]" target="CBlob"/>-->
     <!--    </type-map>-->
 
-    <!-- Example for Python and MySQL: -->
-
-    <!--    <type-map default="">-->
-    <!--        <type detected="java.lang.Short" target="int"/>-->
-    <!--        <type detected="java.lang.Integer" target="int"/>-->
-    <!--        <type detected="java.lang.Long" target="long"/>-->
-    <!--        <type detected="java.lang.Double" target="float"/>-->
-    <!--        <type detected="java.lang.Float" target="float"/>-->
-    <!--        <type detected="java.math.BigDecimal" target="float"/>-->
-    <!--        <type detected="java.lang.String" target="str"/>-->
-    <!--        <type detected="byte[]" target="bytes"/>-->
-    <!--        <type detected="java.lang.Boolean" target="bool"/>-->
-    <!--        <type detected="java.util.Date" target="str"/>-->
-    <!--    </type-map>-->
-
     <!-- Example for PHP based on this -->
     <!-- https://www.w3schools.com/php/php_datatypes.asp -->
 
@@ -119,6 +104,8 @@
     <!--        <type detected="java.lang.String" target="String"/>-->
     <!--        <type detected="java.lang.Object" target="Object"/>-->
     <!--    </type-map>-->
+
+    <!-- Example for Python and MySQL: -->
 
     <type-map default="">
 
@@ -151,6 +138,8 @@
         <type detected="java.lang.String" target="str"/>
         <type detected="java.lang.Boolean" target="bool"/>
         <type detected="byte[]" target="bytes"/>
+
+        <type detected="java.lang.Object" target="object"/>
 
     </type-map>
 
