@@ -46,17 +46,17 @@
           class="com.mysql.jdbc.Driver" url="jdbc:mysql://localhost/orders"
           user="root" pwd="root"/>
 
-    <!-- tag 'type-map' aims to specify how the types detected by
+    <!-- tag 'type-map' specifies how the types detected by
          code generator (JDBC) are rendered in target code. -->
 
-    <!-- if detected JDBC type is missing in 'type-map', then 'default' is used. -->
+    <!-- if <type detected=<JDBC type> is missing in 'type-map', then 'default' is used. -->
 
     <!-- if 'default' is empty, detected type is rendered as-is. -->
 
     <!-- this is why type-map for Java+JDBC is empty: -->
 
-    <type-map default="">
-    </type-map>
+    <!--    <type-map default="">-->
+    <!--    </type-map>-->
 
     <!-- The types detected by JDBC and the types of Android run-time may differ: -->
 
@@ -69,9 +69,7 @@
 
     <!-- Example for Go and SQLite3: -->
 
-    <!-- use ':' to specify imports: -->
-
-    <!--    <type detected="java.util.Date" target="time:time.Time"/>-->
+    <!-- use ':' to specify imports:  <type detected="java.util.Date" target="time:time.Time"/>-->
 
     <!--    <type-map default="">-->
     <!--        <type detected="java.lang.Integer" target="int64" />-->
@@ -122,36 +120,77 @@
     <!--        <type detected="java.lang.Object" target="Object"/>-->
     <!--    </type-map>-->
 
-    <!-- Example for Python + sqlalchemy -->
+    <type-map default="">
 
-<!--    <type-map default="">-->
-<!--        <type detected="java.lang.Short" target="{type}|0:SmallInteger"/>-->
-<!--        <type detected="java.lang.Integer" target="{type}|0:Integer"/>-->
-<!--        <type detected="java.lang.Long" target="{type}|0:BigInteger"/>-->
+        <!-- ***** sqlalchemy (sa) ****************** -->
 
-<!--        <type detected="java.lang.Float" target="{type}|0:Float"/>-->
-<!--        <type detected="java.lang.Double" target="{type}|0:Float"/>-->
-<!--        <type detected="java.math.BigDecimal" target="{type}|0:Float"/>-->
+        <type detected="sa-java.lang.Short" target="${type}|0:SmallInteger"/>
+        <type detected="sa-java.lang.Integer" target="${type}|0:Integer"/>
+        <type detected="sa-java.lang.Long" target="${type}|0:BigInteger"/>
 
-<!--        <type detected="java.util.Date" target="{type}|0:DateTime"/>-->
-<!--        <type detected="java.lang.String" target="{type}|0:String"/>-->
-<!--        <type detected="java.lang.Boolean" target="{type}|0:Boolean"/>-->
-<!--        <type detected="byte[]" target="{type}|0:LargeBinary"/>-->
-<!--    </type-map>-->
+        <type detected="sa-java.lang.Float" target="${type}|0:Float"/>
+        <type detected="sa-java.lang.Double" target="${type}|0:Float"/>
+        <type detected="sa-java.math.BigDecimal" target="${type}|0:Float"/>
+
+        <type detected="sa-java.util.Date" target="${type}|0:DateTime"/>
+        <type detected="sa-java.lang.String" target="${type}|0:String"/>
+        <type detected="sa-java.lang.Boolean" target="${type}|0:Boolean"/>
+        <type detected="sa-byte[]" target="${type}|0:LargeBinary"/>
+
+        <!-- ****** raw SQL ************************ -->
+
+        <type detected="java.lang.Short" target="int"/>
+        <type detected="java.lang.Integer" target="int"/>
+        <type detected="java.lang.Long" target="long"/>
+
+        <type detected="java.lang.Double" target="float"/>
+        <type detected="java.lang.Float" target="float"/>
+        <type detected="java.math.BigDecimal" target="float"/>
+
+        <type detected="java.util.Date" target="str"/>
+        <type detected="java.lang.String" target="str"/>
+        <type detected="java.lang.Boolean" target="bool"/>
+        <type detected="byte[]" target="bytes"/>
+
+    </type-map>
 
     <global-macros>
 
-<!--        {auto} will be built-in. not implementd yet, just ignored and replaced with nothing.-->
-<!--        <global-marker name="{auto}" value="-built-in–"/> -->
+        <!-- =built-in= is a key-word -->
 
-        <global-macro name="{snake_case(column)}" value="-built-in–"/>
-        <global-macro name="{camelCase(column)}" value="-built-in–"/>
-        <global-macro name="{TitleCase(column)}" value="-built-in–"/>
-        <global-macro name="{kebab-case(column)}" value="-built-in–"/>
-        <global-macro name="{column}" value="--built-in–"/>
+        <global-macro name="${column}" value="=built-in="/>
+        <global-macro name="${lower_snake_case(column)}" value="=built-in="/>
+        <global-macro name="${camelCase(column)}" value="=built-in="/>
+        <global-macro name="${TitleCase(column)}" value="=built-in="/>
+        <global-macro name="${kebab-case(column)}" value="=built-in="/>
 
-        <global-macro name="{json}" value=" `json:&quot;{snake_case(column)}{0}&quot;`"/>
-       <global-macro name="{type}" value="= Column('{column}', {0}{1})"/>
+        <global-macro name="${sqlalchemy-params}" value="=built-in="/>
+
+        <!-- go json tags: -->
+
+        <global-macro name="${json}" value=" `json:&quot;${lower_snake_case(column)}${more-params}&quot;`"/>
+
+        <!-- sqlalchemy Column: -->
+
+        <global-macro name="${type}" value="= Column('${column}', ${0}${sqlalchemy-params}${more-params})${comment}"/>
+
+        <!-- TODO: for macros like "${vm:...}", the values are rendered by Velocity -->
+
+        <global-macro name="${vm:sqlalchemy-params}"
+                      value="#if($fi.isPK()), primary_key=True#end#if($fi.isAI()), auto_increment=True#end"/>
+
+        <!-- $fi in this ^^ example is a predefined parameter of class FieldInfo:
+
+                    class FieldInfo:
+                        String getName();
+                        String getType();
+                        String getColumnName();
+                        boolean isAI();
+                        boolean isPK();
+                        String getComment();
+                        String getterMethod();
+                        String setterMethod();
+                    -->
 
     </global-macros>
 

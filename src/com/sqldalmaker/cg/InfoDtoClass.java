@@ -202,37 +202,37 @@ class InfoDtoClass {
 
     private static Map<String, IMacro> _get_macros() {
         Map<String, IMacro> macros = new HashMap<String, IMacro>();
-        macros.put("{lower_snake_case(column)}", new IMacro() {
+        macros.put("${lower_snake_case(column)}", new IMacro() {
             @Override
             public String exec(FieldInfo fi) {
                 return Helpers.camel_case_to_lower_snake_case(fi.getColumnName());
             }
         });
-        macros.put("{camelCase(column)}", new IMacro() {
+        macros.put("${camelCase(column)}", new IMacro() {
             @Override
             public String exec(FieldInfo fi) {
                 return Helpers.to_lower_camel_or_title_case(fi.getColumnName(), false);
             }
         });
-        macros.put("{TitleCase(column)}", new IMacro() {
+        macros.put("${TitleCase(column)}", new IMacro() {
             @Override
             public String exec(FieldInfo fi) {
                 return Helpers.to_lower_camel_or_title_case(fi.getColumnName(), true);
             }
         });
-        macros.put("{kebab-case(column)}", new IMacro() {
+        macros.put("${kebab-case(column)}", new IMacro() {
             @Override
             public String exec(FieldInfo fi) {
                 return Helpers.to_kebab_case(fi.getColumnName());
             }
         });
-        macros.put("{column}", new IMacro() {
+        macros.put("${column}", new IMacro() {
             @Override
             public String exec(FieldInfo fi) {
                 return fi.getColumnName();
             }
         });
-        macros.put("{sqlalchemy-params}", new IMacro() {
+        macros.put("${sqlalchemy-params}", new IMacro() {
             @Override
             public String exec(FieldInfo fi) {
                 String res = "";

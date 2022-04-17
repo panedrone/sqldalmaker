@@ -34,9 +34,9 @@ public class JaxbUtils {
             for (GlobalMacro m : jaxb_global_makros.getGlobalMacro()) {
                 String name = m.getName();
                 String value = m.getValue();
-                if (value.equals("-built-in–")) {
+                if (value.equals("=built-in=")) {
                     built_in.put(name, value);
-                } else if (name.startsWith("{custom_vm:")) {
+                } else if (name.startsWith("${vm:") && name.endsWith("}")) {
                     custom_vm.put(name, value);
                 } else {
                     custom.put(name, value);
@@ -78,7 +78,7 @@ public class JaxbUtils {
                     }
                     String param_name = p.substring(0, param_value_start);
                     String param_value = p.substring(param_value_start + 1);
-                    params.put("{" + param_name + "}", param_value);
+                    params.put("${" + param_name + "}", param_value);
                 }
                 type_name = type_name.substring(0, local_field_type_params_start);
                 for (String name : params.keySet()) {
@@ -103,14 +103,19 @@ public class JaxbUtils {
         int start = 0;
         int end;
         for (int i=0; i < input.length(); ++i) {
-            if (input.charAt(i) == '{') {
-                ++count;
-                if (count == 1) {
+            String tail = input.substring(i);
+            // if (input.charAt(i) == '{') {
+            if (tail.startsWith("${")) {
+                // ++count;
+                // if (count == 1) {
+                count += 2;
+                if (count == 2) {
                     start = i;
                 }
             }
             if (input.charAt(i) == '}') {
-                --count;
+                //--count;
+                count -= 2;
                 if (count == 0) {
                     res.add(input.substring(start, i+1));
                     //System.out.println();
