@@ -1,19 +1,19 @@
 2022-04-17
 
-    SQLAlchemy models:
+    # SQLAlchemy models (update XSD files from the tab 'Admin'):
 
     ds = DataStore()
     ds.open()
 
     # orm-way ---------------------------------------------
-    # <dto-class name="sqlalchemy-TaskModel" ref="taskas"/>
+    # <dto-class name="sqlalchemy-TaskModel" ref="tasks"/>
 
     tasks = self.ds.session.query(TaskModel).filter(TaskModel.g_id == g_id).all()
     for tt in tasks:
         t: TaskModel = tt
         print(f"{t.t_date}\t{t.t_subject}\n")
 
-    task = self.ds.session.query(TaskModel).get(i_id)
+    task = self.ds.session.query(TaskModel).get(t_id)
     task.t_subject = t_subject
     ds.commit()
 

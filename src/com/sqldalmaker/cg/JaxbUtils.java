@@ -101,7 +101,7 @@ public class JaxbUtils {
         Set<String> res = new HashSet<String>();
         int count = 0;
         int start = 0;
-        int end;
+        // int end;
         for (int i=0; i < input.length(); ++i) {
             String tail = input.substring(i);
             // if (input.charAt(i) == '{') {
