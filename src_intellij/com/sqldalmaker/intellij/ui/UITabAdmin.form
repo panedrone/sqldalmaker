@@ -55,7 +55,7 @@
                       <component id="a821f" class="javax.swing.JButton" binding="recentChangesButton" default-binding="true">
                         <constraints/>
                         <properties>
-                          <text value="Recent changes"/>
+                          <text value="News"/>
                         </properties>
                       </component>
                       <component id="6d08f" class="javax.swing.JTextField" binding="vTextField" default-binding="true">
@@ -259,7 +259,7 @@
                       <component id="b2f0d" class="javax.swing.JButton" binding="SQLAlchemyButton" default-binding="true">
                         <constraints/>
                         <properties>
-                          <text value="SQLAlchemy"/>
+                          <text value="sqlalchemy"/>
                         </properties>
                       </component>
                       <component id="df46c" class="javax.swing.JButton" binding="btn_cx_Oracle">
@@ -363,20 +363,20 @@
                       </component>
                     </children>
                   </grid>
-                  <grid id="22f6d" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="0">
+                  <grid id="22f6d" layout-manager="BorderLayout" hgap="0" vgap="0">
                     <constraints>
                       <grid row="7" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="1" fill="1" indent="0" use-parent-layout="false"/>
-                      <gridbag weightx="1.0" weighty="1.0"/>
+                      <gridbag top="8" left="8" bottom="0" right="8" weightx="1.0" weighty="1.0"/>
                     </constraints>
                     <properties/>
                     <border type="none"/>
                     <children>
                       <component id="c733b" class="javax.swing.JTextPane" binding="text1">
-                        <constraints/>
+                        <constraints border-constraint="Center"/>
                         <properties>
                           <background color="-1"/>
                           <editable value="false"/>
-                          <margin top="15" left="15" bottom="15" right="15"/>
+                          <margin top="0" left="15" bottom="15" right="15"/>
                           <text value=""/>
                         </properties>
                       </component>

@@ -131,7 +131,8 @@ public class JdbcUtils {
     }
 
     private InfoDbTable _createTableInfo(String table_name, String explicit_pk) throws Exception {
-        return new InfoDbTable(conn, type_map, dto_field_names_mode, table_name, explicit_pk);
+        String model = ""; // no model
+        return new InfoDbTable(model, conn, type_map, dto_field_names_mode, table_name, explicit_pk);
     }
 
     private void _get_sql_shortcut_info(
@@ -242,8 +243,8 @@ public class JdbcUtils {
         List<FieldInfo> dao_fields = new ArrayList<FieldInfo>();
         StringBuilder error = new StringBuilder();
         try {
-            InfoCustomSql info = new InfoCustomSql(conn, type_map, dto_field_names_mode);
-            info.get_field_info_by_jdbc_sql(dao_query_jdbc_sql, dao_fields_map, dao_fields);
+            // no model!
+            InfoCustomSql.get_field_info_by_jdbc_sql("", conn, dto_field_names_mode, dao_query_jdbc_sql, dao_fields_map, dao_fields);
         } catch (Exception e) {
             error.append(e.getMessage());
         }
@@ -350,7 +351,7 @@ public class JdbcUtils {
             List<FieldInfo> _dto_fields) throws Exception {
 
         InfoDtoClass info = new InfoDtoClass(conn, type_map, global_markers, dto_field_names_mode);
-        return info.get_dto_field_info(jaxb_dto_class, sql_root_abs_path,_dto_fields);
+        return info.get_dto_field_info(jaxb_dto_class, sql_root_abs_path, _dto_fields);
     }
 
     // DAO. Raw-SQL -------------------------------------------
@@ -379,8 +380,7 @@ public class JdbcUtils {
             _get_free_sql_fields_info(sql_root_abs_path, dao_query_jdbc_sql,
                     jaxb_dto_or_return_type, jaxb_return_type_is_dto, jaxb_dto_classes, _fields);
 
-            InfoCustomSql info = new InfoCustomSql(conn, type_map, dto_field_names_mode);
-            info.get_free_sql_params_info(dao_query_jdbc_sql, param_names_mode, method_param_descriptors, _params);
+            InfoCustomSql.get_jdbc_sql_params_info(conn, type_map, dao_query_jdbc_sql, param_names_mode, method_param_descriptors, _params);
         }
         for (FieldInfo fi : _fields) {
             String type_name = type_map.get_target_type_name(fi.getType());
@@ -396,8 +396,7 @@ public class JdbcUtils {
             List<FieldInfo> _params) throws Exception {
 
         FieldNamesMode param_names_mode = _refine_method_params_names_mode(dto_param_type);
-        InfoCustomSql info = new InfoCustomSql(conn, type_map, dto_field_names_mode);
-        info.get_free_sql_params_info(dao_jdbc_sql, param_names_mode, method_param_descriptors, _params);
+        InfoCustomSql.get_jdbc_sql_params_info(conn, type_map, dao_jdbc_sql, param_names_mode, method_param_descriptors, _params);
     }
 
     // DAO. CRUD -----------------------------------------------

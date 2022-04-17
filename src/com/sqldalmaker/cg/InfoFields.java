@@ -5,9 +5,9 @@
  */
 package com.sqldalmaker.cg;
 
-import org.apache.cayenne.dba.TypesMapping;
-
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -17,20 +17,20 @@ import java.util.Map;
  */
 class InfoFields {
 
-    public static List<FieldInfo> get_field_info_by_jdbc_sql(
-            FieldNamesMode dto_field_names_mode,
-            PreparedStatement ps,
-            Map<String, FieldInfo> _fields_map) throws Exception {
+    public static List<FieldInfo> get_field_info_by_jdbc_sql(String model,
+                                                             FieldNamesMode dto_field_names_mode,
+                                                             PreparedStatement ps,
+                                                             Map<String, FieldInfo> _fields_map) throws Exception {
 
         List<FieldInfo> _fields = new ArrayList<FieldInfo>();
         ResultSetMetaData rsmd = _get_rs_md(ps);
         int column_count = _get_col_count(rsmd);
         _fields_map.clear();
-        for (int i = 1; i <= column_count; i++) {
-            String col_name = _get_jdbc_col_name(rsmd, i);
-            String type_name = _get_jdbc_col_type_name(rsmd, i);
+        for (int col_num = 1; col_num <= column_count; col_num++) {
+            String col_name = _get_jdbc_col_name(rsmd, col_num);
+            String type_name = model + _get_jdbc_col_type_name(rsmd, col_num);
             FieldInfo field = new FieldInfo(dto_field_names_mode, type_name, col_name, "q(" + col_name + ")");
-            if (rsmd.isAutoIncrement(i)) {
+            if (rsmd.isAutoIncrement(col_num)) {
                 field.setAI(true);
             } else {
                 field.setAI(false);
@@ -71,7 +71,8 @@ class InfoFields {
         return column_count;
     }
 
-    private static String _get_jdbc_col_name(ResultSetMetaData rsmd, int col_num) throws Exception {
+    private static String _get_jdbc_col_name(ResultSetMetaData rsmd,
+                                             int col_num) throws Exception {
         String column_name;
         try {
             column_name = rsmd.getColumnLabel(col_num);
@@ -91,10 +92,10 @@ class InfoFields {
         return column_name;
     }
 
-    private static String _get_jdbc_col_type_name(ResultSetMetaData rsmd, int i) {
+    private static String _get_jdbc_col_type_name(ResultSetMetaData rsmd, int col_num) {
         try {
             // sometime, it returns "[B": See comments for Class.getName() API
-            String java_class_name = rsmd.getColumnClassName(i);
+            String java_class_name = rsmd.getColumnClassName(col_num);
             return Helpers.process_java_type_name(java_class_name);
         } catch (Exception ex) {
             return Object.class.getName();

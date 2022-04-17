@@ -499,7 +499,7 @@ public class UITabAdmin {
         btn_validate_all.setText("Validate All");
         panel3.add(btn_validate_all);
         recentChangesButton = new JButton();
-        recentChangesButton.setText("Recent changes");
+        recentChangesButton.setText("News");
         panel3.add(recentChangesButton);
         vTextField = new JTextField();
         vTextField.setBackground(new Color(-855310));
@@ -628,7 +628,7 @@ public class UITabAdmin {
         sqlite3MysqlConnectorPsycopg2Button.setText("sqlite3, mysql.connector, psycopg2");
         panel7.add(sqlite3MysqlConnectorPsycopg2Button);
         SQLAlchemyButton = new JButton();
-        SQLAlchemyButton.setText("SQLAlchemy");
+        SQLAlchemyButton.setText("sqlalchemy");
         panel7.add(SQLAlchemyButton);
         btn_cx_Oracle = new JButton();
         btn_cx_Oracle.setText("cx_Oracle");
@@ -693,7 +693,7 @@ public class UITabAdmin {
         rubyVmButton.setText("ruby.vm");
         panel9.add(rubyVmButton);
         final JPanel panel10 = new JPanel();
-        panel10.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
+        panel10.setLayout(new BorderLayout(0, 0));
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 7;
@@ -701,13 +701,14 @@ public class UITabAdmin {
         gbc.weighty = 1.0;
         gbc.anchor = GridBagConstraints.NORTH;
         gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(8, 8, 0, 8);
         panel2.add(panel10, gbc);
         text1 = new JTextPane();
         text1.setBackground(new Color(-1));
         text1.setEditable(false);
-        text1.setMargin(new Insets(15, 15, 15, 15));
+        text1.setMargin(new Insets(0, 15, 15, 15));
         text1.setText("");
-        panel10.add(text1);
+        panel10.add(text1, BorderLayout.CENTER);
     }
 
     /**

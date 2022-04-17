@@ -156,8 +156,9 @@ public class IdeaTargetLanguageHelpers {
         } else if (RootFileName.RUBY.equals(root_fn)) {
             return Helpers.convert_file_name_to_snake_case(class_name, "rb");
         } else if (RootFileName.PYTHON.equals(root_fn)) {
-            if (class_name.startsWith("sqlalchemy-")) {
-                class_name = class_name.replace("sqlalchemy-", "");
+            int model_name_end_index = class_name.indexOf('-');
+            if (model_name_end_index != -1) {
+                class_name = class_name.substring(model_name_end_index + 1);
             }
             return Helpers.convert_file_name_to_snake_case(class_name, "py");
         } else if (RootFileName.GO.equals(root_fn)) {

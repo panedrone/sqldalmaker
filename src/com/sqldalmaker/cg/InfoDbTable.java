@@ -25,10 +25,12 @@ class InfoDbTable {
     private final JaxbUtils.JaxbTypeMap type_map;
     private final FieldNamesMode dto_field_names_mode;
 
+    private final String model;
     private final String table_name;
     private final String explicit_pk;
 
-    public InfoDbTable(Connection conn,
+    public InfoDbTable(String model,
+                       Connection conn,
                        JaxbUtils.JaxbTypeMap type_map,
                        FieldNamesMode dto_field_names_mode,
                        String table_name,
@@ -38,6 +40,10 @@ class InfoDbTable {
         this.type_map = type_map;
         this.dto_field_names_mode = dto_field_names_mode;
 
+        this.model = model;
+        if (!SqlUtils.is_table_ref(table_name)) {
+            throw new Exception("Table name expected: " + table_name);
+        }
         this.table_name = table_name;
         this.explicit_pk = explicit_pk;
 
@@ -46,7 +52,7 @@ class InfoDbTable {
 
     private void _refine_field_info_by_jdbc_table() throws Exception {
         String jdbc_sql = _jdbc_sql_by_table_name(table_name);
-        _get_field_info_by_jdbc_sql(jdbc_sql, fields_map, fields_all);
+        InfoCustomSql.get_field_info_by_jdbc_sql(model, conn, dto_field_names_mode, jdbc_sql, fields_map, fields_all);
         Set<String> lower_case_pk_col_names = _get_lower_case_pk_col_names(table_name, explicit_pk);
         for (FieldInfo fi : fields_all) {
             String col_name = fi.getColumnName();
@@ -59,17 +65,11 @@ class InfoDbTable {
                 fi.setPK(false);
             }
         }
-        _refine_field_info_by_jdbc_table(conn, table_name, fields_map);
+        _refine_field_info_by_table_metadata();
         _refine_by_type_map();
     }
-    private static void _refine_field_info_by_jdbc_table(
-            Connection conn,
-            String table_name,
-            Map<String, FieldInfo> fields_map) throws Exception {
 
-        if (!SqlUtils.is_table_ref(table_name)) {
-            throw new Exception("Table name expected: " + table_name);
-        }
+    private void _refine_field_info_by_table_metadata() throws Exception {
         DatabaseMetaData md = conn.getMetaData();
         ResultSet columns_rs = _get_columns_rs(md, table_name);
         try {
@@ -79,7 +79,7 @@ class InfoDbTable {
                     int type = columns_rs.getInt("DATA_TYPE");
                     String apache_java_type_name = TypesMapping.getJavaBySqlType(type);
                     FieldInfo fi = fields_map.get(db_col_name);
-                    fi.refine_rendered_type(apache_java_type_name);
+                    fi.refine_rendered_type(_get_type_name(apache_java_type_name));
                     fi.setComment("t(" + db_col_name + ")");
                 }
             }
@@ -88,9 +88,12 @@ class InfoDbTable {
         }
     }
 
-    private static ResultSet _get_columns_rs(
-            DatabaseMetaData md,
-            String table_name) throws SQLException {
+    private String _get_type_name(String type_name) {
+        return model + type_name;
+    }
+
+    private static ResultSet _get_columns_rs(DatabaseMetaData md,
+                                             String table_name) throws SQLException {
 
         String[] parts = table_name.split("\\.", -1); // -1 to leave empty strings
         ResultSet rs_columns;
@@ -102,21 +105,6 @@ class InfoDbTable {
             rs_columns = md.getColumns(null, schema_nm, table_nm, "%");
         }
         return rs_columns;
-    }
-
-    private void _get_field_info_by_jdbc_sql(
-            String jdbc_sql,
-            Map<String, FieldInfo> fields_map,
-            List<FieldInfo> fields_all) throws Exception {
-
-        PreparedStatement ps = InfoCustomSql.prepare_jdbc_sql(conn, jdbc_sql);
-        try {
-            List<FieldInfo> res = InfoFields.get_field_info_by_jdbc_sql(dto_field_names_mode, ps, fields_map);
-            fields_all.clear();
-            fields_all.addAll(res);
-        } finally {
-            ps.close();
-        }
     }
 
     private static String _jdbc_sql_by_table_name(String table_name) {

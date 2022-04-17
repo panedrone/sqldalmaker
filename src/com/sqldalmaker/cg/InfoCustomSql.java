@@ -17,44 +17,45 @@ import java.util.Map;
  */
 class InfoCustomSql {
 
-    private final Connection conn;
-    private final JaxbUtils.JaxbTypeMap type_map;
-    private final FieldNamesMode dto_field_names_mode;
-
-    public InfoCustomSql(Connection conn,
-                         JaxbUtils.JaxbTypeMap type_map,
-                         FieldNamesMode dto_field_names_mode) {
-
-        this.conn = conn;
-        this.type_map = type_map;
-        this.dto_field_names_mode = dto_field_names_mode;
+    private static PreparedStatement _prepare_jdbc_sql(Connection conn, String jdbc_sql) throws SQLException {
+        boolean is_sp = SqlUtils.is_jdbc_stored_proc_call(jdbc_sql);
+        if (is_sp) {
+            return conn.prepareCall(jdbc_sql);
+        } else {
+            // For MySQL, prepareStatement doesn't throw Exception for
+            // invalid SQL statements and doesn't return null as well
+            return conn.prepareStatement(jdbc_sql);
+        }
     }
 
-    public void get_free_sql_params_info(
-            String dao_jdbc_sql,
-            FieldNamesMode param_names_mode,
-            String[] method_param_descriptors,
-            List<FieldInfo> params) throws Exception {
+    public static void get_field_info_by_jdbc_sql(String model,
+                                                  Connection conn,
+                                                  FieldNamesMode dto_field_names_mode,
+                                                  String jdbc_sql,
+                                                  Map<String, FieldInfo> fields_map,
+                                                  List<FieldInfo> fields_all) throws Exception {
 
-        Helpers.check_duplicates(method_param_descriptors);
-        PreparedStatement ps = prepare_jdbc_sql(conn, dao_jdbc_sql);
+        PreparedStatement ps = _prepare_jdbc_sql(conn, jdbc_sql);
         try {
-            InfoCustomSql.get_params_info(ps, type_map, param_names_mode, method_param_descriptors, params);
+            List<FieldInfo> res = InfoFields.get_field_info_by_jdbc_sql(model, dto_field_names_mode, ps, fields_map);
+            fields_all.clear();
+            fields_all.addAll(res);
         } finally {
             ps.close();
         }
     }
 
-    public void get_field_info_by_jdbc_sql(
-            String jdbc_sql,
-            Map<String, FieldInfo> fields_map,
-            List<FieldInfo> fields_all) throws Exception {
+    public static void get_jdbc_sql_params_info(Connection conn,
+                                                JaxbUtils.JaxbTypeMap type_map,
+                                                String dao_jdbc_sql,
+                                                FieldNamesMode param_names_mode,
+                                                String[] method_param_descriptors,
+                                                List<FieldInfo> params) throws Exception {
 
-        PreparedStatement ps = prepare_jdbc_sql(conn, jdbc_sql);
+        Helpers.check_duplicates(method_param_descriptors);
+        PreparedStatement ps = _prepare_jdbc_sql(conn, dao_jdbc_sql);
         try {
-            List<FieldInfo> res = InfoFields.get_field_info_by_jdbc_sql(dto_field_names_mode, ps, fields_map);
-            fields_all.clear();
-            fields_all.addAll(res);
+            InfoCustomSql.get_params_info(ps, type_map, param_names_mode, method_param_descriptors, params);
         } finally {
             ps.close();
         }
@@ -172,16 +173,5 @@ class InfoCustomSql {
         }
         param_type_name = type_map.get_target_type_name(param_type_name);
         return new FieldInfo(param_names_mode, param_type_name, param_name, "parameter");
-    }
-
-    public static PreparedStatement prepare_jdbc_sql(Connection conn, String jdbc_sql) throws SQLException {
-        boolean is_sp = SqlUtils.is_jdbc_stored_proc_call(jdbc_sql);
-        if (is_sp) {
-            return conn.prepareCall(jdbc_sql);
-        } else {
-            // For MySQL, prepareStatement doesn't throw Exception for
-            // invalid SQL statements and doesn't return null as well
-            return conn.prepareStatement(jdbc_sql);
-        }
     }
 }

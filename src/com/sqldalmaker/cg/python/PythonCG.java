@@ -60,9 +60,11 @@ public class PythonCG {
             db_utils.get_dto_field_info(jaxb_dto_class, sql_root_abs_path, fields);
             Map<String, Object> context = new HashMap<String, Object>();
             String name;
-            if (dto_class_name.startsWith("sqlalchemy-")) {
-                dto_class_name = dto_class_name.replace("sqlalchemy-", "");
-                context.put("model", "sqlalchemy");
+            int model_name_end_index = dto_class_name.indexOf('-');
+            if (model_name_end_index != -1) {
+                String model = dto_class_name.substring(0, model_name_end_index);
+                dto_class_name = dto_class_name.substring(model_name_end_index + 1);
+                context.put("model", model);
             }
             String ref = jaxb_dto_class.getRef();
             if (SqlUtils.is_table_ref(ref)) {
