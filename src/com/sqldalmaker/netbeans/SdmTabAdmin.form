@@ -61,11 +61,11 @@
             <Container class="javax.swing.JPanel" name="jPanel8">
               <Properties>
                 <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                  <Dimension value="[710, 436]"/>
+                  <Dimension value="[680, 436]"/>
                 </Property>
                 <Property name="name" type="java.lang.String" value="" noResource="true"/>
                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                  <Dimension value="[710, 436]"/>
+                  <Dimension value="[680, 436]"/>
                 </Property>
               </Properties>
 
@@ -116,8 +116,9 @@
                     </Component>
                     <Component class="javax.swing.JButton" name="jButton13">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="Recent changes"/>
+                        <Property name="actionCommand" type="java.lang.String" value="News"/>
                         <Property name="focusPainted" type="boolean" value="false"/>
+                        <Property name="label" type="java.lang.String" value="News"/>
                       </Properties>
                       <Events>
                         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton13ActionPerformed"/>
@@ -211,15 +212,18 @@
                     </Component>
                     <Component class="javax.swing.JButton" name="jButton28">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="PDO, mysql"/>
+                        <Property name="label" type="java.lang.String" value="mysql"/>
                       </Properties>
+                      <AccessibilityProperties>
+                        <Property name="AccessibleContext.accessibleName" type="java.lang.String" value="mysql"/>
+                      </AccessibilityProperties>
                       <Events>
                         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton28ActionPerformed"/>
                       </Events>
                     </Component>
                     <Component class="javax.swing.JButton" name="jButton29">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="PDO, oracle"/>
+                        <Property name="label" type="java.lang.String" value="oracle"/>
                       </Properties>
                       <Events>
                         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton29ActionPerformed"/>
@@ -235,7 +239,7 @@
                     </Component>
                     <Component class="javax.swing.JButton" name="jButton30">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="PDO, mssql"/>
+                        <Property name="label" type="java.lang.String" value="mssql"/>
                       </Properties>
                       <Events>
                         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton30ActionPerformed"/>
@@ -243,8 +247,8 @@
                     </Component>
                     <Component class="javax.swing.JButton" name="jButton26">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="PDO, postgresql"/>
                         <Property name="focusPainted" type="boolean" value="false"/>
+                        <Property name="label" type="java.lang.String" value="postgresql"/>
                       </Properties>
                       <Events>
                         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton26ActionPerformed"/>
@@ -252,8 +256,8 @@
                     </Component>
                     <Component class="javax.swing.JButton" name="jButton11">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="PDO, sqlite3"/>
                         <Property name="focusPainted" type="boolean" value="false"/>
+                        <Property name="label" type="java.lang.String" value="sqlite3"/>
                       </Properties>
                       <Events>
                         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton11ActionPerformed"/>
@@ -372,7 +376,7 @@
                     </Component>
                     <Component class="javax.swing.JButton" name="jButton7">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="sqlite3, mysql.connector, psycopg2, django.db"/>
+                        <Property name="text" type="java.lang.String" value="sqlite3, mysql.connector, psycopg2"/>
                       </Properties>
                       <Events>
                         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton7ActionPerformed"/>

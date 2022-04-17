@@ -1,4 +1,4 @@
-2022-04-10
+2022-04-17
 
     SQLAlchemy models:
 
@@ -9,20 +9,20 @@
     # <dto-class name="sqlalchemy-TaskModel" ref="taskas"/>
 
     tasks = self.ds.session.query(TaskModel).filter(TaskModel.g_id == g_id).all()
-    for t in tasks:
-        ai: ActorInfo = r
-        print(f"{ai.t_date}\t{ai.t_subject}\n")
+    for tt in tasks:
+        t: TaskModel = tt
+        print(f"{t.t_date}\t{t.t_subject}\n")
 
-    group = self.ds.session.query(TaskModel).get(i_id)
-    group.t_subject = t_subject
+    task = self.ds.session.query(TaskModel).get(i_id)
+    task.t_subject = t_subject
     ds.commit()
 
     # raw sql --------------------------------------------
     # <dto-class name="ActorInfo" ref="actor_info.sql"/>
 
-    res = ds.fetch_all_raw(ActorInfo, [50]) # 50 is film_id
-    for r in res:
-        print("\n", r)
+    aa = ds.fetch_all_raw(ActorInfo, [50]) # 50 is film_id
+    for a in aa:
+        print("\n", a)
 
 2022-04-06
 

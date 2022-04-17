@@ -205,9 +205,9 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         });
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jPanel8.setMinimumSize(new java.awt.Dimension(710, 436));
+        jPanel8.setMinimumSize(new java.awt.Dimension(680, 436));
         jPanel8.setName(""); // NOI18N
-        jPanel8.setPreferredSize(new java.awt.Dimension(710, 436));
+        jPanel8.setPreferredSize(new java.awt.Dimension(680, 436));
         jPanel8.setLayout(new javax.swing.BoxLayout(jPanel8, javax.swing.BoxLayout.Y_AXIS));
 
         jPanel3.setMinimumSize(new java.awt.Dimension(710, 32));
@@ -241,8 +241,9 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         });
         jPanel3.add(jButton6);
 
-        jButton13.setText("Recent changes");
+        jButton13.setActionCommand("News");
         jButton13.setFocusPainted(false);
+        jButton13.setLabel("News");
         jButton13.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton13ActionPerformed(evt);
@@ -310,15 +311,16 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         });
         jPanel1.add(jButton10);
 
-        jButton28.setText("PDO, mysql");
+        jButton28.setLabel("mysql");
         jButton28.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton28ActionPerformed(evt);
             }
         });
         jPanel1.add(jButton28);
+        jButton28.getAccessibleContext().setAccessibleName("mysql");
 
-        jButton29.setText("PDO, oracle");
+        jButton29.setLabel("oracle");
         jButton29.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton29ActionPerformed(evt);
@@ -334,7 +336,7 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         });
         jPanel1.add(jButton33);
 
-        jButton30.setText("PDO, mssql");
+        jButton30.setLabel("mssql");
         jButton30.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton30ActionPerformed(evt);
@@ -342,8 +344,8 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         });
         jPanel1.add(jButton30);
 
-        jButton26.setText("PDO, postgresql");
         jButton26.setFocusPainted(false);
+        jButton26.setLabel("postgresql");
         jButton26.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton26ActionPerformed(evt);
@@ -351,8 +353,8 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         });
         jPanel1.add(jButton26);
 
-        jButton11.setText("PDO, sqlite3");
         jButton11.setFocusPainted(false);
+        jButton11.setLabel("sqlite3");
         jButton11.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton11ActionPerformed(evt);
@@ -441,7 +443,7 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         jLabel9.setPreferredSize(new java.awt.Dimension(40, 14));
         jPanel9.add(jLabel9);
 
-        jButton7.setText("sqlite3, mysql.connector, psycopg2, django.db");
+        jButton7.setText("sqlite3, mysql.connector, psycopg2");
         jButton7.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton7ActionPerformed(evt);
