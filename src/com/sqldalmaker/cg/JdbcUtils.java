@@ -209,7 +209,7 @@ public class JdbcUtils {
         }
     }
 
-    private void _get_free_sql_fields_info_ret_dto(
+    private void _get_custom_sql_ret_field_info(
             String sql_root_abs_path,
             String jaxb_dto_or_return_type,
             DtoClasses jaxb_dto_classes,
@@ -231,7 +231,7 @@ public class JdbcUtils {
         }
     }
 
-    private void _get_free_sql_fields_info(
+    private void _get_custom_sql_fields_info(
             String sql_root_abs_path,
             String dao_query_jdbc_sql,
             String jaxb_dto_or_return_type,
@@ -249,7 +249,7 @@ public class JdbcUtils {
             error.append(e.getMessage());
         }
         if (jaxb_return_type_is_dto) {
-            _get_free_sql_fields_info_ret_dto(sql_root_abs_path, jaxb_dto_or_return_type, jaxb_dto_classes, _fields, dao_fields, error);
+            _get_custom_sql_ret_field_info(sql_root_abs_path, jaxb_dto_or_return_type, jaxb_dto_classes, _fields, dao_fields, error);
         } else {
             _fields.add(_get_ret_field_info(dto_field_names_mode, jaxb_dto_or_return_type, dao_fields));
         }
@@ -360,7 +360,8 @@ public class JdbcUtils {
 
     public String get_dao_query_info(
             String sql_root_abs_path,
-            String dao_jaxb_ref, String dto_param_type,
+            String dao_jaxb_ref,
+            String dto_param_type,
             String[] method_param_descriptors,
             String jaxb_dto_or_return_type,
             boolean jaxb_return_type_is_dto,
@@ -377,9 +378,8 @@ public class JdbcUtils {
             _get_sql_shortcut_info(sql_root_abs_path, dao_jaxb_ref, method_param_descriptors, param_names_mode,
                     jaxb_dto_or_return_type, jaxb_return_type_is_dto, jaxb_dto_classes, _fields, _params);
         } else {
-            _get_free_sql_fields_info(sql_root_abs_path, dao_query_jdbc_sql,
+            _get_custom_sql_fields_info(sql_root_abs_path, dao_query_jdbc_sql,
                     jaxb_dto_or_return_type, jaxb_return_type_is_dto, jaxb_dto_classes, _fields);
-
             InfoCustomSql.get_jdbc_sql_params_info(conn, type_map, dao_query_jdbc_sql, param_names_mode, method_param_descriptors, _params);
         }
         for (FieldInfo fi : _fields) {

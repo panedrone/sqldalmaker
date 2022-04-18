@@ -31,7 +31,10 @@ public class PythonCG {
         private final TemplateEngine te;
         private final JdbcUtils db_utils;
 
-        public DTO(DtoClasses jaxb_dto_classes, Settings jaxb_settings, Connection connection, String sql_root_abs_path,
+        public DTO(DtoClasses jaxb_dto_classes,
+                   Settings jaxb_settings,
+                   Connection conn,
+                   String sql_root_abs_path,
                    String vm_file_system_dir) throws Exception {
 
             this.jaxb_dto_classes = jaxb_dto_classes.getDtoClass();
@@ -41,7 +44,7 @@ public class PythonCG {
             } else {
                 te = new TemplateEngine(vm_file_system_dir, true);
             }
-            db_utils = new JdbcUtils(connection, FieldNamesMode.SNAKE_CASE, FieldNamesMode.SNAKE_CASE, jaxb_settings);
+            db_utils = new JdbcUtils(conn, FieldNamesMode.SNAKE_CASE, FieldNamesMode.SNAKE_CASE, jaxb_settings);
         }
 
         @Override
@@ -117,8 +120,12 @@ public class PythonCG {
         private final TemplateEngine te;
         private final JdbcUtils db_utils;
 
-        public DAO(String dto_package, DtoClasses jaxb_dto_classes, Settings jaxb_settings,
-                   Connection connection, String sql_root_abs_path, String vm_file_system_dir) throws Exception {
+        public DAO(String dto_package,
+                   DtoClasses jaxb_dto_classes,
+                   Settings jaxb_settings,
+                   Connection conn,
+                   String sql_root_abs_path,
+                   String vm_file_system_dir) throws Exception {
 
             this.jaxb_dto_classes = jaxb_dto_classes;
             this.sql_root_abs_path = sql_root_abs_path;
@@ -128,7 +135,7 @@ public class PythonCG {
             } else {
                 te = new TemplateEngine(vm_file_system_dir, true);
             }
-            db_utils = new JdbcUtils(connection, FieldNamesMode.SNAKE_CASE, FieldNamesMode.SNAKE_CASE, jaxb_settings);
+            db_utils = new JdbcUtils(conn, FieldNamesMode.SNAKE_CASE, FieldNamesMode.SNAKE_CASE, jaxb_settings);
         }
 
         @Override
@@ -197,10 +204,18 @@ public class PythonCG {
         //
         // this method is called from both 'render_jaxb_query' and 'render_crud_read'
         //
-        private StringBuilder _render_query(String dao_query_jdbc_sql, boolean is_external_sql,
-                                            String jaxb_dto_or_return_type, boolean jaxb_return_type_is_dto, boolean fetch_list,
-                                            String method_name, String dto_param_type, String crud_table,
-                                            List<FieldInfo> fields_all, List<FieldInfo> fields_pk, boolean out_params) throws Exception {
+        private StringBuilder _render_query(String dao_query_jdbc_sql,
+                                            boolean is_external_sql,
+                                            String jaxb_dto_or_return_type,
+                                            boolean jaxb_return_type_is_dto,
+                                            boolean fetch_list,
+                                            String method_name,
+                                            String dto_param_type,
+                                            String crud_table,
+                                            List<FieldInfo> fields_all,
+                                            List<FieldInfo> fields_pk,
+                                            boolean out_params) throws Exception {
+
             if (dao_query_jdbc_sql == null) {
                 return Helpers.get_no_pk_warning(method_name);
             }
@@ -225,6 +240,12 @@ public class PythonCG {
             context.put("ref", crud_table);
             context.put("sql", python_sql_str);
             context.put("use_dto", jaxb_return_type_is_dto);
+//            if (jaxb_return_type_is_dto) {
+//                int model_end = returned_type_name.indexOf('-');
+//                if (model_end != -1) {
+//                    returned_type_name = returned_type_name.substring(model_end + 1);
+//                }
+//            }
             context.put("returned_type_name", returned_type_name);
             context.put("fetch_list", fetch_list);
             context.put("imports", imports.values());
@@ -240,16 +261,25 @@ public class PythonCG {
 
         private String _get_rendered_dto_class_name(String dto_class_name, boolean add_to_import) throws Exception {
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
-            if (add_to_import) {
-                String dto_class_nm = jaxb_dto_class.getName();
-                String python_fn = Helpers.camel_case_to_lower_snake_case(dto_class_nm);
-                if (dto_package != null && dto_package.length() > 0) {
-                    python_fn = dto_package + "." + python_fn;
-                }
-                ImportItem item = new ImportItem(python_fn, dto_class_nm);
-                imports.put(dto_class_nm, item);
+            if (!add_to_import) {
+                return jaxb_dto_class.getName();
             }
-            return jaxb_dto_class.getName();
+            String dto_class_nm = jaxb_dto_class.getName();
+            String python_fn = Helpers.camel_case_to_lower_snake_case(dto_class_nm);
+            int model_end = python_fn.indexOf('-');
+            if (model_end != -1) {
+                python_fn = python_fn.substring(model_end + 1);
+            }
+            if (dto_package != null && dto_package.length() > 0) {
+                python_fn = dto_package + "." + python_fn;
+            }
+            model_end = dto_class_nm.indexOf('-');
+            if (model_end != -1) {
+                dto_class_nm = dto_class_nm.substring(model_end + 1);
+            }
+            ImportItem item = new ImportItem(python_fn, dto_class_nm);
+            imports.put(dto_class_nm, item);
+            return dto_class_nm;
         }
 
         @Override

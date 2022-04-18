@@ -51,6 +51,8 @@ class $class_name(Base):
 #end
 #if($sql)
 
+    __abstract__ = True
+
     SQL = """$sql"""
 #end
 #else

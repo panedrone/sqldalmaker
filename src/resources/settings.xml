@@ -124,6 +124,8 @@
         <type detected="sa-java.lang.Boolean" target="${type}|0:Boolean"/>
         <type detected="sa-byte[]" target="${type}|0:LargeBinary"/>
 
+        <type detected="sa-java.lang.Object" target="= Column('${column}')"/>  <!-- type unknown -->
+
         <!-- ****** raw SQL ************************ -->
 
         <type detected="java.lang.Short" target="int"/>
