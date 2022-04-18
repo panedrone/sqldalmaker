@@ -81,6 +81,12 @@ class InfoDbTable {
                     FieldInfo fi = fields_map.get(db_col_name);
                     fi.refine_rendered_type(_get_type_name(apache_java_type_name));
                     fi.setComment("t(" + db_col_name + ")");
+                    Object ai = columns_rs.getObject("IS_AUTOINCREMENT");
+                    if ("yes".equals(ai) || "YES".equals(ai)) {
+                        fi.setAI(true);
+                    } else {
+                        fi.setAI(false);
+                    }
                 }
             }
         } finally {
