@@ -242,9 +242,9 @@ class InfoDtoClass {
                 if (fi.isAI()) {
                     res += ", autoincrement=True";
                 }
-//                if (fi.isNullable()) {
-//                    res += ", nullable=True";
-//                }
+                if (fi.isNullable()) {
+                    res += ", nullable=True";
+                }
                 return res;
             }
         });

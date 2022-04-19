@@ -81,11 +81,29 @@ class InfoDbTable {
                     FieldInfo fi = fields_map.get(db_col_name);
                     fi.refine_rendered_type(_get_type_name(apache_java_type_name));
                     fi.setComment("t(" + db_col_name + ")");
+                    /* DatabaseMetaData.java:
+                     *   <LI><B>IS_AUTOINCREMENT</B> String  {@code =>} Indicates whether this column is auto incremented
+                     *       <UL>
+                     *       <LI> YES           --- if the column is auto incremented
+                     *       <LI> NO            --- if the column is not auto incremented
+                     *       <LI> empty string  --- if it cannot be determined whether the column is auto incremented
+                     *       </UL>
+                     *   <LI>
+                     */
                     Object ai = columns_rs.getObject("IS_AUTOINCREMENT");
                     if ("yes".equals(ai) || "YES".equals(ai)) {
                         fi.setAI(true);
                     } else {
                         fi.setAI(false);
+                    }
+                    int nullable = columns_rs.getInt("NULLABLE");
+                    if (nullable == DatabaseMetaData.columnNullable) {
+//                        System.out.println("nullable true");
+                        // http://www.java2s.com/Code/Java/Database-SQL-JDBC/IsColumnNullable.htm
+                        fi.setNullable(true);
+                    } else {
+                        // System.out.println("nullable false");
+                        fi.setNullable(false);
                     }
                 }
             }

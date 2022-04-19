@@ -16,8 +16,9 @@ public class FieldInfo {
 
     private final String database_column_name; // original name in database without conversions to lower/camel case etc.
 
-    private boolean is_auto_increment;
+    private boolean is_auto_increment = false;
     private boolean is_pk = false;
+    private boolean is_nullable = false;
 
     private String comment;
 
@@ -73,7 +74,7 @@ public class FieldInfo {
         return this.database_column_name;
     }
 
-    public boolean isPK() { // this method is for use in VM templates
+    public boolean isPK() {
         return this.is_pk;
     }
 
@@ -81,12 +82,20 @@ public class FieldInfo {
         this.is_pk = pk;
     }
 
-    public boolean isAI() { // this method is for use in VM templates
+    public boolean isAI() {
         return this.is_auto_increment;
     }
 
     public void setAI(boolean isAutoIncrement) {
         this.is_auto_increment = isAutoIncrement;
+    }
+
+    public boolean isNullable() {
+        return this.is_nullable;
+    }
+
+    public void setNullable(boolean nullable) {
+        this.is_nullable = nullable;
     }
 
     public String getComment() { // this method is for use in VM templates
