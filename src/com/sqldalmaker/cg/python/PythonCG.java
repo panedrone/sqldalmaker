@@ -139,7 +139,8 @@ public class PythonCG {
         }
 
         @Override
-        public String[] translate(String dao_class_name, DaoClass dao_class) throws Exception {
+        public String[] translate(String dao_class_name,
+                                  DaoClass dao_class) throws Exception {
             imports.clear();
             List<String> methods = new ArrayList<String>();
             JaxbUtils.process_jaxb_dao_class(this, dao_class, methods);
@@ -307,9 +308,15 @@ public class PythonCG {
             }
         }
 
-        private void _render_exec_dml(StringBuilder buffer, String jdbc_dao_sql, boolean is_external_sql,
-                                      String method_name, String dto_param_type, String[] param_descriptors,
-                                      String xml_node_name, String sql_path) throws Exception {
+        private void _render_exec_dml(StringBuilder buffer,
+                                      String jdbc_dao_sql,
+                                      boolean is_external_sql,
+                                      String method_name,
+                                      String dto_param_type,
+                                      String[] param_descriptors,
+                                      String xml_node_name,
+                                      String sql_path) throws Exception {
+
             SqlUtils.throw_if_select_sql(jdbc_dao_sql);
             List<FieldInfo> _params = new ArrayList<FieldInfo>();
             db_utils.get_dao_exec_dml_info(jdbc_dao_sql, dto_param_type, param_descriptors, _params);
@@ -397,7 +404,10 @@ public class PythonCG {
             return m;
         }
 
-        private void _assign_params(List<FieldInfo> params, String dto_param_type, Map<String, Object> context) throws Exception {
+        private void _assign_params(List<FieldInfo> params,
+                                    String dto_param_type,
+                                    Map<String, Object> context) throws Exception {
+
             int params_count = params.size();
             if (dto_param_type.length() > 0) {
                 if (params_count == 0) {
@@ -432,8 +442,13 @@ public class PythonCG {
         }
 
         @Override
-        public StringBuilder render_crud_create(String class_name, String method_name, String table_name,
-                                                String dto_class_name, boolean fetch_generated, String generated) throws Exception {
+        public StringBuilder render_crud_create(String class_name,
+                                                String method_name,
+                                                String table_name,
+                                                String dto_class_name,
+                                                boolean fetch_generated,
+                                                String generated) throws Exception {
+
             List<FieldInfo> fields_not_ai = new ArrayList<FieldInfo>();
             List<FieldInfo> fields_ai = new ArrayList<FieldInfo>();
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
@@ -462,8 +477,12 @@ public class PythonCG {
         }
 
         @Override
-        public StringBuilder render_crud_read(String method_name, String dao_table_name, String dto_class_name,
-                                              String explicit_pk, boolean fetch_list) throws Exception {
+        public StringBuilder render_crud_read(String method_name,
+                                              String dao_table_name,
+                                              String dto_class_name,
+                                              String explicit_pk,
+                                              boolean fetch_list) throws Exception {
+
             List<FieldInfo> fields_all = new ArrayList<FieldInfo>();
             List<FieldInfo> fields_pk = new ArrayList<FieldInfo>();
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
@@ -474,8 +493,13 @@ public class PythonCG {
         }
 
         @Override
-        public StringBuilder render_crud_update(String class_name, String method_name, String table_name,
-                                                String explicit_pk, String dto_class_name, boolean primitive_params) throws Exception {
+        public StringBuilder render_crud_update(String class_name,
+                                                String method_name,
+                                                String table_name,
+                                                String explicit_pk,
+                                                String dto_class_name,
+                                                boolean primitive_params) throws Exception {
+
             List<FieldInfo> updated_fields = new ArrayList<FieldInfo>();
             List<FieldInfo> fields_pk = new ArrayList<FieldInfo>();
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
@@ -506,8 +530,11 @@ public class PythonCG {
         }
 
         @Override
-        public StringBuilder render_crud_delete(String class_name, String method_name,
-                                                String table_name, String explicit_pk) throws Exception {
+        public StringBuilder render_crud_delete(String class_name,
+                                                String method_name,
+                                                String table_name,
+                                                String explicit_pk) throws Exception {
+
             List<FieldInfo> fields_pk = new ArrayList<FieldInfo>();
             String dao_jdbc_sql = db_utils.get_dao_crud_delete_info(table_name, explicit_pk, fields_pk);
             if (fields_pk.isEmpty()) {

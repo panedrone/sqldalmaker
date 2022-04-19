@@ -23,11 +23,9 @@ class InfoDbTable {
 
     private final Connection conn;
     private final JaxbUtils.JaxbTypeMap type_map;
-    private final FieldNamesMode dto_field_names_mode;
 
     private final String model;
     private final String table_name;
-    private final String explicit_pk;
 
     public InfoDbTable(String model,
                        Connection conn,
@@ -38,19 +36,15 @@ class InfoDbTable {
 
         this.conn = conn;
         this.type_map = type_map;
-        this.dto_field_names_mode = dto_field_names_mode;
 
         this.model = model;
         if (!SqlUtils.is_table_ref(table_name)) {
             throw new Exception("Table name expected: " + table_name);
         }
         this.table_name = table_name;
-        this.explicit_pk = explicit_pk;
 
-        _refine_field_info_by_jdbc_table();
-    }
+        validate_table_name(conn, table_name); // Oracle PK are not detected with lower case table name
 
-    private void _refine_field_info_by_jdbc_table() throws Exception {
         String jdbc_sql = _jdbc_sql_by_table_name(table_name);
         InfoCustomSql.get_field_info_by_jdbc_sql(model, conn, dto_field_names_mode, jdbc_sql, fields_map, fields_all);
         Set<String> lower_case_pk_col_names = _get_lower_case_pk_col_names(table_name, explicit_pk);
@@ -67,6 +61,30 @@ class InfoDbTable {
         }
         _refine_field_info_by_table_metadata();
         _refine_by_type_map();
+    }
+
+    public static void validate_table_name(Connection conn,
+                                           String table_name) throws Exception {
+
+        DatabaseMetaData db_info = conn.getMetaData();
+        String schema = null;
+        if (table_name.contains(".")) {
+            String[] parts = table_name.split("\\.");
+            if (parts.length != 2) {
+                throw new SQLException("Invalid table name: '" + table_name + "'");
+            }
+            schema = parts[0];
+            table_name = parts[1];
+        }
+        ResultSet rs = db_info.getTables(null, schema, table_name, null);
+        try {
+            if (rs.next()) {
+                return;
+            }
+        } finally {
+            rs.close();
+        }
+        throw new Exception("Data table '" + table_name + "' not found. Table names may be case sensitive.");
     }
 
     private void _refine_field_info_by_table_metadata() throws Exception {

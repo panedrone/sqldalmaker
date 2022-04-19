@@ -18,7 +18,8 @@ PHP, Java, C++, Python, Ruby, and Go. To generate the class, you declare it in X
     <change-notes>
         <![CDATA[
 <ul>
-<li>fix of DTO fields wizard</li>
+<li>Fixes for SQLAlchemy + Oracle</li>
+<li>Fixes of DTO fields wizard</li>
 <li>+ SQLAlchemy nullable</li>
 <li>+ SQLAlchemy models</li>
 <li>Navigation from XML to generated files</li>

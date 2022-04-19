@@ -3,6 +3,10 @@ import sqlalchemy
 import sqlalchemy.ext.declarative
 from sqlalchemy.orm import declarative_base, sessionmaker
 
+# import psycopg2
+
+import cx_Oracle
+
 Base = declarative_base()
 
 
@@ -26,6 +30,7 @@ class DataStore:
     - sqlite3 ---------------- built-in
     - postgresql ------------- pip install psycopg2
     - mysql+mysqlconnector --- pip install mysql-connector-python
+    - cx_Oracle
 
     """
 
@@ -33,17 +38,32 @@ class DataStore:
         sqlite3 = 1
         mysql = 2
         postgresql = 3
+        oracle = 4
 
     def __init__(self):
         self.conn = None
         self.transaction = None
-        self.engine = sqlalchemy.create_engine('sqlite:///todo-list.sqlite')
-        self.engine_type = self.EngineType.sqlite3
+
+        # self.engine = sqlalchemy.create_engine('sqlite:///todo-list.sqlite')
+        # self.engine_type = self.EngineType.sqlite3
+
         # self.engine = sqlalchemy.create_engine('postgresql://postgres:sa@localhost/my-tests')
         # self.engine_type = self.EngineType.postgresql
+
         # https://www.tutorialguruji.com/dbms/how-do-i-execute-a-mysql-stored-procedure-in-a-sqlalchemy-scoped-session-to-return-a-single-result-set-of-data-for-flask-web-app/
         # self.engine = sqlalchemy.create_engine('mysql+mysqlconnector://root:root@localhost/sakila')
         # self.engine_type = self.EngineType.mysql
+
+        user = 'MY_TESTS'
+        pwd = 'sa'
+        dsn = cx_Oracle.makedsn(
+            'localhost', 1521,
+            service_name="orcl"
+            # service_name='your_service_name_if_any'
+        )
+        self.engine = sqlalchemy.create_engine(f'oracle+cx_oracle://{user}:{pwd}@{dsn}', echo=False)
+        self.engine_type = self.EngineType.oracle
+
         self.session = sessionmaker(bind=self.engine)()
 
     def open(self):

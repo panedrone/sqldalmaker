@@ -304,26 +304,8 @@ public class JdbcUtils {
         }
     }
 
-    public void validate_table_name(String table_name) throws SQLException {
-        DatabaseMetaData db_info = conn.getMetaData();
-        String schema = null;
-        if (table_name.contains(".")) {
-            String[] parts = table_name.split("\\.");
-            if (parts.length != 2) {
-                throw new SQLException("Invalid table name: '" + table_name + "'");
-            }
-            schema = parts[0];
-            table_name = parts[1];
-        }
-        ResultSet rs = db_info.getTables(null, schema, table_name, null);
-        try {
-            if (rs.next()) {
-                return;
-            }
-        } finally {
-            rs.close();
-        }
-        throw new SQLException("Data table '" + table_name + "' not found. Table names may be case sensitive.");
+    public void validate_table_name(String table_name) throws Exception {
+        InfoDbTable.validate_table_name(conn, table_name);
     }
 
     // DTO -----------------------------------------------------

@@ -1,3 +1,17 @@
+2022-04-20
+
+    - Fixes for SQLAlchemy + Oracle.
+
+        Re-define identity keys as Integer-s because of auto-detected Float-s are not working:
+
+        <dto-class name="sa-Group" ref="GROUPS">
+            <field type="|0:Integer" column="G_ID"/>
+        </dto-class>
+
+        ^^ also, specify table names in upper-case to detect primary keys correctly.
+
+    - Fixes of imports.
+
 2022-04-17
 
     # SQLAlchemy models (update XSD files from the tab 'Admin'):

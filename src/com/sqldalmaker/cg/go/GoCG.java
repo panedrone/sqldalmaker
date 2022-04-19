@@ -36,17 +36,22 @@ public class GoCG {
             return null;
         }
         String type_part = type_parts[0];
-        String[] parts = type_part.split("[.]");
+        String[] parts = type_part.split("[:]");
         if (parts.length < 2) {
             return null;
         }
         return parts[0];
     }
 
-    private static String _get_just_type(FieldInfo fi) {
+    private static String _get_type_without_import(FieldInfo fi) {
         String[] type_parts = fi.getType().split("\\s+");
         type_parts = type_parts[0].split("[$]"); // it returns whole string if there are no "\\s+"
-        return type_parts[0]; // it returns whole string if there are no "$"
+        String type_part = type_parts[0]; // it returns whole string if there are no "$"
+        String[] parts = type_part.split("[:]");
+        if (parts.length < 2) {
+            return type_part;
+        }
+        return parts[1];
     }
 
     public static class DTO implements IDtoCG {
@@ -58,8 +63,14 @@ public class GoCG {
         private final TemplateEngine te;
         private final JdbcUtils db_utils;
 
-        public DTO(String dto_package, DtoClasses jaxb_dto_classes, Settings jaxb_settings, Connection connection,
-                   String sql_root_abs_path, FieldNamesMode field_names_mode, String vm_file_system_dir) throws Exception {
+        public DTO(String dto_package,
+                   DtoClasses jaxb_dto_classes,
+                   Settings jaxb_settings,
+                   Connection connection,
+                   String sql_root_abs_path,
+                   FieldNamesMode field_names_mode,
+                   String vm_file_system_dir) throws Exception {
+
             this.dto_package = dto_package;
             this.jaxb_dto_classes = jaxb_dto_classes.getDtoClass();
             this.sql_root_abs_path = sql_root_abs_path;
@@ -91,28 +102,25 @@ public class GoCG {
             int max_name_len = -1;
             int max_type_name_len = -1;
             for (FieldInfo fi : fields) {
-                {
-                    String imp = _get_import(fi);
-                    if (imp != null) {
-                        imports.add(imp);
-                    }
+                String imp = _get_import(fi);
+                if (imp != null) {
+                    imports.add(imp);
                 }
                 int name_len = fi.getName().length();
                 if (name_len > max_name_len) {
                     max_name_len = name_len;
                 }
-                String just_type = _get_just_type(fi);
+                String just_type = _get_type_without_import(fi);
+                fi.refine_rendered_type(just_type);
                 if (just_type.length() > max_type_name_len) {
                     max_type_name_len = just_type.length();
                 }
             }
             String name_format = "%-" + max_name_len + "." + max_name_len + "s";
             for (FieldInfo fi : fields) {
-                {
-                    String name = fi.getName();
-                    name = String.format(name_format, name);
-                    fi.setName(name);
-                }
+                String name = fi.getName();
+                name = String.format(name_format, name);
+                fi.setName(name);
                 if (max_type_name_len > 0) {
                     String type_name = fi.getType();
                     String[] type_parts = type_name.split("\\s+");
@@ -152,8 +160,14 @@ public class GoCG {
 
         private String dao_class_name;
 
-        public DAO(String dao_package, DtoClasses jaxb_dto_classes, Settings jaxb_settings, Connection connection,
-                   String sql_root_abs_path, FieldNamesMode field_names_mode, String vm_file_system_dir) throws Exception {
+        public DAO(String dao_package,
+                   DtoClasses jaxb_dto_classes,
+                   Settings jaxb_settings,
+                   Connection connection,
+                   String sql_root_abs_path,
+                   FieldNamesMode field_names_mode,
+                   String vm_file_system_dir) throws Exception {
+
             //this.dto_package = dto_package;
             this.dao_package = dao_package;
             this.jaxb_dto_classes = jaxb_dto_classes;
@@ -167,7 +181,8 @@ public class GoCG {
         }
 
         @Override
-        public String[] translate(String dao_class_name, DaoClass dao_class) throws Exception {
+        public String[] translate(String dao_class_name,
+                                  DaoClass dao_class) throws Exception {
             imports.clear();
             this.dao_class_name = dao_class_name;
             List<String> methods = new ArrayList<String>();
@@ -226,10 +241,16 @@ public class GoCG {
         //
         // this method is called from both 'render_jaxb_query' and 'render_crud_read'
         //
-        private StringBuilder _render_query(
-                String dao_query_jdbc_sql, boolean is_external_sql,
-                String jaxb_dto_or_return_type, boolean jaxb_return_type_is_dto, boolean fetch_list, String method_name,
-                String dto_param_type, String crud_table, List<FieldInfo> fields, List<FieldInfo> params) throws Exception {
+        private StringBuilder _render_query(String dao_query_jdbc_sql,
+                                            boolean is_external_sql,
+                                            String jaxb_dto_or_return_type,
+                                            boolean jaxb_return_type_is_dto,
+                                            boolean fetch_list, String method_name,
+                                            String dto_param_type,
+                                            String crud_table,
+                                            List<FieldInfo> fields,
+                                            List<FieldInfo> params) throws Exception {
+
             if (dao_query_jdbc_sql == null) {
                 return Helpers.get_no_pk_warning(method_name);
             }
@@ -295,9 +316,15 @@ public class GoCG {
             }
         }
 
-        private void _render_exec_dml(StringBuilder buffer, String jdbc_dao_sql, boolean is_external_sql,
-                                      String method_name, String dto_param_type, String[] param_descriptors, String xml_node_name,
+        private void _render_exec_dml(StringBuilder buffer,
+                                      String jdbc_dao_sql,
+                                      boolean is_external_sql,
+                                      String method_name,
+                                      String dto_param_type,
+                                      String[] param_descriptors,
+                                      String xml_node_name,
                                       String sql_path) throws Exception {
+
             SqlUtils.throw_if_select_sql(jdbc_dao_sql);
             List<FieldInfo> _params = new ArrayList<FieldInfo>();
             db_utils.get_dao_exec_dml_info(jdbc_dao_sql, dto_param_type, param_descriptors, _params);
@@ -306,7 +333,7 @@ public class GoCG {
                 if (imp != null) {
                     imports.add(imp);
                 }
-                String just_type = _get_just_type(pi);
+                String just_type = _get_type_without_import(pi);
                 pi.refine_rendered_type(just_type);
             }
             String go_sql = SqlUtils.format_jdbc_sql_for_go(jdbc_dao_sql);
@@ -399,8 +426,9 @@ public class GoCG {
             return m;
         }
 
-        private void _assign_params_and_imports(List<FieldInfo> params, String dto_param_type, Map<String, Object> context)
-                throws Exception {
+        private void _assign_params_and_imports(List<FieldInfo> params,
+                                                String dto_param_type,
+                                                Map<String, Object> context) throws Exception {
             int params_count = params.size();
             boolean plain_params;
             if (dto_param_type != null && dto_param_type.length() > 0) {
@@ -421,7 +449,7 @@ public class GoCG {
                     if (imp != null) {
                         imports.add(imp);
                     }
-                    String just_type = _get_just_type(pi);
+                    String just_type = _get_type_without_import(pi);
                     pi.refine_rendered_type(just_type);
                 }
             }
@@ -432,7 +460,8 @@ public class GoCG {
             context.put("imports", imports);
         }
 
-        private String[] _parse_method_declaration(String method_text, String dto_package) throws Exception {
+        private String[] _parse_method_declaration(String method_text,
+                                                   String dto_package) throws Exception {
             String dto_param_type = "";
             String param_descriptors = "";
             String method_name;
@@ -454,8 +483,13 @@ public class GoCG {
         }
 
         @Override
-        public StringBuilder render_crud_create(String class_name, String method_name, String table_name,
-                                                String dto_class_name, boolean fetch_generated, String generated) throws Exception {
+        public StringBuilder render_crud_create(String class_name,
+                                                String method_name,
+                                                String table_name,
+                                                String dto_class_name,
+                                                boolean fetch_generated,
+                                                String generated) throws Exception {
+
             List<FieldInfo> fields_not_ai = new ArrayList<FieldInfo>();
             List<FieldInfo> fields_ai = new ArrayList<FieldInfo>();
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
@@ -493,8 +527,12 @@ public class GoCG {
         }
 
         @Override
-        public StringBuilder render_crud_read(String method_name, String dao_table_name, String dto_class_name,
-                                              String explicit_pk, boolean fetch_list) throws Exception {
+        public StringBuilder render_crud_read(String method_name,
+                                              String dao_table_name,
+                                              String dto_class_name,
+                                              String explicit_pk,
+                                              boolean fetch_list) throws Exception {
+
             List<FieldInfo> fields_all = new ArrayList<FieldInfo>();
             List<FieldInfo> fields_pk = new ArrayList<FieldInfo>();
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
@@ -505,8 +543,13 @@ public class GoCG {
         }
 
         @Override
-        public StringBuilder render_crud_update(String class_name, String method_name, String table_name,
-                                                String explicit_pk, String dto_class_name, boolean primitive_params) throws Exception {
+        public StringBuilder render_crud_update(String class_name,
+                                                String method_name,
+                                                String table_name,
+                                                String explicit_pk,
+                                                String dto_class_name,
+                                                boolean primitive_params) throws Exception {
+
             List<FieldInfo> fields_not_pk = new ArrayList<FieldInfo>();
             List<FieldInfo> fields_pk = new ArrayList<FieldInfo>();
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
@@ -540,8 +583,11 @@ public class GoCG {
         }
 
         @Override
-        public StringBuilder render_crud_delete(String class_name, String method_name, String table_name,
+        public StringBuilder render_crud_delete(String class_name,
+                                                String method_name,
+                                                String table_name,
                                                 String explicit_pk) throws Exception {
+
             List<FieldInfo> fields_pk = new ArrayList<FieldInfo>();
             String dao_jdbc_sql = db_utils.get_dao_crud_delete_info(table_name, explicit_pk, fields_pk);
             if (fields_pk.isEmpty()) {
