@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2021 sqldalmaker@gmail.com
+    Copyright 2011-2022 sqldalmaker@gmail.com
     SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -484,7 +484,10 @@ public class UITabDTO {
         }
     }
 
-    private void validate_with_progress_sync(final IDtoCG gen, final AbstractTableModel model, final Settings settings) {
+    private void validate_with_progress_sync(IDtoCG gen,
+                                             AbstractTableModel model,
+                                             Settings settings) {
+
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
