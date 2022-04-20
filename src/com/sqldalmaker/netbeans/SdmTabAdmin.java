@@ -241,9 +241,9 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         });
         jPanel3.add(jButton6);
 
+        jButton13.setText("News");
         jButton13.setActionCommand("News");
         jButton13.setFocusPainted(false);
-        jButton13.setLabel("News");
         jButton13.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton13ActionPerformed(evt);
@@ -311,16 +311,15 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         });
         jPanel1.add(jButton10);
 
-        jButton28.setLabel("mysql");
+        jButton28.setText("MySQL");
         jButton28.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton28ActionPerformed(evt);
             }
         });
         jPanel1.add(jButton28);
-        jButton28.getAccessibleContext().setAccessibleName("mysql");
 
-        jButton29.setLabel("oracle");
+        jButton29.setText("Oracle");
         jButton29.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton29ActionPerformed(evt);
@@ -336,7 +335,7 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         });
         jPanel1.add(jButton33);
 
-        jButton30.setLabel("mssql");
+        jButton30.setText("MS SQL");
         jButton30.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton30ActionPerformed(evt);
@@ -344,8 +343,8 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         });
         jPanel1.add(jButton30);
 
+        jButton26.setText("PostgreSQL");
         jButton26.setFocusPainted(false);
-        jButton26.setLabel("postgresql");
         jButton26.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton26ActionPerformed(evt);
@@ -353,8 +352,8 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         });
         jPanel1.add(jButton26);
 
+        jButton11.setText("SQLite3");
         jButton11.setFocusPainted(false);
-        jButton11.setLabel("sqlite3");
         jButton11.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton11ActionPerformed(evt);

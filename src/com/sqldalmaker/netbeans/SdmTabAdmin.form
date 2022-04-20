@@ -116,9 +116,9 @@
                     </Component>
                     <Component class="javax.swing.JButton" name="jButton13">
                       <Properties>
+                        <Property name="text" type="java.lang.String" value="News"/>
                         <Property name="actionCommand" type="java.lang.String" value="News"/>
                         <Property name="focusPainted" type="boolean" value="false"/>
-                        <Property name="label" type="java.lang.String" value="News"/>
                       </Properties>
                       <Events>
                         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton13ActionPerformed"/>
@@ -212,18 +212,15 @@
                     </Component>
                     <Component class="javax.swing.JButton" name="jButton28">
                       <Properties>
-                        <Property name="label" type="java.lang.String" value="mysql"/>
+                        <Property name="text" type="java.lang.String" value="MySQL"/>
                       </Properties>
-                      <AccessibilityProperties>
-                        <Property name="AccessibleContext.accessibleName" type="java.lang.String" value="mysql"/>
-                      </AccessibilityProperties>
                       <Events>
                         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton28ActionPerformed"/>
                       </Events>
                     </Component>
                     <Component class="javax.swing.JButton" name="jButton29">
                       <Properties>
-                        <Property name="label" type="java.lang.String" value="oracle"/>
+                        <Property name="text" type="java.lang.String" value="Oracle"/>
                       </Properties>
                       <Events>
                         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton29ActionPerformed"/>
@@ -239,7 +236,7 @@
                     </Component>
                     <Component class="javax.swing.JButton" name="jButton30">
                       <Properties>
-                        <Property name="label" type="java.lang.String" value="mssql"/>
+                        <Property name="text" type="java.lang.String" value="MS SQL"/>
                       </Properties>
                       <Events>
                         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton30ActionPerformed"/>
@@ -247,8 +244,8 @@
                     </Component>
                     <Component class="javax.swing.JButton" name="jButton26">
                       <Properties>
+                        <Property name="text" type="java.lang.String" value="PostgreSQL"/>
                         <Property name="focusPainted" type="boolean" value="false"/>
-                        <Property name="label" type="java.lang.String" value="postgresql"/>
                       </Properties>
                       <Events>
                         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton26ActionPerformed"/>
@@ -256,8 +253,8 @@
                     </Component>
                     <Component class="javax.swing.JButton" name="jButton11">
                       <Properties>
+                        <Property name="text" type="java.lang.String" value="SQLite3"/>
                         <Property name="focusPainted" type="boolean" value="false"/>
-                        <Property name="label" type="java.lang.String" value="sqlite3"/>
                       </Properties>
                       <Events>
                         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton11ActionPerformed"/>

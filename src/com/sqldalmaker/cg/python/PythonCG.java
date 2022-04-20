@@ -62,7 +62,6 @@ public class PythonCG {
             List<FieldInfo> fields = new ArrayList<FieldInfo>();
             db_utils.get_dto_field_info(jaxb_dto_class, sql_root_abs_path, fields);
             Map<String, Object> context = new HashMap<String, Object>();
-            String name;
             int model_name_end_index = dto_class_name.indexOf('-');
             if (model_name_end_index != -1) {
                 String model = dto_class_name.substring(0, model_name_end_index);
