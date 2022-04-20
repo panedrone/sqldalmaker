@@ -26,32 +26,40 @@ public class GoCG {
         return Helpers.class.getPackage().getName().replace('.', '/') + "/go/go.vm";
     }
 
-    private static String _get_import(FieldInfo fi) {
-        String rendered_field_type = fi.getType();
-        if (rendered_field_type == null) {
+    private static String _get_type_import(FieldInfo fi) {
+        String initial_type = fi.getType();
+        if (initial_type == null) {
             return null;
         }
-        String[] type_parts = rendered_field_type.trim().split("\\s+");
+        String[] type_parts = initial_type.trim().split("\\s+");
         if (type_parts.length < 1) {
             return null;
         }
-        String type_part = type_parts[0];
-        String[] parts = type_part.split("[:]");
-        if (parts.length < 2) {
+        String type_part = type_parts[0]; // type_part = "time:time.Time"
+        int import_end = type_part.indexOf(':');
+        if (import_end == -1) {
             return null;
         }
-        return parts[0];
+        String res = type_part.substring(0, import_end);
+        return res;
     }
 
-    private static String _get_type_without_import(FieldInfo fi) {
-        String[] type_parts = fi.getType().split("\\s+");
-        type_parts = type_parts[0].split("[$]"); // it returns whole string if there are no "\\s+"
-        String type_part = type_parts[0]; // it returns whole string if there are no "$"
-        String[] parts = type_part.split("[:]");
-        if (parts.length < 2) {
-            return type_part;
+    private static String _get_type_without_import(String type) {
+        // "time:time.Time `json:"t_date"`{$0}"
+        String initial_type = type.split("[$]")[0]; // it is needed for parameters
+        int import_end = initial_type.split("\\s+")[0].indexOf(":");
+        if (import_end == -1) {
+            return initial_type;
         }
-        return parts[1];
+        String res = initial_type.substring(import_end + 1);
+        return res;
+    }
+
+    private static String _get_type_without_import_and_tag(FieldInfo fi) {
+        String initial_type = _get_type_without_import(fi.getType()); // "time:time.Time `json:"t_date"`"
+        String[] type_parts = initial_type.split("\\s+"); // it returns the whole string if there are no "\\s+"
+        String type_part = type_parts[0]; // type_part = "time:time.Time"
+        return type_part;
     }
 
     public static class DTO implements IDtoCG {
@@ -102,7 +110,7 @@ public class GoCG {
             int max_name_len = -1;
             int max_type_name_len = -1;
             for (FieldInfo fi : fields) {
-                String imp = _get_import(fi);
+                String imp = _get_type_import(fi);
                 if (imp != null) {
                     imports.add(imp);
                 }
@@ -110,8 +118,7 @@ public class GoCG {
                 if (name_len > max_name_len) {
                     max_name_len = name_len;
                 }
-                String just_type = _get_type_without_import(fi);
-                fi.refine_rendered_type(just_type);
+                String just_type = _get_type_without_import_and_tag(fi);
                 if (just_type.length() > max_type_name_len) {
                     max_type_name_len = just_type.length();
                 }
@@ -121,17 +128,17 @@ public class GoCG {
                 String name = fi.getName();
                 name = String.format(name_format, name);
                 fi.setName(name);
+                String type_name = _get_type_without_import(fi.getType());
                 if (max_type_name_len > 0) {
-                    String type_name = fi.getType();
-                    String[] type_parts = type_name.split("\\s+");
-                    if (type_parts.length > 1) {
-                        String just_type = type_parts[0];
-                        String type_tag = type_parts[1];
+                    String just_type = _get_type_without_import_and_tag(fi);
+                    int just_type_len = just_type.length();
+                    if (just_type_len < type_name.length()) {
+                        String type_tag = type_name.substring(just_type_len  + 1);
                         String type_format = "%-" + max_type_name_len + "." + max_type_name_len + "s %s";
                         type_name = String.format(type_format, just_type, type_tag);
-                        fi.refine_rendered_type(type_name);
                     }
                 }
+                fi.refine_rendered_type(type_name);
             }
             context.put("imports", imports);
             context.put("class_name", dto_class_name);
@@ -258,7 +265,9 @@ public class GoCG {
             if (jaxb_return_type_is_dto) {
                 returned_type_name = _get_rendered_dto_class_name(jaxb_dto_or_return_type);
             } else {
-                returned_type_name = fields.get(0).getType();
+                FieldInfo ret_fi = fields.get(0);
+                returned_type_name = _get_type_without_import_and_tag(ret_fi);
+                ret_fi.refine_rendered_type(returned_type_name);
             }
             String go_sql_str = SqlUtils.format_jdbc_sql_for_go(dao_query_jdbc_sql);
             Map<String, Object> context = new HashMap<String, Object>();
@@ -329,11 +338,11 @@ public class GoCG {
             List<FieldInfo> _params = new ArrayList<FieldInfo>();
             db_utils.get_dao_exec_dml_info(jdbc_dao_sql, dto_param_type, param_descriptors, _params);
             for (FieldInfo pi : _params) {
-                String imp = _get_import(pi);
+                String imp = _get_type_import(pi);
                 if (imp != null) {
                     imports.add(imp);
                 }
-                String just_type = _get_type_without_import(pi);
+                String just_type = _get_type_without_import_and_tag(pi);
                 pi.refine_rendered_type(just_type);
             }
             String go_sql = SqlUtils.format_jdbc_sql_for_go(jdbc_dao_sql);
@@ -445,11 +454,11 @@ public class GoCG {
             context.put("plain_params", plain_params);
             if (plain_params) {
                 for (FieldInfo pi : params) {
-                    String imp = _get_import(pi);
+                    String imp = _get_type_import(pi);
                     if (imp != null) {
                         imports.add(imp);
                     }
-                    String just_type = _get_type_without_import(pi);
+                    String just_type = _get_type_without_import_and_tag(pi);
                     pi.refine_rendered_type(just_type);
                 }
             }

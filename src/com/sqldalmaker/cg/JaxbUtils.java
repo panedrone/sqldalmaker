@@ -99,27 +99,20 @@ public class JaxbUtils {
     private static Set<String> _find_macro_calls(String input) {
         // https://stackoverflow.com/questions/53904144/regex-matching-even-amount-of-brackets
         Set<String> res = new HashSet<String>();
-        int count = 0;
-        int start = 0;
+        boolean inside_of_macro = false;
+        int start = -1;
         // int end;
         for (int i = 0; i < input.length(); ++i) {
             String tail = input.substring(i);
-            // if (input.charAt(i) == '{') {
             if (tail.startsWith("${")) {
-                // ++count;
-                // if (count == 1) {
-                count += 2;
-                if (count == 2) {
-                    start = i;
-                }
+                inside_of_macro = true;
+                start = i;
+                continue;
             }
-            if (input.charAt(i) == '}') {
-                //--count;
-                count -= 2;
-                if (count == 0) {
-                    res.add(input.substring(start, i + 1));
-                    //System.out.println();
-                }
+            if (inside_of_macro && input.charAt(i) == '}') {
+                res.add(input.substring(start, i + 1));
+                inside_of_macro = false;
+                start = -1;
             }
         }
         return res;
