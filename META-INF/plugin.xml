@@ -2,7 +2,7 @@
     <id>dal-mpe</id>
     <name>SQL DAL Maker</name>
     <category>Database</category>
-    <version>1.222.2204</version>
+    <version>1.223.2204</version>
     <vendor email="sqldalmaker@gmail.com"/>
     <idea-version since-build="181.5684.4"/>
 
@@ -19,6 +19,7 @@ PHP, Java, C++, Python, Ruby, and Go. To generate the class, you declare it in X
         <![CDATA[
 <ul>
 <li>Fixes for SQLAlchemy + Oracle</li>
+<li>Fixes for Go</li>
 <li>Fixes of DTO fields wizard</li>
 <li>+ SQLAlchemy nullable</li>
 <li>+ SQLAlchemy models</li>

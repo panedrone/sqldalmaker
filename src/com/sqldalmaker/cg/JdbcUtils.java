@@ -435,6 +435,8 @@ public class JdbcUtils {
     }
 
     public String get_dao_crud_delete_info(String dao_table_name,
+                                           DtoClass jaxb_dto_class,
+                                           String sql_root_abs_path,
                                            String explicit_pk,
                                            List<FieldInfo> _fields_pk) throws Exception {
 
@@ -444,6 +446,7 @@ public class JdbcUtils {
         if (_fields_pk.isEmpty()) {
             return null; // just render info comment instead of method
         }
+        _refine_dao_fields_by_dto_fields(jaxb_dto_class, sql_root_abs_path, _fields_pk);
         return SqlUtils.create_crud_delete_sql(dao_table_name, _fields_pk);
     }
 }

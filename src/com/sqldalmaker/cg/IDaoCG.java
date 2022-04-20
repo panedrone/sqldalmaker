@@ -20,17 +20,30 @@ public interface IDaoCG {
 
     StringBuilder render_jaxb_exec_dml(ExecDml jaxb_exec_dml) throws Exception;
 
-    StringBuilder render_jaxb_crud(TypeCrud jaxb_type_crud) throws Exception;
+    StringBuilder render_jaxb_crud(String dao_class_name, TypeCrud jaxb_type_crud) throws Exception;
 
-    StringBuilder render_crud_create(String class_name, String method_name, String table_name, String dto_class_name,
-                                     boolean fetch_generated, String generated) throws Exception;
+    StringBuilder render_crud_create(String dao_class_name,
+                                     String method_name,
+                                     String table_name, String dto_class_name,
+                                     boolean fetch_generated,
+                                     String generated) throws Exception;
 
-    StringBuilder render_crud_read(String method_name, String dao_table_name, String dto_class_name,
-                                   String explicit_pk, boolean fetch_list) throws Exception;
+    StringBuilder render_crud_read(String method_name,
+                                   String dao_table_name,
+                                   String dto_class_name,
+                                   String explicit_pk,
+                                   boolean fetch_list) throws Exception;
 
-    StringBuilder render_crud_update(String class_name, String method_name, String dao_table_name,
-                                     String explicit_pk, String dto_class_name, boolean primitive_params) throws Exception;
+    StringBuilder render_crud_update(String dao_class_name,
+                                     String method_name,
+                                     String dao_table_name,
+                                     String explicit_pk,
+                                     String dto_class_name,
+                                     boolean primitive_params) throws Exception;
 
-    StringBuilder render_crud_delete(String class_name, String method_name, String table_name,
+    StringBuilder render_crud_delete(String dao_class_name,
+                                     String dto_class_name,
+                                     String method_name,
+                                     String table_name,
                                      String explicit_pk) throws Exception;
 }

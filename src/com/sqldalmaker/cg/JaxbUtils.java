@@ -102,7 +102,7 @@ public class JaxbUtils {
         int count = 0;
         int start = 0;
         // int end;
-        for (int i=0; i < input.length(); ++i) {
+        for (int i = 0; i < input.length(); ++i) {
             String tail = input.substring(i);
             // if (input.charAt(i) == '{') {
             if (tail.startsWith("${")) {
@@ -117,7 +117,7 @@ public class JaxbUtils {
                 //--count;
                 count -= 2;
                 if (count == 0) {
-                    res.add(input.substring(start, i+1));
+                    res.add(input.substring(start, i + 1));
                     //System.out.println();
                 }
             }
@@ -192,6 +192,7 @@ public class JaxbUtils {
 
     public static void process_jaxb_dao_class(
             IDaoCG dao_cg,
+            String dao_class_name,
             DaoClass jaxb_dao_class,
             List<String> methods) throws Exception {
 
@@ -206,7 +207,7 @@ public class JaxbUtils {
                     StringBuilder buf = dao_cg.render_jaxb_exec_dml((ExecDml) jaxb_element);
                     methods.add(buf.toString());
                 } else if (jaxb_element instanceof TypeCrud) {
-                    StringBuilder buf = dao_cg.render_jaxb_crud((TypeCrud) jaxb_element);
+                    StringBuilder buf = dao_cg.render_jaxb_crud(dao_class_name, (TypeCrud) jaxb_element);
                     methods.add(buf.toString());
                 } else {
                     throw new Exception("Unexpected element found in DTO XML file");
@@ -297,6 +298,7 @@ public class JaxbUtils {
     private static boolean _process_jaxb_crud_update(
             IDaoCG dao_cg,
             TypeCrud jaxb_type_crud,
+            String dao_class_name,
             String dto_class_name,
             String table_name,
             String explicit_primary_keys,
@@ -315,7 +317,7 @@ public class JaxbUtils {
             return true;
         }
         method_name = Helpers.get_method_name(method_name, field_names_mode);
-        StringBuilder tmp = dao_cg.render_crud_update(null, method_name, table_name, explicit_primary_keys,
+        StringBuilder tmp = dao_cg.render_crud_update(dao_class_name, method_name, table_name, explicit_primary_keys,
                 dto_class_name, false);
         code_buff.append(tmp);
         return true;
@@ -324,6 +326,7 @@ public class JaxbUtils {
     private static boolean _process_jaxb_crud_delete(
             IDaoCG dao_cg,
             TypeCrud jaxb_type_crud,
+            String dao_class_name,
             String dto_class_name,
             String table_name,
             String explicit_pk,
@@ -342,16 +345,16 @@ public class JaxbUtils {
             return true;
         }
         method_name = Helpers.get_method_name(method_name, field_names_mode);
-        StringBuilder tmp = dao_cg.render_crud_delete(null, method_name, table_name, explicit_pk);
+        StringBuilder tmp = dao_cg.render_crud_delete(dao_class_name, dto_class_name, method_name, table_name, explicit_pk);
         code_buff.append(tmp);
         return true;
     }
 
-    public static StringBuilder process_jaxb_crud(
-            IDaoCG dao_cg,
-            FieldNamesMode field_names_mode,
-            TypeCrud jaxb_type_crud,
-            String dto_class_name) throws Exception {
+    public static StringBuilder process_jaxb_crud(IDaoCG dao_cg,
+                                                  FieldNamesMode field_names_mode,
+                                                  TypeCrud jaxb_type_crud,
+                                                  String dao_class_name,
+                                                  String dto_class_name) throws Exception {
 
         String table_name = jaxb_type_crud.getTable();
         String explicit_primary_keys = jaxb_type_crud.getPk();
@@ -369,11 +372,11 @@ public class JaxbUtils {
                 field_names_mode, code_buff)) {
             is_empty = false;
         }
-        if (_process_jaxb_crud_update(dao_cg, jaxb_type_crud, dto_class_name, table_name, explicit_primary_keys,
+        if (_process_jaxb_crud_update(dao_cg, jaxb_type_crud, dao_class_name, dto_class_name, table_name, explicit_primary_keys,
                 field_names_mode, code_buff)) {
             is_empty = false;
         }
-        if (_process_jaxb_crud_delete(dao_cg, jaxb_type_crud, dto_class_name, table_name, explicit_primary_keys,
+        if (_process_jaxb_crud_delete(dao_cg, jaxb_type_crud, dao_class_name, dto_class_name, table_name, explicit_primary_keys,
                 field_names_mode, code_buff)) {
             is_empty = false;
         }

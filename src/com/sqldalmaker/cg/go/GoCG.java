@@ -186,7 +186,7 @@ public class GoCG {
             imports.clear();
             this.dao_class_name = dao_class_name;
             List<String> methods = new ArrayList<String>();
-            JaxbUtils.process_jaxb_dao_class(this, dao_class, methods);
+            JaxbUtils.process_jaxb_dao_class(this, dao_class_name, dao_class, methods);
             for (int i = 0; i < methods.size(); i++) {
                 String m = methods.get(i).replace("    //", "//");
                 methods.set(i, m);
@@ -543,7 +543,7 @@ public class GoCG {
         }
 
         @Override
-        public StringBuilder render_crud_update(String class_name,
+        public StringBuilder render_crud_update(String dao_class_name,
                                                 String method_name,
                                                 String table_name,
                                                 String explicit_pk,
@@ -564,7 +564,7 @@ public class GoCG {
             String go_sql_str = SqlUtils.format_jdbc_sql_for_go(dao_jdbc_sql);
             Map<String, Object> context = new HashMap<String, Object>();
             context.put("mode", "dao_exec_dml");
-            context.put("class_name", dao_class_name);
+            context.put("class_name", this.dao_class_name);
             context.put("table_name", table_name);
             context.put("method_type", "UPDATE");
             context.put("method_name", method_name);
@@ -583,13 +583,15 @@ public class GoCG {
         }
 
         @Override
-        public StringBuilder render_crud_delete(String class_name,
+        public StringBuilder render_crud_delete(String dao_class_name,
+                                                String dto_class_name,
                                                 String method_name,
                                                 String table_name,
                                                 String explicit_pk) throws Exception {
 
             List<FieldInfo> fields_pk = new ArrayList<FieldInfo>();
-            String dao_jdbc_sql = db_utils.get_dao_crud_delete_info(table_name, explicit_pk, fields_pk);
+            DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
+            String dao_jdbc_sql = db_utils.get_dao_crud_delete_info(table_name, jaxb_dto_class, sql_root_abs_path, explicit_pk, fields_pk);
             if (fields_pk.isEmpty()) {
                 return Helpers.get_no_pk_warning(method_name);
             }
@@ -611,7 +613,7 @@ public class GoCG {
         }
 
         @Override
-        public StringBuilder render_jaxb_crud(TypeCrud jaxb_type_crud) throws Exception {
+        public StringBuilder render_jaxb_crud(String dao_class_name, TypeCrud jaxb_type_crud) throws Exception {
             String node_name = JaxbUtils.get_jaxb_node_name(jaxb_type_crud);
             String dto_class_name = jaxb_type_crud.getDto();
             if (dto_class_name.length() == 0) {
@@ -625,7 +627,7 @@ public class GoCG {
                 db_utils.validate_table_name(table_attr);
                 _process_dto_class_name(dto_class_name);
                 StringBuilder code_buff = JaxbUtils.process_jaxb_crud(this, db_utils.get_dto_field_names_mode(),
-                        jaxb_type_crud, dto_class_name);
+                        jaxb_type_crud, dao_class_name, dto_class_name);
                 return code_buff;
             } catch (Throwable e) {
                 // e.printStackTrace();

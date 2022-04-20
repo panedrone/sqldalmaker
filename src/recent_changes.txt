@@ -10,6 +10,8 @@
 
         ^^ also, specify table names in upper-case to detect primary keys correctly.
 
+        https://docs.sqlalchemy.org/en/14/dialects/oracle.html
+
     - Fixes of imports.
 
 2022-04-17
