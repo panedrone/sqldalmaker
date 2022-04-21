@@ -98,7 +98,8 @@ class InfoDbTable {
                     String apache_java_type_name = TypesMapping.getJavaBySqlType(type);
                     FieldInfo fi = fields_map.get(db_col_name);
                     fi.refine_rendered_type(_get_type_name(apache_java_type_name));
-                    fi.setComment("t(" + db_col_name + ")");
+                    //fi.setComment("t(" + db_col_name + ")");
+                    fi.setComment("t");
                     /* DatabaseMetaData.java:
                      *   <LI><B>IS_AUTOINCREMENT</B> String  {@code =>} Indicates whether this column is auto incremented
                      *       <UL>

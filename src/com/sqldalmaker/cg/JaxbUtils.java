@@ -159,28 +159,19 @@ public class JaxbUtils {
         return attr.name();
     }
 
-    public static DtoClass find_jaxb_dto_class(
-            String dto_class_name,
-            DtoClasses jaxb_dto_classes) throws Exception {
+    public static DtoClass find_jaxb_dto_class(String dto_class_name,
+                                               DtoClasses jaxb_dto_classes) throws Exception {
 
         if (dto_class_name == null || dto_class_name.length() == 0) {
-            throw new Exception("Invalid name of DTO class: " + dto_class_name);
+            throw new Exception("Invalid DTO class name: " + dto_class_name);
         }
-        DtoClass res = null;
-        int found = 0;
         for (DtoClass cls : jaxb_dto_classes.getDtoClass()) {
             String name = cls.getName();
             if (name != null && name.equals(dto_class_name)) {
-                res = cls;
-                found++;
+                return cls;
             }
         }
-        if (found == 0) {
-            throw new Exception("DTO XML element not found: '" + dto_class_name + "'");
-        } else if (found > 1) {
-            throw new Exception("Duplicate DTO XML elements for name='" + dto_class_name + "' found.");
-        }
-        return res;
+        throw new Exception("DTO XML element not found: '" + dto_class_name + "'");
     }
 
     public static void process_jaxb_dao_class(
@@ -222,7 +213,7 @@ public class JaxbUtils {
             method_name = jaxb_type_crud.getCreate().getMethod();
         } else {
             if (jaxb_type_crud instanceof CrudAuto) {
-                method_name = "create" + dto_class_name;
+                method_name = build_method_name("create", dto_class_name);
             }
         }
         if (method_name == null) {
@@ -250,7 +241,7 @@ public class JaxbUtils {
             method_name = jaxb_type_crud.getReadAll().getMethod();
         } else {
             if (jaxb_type_crud instanceof CrudAuto) {
-                method_name = "read" + dto_class_name + "List";
+                method_name = build_method_name("read", dto_class_name + "List");
             }
         }
         if (method_name == null) {
@@ -276,7 +267,7 @@ public class JaxbUtils {
             method_name = jaxb_type_crud.getRead().getMethod();
         } else {
             if (jaxb_type_crud instanceof CrudAuto) {
-                method_name = "read" + dto_class_name;
+                method_name = build_method_name("read", dto_class_name);
             }
         }
         if (method_name == null) {
@@ -303,7 +294,7 @@ public class JaxbUtils {
             method_name = jaxb_type_crud.getUpdate().getMethod();
         } else {
             if (jaxb_type_crud instanceof CrudAuto) {
-                method_name = "update" + dto_class_name;
+                method_name = build_method_name("update", dto_class_name);
             }
         }
         if (method_name == null) {
@@ -331,7 +322,7 @@ public class JaxbUtils {
             method_name = jaxb_type_crud.getDelete().getMethod();
         } else {
             if (jaxb_type_crud instanceof CrudAuto) {
-                method_name = "delete" + dto_class_name;
+                method_name = build_method_name("delete", dto_class_name);
             }
         }
         if (method_name == null) {
@@ -341,6 +332,16 @@ public class JaxbUtils {
         StringBuilder tmp = dao_cg.render_crud_delete(dao_class_name, dto_class_name, method_name, table_name, explicit_pk);
         code_buff.append(tmp);
         return true;
+    }
+
+    private static String build_method_name(String base, String dto_class_name) {
+        int model_name_end_index = dto_class_name.indexOf('-');
+        if (model_name_end_index == -1) {
+            return base + dto_class_name;
+        }
+        String model = dto_class_name.substring(0, model_name_end_index);
+        dto_class_name = dto_class_name.substring(model_name_end_index + 1);
+        return base + dto_class_name;
     }
 
     public static StringBuilder process_jaxb_crud(IDaoCG dao_cg,

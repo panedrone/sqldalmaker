@@ -461,6 +461,9 @@ public class Helpers {
     }
 
     public static String to_lower_camel_or_title_case(String str, boolean title_case) {
+        if (str.toUpperCase().equals(str)) {
+            str = str.toLowerCase(); // "PROJECTS" --> "projects"
+        }
         if (!str.contains("_")) {
             if (title_case) {
                 return Helpers.replace_char_at(str, 0, Character.toTitleCase(str.charAt(0)));

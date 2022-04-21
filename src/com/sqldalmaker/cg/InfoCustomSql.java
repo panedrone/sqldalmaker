@@ -52,7 +52,8 @@ class InfoCustomSql {
         for (int col_num = 1; col_num <= column_count; col_num++) {
             String col_name = _get_jdbc_col_name(rsmd, col_num);
             String type_name = model + _get_jdbc_col_type_name(rsmd, col_num);
-            FieldInfo field = new FieldInfo(dto_field_names_mode, type_name, col_name, "q(" + col_name + ")");
+            //FieldInfo field = new FieldInfo(dto_field_names_mode, type_name, col_name, "q(" + col_name + ")");
+            FieldInfo field = new FieldInfo(dto_field_names_mode, type_name, col_name, "q");
             // === panedrone: it is nullable for all columns except PK (sqlite3)
             // field.setNullable(rsmd.isNullable(col_num) == ResultSetMetaData.columnNullable);
             field.setAI(rsmd.isAutoIncrement(col_num));

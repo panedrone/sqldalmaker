@@ -204,7 +204,7 @@ public class UIDialogSelectDbSchema extends JDialog {
                     radio_selected_schema.setText("Without schema");
                 } else {
                     radio_selected_schema.setText("Use selected schema");
-                    chk_schema_in_xml.setSelected(true);
+                    // chk_schema_in_xml.setSelected(true);
                 }
             } finally {
                 con.close();

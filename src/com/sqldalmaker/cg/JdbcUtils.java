@@ -54,9 +54,14 @@ public class JdbcUtils {
                         + _get_column_names(dto_fields) + "]. Ensure upper/lower case.");
             }
             FieldInfo dto_fi = dto_fields_map.get(dao_col_name);
-            String dto_fi_target_type_name = dto_fi.getType();
-            if (Object.class.getTypeName().equals(dto_fi_target_type_name) == false) {
-                // prefer DTO if it is not Object.
+            // Always prefer DTO field type
+            //      1. if ist original name is not Object
+            //      2. if target type name of DTO field is not "object"
+            String dto_fi_original_type_name = dto_fi.getOriginalType();
+            String object_target_type_name = type_map.get_target_type_name(Object.class.getTypeName());
+            if (!Object.class.getTypeName().equals(dto_fi_original_type_name) ||
+                    (object_target_type_name.length() > 0 && !object_target_type_name.equals(dto_fi.getType()))) {
+                String dto_fi_target_type_name = dto_fi.getType();
                 dao_fi.refine_rendered_type(dto_fi_target_type_name);
             }
             String dto_comment = dto_fi.getComment();

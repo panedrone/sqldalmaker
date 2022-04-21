@@ -13,6 +13,7 @@ public class FieldInfo {
     private String rendered_field_name;
 
     private String rendered_field_type;
+    private final String original_field_type;
 
     private final String database_column_name; // original name in database without conversions to lower/camel case etc.
 
@@ -24,12 +25,13 @@ public class FieldInfo {
 
     private String name_prefix = "";
 
-    public FieldInfo(FieldNamesMode field_names_mode, String jdbc_java_type_name, String jdbc_db_col_name, String comment) throws Exception {
-        if (jdbc_java_type_name == null) {
+    public FieldInfo(FieldNamesMode field_names_mode, String original_field_type, String jdbc_db_col_name, String comment) throws Exception {
+        if (original_field_type == null) {
             throw new Exception("<field type=null. Ensure that XSD and XML are valid.");
         }
+        this.original_field_type = original_field_type;
         this.database_column_name = jdbc_db_col_name;
-        this.rendered_field_type = jdbc_java_type_name;
+        this.rendered_field_type = original_field_type;
         this.rendered_field_name = jdbc_db_col_name;
         if ("parameter".equals(comment) == false) {
             this.rendered_field_name = this.rendered_field_name.replace(" ", "_"); // for mysql!
@@ -118,5 +120,9 @@ public class FieldInfo {
         String s = this.name_prefix + this.rendered_field_name;
         String X = Helpers.replace_char_at(s, 0, Character.toUpperCase(s.charAt(0)));
         return "set" + X;
+    }
+
+    public String getOriginalType() {
+        return original_field_type;
     }
 }

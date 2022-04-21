@@ -100,7 +100,7 @@ public class SdmUtils {
                 if (field_names_mode == FieldNamesMode.SNAKE_CASE) {
                     c = Helpers.camel_case_to_lower_snake_case(c);
                 } else if (field_names_mode == FieldNamesMode.LOWER_CAMEL_CASE) {
-                    c = to_lower_camel_or_title_case(c, false);
+                    c = Helpers.to_lower_camel_or_title_case(c, false);
                 }
                 if (first) {
                     params += c;
@@ -130,19 +130,13 @@ public class SdmUtils {
         }
     }
 
-    private static String to_lower_camel_or_title_case(String str,
-                                                       boolean title_case) {
-
-        return Helpers.to_lower_camel_or_title_case(str, title_case);
-    }
-
     /*
         just table name without schema needed
      */
     public static String table_name_to_dto_class_name(String table_name,
                                                       boolean plural_to_singular) {
 
-        String word = to_lower_camel_or_title_case(table_name, true);
+        String word = Helpers.to_lower_camel_or_title_case(table_name, true);
         if (plural_to_singular) {
             int last_word_index = -1;
             String last_word;

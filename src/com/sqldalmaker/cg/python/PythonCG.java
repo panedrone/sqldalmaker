@@ -221,7 +221,7 @@ public class PythonCG {
             }
             String returned_type_name;
             if (jaxb_return_type_is_dto) {
-                returned_type_name = _get_rendered_dto_class_name(jaxb_dto_or_return_type, fetch_list);
+                returned_type_name = _get_rendered_dto_class_name(jaxb_dto_or_return_type, fetch_list); // import is needed only for read list
             } else {
                 if (fields_all.size() == 0) {
                     returned_type_name = "?";
@@ -261,24 +261,19 @@ public class PythonCG {
 
         private String _get_rendered_dto_class_name(String dto_class_name, boolean add_to_import) throws Exception {
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
-            if (!add_to_import) {
-                return jaxb_dto_class.getName();
-            }
             String dto_class_nm = jaxb_dto_class.getName();
-            String python_fn = Helpers.camel_case_to_lower_snake_case(dto_class_nm);
-            int model_end = python_fn.indexOf('-');
-            if (model_end != -1) {
-                python_fn = python_fn.substring(model_end + 1);
-            }
-            if (dto_package != null && dto_package.length() > 0) {
-                python_fn = dto_package + "." + python_fn;
-            }
-            model_end = dto_class_nm.indexOf('-');
+            int model_end = dto_class_nm.indexOf('-');
             if (model_end != -1) {
                 dto_class_nm = dto_class_nm.substring(model_end + 1);
             }
-            ImportItem item = new ImportItem(python_fn, dto_class_nm);
-            imports.put(dto_class_nm, item);
+            if (add_to_import) {
+                String python_fn = Helpers.camel_case_to_lower_snake_case(dto_class_nm);
+                if (dto_package != null && dto_package.length() > 0) {
+                    python_fn = dto_package + "." + python_fn;
+                }
+                ImportItem item = new ImportItem(python_fn, dto_class_nm);
+                imports.put(dto_class_nm, item);
+            }
             return dto_class_nm;
         }
 
@@ -460,7 +455,8 @@ public class PythonCG {
             context.put("sql", sql_str);
             context.put("method_name", method_name);
             context.put("params", fields_not_ai);
-            context.put("dto_param", _get_rendered_dto_class_name(dto_class_name, false));
+            dto_class_name = _get_rendered_dto_class_name(dto_class_name, false); // "false" because it is only for comments
+            context.put("dto_param", dto_class_name);
             if (fetch_generated && fields_ai.size() > 0) {
                 context.put("keys", fields_ai);
                 context.put("mode", "dao_create");
@@ -518,7 +514,9 @@ public class PythonCG {
             context.put("method_name", method_name);
             context.put("sql", sql_str);
             context.put("table_name", table_name);
-            context.put("dto_param", primitive_params ? "" : _get_rendered_dto_class_name(dto_class_name, false));
+            dto_class_name = _get_rendered_dto_class_name(dto_class_name, false); // "false" because it is only for comments
+            // context.put("dto_param", dto_class_name);
+            context.put("dto_param", primitive_params ? "" : dto_class_name);
             context.put("params", updated_fields);
             context.put("is_external_sql", false);
             StringWriter sw = new StringWriter();
@@ -575,7 +573,7 @@ public class PythonCG {
             }
             try {
                 db_utils.validate_table_name(table_name);
-                _get_rendered_dto_class_name(dto_class_name, false);
+                // dto_class_name = _get_rendered_dto_class_name(dto_class_name, true);
                 StringBuilder code_buff = JaxbUtils.process_jaxb_crud(this, db_utils.get_dto_field_names_mode(),
                         jaxb_type_crud, dao_class_name, dto_class_name);
                 return code_buff;
