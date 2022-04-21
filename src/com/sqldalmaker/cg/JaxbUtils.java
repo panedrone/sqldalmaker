@@ -174,11 +174,10 @@ public class JaxbUtils {
         throw new Exception("DTO XML element not found: '" + dto_class_name + "'");
     }
 
-    public static void process_jaxb_dao_class(
-            IDaoCG dao_cg,
-            String dao_class_name,
-            DaoClass jaxb_dao_class,
-            List<String> methods) throws Exception {
+    public static void process_jaxb_dao_class(IDaoCG dao_cg,
+                                              String dao_class_name,
+                                              DaoClass jaxb_dao_class,
+                                              List<String> methods) throws Exception {
 
         if (jaxb_dao_class.getCrudOrCrudAutoOrQuery() != null) {
             for (int i = 0; i < jaxb_dao_class.getCrudOrCrudAutoOrQuery().size(); i++) {
@@ -200,14 +199,12 @@ public class JaxbUtils {
         }
     }
 
-    private static boolean _process_jaxb_crud_create(
-            IDaoCG dao_cg,
-            TypeCrud jaxb_type_crud,
-            String dto_class_name,
-            String table_name,
-            FieldNamesMode field_names_mode,
-            StringBuilder code_buff) throws Exception {
-
+    private static boolean _process_jaxb_crud_create(IDaoCG dao_cg,
+                                                     TypeCrud jaxb_type_crud,
+                                                     String dto_class_name,
+                                                     String table_name,
+                                                     FieldNamesMode field_names_mode,
+                                                     StringBuilder code_buff) throws Exception {
         String method_name = null;
         if (jaxb_type_crud.getCreate() != null) {
             method_name = jaxb_type_crud.getCreate().getMethod();
@@ -228,14 +225,12 @@ public class JaxbUtils {
         return true;
     }
 
-    private static boolean _process_jaxb_crud_read_all(
-            IDaoCG dao_cg,
-            TypeCrud jaxb_type_crud,
-            String dto_class_name,
-            String table_name,
-            FieldNamesMode field_names_mode,
-            StringBuilder code_buff) throws Exception {
-
+    private static boolean _process_jaxb_crud_read_all(IDaoCG dao_cg,
+                                                       TypeCrud jaxb_type_crud,
+                                                       String dto_class_name,
+                                                       String table_name,
+                                                       FieldNamesMode field_names_mode,
+                                                       StringBuilder code_buff) throws Exception {
         String method_name = null;
         if (jaxb_type_crud.getReadAll() != null) {
             method_name = jaxb_type_crud.getReadAll().getMethod();
@@ -253,15 +248,13 @@ public class JaxbUtils {
         return true;
     }
 
-    private static boolean _process_jaxb_crud_read(
-            IDaoCG dao_cg,
-            TypeCrud jaxb_type_crud,
-            String dto_class_name,
-            String table_name,
-            String explicit_pk,
-            FieldNamesMode field_names_mode,
-            StringBuilder code_buff) throws Exception {
-
+    private static boolean _process_jaxb_crud_read(IDaoCG dao_cg,
+                                                   TypeCrud jaxb_type_crud,
+                                                   String dto_class_name,
+                                                   String table_name,
+                                                   String explicit_pk,
+                                                   FieldNamesMode field_names_mode,
+                                                   StringBuilder code_buff) throws Exception {
         String method_name = null;
         if (jaxb_type_crud.getRead() != null) {
             method_name = jaxb_type_crud.getRead().getMethod();
@@ -279,16 +272,14 @@ public class JaxbUtils {
         return true;
     }
 
-    private static boolean _process_jaxb_crud_update(
-            IDaoCG dao_cg,
-            TypeCrud jaxb_type_crud,
-            String dao_class_name,
-            String dto_class_name,
-            String table_name,
-            String explicit_primary_keys,
-            FieldNamesMode field_names_mode,
-            StringBuilder code_buff) throws Exception {
-
+    private static boolean _process_jaxb_crud_update(IDaoCG dao_cg,
+                                                     TypeCrud jaxb_type_crud,
+                                                     String dao_class_name,
+                                                     String dto_class_name,
+                                                     String table_name,
+                                                     String explicit_primary_keys,
+                                                     FieldNamesMode field_names_mode,
+                                                     StringBuilder code_buff) throws Exception {
         String method_name = null;
         if (jaxb_type_crud.getUpdate() != null) {
             method_name = jaxb_type_crud.getUpdate().getMethod();
@@ -307,16 +298,14 @@ public class JaxbUtils {
         return true;
     }
 
-    private static boolean _process_jaxb_crud_delete(
-            IDaoCG dao_cg,
-            TypeCrud jaxb_type_crud,
-            String dao_class_name,
-            String dto_class_name,
-            String table_name,
-            String explicit_pk,
-            FieldNamesMode field_names_mode,
-            StringBuilder code_buff) throws Exception {
-
+    private static boolean _process_jaxb_crud_delete(IDaoCG dao_cg,
+                                                     TypeCrud jaxb_type_crud,
+                                                     String dao_class_name,
+                                                     String dto_class_name,
+                                                     String table_name,
+                                                     String explicit_pk,
+                                                     FieldNamesMode field_names_mode,
+                                                     StringBuilder code_buff) throws Exception {
         String method_name = null;
         if (jaxb_type_crud.getDelete() != null) {
             method_name = jaxb_type_crud.getDelete().getMethod();
@@ -339,7 +328,6 @@ public class JaxbUtils {
         if (model_name_end_index == -1) {
             return base + dto_class_name;
         }
-        String model = dto_class_name.substring(0, model_name_end_index);
         dto_class_name = dto_class_name.substring(model_name_end_index + 1);
         return base + dto_class_name;
     }

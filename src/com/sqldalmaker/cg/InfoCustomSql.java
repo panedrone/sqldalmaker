@@ -20,10 +20,24 @@ class InfoCustomSql {
                                                   String jdbc_sql,
                                                   Map<String, FieldInfo> fields_map,
                                                   List<FieldInfo> fields_all) throws Exception {
-
+        fields_map.clear();
+        fields_all.clear();
         PreparedStatement ps = _prepare_jdbc_sql(conn, jdbc_sql);
         try {
-            _refine_field_info(model, dto_field_names_mode, ps, fields_all, fields_map);
+            ResultSetMetaData rsmd = _get_rs_md(ps);
+            int column_count = _get_col_count(rsmd);
+            for (int col_num = 1; col_num <= column_count; col_num++) {
+                String col_name = _get_jdbc_col_name(rsmd, col_num);
+                String type_name = model + _get_jdbc_col_type_name(rsmd, col_num);
+                //FieldInfo field = new FieldInfo(dto_field_names_mode, type_name, col_name, "q(" + col_name + ")");
+                FieldInfo field = new FieldInfo(dto_field_names_mode, type_name, col_name, "q");
+                // === panedrone: it is nullable for all columns except PK (sqlite3)
+                // field.setNullable(rsmd.isNullable(col_num) == ResultSetMetaData.columnNullable);
+                boolean is_ai = rsmd.isAutoIncrement(col_num);
+                field.setAI(is_ai);
+                fields_map.put(col_name, field);
+                fields_all.add(field);
+            }
         } finally {
             ps.close();
         }
@@ -37,28 +51,6 @@ class InfoCustomSql {
             // For MySQL, prepareStatement doesn't throw Exception for
             // invalid SQL statements and doesn't return null as well
             return conn.prepareStatement(jdbc_sql);
-        }
-    }
-
-    public static void _refine_field_info(String model,
-                                          FieldNamesMode dto_field_names_mode,
-                                          PreparedStatement ps,
-                                          List<FieldInfo> _fields,
-                                          Map<String, FieldInfo> _fields_map) throws Exception {
-
-        ResultSetMetaData rsmd = _get_rs_md(ps);
-        int column_count = _get_col_count(rsmd);
-        _fields_map.clear();
-        for (int col_num = 1; col_num <= column_count; col_num++) {
-            String col_name = _get_jdbc_col_name(rsmd, col_num);
-            String type_name = model + _get_jdbc_col_type_name(rsmd, col_num);
-            //FieldInfo field = new FieldInfo(dto_field_names_mode, type_name, col_name, "q(" + col_name + ")");
-            FieldInfo field = new FieldInfo(dto_field_names_mode, type_name, col_name, "q");
-            // === panedrone: it is nullable for all columns except PK (sqlite3)
-            // field.setNullable(rsmd.isNullable(col_num) == ResultSetMetaData.columnNullable);
-            field.setAI(rsmd.isAutoIncrement(col_num));
-            _fields_map.put(col_name, field);
-            _fields.add(field);
         }
     }
 

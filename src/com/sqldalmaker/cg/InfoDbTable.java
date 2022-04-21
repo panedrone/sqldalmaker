@@ -109,11 +109,16 @@ class InfoDbTable {
                      *       </UL>
                      *   <LI>
                      */
-                    Object ai = columns_rs.getObject("IS_AUTOINCREMENT");
-                    if ("yes".equals(ai) || "YES".equals(ai)) {
-                        fi.setAI(true);
-                    } else {
-                        fi.setAI(false);
+                    if (!fi.isAI()) {
+                        // IS_AUTOINCREMENT may work incorrectly. i.e. with sqlite-jdbc-3.19.3.jar.
+                        // Use it only if AI was not set by SQL colums metadata
+                        Object ai = columns_rs.getObject("IS_AUTOINCREMENT");
+                        if ("yes".equals(ai) || "YES".equals(ai)) {
+                            fi.setAI(true);
+                        }
+//                        else {
+//                            fi.setAI(false);
+//                        }
                     }
                     int nullable = columns_rs.getInt("NULLABLE");
                     if (nullable == DatabaseMetaData.columnNullable) {
