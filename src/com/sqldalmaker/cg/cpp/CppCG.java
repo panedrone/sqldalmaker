@@ -27,7 +27,7 @@ public class CppCG {
     public static class DTO implements IDtoCG {
 
         private final String sql_root_abs_path;
-        private final List<DtoClass> jaxb_dto_classes;
+        private final DtoClasses jaxb_dto_classes;
         private final TemplateEngine te;
         private final JdbcUtils db_utils;
         private final String dto_class_prefix;
@@ -39,7 +39,7 @@ public class CppCG {
                    String dto_class_prefix,
                    String vm_file_system_dir) throws Exception {
 
-            this.jaxb_dto_classes = jaxb_dto_classes.getDtoClass();
+            this.jaxb_dto_classes = jaxb_dto_classes;
             this.dto_class_prefix = dto_class_prefix;
             this.sql_root_abs_path = sql_root_abs_path;
             if (vm_file_system_dir == null) {
@@ -52,16 +52,7 @@ public class CppCG {
 
         @Override
         public String[] translate(String dto_class_base_name) throws Exception {
-            DtoClass jaxb_dto_class = null;
-            for (DtoClass cls : jaxb_dto_classes) {
-                if (cls.getName().equals(dto_class_base_name)) {
-                    jaxb_dto_class = cls;
-                    break;
-                }
-            }
-            if (jaxb_dto_class == null) {
-                throw new Exception("XML element of DTO class '" + dto_class_base_name + "' not found");
-            }
+            DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_base_name, jaxb_dto_classes);
             List<FieldInfo> fields = new ArrayList<FieldInfo>();
             db_utils.get_dto_field_info(jaxb_dto_class, sql_root_abs_path, fields);
             Map<String, Object> context = new HashMap<String, Object>();

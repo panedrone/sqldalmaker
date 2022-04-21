@@ -71,7 +71,7 @@ public class Helpers {
 
     public static String to_kebab_case(String src) {
         String sc = camel_case_to_lower_snake_case(src);
-        String []parts = sc.split("_");
+        String[] parts = sc.split("_");
         String kc = String.join("-", parts);
         return kc;
     }
@@ -278,7 +278,13 @@ public class Helpers {
             }
             boolean is_letter_or_digit = Character.isLetterOrDigit(ch);
             // SQL parameter name may be detected like 'column1:0' and renamed to column1_0
-            if (!is_letter_or_digit && ch != '$' && ch != '_' && ch != '~' && ch != ':') {
+            if (!is_letter_or_digit &&
+                    ch != '$' &&
+                    ch != '_' &&
+                    ch != '~' &&
+                    ch != ':' &&
+                    ch != '-' // separator for model
+            ) {
                 throw new Exception("Invalid character in the name of item: " + name);
             }
         }

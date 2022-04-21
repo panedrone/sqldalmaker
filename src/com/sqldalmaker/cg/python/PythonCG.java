@@ -27,7 +27,7 @@ public class PythonCG {
     public static class DTO implements IDtoCG {
 
         private final String sql_root_abs_path;
-        private final List<DtoClass> jaxb_dto_classes;
+        private final DtoClasses jaxb_dto_classes;
         private final TemplateEngine te;
         private final JdbcUtils db_utils;
 
@@ -37,7 +37,7 @@ public class PythonCG {
                    String sql_root_abs_path,
                    String vm_file_system_dir) throws Exception {
 
-            this.jaxb_dto_classes = jaxb_dto_classes.getDtoClass();
+            this.jaxb_dto_classes = jaxb_dto_classes;
             this.sql_root_abs_path = sql_root_abs_path;
             if (vm_file_system_dir == null) {
                 te = new TemplateEngine(get_template_path(), false);
@@ -49,16 +49,7 @@ public class PythonCG {
 
         @Override
         public String[] translate(String dto_class_name) throws Exception {
-            DtoClass jaxb_dto_class = null;
-            for (DtoClass cls : jaxb_dto_classes) {
-                if (cls.getName().equals(dto_class_name)) {
-                    jaxb_dto_class = cls;
-                    break;
-                }
-            }
-            if (jaxb_dto_class == null) {
-                throw new Exception("XML element of DTO class '" + dto_class_name + "' not found");
-            }
+            DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
             List<FieldInfo> fields = new ArrayList<FieldInfo>();
             db_utils.get_dto_field_info(jaxb_dto_class, sql_root_abs_path, fields);
             Map<String, Object> context = new HashMap<String, Object>();
@@ -240,12 +231,6 @@ public class PythonCG {
             context.put("ref", crud_table);
             context.put("sql", python_sql_str);
             context.put("use_dto", jaxb_return_type_is_dto);
-//            if (jaxb_return_type_is_dto) {
-//                int model_end = returned_type_name.indexOf('-');
-//                if (model_end != -1) {
-//                    returned_type_name = returned_type_name.substring(model_end + 1);
-//                }
-//            }
             context.put("returned_type_name", returned_type_name);
             context.put("fetch_list", fetch_list);
             context.put("imports", imports.values());
@@ -331,7 +316,7 @@ public class PythonCG {
                                     " Expected syntax: [on_dto_1:Dto1, on_dto_2:Dto2, ...]. Specified: "
                                     + "[" + String.join(",", implicit_param_descriptors) + "]");
                         }
-                        MappingInfo m = _create_mapping(parts);
+                        MappingInfo m = _create_ref_cursor_mapping(parts);
                         m_list.add(m);
                         method_params.add(new FieldInfo(FieldNamesMode.SNAKE_CASE, "callable", m.method_param_name, "parameter"));
                         cb_elements.add(m.exec_dml_param_name);
@@ -343,7 +328,7 @@ public class PythonCG {
                     String param_descriptor = param_descriptors[pd_i];
                     String[] parts = _parse_param_descriptor(param_descriptor);
                     if (parts != null) {
-                        MappingInfo m = _create_mapping(parts);
+                        MappingInfo m = _create_ref_cursor_mapping(parts);
                         m_list.add(m);
                         method_params.add(new FieldInfo(FieldNamesMode.SNAKE_CASE, "callable", m.method_param_name, "parameter"));
                         exec_dml_params.add(new FieldInfo(FieldNamesMode.SNAKE_CASE, "callable", m.exec_dml_param_name, "parameter"));
@@ -381,15 +366,15 @@ public class PythonCG {
             return parts;
         }
 
-        private MappingInfo _create_mapping(String[] parts) throws Exception {
+        private MappingInfo _create_ref_cursor_mapping(String[] parts) throws Exception {
+            String dto_class_name_with_model = parts[1].trim();
+            DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name_with_model, jaxb_dto_classes);
             MappingInfo m = new MappingInfo();
             m.method_param_name = parts[0].trim();
             String cb_param_name = String.format("_map_cb_%s", m.method_param_name);
             m.exec_dml_param_name = cb_param_name;
-            m.dto_class_name = parts[1].trim();
+            m.dto_class_name = _get_rendered_dto_class_name(dto_class_name_with_model, true); // extends imports;
             List<FieldInfo> fields = new ArrayList<FieldInfo>();
-            DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(m.dto_class_name, jaxb_dto_classes);
-            _get_rendered_dto_class_name(jaxb_dto_class.getName(), true); // extends imports
             db_utils.get_dto_field_info(jaxb_dto_class, sql_root_abs_path, fields);
             if (fields.size() > 0) {
                 fields.get(0).setComment(fields.get(0).getComment() + " [INFO] REF CURSOR");
