@@ -1,3 +1,7 @@
+2022-04-22
+
+    Improvements fo Python
+
 2022-04-21
 
     Fix related to incorrect AI detection in sqlite-jdbc-3.19.3.jar

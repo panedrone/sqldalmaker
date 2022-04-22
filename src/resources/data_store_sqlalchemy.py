@@ -5,7 +5,7 @@ from sqlalchemy.orm import declarative_base, sessionmaker
 
 # import psycopg2
 
-import cx_Oracle
+# import cx_Oracle
 
 Base = declarative_base()
 
@@ -27,10 +27,11 @@ class DataStore:
     https://chartio.com/resources/tutorials/how-to-execute-raw-sql-in-sqlalchemy/
 
     Successfully tested with:
-    - sqlite3 ---------------- built-in
-    - postgresql ------------- pip install psycopg2
-    - mysql+mysqlconnector --- pip install mysql-connector-python
-    - cx_Oracle
+
+        - sqlite3 ---------------- built-in
+        - postgresql ------------- pip install psycopg2
+        - mysql+mysqlconnector --- pip install mysql-connector-python
+        - cx_Oracle -------------- pip install cx_oracle
 
     """
 
@@ -44,8 +45,8 @@ class DataStore:
         self.conn = None
         self.transaction = None
 
-        # self.engine = sqlalchemy.create_engine('sqlite:///todo-list.sqlite')
-        # self.engine_type = self.EngineType.sqlite3
+        self.engine = sqlalchemy.create_engine('sqlite:///todo-list.sqlite')
+        self.engine_type = self.EngineType.sqlite3
 
         # self.engine = sqlalchemy.create_engine('postgresql://postgres:sa@localhost/my-tests')
         # self.engine_type = self.EngineType.postgresql
@@ -54,15 +55,15 @@ class DataStore:
         # self.engine = sqlalchemy.create_engine('mysql+mysqlconnector://root:root@localhost/sakila')
         # self.engine_type = self.EngineType.mysql
 
-        user = 'MY_TESTS'
-        pwd = 'sa'
-        dsn = cx_Oracle.makedsn(
-            'localhost', 1521,
-            service_name="orcl"
-            # service_name='your_service_name_if_any'
-        )
-        self.engine = sqlalchemy.create_engine(f'oracle+cx_oracle://{user}:{pwd}@{dsn}', echo=False)
-        self.engine_type = self.EngineType.oracle
+        # user = 'MY_TESTS'
+        # pwd = 'sa'
+        # dsn = cx_Oracle.makedsn(
+        #     'localhost', 1521,
+        #     service_name="orcl"
+        #     # service_name='your_service_name_if_any'
+        # )
+        # self.engine = sqlalchemy.create_engine(f'oracle+cx_oracle://{user}:{pwd}@{dsn}', echo=False)
+        # self.engine_type = self.EngineType.oracle
 
         self.session = sessionmaker(bind=self.engine)()
 
@@ -95,6 +96,25 @@ class DataStore:
         self.transaction.rollback()
         self.transaction = None
 
+    def get_all(self, cls, params=None):
+        """
+        :param cls: An __abstract_ model class or plain DTO class containing a static field "SQL"
+        :param params: [] the values of SQL params
+        :return: [dict]: an array of dict like [{'g_id': 21, 'g_name': 'Project 1'}, {'g_id': 22, 'g_name': 'Project 2']
+        """
+        # rows = self.engine.execute(cls.SQL)  # .fetchall()
+        # performs -->
+        # connection = self.connect(close_with_result=True) ---- no need because of connected
+        if params is None:
+            params = []
+        # with self._exec(cls.SQL, params) as rows: # .fetchall() -- AttributeError: __enter__
+        cursor = self._exec(cls.SQL, params)
+        try:
+            # https://stackoverflow.com/questions/1958219/how-to-convert-sqlalchemy-row-object-to-a-python-dict
+            return [dict(row) for row in cursor]
+        finally:
+            cursor.close()
+
     def insert_row(self, sql, params, ai_values):
         """
         Returns:
@@ -106,20 +126,28 @@ class DataStore:
         Raises:
             Exception: if no rows inserted.
         """
-        sql = _format_sql(sql)
+        sql = self._format_sql(sql)
         if len(ai_values) > 0:
             if self.engine_type == self.EngineType.postgresql:
                 sql += ' RETURNING ' + ai_values[0][0]
         cursor = self._exec(sql, params)
-        if len(ai_values) > 0:
-            if self.engine_type == self.EngineType.postgresql:
-                ai_values[0][1] = cursor.fetchone()[0]
-            else:
-                ai_values[0][1] = cursor.lastrowid
-        if cursor.rowcount == 0:
-            raise Exception('No rows inserted')
+        try:
+            if len(ai_values) > 0:
+                if self.engine_type == self.EngineType.postgresql:
+                    ai_values[0][1] = cursor.fetchone()[0]
+                else:
+                    ai_values[0][1] = cursor.lastrowid
+            if cursor.rowcount == 0:
+                raise Exception('No rows inserted')
+        finally:
+            cursor.close()
 
     def _exec(self, sql, params):
+        """
+        :param sql:
+        :param params:
+        :return: <sqlalchemy.engine.cursor.LegacyCursorResult object at 0x00000243D83C5D00>
+        """
         pp = tuple(params)
         txt = sql  # don't use sqlalchemy.text(sql) with '%' as params
         return self.conn.execute(txt, pp)
@@ -134,12 +162,15 @@ class DataStore:
             else:
                 call_params.append(p)
         cursor = self._exec(sql, call_params)
-        if len(out_params) > 0:
-            row0 = cursor.fetchone()
-            i = 0
-            for value in row0:
-                out_params[i].value = value
-                i += 1
+        try:
+            if len(out_params) > 0:
+                row0 = cursor.fetchone()
+                i = 0
+                for value in row0:
+                    out_params[i].value = value
+                    i += 1
+        finally:
+            cursor.close()
 
     def _exec_sp_mysql(self, sp, params):
         call_params = _get_call_params(params)
@@ -182,11 +213,14 @@ class DataStore:
         Returns:
             Number of updated rows.
         """
-        sql = _format_sql(sql)
+        sql = self._format_sql(sql)
         sp = _get_sp_name(sql)
         if sp is None:
             cursor = self._exec(sql, params)
-            return cursor.rowcount
+            try:
+                return cursor.rowcount
+            finally:
+                cursor.close()
         if self.engine_type == self.EngineType.postgresql:
             self._exec_proc_pg(sql, params)  # sql!
         elif self.engine_type == self.EngineType.mysql:
@@ -223,14 +257,17 @@ class DataStore:
             sql (string): SQL statement.
             params (array, optional): Values of SQL parameters if needed.
         """
-        sql = _format_sql(sql)
+        sql = self._format_sql(sql)
         res = []
         sp = _get_sp_name(sql)
         if sp is None:
             cursor = self._exec(sql, params)
-            for row in cursor:
-                res.append(row[0])
-            return res
+            try:
+                for row in cursor:
+                    res.append(row[0])
+                return res
+            finally:
+                cursor.close()
         if self.engine_type != self.EngineType.mysql:
             raise Exception('Not supported for this engine')
 
@@ -268,34 +305,40 @@ class DataStore:
             params (array, optional): Values of SQL parameters if needed.
             callback
         """
-        sql = _format_sql(sql)
+        sql = self._format_sql(sql)
         sp = _get_sp_name(sql)
         if sp is None:
             cursor = self._exec(sql, params)
-            for row in cursor:
-                callback(row)
-            return
+            try:
+                for row in cursor:
+                    callback(row)
+                return
+            finally:
+                cursor.close()
         if self.engine_type != self.EngineType.mysql:
             raise Exception('Not supported for this engine')
         self._query_sp_mysql(sp, lambda result: _fetch_all(result, callback), params)
 
+    def _format_sql(self, sql):
+        if self.engine_type == self.EngineType.sqlite3:
+            return sql
+        return sql.replace("?", "%s")
 
-def _fetch_all(result, callback):
+
+def _fetch_all(cursor, callback):
     # https://stackoverflow.com/questions/34030020/mysql-python-connector-get-columns-names-from-select-statement-in-stored-procedu
     # https://kadler.github.io/2018/01/08/fetching-python-database-cursors-by-column-name.html#
-    for row_values in result:
-        row = {}
-        i = 0
-        for d in result.description:
-            col_name = d[0]
-            value = row_values[i]
-            row[col_name] = value
-            i = i + 1
+    for r in cursor:
+        # https://stackoverflow.com/questions/1958219/how-to-convert-sqlalchemy-row-object-to-a-python-dict
+        # How to convert SQLAlchemy row object to a Python dict?
+        row = dict(r)
+        # i = 0
+        # for d in result.description:
+        #     col_name = d[0]
+        #     value = r[i]
+        #     row[col_name] = value
+        #     i = i + 1
         callback(row)
-
-
-def _format_sql(sql):
-    return sql.replace("?", "%s")
 
 
 def _get_sp_name(sql):
