@@ -64,19 +64,10 @@ class InfoDbTable {
     }
 
     public static void validate_table_name(Connection conn,
-                                           String table_name) throws Exception {
+                                           String table_name_parretn) throws Exception {
 
-        DatabaseMetaData db_info = conn.getMetaData();
-        String schema = null;
-        if (table_name.contains(".")) {
-            String[] parts = table_name.split("\\.");
-            if (parts.length != 2) {
-                throw new SQLException("Invalid table name: '" + table_name + "'");
-            }
-            schema = parts[0];
-            table_name = parts[1];
-        }
-        ResultSet rs = db_info.getTables(null, schema, table_name, null);
+        // it may include schema like "public.%"
+        ResultSet rs = get_tables_rs(conn, table_name_parretn, true);
         try {
             if (rs.next()) {
                 return;
@@ -84,7 +75,32 @@ class InfoDbTable {
         } finally {
             rs.close();
         }
-        throw new Exception("Data table '" + table_name + "' not found. Table names may be case sensitive.");
+        throw new Exception("Not found: '" + table_name_parretn + "'. The search is case-sensitive.");
+    }
+
+    public static ResultSet get_tables_rs(Connection conn,
+                                          String table_name_parretn, // it may include schema like "public.%"
+                                          boolean include_views) throws SQLException {
+        String schema_name = null;
+        if (table_name_parretn.contains(".")) {
+            String[] parts = table_name_parretn.split("\\.");
+            if (parts.length != 2) {
+                throw new SQLException("Invalid table name: '" + table_name_parretn + "'");
+            }
+            schema_name = parts[0];
+            table_name_parretn = parts[1];
+        }
+        String[] types;
+        if (include_views) {
+            types = new String[]{"TABLE", "VIEW"};
+        } else {
+            types = new String[]{"TABLE"};
+        }
+        DatabaseMetaData dbmd = conn.getMetaData();
+        ResultSet rs_tables;
+        String catalog = conn.getCatalog();
+        rs_tables = dbmd.getTables(catalog, schema_name, table_name_parretn, types);
+        return rs_tables;
     }
 
     private void _refine_field_info_by_table_metadata() throws Exception {

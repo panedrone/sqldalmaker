@@ -1,13 +1,59 @@
-import sqlalchemy
+#########################################
+# code below is for SQLAlchemy without flask
+#
+# import sqlalchemy
+#
+# import sqlalchemy.ext.declarative
+# from sqlalchemy.orm import declarative_base, sessionmaker
 
-import sqlalchemy.ext.declarative
-from sqlalchemy.orm import declarative_base, sessionmaker
+# Base = declarative_base()
+#
+# Column = sqlalchemy.Column
+#
+# SmallInteger = sqlalchemy.SmallInteger
+# Integer = sqlalchemy.Integer
+# BigInteger = sqlalchemy.BigInteger
+#
+# Float = sqlalchemy.Float
+#
+# DateTime = sqlalchemy.DateTime
+# String = sqlalchemy.String
+# Boolean = sqlalchemy.Boolean
+# LargeBinary = sqlalchemy.LargeBinary
+
+
+# add "Flask-SQLAlchemy" to requirements.txt. "SQLAlchemy" must be added too
+
+from flask_sqlalchemy import SQLAlchemy
+
+from app import app
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///todo-list.sqlite'
+# FSADeprecationWarning: SQLALCHEMY_TRACK_MODIFICATIONS adds
+# significant overhead and will be disabled by default in the future.
+# Set it to True or False to suppress this warning.
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db = SQLAlchemy(app)
 
 # import psycopg2
 
 # import cx_Oracle
 
-Base = declarative_base()
+Base = db.Model
+
+Column = db.Column
+
+SmallInteger = db.SmallInteger
+Integer = db.Integer
+BigInteger = db.BigInteger
+
+Float = db.Float
+
+DateTime = db.DateTime
+String = db.String
+Boolean = db.Boolean
+LargeBinary = db.LargeBinary
 
 
 class OutParam:
@@ -45,8 +91,11 @@ class DataStore:
         self.conn = None
         self.transaction = None
 
-        self.engine = sqlalchemy.create_engine('sqlite:///todo-list.sqlite')
         self.engine_type = self.EngineType.sqlite3
+        #########################################
+        # code below is for SQLAlchemy without flask
+        #
+        # self.engine = sqlalchemy.create_engine('sqlite:///todo-list.sqlite')
 
         # self.engine = sqlalchemy.create_engine('postgresql://postgres:sa@localhost/my-tests')
         # self.engine_type = self.EngineType.postgresql
@@ -65,15 +114,21 @@ class DataStore:
         # self.engine = sqlalchemy.create_engine(f'oracle+cx_oracle://{user}:{pwd}@{dsn}', echo=False)
         # self.engine_type = self.EngineType.oracle
 
-        self.session = sessionmaker(bind=self.engine)()
+        self.session = db.session
+        #########################################
+        # code below is for sqlalchemy without flask
+        #
+        # self.session = sessionmaker(bind=self.engine)()
 
-    def open(self):
-        self.conn = self.engine.connect()
-
-    def close(self):
-        if self.conn:
-            self.conn.close()
-            self.conn = None
+    # code below is for SQLAlchemy without flask
+    #
+    # def open(self):
+    #     self.conn = self.engine.connect()
+    #
+    # def close(self):
+    #     if self.conn:
+    #         self.conn.close()
+    #         self.conn = None
 
     def begin(self):
         if self.transaction is None:
@@ -100,7 +155,7 @@ class DataStore:
         self.transaction.rollback()
         self.transaction = None
 
-    def get_all(self, cls, params=None):
+    def get_all(self, cls, params=None) -> []:
         """
         :param cls: An __abstract_ model class or plain DTO class containing a static field "SQL"
         :param params: [] the values of SQL params
@@ -166,7 +221,7 @@ class DataStore:
         """
         pp = tuple(params)
         txt = sql  # don't use sqlalchemy.text(sql) with '%' as params
-        return self.conn.execute(txt, pp)
+        return self.session.execute(txt, pp)
 
     def _exec_proc_pg(self, sql, params):
         out_params = []
@@ -191,7 +246,7 @@ class DataStore:
     def _exec_sp_mysql(self, sp, params):
         call_params = _get_call_params(params)
         # https://stackoverflow.com/questions/45979950/sqlalchemy-error-when-calling-mysql-stored-procedure
-        raw_conn = self.engine.raw_connection()
+        raw_conn = self.session.raw_connection()
         try:
             with raw_conn.cursor() as cursor:
                 result_args = cursor.callproc(sp, call_params)
@@ -210,7 +265,7 @@ class DataStore:
     def _query_sp_mysql(self, sp, on_result, params):
         call_params = _get_call_params(params)
         # https://stackoverflow.com/questions/45979950/sqlalchemy-error-when-calling-mysql-stored-procedure
-        raw_conn = self.engine.raw_connection()
+        raw_conn = self.session.raw_connection()
         try:
             with raw_conn.cursor() as cursor:
                 # result_args: https://pynative.com/python-mysql-execute-stored-procedure/

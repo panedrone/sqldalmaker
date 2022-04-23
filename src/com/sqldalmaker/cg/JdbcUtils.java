@@ -278,20 +278,15 @@ public class JdbcUtils {
     }
 
     public static ResultSet get_tables_rs(Connection conn,
-                                          DatabaseMetaData dbmd,
                                           String schema_name,
                                           boolean include_views) throws SQLException {
-
-        String[] types;
-        if (include_views) {
-            types = new String[]{"TABLE", "VIEW"};
+        String table_name_parretn;
+        if (schema_name == null) {
+            table_name_parretn = "%";
         } else {
-            types = new String[]{"TABLE"};
+            table_name_parretn = schema_name + ".%";
         }
-        ResultSet rs_tables;
-        String catalog = conn.getCatalog();
-        rs_tables = dbmd.getTables(catalog, schema_name, "%", types);
-        return rs_tables;
+        return InfoDbTable.get_tables_rs(conn, table_name_parretn, include_views);
     }
 
     public static void get_schema_names(Connection con,

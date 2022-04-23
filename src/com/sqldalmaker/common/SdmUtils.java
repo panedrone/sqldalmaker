@@ -69,18 +69,19 @@ public class SdmUtils {
                                      Connection conn,
                                      boolean schema_in_xml,
                                      String selected_schema,
-                                     DatabaseMetaData db_info,
                                      ResultSet rs_tables,
                                      List<Object> nodes,
                                      boolean plural_to_singular) throws SQLException {
 
         String fk_table_name = rs_tables.getString("TABLE_NAME");
-        ResultSet rs = db_info.getImportedKeys(conn.getCatalog(), selected_schema, fk_table_name);
+        DatabaseMetaData dbmd = conn.getMetaData();
+        ResultSet rs = dbmd.getImportedKeys(conn.getCatalog(), selected_schema, fk_table_name);
         // [pk_table_name - list of fk_column_name]
         HashMap<String, List<String>> map = new HashMap<String, List<String>>();
         try {
             while (rs.next()) {
                 String pk_table_name = rs.getString("PKTABLE_NAME");
+                String pk_column_name = rs.getString("PKCOLUMN_NAME");
                 String fk_column_name = rs.getString("FKCOLUMN_NAME");
                 if (!map.containsKey(pk_table_name)) {
                     map.put(pk_table_name, new ArrayList<String>());
@@ -177,8 +178,7 @@ public class SdmUtils {
 
         DaoClass root = object_factory.createDaoClass();
         List<Object> nodes = root.getCrudOrCrudAutoOrQuery();
-        DatabaseMetaData db_info = conn.getMetaData();
-        ResultSet rs = JdbcUtils.get_tables_rs(conn, db_info, selected_schema, include_views);
+        ResultSet rs = JdbcUtils.get_tables_rs(conn, selected_schema, include_views);
         try {
             while (rs.next()) {
                 try {
@@ -245,7 +245,7 @@ public class SdmUtils {
                             nodes.add(crud);
                         }
                         if (add_fk_access) {
-                            add_fk_access(field_names_mode, conn, schema_in_xml, selected_schema, db_info, rs,
+                            add_fk_access(field_names_mode, conn, schema_in_xml, selected_schema, rs,
                                     nodes, plural_to_singular);
                         }
                     }
@@ -268,12 +268,10 @@ public class SdmUtils {
 
         DaoClass root = object_factory.createDaoClass();
         List<Object> nodes = root.getCrudOrCrudAutoOrQuery();
-        DatabaseMetaData db_info = conn.getMetaData();
-        ResultSet rs = JdbcUtils.get_tables_rs(conn, db_info, selected_schema, /* include_views */ false); // no FK in views
+        ResultSet rs = JdbcUtils.get_tables_rs(conn, selected_schema, /* include_views */ false); // no FK in views
         try {
             while (rs.next()) {
-                add_fk_access(field_names_mode, conn, schema_in_xml, selected_schema, db_info, rs, nodes,
-                        plural_to_singular);
+                add_fk_access(field_names_mode, conn, schema_in_xml, selected_schema, rs, nodes, plural_to_singular);
             }
         } finally {
             rs.close();
@@ -291,8 +289,7 @@ public class SdmUtils {
 
         DtoClasses root = object_factory.createDtoClasses();
         List<DtoClass> items = root.getDtoClass();
-        DatabaseMetaData db_info = conn.getMetaData();
-        ResultSet rs = JdbcUtils.get_tables_rs(conn, db_info, selected_schema, include_views);
+        ResultSet rs = JdbcUtils.get_tables_rs(conn, selected_schema, include_views);
         try {
             while (rs.next()) {
                 String table_name = rs.getString("TABLE_NAME");
@@ -314,7 +311,9 @@ public class SdmUtils {
     }
 
     // for Java
-    public static String get_package_relative_path(Settings settings, String package_name) {
+    public static String get_package_relative_path(Settings settings,
+                                                   String package_name) {
+
         String source_folder = settings.getFolders().getTarget();
         if (package_name.length() == 0) {
             return source_folder;
@@ -322,11 +321,11 @@ public class SdmUtils {
         return Helpers.concat_path(source_folder, package_name.replace(".", "/"));
     }
 
-    public static void gen_tmp_field_tags(Settings settings,
-                                          Connection connection,
-                                          com.sqldalmaker.jaxb.dto.ObjectFactory object_factory,
-                                          DtoClass dto_class,
-                                          String sql_root_abs_path) throws Exception {
+    public static void gen_field_wizard_jaxb(Settings settings,
+                                             Connection connection,
+                                             com.sqldalmaker.jaxb.dto.ObjectFactory object_factory,
+                                             DtoClass dto_class,
+                                             String sql_root_abs_path) throws Exception {
 
         JdbcUtils db_utils = new JdbcUtils(connection, FieldNamesMode.AS_IS, FieldNamesMode.AS_IS, settings);
         ArrayList<FieldInfo> fields = new ArrayList<FieldInfo>();
@@ -351,7 +350,6 @@ public class SdmUtils {
 
     public static Set<String> get_dto_class_names_used_in_dto_xml(String dto_xml_abs_file_path,
                                                                   String dto_xsd_abs_file_path) throws Exception {
-
         Set<String> res = new HashSet<String>();
         List<DtoClass> list = SdmUtils.get_dto_classes(dto_xml_abs_file_path, dto_xsd_abs_file_path);
         for (DtoClass cls : list) {

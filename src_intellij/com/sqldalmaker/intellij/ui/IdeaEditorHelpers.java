@@ -205,7 +205,7 @@ public class IdeaEditorHelpers {
             VirtualFile project_dir = IdeaHelpers.get_project_base_dir(project);
             final String module_root = project_dir.getPath();
             String sql_root_folder_full_path = module_root + "/" + settings.getFolders().getSql();
-            SdmUtils.gen_tmp_field_tags(settings, con, object_factory, cls, sql_root_folder_full_path);
+            SdmUtils.gen_field_wizard_jaxb(settings, con, object_factory, cls, sql_root_folder_full_path);
             open_dto_xml_in_editor(object_factory, project, dto_classes);
         } finally {
             con.close();
