@@ -10,6 +10,8 @@
 #
 # Column = sqlalchemy.Column
 #
+# ForeignKey = sqlalchemy.ForeignKey
+#
 # SmallInteger = sqlalchemy.SmallInteger
 # Integer = sqlalchemy.Integer
 # BigInteger = sqlalchemy.BigInteger
@@ -43,6 +45,8 @@ db = SQLAlchemy(app)
 Base = db.Model
 
 Column = db.Column
+
+ForeignKey = db.ForeignKey
 
 SmallInteger = db.SmallInteger
 Integer = db.Integer

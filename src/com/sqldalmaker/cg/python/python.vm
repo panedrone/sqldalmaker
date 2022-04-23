@@ -43,13 +43,14 @@ class $class_name(Base):
 #if($tablename)
     __tablename__ = '$tablename'
 
+#else
+    __abstract__ = True
+
 #end
 #foreach($f in $fields)
     $f.getName() $f.getType()
 #end
 #if($sql)
-
-    __abstract__ = True
 
     SQL = """$sql"""
 #end

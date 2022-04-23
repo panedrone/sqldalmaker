@@ -81,8 +81,8 @@ public class SdmUtils {
         try {
             while (rs.next()) {
                 String pk_table_name = rs.getString("PKTABLE_NAME");
-                String pk_column_name = rs.getString("PKCOLUMN_NAME");
-                String fk_column_name = rs.getString("FKCOLUMN_NAME");
+                // String pk_column_name = rs.getString("PKCOLUMN_NAME");
+                String fk_column_name = rs.getString("FKCOLUMN_NAME"); // column name in FK table
                 if (!map.containsKey(pk_table_name)) {
                     map.put(pk_table_name, new ArrayList<String>());
                 }

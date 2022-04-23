@@ -236,11 +236,22 @@ class InfoDtoClass {
             @Override
             public String exec(FieldInfo fi) {
                 String res = "";
+                if (fi.getFK() != null) {  // positional arguments must go 1st
+                    res += String.format(", ForeignKey('%s')", fi.getFK());
+                }
                 if (fi.isPK()) {
                     res += ", primary_key=True";
                 }
                 if (fi.isAI()) {
                     res += ", autoincrement=True";
+                }
+                if (!fi.isPK()) {
+                    if (fi.isIndexed()) {
+                        res += ", index=True";
+                    }
+                    if (fi.isUnique()) {
+                        res += ", unique=True";
+                    }
                 }
                 if (fi.isNullable()) {
                     res += ", nullable=True";

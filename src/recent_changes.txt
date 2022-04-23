@@ -1,3 +1,7 @@
+2022-04-23
+
+    + (Flask-)SQLAlchemy "ForeignKey", "index", "unique"
+
 2022-04-22
 
     Improvements fo Python

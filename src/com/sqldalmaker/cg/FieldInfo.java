@@ -21,6 +21,11 @@ public class FieldInfo {
     private boolean is_pk = false;
     private boolean is_nullable = false;
 
+    private String foreign_key = null;
+
+    private boolean is_indexed = false;
+    private boolean is_unique = false;
+
     private String comment;
 
     private String name_prefix = "";
@@ -92,6 +97,14 @@ public class FieldInfo {
         this.is_auto_increment = isAutoIncrement;
     }
 
+    public String getFK() {
+        return foreign_key;
+    }
+
+    public void setFK(String fk) {
+        foreign_key = fk;
+    }
+
     public boolean isNullable() {
         return this.is_nullable;
     }
@@ -124,5 +137,21 @@ public class FieldInfo {
 
     public String getOriginalType() {
         return original_field_type;
+    }
+
+    public boolean isIndexed() {
+        return is_indexed;
+    }
+
+    public void setIndexed(boolean indexed) {
+        is_indexed = indexed;
+    }
+
+    public boolean isUnique() {
+        return is_unique;
+    }
+
+    public void setUnique(boolean unique) {
+        is_unique = unique;
     }
 }

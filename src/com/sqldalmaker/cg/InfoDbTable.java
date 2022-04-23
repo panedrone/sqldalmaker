@@ -104,47 +104,61 @@ class InfoDbTable {
     }
 
     private void _refine_field_info_by_table_metadata() throws Exception {
+        String schema_nm;
+        String table_nm;
+        String[] parts = table_name.split("\\.", -1); // -1 to leave empty strings
+        if (parts.length == 1) {
+            schema_nm = null;
+            table_nm = table_name;
+        } else {
+            schema_nm = table_name.substring(0, table_name.lastIndexOf('.'));
+            table_nm = parts[parts.length - 1];
+        }
+        Map<String, String> unique = _index_names_by_lo_case_col_names(conn, schema_nm,table_name, true);
+        Map<String, String> indexed = _index_names_by_lo_case_col_names(conn, schema_nm,table_name, false);
+        Map<String, String[]> fk = _get_lower_case_FK_col_names(conn, schema_nm, table_name);
         DatabaseMetaData md = conn.getMetaData();
-        ResultSet columns_rs = _get_columns_rs(md, table_name);
+        ResultSet columns_rs = md.getColumns(conn.getCatalog(), schema_nm, table_nm, "%");
         try {
             while (columns_rs.next()) {
                 String db_col_name = columns_rs.getString("COLUMN_NAME");
-                if (fields_map.containsKey(db_col_name)) {
-                    int type = columns_rs.getInt("DATA_TYPE");
-                    String apache_java_type_name = TypesMapping.getJavaBySqlType(type);
-                    FieldInfo fi = fields_map.get(db_col_name);
-                    fi.refine_rendered_type(_get_type_name(apache_java_type_name));
-                    //fi.setComment("t(" + db_col_name + ")");
-                    fi.setComment("t");
-                    /* DatabaseMetaData.java:
-                     *   <LI><B>IS_AUTOINCREMENT</B> String  {@code =>} Indicates whether this column is auto incremented
-                     *       <UL>
-                     *       <LI> YES           --- if the column is auto incremented
-                     *       <LI> NO            --- if the column is not auto incremented
-                     *       <LI> empty string  --- if it cannot be determined whether the column is auto incremented
-                     *       </UL>
-                     *   <LI>
-                     */
-                    if (!fi.isAI()) {
-                        // IS_AUTOINCREMENT may work incorrectly. i.e. with sqlite-jdbc-3.19.3.jar.
-                        // Use it only if AI was not set by SQL colums metadata
-                        Object ai = columns_rs.getObject("IS_AUTOINCREMENT");
-                        if ("yes".equals(ai) || "YES".equals(ai)) {
-                            fi.setAI(true);
-                        }
-//                        else {
-//                            fi.setAI(false);
-//                        }
+                if (!fields_map.containsKey(db_col_name)) {
+                    continue;
+                }
+                int type = columns_rs.getInt("DATA_TYPE");
+                String apache_java_type_name = TypesMapping.getJavaBySqlType(type);
+                FieldInfo fi = fields_map.get(db_col_name);
+                fi.refine_rendered_type(_get_type_name(apache_java_type_name));
+                fi.setComment("t");
+                if (!fi.isAI()) {
+                    // IS_AUTOINCREMENT may work incorrectly (sqlite-jdbc-3.19.3.jar).
+                    // So, use it only if AI was not set by SQL colums metadata
+                    Object ai = columns_rs.getObject("IS_AUTOINCREMENT");
+                    if ("yes".equals(ai) || "YES".equals(ai)) {
+                        fi.setAI(true);
                     }
-                    int nullable = columns_rs.getInt("NULLABLE");
-                    if (nullable == DatabaseMetaData.columnNullable) {
-//                        System.out.println("nullable true");
-                        // http://www.java2s.com/Code/Java/Database-SQL-JDBC/IsColumnNullable.htm
-                        fi.setNullable(true);
-                    } else {
-                        // System.out.println("nullable false");
-                        fi.setNullable(false);
-                    }
+                }
+                int nullable = columns_rs.getInt("NULLABLE");
+                if (nullable == DatabaseMetaData.columnNullable) {
+                    // http://www.java2s.com/Code/Java/Database-SQL-JDBC/IsColumnNullable.htm
+                    fi.setNullable(true);
+                } else {
+                    fi.setNullable(false);
+                }
+                String lo_case_col_name = db_col_name.toLowerCase();
+                if (fk.containsKey(lo_case_col_name)) {
+                    String[] res = fk.get(lo_case_col_name);
+                    String pk_table_name = res[0];
+                    String pk_column_name = res[1];
+                    fi.setFK(String.format("%s.%s", pk_table_name, pk_column_name));
+                }
+                if (indexed.containsKey(lo_case_col_name)) {
+                    String res = indexed.get(lo_case_col_name);
+                    fi.setIndexed(true);
+                }
+                if (unique.containsKey(lo_case_col_name)) {
+                    String res = unique.get(lo_case_col_name);
+                    fi.setUnique(true);
                 }
             }
         } finally {
@@ -152,23 +166,44 @@ class InfoDbTable {
         }
     }
 
-    private String _get_type_name(String type_name) {
-        return model + type_name;
+    private Map<String, String> _index_names_by_lo_case_col_names(Connection conn,
+                                                                  String schema,
+                                                                  String table_name,
+                                                                  boolean unique) throws SQLException {
+        Map<String, String> res = new HashMap<String, String>();
+        DatabaseMetaData dm = conn.getMetaData();
+        ResultSet rs = dm.getIndexInfo(null, schema, table_name, unique, true);
+        while (rs.next()) {
+            String indexName = rs.getString("INDEX_NAME");
+            String columnName = rs.getString("COLUMN_NAME");
+            if (columnName != null) { // === panedrone: hello from oracle
+                res.put(columnName.toLowerCase(), indexName);
+            }
+        }
+        return res;
     }
 
-    private static ResultSet _get_columns_rs(DatabaseMetaData md,
-                                             String table_name) throws SQLException {
-
-        String[] parts = table_name.split("\\.", -1); // -1 to leave empty strings
-        ResultSet rs_columns;
-        if (parts.length == 1) {
-            rs_columns = md.getColumns(null, null, table_name, "%");
-        } else {
-            String schema_nm = table_name.substring(0, table_name.lastIndexOf('.'));
-            String table_nm = parts[parts.length - 1];
-            rs_columns = md.getColumns(null, schema_nm, table_nm, "%");
+    private static Map<String, String[]> _get_lower_case_FK_col_names(Connection conn,
+                                                                      String schema,
+                                                                      String table_name) throws SQLException {
+        DatabaseMetaData dbmd = conn.getMetaData();
+        ResultSet rs = dbmd.getImportedKeys(conn.getCatalog(), schema, table_name);
+        Map<String, String[]> map = new HashMap<String, String[]>();
+        try {
+            while (rs.next()) {
+                String pk_table_name = rs.getString("PKTABLE_NAME");
+                String pk_column_name = rs.getString("PKCOLUMN_NAME");
+                String fk_column_name = rs.getString("FKCOLUMN_NAME"); // FK column name in table_name
+                map.put(fk_column_name.toLowerCase(), new String[]{pk_table_name, pk_column_name});
+            }
+        } finally {
+            rs.close();
         }
-        return rs_columns;
+        return map;
+    }
+
+    private String _get_type_name(String type_name) {
+        return model + type_name;
     }
 
     private static String _jdbc_sql_by_table_name(String table_name) {
