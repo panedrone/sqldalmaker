@@ -153,11 +153,11 @@ class InfoDbTable {
                     fi.setFK(String.format("%s.%s", pk_table_name, pk_column_name));
                 }
                 if (indexed.containsKey(lo_case_col_name)) {
-                    String res = indexed.get(lo_case_col_name);
+                    //String res = indexed.get(lo_case_col_name);
                     fi.setIndexed(true);
                 }
                 if (unique.containsKey(lo_case_col_name)) {
-                    String res = unique.get(lo_case_col_name);
+                    //String res = unique.get(lo_case_col_name);
                     fi.setUnique(true);
                 }
             }

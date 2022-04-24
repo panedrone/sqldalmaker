@@ -119,7 +119,7 @@ public class NbpIdeEditorHelpers {
             root.getDtoClass().add(cls_element);
             Settings sett = NbpHelpers.load_settings(obj);
             String sql_root_folder_abs_path = NbpPathHelpers.get_absolute_dir_path_str(obj, sett.getFolders().getSql());
-            SdmUtils.gen_tmp_field_tags(sett, con, object_factory, cls_element, sql_root_folder_abs_path);
+            SdmUtils.gen_field_wizard_jaxb(sett, con, object_factory, cls_element, sql_root_folder_abs_path);
             open_dto_in_editor_async(object_factory, root);
         } finally {
             con.close();

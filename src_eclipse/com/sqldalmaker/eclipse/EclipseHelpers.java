@@ -171,6 +171,6 @@ public class EclipseHelpers {
 			DtoClass dto_class, String project_root, IEditor2 editor2) throws Exception {
 		Settings settings = load_settings(editor2);
 		String sql_root_abs_path = project_root + "/" + settings.getFolders().getSql();
-		SdmUtils.gen_tmp_field_tags(settings, connection, object_factory, dto_class, sql_root_abs_path);
+		SdmUtils.gen_field_wizard_jaxb(settings, connection, object_factory, dto_class, sql_root_abs_path);
 	}
 }
