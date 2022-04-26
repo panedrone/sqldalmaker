@@ -1,3 +1,15 @@
+2022-04-25
+
+    (SQLAlchemy only so far)
+
+    Rework to allow using "<query-dto-list..." and "<query-dto..." with empty "ref":
+
+    <query-dto-list method="get_orders(dt1, dt2) dto="sa-OrderEx" ref=""/>
+
+    In such cases, "ref" from ""<dto-class..." is used:
+
+     <dto-class name="sa-OrderEx" ref="get_orders.sql"/>
+
 2022-04-23
 
     + (Flask-)SQLAlchemy "ForeignKey", "index", "unique"

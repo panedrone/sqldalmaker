@@ -432,6 +432,9 @@ public class SqlUtils {
         // validate_table_name(table_name); // TODO: PostgreSQL JDBC prepareStatement
         // passes wrong table names
         String param_descriptors = parts2[1];
+        if (param_descriptors.trim().length() == 0) {
+            return "select * from " + table_name;
+        }
         String[] param_arr = Helpers.get_listed_items(param_descriptors, false);
         if (param_arr.length < 1) {
             throw new Exception("Not empty list of parameters expected in SQL shortcut");

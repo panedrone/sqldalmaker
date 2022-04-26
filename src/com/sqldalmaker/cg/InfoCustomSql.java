@@ -59,10 +59,10 @@ class InfoCustomSql {
         try {
             rsmd = ps.getMetaData();
         } catch (SQLException e) {
-            throw new Exception("Exception in getMetaData " + e.getMessage());
+            throw new Exception("Cannot detect Prepared Statement MetaData: " + e.getMessage());
         }
         if (rsmd == null) {  // it is possible by javadocs
-            throw new Exception("getMetaData() == null");
+            throw new Exception("Cannot detect Prepared Statement MetaData");
         }
         return rsmd;
     }

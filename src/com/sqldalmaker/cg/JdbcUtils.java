@@ -316,8 +316,12 @@ public class JdbcUtils {
                                                      String sql_root_abs_path,
                                                      List<FieldInfo> _dto_fields) throws Exception {
 
-        InfoDtoClass info = new InfoDtoClass(conn, type_map, global_markers, dto_field_names_mode);
-        return info.get_dto_field_info(jaxb_dto_class, sql_root_abs_path, _dto_fields);
+        try {
+            InfoDtoClass info = new InfoDtoClass(conn, type_map, global_markers, dto_field_names_mode);
+            return info.get_dto_field_info(jaxb_dto_class, sql_root_abs_path, _dto_fields);
+        } catch (Exception e) {
+            throw new Exception(String.format("<dto-class name=\"%s\"... error: %s", jaxb_dto_class.getName(), e.getMessage()));
+        }
     }
 
     // DAO. Raw-SQL -------------------------------------------
@@ -337,6 +341,21 @@ public class JdbcUtils {
         _fields.clear();
         _params.clear();
         Helpers.check_duplicates(method_param_descriptors);
+        if (dao_jaxb_ref == null || dao_jaxb_ref.trim().length() == 0) { // empty "ref"
+            if (!jaxb_return_type_is_dto) {
+                throw new Exception("Empty 'ref' is not allowed here");
+            }
+            String dto_class_name = jaxb_dto_or_return_type;
+            DtoClass jaxb_dto = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
+            String dto_jaxb_ref = jaxb_dto.getRef();
+            if (dto_jaxb_ref == null || dto_jaxb_ref.trim().length() == 0) {
+                throw new Exception("Both DAO 'ref' and DTO 'ref' are empty");
+            }
+            dao_jaxb_ref = dto_jaxb_ref;
+            if (SqlUtils.is_table_ref(dao_jaxb_ref)) {
+                dao_jaxb_ref += "()"; // process it as sql_shortcut
+            }
+        }
         String dao_query_jdbc_sql = SqlUtils.jdbc_sql_by_query_ref(dao_jaxb_ref, sql_root_abs_path);
         FieldNamesMode param_names_mode = _refine_method_params_names_mode(dto_param_type);
         if (SqlUtils.is_sql_shortcut_ref(dao_jaxb_ref)) {

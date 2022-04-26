@@ -143,7 +143,7 @@ class $class_name:
         self.ds.query_all_rows(sql, #param_array($dto_param), _map_cb#if($out_params), out_params#end)
         return _res
 #else
-        return self.ds.query_scalar_array(sql, #param_array($dto_param)#if($out_params), out_params#end)
+        return self.ds.query_all_scalars(sql, #param_array($dto_param)#if($out_params), out_params#end)
 #end
 #else
     def $method_name(#if($dto_param != "")#param_decls_dto($is_external_sql)p, obj#else#param_decls($is_external_sql $params)#if($use_dto), obj#end#end#if($out_params), out_params#end):
@@ -177,7 +177,7 @@ class $class_name:
         """
 #sql_var($is_external_sql $sql)
 #if($use_dto)
-        row = self.ds.query_single_row(sql, #param_array($dto_param)#if($out_params), out_params#end)
+        row = self.ds.query_row(sql, #param_array($dto_param)#if($out_params), out_params#end)
 #foreach($f in ${fields})
         obj.${f.getName()} = row["${f.getColumnName()}"]  # ${f.getComment()}
 #end
