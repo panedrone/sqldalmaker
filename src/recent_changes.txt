@@ -1,8 +1,10 @@
 2022-04-29
 
-    VM templates for global macros
+    VM templates for global macros.
 
+    See -->
 
+    https://github.com/panedrone/sqldalmaker/blob/master/src/resources/settings.xml
 
 2022-04-25
 
