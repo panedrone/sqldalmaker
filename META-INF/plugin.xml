@@ -18,6 +18,7 @@ PHP, Java, C++, Python, Ruby, and Go. To generate the class, you declare it in X
     <change-notes>
         <![CDATA[
 <ul>
+<li>+ django.db models</li>
 <li>VM templates for global macros</li>
 <li>"query-dto-list..." and "query-dto..." with empty "ref" to use "ref" from DTO</li>
 <li>+ (Flask-)SQLAlchemy "ForeignKey", "index", "unique"</li>

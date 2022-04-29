@@ -54,7 +54,28 @@ class $class_name(Base):
 
     SQL = """$sql"""
 #end
+#elseif ($model=="django" || $model=="dj")
+from django.db import models
+
+
+class $class_name(models.Model):
+#foreach($f in $fields)
+    $f.getName() $f.getType()
+#end
+#if($tablename)
+
+    class Meta:
+        db_table = '$tablename'
 #else
+
+    class Meta:
+        managed = False
+#end
+#if($sql)
+
+    SQL = """$sql"""
+#end
+#elseif (1 == 1)
 
 class $class_name:
     """

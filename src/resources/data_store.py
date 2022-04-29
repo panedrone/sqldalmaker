@@ -10,6 +10,10 @@ import os
 import django.db
 from django.db import transaction
 
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'settings')
+
+django.setup()  # AppRegistryNotReady("Apps aren't loaded yet.")
+
 
 class OutParam:
     def __init__(self):
@@ -28,7 +32,7 @@ class DataStore:
         - 'django.db.backends.sqlite3' ---------------- built-in
         - 'django.db.backends.postgresql_psycopg2' ---- pip install psycopg2
         - 'mysql.connector.django' -------------------- pip install mysql-connector-python
-           (Instead of built-in 'django.db.backends.mysql' to enable cursor.stored_results().
+           ^^ instead of built-in 'django.db.backends.mysql' to enable cursor.stored_results().
            MySQL SP returning result-sets --> http://www.mysqltutorial.org/calling-mysql-stored-procedures-python/
            MySQL Connector/Python as Django Engine? -->
            https://stackoverflow.com/questions/26573984/django-how-to-install-mysql-connector-python-with-pip3)
@@ -59,7 +63,6 @@ class DataStore:
 
         # uncomment to use with django.db:
 
-        os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'settings')
         con = django.db.connections['default']
         engine = con.settings_dict["ENGINE"]
         if 'sqlite3' in engine:
@@ -77,9 +80,23 @@ class DataStore:
             self.conn.close()
             self.conn = None
 
+    @staticmethod
+    def get_all(cls, params=None) -> []:
+        if not params:
+            params = ()
+        return cls.objects.raw(cls.SQL, params)
+
+    def get_one(self, cls, params=None):
+        rows = self.get_all(cls, params)
+        if len(rows) == 0:
+            raise Exception('No rows')
+        if len(rows) > 1:
+            raise Exception('More than 1 row exists')
+        return rows[0]
+
     # uncomment to use without django.db:
 
-    # def start_transaction(self):
+    # def begin(self):
     #     self.conn.execute('begin')  # sqlite3
     #     self.conn.start_transaction() # mysql
     #     self.conn.begin() # psycopg2
@@ -97,7 +114,7 @@ class DataStore:
     # uncomment to use with django.db:
 
     @staticmethod
-    def start_transaction():
+    def begin():
         django.db.transaction.set_autocommit(False)
 
     @staticmethod
@@ -207,7 +224,7 @@ class DataStore:
         Raises:
             Exception: if amount of rows != 1.
         """
-        rows = self.query_scalar_array(sql, params)
+        rows = self.query_all_scalars(sql, params)
         if len(rows) == 0:
             raise Exception('No rows')
         if len(rows) > 1:
@@ -217,7 +234,7 @@ class DataStore:
         else:
             return rows[0]  # 'select get_test_rating(?)' returns just scalar value, not array of arrays
 
-    def query_scalar_array(self, sql, params):
+    def query_all_scalars(self, sql, params):
         """
         Returns:
             array of scalar values
@@ -245,7 +262,7 @@ class DataStore:
             self._query_proc_mysql(cursor, sp, on_result, params)
             return res
 
-    def query_single_row(self, sql, params):
+    def query_row(self, sql, params):
         """
         Returns:
             Single row

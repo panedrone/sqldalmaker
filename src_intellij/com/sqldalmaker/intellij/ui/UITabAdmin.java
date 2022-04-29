@@ -625,7 +625,7 @@ public class UITabAdmin {
         label4.setText(" Python ");
         panel7.add(label4);
         sqlite3MysqlConnectorPsycopg2Button = new JButton();
-        sqlite3MysqlConnectorPsycopg2Button.setText("sqlite3, mysql.connector, psycopg2");
+        sqlite3MysqlConnectorPsycopg2Button.setText("sqlite3, mysql.connector, psycopg2, django.db");
         panel7.add(sqlite3MysqlConnectorPsycopg2Button);
         SQLAlchemyButton = new JButton();
         SQLAlchemyButton.setText("sqlalchemy");

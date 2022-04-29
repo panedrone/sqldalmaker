@@ -1,10 +1,15 @@
-2022-04-29
+2022-04-30
 
-    VM templates for global macros.
+    + django.db models
 
     See -->
 
     https://github.com/panedrone/sqldalmaker/blob/master/src/resources/settings.xml
+    https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store.py
+
+2022-04-29
+
+    VM templates for global macros.
 
 2022-04-25
 

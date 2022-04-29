@@ -149,6 +149,35 @@
 
         <type detected="sa-java.lang.Object" target="${sa-type-unknown}"/>
 
+        <!-- ***** django (dj) ****************** -->
+
+        <type detected="dj-java.lang.Short" target="${dj-type}|0:IntegerField"/>
+        <type detected="dj-java.lang.Integer" target="${dj-type}|0:IntegerField"/>
+        <type detected="dj-java.lang.Long" target="${dj-type}|0:BigIntegerField"/>
+
+        <type detected="dj-java.lang.Float" target="${dj-type}|0:FloatField"/>
+        <type detected="dj-java.lang.Double" target="${dj-type}|0:FloatField"/>
+        <type detected="dj-java.math.BigDecimal" target="${dj-type}|0:DecimalField"/>
+
+        <type detected="dj-java.util.Date" target="${dj-type}|0:DateTimeField"/>
+        <type detected="dj-java.lang.String" target="${dj-type}|0:CharField"/>
+        <type detected="dj-java.lang.Boolean" target="${dj-type}|0:BooleanField"/>
+        <type detected="dj-byte[]" target="${dj-type}|0:BinaryField"/>
+
+        <type detected="dj-java.lang.Object" target="${dj-type}|0:CharField"/>
+
+        <type detected="dj-int" target="${dj-type}|0:IntegerField"/>
+        <type detected="dj-long" target="${dj-type}|0:BigIntegerField"/>
+
+        <type detected="dj-float" target="${dj-type}|0:FloatField"/>
+
+        <type detected="dj-date" target="${dj-type}|0:DateTimeField"/>
+        <type detected="dj-str" target="${dj-type}|0:CharField"/>
+        <type detected="dj-bool" target="${dj-type}|0:BooleanField"/>
+        <!--        <type detected="dj-byte[]" target="${dj-type}|0:BinaryField"/> -->
+
+        <type detected="dj-object" target="${dj-type}|0:CharField"/>
+
         <!-- ****** raw SQL ************************ -->
 
         <type detected="java.lang.Short" target="int"/>
@@ -203,6 +232,14 @@ ForeignKey('$fi.getFK()')#end#if($fi.isIndexed()),
 index=True#end#if($fi.isUnique()),
 unique=True#end#if($fi.isNullable()),
 nullable=True#end"/>
+
+        <global-macro name="${dj-type}" value="= models.${vm:dj-type}${comment}"/>
+
+        <global-macro name="${vm:dj-type}" value="#if($fi.isAI())AutoField#else${0}#end(db_column='$fi.getColumnName()'#if($fi.isPK()),
+primary_key=True#end#if($fi.isIndexed()),
+index=True#end#if($fi.isUnique()),
+unique=True#end#if($fi.isNullable()),
+blank=True, null=True#end${1})"/>
 
         <!-- $fi in this ^^ example is a predefined parameter of class FieldInfo:
 

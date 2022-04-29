@@ -253,7 +253,7 @@
                       <component id="85bc6" class="javax.swing.JButton" binding="sqlite3MysqlConnectorPsycopg2Button" default-binding="true">
                         <constraints/>
                         <properties>
-                          <text value="sqlite3, mysql.connector, psycopg2"/>
+                          <text value="sqlite3, mysql.connector, psycopg2, django.db"/>
                         </properties>
                       </component>
                       <component id="b2f0d" class="javax.swing.JButton" binding="SQLAlchemyButton" default-binding="true">
