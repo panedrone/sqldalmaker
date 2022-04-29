@@ -124,32 +124,32 @@
 
     <type-map default="">
 
-        <!-- ***** sqlalchemy (sa) ************************************ -->
+        <!-- ***** sqlalchemy (sa) ****************** -->
 
         <!-- https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store_sqlalchemy.py-->
 
         <!-- all numerics for oracle_cx -->
 
-        <type detected="sa-java.math.BigDecimal" target="${type}|0:NUMBER"/>
+        <!--        <type detected="sa-java.math.BigDecimal" target="${sa-type}|0:NUMBER"/>-->
 
         <!-- numerics for others -->
 
-        <!--        <type detected="sa-java.lang.Short" target="${type}|0:SmallInteger"/>-->
-        <!--        <type detected="sa-java.lang.Integer" target="${type}|0:Integer"/>-->
-        <!--        <type detected="sa-java.lang.Long" target="${type}|0:BigInteger"/>-->
+        <type detected="sa-java.lang.Short" target="${sa-type}|0:SmallInteger"/>
+        <type detected="sa-java.lang.Integer" target="${sa-type}|0:Integer"/>
+        <type detected="sa-java.lang.Long" target="${sa-type}|0:BigInteger"/>
 
-        <!--        <type detected="sa-java.lang.Float" target="${type}|0:Float"/>-->
-        <!--        <type detected="sa-java.lang.Double" target="${type}|0:Float"/>-->
-        <!--        <type detected="sa-java.math.BigDecimal" target="${type}|0:Float"/>-->
+        <type detected="sa-java.lang.Float" target="${sa-type}|0:Float"/>
+        <type detected="sa-java.lang.Double" target="${sa-type}|0:Float"/>
+        <type detected="sa-java.math.BigDecimal" target="${sa-type}|0:Float"/>
 
-        <type detected="sa-java.util.Date" target="${type}|0:DateTime"/>
-        <type detected="sa-java.lang.String" target="${type}|0:String"/>
-        <type detected="sa-java.lang.Boolean" target="${type}|0:Boolean"/>
-        <type detected="sa-byte[]" target="${type}|0:LargeBinary"/>
+        <type detected="sa-java.util.Date" target="${sa-type}|0:DateTime"/>
+        <type detected="sa-java.lang.String" target="${sa-type}|0:String"/>
+        <type detected="sa-java.lang.Boolean" target="${sa-type}|0:Boolean"/>
+        <type detected="sa-byte[]" target="${sa-type}|0:LargeBinary"/>
 
-        <type detected="sa-java.lang.Object" target="${type-unknown}"/>
+        <type detected="sa-java.lang.Object" target="${sa-type-unknown}"/>
 
-        <!-- ****** raw SQL (without sqlalchemy) ********************** -->
+        <!-- ****** raw SQL ************************ -->
 
         <type detected="java.lang.Short" target="int"/>
         <type detected="java.lang.Integer" target="int"/>
@@ -178,7 +178,8 @@
         <global-macro name="${TitleCase(column)}" value="=built-in="/>
         <global-macro name="${kebab-case(column)}" value="=built-in="/>
 
-        <global-macro name="${sqlalchemy-params}" value="=built-in="/>
+        <!-- deprecated, don't use -->
+        <!--        <global-macro name="${sqlalchemy-params}" value="=built-in="/>-->
 
         <!-- go json tags: -->
 
@@ -188,26 +189,36 @@
 
         <!-- sqlalchemy Column: -->
 
-        <global-macro name="${type}" value="= Column('${column}', ${0}${sqlalchemy-params}${1})${comment}"/>
+        <!-- deprecated, don't use -->
+        <!--        <global-macro name="${type}" value="= Column('${column}', ${0}${sqlalchemy-params}${1})${comment}"/>-->
 
-        <global-macro name="${type-unknown}" value="= Column('${column}'${sqlalchemy-params}${1})${comment}"/>
+        <global-macro name="${sa-type-unknown}" value="= Column('${column}'${vm:sa-type-params})${comment}"/>
 
-        <!-- TODO: for macros like "${vm:...}", the values are rendered by Apache Velocity -->
+        <global-macro name="${sa-type}" value="= Column('${column}', ${0}${vm:sa-type-params})${comment}"/>
 
-        <global-macro name="${vm:sqlalchemy-params}"
-                      value="#if($fi.isPK()), primary_key=True#end#if($fi.isAI()), auto_increment=True#end"/>
+        <global-macro name="${vm:sa-type-params}" value="#if($fi.isPK()),
+primary_key=True#end#if($fi.isAI()),
+auto_increment=True#end#if($fi.getFK()),
+ForeignKey('$fi.getFK()')#end#if($fi.isIndexed()),
+index=True#end#if($fi.isUnique()),
+unique=True#end#if($fi.isNullable()),
+nullable=True#end"/>
 
         <!-- $fi in this ^^ example is a predefined parameter of class FieldInfo:
 
                     class FieldInfo:
-                        String getName();
-                        String getType();
-                        String getColumnName();
-                        boolean isAI();
-                        boolean isPK();
-                        String getComment();
-                        String getterMethod();
-                        String setterMethod();
+                        String getName()
+                        String getType()
+                        String getColumnName()
+                        boolean isAI()
+                        boolean isPK()
+                        String getFK()
+                        boolean isNullable()
+                        boolean isIndexed()
+                        boolean isUnique()
+                        String getComment()
+                        String getterMethod()
+                        String setterMethod()
                     -->
 
     </global-macros>

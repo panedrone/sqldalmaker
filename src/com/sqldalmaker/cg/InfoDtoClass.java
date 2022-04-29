@@ -7,6 +7,7 @@ package com.sqldalmaker.cg;
 
 import com.sqldalmaker.jaxb.dto.DtoClass;
 
+import java.io.StringWriter;
 import java.sql.Connection;
 import java.util.*;
 
@@ -38,9 +39,6 @@ class InfoDtoClass {
                                                      List<FieldInfo> _dto_fields) throws Exception {
 
         Map<String, FieldInfo> fields_map = _prepare_detected(jaxb_dto_class, sql_root_abs_path, _dto_fields);
-        if (type_map == null) {
-            return fields_map; // DTO XML wizard
-        }
         Set<String> refined_by_field_jaxb = _refine_by_jaxb_dto_class_fields(jaxb_dto_class, _dto_fields, fields_map);
         _refine_others(refined_by_field_jaxb, _dto_fields);
         _substitute_built_in_macros(_dto_fields);
@@ -141,7 +139,7 @@ class InfoDtoClass {
         int local_field_type_params_start = type_name.indexOf('|');
         if (local_field_type_params_start == -1) { // explicit_type_name only, no parameters "int64"
             String type_map_target_type = get_target_type_by_type_map(type_map, type_name);
-            target_type = _parse_target_type(type_map_target_type, macros);
+            target_type = _parse_target_type(fi, type_map_target_type, macros);
         } else {
             String local_field_type_explicit;
             if (local_field_type_params_start == 0) { // "|0: hello0|1:hello1"
@@ -153,9 +151,9 @@ class InfoDtoClass {
             if (local_field_type_explicit.length() == 0) { // only parameters "|0:hello"
                 String detected_jdbc_type_name = fi.getType();
                 String type_map_target_type = get_target_type_by_type_map(type_map, detected_jdbc_type_name);
-                parsed_target_type = _parse_target_type(type_map_target_type, macros);
+                parsed_target_type = _parse_target_type(fi, type_map_target_type, macros);
             } else { // local_field_type_explicit + parameters "int64{json}|0:hello"
-                parsed_target_type = _parse_target_type(local_field_type_explicit, macros);
+                parsed_target_type = _parse_target_type(fi, local_field_type_explicit, macros);
             }
             String local_field_type_params = type_name.substring(local_field_type_params_start);
             target_type = parsed_target_type + local_field_type_params;
@@ -163,31 +161,60 @@ class InfoDtoClass {
         fi.refine_rendered_type(target_type);
     }
 
-    private String _parse_target_type(String target,
-                                      JaxbUtils.JaxbMacros global_markers) throws Exception {
+    private static String _parse_target_type(FieldInfo fi,
+                                             String target,
+                                             JaxbUtils.JaxbMacros global_markers) throws Exception {
 
-        return _parse_target_type_recursive(0, target, global_markers);
+        return _parse_target_type_recursive(0, fi, target, global_markers);
     }
 
     private static String _parse_target_type_recursive(int depth,
-                                                       String target,
-                                                       JaxbUtils.JaxbMacros global_markers) throws Exception {
+                                                       FieldInfo fi, // fi in here is used for vm templates
+                                                       String target_type_name,
+                                                       JaxbUtils.JaxbMacros macros) throws Exception {
         if (depth > 10) {
-            throw new Exception("Depth > 10: " + target);
+            throw new Exception("Depth > 10: " + target_type_name);
         }
-        String res = target;
+        String res = target_type_name;
         boolean found = false;
-        for (String m_name : global_markers.get_custom_names()) {
-            if (res.contains(m_name)) {
-                res = res.replace(m_name, global_markers.get_custom(m_name));
+        for (String m_name : macros.get_custom_names()) {
+            if (res.contains(m_name)) { // single replacement in one pass
+                res = res.replace(m_name, macros.get_custom(m_name));
+                found = true;
+            }
+        }
+        if (!found) {
+            String tmp = _substitute_vm_macros(fi, res, macros);
+            if (tmp != null) {
+                res = tmp; // single replacement in one pass
                 found = true;
             }
         }
         if (!found) {
             return res;
         }
-        res = _parse_target_type_recursive(depth + 1, res, global_markers);
+        res = _parse_target_type_recursive(depth + 1, fi, res, macros);
         return res;
+    }
+
+    private static String _substitute_vm_macros(FieldInfo fi, // fi in here is used for vm templates
+                                                String target_type_name,
+                                                JaxbUtils.JaxbMacros macros) throws Exception {
+
+        for (String m_name : macros.get_custom_vm_names()) {
+            if (target_type_name.contains(m_name)) { // single replacement in one pass
+                String vm_template = macros.get_custom_vm(m_name);
+                TemplateEngine te = new TemplateEngine(vm_template, m_name);
+                Map<String, Object> values = new HashMap<String, Object>();
+                values.put("fi", fi);
+                StringWriter sw = new StringWriter();
+                te.merge(values, sw);
+                String value = sw.toString();
+                target_type_name = target_type_name.replace(m_name, value);
+                return target_type_name;
+            }
+        }
+        return null;
     }
 
     private static String get_target_type_by_type_map(JaxbUtils.JaxbTypeMap type_map,
@@ -201,7 +228,7 @@ class InfoDtoClass {
         String exec(FieldInfo fi);
     }
 
-    private static Map<String, IMacro> _get_macros() {
+    private static Map<String, IMacro> _get_built_in_macros() {
         Map<String, IMacro> macros = new HashMap<String, IMacro>();
         macros.put("${lower_snake_case(column)}", new IMacro() {
             @Override
@@ -264,20 +291,43 @@ class InfoDtoClass {
     }
 
     private static void _substitute_built_in_macros(List<FieldInfo> fields) {
-        Map<String, IMacro> macro = _get_macros();
+        Map<String, IMacro> built_in_macros = _get_built_in_macros();
         for (FieldInfo fi : fields) {
             String curr_type = fi.getType();
             if (curr_type.length() == 0) {
                 continue;
             }
-            for (String name : macro.keySet()) {
+            for (String name : built_in_macros.keySet()) {
                 if (!curr_type.contains(name)) {
                     continue;
                 }
-                String value = macro.get(name).exec(fi);
+                String value = built_in_macros.get(name).exec(fi);
                 curr_type = curr_type.replace(name, value);
             }
             fi.refine_rendered_type(curr_type);
         }
     }
+
+//    private static void _substitute_vm_macros(List<FieldInfo> fields) throws Exception {
+//        for (FieldInfo fi : fields) {
+//            String curr_type = fi.getType();
+//            if (curr_type.length() == 0) {
+//                continue;
+//            }
+//            for (String m_name : macros.get_custom_vm_names()) {
+//                if (curr_type.contains(m_name)) {
+//                    String vm_template = macros.get_custom_vm(m_name);
+//                    TemplateEngine te = new TemplateEngine(vm_template, m_name);
+//                    Map<String, Object> values = new HashMap<String, Object>();
+//                    values.put("fi", fi);
+//                    StringWriter sw = new StringWriter();
+//                    te.merge(values, sw);
+//                    String value = sw.toString();
+//                    curr_type = curr_type.replace(m_name, value);
+//                    fi.refine_rendered_type(curr_type);
+//                }
+//            }
+//        }
+//    }
+
 }

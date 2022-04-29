@@ -14,6 +14,7 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.runtime.RuntimeInstance;
 import org.apache.velocity.runtime.RuntimeServices;
+import org.apache.velocity.runtime.parser.ParseException;
 import org.apache.velocity.runtime.parser.node.SimpleNode;
 
 /**
@@ -23,14 +24,28 @@ public class TemplateEngine {
 
     private final Template template;
 
-    public TemplateEngine(String vm_path, boolean is_file_system) throws Exception {
+    public TemplateEngine(String vm_template,
+                          String template_name) throws Exception {
 
-        String template_text;
+        template = create_template(vm_template, template_name);
+    }
+
+    public TemplateEngine(String vm_path,
+                          boolean is_file_system) throws Exception {
+
+        String vm_template;
         if (is_file_system) {
-            template_text = Helpers.load_text_from_file(vm_path);
+            vm_template = Helpers.load_text_from_file(vm_path);
         } else {
-            template_text = Helpers.read_from_jar_file_2(vm_path);
+            vm_template = Helpers.read_from_jar_file_2(vm_path);
         }
+        String template_name = vm_path;
+        template = create_template(vm_template, template_name);
+    }
+
+    private Template create_template(String template_text,
+                                     String template_name) throws ParseException {
+
         // Velocity loads ResourceManager in this way:
         // ClassLoader loader = Thread.currentThread().getContextClassLoader();
         // return Class.forName(clazz, true, loader);
@@ -89,11 +104,14 @@ public class TemplateEngine {
             // Boolean.FALSE.toString());
             // }
             StringReader reader = new StringReader(template_text);
-            SimpleNode node = runtime_services.parse(reader, vm_path);
-            template = new Template();
+            // parse(String string, String templateName)
+            // https://velocity.apache.org/engine/1.7/apidocs/org/apache/velocity/runtime/RuntimeServices.html
+            SimpleNode node = runtime_services.parse(reader, template_name);
+            Template template = new Template();
             template.setRuntimeServices(runtime_services);
             template.setData(node);
             template.initDocument();
+            return template;
         } finally {
             thread.setContextClassLoader(loader);
         }
