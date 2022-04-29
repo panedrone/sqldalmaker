@@ -198,7 +198,7 @@
 
         <global-macro name="${vm:sa-type-params}" value="#if($fi.isPK()),
 primary_key=True#end#if($fi.isAI()),
-auto_increment=True#end#if($fi.getFK()),
+autoincrement=True#end#if($fi.getFK()),
 ForeignKey('$fi.getFK()')#end#if($fi.isIndexed()),
 index=True#end#if($fi.isUnique()),
 unique=True#end#if($fi.isNullable()),

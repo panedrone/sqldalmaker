@@ -1,3 +1,9 @@
+2022-04-29
+
+    VM templates for global macros
+
+
+
 2022-04-25
 
     Rework to allow using "<query-dto-list..." and "<query-dto..." with empty "ref":
