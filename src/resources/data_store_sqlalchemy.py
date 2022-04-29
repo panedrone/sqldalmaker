@@ -1,63 +1,101 @@
-#########################################
-# code below is for SQLAlchemy without flask
-#
-# import sqlalchemy
-#
-# import sqlalchemy.ext.declarative
-# from sqlalchemy.orm import declarative_base, sessionmaker
-
-# Base = declarative_base()
-#
-# Column = sqlalchemy.Column
-#
-# ForeignKey = sqlalchemy.ForeignKey
-#
-# SmallInteger = sqlalchemy.SmallInteger
-# Integer = sqlalchemy.Integer
-# BigInteger = sqlalchemy.BigInteger
-#
-# Float = sqlalchemy.Float
-#
-# DateTime = sqlalchemy.DateTime
-# String = sqlalchemy.String
-# Boolean = sqlalchemy.Boolean
-# LargeBinary = sqlalchemy.LargeBinary
-
-
-# add "Flask-SQLAlchemy" to requirements.txt. "SQLAlchemy" must be added too
-
+# add "Flask-SQLAlchemy" to requirements.txt.
+# "SQLAlchemy" must be added too
+import flask_sqlalchemy
 from flask_sqlalchemy import SQLAlchemy
+
+import cx_Oracle
 
 from app import app
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///todo-list.sqlite'
-# FSADeprecationWarning: SQLALCHEMY_TRACK_MODIFICATIONS adds
-# significant overhead and will be disabled by default in the future.
-# Set it to True or False to suppress this warning.
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+if flask_sqlalchemy:
+    # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///todolist.sqlite'
 
-db = SQLAlchemy(app)
+    # add mysql-connector-python to requirements.txt
+    # app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:sa@localhost/todolist'
 
-# import psycopg2
+    # add psycopg2 to requirements.txt
+    # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:sa@localhost/my-tests'
 
-# import cx_Oracle
+    # add cx_oracle to requirements.txt
+    if cx_Oracle:
+        user = 'MY_TESTS'
+        pwd = 'sa'
+        dsn = cx_Oracle.makedsn(
+            'localhost', 1521,
+            service_name="orcl"
+            # service_name='your_service_name_if_any'
+        )
+        app.config['SQLALCHEMY_DATABASE_URI'] = f'oracle+cx_oracle://{user}:{pwd}@{dsn}'
 
-Base = db.Model
+    # FSADeprecationWarning: SQLALCHEMY_TRACK_MODIFICATIONS adds
+    # significant overhead and will be disabled by default in the future.
+    # Set it to True or False to suppress this warning.
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-Column = db.Column
+    db = SQLAlchemy(app)
 
-ForeignKey = db.ForeignKey
+    Base = db.Model
 
-SmallInteger = db.SmallInteger
-Integer = db.Integer
-BigInteger = db.BigInteger
+    Column = db.Column
+    ForeignKey = db.ForeignKey
 
-Float = db.Float
+    if not cx_Oracle:
+        SmallInteger = db.SmallInteger
+        Integer = db.Integer
+        BigInteger = db.BigInteger
 
-DateTime = db.DateTime
-String = db.String
-Boolean = db.Boolean
-LargeBinary = db.LargeBinary
+        Float = db.Float
+
+        DateTime = db.DateTime
+
+    String = db.String
+    Boolean = db.Boolean
+    LargeBinary = db.LargeBinary
+
+else:
+    # code below is for SQLAlchemy without flask
+
+    import sqlalchemy.ext.declarative
+    from sqlalchemy.orm import declarative_base, sessionmaker
+
+    Base = declarative_base()
+
+    Column = sqlalchemy.Column
+    ForeignKey = sqlalchemy.ForeignKey
+
+    SmallInteger = sqlalchemy.SmallInteger
+    Integer = sqlalchemy.Integer
+    BigInteger = sqlalchemy.BigInteger
+
+    Float = sqlalchemy.Float
+
+    DateTime = sqlalchemy.DateTime
+
+    String = sqlalchemy.String
+    Boolean = sqlalchemy.Boolean
+    LargeBinary = sqlalchemy.LargeBinary
+
+if cx_Oracle:
+    from sqlalchemy.dialects import oracle
+
+    SmallInteger = oracle.NUMBER
+    Integer = oracle.NUMBER
+    BigInteger = oracle.NUMBER
+
+    Numeric = oracle.NUMBER
+    Float = oracle.NUMBER
+
+    # unlike default "Float", INSERT works correctly win Identity columns like
+    # g_id = Column('G_ID', NUMBER, primary_key=True)
+    NUMBER = oracle.NUMBER
+
+    # https://stackoverflow.com/questions/64903159/convert-oracle-datatypes-to-sqlalchemy-types
+    # https://docs.sqlalchemy.org/en/14/dialects/oracle.html
+    # Provide the oracle DATE type.
+    #     This type has no special Python behavior, except that it subclasses
+    #     :class:`_types.DateTime`; this is to suit the fact that the Oracle
+    #     ``DATE`` type supports a time value.
+    DateTime = oracle.DATE  # (timezone=False)
 
 
 class OutParam:
@@ -94,12 +132,12 @@ class DataStore:
     def __init__(self):
         self.conn = None
         self.transaction = None
-
-        self.engine_type = self.EngineType.sqlite3
+        self.engine = None
         #########################################
         # code below is for SQLAlchemy without flask
         #
-        # self.engine = sqlalchemy.create_engine('sqlite:///todo-list.sqlite')
+        # self.engine = sqlalchemy.create_engine('sqlite:///todolist.sqlite')
+        # self.engine_type = self.EngineType.sqlite3
 
         # self.engine = sqlalchemy.create_engine('postgresql://postgres:sa@localhost/my-tests')
         # self.engine_type = self.EngineType.postgresql
@@ -116,13 +154,12 @@ class DataStore:
         #     # service_name='your_service_name_if_any'
         # )
         # self.engine = sqlalchemy.create_engine(f'oracle+cx_oracle://{user}:{pwd}@{dsn}', echo=False)
-        # self.engine_type = self.EngineType.oracle
+        self.engine_type = self.EngineType.oracle
 
-        self.session = db.session
-        #########################################
-        # code below is for sqlalchemy without flask
-        #
-        # self.session = sessionmaker(bind=self.engine)()
+        if db:
+            self.session = db.session
+        else:
+            self.session = sessionmaker(bind=self.engine)()
 
     # code below is for SQLAlchemy without flask
     #
@@ -314,7 +351,7 @@ class DataStore:
         Raises:
             Exception: if amount of rows != 1.
         """
-        rows = self.query_all_scalars(sql, params)
+        rows = self.query_scalar_array(sql, params)
         if len(rows) == 0:
             raise Exception('No rows')
         if len(rows) > 1:
@@ -324,7 +361,7 @@ class DataStore:
         else:
             return rows[0]  # 'select get_test_rating(?)' returns just scalar value, not array of arrays
 
-    def query_all_scalars(self, sql, params):
+    def query_scalar_array(self, sql, params):
         """
         Returns:
             array of scalar values
@@ -353,7 +390,7 @@ class DataStore:
         self._query_sp_mysql(sp, on_result, params)
         return res
 
-    def query_row(self, sql, params):
+    def query_single_row(self, sql, params):
         """
         Returns:
             Single row

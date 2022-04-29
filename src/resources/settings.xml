@@ -124,15 +124,23 @@
 
     <type-map default="">
 
-        <!-- ***** sqlalchemy (sa) ****************** -->
+        <!-- ***** sqlalchemy (sa) ************************************ -->
 
-        <type detected="sa-java.lang.Short" target="${type}|0:SmallInteger"/>
-        <type detected="sa-java.lang.Integer" target="${type}|0:Integer"/>
-        <type detected="sa-java.lang.Long" target="${type}|0:BigInteger"/>
+        <!-- https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store_sqlalchemy.py-->
 
-        <type detected="sa-java.lang.Float" target="${type}|0:Float"/>
-        <type detected="sa-java.lang.Double" target="${type}|0:Float"/>
-        <type detected="sa-java.math.BigDecimal" target="${type}|0:Float"/>
+        <!-- all numerics for oracle_cx -->
+
+        <type detected="sa-java.math.BigDecimal" target="${type}|0:NUMBER"/>
+
+        <!-- numerics for others -->
+
+        <!--        <type detected="sa-java.lang.Short" target="${type}|0:SmallInteger"/>-->
+        <!--        <type detected="sa-java.lang.Integer" target="${type}|0:Integer"/>-->
+        <!--        <type detected="sa-java.lang.Long" target="${type}|0:BigInteger"/>-->
+
+        <!--        <type detected="sa-java.lang.Float" target="${type}|0:Float"/>-->
+        <!--        <type detected="sa-java.lang.Double" target="${type}|0:Float"/>-->
+        <!--        <type detected="sa-java.math.BigDecimal" target="${type}|0:Float"/>-->
 
         <type detected="sa-java.util.Date" target="${type}|0:DateTime"/>
         <type detected="sa-java.lang.String" target="${type}|0:String"/>
@@ -141,7 +149,7 @@
 
         <type detected="sa-java.lang.Object" target="${type-unknown}"/>
 
-        <!-- ****** raw SQL ************************ -->
+        <!-- ****** raw SQL (without sqlalchemy) ********************** -->
 
         <type detected="java.lang.Short" target="int"/>
         <type detected="java.lang.Integer" target="int"/>
@@ -180,9 +188,9 @@
 
         <!-- sqlalchemy Column: -->
 
-        <global-macro name="${type}" value="= Column('${column}', ${0}${sqlalchemy-params}${1})${2}"/>
+        <global-macro name="${type}" value="= Column('${column}', ${0}${sqlalchemy-params}${1})${comment}"/>
 
-        <global-macro name="${type-unknown}" value="= Column('${column}'${sqlalchemy-params}${1})${2}"/>
+        <global-macro name="${type-unknown}" value="= Column('${column}'${sqlalchemy-params}${1})${comment}"/>
 
         <!-- TODO: for macros like "${vm:...}", the values are rendered by Apache Velocity -->
 
