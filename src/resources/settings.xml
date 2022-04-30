@@ -134,6 +134,8 @@
 
         <!-- numerics for others -->
 
+        <!-- detected -->
+
         <type detected="sa-java.lang.Short" target="${sa-type}|0:SmallInteger"/>
         <type detected="sa-java.lang.Integer" target="${sa-type}|0:Integer"/>
         <type detected="sa-java.lang.Long" target="${sa-type}|0:BigInteger"/>
@@ -151,6 +153,8 @@
 
         <!-- ***** django (dj) ****************** -->
 
+        <!-- detected -->
+
         <type detected="dj-java.lang.Short" target="${dj-type}|0:IntegerField"/>
         <type detected="dj-java.lang.Integer" target="${dj-type}|0:IntegerField"/>
         <type detected="dj-java.lang.Long" target="${dj-type}|0:BigIntegerField"/>
@@ -166,6 +170,8 @@
 
         <type detected="dj-java.lang.Object" target="${dj-type}|0:CharField"/>
 
+        <!-- specified in <field type... -->
+
         <type detected="dj-int" target="${dj-type}|0:IntegerField"/>
         <type detected="dj-long" target="${dj-type}|0:BigIntegerField"/>
 
@@ -174,7 +180,6 @@
         <type detected="dj-date" target="${dj-type}|0:DateTimeField"/>
         <type detected="dj-str" target="${dj-type}|0:CharField"/>
         <type detected="dj-bool" target="${dj-type}|0:BooleanField"/>
-        <!--        <type detected="dj-byte[]" target="${dj-type}|0:BinaryField"/> -->
 
         <type detected="dj-object" target="${dj-type}|0:CharField"/>
 
@@ -237,7 +242,7 @@ nullable=True#end"/>
 
         <global-macro name="${vm:dj-type}" value="#if($fi.isAI())AutoField#else${0}#end(db_column='$fi.getColumnName()'#if($fi.isPK()),
 primary_key=True#end#if($fi.isIndexed()),
-index=True#end#if($fi.isUnique()),
+db_index=True#end#if($fi.isUnique()),
 unique=True#end#if($fi.isNullable()),
 blank=True, null=True#end${1})"/>
 

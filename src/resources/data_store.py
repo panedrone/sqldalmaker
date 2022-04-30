@@ -4,15 +4,27 @@
 # import psycopg2
 # import mysql.connector
 
-# uncomment the imports below to use with django.db:
+# uncomment the code below to use with django.db:
 
 import os
 import django.db
+from django.apps import AppConfig
 from django.db import transaction
 
+
+class MyDjangoAppConfig(AppConfig):
+    # default_auto_field = 'django.db.models.BigAutoField'
+    default_auto_field = 'django.db.models.AutoField'
+    name = 'dal'  # python package containing generated django models
+
+
+# there should be "settings.py" in the project root
+# Google --> django settings.py location
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'settings')
 
-django.setup()  # AppRegistryNotReady("Apps aren't loaded yet.")
+# django.setup() should be called before importing/using generated django models -->
+# AppRegistryNotReady("Apps aren't loaded yet.")
+django.setup()
 
 
 class OutParam:
@@ -23,7 +35,7 @@ class OutParam:
 class DataStore:
     """
         SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
-        This is an example of how to implement DataStore in Python + django.db -->
+        This is an example of how to implement DataStore in Python + sqlite3/psycopg2/mysql/django.db -->
         Executing custom SQL directly https://docs.djangoproject.com/en/3.2/topics/db/sql/
         Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store.py
         Copy-paste this code to your project and change it for your needs.
@@ -84,10 +96,13 @@ class DataStore:
     def get_all(cls, params=None) -> []:
         if not params:
             params = ()
-        return cls.objects.raw(cls.SQL, params)
+        raw_query_set = cls.objects.raw(cls.SQL, params)
+        res = [r for r in raw_query_set]
+        return res
 
-    def get_one(self, cls, params=None):
-        rows = self.get_all(cls, params)
+    @staticmethod
+    def get_one(cls, params=None):
+        rows = DataStore.get_all(cls, params)
         if len(rows) == 0:
             raise Exception('No rows')
         if len(rows) > 1:
