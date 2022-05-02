@@ -133,10 +133,14 @@ class InfoDbTable {
                 if (!fi.isAI()) {
                     // IS_AUTOINCREMENT may work incorrectly (sqlite-jdbc-3.19.3.jar).
                     // So, use it only if AI was not set by SQL colums metadata
-                    Object ai = columns_rs.getObject("IS_AUTOINCREMENT");
-                    if ("yes".equals(ai) || "YES".equals(ai)) {
+                    Object is_ai = columns_rs.getObject("IS_AUTOINCREMENT");
+                    if ("yes".equals(is_ai) || "YES".equals(is_ai)) {
                         fi.setAI(true);
                     }
+                }
+                Object is_gk = columns_rs.getObject("IS_GENERATEDCOLUMN"); // NO for oracle Indentity
+                if ("yes".equals(is_gk) || "YES".equals(is_gk)) {
+                    fi.setGenerated(true);
                 }
                 int nullable = columns_rs.getInt("NULLABLE");
                 if (nullable == DatabaseMetaData.columnNullable) {

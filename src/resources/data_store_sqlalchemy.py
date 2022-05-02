@@ -1,6 +1,4 @@
-# add "Flask-SQLAlchemy" to requirements.txt.
-# "SQLAlchemy" must be added too
-import flask_sqlalchemy
+import flask_sqlalchemy  # add "Flask-SQLAlchemy" and "SQLAlchemy" to requirements.txt.
 from flask_sqlalchemy import SQLAlchemy
 
 import cx_Oracle
@@ -39,6 +37,8 @@ if flask_sqlalchemy:
     Column = db.Column
     ForeignKey = db.ForeignKey
 
+    Identity = db.Identity
+
     if not cx_Oracle:
         SmallInteger = db.SmallInteger
         Integer = db.Integer
@@ -63,6 +63,8 @@ else:
     Column = sqlalchemy.Column
     ForeignKey = sqlalchemy.ForeignKey
 
+    Identity = sqlalchemy.Identity
+
     SmallInteger = sqlalchemy.SmallInteger
     Integer = sqlalchemy.Integer
     BigInteger = sqlalchemy.BigInteger
@@ -74,6 +76,32 @@ else:
     String = sqlalchemy.String
     Boolean = sqlalchemy.Boolean
     LargeBinary = sqlalchemy.LargeBinary
+
+# sqlalchemy\dialects\oracle\base.py
+#
+# Starting from version 12 Oracle can make use of identity columns using
+# the :class:`_sql.Identity` to specify the autoincrementing behavior::
+#
+#    t = Table('mytable', metadata,
+#        Column('id', Integer, Identity(start=3), primary_key=True),
+#        Column(...), ...
+#    )
+#
+# ------------------------------
+# If you plan using db.create_all(), declare this:
+#
+# <dto-class name="sa-Group" ref="GROUPS">
+#     <field column="G_ID" type="|0:NUMBER, Identity(start=3)"/>
+# </dto-class>
+#
+# But if you work with existing tables, the values of inserted identities ar OK even with such defaults:
+#
+# <dto-class name="sa-Group" ref="GROUPS"/>
+#
+# if flask_sqlalchemy:
+#     Identity = db.Identity
+# else:
+#     Identity = sqlalchemy.Identity
 
 if cx_Oracle:
     from sqlalchemy.dialects import oracle

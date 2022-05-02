@@ -19,6 +19,8 @@ public class FieldInfo {
 
     private boolean is_auto_increment = false;
     private boolean is_pk = false;
+    private boolean is_generated = false;
+
     private boolean is_nullable = false;
 
     private String foreign_key = null;
@@ -95,6 +97,14 @@ public class FieldInfo {
 
     public void setAI(boolean isAutoIncrement) {
         this.is_auto_increment = isAutoIncrement;
+    }
+
+    public boolean isGenerated() {
+        return this.is_generated;
+    }
+
+    public void setGenerated(boolean is_generated) {
+        this.is_generated = is_generated;
     }
 
     public String getFK() {

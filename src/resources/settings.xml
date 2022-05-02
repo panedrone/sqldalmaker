@@ -130,19 +130,17 @@
 
         <!-- all numerics for oracle_cx -->
 
-        <!--        <type detected="sa-java.math.BigDecimal" target="${sa-type}|0:NUMBER"/>-->
+        <type detected="sa-java.math.BigDecimal" target="${sa-type}|0:NUMBER"/>
 
         <!-- numerics for others -->
 
-        <!-- detected -->
+        <!--        <type detected="sa-java.lang.Short" target="${sa-type}|0:SmallInteger"/>-->
+        <!--        <type detected="sa-java.lang.Integer" target="${sa-type}|0:Integer"/>-->
+        <!--        <type detected="sa-java.lang.Long" target="${sa-type}|0:BigInteger"/>-->
 
-        <type detected="sa-java.lang.Short" target="${sa-type}|0:SmallInteger"/>
-        <type detected="sa-java.lang.Integer" target="${sa-type}|0:Integer"/>
-        <type detected="sa-java.lang.Long" target="${sa-type}|0:BigInteger"/>
-
-        <type detected="sa-java.lang.Float" target="${sa-type}|0:Float"/>
-        <type detected="sa-java.lang.Double" target="${sa-type}|0:Float"/>
-        <type detected="sa-java.math.BigDecimal" target="${sa-type}|0:Float"/>
+        <!--        <type detected="sa-java.lang.Float" target="${sa-type}|0:Float"/>-->
+        <!--        <type detected="sa-java.lang.Double" target="${sa-type}|0:Float"/>-->
+        <!--        <type detected="sa-java.math.BigDecimal" target="${sa-type}|0:Float"/>-->
 
         <type detected="sa-java.util.Date" target="${sa-type}|0:DateTime"/>
         <type detected="sa-java.lang.String" target="${sa-type}|0:String"/>
@@ -152,8 +150,6 @@
         <type detected="sa-java.lang.Object" target="${sa-type-unknown}"/>
 
         <!-- ***** django (dj) ****************** -->
-
-        <!-- detected -->
 
         <type detected="dj-java.lang.Short" target="${dj-type}|0:IntegerField"/>
         <type detected="dj-java.lang.Integer" target="${dj-type}|0:IntegerField"/>
@@ -170,8 +166,6 @@
 
         <type detected="dj-java.lang.Object" target="${dj-type}|0:CharField"/>
 
-        <!-- specified in <field type... -->
-
         <type detected="dj-int" target="${dj-type}|0:IntegerField"/>
         <type detected="dj-long" target="${dj-type}|0:BigIntegerField"/>
 
@@ -180,6 +174,7 @@
         <type detected="dj-date" target="${dj-type}|0:DateTimeField"/>
         <type detected="dj-str" target="${dj-type}|0:CharField"/>
         <type detected="dj-bool" target="${dj-type}|0:BooleanField"/>
+        <!--        <type detected="dj-byte[]" target="${dj-type}|0:BinaryField"/> -->
 
         <type detected="dj-object" target="${dj-type}|0:CharField"/>
 
@@ -233,17 +228,17 @@
         <global-macro name="${vm:sa-type-params}" value="#if($fi.isPK()),
 primary_key=True#end#if($fi.isAI()),
 autoincrement=True#end#if($fi.getFK()),
-ForeignKey('$fi.getFK()')#end#if($fi.isIndexed()),
+ForeignKey('$fi.getFK()')#end#if(!$fi.isPK())#if($fi.isIndexed()),
 index=True#end#if($fi.isUnique()),
-unique=True#end#if($fi.isNullable()),
+unique=True#end#end#if($fi.isNullable()),
 nullable=True#end"/>
 
         <global-macro name="${dj-type}" value="= models.${vm:dj-type}${comment}"/>
 
         <global-macro name="${vm:dj-type}" value="#if($fi.isAI())AutoField#else${0}#end(db_column='$fi.getColumnName()'#if($fi.isPK()),
-primary_key=True#end#if($fi.isIndexed()),
+primary_key=True#else#if($fi.isIndexed()),
 db_index=True#end#if($fi.isUnique()),
-unique=True#end#if($fi.isNullable()),
+unique=True#end#end#if($fi.isNullable()),
 blank=True, null=True#end${1})"/>
 
         <!-- $fi in this ^^ example is a predefined parameter of class FieldInfo:
