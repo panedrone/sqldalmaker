@@ -24,8 +24,8 @@ import javax.xml.bind.annotation.XmlType;
  * &amp;lt;complexType&amp;gt;
  *   &amp;lt;complexContent&amp;gt;
  *     &amp;lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&amp;gt;
- *       &amp;lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}string" /&amp;gt;
- *       &amp;lt;attribute name="value" use="required" type="{http://www.w3.org/2001/XMLSchema}string" /&amp;gt;
+ *       &amp;lt;attribute ref="{}var use="required""/&amp;gt;
+ *       &amp;lt;attribute ref="{}value use="required""/&amp;gt;
  *     &amp;lt;/restriction&amp;gt;
  *   &amp;lt;/complexContent&amp;gt;
  * &amp;lt;/complexType&amp;gt;
@@ -35,36 +35,36 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "")
-@XmlRootElement(name = "global-macro")
-public class GlobalMacro {
+@XmlRootElement(name = "set")
+public class Set {
 
-    @XmlAttribute(name = "name", required = true)
-    protected String name;
+    @XmlAttribute(name = "var", required = true)
+    protected String var;
     @XmlAttribute(name = "value", required = true)
     protected String value;
 
     /**
-     * Gets the value of the name property.
+     * Gets the value of the var property.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getName() {
-        return name;
+    public String getVar() {
+        return var;
     }
 
     /**
-     * Sets the value of the name property.
+     * Sets the value of the var property.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setName(String value) {
-        this.name = value;
+    public void setVar(String value) {
+        this.var = value;
     }
 
     /**

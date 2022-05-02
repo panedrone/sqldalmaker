@@ -138,10 +138,11 @@ class InfoDbTable {
                         fi.setAI(true);
                     }
                 }
-                Object is_gk = columns_rs.getObject("IS_GENERATEDCOLUMN"); // NO for oracle Indentity
-                if ("yes".equals(is_gk) || "YES".equals(is_gk)) {
-                    fi.setGenerated(true);
-                }
+                // Exception: Invalid column Info
+//                Object is_gk = columns_rs.getObject("IS_GENERATEDCOLUMN"); // NO for oracle Indentity
+//                if ("yes".equals(is_gk) || "YES".equals(is_gk)) {
+//                    fi.setGenerated(true);
+//                }
                 int nullable = columns_rs.getInt("NULLABLE");
                 if (nullable == DatabaseMetaData.columnNullable) {
                     // http://www.java2s.com/Code/Java/Database-SQL-JDBC/IsColumnNullable.htm

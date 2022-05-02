@@ -1,3 +1,7 @@
+2022-05-02
+
+    + XML wrapper for VM templates
+
 2022-04-30
 
     + django.db models

@@ -11,6 +11,7 @@ package com.sqldalmaker.jaxb.settings;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
@@ -24,8 +25,11 @@ import javax.xml.bind.annotation.XmlType;
  * &amp;lt;complexType&amp;gt;
  *   &amp;lt;complexContent&amp;gt;
  *     &amp;lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&amp;gt;
- *       &amp;lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}string" /&amp;gt;
- *       &amp;lt;attribute name="value" use="required" type="{http://www.w3.org/2001/XMLSchema}string" /&amp;gt;
+ *       &amp;lt;choice&amp;gt;
+ *         &amp;lt;element name="vm" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&amp;gt;
+ *         &amp;lt;element ref="{}vm-xml" minOccurs="0"/&amp;gt;
+ *       &amp;lt;/choice&amp;gt;
+ *       &amp;lt;attribute ref="{}name use="required""/&amp;gt;
  *     &amp;lt;/restriction&amp;gt;
  *   &amp;lt;/complexContent&amp;gt;
  * &amp;lt;/complexType&amp;gt;
@@ -34,14 +38,66 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "")
-@XmlRootElement(name = "global-macro")
-public class GlobalMacro {
+@XmlType(name = "", propOrder = {
+    "vm",
+    "vmXml"
+})
+@XmlRootElement(name = "sdm-script")
+public class SdmScript {
 
+    protected String vm;
+    @XmlElement(name = "vm-xml")
+    protected VmXml vmXml;
     @XmlAttribute(name = "name", required = true)
     protected String name;
-    @XmlAttribute(name = "value", required = true)
-    protected String value;
+
+    /**
+     * Gets the value of the vm property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getVm() {
+        return vm;
+    }
+
+    /**
+     * Sets the value of the vm property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setVm(String value) {
+        this.vm = value;
+    }
+
+    /**
+     * Gets the value of the vmXml property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link VmXml }
+     *     
+     */
+    public VmXml getVmXml() {
+        return vmXml;
+    }
+
+    /**
+     * Sets the value of the vmXml property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link VmXml }
+     *     
+     */
+    public void setVmXml(VmXml value) {
+        this.vmXml = value;
+    }
 
     /**
      * Gets the value of the name property.
@@ -65,30 +121,6 @@ public class GlobalMacro {
      */
     public void setName(String value) {
         this.name = value;
-    }
-
-    /**
-     * Gets the value of the value property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getValue() {
-        return value;
-    }
-
-    /**
-     * Sets the value of the value property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setValue(String value) {
-        this.value = value;
     }
 
 }

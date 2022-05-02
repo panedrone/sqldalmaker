@@ -7,6 +7,7 @@ package com.sqldalmaker.cg;
 
 import com.sqldalmaker.jaxb.dto.DtoClass;
 import com.sqldalmaker.jaxb.dto.DtoClasses;
+import com.sqldalmaker.jaxb.settings.SdmScripts;
 import com.sqldalmaker.jaxb.settings.Settings;
 
 import java.sql.*;
@@ -24,6 +25,8 @@ public class JdbcUtils {
     private final JaxbUtils.JaxbMacros global_markers;
     private final JaxbUtils.JaxbTypeMap type_map;
 
+    private final SdmScripts sdm_scripts;
+
     public JdbcUtils(Connection conn,
                      FieldNamesMode field_names_mode,
                      FieldNamesMode method_params_names_mode,
@@ -35,6 +38,7 @@ public class JdbcUtils {
 
         this.global_markers = new JaxbUtils.JaxbMacros(jaxb_settings.getGlobalMacros());
         this.type_map = new JaxbUtils.JaxbTypeMap(jaxb_settings.getTypeMap());
+        sdm_scripts = jaxb_settings.getSdmScripts();
     }
 
     public FieldNamesMode get_dto_field_names_mode() {
@@ -317,10 +321,10 @@ public class JdbcUtils {
                                                      List<FieldInfo> _dto_fields) throws Exception {
 
         try {
-            InfoDtoClass info = new InfoDtoClass(conn, type_map, global_markers, dto_field_names_mode);
+            InfoDtoClass info = new InfoDtoClass(conn, type_map, global_markers, sdm_scripts, dto_field_names_mode);
             return info.get_dto_field_info(jaxb_dto_class, sql_root_abs_path, _dto_fields);
         } catch (Exception e) {
-            throw new Exception(String.format("<dto-class name=\"%s\"... error: %s", jaxb_dto_class.getName(), e.getMessage()));
+            throw new Exception(String.format("<dto-class name=\"%s\"... %s", jaxb_dto_class.getName(), e));
         }
     }
 

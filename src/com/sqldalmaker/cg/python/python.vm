@@ -65,6 +65,7 @@ class $class_name(models.Model):
 #if($tablename)
 
     class Meta:
+        managed = False
         db_table = '$tablename'
 #else
 
