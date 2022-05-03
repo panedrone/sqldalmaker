@@ -7,9 +7,11 @@
 # uncomment the code below to use with django.db:
 
 import os
+
 import django.db
 from django.apps import AppConfig
 from django.db import transaction
+from django.db.backends.base.base import BaseDatabaseWrapper
 
 
 class MyDjangoAppConfig(AppConfig):
@@ -58,18 +60,19 @@ class DataStore:
     def __init__(self):
         self.conn = None
         self.engine_type = self.EngineType.sqlite3
+        self.open()
 
     def open(self):
         # uncomment to use without django.db:
 
         # self.conn = sqlite3.connect('./task-tracker.sqlite')
-        # self.engine = self.Engine.sqlite3
+        # self.engine_type = self.EngineType.sqlite3
 
         # self.conn = mysql.connector.Connect(user='root', password='root', host='127.0.0.1', database='sakila')
-        # self.engine = self.Engine.mysql
+        # self.engine_type = self.EngineType.mysql
 
         # self.conn = psycopg2.connect(host="localhost", database="my-tests", user="postgres", password="sa")
-        # self.engine = self.Engine.postgresql
+        # self.engine_type = self.EngineType.postgresql
 
         # print(self.conn.autocommit)
 
@@ -151,11 +154,12 @@ class DataStore:
         Raises:
             Exception: if no rows inserted.
         """
-        with self.conn.cursor() as cursor:
-            sql = _format_sql(sql)
-            if len(ai_values) > 0:
-                if self.engine_type == self.EngineType.postgresql:
-                    sql += ' RETURNING ' + ai_values[0][0]
+        sql = self._format_sql(sql)
+        if len(ai_values) > 0:
+            if self.engine_type == self.EngineType.postgresql:
+                sql += ' RETURNING ' + ai_values[0][0]
+
+        def do_insert(cursor):
             cursor.execute(sql, params)
             if len(ai_values) > 0:
                 if self.engine_type == self.EngineType.postgresql:
@@ -164,6 +168,8 @@ class DataStore:
                     ai_values[0][1] = cursor.lastrowid
             if cursor.rowcount == 0:
                 raise Exception('No rows inserted')
+
+        self._exec(do_insert)
 
     @staticmethod
     def _exec_proc_pg(cursor, sql, params):
@@ -183,9 +189,8 @@ class DataStore:
                 out_params[i].value = value
                 i += 1
 
-    @staticmethod
-    def _exec_proc_mysql(cursor, sp, params):
-        call_params = _get_call_params(params)
+    def _exec_proc_mysql(self, cursor, sp, params):
+        call_params = self._get_call_params(params)
         # result_args: https://pynative.com/python-mysql-execute-stored-procedure/
         result_args = cursor.callproc(sp, call_params)
         for p in params:
@@ -193,19 +198,18 @@ class DataStore:
                 i = 0
                 for result in cursor.stored_results():
                     callback = p[i]
-                    _fetch_all(result, callback)
+                    self._fetch_all(result, callback)
                     i += 1
                 break
-        _assign_out_params(params, result_args)
+        self._assign_out_params(params, result_args)
 
-    @staticmethod
-    def _query_proc_mysql(cursor, sp, on_result, params):
-        call_params = _get_call_params(params)
+    def _query_proc_mysql(self, cursor, sp, on_result, params):
+        call_params = self._get_call_params(params)
         # result_args: https://pynative.com/python-mysql-execute-stored-procedure/
         result_args = cursor.callproc(sp, call_params)
         for result in cursor.stored_results():
             on_result(result)
-        _assign_out_params(params, result_args)
+        self._assign_out_params(params, result_args)
 
     def exec_dml(self, sql, params):
         """
@@ -215,9 +219,10 @@ class DataStore:
         Returns:
             Number of updated rows.
         """
-        sql = _format_sql(sql)
-        sp = _get_sp_name(sql)
-        with self.conn.cursor() as cursor:
+        sql = self._format_sql(sql)
+        sp = self._get_sp_name(sql)
+
+        def do_exec(cursor):
             if sp is None:
                 cursor.execute(sql, params)
                 return cursor.rowcount
@@ -228,6 +233,8 @@ class DataStore:
             else:
                 raise Exception('Not supported for this engine')
             return 0
+
+        self._exec(do_exec)
 
     def query_scalar(self, sql, params):
         """
@@ -257,11 +264,11 @@ class DataStore:
             sql (string): SQL statement.
             params (array, optional): Values of SQL parameters if needed.
         """
-        sql = _format_sql(sql)
+        sql = self._format_sql(sql)
         res = []
-        sp = _get_sp_name(sql)
-        # https://docs.djangoproject.com/en/3.2/topics/db/sql/
-        with self.conn.cursor() as cursor:
+        sp = self._get_sp_name(sql)
+
+        def fetch_all(cursor):
             if sp is None:
                 cursor.execute(sql, params)
                 for row in cursor:
@@ -275,7 +282,9 @@ class DataStore:
                     res.append(row_values[0])
 
             self._query_proc_mysql(cursor, sp, on_result, params)
-            return res
+
+        self._exec(fetch_all)
+        return res
 
     def query_row(self, sql, params):
         """
@@ -304,9 +313,10 @@ class DataStore:
             params (array, optional): Values of SQL parameters if needed.
             callback
         """
-        sql = _format_sql(sql)
-        sp = _get_sp_name(sql)
-        with self.conn.cursor() as cursor:
+        sql = self._format_sql(sql)
+        sp = self._get_sp_name(sql)
+
+        def fetch_all(cursor):
             if sp is None:
                 cursor.execute(sql, params)
                 columns = [col[0] for col in cursor.description]
@@ -317,60 +327,76 @@ class DataStore:
                 return
             if self.engine_type != self.EngineType.mysql:
                 raise Exception('Not supported for this engine')
-            self._query_proc_mysql(cursor, sp, lambda result: _fetch_all(result, callback), params)
+            self._query_proc_mysql(cursor, sp, lambda result: self._fetch_all(result, callback), params)
 
+        self._exec(fetch_all)
 
-def _fetch_all(result, callback):
-    # https://stackoverflow.com/questions/34030020/mysql-python-connector-get-columns-names-from-select-statement-in-stored-procedu
-    # https://kadler.github.io/2018/01/08/fetching-python-database-cursors-by-column-name.html#
-    for row_values in result:
-        row = {}
-        i = 0
-        for d in result.description:
-            col_name = d[0]
-            value = row_values[i]
-            row[col_name] = value
-            i = i + 1
-        callback(row)
+    def _exec(self, func: callable):
+        if isinstance(self.conn, BaseDatabaseWrapper):
+            # https://stackoverflow.com/questions/8402898/how-can-i-access-the-low-level-psycopg2-connection-in-django
+            with django.db.connection.cursor() as cursor:
+                func(cursor)
+            return
+        # with self.conn.cursor() as cursor:  # sqlite3 error without django
+        cursor = self.conn.cursor()
+        try:
+            func(cursor)
+        finally:
+            cursor.close()
 
+    def _format_sql(self, sql):
+        if isinstance(self.conn, BaseDatabaseWrapper):
+            return sql.replace("?", "%s")
+        return sql
 
-def _format_sql(sql):
-    return sql.replace("?", "%s")
+    @staticmethod
+    def _fetch_all(result, callback):
+        # https://stackoverflow.com/questions/34030020/mysql-python-connector-get-columns-names-from-select-statement-in-stored-procedu
+        # https://kadler.github.io/2018/01/08/fetching-python-database-cursors-by-column-name.html#
+        for row_values in result:
+            row = {}
+            i = 0
+            for d in result.description:
+                col_name = d[0]
+                value = row_values[i]
+                row[col_name] = value
+                i = i + 1
+            callback(row)
 
+    @staticmethod
+    def _get_sp_name(sql):
+        parts = sql.split()
+        if len(parts) >= 2 and parts[0].strip().lower() == "call":
+            name = parts[1]
+            end = name.find("(")
+            if end == -1:
+                return name
+            else:
+                return name[0:end]
+        return None
 
-def _get_sp_name(sql):
-    parts = sql.split()
-    if len(parts) >= 2 and parts[0].strip().lower() == "call":
-        name = parts[1]
-        end = name.find("(")
-        if end == -1:
-            return name
-        else:
-            return name[0:end]
-    return None
+    @staticmethod
+    def _get_call_params(params):
+        """
+        COMMENT FROM SOURCES OF MySQL Connector => cursor.py:
 
+        For OUT and INOUT parameters the user should provide the
+        type of the parameter as well. The argument should be a
+        tuple with first item as the value of the parameter to pass
+        and second argument the type of the argument.
+        """
+        call_params = []
+        for p in params:
+            if isinstance(p, OutParam):
+                call_params.append(p.value)
+            elif isinstance(p, list) and callable(p[0]):
+                pass  # MySQL SP returning result-sets
+            else:
+                call_params.append(p)
+        return call_params
 
-def _get_call_params(params):
-    """
-    COMMENT FROM SOURCES OF MySQL Connector => cursor.py:
-
-    For OUT and INOUT parameters the user should provide the
-    type of the parameter as well. The argument should be a
-    tuple with first item as the value of the parameter to pass
-    and second argument the type of the argument.
-    """
-    call_params = []
-    for p in params:
-        if isinstance(p, OutParam):
-            call_params.append(p.value)
-        elif isinstance(p, list) and callable(p[0]):
-            pass  # MySQL SP returning result-sets
-        else:
-            call_params.append(p)
-    return call_params
-
-
-def _assign_out_params(params, result_args):
-    for i in range(len(params)):
-        if isinstance(params[i], OutParam):
-            params[i].value = result_args[i]
+    @staticmethod
+    def _assign_out_params(params, result_args):
+        for i in range(len(params)):
+            if isinstance(params[i], OutParam):
+                params[i].value = result_args[i]
