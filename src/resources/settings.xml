@@ -252,8 +252,7 @@
 
         <sdm-script name="sa-column-vm">
             <vm>
-                <![CDATA[
-#if($fi.getFK()), ForeignKey('$fi.getFK()')#end
+                <![CDATA[#if($fi.getFK()), ForeignKey('$fi.getFK()')#end
 #if($fi.isPK()), primary_key=True#end
 #if($fi.isAI()), autoincrement=True#end
 #if(!$fi.isPK())
@@ -266,8 +265,7 @@
 
         <sdm-script name="dj-field-vm">
             <vm>
-                <![CDATA[
-#if($fi.isAI())AutoField#else${0}#end(db_column='$fi.getColumnName()'#if($fi.isPK())
+                <![CDATA[#if($fi.isAI())AutoField#else${0}#end(db_column='$fi.getColumnName()'#if($fi.isPK())
 , primary_key=True#else
 #if($fi.isIndexed())
 , db_index=True#end
