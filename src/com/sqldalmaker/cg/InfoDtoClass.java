@@ -211,7 +211,7 @@ class InfoDtoClass {
         for (String m_name : macros.get_custom_vm_names()) {
             if (target_type_name.contains(m_name)) { // single replacement in one pass
                 String vm_template = macros.get_custom_vm(m_name);
-                if (vm_template.startsWith("ref:")) {
+                if (vm_template.startsWith("ref:") || vm_template.startsWith("sdm:")) {
                     String target_vm_template = null;
                     if (sdm_scripts != null) {
                         int pos = vm_template.indexOf(':');

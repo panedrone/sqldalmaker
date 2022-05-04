@@ -207,9 +207,6 @@
         <global-macro name="${TitleCase(column)}" value="=built-in="/>
         <global-macro name="${kebab-case(column)}" value="=built-in="/>
 
-        <!-- deprecated, don't use -->
-        <!--        <global-macro name="${sqlalchemy-params}" value="=built-in="/>-->
-
         <!-- go json tags: -->
 
         <global-macro name="${col}" value="${lower_snake_case(column)}"/>
@@ -218,15 +215,15 @@
 
         <!-- sqlalchemy Column: -->
 
-        <!-- deprecated, don't use -->
-        <!--        <global-macro name="${type}" value="= Column('${column}', ${0}${sqlalchemy-params}${1})${comment}"/>-->
+        <global-macro name="${sa-type-unknown}" value="${sa-type-base}|type:"/>
+        <global-macro name="${sa-type}" value="${sa-type-base}|type:, ${0}"/>
+        <global-macro name="${sa-type-base}" value="= Column('${column}'${type}${vm:sa-type-params})${comment}"/>
+        <global-macro name="${vm:sa-type-params}" value="sdm:sa-column-vm"/>
 
-        <global-macro name="${sa-type-unknown}" value="= Column('${column}'${vm:sa-type-params})${comment}"/>
-        <global-macro name="${sa-type}" value="= Column('${column}', ${0}${vm:sa-type-params})${comment}"/>
-        <global-macro name="${vm:sa-type-params}" value="ref:sa-column-vm"/>
+        <!-- djando field: -->
 
         <global-macro name="${dj-type}" value="= models.${vm:dj-type}${comment}"/>
-        <global-macro name="${vm:dj-type}" value="ref:dj-field-vm"/>
+        <global-macro name="${vm:dj-type}" value="sdm:dj-field-vm"/>
 
     </global-macros>
 
@@ -252,7 +249,8 @@
 
         <sdm-script name="sa-column-vm">
             <vm>
-                <![CDATA[#if($fi.getFK()), ForeignKey('$fi.getFK()')#end
+                <![CDATA[
+#if($fi.FK), ForeignKey('$fi.FK')#end
 #if($fi.isPK()), primary_key=True#end
 #if($fi.isAI()), autoincrement=True#end
 #if(!$fi.isPK())
@@ -265,7 +263,8 @@
 
         <sdm-script name="dj-field-vm">
             <vm>
-                <![CDATA[#if($fi.isAI())AutoField#else${0}#end(db_column='$fi.getColumnName()'#if($fi.isPK())
+                <![CDATA[
+#if($fi.isAI())AutoField#else${0}#end(db_column='$fi.getColumnName()'#if($fi.isPK())
 , primary_key=True#else
 #if($fi.isIndexed())
 , db_index=True#end
