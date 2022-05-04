@@ -253,10 +253,7 @@
 #if($fi.FK), ForeignKey('$fi.FK')#end
 #if($fi.isPK()), primary_key=True#end
 #if($fi.isAI()), autoincrement=True#end
-#if(!$fi.isPK())
-#if($fi.isIndexed()), index=True#end
-#if($fi.isUnique()), unique=True#end
-#end
+#if(!$fi.isPK())#if($fi.isIndexed()), index=True#end#if($fi.isUnique()), unique=True#end#end
 #if($fi.isNullable()), nullable=True#end]]>
             </vm>
         </sdm-script>
