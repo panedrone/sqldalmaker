@@ -264,15 +264,11 @@
         <sdm-script name="dj-field-vm">
             <vm>
                 <![CDATA[
-#if($fi.isAI())AutoField#else${0}#end(db_column='$fi.getColumnName()'#if($fi.isPK())
-, primary_key=True#else
-#if($fi.isIndexed())
-, db_index=True#end
-#if($fi.isUnique())
-, unique=True#end
-#end
-#if($fi.isNullable())
-, blank=True, null=True#end${1})]]>
+#if($fi.isAI())AutoField#else${0}#end(db_column='$fi.getColumnName()'#if($fi.isPK()), primary_key=True#else
+#if($fi.isIndexed()), db_index=True#end
+#if($fi.isUnique()), unique=True#end
+#if($fi.isNullable()), blank=True, null=True#end
+#end${1})]]>
             </vm>
         </sdm-script>
 

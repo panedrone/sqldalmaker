@@ -1,4 +1,4 @@
-SQL DAL Maker is a generator of DTO and DAO classes to access relational databases.
+SQL DAL Maker is a generator of DTO, Model, and DAO/raw-SQL classes to access relational databases.
 
 Target programming languages: PHP, Java, C++, Python, Ruby, and Go.
 
