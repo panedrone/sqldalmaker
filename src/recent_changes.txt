@@ -1,6 +1,6 @@
 2022-05-03
 
-    XML wrapper for VM templates (updete XSD files and see Reference "settings.xml")
+    + XML wrappers for VM templates (updete XSD files and see the reference "settings.xml")
 
 2022-04-30
 

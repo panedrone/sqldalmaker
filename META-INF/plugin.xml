@@ -20,9 +20,7 @@ Target programming languages: PHP, Java, C++, Python, Ruby, and Go. To generate 
 <ul>
 <li>+ XML wrappers for VM templates (updete XSD files and see the reference "settings.xml")</li>
 <li>+ django.db models</li>
-<li>VM templates for global macros</li>
-<li>"query-dto-list..." and "query-dto..." with empty "ref" to use "ref" from DTO</li>
-<li>+ (Flask-)SQLAlchemy "ForeignKey", "index", "unique"</li>
+<li>+ VM templates for global macros</li>
 <li>+ Flask-SQLAlchemy</li>
 </ul>]]></change-notes>
 
