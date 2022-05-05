@@ -213,7 +213,7 @@ class InfoDtoClass {
             } else if (vm_macro.getVmXml() != null) {
                 vm_template = Xml2Vm.parse(vm_macro.getVmXml());
             } else {
-                throw new Exception("Not found  " + m_name);
+                throw new Exception("Expected <vm> or <vm-xml> in " + m_name);
             }
             TemplateEngine te = new TemplateEngine(vm_template, m_name);
             Map<String, Object> values = new HashMap<String, Object>();

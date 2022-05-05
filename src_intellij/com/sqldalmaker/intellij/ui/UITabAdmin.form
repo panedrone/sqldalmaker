@@ -61,7 +61,6 @@
                       <component id="6d08f" class="javax.swing.JTextField" binding="vTextField" default-binding="true">
                         <constraints/>
                         <properties>
-                          <background color="-855310"/>
                           <editable value="false"/>
                           <horizontalAlignment value="4"/>
                           <text value="v. ?"/>
@@ -374,7 +373,6 @@
                       <component id="c733b" class="javax.swing.JTextPane" binding="text1">
                         <constraints border-constraint="Center"/>
                         <properties>
-                          <background color="-1"/>
                           <editable value="false"/>
                           <margin top="0" left="15" bottom="15" right="15"/>
                           <text value=""/>

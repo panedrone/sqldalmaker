@@ -12,6 +12,7 @@ import com.sqldalmaker.common.Const;
 import com.sqldalmaker.jaxb.settings.Settings;
 
 import javax.swing.*;
+import javax.swing.border.TitledBorder;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.plaf.FontUIResource;
@@ -502,7 +503,6 @@ public class UITabAdmin {
         recentChangesButton.setText("News");
         panel3.add(recentChangesButton);
         vTextField = new JTextField();
-        vTextField.setBackground(new Color(-855310));
         vTextField.setEditable(false);
         vTextField.setHorizontalAlignment(4);
         vTextField.setText("v. ?");
@@ -704,7 +704,6 @@ public class UITabAdmin {
         gbc.insets = new Insets(8, 8, 0, 8);
         panel2.add(panel10, gbc);
         text1 = new JTextPane();
-        text1.setBackground(new Color(-1));
         text1.setEditable(false);
         text1.setMargin(new Insets(0, 15, 15, 15));
         text1.setText("");

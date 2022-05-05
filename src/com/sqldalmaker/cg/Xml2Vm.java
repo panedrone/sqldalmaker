@@ -1,3 +1,8 @@
+/*
+    Copyright 2011-2022 sqldalmaker@gmail.com
+    SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
+    Read LICENSE.txt in the root of this project/archive for details.
+ */
 package com.sqldalmaker.cg;
 
 import com.sqldalmaker.jaxb.settings.*;
