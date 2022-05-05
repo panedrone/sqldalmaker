@@ -15,13 +15,15 @@
         2) target class: public class Word implements com.google.gwt.user.client.rpc.IsSerializable... -->
     <!-- field-names-mode (Java, PHP, Go): 0 - TitleCase, 1 - camelCase; 2 - snake_case; -->
     <!-- single-file: for future use. -->
-
-    <dto scope="com.mycom.myproject.dto" inheritance="" field-names-mode="1" single-file=""/>
+	<!-- macro: for future use. -->
+	
+    <dto scope="com.mycom.myproject.dto" inheritance="" field-names-mode="1" single-file="" macro=""/>
 
     <!-- scope (only Java, Go, PHP): the name of package (Java, Go) or name-space
         (PHP) for DAO; -->
+	<!-- macro: for future use. -->
 
-    <dao scope="com.mycom.myproject.dao"/>
+    <dao scope="com.mycom.myproject.dao" macro=""/>
 
     <!-- location of external VM file (relative to the project root): -->
 
@@ -197,37 +199,33 @@
 
     </type-map>
 
-    <global-macros>
+    <macros>
 
         <!-- =built-in= is a key-word -->
 
-        <global-macro name="${column}" value="=built-in="/>
-        <global-macro name="${lower_snake_case(column)}" value="=built-in="/>
-        <global-macro name="${camelCase(column)}" value="=built-in="/>
-        <global-macro name="${TitleCase(column)}" value="=built-in="/>
-        <global-macro name="${kebab-case(column)}" value="=built-in="/>
+        <macro name="${column}" value="=built-in="/>
+        <macro name="${lower_snake_case(column)}" value="=built-in="/>
+        <macro name="${camelCase(column)}" value="=built-in="/>
+        <macro name="${TitleCase(column)}" value="=built-in="/>
+        <macro name="${kebab-case(column)}" value="=built-in="/>
 
         <!-- go json tags: -->
 
-        <global-macro name="${col}" value="${lower_snake_case(column)}"/>
+        <macro name="${col}" value="${lower_snake_case(column)}"/>
 
-        <global-macro name="${json}" value=" `json:&quot;${col}${0}&quot;`"/>
+        <macro name="${json}" value=" `json:&quot;${col}${0}&quot;`"/>
 
         <!-- sqlalchemy Column: -->
 
-        <global-macro name="${sa-type-unknown}" value="${sa-type-base}|type:"/>
-        <global-macro name="${sa-type}" value="${sa-type-base}|type:, ${0}"/>
-        <global-macro name="${sa-type-base}" value="= Column('${column}'${type}${vm:sa-type-params})${comment}"/>
-        <global-macro name="${vm:sa-type-params}" value="sdm:sa-column-vm"/>
+        <macro name="${sa-type-unknown}" value="${sa-type-base}|type:"/>
+        <macro name="${sa-type}" value="${sa-type-base}|type:, ${0}"/>
+        <macro name="${sa-type-base}" value="= Column('${column}'${type}${vm:sa-type-params})${comment}"/>
+        <macro name="${vm:sa-type-params}" value="sdm:sa-column-vm"/>
 
         <!-- djando field: -->
 
-        <global-macro name="${dj-type}" value="= models.${vm:dj-type}${comment}"/>
-        <global-macro name="${vm:dj-type}" value="sdm:dj-field-vm"/>
-
-    </global-macros>
-
-    <sdm-scripts>
+        <macro name="${dj-type}" value="= models.${vm:dj-type}${comment}"/>
+        <macro name="${vm:dj-type}" value="sdm:dj-field-vm"/>
 
         <!-- In sdm-scripts dedicated to render fields/columns,
              "$fi" is a predefined variable of class FieldInfo:
@@ -247,7 +245,7 @@
                     String setterMethod()
                         -->
 
-        <sdm-script name="sa-column-vm">
+        <macro name="sa-column-vm">
             <vm>
                 <![CDATA[#if($fi.FK), ForeignKey('$fi.FK')#end
 #if($fi.isPK()), primary_key=True#end
@@ -257,19 +255,20 @@
 #if($fi.isNullable()), nullable=True#end
 #end]]>
             </vm>
-        </sdm-script>
+        </macro>
 
-        <sdm-script name="dj-field-vm">
+        <macro name="dj-field-vm">
             <vm>
-                <![CDATA[#if($fi.isAI())AutoField#else${0}#end(db_column='$fi.getColumnName()'#if($fi.isPK()), primary_key=True#else
+                <![CDATA[
+#if($fi.isAI())AutoField#else${0}#end(db_column='$fi.getColumnName()'#if($fi.isPK()), primary_key=True#else
 #if($fi.isIndexed()), db_index=True#end
 #if($fi.isUnique()), unique=True#end
 #if($fi.isNullable()), blank=True, null=True#end
 #end${1})]]>
             </vm>
-        </sdm-script>
+        </macro>
 
-        <sdm-script name="sa-column">
+        <macro name="sa-column">
             <vm-xml>
                 <if var="$fi.getFK()">
                     <print var=", ForeignKey('$fi.getFK()')"/>
@@ -292,9 +291,9 @@
                     </if>
                 </if>
             </vm-xml>
-        </sdm-script>
+        </macro>
 
-        <sdm-script name="dj-field">
+        <macro name="dj-field">
             <vm-xml>
                 <if var="$fi.isAI()">
                     <print var="AutoField"/>
@@ -319,8 +318,8 @@
                 </if>
                 <print var="${1})"/>
             </vm-xml>
-        </sdm-script>
+        </macro>
 
-    </sdm-scripts>
+    </macros>
 
 </settings>

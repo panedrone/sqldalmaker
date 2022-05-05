@@ -6,8 +6,7 @@
 package com.sqldalmaker.cg;
 
 import com.sqldalmaker.jaxb.dto.DtoClass;
-import com.sqldalmaker.jaxb.settings.SdmScript;
-import com.sqldalmaker.jaxb.settings.SdmScripts;
+import com.sqldalmaker.jaxb.settings.Macros;
 
 import java.io.StringWriter;
 import java.sql.Connection;
@@ -23,20 +22,17 @@ class InfoDtoClass {
     private final JaxbUtils.JaxbTypeMap type_map;
     private final JaxbUtils.JaxbMacros macros;
 
-    private final SdmScripts sdm_scripts;
-
     private final FieldNamesMode dto_field_names_mode;
 
     public InfoDtoClass(Connection conn,
                         JaxbUtils.JaxbTypeMap type_map,
                         JaxbUtils.JaxbMacros macros,
-                        SdmScripts sdm_scripts,
                         FieldNamesMode dto_field_names_mode) {
 
         this.conn = conn;
         this.type_map = type_map;
         this.macros = macros;
-        this.sdm_scripts = sdm_scripts;
+
         this.dto_field_names_mode = dto_field_names_mode;
     }
 
@@ -168,29 +164,28 @@ class InfoDtoClass {
     }
 
     private String _parse_target_type(FieldInfo fi,
-                                             String target) throws Exception {
+                                      String target) throws Exception {
 
-        return _parse_target_type_recursive(0, fi, target, macros, sdm_scripts);
+        return _parse_target_type_recursive(0, fi, target, macros);
     }
 
     private static String _parse_target_type_recursive(int depth,
                                                        FieldInfo fi, // fi in here is used for vm templates
                                                        String target_type_name,
-                                                       JaxbUtils.JaxbMacros jaxb_markers,
-                                                       SdmScripts sdm_scripts) throws Exception {
+                                                       JaxbUtils.JaxbMacros macros) throws Exception {
         if (depth > 10) {
             throw new Exception("Depth > 10: " + target_type_name);
         }
         String res = target_type_name;
         boolean found = false;
-        for (String m_name : jaxb_markers.get_custom_names()) {
+        for (String m_name : macros.get_custom_names()) {
             if (res.contains(m_name)) { // single replacement in one pass
-                res = res.replace(m_name, jaxb_markers.get_custom(m_name));
+                res = res.replace(m_name, macros.get_custom(m_name));
                 found = true;
             }
         }
         if (!found) {
-            String tmp = _substitute_vm_macros(fi, res, jaxb_markers, sdm_scripts);
+            String tmp = _substitute_vm_macros(fi, res, macros);
             if (tmp != null) {
                 res = tmp; // single replacement in one pass
                 found = true;
@@ -199,49 +194,35 @@ class InfoDtoClass {
         if (!found) {
             return res;
         }
-        res = _parse_target_type_recursive(depth + 1, fi, res, jaxb_markers, sdm_scripts);
+        res = _parse_target_type_recursive(depth + 1, fi, res, macros);
         return res;
     }
 
     private static String _substitute_vm_macros(FieldInfo fi, // fi in here is used for vm templates
                                                 String target_type_name,
-                                                JaxbUtils.JaxbMacros macros,
-                                                SdmScripts sdm_scripts) throws Exception {
+                                                JaxbUtils.JaxbMacros macros) throws Exception {
 
-        for (String m_name : macros.get_custom_vm_names()) {
-            if (target_type_name.contains(m_name)) { // single replacement in one pass
-                String vm_template = macros.get_custom_vm(m_name);
-                if (vm_template.startsWith("ref:") || vm_template.startsWith("sdm:")) {
-                    String target_vm_template = null;
-                    if (sdm_scripts != null) {
-                        int pos = vm_template.indexOf(':');
-                        String sdm_scripts_name = vm_template.substring(pos + 1);
-                        for (SdmScript s : sdm_scripts.getSdmScript()) {
-                            if (sdm_scripts_name.equals(s.getName())) {
-                                if (s.getVm() != null) {
-                                    target_vm_template = s.getVm().trim();
-                                    break;
-                                } else if (s.getVmXml() != null) {
-                                    target_vm_template = Xml2Vm.parse(s.getVmXml());
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                    if (target_vm_template == null) {
-                        throw new Exception("Not found --> " + vm_template);
-                    }
-                    vm_template = target_vm_template;
-                }
-                TemplateEngine te = new TemplateEngine(vm_template, m_name);
-                Map<String, Object> values = new HashMap<String, Object>();
-                values.put("fi", fi);
-                StringWriter sw = new StringWriter();
-                te.merge(values, sw);
-                String value = sw.toString();
-                target_type_name = target_type_name.replace(m_name, value);
-                return target_type_name;
+        for (String m_name : macros.get_vm_macro_names()) {
+            if (!target_type_name.contains(m_name)) {
+                continue;
             }
+            String vm_template;
+            Macros.Macro vm_macro = macros.get_vm_macro(m_name);
+            if (vm_macro.getVm() != null) {
+                vm_template = vm_macro.getVm().trim();
+            } else if (vm_macro.getVmXml() != null) {
+                vm_template = Xml2Vm.parse(vm_macro.getVmXml());
+            } else {
+                throw new Exception("Not found  " + m_name);
+            }
+            TemplateEngine te = new TemplateEngine(vm_template, m_name);
+            Map<String, Object> values = new HashMap<String, Object>();
+            values.put("fi", fi);
+            StringWriter sw = new StringWriter();
+            te.merge(values, sw);
+            String value = sw.toString();
+            target_type_name = target_type_name.replace(m_name, value);
+            return target_type_name; // single replacement in one pass
         }
         return null;
     }
@@ -255,6 +236,7 @@ class InfoDtoClass {
 
     private interface IMacro {
         String exec(FieldInfo fi);
+
     }
 
     private static Map<String, IMacro> _get_built_in_macros() {

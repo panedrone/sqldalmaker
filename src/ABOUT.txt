@@ -4,6 +4,12 @@ Target programming languages: PHP, Java, C++, Python, Ruby, and Go.
 
 To generate the class, you declare it in XML meta-program.
 
+*******************
+Implementation for Models is in pogress. After updating the plugin,
+validate/update XSD files and do the fixes in "settings.xml".
+Use "Reference settings.xml" as example.</b></p>
+*******************
+
 SQL DAL Maker for Eclipse: http://marketplace.eclipse.org/content/sql-dal-maker
 SQL DAL Maker for IntelliJ-Platform: https://plugins.jetbrains.com/plugin/7092
 SQL DAL Maker for NetBeans: https://sourceforge.net/projects/sqldalmaker/files/NetBeans

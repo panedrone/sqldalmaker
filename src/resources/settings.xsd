@@ -1,21 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema attributeFormDefault="unqualified"
-           elementFormDefault="qualified"
+<xs:schema elementFormDefault="qualified"
            xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
     <xs:element name="settings">
         <xs:complexType>
             <xs:sequence>
-                <xs:element ref="folders" minOccurs="1" maxOccurs="1"/>
-                <xs:element ref="dto" minOccurs="1" maxOccurs="1"/>
-                <xs:element ref="dao" minOccurs="1" maxOccurs="1"/>
-                <xs:element ref="external-vm-file" minOccurs="1" maxOccurs="1"/>
-                <xs:element ref="ide" minOccurs="1" maxOccurs="1"/>
-                <xs:element ref="cpp" minOccurs="1" maxOccurs="1"/>
-                <xs:element ref="jdbc" minOccurs="1" maxOccurs="1"/>
-                <xs:element ref="type-map" minOccurs="1" maxOccurs="1"/>
-                <xs:element ref="global-macros" minOccurs="0" maxOccurs="1"/>
-                <xs:element ref="sdm-scripts" minOccurs="0" maxOccurs="1"/>
+                <xs:element ref="folders"/>
+                <xs:element ref="dto"/>
+                <xs:element ref="dao"/>
+                <xs:element ref="external-vm-file"/>
+                <xs:element ref="ide"/>
+                <xs:element ref="cpp"/>
+                <xs:element ref="jdbc"/>
+                <xs:element ref="type-map"/>
+                <xs:element ref="macros"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -31,11 +29,13 @@
             <xs:attribute name="inheritance" use="required" type="xs:string"/>
             <xs:attribute name="field-names-mode" use="required" type="xs:int"/>
             <xs:attribute name="single-file" use="required" type="xs:string"/>
+            <xs:attribute name="macro" use="required" type="xs:string"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="dao">
         <xs:complexType>
             <xs:attribute name="scope" use="required" type="xs:string"/>
+            <xs:attribute name="macro" use="required" type="xs:string"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="external-vm-file">
@@ -83,24 +83,27 @@
             <xs:attribute name="target" use="required" type="xs:string"/>
         </xs:complexType>
     </xs:element>
-    <xs:element name="global-macros">
+    <xs:element name="macros">
         <xs:complexType>
             <xs:sequence>
                 <xs:choice minOccurs="0" maxOccurs="unbounded">
-                    <xs:element ref="global-macro"/>
+                    <xs:element name="macro">
+                        <xs:complexType>
+                            <xs:choice minOccurs="0">
+                                <xs:element name="vm" type="xs:string" minOccurs="0"/>
+                                <xs:element ref="vm-xml" minOccurs="0"/>
+                            </xs:choice>
+                            <xs:attribute ref="name" use="required"/>
+                            <xs:attribute ref="value" use="optional"/>
+                        </xs:complexType>
+                    </xs:element>
                 </xs:choice>
             </xs:sequence>
         </xs:complexType>
-        <xs:unique name="global-macro-id">
+        <xs:unique name="macro-name">
             <xs:selector xpath="./*"/>
             <xs:field xpath="@name"/>
         </xs:unique>
-    </xs:element>
-    <xs:element name="global-macro">
-        <xs:complexType>
-            <xs:attribute name="name" use="required" type="xs:string"/>
-            <xs:attribute name="value" use="required" type="xs:string"/>
-        </xs:complexType>
     </xs:element>
 
     <xs:attribute name="var" type="xs:string"/>
@@ -109,26 +112,18 @@
     <xs:attribute name="params" type="xs:string"/>
     <xs:attribute name="value" type="xs:string"/>
 
-    <xs:element name="sdm-scripts">
-        <xs:complexType>
-            <xs:choice minOccurs="0" maxOccurs="unbounded">
-                <xs:element ref="sdm-script"/>
+    <xs:complexType name="root-statements">
+        <xs:sequence minOccurs="0" maxOccurs="unbounded">
+            <xs:choice>
+                <xs:element ref="if"/>
+                <xs:element ref="set"/>
+                <xs:element ref="foreach"/>
+                <xs:element ref="macro"/>
+                <xs:element ref="print"/>
+                <xs:element ref="br"/>
             </xs:choice>
-        </xs:complexType>
-        <xs:unique name="sdm-script-name">
-            <xs:selector xpath="./*"/>
-            <xs:field xpath="@name"/>
-        </xs:unique>
-    </xs:element>
-    <xs:element name="sdm-script">
-        <xs:complexType>
-            <xs:choice minOccurs="1">
-                <xs:element name="vm" type="xs:string" minOccurs="0" maxOccurs="1"/>
-                <xs:element ref="vm-xml" minOccurs="0" maxOccurs="1"/>
-            </xs:choice>
-            <xs:attribute ref="name" use="required"/>
-        </xs:complexType>
-    </xs:element>
+        </xs:sequence>
+    </xs:complexType>
     <xs:element name="vm-xml">
         <xs:complexType>
             <xs:complexContent>
@@ -201,17 +196,5 @@
             <xs:attribute name="br" default="" use="optional"/>
         </xs:complexType>
     </xs:element>
-    <xs:complexType name="root-statements">
-        <xs:sequence minOccurs="0" maxOccurs="unbounded">
-            <xs:choice>
-                <xs:element ref="if"/>
-                <xs:element ref="set"/>
-                <xs:element ref="foreach"/>
-                <xs:element ref="macro"/>
-                <xs:element ref="print"/>
-                <xs:element ref="br"/>
-            </xs:choice>
-        </xs:sequence>
-    </xs:complexType>
 
 </xs:schema>

@@ -8,8 +8,7 @@ package com.sqldalmaker.cg;
 import com.sqldalmaker.jaxb.dao.*;
 import com.sqldalmaker.jaxb.dto.DtoClass;
 import com.sqldalmaker.jaxb.dto.DtoClasses;
-import com.sqldalmaker.jaxb.settings.GlobalMacro;
-import com.sqldalmaker.jaxb.settings.GlobalMacros;
+import com.sqldalmaker.jaxb.settings.Macros;
 import com.sqldalmaker.jaxb.settings.Type;
 import com.sqldalmaker.jaxb.settings.TypeMap;
 
@@ -25,21 +24,25 @@ public class JaxbUtils {
 
         private final Map<String, String> built_in = new HashMap<String, String>();
         private final Map<String, String> custom = new HashMap<String, String>();
-        private final Map<String, String> custom_vm = new HashMap<String, String>();
+        private final Map<String, Macros.Macro> custom_vm = new HashMap<String, Macros.Macro>();
 
-        public JaxbMacros(GlobalMacros jaxb_global_makros) {
-            if (jaxb_global_makros == null) {
+        public JaxbMacros(Macros jaxb_makros) {
+            if (jaxb_makros == null) {
                 return;
             }
-            for (GlobalMacro m : jaxb_global_makros.getGlobalMacro()) {
+            for (Macros.Macro m : jaxb_makros.getMacro()) {
                 String name = m.getName();
                 String value = m.getValue();
-                if (value.equals("=built-in=")) {
-                    built_in.put(name, value);
-                } else if (name.startsWith("${vm:") && name.endsWith("}")) {
-                    custom_vm.put(name, value);
+                if (value == null) { // it is optional
+                    if (m.getVm() != null || m.getVmXml() != null) {
+                        custom_vm.put(name, m);
+                    }
                 } else {
-                    custom.put(name, value);
+                    if (value.equals("=built-in=")) {
+                        built_in.put(name, value);
+                    } else {
+                        custom.put(name, value);
+                    }
                 }
             }
         }
@@ -52,7 +55,7 @@ public class JaxbUtils {
             return custom.keySet();
         }
 
-        public Set<String> get_custom_vm_names() {
+        public Set<String> get_vm_macro_names() {
             return custom_vm.keySet();
         }
 
@@ -60,7 +63,7 @@ public class JaxbUtils {
             return custom.get(name);
         }
 
-        public String get_custom_vm(String name) {
+        public Macros.Macro get_vm_macro(String name) {
             return custom_vm.get(name);
         }
 

@@ -2,7 +2,7 @@
     <id>dal-mpe</id>
     <name>SQL DAL Maker</name>
     <category>Database</category>
-    <version>1.233.2205</version>
+    <version>1.234.2205</version>
     <vendor email="sqldalmaker@gmail.com"/>
     <idea-version since-build="181.5684.4"/>
 
@@ -17,7 +17,13 @@ Target programming languages: PHP, Java, C++, Python, Ruby, and Go. To generate 
 
     <change-notes>
         <![CDATA[
+<p>
+Implementation for Models is in pogress. After updating the plugin,
+validate/update XSD files and do the fixes in "settings.xml".
+Use "Reference settings.xml" as example.
+</p>
 <ul>
+<li>changes in settings.xsd: “global-macros” and “sdm-scripts” are merged to “macros”</li>
 <li>+ XML wrappers for VM templates (updete XSD files and see the reference "settings.xml")</li>
 <li>+ django.db models</li>
 <li>+ VM templates for global macros</li>
