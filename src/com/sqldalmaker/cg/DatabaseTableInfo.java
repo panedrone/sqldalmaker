@@ -13,7 +13,7 @@ import java.util.*;
 /**
  * @author sqldalmaker@gmail.com
  */
-class InfoDbTable {
+class DatabaseTableInfo {
 
     public final List<FieldInfo> fields_all = new ArrayList<FieldInfo>();
     public final List<FieldInfo> fields_not_pk = new ArrayList<FieldInfo>();
@@ -27,12 +27,12 @@ class InfoDbTable {
     private final String model;
     private final String table_name;
 
-    public InfoDbTable(String model,
-                       Connection conn,
-                       JaxbUtils.JaxbTypeMap type_map,
-                       FieldNamesMode dto_field_names_mode,
-                       String table_name,
-                       String explicit_pk) throws Exception {
+    public DatabaseTableInfo(String model,
+                             Connection conn,
+                             JaxbUtils.JaxbTypeMap type_map,
+                             FieldNamesMode dto_field_names_mode,
+                             String table_name,
+                             String explicit_pk) throws Exception {
 
         this.conn = conn;
         this.type_map = type_map;
@@ -46,7 +46,7 @@ class InfoDbTable {
         validate_table_name(conn, table_name); // Oracle PK are not detected with lower case table name
 
         String jdbc_sql = _jdbc_sql_by_table_name(table_name);
-        InfoCustomSql.get_field_info_by_jdbc_sql(model, conn, dto_field_names_mode, jdbc_sql, fields_map, fields_all);
+        CustomSqlUtils.get_field_info_by_jdbc_sql(model, conn, dto_field_names_mode, jdbc_sql, fields_map, fields_all);
         Set<String> lower_case_pk_col_names = _get_lower_case_pk_col_names(table_name, explicit_pk);
         for (FieldInfo fi : fields_all) {
             String col_name = fi.getColumnName();

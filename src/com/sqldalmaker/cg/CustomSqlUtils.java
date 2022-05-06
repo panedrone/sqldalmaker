@@ -6,13 +6,15 @@
 package com.sqldalmaker.cg;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
  * @author sqldalmaker@gmail.com
  */
-class InfoCustomSql {
+class CustomSqlUtils {
 
     public static void get_field_info_by_jdbc_sql(String model,
                                                   Connection conn,
@@ -127,7 +129,7 @@ class InfoCustomSql {
         Helpers.check_duplicates(method_param_descriptors);
         PreparedStatement ps = _prepare_jdbc_sql(conn, dao_jdbc_sql);
         try {
-            InfoCustomSql.get_params_info(ps, type_map, param_names_mode, method_param_descriptors, params);
+            CustomSqlUtils.get_params_info(ps, type_map, param_names_mode, method_param_descriptors, params);
         } finally {
             ps.close();
         }
@@ -245,5 +247,44 @@ class InfoCustomSql {
         }
         param_type_name = type_map.get_target_type_name(param_type_name);
         return new FieldInfo(param_names_mode, param_type_name, param_name, "parameter");
+    }
+
+    public static void get_shortcut_info(JaxbUtils.JaxbTypeMap type_map,
+                                         FieldNamesMode param_names_mode,
+                                         String[] method_param_descriptors,
+                                         List<FieldInfo> fields_all,
+                                         String[] filter_col_names,
+                                         List<FieldInfo> _params) throws Exception {
+
+        Map<String, FieldInfo> all_col_names_map = new HashMap<String, FieldInfo>();
+        for (FieldInfo fi : fields_all) {
+            String cn = fi.getColumnName();
+            all_col_names_map.put(cn, fi);
+        }
+        List<FieldInfo> fields_filter = new ArrayList<FieldInfo>();
+        for (String fcn : filter_col_names) {
+            if (!all_col_names_map.containsKey(fcn))
+                throw new Exception("Invalid SQL-shortcut. Table column '" + fcn + "' not found. Ensure upper/lower case.");
+            FieldInfo fi = all_col_names_map.get(fcn);
+            fields_filter.add(fi);
+        }
+        // assign param types from table!! without dto-refinement!!!
+        if (method_param_descriptors.length != fields_filter.size()) {
+            throw new Exception("Invalid SQL-shortcut. Methof parameters declared: " + method_param_descriptors.length
+                    + ". SQL parameters expected: " + fields_filter.size());
+        }
+        for (int i = 0; i < method_param_descriptors.length; i++) {
+            String param_descriptor = method_param_descriptors[i];
+            FieldInfo fi = fields_filter.get(i);
+            String curr_type = fi.getType();
+            String default_param_type_name = get_target_type_by_type_map(type_map, curr_type);
+            FieldInfo pi = CustomSqlUtils.create_param_info(type_map, param_names_mode, param_descriptor, default_param_type_name);
+            _params.add(pi);
+        }
+    }
+
+    private static String get_target_type_by_type_map(JaxbUtils.JaxbTypeMap type_map, String detected) {
+        String target_type_name = type_map.get_target_type_name(detected);
+        return target_type_name;
     }
 }

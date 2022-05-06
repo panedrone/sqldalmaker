@@ -15,7 +15,7 @@ import java.util.*;
 /**
  * @author sqldalmaker@gmail.com
  */
-class InfoDtoClass {
+class DtoClassInfo {
 
     private final Connection conn;
 
@@ -24,7 +24,7 @@ class InfoDtoClass {
 
     private final FieldNamesMode dto_field_names_mode;
 
-    public InfoDtoClass(Connection conn,
+    public DtoClassInfo(Connection conn,
                         JaxbUtils.JaxbTypeMap type_map,
                         JaxbUtils.JaxbMacros macros,
                         FieldNamesMode dto_field_names_mode) {
@@ -70,7 +70,7 @@ class InfoDtoClass {
         if (!SqlUtils.is_empty_ref(jaxb_dto_class_ref)) {
             String jdbc_sql = SqlUtils.jdbc_sql_by_dto_class_ref(jaxb_dto_class_ref, sql_root_abs_path);
             // get fields from sql first to omit invisible/db-specific fields
-            InfoCustomSql.get_field_info_by_jdbc_sql(model, conn, dto_field_names_mode, jdbc_sql, fields_map, _dto_fields);
+            CustomSqlUtils.get_field_info_by_jdbc_sql(model, conn, dto_field_names_mode, jdbc_sql, fields_map, _dto_fields);
             if (SqlUtils.is_table_ref(jaxb_dto_class_ref)) {
                 String table_name = jaxb_dto_class_ref;
                 _fill_by_table(model, table_name, _dto_fields, fields_map);
@@ -126,7 +126,7 @@ class InfoDtoClass {
                                 Map<String, FieldInfo> fields_map) throws Exception {
 
         String explicit_pk = "*";
-        InfoDbTable info = new InfoDbTable(model, conn, type_map, dto_field_names_mode, table_name, explicit_pk);
+        DatabaseTableInfo info = new DatabaseTableInfo(model, conn, type_map, dto_field_names_mode, table_name, explicit_pk);
         _dto_fields.clear();
         _dto_fields.addAll(info.fields_all);
         fields_map.clear();
