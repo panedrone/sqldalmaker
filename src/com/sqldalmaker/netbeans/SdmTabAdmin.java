@@ -195,9 +195,9 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         jScrollPane1.setBorder(null);
 
         jPanel6.setToolTipText(org.openide.util.NbBundle.getMessage(SdmTabAdmin.class, "SdmTabAdmin.toolTipText")); // NOI18N
-        jPanel6.setMinimumSize(new java.awt.Dimension(710, 436));
+        jPanel6.setMinimumSize(new java.awt.Dimension(710, 560));
         jPanel6.setName(""); // NOI18N
-        jPanel6.setPreferredSize(new java.awt.Dimension(710, 436));
+        jPanel6.setPreferredSize(new java.awt.Dimension(710, 560));
         jPanel6.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 jPanel6MouseEntered(evt);
@@ -205,9 +205,9 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         });
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jPanel8.setMinimumSize(new java.awt.Dimension(680, 436));
+        jPanel8.setMinimumSize(new java.awt.Dimension(680, 560));
         jPanel8.setName(""); // NOI18N
-        jPanel8.setPreferredSize(new java.awt.Dimension(680, 436));
+        jPanel8.setPreferredSize(new java.awt.Dimension(680, 560));
         jPanel8.setLayout(new javax.swing.BoxLayout(jPanel8, javax.swing.BoxLayout.Y_AXIS));
 
         jPanel3.setMinimumSize(new java.awt.Dimension(710, 32));
@@ -242,7 +242,6 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         jPanel3.add(jButton6);
 
         jButton13.setText("News");
-        jButton13.setActionCommand("News");
         jButton13.setFocusPainted(false);
         jButton13.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -571,7 +570,6 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         jPanel8.add(jPanel7);
 
         jTextPane1.setEditable(false);
-        jTextPane1.setBackground(new java.awt.Color(255, 255, 255));
         jTextPane1.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
         jTextPane1.setAutoscrolls(false);
         jTextPane1.setMargin(new java.awt.Insets(0, 12, 12, 12));
