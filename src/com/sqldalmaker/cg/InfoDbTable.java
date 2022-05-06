@@ -114,28 +114,52 @@ class InfoDbTable {
             schema_nm = table_name.substring(0, table_name.lastIndexOf('.'));
             table_nm = parts[parts.length - 1];
         }
-        Map<String, String> unique = _index_names_by_lo_case_col_names(conn, schema_nm,table_name, true);
-        Map<String, String> indexed = _index_names_by_lo_case_col_names(conn, schema_nm,table_name, false);
+        Map<String, String> unique = _index_names_by_lo_case_col_names(conn, schema_nm, table_name, true);
+        Map<String, String> indexed = _index_names_by_lo_case_col_names(conn, schema_nm, table_name, false);
         Map<String, String[]> fk = _get_lower_case_FK_col_names(conn, schema_nm, table_name);
         DatabaseMetaData md = conn.getMetaData();
         ResultSet columns_rs = md.getColumns(conn.getCatalog(), schema_nm, table_nm, "%");
         try {
             while (columns_rs.next()) {
-                String db_col_name = columns_rs.getString("COLUMN_NAME");
-                if (!fields_map.containsKey(db_col_name)) {
+                String db_col_name;
+                try {
+                    db_col_name = columns_rs.getString("COLUMN_NAME");
+                    if (!fields_map.containsKey(db_col_name)) {
+                        continue;
+                    }
+                } catch (Exception e) {
+                    System.err.println("COLUMN_NAME: " + e.getMessage());
                     continue;
                 }
-                int type = columns_rs.getInt("DATA_TYPE");
-                String apache_java_type_name = TypesMapping.getJavaBySqlType(type);
                 FieldInfo fi = fields_map.get(db_col_name);
-                fi.refine_rendered_type(_get_type_name(apache_java_type_name));
-                fi.setComment("t");
+                try {
+                    int type = columns_rs.getInt("DATA_TYPE");
+                    String apache_java_type_name = TypesMapping.getJavaBySqlType(type);
+                    fi.refine_rendered_type(_get_type_name(apache_java_type_name));
+                    fi.setComment("t");
+                    if (String.class.getName().equals(apache_java_type_name)) {
+                        try {
+                            int size = columns_rs.getInt("COLUMN_SIZE");
+                            if (size < 2000000000) { // sqlite3
+                                fi.setColumnSize(size);
+                            }
+                        } catch (Exception e) {
+                            System.err.println("COLUMN_SIZE: " + e.getMessage());
+                        }
+                    }
+                } catch (Exception e) {
+                    System.err.println("DATA_TYPE: " + e.getMessage());
+                }
                 if (!fi.isAI()) {
-                    // IS_AUTOINCREMENT may work incorrectly (sqlite-jdbc-3.19.3.jar).
-                    // So, use it only if AI was not set by SQL colums metadata
-                    Object is_ai = columns_rs.getObject("IS_AUTOINCREMENT");
-                    if ("yes".equals(is_ai) || "YES".equals(is_ai)) {
-                        fi.setAI(true);
+                    try {
+                        // IS_AUTOINCREMENT may work incorrectly (sqlite-jdbc-3.19.3.jar).
+                        // So, use it only if AI was not set by SQL colums metadata
+                        Object is_ai = columns_rs.getObject("IS_AUTOINCREMENT");
+                        if ("yes".equals(is_ai) || "YES".equals(is_ai)) {
+                            fi.setAI(true);
+                        }
+                    } catch (Exception e) {
+                        System.err.println("IS_AUTOINCREMENT: " + e.getMessage());
                     }
                 }
                 // Exception: Invalid column Info
@@ -143,12 +167,16 @@ class InfoDbTable {
 //                if ("yes".equals(is_gk) || "YES".equals(is_gk)) {
 //                    fi.setGenerated(true);
 //                }
-                int nullable = columns_rs.getInt("NULLABLE");
-                if (nullable == DatabaseMetaData.columnNullable) {
-                    // http://www.java2s.com/Code/Java/Database-SQL-JDBC/IsColumnNullable.htm
-                    fi.setNullable(true);
-                } else {
-                    fi.setNullable(false);
+                try {
+                    int nullable = columns_rs.getInt("NULLABLE");
+                    if (nullable == DatabaseMetaData.columnNullable) {
+                        // http://www.java2s.com/Code/Java/Database-SQL-JDBC/IsColumnNullable.htm
+                        fi.setNullable(true);
+                    } else {
+                        fi.setNullable(false);
+                    }
+                } catch (Exception e) {
+                    System.err.println("NULLABLE: " + e.getMessage());
                 }
                 String lo_case_col_name = db_col_name.toLowerCase();
                 if (fk.containsKey(lo_case_col_name)) {

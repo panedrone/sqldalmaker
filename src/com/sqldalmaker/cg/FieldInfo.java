@@ -17,6 +17,8 @@ public class FieldInfo {
 
     private final String database_column_name; // original name in database without conversions to lower/camel case etc.
 
+    private int database_column_size = 0;
+
     private boolean is_auto_increment = false;
     private boolean is_pk = false;
     private boolean is_generated = false;
@@ -81,6 +83,14 @@ public class FieldInfo {
 
     public String getColumnName() { // this method is for use in VM templates
         return this.database_column_name;
+    }
+
+    public int getColumnSize() { // this method is for use in VM templates
+        return this.database_column_size;
+    }
+
+    public void setColumnSize(int size) {
+        this.database_column_size = size;
     }
 
     public boolean isPK() {

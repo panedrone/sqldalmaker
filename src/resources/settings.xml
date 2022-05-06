@@ -217,23 +217,21 @@
 
         <!-- sqlalchemy Column: -->
 
-        <macro name="${sa-type-unknown}" value="${sa-type-base}|type:"/>
-        <macro name="${sa-type}" value="${sa-type-base}|type:, ${0}"/>
-        <macro name="${sa-type-base}" value="= Column('${column}'${type}${vm:sa-type-params})${comment}"/>
-        <macro name="${vm:sa-type-params}" value="sdm:sa-column-vm"/>
+        <macro name="${sa-type-unknown}" value="${sa-column-base}|type:"/>
+        <macro name="${sa-type}" value="${sa-column-base}|type:, ${0}"/>
 
         <!-- djando field: -->
 
-        <macro name="${dj-type}" value="= models.${vm:dj-type}${comment}"/>
-        <macro name="${vm:dj-type}" value="sdm:dj-field-vm"/>
+        <macro name="${dj-type}" value="${dj-field}"/>
 
-        <!-- In sdm-scripts dedicated to render fields/columns,
+        <!-- In VM-based macros dedicated to render the fields/columns,
              "$fi" is a predefined variable of class FieldInfo:
 
                 class FieldInfo:
                     String getName()
                     String getType()
                     String getColumnName()
+                    int getColumnSize()
                     boolean isAI()
                     boolean isPK()
                     String getFK()
@@ -245,78 +243,89 @@
                     String setterMethod()
                         -->
 
-        <macro name="sa-column-vm">
+        <macro name="${sa-column-base}">
             <vm>
-                <![CDATA[#if($fi.FK), ForeignKey('$fi.FK')#end
-#if($fi.isPK()), primary_key=True#end
-#if($fi.isAI()), autoincrement=True#end
-#if(!$fi.isPK())
-#if($fi.isIndexed()), index=True#end#if($fi.isUnique()), unique=True#end
-#if($fi.isNullable()), nullable=True#end
-#end]]>
+                <![CDATA[= Column('${column}'${type}#if($fi.ColumnSize>0)($fi.ColumnSize)#end#if($fi.FK), ForeignKey('$fi.FK')#end
+#if($fi.PK), primary_key=True#end
+#if($fi.AI), autoincrement=True#end
+#if(!$fi.PK)
+#if($fi.Indexed), index=True#end
+#if($fi.Unique), unique=True#end
+#if($fi.Nullable), nullable=True#end
+#end)${comment}]]>
             </vm>
         </macro>
 
-        <macro name="dj-field-vm">
+        <macro name="${dj-field}">
             <vm>
                 <![CDATA[
-#if($fi.isAI())AutoField#else${0}#end(db_column='$fi.getColumnName()'#if($fi.isPK()), primary_key=True#else
-#if($fi.isIndexed()), db_index=True#end
-#if($fi.isUnique()), unique=True#end
-#if($fi.isNullable()), blank=True, null=True#end
-#end${1})]]>
+= models.#if($fi.AI)AutoField#else${0}#end(db_column='$fi.ColumnName'#if($fi.ColumnSize>0), max_length=$fi.ColumnSize#end
+#if($fi.PK), primary_key=True#else
+#if($fi.Indexed), db_index=True#end
+#if($fi.Unique), unique=True#end
+#if($fi.Nullable), blank=True, null=True#end
+#end${1})${comment}]]>
             </vm>
         </macro>
 
-        <macro name="sa-column">
+        <macro name="${sa-column-base2}">
             <vm-xml>
-                <if var="$fi.getFK()">
-                    <print var=", ForeignKey('$fi.getFK()')"/>
+                <print var="= Column('${column}'${type}"/>
+                <if var="$fi.ColumnSize>0">
+                    <print var="($fi.ColumnSize)"/>
                 </if>
-                <if var="$fi.isPK()">
+                <if var="$fi.FK">
+                    <print var=", ForeignKey('$fi.FK')"/>
+                </if>
+                <if var="$fi.PK">
                     <print var=", primary_key=True"/>
                 </if>
-                <if var="$fi.isAI()">
+                <if var="$fi.AI">
                     <print var=", autoincrement=True"/>
                 </if>
-                <if var="!$fi.isPK()">
-                    <if var="$fi.isIndexed()">
+                <if var="!$fi.PK">
+                    <if var="$fi.Indexed">
                         <print var=", index=True"/>
                     </if>
-                    <if var="$fi.isUnique()">
+                    <if var="$fi.Unique">
                         <print var=", unique=True"/>
                     </if>
-                    <if var="$fi.isNullable()">
+                    <if var="$fi.Nullable">
                         <print var=", nullable=True"/>
                     </if>
                 </if>
+                <print var=")${comment}"/>
             </vm-xml>
         </macro>
 
-        <macro name="dj-field">
+        <macro name="${dj-field2}">
             <vm-xml>
-                <if var="$fi.isAI()">
+                <print var="= models."/>
+                <if var="$fi.AI">
                     <print var="AutoField"/>
                     <else>
                         <print var="${0}"/>
                     </else>
                 </if>
-                <print var="(db_column='$fi.getColumnName()'"/>
+                <print var="(db_column='$fi.ColumnName'"/>
                 <if var="$fi.isPK()">
                     <print var=", primary_key=True"/>
                 </if>
-                <if var="!$fi.isPK()">
-                    <if var="$fi.isIndexed()">
+                <if var="$fi.ColumnSize>0">
+                    <print var=", max_length=$fi.ColumnSize"/>
+                </if>
+                <if var="!$fi.PK">
+                    <if var="$fi.Indexed">
                         <print var=", db_index=True"/>
                     </if>
-                    <if var="$fi.isUnique()">
+                    <if var="$fi.Unique">
                         <print var=", unique=True"/>
                     </if>
-                    <if var="$fi.isNullable()">
+                    <if var="$fi.Nullable">
                         <print var=", blank=True, null=True"/>
                     </if>
                 </if>
-                <print var="${1})"/>
+                <print var="${1})${comment}"/>
             </vm-xml>
         </macro>
 
