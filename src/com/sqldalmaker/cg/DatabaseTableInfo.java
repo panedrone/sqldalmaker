@@ -140,9 +140,10 @@ class DatabaseTableInfo {
                     if (String.class.getName().equals(apache_java_type_name)) {
                         try {
                             int size = columns_rs.getInt("COLUMN_SIZE");
-                            if (size < 2000000000) { // sqlite3
-                                fi.setColumnSize(size);
+                            if (size > 0xfff) { // sqlite3 2000000000
+                                size = 0xfff;
                             }
+                            fi.setColumnSize(size);
                         } catch (Exception e) {
                             System.err.println("COLUMN_SIZE: " + e.getMessage());
                         }

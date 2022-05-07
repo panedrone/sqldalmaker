@@ -39,13 +39,17 @@ class DtoClassInfo {
     public Map<String, FieldInfo> get_dto_field_info(DtoClass jaxb_dto_class,
                                                      String sql_root_abs_path,
                                                      List<FieldInfo> _dto_fields) throws Exception {
-
-        Map<String, FieldInfo> fields_map = _prepare_detected(jaxb_dto_class, sql_root_abs_path, _dto_fields);
-        Set<String> refined_by_field_jaxb = _refine_by_jaxb_dto_class_fields(jaxb_dto_class, _dto_fields, fields_map);
-        _refine_others(refined_by_field_jaxb, _dto_fields);
-        _substitute_built_in_macros(_dto_fields);
-        _substitute_type_params(_dto_fields);
-        return fields_map;
+        try {
+            Map<String, FieldInfo> fields_map = _prepare_detected(jaxb_dto_class, sql_root_abs_path, _dto_fields);
+            Set<String> refined_by_field_jaxb = _refine_by_jaxb_dto_class_fields(jaxb_dto_class, _dto_fields, fields_map);
+            _refine_others(refined_by_field_jaxb, _dto_fields);
+            _substitute_built_in_macros(_dto_fields);
+            _substitute_type_params(_dto_fields);
+            return fields_map;
+        } catch (Exception e) {
+            throw new Exception(String.format("<dto-class name=\"%s\"... %s: %s",
+                    jaxb_dto_class.getName(), e.getClass().getName(), e.getMessage()));
+        }
     }
 
     private void _substitute_type_params(List<FieldInfo> _dto_fields) {

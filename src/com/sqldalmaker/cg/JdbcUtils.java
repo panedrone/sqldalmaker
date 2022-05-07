@@ -45,29 +45,8 @@ public class JdbcUtils {
                                                   String sql_root_abs_path,
                                                   List<FieldInfo> dao_fields_all) throws Exception {
 
-        List<FieldInfo> dto_fields = new ArrayList<FieldInfo>();
-        Map<String, FieldInfo> dto_fields_map = get_dto_field_info(jaxb_dto_class, sql_root_abs_path, dto_fields);
-        for (FieldInfo dao_fi : dao_fields_all) {
-            String dao_col_name = dao_fi.getColumnName();
-            if (dto_fields_map.containsKey(dao_col_name) == false) {
-                throw new Exception("DAO column '" + dao_col_name + "' not found among DTO columns ["
-                        + _get_column_names(dto_fields) + "]. Ensure upper/lower case.");
-            }
-            FieldInfo dto_fi = dto_fields_map.get(dao_col_name);
-            // Always prefer DTO field type
-            //      1. if ist original name is not Object
-            //      2. if target type name of DTO field is not "object"
-            String dto_fi_original_type_name = dto_fi.getOriginalType();
-            String object_target_type_name = type_map.get_target_type_name(Object.class.getTypeName());
-            if (!Object.class.getTypeName().equals(dto_fi_original_type_name) ||
-                    (object_target_type_name.length() > 0 && !object_target_type_name.equals(dto_fi.getType()))) {
-                String dto_fi_target_type_name = dto_fi.getType();
-                dao_fi.refine_rendered_type(dto_fi_target_type_name);
-            }
-            String dto_comment = dto_fi.getComment();
-            String dao_comment = dao_fi.getComment();
-            dao_fi.setComment(dto_comment + " <- " + dao_comment);
-        }
+        CustomSqlInfo info = new CustomSqlInfo(conn, dto_field_names_mode, method_params_names_mode, global_markers, type_map);
+        info.refine_dao_fields_by_dto_fields(jaxb_dto_class, sql_root_abs_path, dao_fields_all);
     }
 
     private void _refine_dao_fields_by_dto_fields_for_crud_create(Map<String, FieldInfo> dto_fields_map,
@@ -75,43 +54,16 @@ public class JdbcUtils {
                                                                   List<FieldInfo> dao_fields_all,
                                                                   List<FieldInfo> _dao_fields_not_generated,
                                                                   List<FieldInfo> _dao_fields_generated) throws Exception {
-        for (FieldInfo dao_field : dao_fields_all) {
-            String dao_col_name = dao_field.getColumnName();
-            if (dto_fields_map.containsKey(dao_col_name) == false) {
-                throw new Exception("Cannot create mapping for DAO column '" +
-                        dao_col_name + "'. Ensure upper/lower case.");
-            }
-            dao_field.refine_rendered_type(dto_fields_map.get(dao_col_name).getType());
-            String gen_dao_col_name = dao_col_name.toLowerCase();
-            if (dao_crud_generated_set.contains(gen_dao_col_name)) {
-                dao_field.setAI(true);
-                _dao_fields_generated.add(dao_field);
-                dao_crud_generated_set.remove(gen_dao_col_name); // it must become empty in the end
-            } else {
-                if (dao_field.isAI()) {
-                    _dao_fields_generated.add(dao_field);
-                } else {
-                    _dao_fields_not_generated.add(dao_field);
-                }
-            }
-        }
-        if (dao_crud_generated_set.size() > 0) { // not processed column names remain!
-            throw new SQLException("Unknown columns are listed as 'generated': " + dao_crud_generated_set);
-        }
+
+        CustomSqlInfo info = new CustomSqlInfo(conn, dto_field_names_mode, method_params_names_mode, global_markers, type_map);
+        info.refine_dao_fields_by_dto_fields_for_crud_create(dto_fields_map, dao_crud_generated_set, dao_fields_all,
+                _dao_fields_not_generated, _dao_fields_generated);
     }
 
     private DatabaseTableInfo _createTableInfo(String table_name,
                                                String explicit_pk) throws Exception {
         String model = ""; // no model
         return new DatabaseTableInfo(model, conn, type_map, dto_field_names_mode, table_name, explicit_pk);
-    }
-
-    private static String _get_column_names(List<FieldInfo> fields) {
-        List<String> col_names = new ArrayList<String>();
-        for (FieldInfo fi : fields) {
-            col_names.add(fi.getColumnName());
-        }
-        return String.join(", ", col_names);
     }
 
     // Public Utils --------------------------------------------
@@ -162,12 +114,8 @@ public class JdbcUtils {
                                                      String sql_root_abs_path,
                                                      List<FieldInfo> _dto_fields) throws Exception {
 
-        try {
-            DtoClassInfo info = new DtoClassInfo(conn, type_map, global_markers, dto_field_names_mode);
-            return info.get_dto_field_info(jaxb_dto_class, sql_root_abs_path, _dto_fields);
-        } catch (Exception e) {
-            throw new Exception(String.format("<dto-class name=\"%s\"... %s", jaxb_dto_class.getName(), e));
-        }
+        DtoClassInfo info = new DtoClassInfo(conn, type_map, global_markers, dto_field_names_mode);
+        return info.get_dto_field_info(jaxb_dto_class, sql_root_abs_path, _dto_fields);
     }
 
     // DAO. Raw-SQL -------------------------------------------

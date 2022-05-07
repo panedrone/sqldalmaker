@@ -23,6 +23,7 @@ validate/update XSD files and do the fixes in "settings.xml".
 Use "Reference settings.xml" as example.
 </p>
 <ul>
+<li>+ CharField max_length for SQLite</li>
 <li>+ CharField max_length for Django and String(...) for SQLAlchemy</li>
 <li>changes in settings.xsd: “global-macros” and “sdm-scripts” are merged to “macros”</li>
 <li>+ XML wrappers for VM templates (updete XSD files and see the reference "settings.xml")</li>

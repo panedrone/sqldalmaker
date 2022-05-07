@@ -10,7 +10,6 @@ import com.sqldalmaker.jaxb.dto.DtoClasses;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.*;
 
 public class CustomSqlInfo {
@@ -36,23 +35,20 @@ public class CustomSqlInfo {
         this.type_map = type_map;
     }
 
-    public Map<String, FieldInfo> get_dto_field_info(DtoClass jaxb_dto_class,
-                                                     String sql_root_abs_path,
-                                                     List<FieldInfo> _dto_fields) throws Exception {
-        try {
-            DtoClassInfo info = new DtoClassInfo(conn, type_map, global_markers, dto_field_names_mode);
-            return info.get_dto_field_info(jaxb_dto_class, sql_root_abs_path, _dto_fields);
-        } catch (Exception e) {
-            throw new Exception(String.format("<dto-class name=\"%s\"... %s", jaxb_dto_class.getName(), e));
-        }
+    private Map<String, FieldInfo> _get_dto_field_info(DtoClass jaxb_dto_class,
+                                                       String sql_root_abs_path,
+                                                       List<FieldInfo> _dto_fields) throws Exception {
+
+        DtoClassInfo info = new DtoClassInfo(conn, type_map, global_markers, dto_field_names_mode);
+        return info.get_dto_field_info(jaxb_dto_class, sql_root_abs_path, _dto_fields);
     }
 
-    private void _refine_dao_fields_by_dto_fields(DtoClass jaxb_dto_class,
-                                                  String sql_root_abs_path,
-                                                  List<FieldInfo> dao_fields_all) throws Exception {
+    public void refine_dao_fields_by_dto_fields(DtoClass jaxb_dto_class,
+                                                String sql_root_abs_path,
+                                                List<FieldInfo> dao_fields_all) throws Exception {
 
         List<FieldInfo> dto_fields = new ArrayList<FieldInfo>();
-        Map<String, FieldInfo> dto_fields_map = get_dto_field_info(jaxb_dto_class, sql_root_abs_path, dto_fields);
+        Map<String, FieldInfo> dto_fields_map = _get_dto_field_info(jaxb_dto_class, sql_root_abs_path, dto_fields);
         for (FieldInfo dao_fi : dao_fields_all) {
             String dao_col_name = dao_fi.getColumnName();
             if (dto_fields_map.containsKey(dao_col_name) == false) {
@@ -76,16 +72,17 @@ public class CustomSqlInfo {
         }
     }
 
-    private void _refine_dao_fields_by_dto_fields_for_crud_create(Map<String, FieldInfo> dto_fields_map,
-                                                                  HashSet<String> dao_crud_generated_set,
-                                                                  List<FieldInfo> dao_fields_all,
-                                                                  List<FieldInfo> _dao_fields_not_generated,
-                                                                  List<FieldInfo> _dao_fields_generated) throws Exception {
+    public void refine_dao_fields_by_dto_fields_for_crud_create(Map<String, FieldInfo> dto_fields_map,
+                                                                 HashSet<String> dao_crud_generated_set,
+                                                                 List<FieldInfo> dao_fields_all,
+                                                                 List<FieldInfo> _dao_fields_not_generated,
+                                                                 List<FieldInfo> _dao_fields_generated) throws Exception {
         for (FieldInfo dao_field : dao_fields_all) {
             String dao_col_name = dao_field.getColumnName();
             if (dto_fields_map.containsKey(dao_col_name) == false) {
-                throw new Exception("Cannot create mapping for DAO column '" +
-                        dao_col_name + "'. Ensure upper/lower case.");
+                List<FieldInfo> dto_fields = new ArrayList<FieldInfo>(dto_fields_map.values());
+                throw new Exception("DAO column '" + dao_col_name + "' not found among DTO columns ["
+                        + _get_column_names(dto_fields) + "]. Ensure upper/lower case.");
             }
             dao_field.refine_rendered_type(dto_fields_map.get(dao_col_name).getType());
             String gen_dao_col_name = dao_col_name.toLowerCase();
@@ -102,13 +99,12 @@ public class CustomSqlInfo {
             }
         }
         if (dao_crud_generated_set.size() > 0) { // not processed column names remain!
-            throw new SQLException("Unknown columns are listed as 'generated': " + dao_crud_generated_set);
+            throw new Exception("Unknown columns are listed as 'generated': " + dao_crud_generated_set);
         }
     }
 
-    private static FieldInfo _get_ret_field_info(FieldNamesMode field_names_mode,
-                                                 String exlicit_ret_type,
-                                                 List<FieldInfo> dao_fields) throws Exception {
+    private FieldInfo _get_ret_field_info(String exlicit_ret_type,
+                                          List<FieldInfo> dao_fields) throws Exception {
         String ret_type_name;
         if (exlicit_ret_type != null && exlicit_ret_type.trim().length() > 0) {
             ret_type_name = exlicit_ret_type;
@@ -127,7 +123,7 @@ public class CustomSqlInfo {
         } else {
             ret_col_name = dao_fields.get(0).getName();
         }
-        return new FieldInfo(field_names_mode, ret_type_name, ret_col_name, "ret-value");
+        return new FieldInfo(dto_field_names_mode, ret_type_name, ret_col_name, "ret-value");
     }
 
     private DatabaseTableInfo _createTableInfo(String table_name) throws Exception {
@@ -150,10 +146,10 @@ public class CustomSqlInfo {
         DatabaseTableInfo tfi = _createTableInfo(dao_table_name);
         if (jaxb_return_type_is_dto) {
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(jaxb_dto_or_return_type, jaxb_dto_classes);
-            _refine_dao_fields_by_dto_fields(jaxb_dto_class, sql_root_abs_path, tfi.fields_all);
+            refine_dao_fields_by_dto_fields(jaxb_dto_class, sql_root_abs_path, tfi.fields_all);
             _fields.addAll(tfi.fields_all);
         } else {
-            _fields.add(_get_ret_field_info(dto_field_names_mode, jaxb_dto_or_return_type, tfi.fields_all));
+            _fields.add(_get_ret_field_info(jaxb_dto_or_return_type, tfi.fields_all));
         }
         if (_fields.size() > 0) {
             String comment = _fields.get(0).getComment();
@@ -215,7 +211,7 @@ public class CustomSqlInfo {
 
         List<FieldInfo> dto_fields = new ArrayList<FieldInfo>();
         DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(jaxb_dto_or_return_type, jaxb_dto_classes);
-        Map<String, FieldInfo> dto_fields_map = get_dto_field_info(jaxb_dto_class, sql_root_abs_path, dto_fields);
+        Map<String, FieldInfo> dto_fields_map = _get_dto_field_info(jaxb_dto_class, sql_root_abs_path, dto_fields);
         if (dao_fields.isEmpty()) {
             _fill_by_dto(dto_fields, _fields, error);
         } else {
@@ -246,7 +242,7 @@ public class CustomSqlInfo {
         if (jaxb_return_type_is_dto) {
             _get_custom_sql_ret_field_info(sql_root_abs_path, jaxb_dto_or_return_type, jaxb_dto_classes, _fields, dao_fields, error);
         } else {
-            _fields.add(_get_ret_field_info(dto_field_names_mode, jaxb_dto_or_return_type, dao_fields));
+            _fields.add(_get_ret_field_info(jaxb_dto_or_return_type, dao_fields));
         }
     }
 
