@@ -154,13 +154,13 @@ public class JdbcUtils {
         return SqlUtils.create_crud_create_sql(dao_table_name, res_dao_fields_not_generated);
     }
 
-    private DatabaseTableInfo _createTableInfoForCrud(DtoClass jaxb_dto_class,
-                                                      String sql_root_abs_path,
-                                                      String table_name,
-                                                      String explicit_pk) throws Exception {
+    private DatabaseTableInfo _create_table_info_for_crud(DtoClass jaxb_dto_class,
+                                                          String sql_root_abs_path,
+                                                          String table_name,
+                                                          String explicit_pk) throws Exception {
 
         CustomSqlInfo info = new CustomSqlInfo(conn, dto_field_names_mode, method_params_names_mode, global_markers, type_map);
-        DatabaseTableInfo t_info = info.get_dao_fields_for_crud(jaxb_dto_class, sql_root_abs_path, table_name,explicit_pk);
+        DatabaseTableInfo t_info = info.get_dao_fields_for_crud(jaxb_dto_class, table_name,explicit_pk);
         return t_info;
     }
 
@@ -173,7 +173,7 @@ public class JdbcUtils {
                                          List<FieldInfo> res_dao_fields_pk) throws Exception {
         res_dao_fields_all.clear();
         res_dao_fields_pk.clear();
-        DatabaseTableInfo tfi = _createTableInfoForCrud(jaxb_dto_class, sql_root_abs_path, dao_table_name, explicit_pk);
+        DatabaseTableInfo tfi = _create_table_info_for_crud(jaxb_dto_class, sql_root_abs_path, dao_table_name, explicit_pk);
         res_dao_fields_all.addAll(tfi.fields_all);
         res_dao_fields_pk.addAll(tfi.fields_pk);
         return SqlUtils.create_crud_read_sql(dao_table_name, res_dao_fields_pk, fetch_list);
@@ -187,7 +187,7 @@ public class JdbcUtils {
                                            List<FieldInfo> res_fields_pk) throws Exception {
         res_fields_not_pk.clear();
         res_fields_pk.clear();
-        DatabaseTableInfo tfi = _createTableInfoForCrud(jaxb_dto_class, sql_root_abs_path, dao_table_name, explicit_pk);
+        DatabaseTableInfo tfi = _create_table_info_for_crud(jaxb_dto_class, sql_root_abs_path, dao_table_name, explicit_pk);
         res_fields_not_pk.addAll(tfi.fields_not_pk);
         res_fields_pk.addAll(tfi.fields_pk);
         if (res_fields_not_pk.isEmpty()) {
@@ -205,7 +205,7 @@ public class JdbcUtils {
                                            String explicit_pk,
                                            List<FieldInfo> res_fields_pk) throws Exception {
 
-        DatabaseTableInfo tfi = _createTableInfoForCrud(jaxb_dto_class, sql_root_abs_path, dao_table_name, explicit_pk);
+        DatabaseTableInfo tfi = _create_table_info_for_crud(jaxb_dto_class, sql_root_abs_path, dao_table_name, explicit_pk);
         res_fields_pk.clear();
         res_fields_pk.addAll(tfi.fields_pk);
         if (res_fields_pk.isEmpty()) {

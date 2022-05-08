@@ -42,15 +42,22 @@ class DtoClassInfo {
                                                      List<FieldInfo> res_dto_fields) throws Exception {
         try {
             Map<String, FieldInfo> fields_map = _prepare_by_jdbc(ignore_model, jaxb_dto_class, sql_root_abs_path, res_dto_fields);
-            Set<String> refined_by_field_jaxb = _refine_by_jaxb_dto_class_fields(jaxb_dto_class, res_dto_fields, fields_map);
-            _refine_others(refined_by_field_jaxb, res_dto_fields);
-            _substitute_built_in_macros(res_dto_fields);
-            _substitute_type_params(res_dto_fields);
+            refine_field_info(fields_map, jaxb_dto_class, res_dto_fields);
             return fields_map;
         } catch (Exception e) {
             throw new Exception(String.format("<dto-class name=\"%s\"... %s: %s",
                     jaxb_dto_class.getName(), e.getClass().getName(), e.getMessage()));
         }
+    }
+
+    public void refine_field_info(Map<String, FieldInfo> fields_map,
+                                  DtoClass jaxb_dto_class,
+                                  List<FieldInfo> res_dto_fields) throws Exception {
+
+        Set<String> refined_by_field_jaxb = _refine_by_jaxb_dto_class_fields(jaxb_dto_class, res_dto_fields, fields_map);
+        _refine_others(refined_by_field_jaxb, res_dto_fields);
+        _substitute_built_in_macros(res_dto_fields);
+        _substitute_type_params(res_dto_fields);
     }
 
     private void _substitute_type_params(List<FieldInfo> _dto_fields) {
