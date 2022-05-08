@@ -36,15 +36,16 @@ class DtoClassInfo {
         this.dto_field_names_mode = dto_field_names_mode;
     }
 
-    public Map<String, FieldInfo> get_dto_field_info(DtoClass jaxb_dto_class,
+    public Map<String, FieldInfo> get_dto_field_info(boolean ignore_model,
+                                                     DtoClass jaxb_dto_class,
                                                      String sql_root_abs_path,
-                                                     List<FieldInfo> _dto_fields) throws Exception {
+                                                     List<FieldInfo> res_dto_fields) throws Exception {
         try {
-            Map<String, FieldInfo> fields_map = _prepare_detected(jaxb_dto_class, sql_root_abs_path, _dto_fields);
-            Set<String> refined_by_field_jaxb = _refine_by_jaxb_dto_class_fields(jaxb_dto_class, _dto_fields, fields_map);
-            _refine_others(refined_by_field_jaxb, _dto_fields);
-            _substitute_built_in_macros(_dto_fields);
-            _substitute_type_params(_dto_fields);
+            Map<String, FieldInfo> fields_map = _prepare_by_jdbc(ignore_model, jaxb_dto_class, sql_root_abs_path, res_dto_fields);
+            Set<String> refined_by_field_jaxb = _refine_by_jaxb_dto_class_fields(jaxb_dto_class, res_dto_fields, fields_map);
+            _refine_others(refined_by_field_jaxb, res_dto_fields);
+            _substitute_built_in_macros(res_dto_fields);
+            _substitute_type_params(res_dto_fields);
             return fields_map;
         } catch (Exception e) {
             throw new Exception(String.format("<dto-class name=\"%s\"... %s: %s",
@@ -58,39 +59,42 @@ class DtoClassInfo {
         }
     }
 
-    private Map<String, FieldInfo> _prepare_detected(DtoClass jaxb_dto_class,
-                                                     String sql_root_abs_path,
-                                                     List<FieldInfo> _dto_fields) throws Exception {
+    private Map<String, FieldInfo> _prepare_by_jdbc(boolean ignore_model,
+                                                    DtoClass jaxb_dto_class,
+                                                    String sql_root_abs_path,
+                                                    List<FieldInfo> res_dto_fields) throws Exception {
 
         String dto_class_name = jaxb_dto_class.getName();
         String model = "";
-        int model_name_end_index = dto_class_name.indexOf('-');
-        if (model_name_end_index != -1) {
-            model = dto_class_name.substring(0, model_name_end_index + 1);
+        if (!ignore_model) {
+            int model_name_end_index = dto_class_name.indexOf('-');
+            if (model_name_end_index != -1) {
+                model = dto_class_name.substring(0, model_name_end_index + 1);
+            }
         }
         Map<String, FieldInfo> fields_map = new HashMap<String, FieldInfo>();
-        _dto_fields.clear();
+        res_dto_fields.clear();
         String jaxb_dto_class_ref = jaxb_dto_class.getRef();
         if (!SqlUtils.is_empty_ref(jaxb_dto_class_ref)) {
             String jdbc_sql = SqlUtils.jdbc_sql_by_dto_class_ref(jaxb_dto_class_ref, sql_root_abs_path);
             // get fields from sql first to omit invisible/db-specific fields
-            CustomSqlUtils.get_field_info_by_jdbc_sql(model, conn, dto_field_names_mode, jdbc_sql, fields_map, _dto_fields);
+            CustomSqlUtils.get_field_info_by_jdbc_sql(model, conn, dto_field_names_mode, jdbc_sql, fields_map, res_dto_fields);
             if (SqlUtils.is_table_ref(jaxb_dto_class_ref)) {
                 String table_name = jaxb_dto_class_ref;
-                _fill_by_table(model, table_name, _dto_fields, fields_map);
+                _fill_by_table(model, table_name, res_dto_fields, fields_map);
             } else if (SqlUtils.is_sql_shortcut_ref(jaxb_dto_class_ref)) {
                 String[] parts = SqlUtils.parse_sql_shortcut_ref(jaxb_dto_class_ref);
                 String table_name = parts[0];
-                _fill_by_table(model, table_name, _dto_fields, fields_map);
+                _fill_by_table(model, table_name, res_dto_fields, fields_map);
             }
         }
         return fields_map;
     }
 
     private void _refine_others(Set<String> refined_by_field_jaxb,
-                                List<FieldInfo> _dto_fields) throws Exception {
+                                List<FieldInfo> dto_fields) throws Exception {
 
-        for (FieldInfo fi : _dto_fields) {
+        for (FieldInfo fi : dto_fields) {
             if (refined_by_field_jaxb.contains(fi.getColumnName())) {
                 continue;
             }
@@ -101,7 +105,7 @@ class DtoClassInfo {
     }
 
     private Set<String> _refine_by_jaxb_dto_class_fields(DtoClass jaxb_dto_class,
-                                                         List<FieldInfo> _dto_fields,
+                                                         List<FieldInfo> dto_fields,
                                                          Map<String, FieldInfo> fields_map) throws Exception {
 
         Set<String> refined_by_field_jaxb = new HashSet<String>();
@@ -115,7 +119,7 @@ class DtoClassInfo {
             } else { // add the field declared in XML, but missing in SQL
                 fi = new FieldInfo(dto_field_names_mode, jaxb_field_type_name, jaxb_field_col_name,
                         "xml(" + jaxb_field_col_name + ")");
-                _dto_fields.add(fi);
+                dto_fields.add(fi);
                 fields_map.put(jaxb_field_col_name, fi);
             }
             _refine_fi(fi, jaxb_field_type_name);
@@ -126,13 +130,13 @@ class DtoClassInfo {
 
     private void _fill_by_table(String model,
                                 String table_name,
-                                List<FieldInfo> _dto_fields,
+                                List<FieldInfo> res_dto_fields,
                                 Map<String, FieldInfo> fields_map) throws Exception {
 
         String explicit_pk = "*";
         DatabaseTableInfo info = new DatabaseTableInfo(model, conn, type_map, dto_field_names_mode, table_name, explicit_pk);
-        _dto_fields.clear();
-        _dto_fields.addAll(info.fields_all);
+        res_dto_fields.clear();
+        res_dto_fields.addAll(info.fields_all);
         fields_map.clear();
         fields_map.putAll(info.fields_map);
     }
@@ -170,13 +174,12 @@ class DtoClassInfo {
     private String _parse_target_type(FieldInfo fi,
                                       String target) throws Exception {
 
-        return _parse_target_type_recursive(0, fi, target, macros);
+        return _parse_target_type_recursive(0, fi, target);
     }
 
-    private static String _parse_target_type_recursive(int depth,
-                                                       FieldInfo fi, // fi in here is used for vm templates
-                                                       String target_type_name,
-                                                       JaxbUtils.JaxbMacros macros) throws Exception {
+    private String _parse_target_type_recursive(int depth,
+                                                FieldInfo fi, // fi in here is used for vm templates
+                                                String target_type_name) throws Exception {
         if (depth > 10) {
             throw new Exception("Depth > 10: " + target_type_name);
         }
@@ -189,7 +192,7 @@ class DtoClassInfo {
             }
         }
         if (!found) {
-            String tmp = _substitute_vm_macros(fi, res, macros);
+            String tmp = _substitute_vm_macros(fi, res);
             if (tmp != null) {
                 res = tmp; // single replacement in one pass
                 found = true;
@@ -198,13 +201,12 @@ class DtoClassInfo {
         if (!found) {
             return res;
         }
-        res = _parse_target_type_recursive(depth + 1, fi, res, macros);
+        res = _parse_target_type_recursive(depth + 1, fi, res);
         return res;
     }
 
-    private static String _substitute_vm_macros(FieldInfo fi, // fi in here is used for vm templates
-                                                String target_type_name,
-                                                JaxbUtils.JaxbMacros macros) throws Exception {
+    private String _substitute_vm_macros(FieldInfo fi, // fi in here is used for vm templates
+                                         String target_type_name) throws Exception {
 
         for (String m_name : macros.get_vm_macro_names()) {
             if (!target_type_name.contains(m_name)) {
@@ -240,7 +242,6 @@ class DtoClassInfo {
 
     private interface IMacro {
         String exec(FieldInfo fi);
-
     }
 
     private static Map<String, IMacro> _get_built_in_macros() {
@@ -275,6 +276,7 @@ class DtoClassInfo {
                 return fi.getColumnName();
             }
         });
+        // deprecated, don't use:
         macros.put("${sqlalchemy-params}", new IMacro() {
             @Override
             public String exec(FieldInfo fi) {

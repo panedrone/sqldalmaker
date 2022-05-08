@@ -257,14 +257,17 @@ class DatabaseTableInfo {
         return target_type_name;
     }
 
-    private Set<String> _get_lower_case_pk_col_names(String table_name, String explicit_pk) throws Exception {
+    private Set<String> _get_lower_case_pk_col_names(String table_name,
+                                                     String explicit_pk) throws Exception {
         if ("*".equals(explicit_pk)) {
             return _get_pk_col_name_aliases_from_table(table_name);
         }
         return _get_pk_col_name_aliaces_from_jaxb(explicit_pk);
     }
 
-    private ResultSet _get_pk_rs(DatabaseMetaData md, String table_name) throws Exception {
+    private ResultSet _get_pk_rs(DatabaseMetaData md,
+                                 String table_name) throws Exception {
+
         if (table_name.contains(".")) {
             String[] parts = table_name.split("\\.");
             if (parts.length != 2) {

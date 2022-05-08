@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2021 sqldalmaker@gmail.com
+ * Copyright 2011-2022 sqldalmaker@gmail.com
  * Read LICENSE.txt in the root of this project/archive.
  * Project web-site: http://sqldalmaker.sourceforge.net
  */
@@ -18,7 +18,6 @@ import javax.swing.text.StyleContext;
 import java.awt.*;
 import java.awt.event.*;
 import java.sql.Connection;
-import java.util.ArrayList;
 import java.util.Locale;
 
 /**
@@ -178,11 +177,10 @@ public class UIDialogSelectDbSchema extends JDialog {
 
     private void refresh() {
         try {
-            final ArrayList<String> items = new ArrayList<String>();
             Connection con = IdeaHelpers.get_connection(project, settings);
             try {
                 table.setTableHeader(null);
-                JdbcUtils.get_schema_names(con, items);
+                java.util.List<String> items = JdbcUtils.get_schema_names(con);
                 table.setModel(new AbstractTableModel() {
                     public Object getValueAt(int rowIndex, int columnIndex) {
                         return items.get(rowIndex);

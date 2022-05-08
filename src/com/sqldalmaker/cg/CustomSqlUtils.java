@@ -124,12 +124,12 @@ class CustomSqlUtils {
                                                 String dao_jdbc_sql,
                                                 FieldNamesMode param_names_mode,
                                                 String[] method_param_descriptors,
-                                                List<FieldInfo> params) throws Exception {
+                                                List<FieldInfo> res_params) throws Exception {
 
         Helpers.check_duplicates(method_param_descriptors);
         PreparedStatement ps = _prepare_jdbc_sql(conn, dao_jdbc_sql);
         try {
-            CustomSqlUtils.get_params_info(ps, type_map, param_names_mode, method_param_descriptors, params);
+            CustomSqlUtils.get_params_info(ps, type_map, param_names_mode, method_param_descriptors, res_params);
         } finally {
             ps.close();
         }
@@ -203,12 +203,12 @@ class CustomSqlUtils {
             JaxbUtils.JaxbTypeMap type_map,
             FieldNamesMode param_names_mode,
             String[] method_param_descriptors,
-            List<FieldInfo> _params) throws Exception {
+            List<FieldInfo> res_params) throws Exception {
 
-        _params.clear();
+        res_params.clear();
         for (String param_descriptor : method_param_descriptors) {
             FieldInfo pi = create_param_info(type_map, param_names_mode, param_descriptor, Object.class.getName());
-            _params.add(pi);
+            res_params.add(pi);
         }
     }
 
@@ -254,7 +254,7 @@ class CustomSqlUtils {
                                          String[] method_param_descriptors,
                                          List<FieldInfo> fields_all,
                                          String[] filter_col_names,
-                                         List<FieldInfo> _params) throws Exception {
+                                         List<FieldInfo> res_params) throws Exception {
 
         Map<String, FieldInfo> all_col_names_map = new HashMap<String, FieldInfo>();
         for (FieldInfo fi : fields_all) {
@@ -279,7 +279,7 @@ class CustomSqlUtils {
             String curr_type = fi.getType();
             String default_param_type_name = get_target_type_by_type_map(type_map, curr_type);
             FieldInfo pi = CustomSqlUtils.create_param_info(type_map, param_names_mode, param_descriptor, default_param_type_name);
-            _params.add(pi);
+            res_params.add(pi);
         }
     }
 
