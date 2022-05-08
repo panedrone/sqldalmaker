@@ -146,8 +146,8 @@ public class JdbcUtils {
                 dao_crud_generated_set.add(k.toLowerCase());
             }
         }
-        List<FieldInfo> dto_fields = new ArrayList<FieldInfo>();
-        //Map<String, FieldInfo> dto_fields_map = get_dto_field_info(jaxb_dto_class, sql_root_abs_path, dto_fields);
+        // List<FieldInfo> dto_fields = new ArrayList<FieldInfo>();
+        // Map<String, FieldInfo> dto_fields_map = get_dto_field_info(jaxb_dto_class, sql_root_abs_path, dto_fields);
         CustomSqlInfo info = new CustomSqlInfo(conn, dto_field_names_mode, method_params_names_mode, global_markers, type_map);
         info.get_dao_fields_for_crud_create(dao_table_name, // dto_fields_map,
                 dao_crud_generated_set, res_dao_fields_not_generated, res_dao_fields_generated);

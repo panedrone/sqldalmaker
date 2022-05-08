@@ -6,7 +6,6 @@
 package com.sqldalmaker.eclipse;
 
 import java.sql.Connection;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
@@ -47,7 +46,7 @@ import com.sqldalmaker.jaxb.settings.Settings;
 public class UIDialogSelectDbSchema extends TitleAreaDialog {
 
 	private String selected_schema;
-	private ArrayList<String> schema_names;
+	private List<String> schema_names;
 
 	private Table table;
 	private TableViewer tableViewer;
@@ -87,7 +86,7 @@ public class UIDialogSelectDbSchema extends TitleAreaDialog {
 	 * @param parentShell
 	 * @param dto2
 	 */
-	private UIDialogSelectDbSchema(Shell parentShell, IProject project, ArrayList<String> schema_names,
+	private UIDialogSelectDbSchema(Shell parentShell, IProject project, List<String> schema_names,
 			Open_Mode open_mode) {
 
 		super(parentShell);
@@ -105,13 +104,13 @@ public class UIDialogSelectDbSchema extends TitleAreaDialog {
 	static void open(Shell parentShell, IEditor2 editor2, ISelectDbSchemaCallback callback, Open_Mode open_mode)
 			throws Exception {
 
-		ArrayList<String> schema_names = new ArrayList<String>();
+		List<String> schema_names;
 
 		Connection con = EclipseHelpers.get_connection(editor2);
 
 		try {
 
-			JdbcUtils.get_schema_names(con, schema_names);
+			schema_names = JdbcUtils.get_schema_names(con);
 
 		} finally {
 
