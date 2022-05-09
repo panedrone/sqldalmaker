@@ -79,9 +79,18 @@ class DtoClassInfo {
                 model = dto_class_name.substring(0, model_name_end_index + 1);
             }
         }
+        String jaxb_dto_class_ref = jaxb_dto_class.getRef();
+        Map<String, FieldInfo> fields_map = _prepare_by_jdbc(model, jaxb_dto_class_ref, sql_root_abs_path, res_dto_fields);
+        return fields_map;
+    }
+
+    private Map<String, FieldInfo> _prepare_by_jdbc(String model,
+                                                    String jaxb_dto_class_ref,
+                                                    String sql_root_abs_path,
+                                                    List<FieldInfo> res_dto_fields) throws Exception {
+
         Map<String, FieldInfo> fields_map = new HashMap<String, FieldInfo>();
         res_dto_fields.clear();
-        String jaxb_dto_class_ref = jaxb_dto_class.getRef();
         if (!SqlUtils.is_empty_ref(jaxb_dto_class_ref)) {
             String jdbc_sql = SqlUtils.jdbc_sql_by_dto_class_ref(jaxb_dto_class_ref, sql_root_abs_path);
             // get fields from sql first to omit invisible/db-specific fields

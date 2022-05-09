@@ -149,7 +149,7 @@ public class JdbcUtils {
         // List<FieldInfo> dto_fields = new ArrayList<FieldInfo>();
         // Map<String, FieldInfo> dto_fields_map = get_dto_field_info(jaxb_dto_class, sql_root_abs_path, dto_fields);
         CustomSqlInfo info = new CustomSqlInfo(conn, dto_field_names_mode, method_params_names_mode, global_markers, type_map);
-        info.get_dao_fields_for_crud_create(dao_table_name, // dto_fields_map,
+        info.get_dao_fields_for_crud_create(jaxb_dto_class, dao_table_name,
                 dao_crud_generated_set, res_dao_fields_not_generated, res_dao_fields_generated);
         return SqlUtils.create_crud_create_sql(dao_table_name, res_dao_fields_not_generated);
     }
@@ -160,7 +160,7 @@ public class JdbcUtils {
                                                           String explicit_pk) throws Exception {
 
         CustomSqlInfo info = new CustomSqlInfo(conn, dto_field_names_mode, method_params_names_mode, global_markers, type_map);
-        DatabaseTableInfo t_info = info.get_dao_fields_for_crud(jaxb_dto_class, table_name,explicit_pk);
+        DatabaseTableInfo t_info = info.get_dao_fields_for_crud(jaxb_dto_class, table_name, explicit_pk);
         return t_info;
     }
 

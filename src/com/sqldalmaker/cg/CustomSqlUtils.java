@@ -6,8 +6,6 @@
 package com.sqldalmaker.cg;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -45,7 +43,9 @@ class CustomSqlUtils {
         }
     }
 
-    private static PreparedStatement _prepare_jdbc_sql(Connection conn, String jdbc_sql) throws SQLException {
+    private static PreparedStatement _prepare_jdbc_sql(Connection conn,
+                                                       String jdbc_sql) throws SQLException {
+
         boolean is_sp = SqlUtils.is_jdbc_stored_proc_call(jdbc_sql);
         if (is_sp) {
             return conn.prepareCall(jdbc_sql);
@@ -107,7 +107,8 @@ class CustomSqlUtils {
         return column_name;
     }
 
-    private static String _get_jdbc_col_type_name(ResultSetMetaData rsmd, int col_num) {
+    private static String _get_jdbc_col_type_name(ResultSetMetaData rsmd,
+                                                  int col_num) {
         try {
             // sometime, it returns "[B": See comments for Class.getName() API
             String java_class_name = rsmd.getColumnClassName(col_num);
@@ -135,12 +136,11 @@ class CustomSqlUtils {
         }
     }
 
-    public static void get_params_info(
-            PreparedStatement ps,
-            JaxbUtils.JaxbTypeMap type_map,
-            FieldNamesMode param_names_mode,
-            String[] method_param_descriptors,
-            List<FieldInfo> _params) throws Exception {
+    public static void get_params_info(PreparedStatement ps,
+                                       JaxbUtils.JaxbTypeMap type_map,
+                                       FieldNamesMode param_names_mode,
+                                       String[] method_param_descriptors,
+                                       List<FieldInfo> _params) throws Exception {
         //
         // get_params_info should not be used for CRUD
         //
@@ -199,12 +199,10 @@ class CustomSqlUtils {
         }
     }
 
-    private static void _get_param_info_by_descriptors(
-            JaxbUtils.JaxbTypeMap type_map,
-            FieldNamesMode param_names_mode,
-            String[] method_param_descriptors,
-            List<FieldInfo> res_params) throws Exception {
-
+    private static void _get_param_info_by_descriptors(JaxbUtils.JaxbTypeMap type_map,
+                                                       FieldNamesMode param_names_mode,
+                                                       String[] method_param_descriptors,
+                                                       List<FieldInfo> res_params) throws Exception {
         res_params.clear();
         for (String param_descriptor : method_param_descriptors) {
             FieldInfo pi = create_param_info(type_map, param_names_mode, param_descriptor, Object.class.getName());
@@ -212,7 +210,8 @@ class CustomSqlUtils {
         }
     }
 
-    private static String _get_jdbc_param_type_name(ParameterMetaData pm, int i) {
+    private static String _get_jdbc_param_type_name(ParameterMetaData pm,
+                                                    int i_0_n) {
         if (pm == null) {
             return Object.class.getName();
         }
@@ -221,7 +220,7 @@ class CustomSqlUtils {
             // 1) getParameterClassName throws exception in
             // mysql-connector-java-5.1.17-bin.jar:
             // 2) sometime it returns "[B": See comments for Class.getName() API
-            java_class_name = pm.getParameterClassName(i + 1);
+            java_class_name = pm.getParameterClassName(i_0_n + 1);
             java_class_name = Helpers.process_java_type_name(java_class_name);
         } catch (Exception ex) {
             java_class_name = Object.class.getName();
@@ -229,12 +228,10 @@ class CustomSqlUtils {
         return java_class_name;
     }
 
-    public static FieldInfo create_param_info(
-            JaxbUtils.JaxbTypeMap type_map,
-            FieldNamesMode param_names_mode,
-            String param_descriptor,
-            String default_param_type_name) throws Exception {
-
+    public static FieldInfo create_param_info(JaxbUtils.JaxbTypeMap type_map,
+                                              FieldNamesMode param_names_mode,
+                                              String param_descriptor,
+                                              String default_param_type_name) throws Exception {
         String param_type_name;
         String param_name;
         String[] parts = Helpers.parse_param_descriptor(param_descriptor);
@@ -247,44 +244,5 @@ class CustomSqlUtils {
         }
         param_type_name = type_map.get_target_type_name(param_type_name);
         return new FieldInfo(param_names_mode, param_type_name, param_name, "parameter");
-    }
-
-    public static void get_shortcut_info(JaxbUtils.JaxbTypeMap type_map,
-                                         FieldNamesMode param_names_mode,
-                                         String[] method_param_descriptors,
-                                         List<FieldInfo> fields_all,
-                                         String[] filter_col_names,
-                                         List<FieldInfo> res_params) throws Exception {
-
-        Map<String, FieldInfo> all_col_names_map = new HashMap<String, FieldInfo>();
-        for (FieldInfo fi : fields_all) {
-            String cn = fi.getColumnName();
-            all_col_names_map.put(cn, fi);
-        }
-        List<FieldInfo> fields_filter = new ArrayList<FieldInfo>();
-        for (String fcn : filter_col_names) {
-            if (!all_col_names_map.containsKey(fcn))
-                throw new Exception("Invalid SQL-shortcut. Table column '" + fcn + "' not found. Ensure upper/lower case.");
-            FieldInfo fi = all_col_names_map.get(fcn);
-            fields_filter.add(fi);
-        }
-        // assign param types from table!! without dto-refinement!!!
-        if (method_param_descriptors.length != fields_filter.size()) {
-            throw new Exception("Invalid SQL-shortcut. Methof parameters declared: " + method_param_descriptors.length
-                    + ". SQL parameters expected: " + fields_filter.size());
-        }
-        for (int i = 0; i < method_param_descriptors.length; i++) {
-            String param_descriptor = method_param_descriptors[i];
-            FieldInfo fi = fields_filter.get(i);
-            String curr_type = fi.getType();
-            String default_param_type_name = get_target_type_by_type_map(type_map, curr_type);
-            FieldInfo pi = CustomSqlUtils.create_param_info(type_map, param_names_mode, param_descriptor, default_param_type_name);
-            res_params.add(pi);
-        }
-    }
-
-    private static String get_target_type_by_type_map(JaxbUtils.JaxbTypeMap type_map, String detected) {
-        String target_type_name = type_map.get_target_type_name(detected);
-        return target_type_name;
     }
 }
