@@ -313,6 +313,9 @@ public class DaoClassInfo {
                                                List<FieldInfo> res_dao_fields_not_generated,
                                                List<FieldInfo> res_dao_fields_generated) throws Exception {
 
+        // The istance of JdbcTableInfo for "crud-create"
+        // should not be cached/shared, because of modyfying of FieldInfo
+
         String no_model = ""; // TODO - info about PK and FK is not needed for crud_create
         JdbcTableInfo t_info = new JdbcTableInfo(no_model, conn, type_map, dto_field_names_mode, table_name, "*");
         List<FieldInfo> dao_fields_all = t_info.fields_all;

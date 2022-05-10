@@ -146,21 +146,29 @@ public class JdbcUtils {
                 dao_crud_generated_set.add(k.toLowerCase());
             }
         }
-        // List<FieldInfo> dto_fields = new ArrayList<FieldInfo>();
-        // Map<String, FieldInfo> dto_fields_map = get_dto_field_info(jaxb_dto_class, sql_root_abs_path, dto_fields);
         DaoClassInfo info = new DaoClassInfo(conn, dto_field_names_mode, method_params_names_mode, global_markers, type_map);
         info.get_dao_fields_for_crud_create(jaxb_dto_class, dao_table_name,
                 dao_crud_generated_set, res_dao_fields_not_generated, res_dao_fields_generated);
         return SqlUtils.create_crud_create_sql(dao_table_name, res_dao_fields_not_generated);
     }
 
+    // 1) if I locate this cache in DaoClassInfo, there should be only one instance of DaoClassInfo in JdbcUtils
+    // 2) FieldInfo from this cashe must be used as is without modyfying
+
+    private final Map<String, JdbcTableInfo> _table_info = new HashMap<String, JdbcTableInfo>();
+
     private JdbcTableInfo _get_table_info_for_crud(DtoClass jaxb_dto_class,
                                                    String sql_root_abs_path,
                                                    String table_name,
                                                    String explicit_pk) throws Exception {
 
+        String key = String.format("%s|%s", table_name, explicit_pk);
+        if (_table_info.containsKey(key)) {
+            return _table_info.get(key);
+        }
         DaoClassInfo info = new DaoClassInfo(conn, dto_field_names_mode, method_params_names_mode, global_markers, type_map);
         JdbcTableInfo t_info = info.get_dao_fields_for_crud(jaxb_dto_class, table_name, explicit_pk);
+        _table_info.put(key, t_info);
         return t_info;
     }
 
