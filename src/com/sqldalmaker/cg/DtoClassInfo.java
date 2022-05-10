@@ -94,7 +94,7 @@ class DtoClassInfo {
         if (!SqlUtils.is_empty_ref(jaxb_dto_class_ref)) {
             String jdbc_sql = SqlUtils.jdbc_sql_by_dto_class_ref(jaxb_dto_class_ref, sql_root_abs_path);
             // get fields from sql first to omit invisible/db-specific fields
-            CustomSqlUtils.get_field_info_by_jdbc_sql(model, conn, dto_field_names_mode, jdbc_sql, fields_map, res_dto_fields);
+            JdbcSqlInfo.get_field_info_by_jdbc_sql(model, conn, dto_field_names_mode, jdbc_sql, fields_map, res_dto_fields);
             if (SqlUtils.is_table_ref(jaxb_dto_class_ref)) {
                 String table_name = jaxb_dto_class_ref;
                 _fill_by_table(model, table_name, res_dto_fields, fields_map);
@@ -150,7 +150,7 @@ class DtoClassInfo {
                                 Map<String, FieldInfo> fields_map) throws Exception {
 
         String explicit_pk = "*";
-        DatabaseTableInfo info = new DatabaseTableInfo(model, conn, type_map, dto_field_names_mode, table_name, explicit_pk);
+        JdbcTableInfo info = new JdbcTableInfo(model, conn, type_map, dto_field_names_mode, table_name, explicit_pk);
         res_dto_fields.clear();
         res_dto_fields.addAll(info.fields_all);
         fields_map.clear();

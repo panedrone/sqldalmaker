@@ -12,7 +12,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.util.*;
 
-public class CustomSqlInfo {
+public class DaoClassInfo {
 
     private final Connection conn;
     private final FieldNamesMode dto_field_names_mode;
@@ -21,11 +21,11 @@ public class CustomSqlInfo {
     private final JaxbUtils.JaxbMacros markers;
     private final JaxbUtils.JaxbTypeMap type_map;
 
-    public CustomSqlInfo(Connection conn,
-                         FieldNamesMode dto_field_names_mode,
-                         FieldNamesMode method_params_names_mode,
-                         JaxbUtils.JaxbMacros markers,
-                         JaxbUtils.JaxbTypeMap type_map) {
+    public DaoClassInfo(Connection conn,
+                        FieldNamesMode dto_field_names_mode,
+                        FieldNamesMode method_params_names_mode,
+                        JaxbUtils.JaxbMacros markers,
+                        JaxbUtils.JaxbTypeMap type_map) {
 
         this.conn = conn;
         this.dto_field_names_mode = dto_field_names_mode;
@@ -99,7 +99,7 @@ public class CustomSqlInfo {
         String[] parts = SqlUtils.parse_sql_shortcut_ref(dao_jaxb_ref); // class name is not available here
         String dao_table_name = parts[0];
         String no_model = ""; // TODO - info about PK and FK is not needed for sql_shortcuts
-        DatabaseTableInfo t_info = new DatabaseTableInfo(no_model, conn, type_map, dto_field_names_mode, dao_table_name, "*");
+        JdbcTableInfo t_info = new JdbcTableInfo(no_model, conn, type_map, dto_field_names_mode, dao_table_name, "*");
         res_fields.addAll(t_info.fields_all); // always add them all to enable checks in _get_shortcut_info
         if (jaxb_return_type_is_dto) {
             // 1) dto class name is available 2) dto info considers jaxb from <field...
@@ -149,7 +149,7 @@ public class CustomSqlInfo {
             FieldInfo fi = fields_filter.get(i);
             String curr_type = fi.getType();
             String default_param_type_name = type_map.get_target_type_name(curr_type);
-            FieldInfo pi = CustomSqlUtils.create_param_info(type_map, param_names_mode, param_descriptor, default_param_type_name);
+            FieldInfo pi = JdbcSqlInfo.create_param_info(type_map, param_names_mode, param_descriptor, default_param_type_name);
             res_params.add(pi);
         }
     }
@@ -201,7 +201,7 @@ public class CustomSqlInfo {
                                                 List<FieldInfo> res_fields,
                                                 StringBuilder error) throws Exception {
 
-        // not only tables, se use DtoClassInfo instead of DatabaseTableInfo
+        // not only tables, se use DtoClassInfo instead of TableInfo
         DtoClassInfo info = new DtoClassInfo(conn, type_map, markers, dto_field_names_mode);
         List<FieldInfo> dto_fields = new ArrayList<FieldInfo>();
         DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(jaxb_dto_or_return_type, jaxb_dto_classes);
@@ -229,7 +229,7 @@ public class CustomSqlInfo {
         try {
             Map<String, FieldInfo> dao_fields_map = new HashMap<String, FieldInfo>();
             // no model!
-            CustomSqlUtils.get_field_info_by_jdbc_sql("", conn, dto_field_names_mode, dao_query_jdbc_sql, dao_fields_map, dao_fields);
+            JdbcSqlInfo.get_field_info_by_jdbc_sql("", conn, dto_field_names_mode, dao_query_jdbc_sql, dao_fields_map, dao_fields);
         } catch (Exception e) {
             error.append(e.getMessage());
         }
@@ -298,7 +298,7 @@ public class CustomSqlInfo {
         } else {
             _get_custom_sql_fields_info(sql_root_abs_path, dao_query_jdbc_sql,
                     jaxb_dto_or_return_type, jaxb_return_type_is_dto, jaxb_dto_classes, res_fields);
-            CustomSqlUtils.get_jdbc_sql_params_info(conn, type_map, dao_query_jdbc_sql, param_names_mode, method_param_descriptors, res_params);
+            JdbcSqlInfo.get_jdbc_sql_params_info(conn, type_map, dao_query_jdbc_sql, param_names_mode, method_param_descriptors, res_params);
         }
         for (FieldInfo fi : res_fields) {
             String type_name = type_map.get_target_type_name(fi.getType());
@@ -314,7 +314,7 @@ public class CustomSqlInfo {
                                                List<FieldInfo> res_dao_fields_generated) throws Exception {
 
         String no_model = ""; // TODO - info about PK and FK is not needed for crud_create
-        DatabaseTableInfo t_info = new DatabaseTableInfo(no_model, conn, type_map, dto_field_names_mode, table_name, "*");
+        JdbcTableInfo t_info = new JdbcTableInfo(no_model, conn, type_map, dto_field_names_mode, table_name, "*");
         List<FieldInfo> dao_fields_all = t_info.fields_all;
         for (FieldInfo dao_field : dao_fields_all) {
             String dao_col_name = dao_field.getColumnName();
@@ -336,11 +336,11 @@ public class CustomSqlInfo {
         }
     }
 
-    public DatabaseTableInfo get_dao_fields_for_crud(DtoClass jaxb_dto_class,
-                                                     String table_name,
-                                                     String explicit_pk) throws Exception {
+    public JdbcTableInfo get_dao_fields_for_crud(DtoClass jaxb_dto_class,
+                                                 String table_name,
+                                                 String explicit_pk) throws Exception {
         String no_model = "";
-        DatabaseTableInfo t_info = new DatabaseTableInfo(no_model, conn, type_map, dto_field_names_mode, table_name, explicit_pk);
+        JdbcTableInfo t_info = new JdbcTableInfo(no_model, conn, type_map, dto_field_names_mode, table_name, explicit_pk);
         _refine_dao_fields_by_dto_fields(jaxb_dto_class, t_info.fields_all);
         return t_info;
     }

@@ -12,7 +12,7 @@ import java.util.Map;
 /**
  * @author sqldalmaker@gmail.com
  */
-class CustomSqlUtils {
+class JdbcSqlInfo {
 
     public static void get_field_info_by_jdbc_sql(String model,
                                                   Connection conn,
@@ -130,7 +130,7 @@ class CustomSqlUtils {
         Helpers.check_duplicates(method_param_descriptors);
         PreparedStatement ps = _prepare_jdbc_sql(conn, dao_jdbc_sql);
         try {
-            CustomSqlUtils.get_params_info(ps, type_map, param_names_mode, method_param_descriptors, res_params);
+            JdbcSqlInfo.get_params_info(ps, type_map, param_names_mode, method_param_descriptors, res_params);
         } finally {
             ps.close();
         }
