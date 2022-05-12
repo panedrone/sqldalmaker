@@ -70,6 +70,7 @@ public class UITabAdmin {
     // private JButton djangoDbButton;
     private JButton sqlite3MysqlConnectorPsycopg2Button;
     private JButton SQLAlchemyButton;
+    private JButton gormButton;
 
     private Project project;
     private VirtualFile root_file;
@@ -362,6 +363,12 @@ public class UITabAdmin {
             @Override
             public void actionPerformed(ActionEvent e) {
                 IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "data_store_sqlalchemy.py", "data_store_sqlalchemy.py");
+            }
+        });
+        gormButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "data_store_gorm.go", "data_store_gorm.go");
             }
         });
     }
@@ -664,6 +671,9 @@ public class UITabAdmin {
         btn_golang = new JButton();
         btn_golang.setText("database/sql");
         panel8.add(btn_golang);
+        gormButton = new JButton();
+        gormButton.setText("gorm");
+        panel8.add(gormButton);
         final JPanel panel9 = new JPanel();
         panel9.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
         gbc = new GridBagConstraints();

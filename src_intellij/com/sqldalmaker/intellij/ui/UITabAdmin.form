@@ -314,6 +314,12 @@
                           <text value="database/sql"/>
                         </properties>
                       </component>
+                      <component id="5fb52" class="javax.swing.JButton" binding="gormButton" default-binding="true">
+                        <constraints/>
+                        <properties>
+                          <text value="gorm"/>
+                        </properties>
+                      </component>
                     </children>
                   </grid>
                   <grid id="4187c" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="1">

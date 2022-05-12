@@ -96,6 +96,12 @@ public class GoCG {
             List<FieldInfo> fields = new ArrayList<FieldInfo>();
             db_utils.get_dto_field_info(jaxb_dto_class, sql_root_abs_path, fields);
             Map<String, Object> context = new HashMap<String, Object>();
+            int model_name_end_index = dto_class_name.indexOf('-');
+            if (model_name_end_index != -1) {
+                String model = dto_class_name.substring(0, model_name_end_index);
+                dto_class_name = dto_class_name.substring(model_name_end_index + 1);
+                context.put("model", model);
+            }
             context.put("package", dto_package);
             Set<String> imports = new HashSet<String>();
             int max_name_len = -1;
@@ -284,7 +290,12 @@ public class GoCG {
 
         private String _get_rendered_dto_class_name(String dto_class_name) throws Exception {
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
-            return jaxb_dto_class.getName();
+            String dto_class_nm = jaxb_dto_class.getName();
+            int model_end = dto_class_nm.indexOf('-');
+            if (model_end != -1) {
+                dto_class_nm = dto_class_nm.substring(model_end + 1);
+            }
+            return dto_class_nm;
         }
 
         private void _process_dto_class_name(String dto_class_name) {

@@ -1,6 +1,6 @@
-2022-05-06
+2022-05-12
 
-    + CharField max_length for Django and String(...) for SQLAlchemy
+    + GORM
 
 2022-05-03
 
