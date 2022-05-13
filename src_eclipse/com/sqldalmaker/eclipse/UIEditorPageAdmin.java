@@ -334,7 +334,7 @@ public class UIEditorPageAdmin extends Composite {
 		});
 		toolkit.adapt(btnSqliteMysqlconnectorPsycopg, true, true);
 		btnSqliteMysqlconnectorPsycopg.setText("sqlite3, mysql.connector, psycopg2, django.db");
-		
+
 		Button btnSqlalchemy = new Button(composite_5, SWT.NONE);
 		btnSqlalchemy.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -367,40 +367,50 @@ public class UIEditorPageAdmin extends Composite {
 		});
 		btnNewButton_7_1.setText("pyodbc, mssql");
 		toolkit.adapt(btnNewButton_7_1, true, true);
-		
+
 		Composite composite_6 = new Composite(composite_2, SWT.NONE);
 		toolkit.adapt(composite_6);
 		toolkit.paintBordersFor(composite_6);
-				composite_6.setLayout(new GridLayout(4, false));
-		
-				Label lblRuby = new Label(composite_6, SWT.NONE);
-				toolkit.adapt(lblRuby, true, true);
-				lblRuby.setText("Ruby");
-						
-								Button btnNewButton_8 = new Button(composite_6, SWT.NONE);
-								btnNewButton_8.addSelectionListener(new SelectionAdapter() {
-									@Override
-									public void widgetSelected(SelectionEvent e) {
-										EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/data_store.rb", "data_store.rb");
-									}
-								});
-								toolkit.adapt(btnNewButton_8, true, true);
-								btnNewButton_8.setText("DBI");
-										
-												Label lblGo = new Label(composite_6, SWT.NONE);
-												toolkit.adapt(lblGo, true, true);
-												lblGo.setText("Go");
-														
-																Button btnNewButton_8_1 = new Button(composite_6, SWT.NONE);
-																btnNewButton_8_1.addSelectionListener(new SelectionAdapter() {
-																	@Override
-																	public void widgetSelected(SelectionEvent e) {
-																		// ending '_' because of bugs
-																		EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/data_store.go", "data_store.go_");
-																	}
-																});
-																btnNewButton_8_1.setText("database/sql");
-																toolkit.adapt(btnNewButton_8_1, true, true);
+		composite_6.setLayout(new GridLayout(5, false));
+
+		Label lblRuby = new Label(composite_6, SWT.NONE);
+		toolkit.adapt(lblRuby, true, true);
+		lblRuby.setText("Ruby");
+
+		Button btnNewButton_8 = new Button(composite_6, SWT.NONE);
+		btnNewButton_8.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/data_store.rb", "data_store.rb");
+			}
+		});
+		toolkit.adapt(btnNewButton_8, true, true);
+		btnNewButton_8.setText("DBI");
+
+		Label lblGo = new Label(composite_6, SWT.NONE);
+		toolkit.adapt(lblGo, true, true);
+		lblGo.setText("Go");
+
+		Button btnNewButton_8_1 = new Button(composite_6, SWT.NONE);
+		btnNewButton_8_1.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				// ending '_' because of bugs
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/data_store.go", "data_store.go_");
+			}
+		});
+		btnNewButton_8_1.setText("database/sql");
+		toolkit.adapt(btnNewButton_8_1, true, true);
+
+		Button btnNewButton_8_1_1 = new Button(composite_6, SWT.NONE);
+		btnNewButton_8_1_1.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/data_store_gorm.go", "data_store_gorm.go_");
+			}
+		});
+		btnNewButton_8_1_1.setText("gorm");
+		toolkit.adapt(btnNewButton_8_1_1, true, true);
 
 		Composite composite_3 = new Composite(composite_top, SWT.NONE);
 		composite_3.setLayout(new GridLayout(6, false));

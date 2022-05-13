@@ -179,6 +179,7 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         jButton18 = new javax.swing.JButton();
         jLabel11 = new javax.swing.JLabel();
         jButton34 = new javax.swing.JButton();
+        jButton16 = new javax.swing.JButton();
         jPanel7 = new javax.swing.JPanel();
         jButton19 = new javax.swing.JButton();
         jButton20 = new javax.swing.JButton();
@@ -508,6 +509,14 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         });
         jPanel5.add(jButton34);
 
+        jButton16.setText("gorm");
+        jButton16.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton16ActionPerformed(evt);
+            }
+        });
+        jPanel5.add(jButton16);
+
         jPanel8.add(jPanel5);
 
         jPanel7.setPreferredSize(new java.awt.Dimension(478, 32));
@@ -757,6 +766,10 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         NbpIdeEditorHelpers.open_resource_file_in_editor_async("data_store_sqlalchemy.py", "data_store_sqlalchemy.py");
     }//GEN-LAST:event_jButton15ActionPerformed
 
+    private void jButton16ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton16ActionPerformed
+        NbpIdeEditorHelpers.open_resource_file_in_editor_async("data_store_gorm.go", "data_store_gorm.go");
+    }//GEN-LAST:event_jButton16ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton10;
@@ -765,6 +778,7 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
     private javax.swing.JButton jButton13;
     private javax.swing.JButton jButton14;
     private javax.swing.JButton jButton15;
+    private javax.swing.JButton jButton16;
     private javax.swing.JButton jButton17;
     private javax.swing.JButton jButton18;
     private javax.swing.JButton jButton19;
