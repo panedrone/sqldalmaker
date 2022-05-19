@@ -54,8 +54,7 @@ class DtoClassInfo {
                                   DtoClass jaxb_dto_class,
                                   List<FieldInfo> res_dto_fields) throws Exception {
 
-        Set<String> refined_by_field_jaxb = _refine_by_jaxb_dto_class_fields(jaxb_dto_class, res_dto_fields, fields_map);
-        _refine_others(refined_by_field_jaxb, res_dto_fields);
+        _refine_by_jaxb(jaxb_dto_class, res_dto_fields, fields_map);
         _substitute_built_in_macros(res_dto_fields);
         _substitute_type_params(res_dto_fields);
     }
@@ -107,22 +106,9 @@ class DtoClassInfo {
         return fields_map;
     }
 
-    private void _refine_others(Set<String> refined_by_field_jaxb,
-                                List<FieldInfo> dto_fields) throws Exception {
-
-        for (FieldInfo fi : dto_fields) {
-            if (refined_by_field_jaxb.contains(fi.getColumnName())) {
-                continue;
-            }
-            String detected_jdbc_type_name = fi.getType().trim();
-            String target_type = get_target_type_by_type_map(type_map, detected_jdbc_type_name);
-            _refine_fi(fi, target_type);
-        }
-    }
-
-    private Set<String> _refine_by_jaxb_dto_class_fields(DtoClass jaxb_dto_class,
-                                                         List<FieldInfo> dto_fields,
-                                                         Map<String, FieldInfo> fields_map) throws Exception {
+    private void _refine_by_jaxb(DtoClass jaxb_dto_class,
+                                 List<FieldInfo> dto_fields,
+                                 Map<String, FieldInfo> fields_map) throws Exception {
 
         Set<String> refined_by_field_jaxb = new HashSet<String>();
         List<DtoClass.Field> jaxb_fields = jaxb_dto_class.getField(); // not null!!
@@ -138,10 +124,16 @@ class DtoClassInfo {
                 dto_fields.add(fi);
                 fields_map.put(jaxb_field_col_name, fi);
             }
-            _refine_fi(fi, jaxb_field_type_name);
+            _refine_fi_by_type_map_and_macros(fi, jaxb_field_type_name);
             refined_by_field_jaxb.add(fi.getColumnName());
         }
-        return refined_by_field_jaxb;
+        for (FieldInfo fi : dto_fields) {
+            if (refined_by_field_jaxb.contains(fi.getColumnName())) {
+                continue;
+            }
+            String type_name = fi.getType().trim(); // !!! getType(), not getOriginalType()
+            _refine_fi_by_type_map_and_macros(fi, type_name);
+        }
     }
 
     private void _fill_by_table(String model,
@@ -157,32 +149,25 @@ class DtoClassInfo {
         fields_map.putAll(info.fields_map);
     }
 
-    private void _refine_fi(FieldInfo fi,
-                            String type_name) throws Exception {
-
+    private void _refine_fi_by_type_map_and_macros(FieldInfo fi,
+                                                   String type_name) throws Exception {
         type_name = type_name.trim();
         String target_type;
         int local_field_type_params_start = type_name.indexOf('|');
         if (local_field_type_params_start == -1) { // explicit_type_name only, no parameters "int64"
-            String type_map_target_type = get_target_type_by_type_map(type_map, type_name);
+            String type_map_target_type = type_map.get_target_type_name(type_name);
             target_type = _parse_target_type(fi, type_map_target_type);
         } else {
-            String local_field_type_explicit;
             if (local_field_type_params_start == 0) { // "|0: hello0|1:hello1"
-                local_field_type_explicit = "";
+                String detected_jdbc_type_name = fi.getOriginalType(); // !!! original
+                String type_map_target_type = type_map.get_target_type_name(detected_jdbc_type_name);
+                target_type = _parse_target_type(fi, type_map_target_type + type_name);
             } else { // "{type}|0:Integer|1:hello1"
-                local_field_type_explicit = type_name.substring(0, local_field_type_params_start).trim();
+                String local_field_type_explicit = type_name.substring(0, local_field_type_params_start).trim();
+                String parsed_target_type = _parse_target_type(fi, local_field_type_explicit);
+                String local_field_type_params = type_name.substring(local_field_type_params_start);
+                target_type = parsed_target_type + local_field_type_params;
             }
-            String parsed_target_type;
-            if (local_field_type_explicit.length() == 0) { // only parameters "|0:hello"
-                String detected_jdbc_type_name = fi.getType();
-                String type_map_target_type = get_target_type_by_type_map(type_map, detected_jdbc_type_name);
-                parsed_target_type = _parse_target_type(fi, type_map_target_type);
-            } else { // local_field_type_explicit + parameters "int64{json}|0:hello"
-                parsed_target_type = _parse_target_type(fi, local_field_type_explicit);
-            }
-            String local_field_type_params = type_name.substring(local_field_type_params_start);
-            target_type = parsed_target_type + local_field_type_params;
         }
         fi.refine_rendered_type(target_type);
     }
@@ -247,13 +232,6 @@ class DtoClassInfo {
             return target_type_name; // single replacement in one pass
         }
         return null;
-    }
-
-    private static String get_target_type_by_type_map(JaxbUtils.JaxbTypeMap type_map,
-                                                      String detected) {
-
-        String target_type_name = type_map.get_target_type_name(detected);
-        return target_type_name;
     }
 
     private interface IMacro {

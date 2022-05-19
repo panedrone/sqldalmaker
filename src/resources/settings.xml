@@ -15,13 +15,13 @@
         2) target class: public class Word implements com.google.gwt.user.client.rpc.IsSerializable... -->
     <!-- field-names-mode (Java, PHP, Go): 0 - TitleCase, 1 - camelCase; 2 - snake_case; -->
     <!-- single-file: for future use. -->
-	<!-- macro: for future use. -->
-	
+    <!-- macro: for future use. -->
+
     <dto scope="com.mycom.myproject.dto" inheritance="" field-names-mode="1" single-file="" macro=""/>
 
     <!-- scope (only Java, Go, PHP): the name of package (Java, Go) or name-space
         (PHP) for DAO; -->
-	<!-- macro: for future use. -->
+    <!-- macro: for future use. -->
 
     <dao scope="com.mycom.myproject.dao" macro=""/>
 
@@ -66,27 +66,11 @@
     <!--        <type detected="java.lang.Integer" target="java.lang.Long"/>-->
     <!--    </type-map>-->
 
-    <!-- if the type is defined in XML meta-program explicitly,
-         it will be rendered as-is anyway (without considering type-map) -->
-
-    <!-- Example for Go and SQLite3: -->
-
-    <!-- use ':' to specify imports:  <type detected="java.util.Date" target="time:time.Time"/>-->
-
-    <!--    <type-map default="">-->
-    <!--        <type detected="java.lang.Integer" target="int64${json}" />-->
-    <!--        <type detected="java.lang.Double" target="float64${json}"/>-->   <!-- go_sqlite3_northwindEF -->
-    <!--        <type detected="java.lang.Float" target="float64${json}" />-->
-    <!--        <type detected="java.lang.String" target="string${json}" />-->
-    <!--        <type detected="byte[]" target="byte[]" />-->
-    <!--        <type detected="java.lang.Object" target="interface{}${json}" />-->
-    <!--    </type-map>-->
-
     <!-- Example for C++ and SQLite3: -->
 
     <!--    <type-map default="CValue">-->
     <!--        <type detected="java.lang.Integer" target="CLong"/>-->
-    <!--        <type detected="java.lang.Double" target="CDouble"/>-->   <!-- go_sqlite3_northwindEF -->
+    <!--        <type detected="java.lang.Double" target="CDouble"/>-->   <!-- sqlite3_northwindEF -->
     <!--        <type detected="java.lang.Float" target="CDouble"/>-->
     <!--        <type detected="java.lang.String" target="CText"/>-->
     <!--        <type detected="byte[]" target="CBlob"/>-->
@@ -107,42 +91,42 @@
     <!--        <type detected="java.lang.Object" target="Object"/>-->
     <!--    </type-map>-->
 
-    <!-- Examples for Python: -->
-
     <type-map default="">
 
         <!-- Example for Go and MySQL|SQLite3: -->
 
-<!--        <type detected="gorm-java.lang.Short" target="int32${json-gorm}"/>-->
-<!--        <type detected="gorm-java.lang.Integer" target="int64${json-gorm}"/>-->
-<!--        <type detected="gorm-java.lang.String" target="string${json-gorm}"/>-->
-<!--        <type detected="gorm-java.util.Date" target="time:time.Time${json-gorm}"/>-->
-<!--        <type detected="gorm-byte[]" target="string${json-gorm}"/>-->
-<!--        <type detected="gorm-java.lang.Boolean" target="int64${json-gorm}"/>-->
-<!--        <type detected="gorm-java.lang.Float" target="float64${json-gorm}"/>-->
-<!--        <type detected="gorm-java.math.BigDecimal" target="float64${json-gorm}"/>-->
-<!--        <type detected="gorm-java.lang.Object" target="interface{}${json}-gorm"/>-->
+        <!-- ******   raw-SQL params and ret-values   ****** -->
 
-<!--        <type detected="java.lang.Short" target="int32${json}"/>-->
-<!--        <type detected="java.lang.Integer" target="int64${json}"/>-->
-<!--        <type detected="java.lang.String" target="string${json}"/>-->
-<!--        <type detected="java.util.Date" target="time:time.Time${json}"/>-->
-<!--        <type detected="byte[]" target="string${json}"/>-->
-<!--        <type detected="java.lang.Boolean" target="int64${json}"/>-->
-<!--        <type detected="java.lang.Float" target="float64${json}"/>-->
-<!--        <type detected="java.math.BigDecimal" target="float64${json}"/>-->
-<!--        <type detected="float" target="float64"/>-->
-<!--        <type detected="java.lang.Object" target="interface{}${json}"/>-->
+        <!--        <type detected="java.lang.Short" target="int16${0}"/>-->
+        <!--        <type detected="java.lang.Integer" target="int32${0}"/> &lt;!&ndash; Google: java.lang.Integer size bits &ndash;&gt;-->
+        <!--        <type detected="java.lang.Long" target="int64${0}"/>-->
+        <!--        <type detected="java.lang.String" target="string${0}"/>-->
+        <!--        <type detected="java.util.Date" target="time:time.Time${0}"/>-->
+        <!--        <type detected="byte[]" target="string${0}"/>-->
+        <!--        <type detected="java.lang.Boolean" target="int64${0}"/>-->
+        <!--        <type detected="java.lang.Float" target="float64${0}"/>-->
+        <!--        <type detected="java.math.BigDecimal" target="float64${0}"/>-->
+        <!--        <type detected="float" target="float64${0}"/>-->
+        <!--        <type detected="java.lang.Object" target="interface{}${0}"/>-->
 
-        <!-- ***** sqlalchemy (sa) ****************** -->
+        <!-- ******   GORM ("gorm-" prefix for detected types)  ****** -->
+
+        <!--        <type detected="gorm-java.lang.Short" target="int16${json-gorm}"/>-->
+        <!--        <type detected="gorm-java.lang.Integer" target="int32${json-gorm}"/>-->
+        <!--        <type detected="gorm-java.lang.Long" target="int64${json-gorm}"/>-->
+        <!--        <type detected="gorm-java.lang.String" target="string${json-gorm}"/>-->
+        <!--        <type detected="gorm-java.util.Date" target="time:time.Time${json-gorm}"/>-->
+        <!--        <type detected="gorm-byte[]" target="string${json-gorm}"/>-->
+        <!--        <type detected="gorm-java.lang.Boolean" target="int64${json-gorm}"/>-->
+        <!--        <type detected="gorm-java.lang.Float" target="float64${json-gorm}"/>-->
+        <!--        <type detected="gorm-java.math.BigDecimal" target="float64${json-gorm}"/>-->
+        <!--        <type detected="gorm-java.lang.Object" target="interface{}${json-gorm}"/>-->
+
+        <!-- ***** SQLAlchemy (sa-) ****************** -->
 
         <!-- https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store_sqlalchemy.py-->
 
-        <!-- all numerics for oracle_cx -->
-
-        <!--        <type detected="sa-java.math.BigDecimal" target="${sa-type}|0:NUMBER"/>-->
-
-        <!-- numerics for others -->
+        <!-- numerics for all except oracle_cx -->
 
         <type detected="sa-java.lang.Short" target="${sa-type}|0:SmallInteger"/>
         <type detected="sa-java.lang.Integer" target="${sa-type}|0:Integer"/>
@@ -152,6 +136,10 @@
         <type detected="sa-java.lang.Double" target="${sa-type}|0:Float"/>
         <type detected="sa-java.math.BigDecimal" target="${sa-type}|0:Float"/>
 
+        <!-- all numerics for oracle_cx -->
+
+        <!--        <type detected="sa-java.math.BigDecimal" target="${sa-type}|0:NUMBER"/>-->
+
         <type detected="sa-java.util.Date" target="${sa-type}|0:DateTime"/>
         <type detected="sa-java.lang.String" target="${sa-type}|0:String"/>
         <type detected="sa-java.lang.Boolean" target="${sa-type}|0:Boolean"/>
@@ -159,7 +147,7 @@
 
         <type detected="sa-java.lang.Object" target="${sa-type-unknown}"/>
 
-        <!-- ***** django (dj) ****************** -->
+        <!-- ***** Django (dj-) ****************** -->
 
         <type detected="dj-java.lang.Short" target="${dj-type}|0:IntegerField"/>
         <type detected="dj-java.lang.Integer" target="${dj-type}|0:IntegerField"/>
@@ -188,7 +176,7 @@
 
         <type detected="dj-object" target="${dj-type}|0:CharField"/>
 
-        <!-- ****** raw SQL ************************ -->
+        <!-- ******   raw-SQL params and ret-values for Python  ****** -->
 
         <type detected="java.lang.Short" target="int"/>
         <type detected="java.lang.Integer" target="int"/>
@@ -219,17 +207,19 @@
 
         <!-- Go tags: -->
 
-        <macro name="${json}" value=" `json:&quot;${col}${0}&quot;`"/>
+        <macro name="${col}" value="${lower_snake_case(column)}"/>
+
+        <macro name="${json}" value=" `json:&quot;${col}${1}&quot;`"/>
 
         <macro name="${json-gorm}"
                value=" `json:&quot;${col}${0}&quot; gorm:&quot;column:${column}${gorm-params}&quot;`"/>
 
-        <!-- sqlalchemy Column: -->
+        <!-- SQLAlchemy Column: -->
 
         <macro name="${sa-type-unknown}" value="${sa-column-base}|type:"/>
         <macro name="${sa-type}" value="${sa-column-base}|type:, ${0}"/>
 
-        <!-- djando field: -->
+        <!-- Django field: -->
 
         <macro name="${dj-type}" value="${dj-field}"/>
 
@@ -307,7 +297,7 @@
             </vm>
         </macro>
 
-        <macro name="${sa-column-base2}">
+        <macro name="${sa-column}">
             <vm-xml>
                 <print var="= Column('${column}'${type}"/>
                 <if var="$fi.ColumnSize>0">

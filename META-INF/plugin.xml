@@ -2,7 +2,7 @@
     <id>dal-mpe</id>
     <name>SQL DAL Maker</name>
     <category>Database</category>
-    <version>1.240.2205</version>
+    <version>1.241.2205</version>
     <vendor email="sqldalmaker@gmail.com"/>
     <idea-version since-build="181.5684.4"/>
 
@@ -18,8 +18,8 @@ Target programming languages: PHP, Java, C++, Python, Ruby, and Go. To generate 
     <change-notes>
         <![CDATA[
 <li>+ <a href="https://github.com/panedrone/sdm_demo_gorm_todolist">GORM</a></li>
-<li>+ Django models</li>
-<li>+ Flask-SQLAlchemy</li>
+<li>+ <a href="https://github.com/panedrone/sdm_demo_django_todolist_sqlite3">Django models</a></li>
+<li>+ <a href="https://github.com/panedrone/sdm_demo_flask_sqlalchemy_todolist">Flask-SQLAlchemy</a></li>
 </ul>]]></change-notes>
 
     <application-components>
