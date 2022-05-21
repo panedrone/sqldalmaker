@@ -20,10 +20,7 @@ import com.sqldalmaker.cg.java.JavaCG;
 import com.sqldalmaker.cg.php.PhpCG;
 import com.sqldalmaker.cg.python.PythonCG;
 import com.sqldalmaker.cg.ruby.RubyCG;
-import com.sqldalmaker.common.Const;
-import com.sqldalmaker.common.RootFileName;
-import com.sqldalmaker.common.SdmUtils;
-import com.sqldalmaker.common.XmlParser;
+import com.sqldalmaker.common.*;
 import com.sqldalmaker.jaxb.dto.DtoClasses;
 import com.sqldalmaker.jaxb.settings.Settings;
 import org.jetbrains.annotations.NotNull;
@@ -54,21 +51,17 @@ public class IdeaTargetLanguageHelpers {
 
     public static boolean snake_case_needed(VirtualFile root_file) {
         String fn = root_file.getName();
-        if (RootFileName.RUBY.equals(fn) || RootFileName.PYTHON.equals(fn)) {
-            return true;
-        }
-        return false;
+        return TargetLangUtils.snake_case_needed(fn);
     }
 
     public static boolean lower_camel_case_needed(VirtualFile root_file) {
         String fn = root_file.getName();
-        if (RootFileName.GO.equals(fn)) {
-            return true;
-        }
-        return false;
+        return TargetLangUtils.lower_camel_case_needed(fn);
     }
 
-    public static void register(@NotNull FileTypeConsumer consumer, FileType file_type) {
+    public static void register(@NotNull FileTypeConsumer consumer,
+                                FileType file_type) {
+
         consumer.consume(file_type, new ExactFileNameMatcher(RootFileName.JAVA));
         consumer.consume(file_type, new ExactFileNameMatcher(RootFileName.CPP));
         // consumer.consume(file_type, new ExactFileNameMatcher(ProfileNames.OBJC));
@@ -78,43 +71,49 @@ public class IdeaTargetLanguageHelpers {
         consumer.consume(file_type, new ExactFileNameMatcher(RootFileName.GO));
     }
 
-    private static String _get_unknown_root_file_msg(String fn) {
-        return "Unknown root file: " + fn;
-    }
-
-    public static String get_target_folder_rel_path(Project project, VirtualFile root_file, Settings settings,
-                                                    String class_name, String class_scope) throws Exception {
+    public static String get_target_folder_rel_path(Project project,
+                                                    VirtualFile root_file,
+                                                    Settings settings,
+                                                    String class_name,
+                                                    String class_scope) throws Exception {
 
         String target_folder_abs_path = get_target_folder_abs_path(project, root_file, settings, class_scope);
-        String target_file_abs_path = get_target_file_path(root_file.getName(), target_folder_abs_path, class_name);
+        String target_file_abs_path = TargetLangUtils.get_target_file_path(root_file.getName(), target_folder_abs_path, class_name);
         String rel_path = IdeaHelpers.get_relative_path(project, target_file_abs_path);
         return rel_path;
     }
 
-    public static void open_editor_sync(Project project, VirtualFile root_file, Settings settings,
-                                        String class_name, String class_scope) throws Exception {
+    public static void open_editor_sync(Project project,
+                                        VirtualFile root_file,
+                                        Settings settings,
+                                        String class_name,
+                                        String class_scope) throws Exception {
 
         String rel_path = get_target_folder_rel_path(project, root_file, settings, class_name, class_scope);
         IdeaEditorHelpers.open_project_file_in_editor_sync(project, rel_path);
     }
 
     public static void prepare_generated_file_data(VirtualFile root_file,
-                                                   String class_name, String[] file_content,
+                                                   String class_name,
+                                                   String[] file_content,
                                                    List<IdeaHelpers.GeneratedFileData> list) throws Exception {
 
-        String file_name = file_name_from_class_name(root_file.getName(), class_name);
+        String file_name = TargetLangUtils.file_name_from_class_name(root_file.getName(), class_name);
         IdeaHelpers.GeneratedFileData gf = new IdeaHelpers.GeneratedFileData();
         gf.file_name = file_name;
         gf.file_content = file_content[0];
         list.add(gf);
     }
 
-    public static void validate_dto(Project project, VirtualFile root_file, Settings settings,
-                                    String class_name, String[] file_content,
+    public static void validate_dto(Project project,
+                                    VirtualFile root_file,
+                                    Settings settings,
+                                    String class_name,
+                                    String[] file_content,
                                     StringBuilder validation_buff) throws Exception {
 
         String target_folder_abs_path = get_target_folder_abs_path(project, root_file, settings, settings.getDto().getScope());
-        String target_file_abs_path = get_target_file_path(root_file.getName(), target_folder_abs_path, class_name);
+        String target_file_abs_path = TargetLangUtils.get_target_file_path(root_file.getName(), target_folder_abs_path, class_name);
         String old_text = Helpers.load_text_from_file(target_file_abs_path);
         if (old_text.length() == 0) {
             validation_buff.append(Const.OUTPUT_FILE_IS_MISSING);
@@ -126,8 +125,10 @@ public class IdeaTargetLanguageHelpers {
         }
     }
 
-    public static String get_target_folder_abs_path(Project project, VirtualFile root_file,
-                                                    Settings settings, String class_scope) throws Exception {
+    public static String get_target_folder_abs_path(Project project,
+                                                    VirtualFile root_file,
+                                                    Settings settings,
+                                                    String class_scope) throws Exception {
 
         String target_folder_rel_path = settings.getFolders().getTarget();
         String module_root = IdeaHelpers.get_project_base_dir(project).getPath();
@@ -141,39 +142,15 @@ public class IdeaTargetLanguageHelpers {
         return res;
     }
 
-    public static String get_target_file_path(String root_fn, String output_dir, String class_name) throws Exception {
-        String file_name = file_name_from_class_name(root_fn, class_name);
-        return Helpers.concat_path(output_dir, file_name);
-    }
-
-    public static String file_name_from_class_name(String root_fn, String class_name) throws Exception {
-        int model_name_end_index = class_name.indexOf('-');
-        if (model_name_end_index != -1) {
-            class_name = class_name.substring(model_name_end_index + 1);
-        }
-        if (RootFileName.PHP.equals(root_fn)) {
-            return class_name + ".php";
-        } else if (RootFileName.JAVA.equals(root_fn)) {
-            return class_name + ".java";
-        } else if (RootFileName.CPP.equals(root_fn)) {
-            return class_name + ".h";
-        } else if (RootFileName.RUBY.equals(root_fn)) {
-            return Helpers.convert_file_name_to_snake_case(class_name, "rb");
-        } else if (RootFileName.PYTHON.equals(root_fn)) {
-            return Helpers.convert_file_name_to_snake_case(class_name, "py");
-        } else if (RootFileName.GO.equals(root_fn)) {
-            return Helpers.convert_file_name_to_snake_case(class_name, "go");
-        }
-        throw new Exception(_get_unknown_root_file_msg(root_fn));
-    }
-
-    public static void validate_dao(Project project, VirtualFile root_file,
-                                    Settings settings, String dao_class_name,
+    public static void validate_dao(Project project,
+                                    VirtualFile root_file,
+                                    Settings settings,
+                                    String dao_class_name,
                                     String[] file_content,
                                     StringBuilder validation_buff) throws Exception {
 
         String target_folder_abs_path = get_target_folder_abs_path(project, root_file, settings, settings.getDao().getScope());
-        String target_file_abs_path = get_target_file_path(root_file.getName(), target_folder_abs_path, dao_class_name);
+        String target_file_abs_path = TargetLangUtils.get_target_file_path(root_file.getName(), target_folder_abs_path, dao_class_name);
         String old_text = Helpers.load_text_from_file(target_file_abs_path);
         if (old_text.length() == 0) {
             validation_buff.append(Const.OUTPUT_FILE_IS_MISSING);
@@ -188,7 +165,8 @@ public class IdeaTargetLanguageHelpers {
     /*
      * returns null if the file is not root-file
      */
-    public static String get_root_file_relative_path(Project project, VirtualFile file) {
+    public static String get_root_file_relative_path(Project project,
+                                                     VirtualFile file) {
         String fn = file.getName();
         if (RootFileName.JAVA.equals(fn)
                 || RootFileName.CPP.equals(fn)
@@ -216,8 +194,10 @@ public class IdeaTargetLanguageHelpers {
                 RootFileName.GO.equals(file.getName());
     }
 
-    public static IDtoCG create_dto_cg(Connection connection, Project project, VirtualFile root_file,
-                                       Settings settings, StringBuilder output_dir_rel_path) throws Exception {
+    public static IDtoCG create_dto_cg(Connection connection,
+                                       Project project, VirtualFile root_file,
+                                       Settings settings,
+                                       StringBuilder output_dir_rel_path) throws Exception {
 
         String project_abs_path = IdeaHelpers.get_project_base_dir(project).getPath();
         String sql_root_abs_path = Helpers.concat_path(project_abs_path, settings.getFolders().getSql());
@@ -274,8 +254,7 @@ public class IdeaTargetLanguageHelpers {
                 String package_rel_path = settings.getFolders().getTarget();
                 output_dir_rel_path.append(package_rel_path);
             }
-            return new RubyCG.DTO(dto_classes, settings, connection,
-                    sql_root_abs_path, vm_file_system_path);
+            return new RubyCG.DTO(dto_classes, settings, connection, sql_root_abs_path, vm_file_system_path);
         } else if (RootFileName.GO.equals(fn)) {
             if (output_dir_rel_path != null) {
                 String package_rel_path = settings.getFolders().getTarget();
@@ -286,12 +265,15 @@ public class IdeaTargetLanguageHelpers {
             return new GoCG.DTO(dto_package, dto_classes, settings, connection,
                     sql_root_abs_path, field_names_mode, vm_file_system_path);
         } else {
-            throw new Exception(_get_unknown_root_file_msg(fn));
+            throw new Exception(TargetLangUtils.get_unknown_root_file_msg(fn));
         }
     }
 
-    protected static IDaoCG create_dao_cg(Connection con, Project project, VirtualFile root_file,
-                                          Settings settings, StringBuilder output_dir_rel_path) throws Exception {
+    protected static IDaoCG create_dao_cg(Connection con,
+                                          Project project,
+                                          VirtualFile root_file,
+                                          Settings settings,
+                                          StringBuilder output_dir_rel_path) throws Exception {
 
         String project_abs_path = IdeaHelpers.get_project_base_dir(project).getPath();
         String sql_root_abs_path = Helpers.concat_path(project_abs_path, settings.getFolders().getSql());
@@ -361,7 +343,7 @@ public class IdeaTargetLanguageHelpers {
             return new GoCG.DAO(dao_package, dto_classes, settings, con,
                     sql_root_abs_path, field_names_mode, vm_file_system_path);
         } else {
-            throw new Exception(_get_unknown_root_file_msg(fn));
+            throw new Exception(TargetLangUtils.get_unknown_root_file_msg(fn));
         }
     }
 }
