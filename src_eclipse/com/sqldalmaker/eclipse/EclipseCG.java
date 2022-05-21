@@ -16,6 +16,7 @@ import com.sqldalmaker.cg.IDaoCG;
 import com.sqldalmaker.cg.IDtoCG;
 import com.sqldalmaker.common.Const;
 import com.sqldalmaker.common.SdmUtils;
+import com.sqldalmaker.common.TargetLangUtils;
 import com.sqldalmaker.common.XmlParser;
 import com.sqldalmaker.jaxb.dao.DaoClass;
 import com.sqldalmaker.jaxb.dto.DtoClass;
@@ -33,6 +34,7 @@ public class EclipseCG {
 	}
 
 	public static void generate_all_dto(IFile root_file, IFile xml_file) {
+
 		StringBuilder output_dir = new StringBuilder();
 		Error error = new Error();
 		try {
@@ -50,7 +52,7 @@ public class EclipseCG {
 					try {
 						// ProgressManager.progress(cls.getName());
 						String[] file_content = gen.translate(cls.getName());
-						String target_file_path = EclipseTargetLanguageHelpers.get_target_file_path(root_file.getName(),
+						String target_file_path = TargetLangUtils.get_target_file_path(root_file.getName(),
 								output_dir.toString(), cls.getName());
 						EclipseHelpers.save_text_to_file(target_file_path, file_content[0]);
 					} catch (Throwable e) {
@@ -77,6 +79,7 @@ public class EclipseCG {
 	}
 
 	public static void validate_all_dto(IFile root_file, IFile xml_file) {
+
 		StringBuilder output_dir = new StringBuilder();
 		Error error = new Error();
 		try {
@@ -94,7 +97,7 @@ public class EclipseCG {
 					try {
 						// ProgressManager.progress(cls.getName());
 						String[] file_content = gen.translate(cls.getName());
-						String target_file_path = EclipseTargetLanguageHelpers.get_target_file_path(root_file.getName(),
+						String target_file_path = TargetLangUtils.get_target_file_path(root_file.getName(),
 								output_dir.toString(), cls.getName());
 						String old_text = Helpers.load_text_from_file(target_file_path);
 						StringBuilder validation_buff = new StringBuilder();
@@ -135,6 +138,7 @@ public class EclipseCG {
 	}
 
 	public static void generate_dao(IFile root_file, IFile xml_file) {
+
 		StringBuilder output_dir = new StringBuilder();
 		Error error = new Error();
 		try {
@@ -155,7 +159,7 @@ public class EclipseCG {
 				DaoClass dao_class = dao_xml_parser.unmarshal(dao_xml_abs_path);
 				try {
 					String[] file_content = gen.translate(dao_class_name, dao_class);
-					String target_file_path = EclipseTargetLanguageHelpers.get_target_file_path(root_file.getName(),
+					String target_file_path = TargetLangUtils.get_target_file_path(root_file.getName(),
 							output_dir.toString(), dao_class_name);
 					EclipseHelpers.save_text_to_file(target_file_path, file_content[0]);
 				} catch (Throwable e) {
@@ -181,6 +185,7 @@ public class EclipseCG {
 	}
 
 	public static void validate_dao(IFile root_file, IFile xml_file) {
+
 		String current_xml_file_path = xml_file.getFullPath().toPortableString();
 		if (current_xml_file_path.startsWith("/")) {
 			current_xml_file_path = current_xml_file_path.substring(1);
@@ -205,7 +210,7 @@ public class EclipseCG {
 				DaoClass dao_class = dao_xml_parser.unmarshal(dao_xml_abs_path);
 				try {
 					String[] file_content = gen.translate(dao_class_name, dao_class);
-					String target_file_path = EclipseTargetLanguageHelpers.get_target_file_path(root_file.getName(),
+					String target_file_path = TargetLangUtils.get_target_file_path(root_file.getName(),
 							output_dir.toString(), dao_class_name);
 					StringBuilder validation_buff = new StringBuilder();
 					String oldText = Helpers.load_text_from_file(target_file_path);

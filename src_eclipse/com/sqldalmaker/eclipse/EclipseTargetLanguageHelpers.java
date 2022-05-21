@@ -27,6 +27,7 @@ import com.sqldalmaker.cg.python.PythonCG;
 import com.sqldalmaker.cg.ruby.RubyCG;
 import com.sqldalmaker.common.RootFileName;
 import com.sqldalmaker.common.SdmUtils;
+import com.sqldalmaker.common.TargetLangUtils;
 import com.sqldalmaker.common.XmlParser;
 import com.sqldalmaker.jaxb.dto.DtoClasses;
 import com.sqldalmaker.jaxb.settings.Settings;
@@ -38,26 +39,19 @@ import com.sqldalmaker.jaxb.settings.Settings;
 public class EclipseTargetLanguageHelpers {
 
 	public static boolean snake_case_needed(IEditor2 editor2) {
+
 		String root_fn = editor2.get_root_file_name();
-		if (RootFileName.RUBY.equals(root_fn) || RootFileName.PYTHON.equals(root_fn)) {
-			return true;
-		}
-		return false;
+		return TargetLangUtils.snake_case_needed(root_fn);
 	}
 
 	public static boolean lower_camel_case_needed(IEditor2 editor2) {
-		String root_fn = editor2.get_root_file_name();
-		if (RootFileName.GO.equals(root_fn)) {
-			return true;
-		}
-		return false;
-	}
 
-	private static String _get_unknown_root_file_msg(String fn) {
-		return "Unknown root file: " + fn;
+		String root_fn = editor2.get_root_file_name();
+		return TargetLangUtils.lower_camel_case_needed(root_fn);
 	}
 
 	public static List<IFile> get_root_files(IContainer xml_mp_folder) throws Exception {
+
 		if (!(xml_mp_folder instanceof IFolder)) {
 			throw new Exception("IFolder expected");
 		}
@@ -74,6 +68,7 @@ public class EclipseTargetLanguageHelpers {
 	}
 
 	public static IFile find_root_file(IContainer xml_mp_folder) throws Exception {
+
 		List<IFile> root_files = get_root_files(xml_mp_folder);
 		if (root_files.size() == 0) {
 			throw new Exception("Root files not found");
@@ -82,8 +77,9 @@ public class EclipseTargetLanguageHelpers {
 	}
 
 	public static String get_rel_path(IEditor2 editor2, String output_dir, String class_name) throws Exception {
+
 		String fn = editor2.get_root_file_name();
-		return get_target_file_path(fn, output_dir, class_name);
+		return TargetLangUtils.get_target_file_path(fn, output_dir, class_name);
 	}
 
 	public static IFile find_source_file_in_project_tree(IProject project, Settings settings, String class_name,
@@ -95,33 +91,12 @@ public class EclipseTargetLanguageHelpers {
 		} else {
 			output_dir = settings.getFolders().getTarget();
 		}
-		String rel_path = get_target_file_path(root_fn, output_dir, class_name);
+		String rel_path = TargetLangUtils.get_target_file_path(root_fn, output_dir, class_name);
 		return project.getFile(rel_path);
 	}
 
-	public static String get_target_file_path(String root_fn, String output_dir, String class_name) throws Exception {
-		String file_name = file_name_from_class_name(root_fn, class_name);
-		return Helpers.concat_path(output_dir, file_name);
-	}
-
-	public static String file_name_from_class_name(String root_fn, String class_name) throws Exception {
-		if (RootFileName.PHP.equals(root_fn)) {
-			return class_name + ".php";
-		} else if (RootFileName.JAVA.equals(root_fn)) {
-			return class_name + ".java";
-		} else if (RootFileName.CPP.equals(root_fn)) {
-			return class_name + ".h";
-		} else if (RootFileName.RUBY.equals(root_fn)) {
-			return Helpers.convert_file_name_to_snake_case(class_name, "rb");
-		} else if (RootFileName.PYTHON.equals(root_fn)) {
-			return Helpers.convert_file_name_to_snake_case(class_name, "py");
-		} else if (RootFileName.GO.equals(root_fn)) {
-			return Helpers.convert_file_name_to_snake_case(class_name, "go");
-		}
-		throw new Exception(_get_unknown_root_file_msg(root_fn));
-	}
-
 	public static String get_root_file_relative_path(final IFile file) {
+
 		String fn = file.getName();
 		if (RootFileName.JAVA.equals(fn) || RootFileName.CPP.equals(fn) || RootFileName.PHP.equals(fn)
 				|| RootFileName.PYTHON.equals(fn) || RootFileName.RUBY.equals(fn) || RootFileName.GO.equals(fn)) {
@@ -218,7 +193,7 @@ public class EclipseTargetLanguageHelpers {
 					vm_file_system_path);
 			return gen;
 		} else {
-			throw new Exception(_get_unknown_root_file_msg(root_file_name));
+			throw new Exception(TargetLangUtils.get_unknown_root_file_msg(root_file_name));
 		}
 	}
 
@@ -309,7 +284,7 @@ public class EclipseTargetLanguageHelpers {
 					vm_file_system_path);
 			return gen;
 		} else {
-			throw new Exception(_get_unknown_root_file_msg(root_fn));
+			throw new Exception(TargetLangUtils.get_unknown_root_file_msg(root_fn));
 		}
 	}
 }
