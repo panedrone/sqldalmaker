@@ -160,7 +160,7 @@ public class SqlUtils {
                 j_str = "\"" + j_str + "\"";
             } else {
                 // "\n" it is OK for debugger window:
-                j_str = new_line + "                . \"\\n " + j_str + "\"";
+                j_str = new_line + "            . \"\\n " + j_str + "\"";
             }
             res.append(j_str);
         }

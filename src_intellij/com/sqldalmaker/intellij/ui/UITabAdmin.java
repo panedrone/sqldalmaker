@@ -71,6 +71,7 @@ public class UITabAdmin {
     private JButton sqlite3MysqlConnectorPsycopg2Button;
     private JButton SQLAlchemyButton;
     private JButton gormButton;
+    private JButton doctrineORMButton;
 
     private Project project;
     private VirtualFile root_file;
@@ -185,7 +186,7 @@ public class UITabAdmin {
         java_vm.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                IdeaEditorHelpers.open_or_activate_jar_file_in_editor(project, "com/sqldalmaker/cg/java", "go.vm", "go.vm");
+                IdeaEditorHelpers.open_or_activate_jar_file_in_editor(project, "com/sqldalmaker/cg/java", "java.vm", "java.vm");
             }
         });
         cppVmButton.addActionListener(new ActionListener() {
@@ -371,6 +372,12 @@ public class UITabAdmin {
                 IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "data_store_gorm.go", "data_store_gorm.go");
             }
         });
+        doctrineORMButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "DataStore_Doctrine_ORM.php", "DataStore_Doctrine_ORM.php");
+            }
+        });
     }
 
     private static String get_err_msg(Throwable ex) {
@@ -551,28 +558,35 @@ public class UITabAdmin {
         dataStorePhpButton.setBorderPainted(true);
         dataStorePhpButton.setContentAreaFilled(true);
         dataStorePhpButton.setMinimumSize(new Dimension(40, 30));
-        dataStorePhpButton.setPreferredSize(new Dimension(78, 30));
+        dataStorePhpButton.setPreferredSize(new Dimension(60, 30));
         dataStorePhpButton.setText("Base");
         panel5.add(dataStorePhpButton);
+        PDODataStorePhpButton = new JButton();
+        PDODataStorePhpButton.setPreferredSize(new Dimension(60, 30));
+        PDODataStorePhpButton.setText("sqlite3");
+        panel5.add(PDODataStorePhpButton);
         btn_mysql = new JButton();
+        btn_mysql.setPreferredSize(new Dimension(60, 30));
         btn_mysql.setText("mysql");
         panel5.add(btn_mysql);
         btn_php_oracle = new JButton();
+        btn_php_oracle.setPreferredSize(new Dimension(60, 30));
         btn_php_oracle.setText("oracle");
         panel5.add(btn_php_oracle);
         dataStorePhpOCI8Button = new JButton();
-        dataStorePhpOCI8Button.setPreferredSize(new Dimension(78, 30));
+        dataStorePhpOCI8Button.setPreferredSize(new Dimension(60, 30));
         dataStorePhpOCI8Button.setText("oci8");
         panel5.add(dataStorePhpOCI8Button);
         dataStorePhpPDOSQLButton = new JButton();
+        dataStorePhpPDOSQLButton.setPreferredSize(new Dimension(60, 30));
         dataStorePhpPDOSQLButton.setText("mssql");
         panel5.add(dataStorePhpPDOSQLButton);
         btn_php_pg = new JButton();
         btn_php_pg.setText("postgesql");
         panel5.add(btn_php_pg);
-        PDODataStorePhpButton = new JButton();
-        PDODataStorePhpButton.setText("sqlite3");
-        panel5.add(PDODataStorePhpButton);
+        doctrineORMButton = new JButton();
+        doctrineORMButton.setText("Doctrine ORM");
+        panel5.add(doctrineORMButton);
         final JPanel panel6 = new JPanel();
         panel6.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
         gbc = new GridBagConstraints();

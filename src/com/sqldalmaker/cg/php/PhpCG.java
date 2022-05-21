@@ -57,8 +57,18 @@ public class PhpCG {
             List<FieldInfo> fields = new ArrayList<FieldInfo>();
             db_utils.get_dto_field_info(jaxb_dto_class, sql_root_abs_path, fields);
             Map<String, Object> context = new HashMap<String, Object>();
+            int model_name_end_index = dto_class_name.indexOf('-');
+            if (model_name_end_index != -1) {
+                String model = dto_class_name.substring(0, model_name_end_index);
+                dto_class_name = dto_class_name.substring(model_name_end_index + 1);
+                context.put("model", model);
+            }
+            String ref = jaxb_dto_class.getRef();
+            if (SqlUtils.is_table_ref(ref)) {
+                context.put("table", ref);
+            }
             context.put("class_name", dto_class_name);
-            context.put("ref", jaxb_dto_class.getRef());
+            context.put("ref", ref);
             context.put("fields", fields);
             context.put("namespace", namespace);
             context.put("mode", "dto_class");

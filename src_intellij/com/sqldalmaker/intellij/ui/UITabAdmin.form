@@ -119,32 +119,42 @@
                           <borderPainted value="true"/>
                           <contentAreaFilled value="true"/>
                           <minimumSize width="40" height="30"/>
-                          <preferredSize width="78" height="30"/>
+                          <preferredSize width="60" height="30"/>
                           <text value="Base"/>
+                        </properties>
+                      </component>
+                      <component id="ca4d1" class="javax.swing.JButton" binding="PDODataStorePhpButton" default-binding="true">
+                        <constraints/>
+                        <properties>
+                          <preferredSize width="60" height="30"/>
+                          <text value="sqlite3"/>
                         </properties>
                       </component>
                       <component id="64c00" class="javax.swing.JButton" binding="btn_mysql">
                         <constraints/>
                         <properties>
+                          <preferredSize width="60" height="30"/>
                           <text value="mysql"/>
                         </properties>
                       </component>
                       <component id="45f42" class="javax.swing.JButton" binding="btn_php_oracle">
                         <constraints/>
                         <properties>
+                          <preferredSize width="60" height="30"/>
                           <text value="oracle"/>
                         </properties>
                       </component>
                       <component id="aff6" class="javax.swing.JButton" binding="dataStorePhpOCI8Button" default-binding="true">
                         <constraints/>
                         <properties>
-                          <preferredSize width="78" height="30"/>
+                          <preferredSize width="60" height="30"/>
                           <text value="oci8"/>
                         </properties>
                       </component>
                       <component id="cc5cf" class="javax.swing.JButton" binding="dataStorePhpPDOSQLButton" default-binding="true">
                         <constraints/>
                         <properties>
+                          <preferredSize width="60" height="30"/>
                           <text value="mssql"/>
                         </properties>
                       </component>
@@ -154,10 +164,10 @@
                           <text value="postgesql"/>
                         </properties>
                       </component>
-                      <component id="ca4d1" class="javax.swing.JButton" binding="PDODataStorePhpButton" default-binding="true">
+                      <component id="2e7e5" class="javax.swing.JButton" binding="doctrineORMButton" default-binding="true">
                         <constraints/>
                         <properties>
-                          <text value="sqlite3"/>
+                          <text value="Doctrine ORM"/>
                         </properties>
                       </component>
                     </children>

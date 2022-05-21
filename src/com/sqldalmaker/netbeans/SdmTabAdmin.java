@@ -153,12 +153,13 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         jPanel1 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         jButton10 = new javax.swing.JButton();
+        jButton11 = new javax.swing.JButton();
         jButton28 = new javax.swing.JButton();
         jButton29 = new javax.swing.JButton();
         jButton33 = new javax.swing.JButton();
         jButton30 = new javax.swing.JButton();
         jButton26 = new javax.swing.JButton();
-        jButton11 = new javax.swing.JButton();
+        jButton27 = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jLabel8 = new javax.swing.JLabel();
         jButton4 = new javax.swing.JButton();
@@ -311,7 +312,18 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         });
         jPanel1.add(jButton10);
 
-        jButton28.setText("MySQL");
+        jButton11.setText("sqlite3");
+        jButton11.setFocusPainted(false);
+        jButton11.setPreferredSize(new java.awt.Dimension(64, 22));
+        jButton11.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton11ActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jButton11);
+
+        jButton28.setText("mysql");
+        jButton28.setPreferredSize(new java.awt.Dimension(64, 22));
         jButton28.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton28ActionPerformed(evt);
@@ -319,7 +331,8 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         });
         jPanel1.add(jButton28);
 
-        jButton29.setText("Oracle");
+        jButton29.setText("oracle");
+        jButton29.setPreferredSize(new java.awt.Dimension(64, 22));
         jButton29.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton29ActionPerformed(evt);
@@ -328,6 +341,7 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         jPanel1.add(jButton29);
 
         jButton33.setText("oci8");
+        jButton33.setPreferredSize(new java.awt.Dimension(64, 22));
         jButton33.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton33ActionPerformed(evt);
@@ -335,7 +349,8 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         });
         jPanel1.add(jButton33);
 
-        jButton30.setText("MS SQL");
+        jButton30.setText("ms sql");
+        jButton30.setPreferredSize(new java.awt.Dimension(64, 22));
         jButton30.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton30ActionPerformed(evt);
@@ -343,7 +358,7 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         });
         jPanel1.add(jButton30);
 
-        jButton26.setText("PostgreSQL");
+        jButton26.setText("postgres");
         jButton26.setFocusPainted(false);
         jButton26.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -352,14 +367,13 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         });
         jPanel1.add(jButton26);
 
-        jButton11.setText("SQLite3");
-        jButton11.setFocusPainted(false);
-        jButton11.addActionListener(new java.awt.event.ActionListener() {
+        jButton27.setLabel("doctrine");
+        jButton27.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton11ActionPerformed(evt);
+                jButton27ActionPerformed(evt);
             }
         });
-        jPanel1.add(jButton11);
+        jPanel1.add(jButton27);
 
         jPanel8.add(jPanel1);
 
@@ -406,7 +420,7 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         jLabel7.setText("C++");
         jPanel2.add(jLabel7);
 
-        jButton24.setText("QtSql");
+        jButton24.setText("Qt");
         jButton24.setFocusPainted(false);
         jButton24.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -415,7 +429,7 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         });
         jPanel2.add(jButton24);
 
-        jButton14.setText("STL, sqlite3");
+        jButton14.setText("stl, sqlite3");
         jButton14.setFocusPainted(false);
         jButton14.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -424,7 +438,7 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         });
         jPanel2.add(jButton14);
 
-        jButton12.setText("ATL, sqlite3");
+        jButton12.setText("atl, sqlite3");
         jButton12.setFocusPainted(false);
         jButton12.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -442,7 +456,7 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         jLabel9.setPreferredSize(new java.awt.Dimension(40, 14));
         jPanel9.add(jLabel9);
 
-        jButton7.setText("sqlite3, mysql.connector, psycopg2");
+        jButton7.setText("sqlite3, mysql.connector, psycopg2, django");
         jButton7.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton7ActionPerformed(evt);
@@ -450,7 +464,7 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         });
         jPanel9.add(jButton7);
 
-        jButton15.setText("SQLAlchemy");
+        jButton15.setText("sqlalchemy");
         jButton15.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton15ActionPerformed(evt);
@@ -770,6 +784,10 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         NbpIdeEditorHelpers.open_resource_file_in_editor_async("data_store_gorm.go", "data_store_gorm.go");
     }//GEN-LAST:event_jButton16ActionPerformed
 
+    private void jButton27ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton27ActionPerformed
+        NbpIdeEditorHelpers.open_resource_file_in_editor_async("DataStore_Doctrine_ORM.php", "DataStore_Doctrine_ORM.php");
+    }//GEN-LAST:event_jButton27ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton10;
@@ -790,6 +808,7 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
     private javax.swing.JButton jButton24;
     private javax.swing.JButton jButton25;
     private javax.swing.JButton jButton26;
+    private javax.swing.JButton jButton27;
     private javax.swing.JButton jButton28;
     private javax.swing.JButton jButton29;
     private javax.swing.JButton jButton3;

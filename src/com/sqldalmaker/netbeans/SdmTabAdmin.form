@@ -209,9 +209,24 @@
                         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton10ActionPerformed"/>
                       </Events>
                     </Component>
+                    <Component class="javax.swing.JButton" name="jButton11">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="sqlite3"/>
+                        <Property name="focusPainted" type="boolean" value="false"/>
+                        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                          <Dimension value="[64, 22]"/>
+                        </Property>
+                      </Properties>
+                      <Events>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton11ActionPerformed"/>
+                      </Events>
+                    </Component>
                     <Component class="javax.swing.JButton" name="jButton28">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="MySQL"/>
+                        <Property name="text" type="java.lang.String" value="mysql"/>
+                        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                          <Dimension value="[64, 22]"/>
+                        </Property>
                       </Properties>
                       <Events>
                         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton28ActionPerformed"/>
@@ -219,7 +234,10 @@
                     </Component>
                     <Component class="javax.swing.JButton" name="jButton29">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="Oracle"/>
+                        <Property name="text" type="java.lang.String" value="oracle"/>
+                        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                          <Dimension value="[64, 22]"/>
+                        </Property>
                       </Properties>
                       <Events>
                         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton29ActionPerformed"/>
@@ -228,6 +246,9 @@
                     <Component class="javax.swing.JButton" name="jButton33">
                       <Properties>
                         <Property name="text" type="java.lang.String" value="oci8"/>
+                        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                          <Dimension value="[64, 22]"/>
+                        </Property>
                       </Properties>
                       <Events>
                         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton33ActionPerformed"/>
@@ -235,7 +256,10 @@
                     </Component>
                     <Component class="javax.swing.JButton" name="jButton30">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="MS SQL"/>
+                        <Property name="text" type="java.lang.String" value="ms sql"/>
+                        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                          <Dimension value="[64, 22]"/>
+                        </Property>
                       </Properties>
                       <Events>
                         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton30ActionPerformed"/>
@@ -243,20 +267,19 @@
                     </Component>
                     <Component class="javax.swing.JButton" name="jButton26">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="PostgreSQL"/>
+                        <Property name="text" type="java.lang.String" value="postgres"/>
                         <Property name="focusPainted" type="boolean" value="false"/>
                       </Properties>
                       <Events>
                         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton26ActionPerformed"/>
                       </Events>
                     </Component>
-                    <Component class="javax.swing.JButton" name="jButton11">
+                    <Component class="javax.swing.JButton" name="jButton27">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="SQLite3"/>
-                        <Property name="focusPainted" type="boolean" value="false"/>
+                        <Property name="label" type="java.lang.String" value="doctrine"/>
                       </Properties>
                       <Events>
-                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton11ActionPerformed"/>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton27ActionPerformed"/>
                       </Events>
                     </Component>
                   </SubComponents>
@@ -328,7 +351,7 @@
                     </Component>
                     <Component class="javax.swing.JButton" name="jButton24">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="QtSql"/>
+                        <Property name="text" type="java.lang.String" value="Qt"/>
                         <Property name="focusPainted" type="boolean" value="false"/>
                       </Properties>
                       <Events>
@@ -337,7 +360,7 @@
                     </Component>
                     <Component class="javax.swing.JButton" name="jButton14">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="STL, sqlite3"/>
+                        <Property name="text" type="java.lang.String" value="stl, sqlite3"/>
                         <Property name="focusPainted" type="boolean" value="false"/>
                       </Properties>
                       <Events>
@@ -346,7 +369,7 @@
                     </Component>
                     <Component class="javax.swing.JButton" name="jButton12">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="ATL, sqlite3"/>
+                        <Property name="text" type="java.lang.String" value="atl, sqlite3"/>
                         <Property name="focusPainted" type="boolean" value="false"/>
                       </Properties>
                       <Events>
@@ -372,7 +395,7 @@
                     </Component>
                     <Component class="javax.swing.JButton" name="jButton7">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="sqlite3, mysql.connector, psycopg2"/>
+                        <Property name="text" type="java.lang.String" value="sqlite3, mysql.connector, psycopg2, django"/>
                       </Properties>
                       <Events>
                         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton7ActionPerformed"/>
@@ -380,7 +403,7 @@
                     </Component>
                     <Component class="javax.swing.JButton" name="jButton15">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="SQLAlchemy"/>
+                        <Property name="text" type="java.lang.String" value="sqlalchemy"/>
                       </Properties>
                       <Events>
                         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton15ActionPerformed"/>
