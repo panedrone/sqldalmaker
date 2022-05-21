@@ -212,19 +212,25 @@ public class PhpCG {
             return buff;
         }
 
-        private String _get_rendered_dto_class_name(String dto_class_name) throws Exception {
-            DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
-            imports.add(jaxb_dto_class.getName());
+        private String _get_rendered_dto_class_name(String _dto_class_name) throws Exception {
+
+            DtoClass _jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(_dto_class_name, jaxb_dto_classes);
+            String dto_class_nm = _jaxb_dto_class.getName();
+            int model_end = dto_class_nm.indexOf('-');
+            if (model_end != -1) {
+                dto_class_nm = dto_class_nm.substring(model_end + 1);
+            }
+            imports.add(dto_class_nm);
             String full_name;
             if (dto_namespace != null && dto_namespace.length() > 0) {
-                full_name = "\\" + dto_namespace + "\\" + jaxb_dto_class.getName();
+                full_name = "\\" + dto_namespace + "\\" + dto_class_nm;
                 uses.add(full_name);
             } else if (dao_namespace != null && dao_namespace.length() > 0) {
-                full_name = "\\" + jaxb_dto_class.getName();
+                full_name = "\\" + dto_class_nm;
                 uses.add(full_name);
             }
             // do not add use if both namespaces are empty
-            return jaxb_dto_class.getName();
+            return dto_class_nm;
         }
 
         @Override
