@@ -152,7 +152,7 @@ public class UIEditorPageAdmin extends Composite {
 		Composite composite = new Composite(composite_2, SWT.NONE);
 		toolkit.adapt(composite);
 		toolkit.paintBordersFor(composite);
-		composite.setLayout(new GridLayout(8, false));
+		composite.setLayout(new GridLayout(9, false));
 
 		Label lblNewLabel = new Label(composite, SWT.NONE);
 		toolkit.adapt(lblNewLabel, true, true);
@@ -176,7 +176,7 @@ public class UIEditorPageAdmin extends Composite {
 						"DataStore_PDO_MySQL.php");
 			}
 		});
-		btnDatastorephppdoMysql.setText("PDO, mysql");
+		btnDatastorephppdoMysql.setText("mysql");
 		toolkit.adapt(btnDatastorephppdoMysql, true, true);
 
 		Button btnDatastorephppdoOracle = new Button(composite, SWT.NONE);
@@ -187,7 +187,7 @@ public class UIEditorPageAdmin extends Composite {
 						"DataStore_PDO_Oracle.php");
 			}
 		});
-		btnDatastorephppdoOracle.setText("PDO, oracle");
+		btnDatastorephppdoOracle.setText("oracle, pdo");
 		toolkit.adapt(btnDatastorephppdoOracle, true, true);
 
 		Button btnDatastorephpociOracle = new Button(composite, SWT.NONE);
@@ -209,7 +209,7 @@ public class UIEditorPageAdmin extends Composite {
 						"DataStore_PDO_PostgreSQL.php");
 			}
 		});
-		btnDatastorephppdoPostgresql.setText("PDO, postgresql");
+		btnDatastorephppdoPostgresql.setText("postgresql");
 		toolkit.adapt(btnDatastorephppdoPostgresql, true, true);
 
 		Button btnDatastorephppdoSql = new Button(composite, SWT.NONE);
@@ -220,7 +220,7 @@ public class UIEditorPageAdmin extends Composite {
 						"DataStore_PDO_SQL_Server.php");
 			}
 		});
-		btnDatastorephppdoSql.setText("PDO, mssql");
+		btnDatastorephppdoSql.setText("ms sql");
 		toolkit.adapt(btnDatastorephppdoSql, true, true);
 
 		Button btnNewButton_12 = new Button(composite, SWT.NONE);
@@ -232,7 +232,18 @@ public class UIEditorPageAdmin extends Composite {
 			}
 		});
 		toolkit.adapt(btnNewButton_12, true, true);
-		btnNewButton_12.setText("PDO, sqlite3");
+		btnNewButton_12.setText("sqlite3");
+		
+		Button btnDoctrineOrm = new Button(composite, SWT.NONE);
+		btnDoctrineOrm.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore_Doctrine_ORM.php",
+						"DataStore_Doctrine_ORM.php");
+			}
+		});
+		toolkit.adapt(btnDoctrineOrm, true, true);
+		btnDoctrineOrm.setText("Doctrine ORM");
 
 		Composite composite_4 = new Composite(composite_2, SWT.NONE);
 		toolkit.adapt(composite_4);
@@ -291,7 +302,7 @@ public class UIEditorPageAdmin extends Composite {
 			}
 		});
 		toolkit.adapt(btnDatastoreCQt, true, true);
-		btnDatastoreCQt.setText("QtSql");
+		btnDatastoreCQt.setText("Qt");
 
 		Button btnDatastoreCStl = new Button(composite_4, SWT.NONE);
 		btnDatastoreCStl.addSelectionListener(new SelectionAdapter() {
@@ -303,7 +314,7 @@ public class UIEditorPageAdmin extends Composite {
 			}
 		});
 		toolkit.adapt(btnDatastoreCStl, true, true);
-		btnDatastoreCStl.setText("STL, sqlite3");
+		btnDatastoreCStl.setText("stl, sqlite3");
 
 		Button btnNewButton_11 = new Button(composite_4, SWT.NONE);
 		btnNewButton_11.addSelectionListener(new SelectionAdapter() {
@@ -314,7 +325,7 @@ public class UIEditorPageAdmin extends Composite {
 			}
 		});
 		toolkit.adapt(btnNewButton_11, true, true);
-		btnNewButton_11.setText("ATL, sqlite3");
+		btnNewButton_11.setText("atl, sqlite3");
 
 		Composite composite_5 = new Composite(composite_2, SWT.NONE);
 		toolkit.adapt(composite_5);
@@ -443,16 +454,16 @@ public class UIEditorPageAdmin extends Composite {
 		button.setText("php.vm");
 		toolkit.adapt(button, true, true);
 
-		Button button_1 = new Button(composite_3, SWT.NONE);
-		button_1.addSelectionListener(new SelectionAdapter() {
+		Button btnJavavm = new Button(composite_3, SWT.NONE);
+		btnJavavm.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				EclipseResourceEditorHelpers.open_resource_file_in_text_editor("com/sqldalmaker/cg/java/java.vm",
-						"go.vm");
+						"java.vm");
 			}
 		});
-		button_1.setText("go.vm");
-		toolkit.adapt(button_1, true, true);
+		btnJavavm.setText("java.vm");
+		toolkit.adapt(btnJavavm, true, true);
 
 		Button button_2 = new Button(composite_3, SWT.NONE);
 		button_2.addSelectionListener(new SelectionAdapter() {

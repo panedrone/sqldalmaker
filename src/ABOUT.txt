@@ -5,9 +5,9 @@ Target programming languages: PHP, Java, C++, Python, Ruby, and Go.
 To generate the class, you declare it in XML meta-program.
 
 *******************
-Implementation for Models is in pogress. After updating the plugin,
-validate/update XSD files and do the fixes in "settings.xml".
-Use "Reference settings.xml" as example.</b></p>
+Newer versions of the plug-in may require partial update/rework of existing XSD and XML files.
+Use "Validate All", then "Create/Overwrite XSD files" and make related fixes if needed.
+Use "Reference settings.xml" as an example.
 *******************
 
 SQL DAL Maker for Eclipse: http://marketplace.eclipse.org/content/sql-dal-maker
