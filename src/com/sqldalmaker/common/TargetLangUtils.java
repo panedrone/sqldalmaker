@@ -47,4 +47,18 @@ public class TargetLangUtils {
         }
         return false;
     }
+
+    public static String get_target_folder_abs_path(String class_scope,
+                                                    String root_file_fn,
+                                                    String target_folder_rel_path,
+                                                    String module_root) {
+        String res;
+        if (RootFileName.JAVA.equals(root_file_fn) || RootFileName.PHP.equals(root_file_fn)) {
+            class_scope = class_scope.replace('.', '/').replace('\\', '/');
+            res = Helpers.concat_path(module_root, target_folder_rel_path, class_scope);
+        } else {
+            res = Helpers.concat_path(module_root, target_folder_rel_path);
+        }
+        return res;
+    }
 }

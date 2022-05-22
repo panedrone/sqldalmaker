@@ -30,19 +30,18 @@ public class PhpCG {
         private final DtoClasses jaxb_dto_classes;
         private final TemplateEngine te;
         private final JdbcUtils db_utils;
-        private final String namespace;
+        private final Settings jaxb_settings;
 
         public DTO(DtoClasses jaxb_dto_classes,
                    Settings jaxb_settings,
                    Connection connection,
                    String sql_root_abs_path,
                    String vm_file_system_dir,
-                   String namespace,
                    FieldNamesMode field_names_mode) throws Exception {
 
             this.jaxb_dto_classes = jaxb_dto_classes;
+            this.jaxb_settings = jaxb_settings;
             this.sql_root_abs_path = sql_root_abs_path;
-            this.namespace = namespace;
             if (vm_file_system_dir == null) {
                 te = new TemplateEngine(get_template_path(), false);
             } else {
@@ -70,7 +69,13 @@ public class PhpCG {
             context.put("class_name", dto_class_name);
             context.put("ref", ref);
             context.put("fields", fields);
-            context.put("namespace", namespace);
+            String dto_namespace = jaxb_settings.getDto().getScope();
+            if (dto_namespace == null) {
+                dto_namespace = "";
+            } else {
+                dto_namespace = dto_namespace.trim().replace('/', '\\');
+            }
+            context.put("namespace", dto_namespace);
             context.put("mode", "dto_class");
             StringWriter sw = new StringWriter();
             te.merge(context, sw);
@@ -87,22 +92,19 @@ public class PhpCG {
         private final Set<String> uses = new HashSet<String>();
         private final TemplateEngine te;
         private final JdbcUtils db_utils;
-        private final String dto_namespace;
-        private final String dao_namespace;
+        private final Settings settings;
 
         public DAO(DtoClasses jaxb_dto_classes,
                    Settings jaxb_settings,
                    Connection connection,
                    String sql_root_abs_path,
                    String vm_file_system_dir,
-                   String dto_namespace,
-                   String dao_namespace,
+                   Settings settings,
                    FieldNamesMode field_names_mode) throws Exception {
 
             this.jaxb_dto_classes = jaxb_dto_classes;
             this.sql_root_abs_path = sql_root_abs_path;
-            this.dto_namespace = dto_namespace;
-            this.dao_namespace = dao_namespace;
+            this.settings = settings;
             if (vm_file_system_dir == null) {
                 te = new TemplateEngine(get_template_path(), false);
             } else {
@@ -130,6 +132,12 @@ public class PhpCG {
             context.put("class_name", dao_class_name);
             context.put("methods", methods);
             context.put("mode", "dao_class");
+            String dao_namespace = settings.getDao().getScope();
+            if (dao_namespace == null) {
+                dao_namespace = "";
+            } else {
+                dao_namespace = dao_namespace.trim().replace('/', '\\');
+            }
             context.put("dao_namespace", dao_namespace);
             StringWriter sw = new StringWriter();
             te.merge(context, sw);
@@ -183,13 +191,13 @@ public class PhpCG {
             if (dao_query_jdbc_sql == null) {
                 return Helpers.get_no_pk_warning(method_name);
             }
-            String returned_type_name;
+            StringBuilder returned_type_name = new StringBuilder();
             if (jaxb_return_type_is_dto) {
-                returned_type_name = _get_rendered_dto_class_name(jaxb_dto_or_return_type);
+                _process_rendered_dto_class_name(jaxb_dto_or_return_type, returned_type_name);
             } else {
                 FieldInfo fi = fields.get(0);
                 String curr_type = fi.getType();
-                returned_type_name = this.db_utils.get_target_type_by_type_map(curr_type);
+                returned_type_name.append(this.db_utils.get_target_type_by_type_map(curr_type));
             }
             String php_sql_str = SqlUtils.jdbc_sql_to_php_str(dao_query_jdbc_sql);
             Map<String, Object> context = new HashMap<String, Object>();
@@ -200,7 +208,7 @@ public class PhpCG {
             context.put("ref", crud_table);
             context.put("sql", php_sql_str);
             context.put("use_dto", jaxb_return_type_is_dto);
-            context.put("returned_type_name", returned_type_name);
+            context.put("returned_type_name", returned_type_name.toString());
             context.put("fetch_list", fetch_list);
             context.put("imports", imports);
             context.put("is_external_sql", is_external_sql);
@@ -212,25 +220,57 @@ public class PhpCG {
             return buff;
         }
 
-        private String _get_rendered_dto_class_name(String _dto_class_name) throws Exception {
+        private void _process_rendered_dto_class_name(String _dto_class_name, StringBuilder rendered_class_name) throws Exception {
 
+            String dao_namespace = settings.getDao().getScope();
+            if (dao_namespace == null) {
+                dao_namespace = "";
+            } else {
+                dao_namespace = dao_namespace.trim().replace('/', '\\');
+            }
+            String dto_namespace = settings.getDto().getScope();
+            if (dto_namespace == null) {
+                dto_namespace = "";
+            } else {
+                dto_namespace = dto_namespace.trim().replace('/', '\\');
+            }
             DtoClass _jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(_dto_class_name, jaxb_dto_classes);
             String dto_class_nm = _jaxb_dto_class.getName();
             int model_end = dto_class_nm.indexOf('-');
             if (model_end != -1) {
                 dto_class_nm = dto_class_nm.substring(model_end + 1);
             }
-            imports.add(dto_class_nm);
-            String full_name;
-            if (dto_namespace != null && dto_namespace.length() > 0) {
-                full_name = "\\" + dto_namespace + "\\" + dto_class_nm;
-                uses.add(full_name);
-            } else if (dao_namespace != null && dao_namespace.length() > 0) {
-                full_name = "\\" + dto_class_nm;
-                uses.add(full_name);
+            // do not add "use" if both namespaces are empty or equal
+            if (dao_namespace.equals(dto_namespace)) {
+                // https://stackoverflow.com/questions/6473126/namespaces-in-php-5-2
+                // Namespaces are available in PHP as of PHP 5.3.0.
+                imports.add(dto_class_nm);
+            } else {
+//                String dal_dir = settings.getFolders().getTarget();
+//                if (dal_dir == null) {
+//                    dal_dir = "";
+//                }
+//                String dto_class_file_path;
+//                if (dal_dir.length() > 0) {
+//                    dto_class_file_path = Helpers.concat_path(dal_dir, dto_namespace, dto_class_nm);
+//                } else {
+//                    dto_class_file_path = Helpers.concat_path(dto_namespace, dto_class_nm);
+//                }
+//                dto_class_file_path = dto_class_file_path.trim().replace('\\', '/');
+//                imports.add(dto_class_file_path);
+                if (dto_namespace.length() > 0) {
+                    // String uses_full_name = "\\" + dto_namespace + "\\" + dto_class_nm;
+                    String uses_full_name = dto_namespace + "\\" + dto_class_nm;
+                    uses.add(uses_full_name);
+                } else if (dao_namespace.length() > 0) {
+                    //String uses_full_name = "\\" + dto_class_nm;
+                    String uses_full_name = dto_class_nm;
+                    uses.add(uses_full_name);
+                }
             }
-            // do not add use if both namespaces are empty
-            return dto_class_nm;
+            if (rendered_class_name != null) {
+                rendered_class_name.append(dto_class_nm);
+            }
         }
 
         @Override
@@ -350,7 +390,7 @@ public class PhpCG {
             m.dto_class_name = parts[1].trim();
             List<FieldInfo> fields = new ArrayList<FieldInfo>();
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(m.dto_class_name, jaxb_dto_classes);
-            _get_rendered_dto_class_name(jaxb_dto_class.getName()); // extends both imports and uses
+            _process_rendered_dto_class_name(jaxb_dto_class.getName(), null); // extends both imports and uses
             db_utils.get_dto_field_info(jaxb_dto_class, sql_root_abs_path, fields);
             if (fields.size() > 0) {
                 fields.get(0).setComment(fields.get(0).getComment() + " [INFO] REF CURSOR");
@@ -368,7 +408,9 @@ public class PhpCG {
                 if (paramsCount == 0) {
                     throw new Exception("DTO parameter specified but SQL-query does not contain any parameters");
                 }
-                context.put("dto_param", _get_rendered_dto_class_name(dto_param_type));
+                StringBuilder rendered_class_name = new StringBuilder();
+                _process_rendered_dto_class_name(dto_param_type, rendered_class_name);
+                context.put("dto_param", rendered_class_name.toString());
             } else {
                 context.put("dto_param", "");
             }
@@ -387,7 +429,7 @@ public class PhpCG {
                     dto_param_type = parts[0];
                     param_descriptors = parts[1];
                     if (dto_param_type.length() > 0) {
-                        _get_rendered_dto_class_name(dto_param_type);
+                        _process_rendered_dto_class_name(dto_param_type, null);
                     }
                 } else {
                     param_descriptors = parts[0];
@@ -419,7 +461,9 @@ public class PhpCG {
             context.put("params", fields_not_ai);
             // 1) you cannot overload PHP functions.
             // 2) more useful for update is version with DTO parameter:
-            context.put("dto_param", _get_rendered_dto_class_name(dto_class_name));
+            StringBuilder rendered_class_name = new StringBuilder();
+            _process_rendered_dto_class_name(dto_class_name, rendered_class_name);
+            context.put("dto_param", rendered_class_name.toString());
             if (fetch_generated && fields_ai.size() > 0) {
                 context.put("keys", fields_ai);
                 context.put("mode", "dao_create");
@@ -479,7 +523,13 @@ public class PhpCG {
             context.put("table_name", table_name);
             // You cannot overload PHP functions. More useful for update is
             // version with DTO parameter:
-            context.put("dto_param", primitive_params ? "" : _get_rendered_dto_class_name(dto_class_name));
+            if (primitive_params) {
+                context.put("dto_param", "");
+            } else {
+                StringBuilder rendered_class_name = new StringBuilder();
+                _process_rendered_dto_class_name(dto_class_name, rendered_class_name);
+                context.put("dto_param", rendered_class_name.toString());
+            }
             context.put("params", updated_fields);
             context.put("is_external_sql", false);
             StringWriter sw = new StringWriter();
@@ -537,7 +587,7 @@ public class PhpCG {
             }
             try {
                 db_utils.validate_table_name(table_attr);
-                _get_rendered_dto_class_name(dto_class_name);
+                _process_rendered_dto_class_name(dto_class_name, null);
                 StringBuilder code_buff = JaxbUtils.process_jaxb_crud(this, db_utils.get_dto_field_names_mode(),
                         jaxb_type_crud, dao_class_name, dto_class_name);
                 return code_buff;

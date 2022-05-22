@@ -133,13 +133,7 @@ public class IdeaTargetLanguageHelpers {
         String target_folder_rel_path = settings.getFolders().getTarget();
         String module_root = IdeaHelpers.get_project_base_dir(project).getPath();
         String root_file_fn = root_file.getName();
-        String res;
-        if (RootFileName.JAVA.equals(root_file_fn)) {
-            res = Helpers.concat_path(module_root, target_folder_rel_path, class_scope.replace('.', '/'));
-        } else {
-            res = Helpers.concat_path(module_root, target_folder_rel_path);
-        }
-        return res;
+        return TargetLangUtils.get_target_folder_abs_path(class_scope, root_file_fn, target_folder_rel_path, module_root);
     }
 
     public static void validate_dao(Project project,
@@ -217,13 +211,12 @@ public class IdeaTargetLanguageHelpers {
         ////////////////////////////////////////////////////
         if (RootFileName.PHP.equals(fn)) {
             if (output_dir_rel_path != null) {
-                String package_rel_path = settings.getFolders().getTarget();
+                String dto_package = settings.getDto().getScope();
+                String package_rel_path = SdmUtils.get_package_relative_path(settings, dto_package);
                 output_dir_rel_path.append(package_rel_path);
             }
             FieldNamesMode field_names_mode = Helpers.get_field_names_mode(settings);
-            String dto_package = settings.getDto().getScope();
-            return new PhpCG.DTO(dto_classes, settings, connection, sql_root_abs_path,
-                    vm_file_system_path, dto_package, field_names_mode);
+            return new PhpCG.DTO(dto_classes, settings, connection, sql_root_abs_path, vm_file_system_path, field_names_mode);
         } else if (RootFileName.JAVA.equals(fn)) {
             FieldNamesMode field_names_mode = Helpers.get_field_names_mode(settings);
             String dto_inheritance = settings.getDto().getInheritance();
@@ -292,15 +285,13 @@ public class IdeaTargetLanguageHelpers {
         String fn = root_file.getName();
         ////////////////////////////////////////////////////
         if (RootFileName.PHP.equals(fn)) {
+            String dao_package = settings.getDao().getScope();
             if (output_dir_rel_path != null) {
-                String package_rel_path = settings.getFolders().getTarget();
+                String package_rel_path = SdmUtils.get_package_relative_path(settings, dao_package);
                 output_dir_rel_path.append(package_rel_path);
             }
             FieldNamesMode field_names_mode = Helpers.get_field_names_mode(settings);
-            String dto_package = settings.getDto().getScope();
-            String dao_package = settings.getDao().getScope();
-            return new PhpCG.DAO(dto_classes, settings, con,
-                    sql_root_abs_path, vm_file_system_path, dto_package, dao_package, field_names_mode);
+            return new PhpCG.DAO(dto_classes, settings, con, sql_root_abs_path, vm_file_system_path, settings, field_names_mode);
         } else if (RootFileName.JAVA.equals(fn)) {
             FieldNamesMode field_names_mode = Helpers.get_field_names_mode(settings);
             String dto_package = settings.getDto().getScope();

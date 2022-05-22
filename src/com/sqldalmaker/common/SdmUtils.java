@@ -318,7 +318,7 @@ public class SdmUtils {
         if (package_name.length() == 0) {
             return source_folder;
         }
-        return Helpers.concat_path(source_folder, package_name.replace(".", "/"));
+        return Helpers.concat_path(source_folder, package_name.replace(".", "/").replace('\\', '/'));
     }
 
     public static void gen_field_wizard_jaxb(Settings settings,
