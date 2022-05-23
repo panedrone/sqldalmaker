@@ -342,8 +342,7 @@ public class CppCG {
             List<FieldInfo> fields_all = new ArrayList<FieldInfo>();
             List<FieldInfo> fields_pk = new ArrayList<FieldInfo>();
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
-            String dao_jdbc_sql = db_utils.get_dao_crud_read_info(fetch_list, jaxb_dto_class, sql_root_abs_path,
-                    dao_table_name, explicit_pk, fields_all, fields_pk);
+            String dao_jdbc_sql = db_utils.get_dao_crud_read_info(fetch_list, jaxb_dto_class, dao_table_name, explicit_pk, fields_all, fields_pk);
             return _render_query(dao_jdbc_sql, false, dto_class_name, true, fetch_list,
                     method_name, "", dao_table_name, fields_all, fields_pk);
         }
@@ -359,7 +358,7 @@ public class CppCG {
             List<FieldInfo> updated_fields = new ArrayList<FieldInfo>();
             List<FieldInfo> fields_pk = new ArrayList<FieldInfo>();
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
-            String dao_jdbc_sql = db_utils.get_dao_crud_update_info(table_name, jaxb_dto_class, sql_root_abs_path, explicit_pk, updated_fields, fields_pk);
+            String dao_jdbc_sql = db_utils.get_dao_crud_update_info(table_name, jaxb_dto_class, explicit_pk, updated_fields, fields_pk);
             if (fields_pk.isEmpty()) {
                 return Helpers.get_no_pk_warning(method_name);
             }
@@ -395,7 +394,7 @@ public class CppCG {
 
             List<FieldInfo> fields_pk = new ArrayList<FieldInfo>();
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
-            String dao_jdbc_sql = db_utils.get_dao_crud_delete_info(table_name, jaxb_dto_class, sql_root_abs_path, explicit_pk, fields_pk);
+            String dao_jdbc_sql = db_utils.get_dao_crud_delete_info(table_name, jaxb_dto_class, explicit_pk, fields_pk);
             if (fields_pk.isEmpty()) {
                 return Helpers.get_no_pk_warning(method_name);
             }

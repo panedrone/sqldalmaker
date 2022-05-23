@@ -285,13 +285,13 @@ public class IdeaTargetLanguageHelpers {
         String fn = root_file.getName();
         ////////////////////////////////////////////////////
         if (RootFileName.PHP.equals(fn)) {
-            String dao_package = settings.getDao().getScope();
             if (output_dir_rel_path != null) {
+                String dao_package = settings.getDao().getScope();
                 String package_rel_path = SdmUtils.get_package_relative_path(settings, dao_package);
                 output_dir_rel_path.append(package_rel_path);
             }
             FieldNamesMode field_names_mode = Helpers.get_field_names_mode(settings);
-            return new PhpCG.DAO(dto_classes, settings, con, sql_root_abs_path, vm_file_system_path, settings, field_names_mode);
+            return new PhpCG.DAO(dto_classes, settings, con, sql_root_abs_path, vm_file_system_path, field_names_mode);
         } else if (RootFileName.JAVA.equals(fn)) {
             FieldNamesMode field_names_mode = Helpers.get_field_names_mode(settings);
             String dto_package = settings.getDto().getScope();

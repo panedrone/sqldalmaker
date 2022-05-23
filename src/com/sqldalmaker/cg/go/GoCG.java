@@ -130,7 +130,7 @@ public class GoCG {
                     String just_type = _get_type_without_import_and_tag(fi);
                     int just_type_len = just_type.length();
                     if (just_type_len < type_name.length()) {
-                        String type_tag = type_name.substring(just_type_len  + 1);
+                        String type_tag = type_name.substring(just_type_len + 1);
                         String type_format = "%-" + max_type_name_len + "." + max_type_name_len + "s %s";
                         type_name = String.format(type_format, just_type, type_tag);
                     }
@@ -547,8 +547,7 @@ public class GoCG {
             List<FieldInfo> fields_all = new ArrayList<FieldInfo>();
             List<FieldInfo> fields_pk = new ArrayList<FieldInfo>();
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
-            String dao_jdbc_sql = db_utils.get_dao_crud_read_info(fetch_list, jaxb_dto_class, sql_root_abs_path,
-                    dao_table_name, explicit_pk, fields_all, fields_pk);
+            String dao_jdbc_sql = db_utils.get_dao_crud_read_info(fetch_list, jaxb_dto_class, dao_table_name, explicit_pk, fields_all, fields_pk);
             return _render_query(dao_jdbc_sql, false, dto_class_name, true, fetch_list, method_name, "", dao_table_name,
                     fields_all, fields_pk);
         }
@@ -564,8 +563,7 @@ public class GoCG {
             List<FieldInfo> fields_not_pk = new ArrayList<FieldInfo>();
             List<FieldInfo> fields_pk = new ArrayList<FieldInfo>();
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
-            String dao_jdbc_sql = db_utils.get_dao_crud_update_info(table_name, jaxb_dto_class, sql_root_abs_path,
-                    explicit_pk, fields_not_pk, fields_pk);
+            String dao_jdbc_sql = db_utils.get_dao_crud_update_info(table_name, jaxb_dto_class, explicit_pk, fields_not_pk, fields_pk);
             if (fields_pk.isEmpty()) {
                 return Helpers.get_no_pk_warning(method_name);
             }
@@ -602,7 +600,7 @@ public class GoCG {
 
             List<FieldInfo> fields_pk = new ArrayList<FieldInfo>();
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
-            String dao_jdbc_sql = db_utils.get_dao_crud_delete_info(table_name, jaxb_dto_class, sql_root_abs_path, explicit_pk, fields_pk);
+            String dao_jdbc_sql = db_utils.get_dao_crud_delete_info(table_name, jaxb_dto_class, explicit_pk, fields_pk);
             if (fields_pk.isEmpty()) {
                 return Helpers.get_no_pk_warning(method_name);
             }

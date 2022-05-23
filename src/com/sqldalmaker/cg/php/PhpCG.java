@@ -92,19 +92,18 @@ public class PhpCG {
         private final Set<String> uses = new HashSet<String>();
         private final TemplateEngine te;
         private final JdbcUtils db_utils;
-        private final Settings settings;
+        private final Settings jaxb_settings;
 
         public DAO(DtoClasses jaxb_dto_classes,
                    Settings jaxb_settings,
                    Connection connection,
                    String sql_root_abs_path,
                    String vm_file_system_dir,
-                   Settings settings,
                    FieldNamesMode field_names_mode) throws Exception {
 
             this.jaxb_dto_classes = jaxb_dto_classes;
             this.sql_root_abs_path = sql_root_abs_path;
-            this.settings = settings;
+            this.jaxb_settings = jaxb_settings;
             if (vm_file_system_dir == null) {
                 te = new TemplateEngine(get_template_path(), false);
             } else {
@@ -132,7 +131,7 @@ public class PhpCG {
             context.put("class_name", dao_class_name);
             context.put("methods", methods);
             context.put("mode", "dao_class");
-            String dao_namespace = settings.getDao().getScope();
+            String dao_namespace = jaxb_settings.getDao().getScope();
             if (dao_namespace == null) {
                 dao_namespace = "";
             } else {
@@ -222,13 +221,13 @@ public class PhpCG {
 
         private void _process_rendered_dto_class_name(String _dto_class_name, StringBuilder rendered_class_name) throws Exception {
 
-            String dao_namespace = settings.getDao().getScope();
+            String dao_namespace = jaxb_settings.getDao().getScope();
             if (dao_namespace == null) {
                 dao_namespace = "";
             } else {
                 dao_namespace = dao_namespace.trim().replace('/', '\\');
             }
-            String dto_namespace = settings.getDto().getScope();
+            String dto_namespace = jaxb_settings.getDto().getScope();
             if (dto_namespace == null) {
                 dto_namespace = "";
             } else {
@@ -487,8 +486,7 @@ public class PhpCG {
             List<FieldInfo> fields_all = new ArrayList<FieldInfo>();
             List<FieldInfo> fields_pk = new ArrayList<FieldInfo>();
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
-            String dao_jdbc_sql = db_utils.get_dao_crud_read_info(fetch_list, jaxb_dto_class, sql_root_abs_path,
-                    dao_table_name, explicit_pk, fields_all, fields_pk);
+            String dao_jdbc_sql = db_utils.get_dao_crud_read_info(fetch_list, jaxb_dto_class, dao_table_name, explicit_pk, fields_all, fields_pk);
             return _render_query(dao_jdbc_sql, false, dto_class_name, true, fetch_list, method_name, "", dao_table_name,
                     fields_all, fields_pk);
         }
@@ -504,8 +502,7 @@ public class PhpCG {
             List<FieldInfo> updated_fields = new ArrayList<FieldInfo>();
             List<FieldInfo> fields_pk = new ArrayList<FieldInfo>();
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
-            String dao_jdbc_sql = db_utils.get_dao_crud_update_info(table_name, jaxb_dto_class, sql_root_abs_path,
-                    explicit_pk, updated_fields, fields_pk);
+            String dao_jdbc_sql = db_utils.get_dao_crud_update_info(table_name, jaxb_dto_class, explicit_pk, updated_fields, fields_pk);
             if (fields_pk.isEmpty()) {
                 return Helpers.get_no_pk_warning(method_name);
             }
@@ -548,7 +545,7 @@ public class PhpCG {
 
             List<FieldInfo> fields_pk = new ArrayList<FieldInfo>();
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
-            String dao_jdbc_sql = db_utils.get_dao_crud_delete_info(table_name, jaxb_dto_class, sql_root_abs_path, explicit_pk, fields_pk);
+            String dao_jdbc_sql = db_utils.get_dao_crud_delete_info(table_name, jaxb_dto_class, explicit_pk, fields_pk);
             if (fields_pk.isEmpty()) {
                 return Helpers.get_no_pk_warning(method_name);
             }

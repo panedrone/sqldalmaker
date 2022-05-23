@@ -310,7 +310,7 @@ public class SdmUtils {
         return root;
     }
 
-    // for Java
+    // for Java and PHP
     public static String get_package_relative_path(Settings settings,
                                                    String package_name) {
 

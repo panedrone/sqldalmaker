@@ -86,7 +86,7 @@ public class EclipseTargetLanguageHelpers {
 			String class_scope, String root_fn) throws Exception {
 
 		String output_dir;
-		if (RootFileName.JAVA.equals(root_fn)) {
+		if (RootFileName.JAVA.equals(root_fn) || RootFileName.PHP.equals(root_fn)) {
 			output_dir = SdmUtils.get_package_relative_path(settings, class_scope);
 		} else {
 			output_dir = settings.getFolders().getTarget();
@@ -151,14 +151,14 @@ public class EclipseTargetLanguageHelpers {
 			return gen;
 		} else if (RootFileName.PHP.equals(root_file_name)) {
 			if (output_dir != null) {
-				String rel_path = settings.getFolders().getTarget();
+				String dto_package = settings.getDto().getScope();
+				String rel_path = SdmUtils.get_package_relative_path(settings, dto_package);
 				String abs_path = EclipseHelpers.get_absolute_dir_path_str(project, rel_path);
 				output_dir.append(abs_path);
 			}
 			FieldNamesMode field_names_mode = Helpers.get_field_names_mode(settings);
-			String dto_package = settings.getDto().getScope();
 			PhpCG.DTO gen = new PhpCG.DTO(dto_classes, settings, conn, sql_root_abs_path, vm_file_system_path,
-					dto_package, field_names_mode);
+					field_names_mode);
 			return gen;
 		} else if (RootFileName.JAVA.equals(root_file_name)) {
 			FieldNamesMode field_names_mode = Helpers.get_field_names_mode(settings);
@@ -240,15 +240,14 @@ public class EclipseTargetLanguageHelpers {
 			return gen;
 		} else if (RootFileName.PHP.equals(root_fn)) {
 			if (output_dir != null) {
-				String rel_path = settings.getFolders().getTarget();
+				String dao_package = settings.getDao().getScope();
+				String rel_path = SdmUtils.get_package_relative_path(settings, dao_package);
 				String abs_path = EclipseHelpers.get_absolute_dir_path_str(project, rel_path);
 				output_dir.append(abs_path);
 			}
 			FieldNamesMode field_names_mode = Helpers.get_field_names_mode(settings);
-			String dto_package = settings.getDto().getScope();
-			String dao_package = settings.getDao().getScope();
 			PhpCG.DAO gen = new PhpCG.DAO(dto_classes, settings, conn, sql_root_abs_path, vm_file_system_path,
-					dto_package, dao_package, field_names_mode);
+					field_names_mode);
 			return gen;
 		} else if (RootFileName.JAVA.equals(root_fn)) {
 			String dao_package = settings.getDao().getScope();
