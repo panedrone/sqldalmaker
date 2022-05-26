@@ -504,8 +504,7 @@ public class GoCG {
             List<FieldInfo> fields_not_ai = new ArrayList<FieldInfo>();
             List<FieldInfo> fields_ai = new ArrayList<FieldInfo>();
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
-            String dao_jdbc_sql = db_utils.get_dao_crud_create_info(jaxb_dto_class, sql_root_abs_path, table_name,
-                    generated, fields_not_ai, fields_ai);
+            String dao_jdbc_sql = db_utils.get_dao_crud_create_info(table_name, jaxb_dto_class, generated, fields_not_ai, fields_ai);
             String go_sql_str = SqlUtils.format_jdbc_sql_for_go(dao_jdbc_sql);
             Map<String, Object> context = new HashMap<String, Object>();
             context.put("method_type", "CREATE");
@@ -547,7 +546,7 @@ public class GoCG {
             List<FieldInfo> fields_all = new ArrayList<FieldInfo>();
             List<FieldInfo> fields_pk = new ArrayList<FieldInfo>();
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
-            String dao_jdbc_sql = db_utils.get_dao_crud_read_info(fetch_list, jaxb_dto_class, dao_table_name, explicit_pk, fields_all, fields_pk);
+            String dao_jdbc_sql = db_utils.get_dao_crud_read_info(dao_table_name, jaxb_dto_class, fetch_list, explicit_pk, fields_all, fields_pk);
             return _render_query(dao_jdbc_sql, false, dto_class_name, true, fetch_list, method_name, "", dao_table_name,
                     fields_all, fields_pk);
         }
@@ -558,7 +557,7 @@ public class GoCG {
                                                 String table_name,
                                                 String explicit_pk,
                                                 String dto_class_name,
-                                                boolean primitive_params) throws Exception {
+                                                boolean scalar_params) throws Exception {
 
             List<FieldInfo> fields_not_pk = new ArrayList<FieldInfo>();
             List<FieldInfo> fields_pk = new ArrayList<FieldInfo>();
@@ -582,7 +581,7 @@ public class GoCG {
             List<FieldInfo> params = new ArrayList<FieldInfo>();
             params.addAll(fields_not_pk);
             params.addAll(fields_pk);
-            String dto_param = primitive_params ? "" : dto_class_name;
+            String dto_param = scalar_params ? "" : dto_class_name;
             _assign_params_and_imports(params, dto_param, context);
             StringWriter sw = new StringWriter();
             te.merge(context, sw);

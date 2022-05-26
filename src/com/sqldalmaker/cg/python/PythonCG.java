@@ -431,7 +431,7 @@ public class PythonCG {
             List<FieldInfo> fields_not_ai = new ArrayList<FieldInfo>();
             List<FieldInfo> fields_ai = new ArrayList<FieldInfo>();
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
-            String dao_jdbc_sql = db_utils.get_dao_crud_create_info(jaxb_dto_class, sql_root_abs_path, table_name, generated, fields_not_ai, fields_ai);
+            String dao_jdbc_sql = db_utils.get_dao_crud_create_info(table_name, jaxb_dto_class, generated, fields_not_ai, fields_ai);
             String sql_str = SqlUtils.jdbc_sql_to_python_string(dao_jdbc_sql);
             Map<String, Object> context = new HashMap<String, Object>();
             context.put("method_type", "CREATE");
@@ -466,7 +466,7 @@ public class PythonCG {
             List<FieldInfo> fields_all = new ArrayList<FieldInfo>();
             List<FieldInfo> fields_pk = new ArrayList<FieldInfo>();
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
-            String dao_jdbc_sql = db_utils.get_dao_crud_read_info(fetch_list, jaxb_dto_class, dao_table_name, explicit_pk, fields_all, fields_pk);
+            String dao_jdbc_sql = db_utils.get_dao_crud_read_info(dao_table_name, jaxb_dto_class, fetch_list, explicit_pk, fields_all, fields_pk);
             return _render_query(dao_jdbc_sql, false, dto_class_name, true, fetch_list,
                     method_name, "", dao_table_name, fields_all, fields_pk, false);
         }
@@ -477,7 +477,7 @@ public class PythonCG {
                                                 String table_name,
                                                 String explicit_pk,
                                                 String dto_class_name,
-                                                boolean primitive_params) throws Exception {
+                                                boolean scalar_params) throws Exception {
 
             List<FieldInfo> updated_fields = new ArrayList<FieldInfo>();
             List<FieldInfo> fields_pk = new ArrayList<FieldInfo>();
@@ -500,7 +500,7 @@ public class PythonCG {
             context.put("table_name", table_name);
             dto_class_name = _get_rendered_dto_class_name(dto_class_name, false); // "false" because it is only for comments
             // context.put("dto_param", dto_class_name);
-            context.put("dto_param", primitive_params ? "" : dto_class_name);
+            context.put("dto_param", scalar_params ? "" : dto_class_name);
             context.put("params", updated_fields);
             context.put("is_external_sql", false);
             StringWriter sw = new StringWriter();

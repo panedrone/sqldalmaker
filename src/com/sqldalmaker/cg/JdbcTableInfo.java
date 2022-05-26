@@ -132,24 +132,30 @@ class JdbcTableInfo {
                     continue;
                 }
                 FieldInfo fi = fields_map.get(db_col_name);
-                try {
-                    int type = columns_rs.getInt("DATA_TYPE");
-                    String apache_java_type_name = TypesMapping.getJavaBySqlType(type);
-                    fi.refine_rendered_type(_get_type_name(apache_java_type_name));
-                    fi.setComment("t");
-                    if (String.class.getName().equals(apache_java_type_name)) {
-                        try {
-                            int size = columns_rs.getInt("COLUMN_SIZE");
-                            if (size > 0xffff) { // sqlite3 2000000000
-                                size = 0xffff;
-                            }
-                            fi.setColumnSize(size);
-                        } catch (Exception e) {
-                            System.err.println("COLUMN_SIZE: " + e.getMessage());
-                        }
+                String sql_type = fi.getType();
+                if (Object.class.getName().equals(sql_type)) {
+                    try {
+                        int type = columns_rs.getInt("DATA_TYPE");
+                        String apache_java_type_name = TypesMapping.getJavaBySqlType(type);
+                        fi.refine_rendered_type(_get_type_name(apache_java_type_name));
+                    } catch (Exception e) {
+                        System.err.println("DATA_TYPE: " + e.getMessage());
                     }
-                } catch (Exception e) {
-                    System.err.println("DATA_TYPE: " + e.getMessage());
+                } else {
+                    // don't re-define sql_type to avoid type conversions at run-time
+                    fi.refine_rendered_type(_get_type_name(sql_type));
+                }
+                fi.setComment("t");
+                if (String.class.getName().equals(fi.getType())) {
+                    try {
+                        int size = columns_rs.getInt("COLUMN_SIZE");
+                        if (size > 0xffff) { // sqlite3 2000000000
+                            size = 0xffff;
+                        }
+                        fi.setColumnSize(size);
+                    } catch (Exception e) {
+                        System.err.println("COLUMN_SIZE: " + e.getMessage());
+                    }
                 }
                 if (!fi.isAI()) {
                     try {

@@ -133,18 +133,17 @@ public class JdbcUtils {
     //
     // ---------------------------------------------------------
 
-    public String get_dao_crud_create_info(DtoClass jaxb_dto_class,
-                                           String sql_root_abs_path,
-                                           String dao_table_name,
-                                           String dao_crud_generated,
+    public String get_dao_crud_create_info(String dao_table_name,
+                                           DtoClass jaxb_dto_class,
+                                           String generated_col_names,
                                            List<FieldInfo> res_dao_fields_not_generated,
                                            List<FieldInfo> res_dao_fields_generated) throws Exception {
 
         res_dao_fields_not_generated.clear();
         res_dao_fields_generated.clear();
         HashSet<String> dao_crud_generated_set = new HashSet<String>();
-        if (!("*".equals(dao_crud_generated))) {
-            String[] gen_keys_arr = Helpers.get_listed_items(dao_crud_generated, false);
+        if (!("*".equals(generated_col_names))) {
+            String[] gen_keys_arr = Helpers.get_listed_items(generated_col_names, false);
             Helpers.check_duplicates(gen_keys_arr);
             for (String k : gen_keys_arr) {
                 dao_crud_generated_set.add(k.toLowerCase());
@@ -175,9 +174,9 @@ public class JdbcUtils {
         return t_info;
     }
 
-    public String get_dao_crud_read_info(boolean fetch_list,
+    public String get_dao_crud_read_info(String dao_table_name,
                                          DtoClass jaxb_dto_class,
-                                         String dao_table_name,
+                                         boolean fetch_list,
                                          String explicit_pk,
                                          List<FieldInfo> res_dao_fields_all,
                                          List<FieldInfo> res_dao_fields_pk) throws Exception {

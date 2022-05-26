@@ -39,7 +39,7 @@ public interface IDaoCG {
                                      String dao_table_name,
                                      String explicit_pk,
                                      String dto_class_name,
-                                     boolean primitive_params) throws Exception;
+                                     boolean scalar_params) throws Exception;
 
     StringBuilder render_crud_delete(String dao_class_name,
                                      String dto_class_name,
