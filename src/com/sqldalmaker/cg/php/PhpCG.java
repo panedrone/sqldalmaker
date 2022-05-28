@@ -12,6 +12,8 @@ import com.sqldalmaker.jaxb.dto.DtoClasses;
 import com.sqldalmaker.jaxb.settings.Settings;
 
 import java.io.StringWriter;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.util.*;
 
@@ -245,24 +247,20 @@ public class PhpCG {
                 // Namespaces are available in PHP as of PHP 5.3.0.
                 imports.add(dto_class_nm);
             } else {
-//                String dal_dir = settings.getFolders().getTarget();
-//                if (dal_dir == null) {
-//                    dal_dir = "";
-//                }
-//                String dto_class_file_path;
-//                if (dal_dir.length() > 0) {
-//                    dto_class_file_path = Helpers.concat_path(dal_dir, dto_namespace, dto_class_nm);
-//                } else {
-//                    dto_class_file_path = Helpers.concat_path(dto_namespace, dto_class_nm);
-//                }
-//                dto_class_file_path = dto_class_file_path.trim().replace('\\', '/');
-//                imports.add(dto_class_file_path);
+                String dao_class_file_dir = dao_namespace.replace('\\', '/');
+                String dto_class_file_path = Helpers.concat_path(dto_namespace, dto_class_nm).replace('\\', '/');
+                // https://stackoverflow.com/questions/204784/how-to-construct-a-relative-path-in-java-from-two-absolute-paths-or-urls
+                Path sourceFile = Paths.get(dao_class_file_dir);
+                Path targetFile = Paths.get(dto_class_file_path);
+                Path relativePath = sourceFile.relativize(targetFile);
+                String include_path = relativePath.toString().replace('\\', '/');
+                // https://www.php.net/manual/en/function.include.php
+                // include __DIR__ . '/../src/includeFile.php';
+                imports.add(include_path);
                 if (dto_namespace.length() > 0) {
-                    // String uses_full_name = "\\" + dto_namespace + "\\" + dto_class_nm;
                     String uses_full_name = dto_namespace + "\\" + dto_class_nm;
                     uses.add(uses_full_name);
                 } else if (dao_namespace.length() > 0) {
-                    //String uses_full_name = "\\" + dto_class_nm;
                     String uses_full_name = dto_class_nm;
                     uses.add(uses_full_name);
                 }

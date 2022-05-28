@@ -88,7 +88,7 @@ namespace ${dao_namespace};
 
 #if (${imports.size()} > 0)
 #foreach($imp in ${imports})
-include_once '${imp}.php';
+include_once __DIR__ . '/${imp}.php';
 #end
 
 #end

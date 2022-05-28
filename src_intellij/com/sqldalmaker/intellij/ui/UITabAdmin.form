@@ -155,7 +155,7 @@
                         <constraints/>
                         <properties>
                           <preferredSize width="60" height="30"/>
-                          <text value="mssql"/>
+                          <text value="ms sql"/>
                         </properties>
                       </component>
                       <component id="d5492" class="javax.swing.JButton" binding="btn_php_pg">
@@ -167,7 +167,7 @@
                       <component id="2e7e5" class="javax.swing.JButton" binding="doctrineORMButton" default-binding="true">
                         <constraints/>
                         <properties>
-                          <text value="Doctrine ORM"/>
+                          <text value="Doctrine"/>
                         </properties>
                       </component>
                     </children>
@@ -193,14 +193,14 @@
                         <constraints/>
                         <properties>
                           <minimumSize width="40" height="30"/>
-                          <preferredSize width="78" height="30"/>
+                          <preferredSize width="60" height="30"/>
                           <text value="Base"/>
                         </properties>
                       </component>
                       <component id="a585c" class="javax.swing.JButton" binding="dataStoreJavaDbUtilsButton" default-binding="true">
                         <constraints/>
                         <properties>
-                          <preferredSize width="78" height="30"/>
+                          <preferredSize width="60" height="30"/>
                           <text value="JDBC"/>
                         </properties>
                       </component>
@@ -222,8 +222,8 @@
                       <component id="7efb0" class="javax.swing.JButton" binding="dataStoreQt5CButton" default-binding="true">
                         <constraints/>
                         <properties>
-                          <preferredSize width="78" height="30"/>
-                          <text value="QtSql"/>
+                          <preferredSize width="60" height="30"/>
+                          <text value="Qt"/>
                         </properties>
                       </component>
                       <component id="ac058" class="javax.swing.JButton" binding="dataStoreCSTLButton" default-binding="true">
@@ -274,13 +274,15 @@
                       <component id="df46c" class="javax.swing.JButton" binding="btn_cx_Oracle">
                         <constraints/>
                         <properties>
-                          <text value="cx_Oracle"/>
+                          <label value="cx_oracle"/>
+                          <text value="cx_oracle"/>
                         </properties>
                       </component>
                       <component id="f94b3" class="javax.swing.JButton" binding="datastore_pyodbc">
                         <constraints/>
                         <properties>
-                          <text value="pyodbc, mssql"/>
+                          <label value="ms sql"/>
+                          <text value="ms sql"/>
                         </properties>
                       </component>
                     </children>
@@ -305,7 +307,7 @@
                       <component id="6a2a4" class="javax.swing.JButton" binding="dataStoreRUBYDBIButton" default-binding="true">
                         <constraints/>
                         <properties>
-                          <preferredSize width="78" height="30"/>
+                          <preferredSize width="60" height="30"/>
                           <text value="DBI"/>
                         </properties>
                       </component>
@@ -327,6 +329,7 @@
                       <component id="5fb52" class="javax.swing.JButton" binding="gormButton" default-binding="true">
                         <constraints/>
                         <properties>
+                          <preferredSize width="60" height="30"/>
                           <text value="gorm"/>
                         </properties>
                       </component>
