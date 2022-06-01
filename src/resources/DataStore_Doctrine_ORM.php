@@ -8,29 +8,43 @@
     Improvements are welcome: sqldalmaker@gmail.com
  */
 
+use Doctrine\DBAL\Connection;
+
 class DataStore
 {
     // https://stackoverflow.com/questions/3325012/execute-raw-sql-using-doctrine-2 // -->
     // https://www.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/data-retrieval-and-manipulation.html#executequery
 
+    /**
+     * @var Connection
+     */
     private $db;
 
-    function __construct($db)
+    function __construct(Connection $db)
     {
         $this->db = $db;
     }
 
-    // https://www.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/transactions.html#transactions
+    /**
+     * @throws \Doctrine\DBAL\Exception
+     */
     public function beginTransaction()
     {
+        // https://www.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/transactions.html#transactions
         $this->db->beginTransaction();
     }
 
+    /**
+     * @throws \Doctrine\DBAL\Exception
+     */
     public function commit()
     {
         $this->db->commit();
     }
 
+    /**
+     * @throws \Doctrine\DBAL\Exception
+     */
     public function rollback()
     {
         $this->db->rollback();
@@ -41,24 +55,27 @@ class DataStore
         // use Doctrine\ORM instead :)
     }
 
-    /*
+    /**
      * Executes a prepared statement with the given SQL and parameters and returns the affected rows count
+     * @throws \Doctrine\DBAL\Exception
      */
     public function execDML($sql, array $params): int
     {
         return $this->db->executeStatement($sql, $params);
     }
 
-    /*
+    /**
      * Retrieve only the value of the first column of the first result row.
+     * @throws \Doctrine\DBAL\Exception
      */
     public function query($sql, array $params)
     {
         return $this->db->fetchOne($sql, $params);
     }
 
-    /*
+    /**
      * Retrieve the values of the first column of all result rows.
+     * @throws \Doctrine\DBAL\Exception
      */
     public function queryList($sql, array $params): array
     {
@@ -73,16 +90,18 @@ class DataStore
         return $res;
     }
 
-    /*
+    /**
      * Retrieve associative array of the first result row.
+     * @throws \Doctrine\DBAL\Exception
      */
     public function queryRow($sql, array $params)
     {
         return $this->db->fetchAssociative($sql, $params);
     }
 
-    /*
+    /**
      * Retrieve associative arrays of all result rows.
+     * @throws \Doctrine\DBAL\Exception
      */
     public function queryRowList($sql, array $params, $callback)
     {
