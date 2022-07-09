@@ -5,6 +5,8 @@
 */
 package com.sqldalmaker.eclipse;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +21,7 @@ import com.sqldalmaker.cg.FieldNamesMode;
 import com.sqldalmaker.cg.Helpers;
 import com.sqldalmaker.cg.IDaoCG;
 import com.sqldalmaker.cg.IDtoCG;
+import com.sqldalmaker.cg.Xml2Vm;
 import com.sqldalmaker.cg.cpp.CppCG;
 import com.sqldalmaker.cg.go.GoCG;
 import com.sqldalmaker.cg.java.JavaCG;
@@ -30,6 +33,7 @@ import com.sqldalmaker.common.SdmUtils;
 import com.sqldalmaker.common.TargetLangUtils;
 import com.sqldalmaker.common.XmlParser;
 import com.sqldalmaker.jaxb.dto.DtoClasses;
+import com.sqldalmaker.jaxb.settings.Macros;
 import com.sqldalmaker.jaxb.settings.Settings;
 
 /**
@@ -109,6 +113,52 @@ public class EclipseTargetLanguageHelpers {
 		return null;
 	}
 
+	private static String get_dto_template(Settings settings, String project_abs_path) throws Exception {
+
+		String m_name = settings.getDto().getMacro();
+		return get_template(m_name, settings, project_abs_path);
+	}
+
+	private static String get_dao_template(Settings settings, String project_abs_path) throws Exception {
+
+		String m_name = settings.getDao().getMacro();
+		return get_template(m_name, settings, project_abs_path);
+	}
+
+	private static String get_template(String m_name, Settings settings, String project_abs_path) throws Exception {
+		String vm_template;
+// read the file or find the macro
+		if (m_name == null || m_name.trim().length() == 0) {
+			if (settings.getExternalVmFile().getPath().trim().length() == 0) {
+				return null;
+			} else {
+				String vm_file_system_path = Helpers.concat_path(project_abs_path,
+						settings.getExternalVmFile().getPath());
+// https://stackoverflow.com/questions/4716503/reading-a-plain-text-file-in-java
+				vm_template = new String(Files.readAllBytes(Paths.get(vm_file_system_path)));
+				return vm_template;
+			}
+		}
+		Macros.Macro vm_macro = null;
+		for (Macros.Macro m : settings.getMacros().getMacro()) {
+			if (m.getName().equalsIgnoreCase(m_name)) {
+				vm_macro = m;
+				break;
+			}
+		}
+		if (vm_macro == null) {
+			throw new Exception("Macro not found: " + m_name);
+		}
+		if (vm_macro.getVm() != null) {
+			vm_template = vm_macro.getVm().trim();
+		} else if (vm_macro.getVmXml() != null) {
+			vm_template = Xml2Vm.parse(vm_macro.getVmXml());
+		} else {
+			throw new Exception("Expected <vm> or <vm-xml> in " + m_name);
+		}
+		return vm_template;
+	}
+
 	public static IDtoCG create_dto_cg(Connection conn, IEditor2 editor2, Settings settings, StringBuilder output_dir)
 			throws Exception {
 
@@ -123,13 +173,8 @@ public class EclipseTargetLanguageHelpers {
 			String dto_xml_abs_path, String dto_xsd_abs_path, StringBuilder output_dir) throws Exception {
 
 		String sql_root_abs_path = EclipseHelpers.get_absolute_dir_path_str(project, settings.getFolders().getSql());
-		String vm_file_system_path;
-		if (settings.getExternalVmFile().getPath().length() == 0) {
-			vm_file_system_path = null;
-		} else {
-			String project_abs_path = project.getLocation().toPortableString();
-			vm_file_system_path = Helpers.concat_path(project_abs_path, settings.getExternalVmFile().getPath());
-		}
+		String project_abs_path = project.getLocation().toPortableString();
+		String vm_template = get_dto_template(settings, project_abs_path);
 		String context_path = DtoClasses.class.getPackage().getName();
 		XmlParser xml_parser = new XmlParser(context_path, dto_xsd_abs_path);
 		DtoClasses dto_classes = xml_parser.unmarshal(dto_xml_abs_path);
@@ -139,7 +184,7 @@ public class EclipseTargetLanguageHelpers {
 				String abs_path = EclipseHelpers.get_absolute_dir_path_str(project, rel_path);
 				output_dir.append(abs_path);
 			}
-			RubyCG.DTO gen = new RubyCG.DTO(dto_classes, settings, conn, sql_root_abs_path, vm_file_system_path);
+			RubyCG.DTO gen = new RubyCG.DTO(dto_classes, settings, conn, sql_root_abs_path, vm_template);
 			return gen;
 		} else if (RootFileName.PYTHON.equals(root_file_name)) {
 			if (output_dir != null) {
@@ -147,7 +192,7 @@ public class EclipseTargetLanguageHelpers {
 				String abs_path = EclipseHelpers.get_absolute_dir_path_str(project, rel_path);
 				output_dir.append(abs_path);
 			}
-			PythonCG.DTO gen = new PythonCG.DTO(dto_classes, settings, conn, sql_root_abs_path, vm_file_system_path);
+			PythonCG.DTO gen = new PythonCG.DTO(dto_classes, settings, conn, sql_root_abs_path, vm_template);
 			return gen;
 		} else if (RootFileName.PHP.equals(root_file_name)) {
 			if (output_dir != null) {
@@ -157,7 +202,7 @@ public class EclipseTargetLanguageHelpers {
 				output_dir.append(abs_path);
 			}
 			FieldNamesMode field_names_mode = Helpers.get_field_names_mode(settings);
-			PhpCG.DTO gen = new PhpCG.DTO(dto_classes, settings, conn, sql_root_abs_path, vm_file_system_path,
+			PhpCG.DTO gen = new PhpCG.DTO(dto_classes, settings, conn, sql_root_abs_path, vm_template,
 					field_names_mode);
 			return gen;
 		} else if (RootFileName.JAVA.equals(root_file_name)) {
@@ -170,7 +215,7 @@ public class EclipseTargetLanguageHelpers {
 			}
 			String dto_inheritance = settings.getDto().getInheritance();
 			JavaCG.DTO gen = new JavaCG.DTO(dto_classes, settings, conn, dto_package, sql_root_abs_path,
-					dto_inheritance, field_names_mode, vm_file_system_path);
+					dto_inheritance, field_names_mode, vm_template);
 			return gen;
 		} else if (RootFileName.CPP.equals(root_file_name)) {
 			if (output_dir != null) {
@@ -179,7 +224,7 @@ public class EclipseTargetLanguageHelpers {
 				output_dir.append(abs_path);
 			}
 			CppCG.DTO gen = new CppCG.DTO(dto_classes, settings, conn, sql_root_abs_path,
-					settings.getCpp().getClassPrefix(), vm_file_system_path);
+					settings.getCpp().getClassPrefix(), vm_template);
 			return gen;
 		} else if (RootFileName.GO.equals(root_file_name)) {
 			if (output_dir != null) {
@@ -190,7 +235,7 @@ public class EclipseTargetLanguageHelpers {
 			String dto_package = settings.getDto().getScope();
 			FieldNamesMode field_names_mode = Helpers.get_field_names_mode(settings);
 			GoCG.DTO gen = new GoCG.DTO(dto_package, dto_classes, settings, conn, sql_root_abs_path, field_names_mode,
-					vm_file_system_path);
+					vm_template);
 			return gen;
 		} else {
 			throw new Exception(TargetLangUtils.get_unknown_root_file_msg(root_file_name));
@@ -210,13 +255,8 @@ public class EclipseTargetLanguageHelpers {
 			String dto_xml_abs_path, String dto_xsd_abs_path, StringBuilder output_dir) throws Exception {
 
 		String sql_root_abs_path = EclipseHelpers.get_absolute_dir_path_str(project, settings.getFolders().getSql());
-		String vm_file_system_path;
-		if (settings.getExternalVmFile().getPath().length() == 0) {
-			vm_file_system_path = null;
-		} else {
-			String project_abs_path = project.getLocation().toPortableString();
-			vm_file_system_path = Helpers.concat_path(project_abs_path, settings.getExternalVmFile().getPath());
-		}
+		String project_abs_path = project.getLocation().toPortableString();
+        String vm_template = get_dao_template(settings, project_abs_path);
 		String context_path = DtoClasses.class.getPackage().getName();
 		XmlParser xml_parser = new XmlParser(context_path, dto_xsd_abs_path);
 		DtoClasses dto_classes = xml_parser.unmarshal(dto_xml_abs_path);
@@ -226,7 +266,7 @@ public class EclipseTargetLanguageHelpers {
 				String abs_path = EclipseHelpers.get_absolute_dir_path_str(project, rel_path);
 				output_dir.append(abs_path);
 			}
-			RubyCG.DAO gen = new RubyCG.DAO(dto_classes, settings, conn, sql_root_abs_path, vm_file_system_path);
+			RubyCG.DAO gen = new RubyCG.DAO(dto_classes, settings, conn, sql_root_abs_path, vm_template);
 			return gen;
 		} else if (RootFileName.PYTHON.equals(root_fn)) {
 			String rel_path = settings.getFolders().getTarget();
@@ -236,7 +276,7 @@ public class EclipseTargetLanguageHelpers {
 			}
 			String dto_package = rel_path = rel_path.replace("/", ".").replace("\\", ".");
 			PythonCG.DAO gen = new PythonCG.DAO(dto_package, dto_classes, settings, conn, sql_root_abs_path,
-					vm_file_system_path);
+					vm_template);
 			return gen;
 		} else if (RootFileName.PHP.equals(root_fn)) {
 			if (output_dir != null) {
@@ -246,7 +286,7 @@ public class EclipseTargetLanguageHelpers {
 				output_dir.append(abs_path);
 			}
 			FieldNamesMode field_names_mode = Helpers.get_field_names_mode(settings);
-			PhpCG.DAO gen = new PhpCG.DAO(dto_classes, settings, conn, sql_root_abs_path, vm_file_system_path,
+			PhpCG.DAO gen = new PhpCG.DAO(dto_classes, settings, conn, sql_root_abs_path, vm_template,
 					field_names_mode);
 			return gen;
 		} else if (RootFileName.JAVA.equals(root_fn)) {
@@ -259,7 +299,7 @@ public class EclipseTargetLanguageHelpers {
 			FieldNamesMode field_names_mode = Helpers.get_field_names_mode(settings);
 			String dto_package = settings.getDto().getScope();
 			JavaCG.DAO gen = new JavaCG.DAO(dto_classes, settings, conn, dto_package, dao_package, sql_root_abs_path,
-					field_names_mode, vm_file_system_path);
+					field_names_mode, vm_template);
 			return gen;
 		} else if (RootFileName.CPP.equals(root_fn)) {
 			if (output_dir != null) {
@@ -269,7 +309,7 @@ public class EclipseTargetLanguageHelpers {
 			}
 			String class_prefix = settings.getCpp().getClassPrefix();
 			CppCG.DAO gen = new CppCG.DAO(dto_classes, settings, conn, sql_root_abs_path, class_prefix,
-					vm_file_system_path);
+					vm_template);
 			return gen;
 		} else if (RootFileName.GO.equals(root_fn)) {
 			if (output_dir != null) {
@@ -280,7 +320,7 @@ public class EclipseTargetLanguageHelpers {
 			String dao_package = settings.getDao().getScope();
 			FieldNamesMode field_names_mode = Helpers.get_field_names_mode(settings);
 			GoCG.DAO gen = new GoCG.DAO(dao_package, dto_classes, settings, conn, sql_root_abs_path, field_names_mode,
-					vm_file_system_path);
+					vm_template);
 			return gen;
 		} else {
 			throw new Exception(TargetLangUtils.get_unknown_root_file_msg(root_fn));
