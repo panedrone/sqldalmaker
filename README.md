@@ -4,8 +4,7 @@ SQL DAL Maker is a generator of DTO, Model, and DAO/raw-SQL classes to access re
 ![SQL DAL Maker](sdm_dj-sa.png)
 
 At the stage of code generation, the target database must exist and be available for JDBC connection.
-
-Code generator uses "live" JDBC metadata to synchronize generated code with the current database schema.
+"Live" JDBC metadata are used to synchronize generated code with the current database schema.
 
 Implemented as plug-ins for [Eclipse IDE](http://marketplace.eclipse.org/content/sql-dal-maker), [IntelliJ-Platform](http://plugins.jetbrains.com/plugin/7092), and [NetBeans 11+](https://github.com/panedrone/sqldalmaker/releases/tag/latest).
 
