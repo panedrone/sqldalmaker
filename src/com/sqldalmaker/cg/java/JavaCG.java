@@ -40,16 +40,16 @@ public class JavaCG {
                    String sql_root_abs_path,
                    String dto_inheritance,
                    FieldNamesMode field_names_mode,
-                   String vm_file_system_dir) throws Exception {
+                   String vm_template) throws Exception {
 
             this.jaxb_dto_classes = jaxb_dto_classes;
             this.dto_package = dto_package;
             this.sql_root_abs_path = sql_root_abs_path;
             this.dto_inheritance = dto_inheritance;
-            if (vm_file_system_dir == null) {
+            if (vm_template == null) {
                 te = new TemplateEngine(get_template_path(), false);
             } else {
-                te = new TemplateEngine(vm_file_system_dir, true);
+                te = new TemplateEngine(vm_template, "java");
             }
             db_utils = new JdbcUtils(connection, field_names_mode, FieldNamesMode.AS_IS, jaxb_settings);
         }
@@ -91,16 +91,16 @@ public class JavaCG {
                    String dao_package,
                    String sql_root_abs_path,
                    FieldNamesMode field_names_mode,
-                   String vm_file_system_dir) throws Exception {
+                   String vm_template) throws Exception {
 
             this.jaxb_dto_classes = jaxb_dto_classes;
             this.dto_package = dto_package;
             this.dao_package = dao_package;
             this.sql_root_abs_path = sql_root_abs_path;
-            if (vm_file_system_dir == null) {
+            if (vm_template == null) {
                 te = new TemplateEngine(get_template_path(), false);
             } else {
-                te = new TemplateEngine(vm_file_system_dir, true);
+                te = new TemplateEngine(vm_template, "java");
             }
             db_utils = new JdbcUtils(connection, field_names_mode, FieldNamesMode.AS_IS, jaxb_settings);
         }

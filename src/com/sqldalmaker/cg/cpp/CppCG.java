@@ -37,15 +37,15 @@ public class CppCG {
                    Connection connection,
                    String sql_root_abs_path,
                    String dto_class_prefix,
-                   String vm_file_system_dir) throws Exception {
+                   String vm_template) throws Exception {
 
             this.jaxb_dto_classes = jaxb_dto_classes;
             this.dto_class_prefix = dto_class_prefix;
             this.sql_root_abs_path = sql_root_abs_path;
-            if (vm_file_system_dir == null) {
+            if (vm_template == null) {
                 te = new TemplateEngine(get_template_path(), false);
             } else {
-                te = new TemplateEngine(vm_file_system_dir, true);
+                te = new TemplateEngine(vm_template, "cpp");
             }
             db_utils = new JdbcUtils(connection, FieldNamesMode.AS_IS, FieldNamesMode.AS_IS, jaxb_settings);
         }
@@ -80,15 +80,15 @@ public class CppCG {
                    Connection connection,
                    String sql_root_abs_path,
                    String class_prefix,
-                   String vm_file_system_dir) throws Exception {
+                   String vm_template) throws Exception {
 
             this.jaxb_dto_classes = jaxb_dto_classes;
             this.sql_root_abs_path = sql_root_abs_path;
             this.class_prefix = class_prefix;
-            if (vm_file_system_dir == null) {
+            if (vm_template == null) {
                 te = new TemplateEngine(get_template_path(), false);
             } else {
-                te = new TemplateEngine(vm_file_system_dir, true);
+                te = new TemplateEngine(vm_template, "cpp");
             }
             db_utils = new JdbcUtils(connection, FieldNamesMode.AS_IS, FieldNamesMode.AS_IS, jaxb_settings);
         }

@@ -1,3 +1,8 @@
+2022-07-09
+
+    + dto macro
+    + dao macro
+
 2022-05-28
 
     fixes regarding PHP namespaces.
@@ -14,7 +19,7 @@
 
 2022-05-03
 
-    + XML wrappers for VM templates (updete XSD files and see the reference "settings.xml")
+    + XML wrappers for VM templates (update XSD files and see the reference "settings.xml")
 
 2022-04-30
 

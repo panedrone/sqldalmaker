@@ -10,10 +10,7 @@ import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.FileTypeConsumer;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.sqldalmaker.cg.FieldNamesMode;
-import com.sqldalmaker.cg.Helpers;
-import com.sqldalmaker.cg.IDaoCG;
-import com.sqldalmaker.cg.IDtoCG;
+import com.sqldalmaker.cg.*;
 import com.sqldalmaker.cg.cpp.CppCG;
 import com.sqldalmaker.cg.go.GoCG;
 import com.sqldalmaker.cg.java.JavaCG;
@@ -22,9 +19,12 @@ import com.sqldalmaker.cg.python.PythonCG;
 import com.sqldalmaker.cg.ruby.RubyCG;
 import com.sqldalmaker.common.*;
 import com.sqldalmaker.jaxb.dto.DtoClasses;
+import com.sqldalmaker.jaxb.settings.Macros;
 import com.sqldalmaker.jaxb.settings.Settings;
 import org.jetbrains.annotations.NotNull;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
@@ -188,6 +188,49 @@ public class IdeaTargetLanguageHelpers {
                 RootFileName.GO.equals(file.getName());
     }
 
+    private static String get_dto_template(Settings settings, String project_abs_path) throws Exception {
+        String m_name = settings.getDto().getMacro();
+        return get_template(m_name, settings, project_abs_path);
+    }
+
+    private static String get_dao_template(Settings settings, String project_abs_path) throws Exception {
+        String m_name = settings.getDao().getMacro();
+        return get_template(m_name, settings, project_abs_path);
+    }
+
+    private static String get_template(String m_name, Settings settings, String project_abs_path) throws Exception {
+        String vm_template;
+        // read the file or find the macro
+        if (m_name == null || m_name.trim().length() == 0) {
+            if (settings.getExternalVmFile().getPath().trim().length() == 0) {
+                return null;
+            } else {
+                String vm_file_system_path = Helpers.concat_path(project_abs_path, settings.getExternalVmFile().getPath());
+                // https://stackoverflow.com/questions/4716503/reading-a-plain-text-file-in-java
+                vm_template = new String(Files.readAllBytes(Paths.get(vm_file_system_path)));
+                return vm_template;
+            }
+        }
+        Macros.Macro vm_macro = null;
+        for (Macros.Macro m : settings.getMacros().getMacro()) {
+            if (m.getName().equalsIgnoreCase(m_name)) {
+                vm_macro = m;
+                break;
+            }
+        }
+        if (vm_macro == null) {
+            throw new Exception("Macro not found: " + m_name);
+        }
+        if (vm_macro.getVm() != null) {
+            vm_template = vm_macro.getVm().trim();
+        } else if (vm_macro.getVmXml() != null) {
+            vm_template = Xml2Vm.parse(vm_macro.getVmXml());
+        } else {
+            throw new Exception("Expected <vm> or <vm-xml> in " + m_name);
+        }
+        return vm_template;
+    }
+
     public static IDtoCG create_dto_cg(Connection connection,
                                        Project project, VirtualFile root_file,
                                        Settings settings,
@@ -195,15 +238,10 @@ public class IdeaTargetLanguageHelpers {
 
         String project_abs_path = IdeaHelpers.get_project_base_dir(project).getPath();
         String sql_root_abs_path = Helpers.concat_path(project_abs_path, settings.getFolders().getSql());
+        String vm_template = get_dto_template(settings, project_abs_path);
         String xml_configs_folder_full_path = root_file.getParent().getPath();
         String dto_xml_abs_path = xml_configs_folder_full_path + "/" + Const.DTO_XML;
         String dto_xsd_abs_path = xml_configs_folder_full_path + "/" + Const.DTO_XSD;
-        String vm_file_system_path;
-        if (settings.getExternalVmFile().getPath().length() == 0) {
-            vm_file_system_path = null;
-        } else {
-            vm_file_system_path = Helpers.concat_path(project_abs_path, settings.getExternalVmFile().getPath());
-        }
         String context_path = DtoClasses.class.getPackage().getName();
         XmlParser xml_parser = new XmlParser(context_path, dto_xsd_abs_path);
         DtoClasses dto_classes = xml_parser.unmarshal(dto_xml_abs_path);
@@ -216,7 +254,7 @@ public class IdeaTargetLanguageHelpers {
                 output_dir_rel_path.append(package_rel_path);
             }
             FieldNamesMode field_names_mode = Helpers.get_field_names_mode(settings);
-            return new PhpCG.DTO(dto_classes, settings, connection, sql_root_abs_path, vm_file_system_path, field_names_mode);
+            return new PhpCG.DTO(dto_classes, settings, connection, sql_root_abs_path, vm_template, field_names_mode);
         } else if (RootFileName.JAVA.equals(fn)) {
             FieldNamesMode field_names_mode = Helpers.get_field_names_mode(settings);
             String dto_inheritance = settings.getDto().getInheritance();
@@ -226,7 +264,7 @@ public class IdeaTargetLanguageHelpers {
                 output_dir_rel_path.append(package_rel_path);
             }
             return new JavaCG.DTO(dto_classes, settings, connection, dto_package,
-                    sql_root_abs_path, dto_inheritance, field_names_mode, vm_file_system_path);
+                    sql_root_abs_path, dto_inheritance, field_names_mode, vm_template);
         } else if (RootFileName.CPP.equals(fn)) {
             if (output_dir_rel_path != null) {
                 String package_rel_path = settings.getFolders().getTarget();
@@ -234,20 +272,19 @@ public class IdeaTargetLanguageHelpers {
             }
             Settings sett = IdeaHelpers.load_settings(root_file);
             return new CppCG.DTO(dto_classes, sett, connection,
-                    sql_root_abs_path, settings.getCpp().getClassPrefix(), vm_file_system_path);
+                    sql_root_abs_path, settings.getCpp().getClassPrefix(), vm_template);
         } else if (RootFileName.PYTHON.equals(fn)) {
             if (output_dir_rel_path != null) {
                 String package_rel_path = settings.getFolders().getTarget();
                 output_dir_rel_path.append(package_rel_path);
             }
-            return new PythonCG.DTO(dto_classes, settings, connection,
-                    sql_root_abs_path, vm_file_system_path);
+            return new PythonCG.DTO(dto_classes, settings, connection, sql_root_abs_path, vm_template);
         } else if (RootFileName.RUBY.equals(fn)) {
             if (output_dir_rel_path != null) {
                 String package_rel_path = settings.getFolders().getTarget();
                 output_dir_rel_path.append(package_rel_path);
             }
-            return new RubyCG.DTO(dto_classes, settings, connection, sql_root_abs_path, vm_file_system_path);
+            return new RubyCG.DTO(dto_classes, settings, connection, sql_root_abs_path, vm_template);
         } else if (RootFileName.GO.equals(fn)) {
             if (output_dir_rel_path != null) {
                 String package_rel_path = settings.getFolders().getTarget();
@@ -256,7 +293,7 @@ public class IdeaTargetLanguageHelpers {
             String dto_package = settings.getDto().getScope();
             FieldNamesMode field_names_mode = Helpers.get_field_names_mode(settings);
             return new GoCG.DTO(dto_package, dto_classes, settings, connection,
-                    sql_root_abs_path, field_names_mode, vm_file_system_path);
+                    sql_root_abs_path, field_names_mode, vm_template);
         } else {
             throw new Exception(TargetLangUtils.get_unknown_root_file_msg(fn));
         }
@@ -273,12 +310,7 @@ public class IdeaTargetLanguageHelpers {
         String xml_configs_folder_full_path = root_file.getParent().getPath();
         String dto_xml_abs_path = xml_configs_folder_full_path + "/" + Const.DTO_XML;
         String dto_xsd_abs_path = xml_configs_folder_full_path + "/" + Const.DTO_XSD;
-        String vm_file_system_path;
-        if (settings.getExternalVmFile().getPath().length() == 0) {
-            vm_file_system_path = null;
-        } else {
-            vm_file_system_path = Helpers.concat_path(project_abs_path, settings.getExternalVmFile().getPath());
-        }
+        String vm_template = get_dao_template(settings, project_abs_path);
         String context_path = DtoClasses.class.getPackage().getName();
         XmlParser xml_parser = new XmlParser(context_path, dto_xsd_abs_path);
         DtoClasses dto_classes = xml_parser.unmarshal(dto_xml_abs_path);
@@ -291,7 +323,7 @@ public class IdeaTargetLanguageHelpers {
                 output_dir_rel_path.append(package_rel_path);
             }
             FieldNamesMode field_names_mode = Helpers.get_field_names_mode(settings);
-            return new PhpCG.DAO(dto_classes, settings, con, sql_root_abs_path, vm_file_system_path, field_names_mode);
+            return new PhpCG.DAO(dto_classes, settings, con, sql_root_abs_path, vm_template, field_names_mode);
         } else if (RootFileName.JAVA.equals(fn)) {
             FieldNamesMode field_names_mode = Helpers.get_field_names_mode(settings);
             String dto_package = settings.getDto().getScope();
@@ -301,29 +333,27 @@ public class IdeaTargetLanguageHelpers {
                 output_dir_rel_path.append(package_rel_path);
             }
             return new JavaCG.DAO(dto_classes, settings, con, dto_package, dao_package,
-                    sql_root_abs_path, field_names_mode, vm_file_system_path);
+                    sql_root_abs_path, field_names_mode, vm_template);
         } else if (RootFileName.CPP.equals(fn)) {
             if (output_dir_rel_path != null) {
                 String package_rel_path = settings.getFolders().getTarget();
                 output_dir_rel_path.append(package_rel_path);
             }
             String class_prefix = settings.getCpp().getClassPrefix();
-            return new CppCG.DAO(dto_classes, settings, con,
-                    sql_root_abs_path, class_prefix, vm_file_system_path);
+            return new CppCG.DAO(dto_classes, settings, con, sql_root_abs_path, class_prefix, vm_template);
         } else if (RootFileName.PYTHON.equals(fn)) {
             String package_rel_path = settings.getFolders().getTarget();
             if (output_dir_rel_path != null) {
                 output_dir_rel_path.append(package_rel_path);
             }
             String dto_package = package_rel_path.replace("/", ".").replace("\\", ".");
-            return new PythonCG.DAO(dto_package, dto_classes, settings, con,
-                    sql_root_abs_path, vm_file_system_path);
+            return new PythonCG.DAO(dto_package, dto_classes, settings, con, sql_root_abs_path, vm_template);
         } else if (RootFileName.RUBY.equals(fn)) {
             if (output_dir_rel_path != null) {
                 String package_rel_path = settings.getFolders().getTarget();
                 output_dir_rel_path.append(package_rel_path);
             }
-            return new RubyCG.DAO(dto_classes, settings, con, sql_root_abs_path, vm_file_system_path);
+            return new RubyCG.DAO(dto_classes, settings, con, sql_root_abs_path, vm_template);
         } else if (RootFileName.GO.equals(fn)) {
             if (output_dir_rel_path != null) {
                 String package_rel_path = settings.getFolders().getTarget();
@@ -331,8 +361,7 @@ public class IdeaTargetLanguageHelpers {
             }
             String dao_package = settings.getDao().getScope();
             FieldNamesMode field_names_mode = Helpers.get_field_names_mode(settings);
-            return new GoCG.DAO(dao_package, dto_classes, settings, con,
-                    sql_root_abs_path, field_names_mode, vm_file_system_path);
+            return new GoCG.DAO(dao_package, dto_classes, settings, con, sql_root_abs_path, field_names_mode, vm_template);
         } else {
             throw new Exception(TargetLangUtils.get_unknown_root_file_msg(fn));
         }

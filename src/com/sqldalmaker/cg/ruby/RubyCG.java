@@ -35,14 +35,14 @@ public class RubyCG {
                    Settings jaxb_settings,
                    Connection connection,
                    String sql_root_abs_path,
-                   String vm_file_system_dir) throws Exception {
+                   String vm_template) throws Exception {
 
             this.jaxb_dto_classes = jaxb_dto_classes.getDtoClass();
             this.sql_root_abs_path = sql_root_abs_path;
-            if (vm_file_system_dir == null) {
+            if (vm_template == null) {
                 te = new TemplateEngine(get_template_path(), false);
             } else {
-                te = new TemplateEngine(vm_file_system_dir, true);
+                te = new TemplateEngine(vm_template, "ruby");
             }
             // http://rubylearning.com/satishtalim/ruby_names.html
             // A constant name starts with an uppercase letter followed by name
@@ -87,16 +87,18 @@ public class RubyCG {
         private final TemplateEngine te;
         private final JdbcUtils db_utils;
 
-        public DAO(DtoClasses jaxb_dto_classes, Settings jaxb_settings,
-                   Connection connection, String sql_root_abs_path,
-                   String vm_file_system_dir) throws Exception {
+        public DAO(DtoClasses jaxb_dto_classes,
+                   Settings jaxb_settings,
+                   Connection connection,
+                   String sql_root_abs_path,
+                   String vm_template) throws Exception {
 
             this.jaxb_dto_classes = jaxb_dto_classes;
             this.sql_root_abs_path = sql_root_abs_path;
-            if (vm_file_system_dir == null) {
+            if (vm_template == null) {
                 te = new TemplateEngine(get_template_path(), false);
             } else {
-                te = new TemplateEngine(vm_file_system_dir, true);
+                te = new TemplateEngine(vm_template, "ruby");
             }
             db_utils = new JdbcUtils(connection, FieldNamesMode.SNAKE_CASE, FieldNamesMode.SNAKE_CASE, jaxb_settings);
         }

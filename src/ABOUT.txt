@@ -1,13 +1,7 @@
-SQL DAL Maker is a generator of DTO, Model, and DAO/raw-SQL classes to access relational databases.
-
-Target programming languages: PHP, Java, C++, Python, Ruby, and Go.
-
-To generate the class, you declare it in XML meta-program.
-
 *******************
 Newer versions of the plug-in may require partial update/rework of existing XSD and XML files.
-Use "Validate All", then "Create/Overwrite XSD files".
-Make related fixes if needed. Use "Reference settings.xml" as an example.
+Use "Validate All", then "Create/Overwrite XSD files" if needed.
+Make related fixes. Use "Reference settings.xml" as an example.
 *******************
 
 SQL DAL Maker for Eclipse: http://marketplace.eclipse.org/content/sql-dal-maker

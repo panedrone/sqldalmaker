@@ -38,16 +38,16 @@ public class PhpCG {
                    Settings jaxb_settings,
                    Connection connection,
                    String sql_root_abs_path,
-                   String vm_file_system_dir,
+                   String vm_template,
                    FieldNamesMode field_names_mode) throws Exception {
 
             this.jaxb_dto_classes = jaxb_dto_classes;
             this.jaxb_settings = jaxb_settings;
             this.sql_root_abs_path = sql_root_abs_path;
-            if (vm_file_system_dir == null) {
+            if (vm_template == null) {
                 te = new TemplateEngine(get_template_path(), false);
             } else {
-                te = new TemplateEngine(vm_file_system_dir, true);
+                te = new TemplateEngine(vm_template, "php");
             }
             db_utils = new JdbcUtils(connection, field_names_mode, FieldNamesMode.AS_IS, jaxb_settings);
         }
@@ -100,16 +100,16 @@ public class PhpCG {
                    Settings jaxb_settings,
                    Connection connection,
                    String sql_root_abs_path,
-                   String vm_file_system_dir,
+                   String vm_template,
                    FieldNamesMode field_names_mode) throws Exception {
 
             this.jaxb_dto_classes = jaxb_dto_classes;
             this.sql_root_abs_path = sql_root_abs_path;
             this.jaxb_settings = jaxb_settings;
-            if (vm_file_system_dir == null) {
+            if (vm_template == null) {
                 te = new TemplateEngine(get_template_path(), false);
             } else {
-                te = new TemplateEngine(vm_file_system_dir, true);
+                te = new TemplateEngine(vm_template, "php");
             }
             db_utils = new JdbcUtils(connection, field_names_mode, FieldNamesMode.AS_IS, jaxb_settings);
         }
