@@ -37,6 +37,7 @@ import java.util.List;
 public class IdeaTargetLanguageHelpers {
 
     public static List<VirtualFile> find_root_files(VirtualFile dir) {
+
         List<VirtualFile> root_files = new ArrayList<VirtualFile>();
         String[] rf_names = {RootFileName.PHP, RootFileName.JAVA, RootFileName.CPP, RootFileName.PYTHON, RootFileName.RUBY, RootFileName.GO};
         for (String rf : rf_names) {
@@ -64,7 +65,6 @@ public class IdeaTargetLanguageHelpers {
 
         consumer.consume(file_type, new ExactFileNameMatcher(RootFileName.JAVA));
         consumer.consume(file_type, new ExactFileNameMatcher(RootFileName.CPP));
-        // consumer.consume(file_type, new ExactFileNameMatcher(ProfileNames.OBJC));
         consumer.consume(file_type, new ExactFileNameMatcher(RootFileName.PHP));
         consumer.consume(file_type, new ExactFileNameMatcher(RootFileName.PYTHON));
         consumer.consume(file_type, new ExactFileNameMatcher(RootFileName.RUBY));
@@ -164,8 +164,7 @@ public class IdeaTargetLanguageHelpers {
         String fn = file.getName();
         if (RootFileName.JAVA.equals(fn)
                 || RootFileName.CPP.equals(fn)
-                || //ProfileNames.OBJC.equals(fn) ||
-                RootFileName.PHP.equals(fn)
+                || RootFileName.PHP.equals(fn)
                 || RootFileName.PYTHON.equals(fn)
                 || RootFileName.RUBY.equals(fn)
                 || RootFileName.GO.equals(fn)) {
@@ -179,6 +178,7 @@ public class IdeaTargetLanguageHelpers {
     }
 
     public static boolean accept(@NotNull VirtualFile file) {
+
         return RootFileName.JAVA.equals(file.getName()) ||
                 RootFileName.CPP.equals(file.getName()) ||
                 // ProfileNames.OBJC.equals(file.getName()) ||
@@ -188,17 +188,23 @@ public class IdeaTargetLanguageHelpers {
                 RootFileName.GO.equals(file.getName());
     }
 
-    private static String get_dto_template(Settings settings, String project_abs_path) throws Exception {
+    private static String get_dto_template(Settings settings,
+                                           String project_abs_path) throws Exception {
+
         String m_name = settings.getDto().getMacro();
         return get_template(m_name, settings, project_abs_path);
     }
 
-    private static String get_dao_template(Settings settings, String project_abs_path) throws Exception {
+    private static String get_dao_template(Settings settings,
+                                           String project_abs_path) throws Exception {
+
         String m_name = settings.getDao().getMacro();
         return get_template(m_name, settings, project_abs_path);
     }
 
-    private static String get_template(String m_name, Settings settings, String project_abs_path) throws Exception {
+    private static String get_template(String m_name,
+                                       Settings settings,
+                                       String project_abs_path) throws Exception {
         String vm_template;
         // read the file or find the macro
         if (m_name == null || m_name.trim().length() == 0) {
