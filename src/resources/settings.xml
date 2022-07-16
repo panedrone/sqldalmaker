@@ -221,7 +221,7 @@
         <type detected="java.lang.Double" target="float"/>
         <type detected="java.math.BigDecimal" target="float"/>
 
-        <type detected="java.util.Date" target="string"/>
+        <type detected="java.util.Date" target="\DateTime"/>
         <type detected="java.lang.String" target="string"/>
         <type detected="java.lang.Boolean" target="bool"/>
         <type detected="byte[]" target="array"/>
