@@ -54,9 +54,18 @@ class DtoClassInfo {
                                   DtoClass jaxb_dto_class,
                                   List<FieldInfo> res_dto_fields) throws Exception {
 
-        _refine_by_jaxb(jaxb_dto_class, res_dto_fields, fields_map);
+        _refine_by_field_jaxb(jaxb_dto_class, res_dto_fields, fields_map);
+        _refine_scalar_types(res_dto_fields);
         _substitute_built_in_macros(res_dto_fields);
         _substitute_type_params(res_dto_fields);
+    }
+
+    private void _refine_scalar_types(List<FieldInfo> dto_fields) {
+        for (FieldInfo fi : dto_fields) {
+            String type_name = fi.getScalarType();
+            type_name = type_map.get_target_type_name(type_name);
+            fi.refine_scalar_type(type_name);
+        }
     }
 
     private void _substitute_type_params(List<FieldInfo> _dto_fields) {
@@ -106,9 +115,9 @@ class DtoClassInfo {
         return fields_map;
     }
 
-    private void _refine_by_jaxb(DtoClass jaxb_dto_class,
-                                 List<FieldInfo> dto_fields,
-                                 Map<String, FieldInfo> fields_map) throws Exception {
+    private void _refine_by_field_jaxb(DtoClass jaxb_dto_class,
+                                       List<FieldInfo> dto_fields,
+                                       Map<String, FieldInfo> fields_map) throws Exception {
 
         Set<String> refined_by_field_jaxb = new HashSet<String>();
         List<DtoClass.Field> jaxb_fields = jaxb_dto_class.getField(); // not null!!

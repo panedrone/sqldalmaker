@@ -1,6 +1,7 @@
 2022-07-16
 
-    Enabled separate modules for DTO and DAO.
+    + Golang: enabled separate modules for DTO and DAO
+    + FieldInfo.ScalarType
 
 2022-07-09
 

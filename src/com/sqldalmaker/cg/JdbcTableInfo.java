@@ -139,6 +139,7 @@ class JdbcTableInfo {
                     try {
                         int type = columns_rs.getInt("DATA_TYPE");
                         String apache_java_type_name = TypesMapping.getJavaBySqlType(type);
+                        fi.refine_scalar_type(apache_java_type_name);
                         String rendered_type_name = _get_type_name(apache_java_type_name);
                         fi.refine_rendered_type(rendered_type_name);
                     } catch (Exception e) {

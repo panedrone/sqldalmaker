@@ -14,6 +14,8 @@ public class FieldInfo {
 
     private String rendered_field_type;
     private final String original_field_type;
+    private final String original_scalar_type;
+    private String scalar_type;
 
     private final String database_column_name; // original name in database without conversions to lower/camel case etc.
 
@@ -38,6 +40,13 @@ public class FieldInfo {
             throw new Exception("<field type=null. Ensure that XSD and XML are valid.");
         }
         this.original_field_type = original_field_type;
+        String[] parts = original_field_type.split("-");
+        if (parts.length > 1) {
+            this.original_scalar_type = parts[1];
+        } else {
+            this.original_scalar_type = original_field_type;
+        }
+        this.scalar_type = original_scalar_type;
         this.database_column_name = jdbc_db_col_name;
         this.rendered_field_type = original_field_type;
         this.rendered_field_name = jdbc_db_col_name;
@@ -164,5 +173,17 @@ public class FieldInfo {
 
     public void setUnique(boolean unique) {
         is_unique = unique;
+    }
+
+    public String getOriginalScalarType() {
+        return original_scalar_type;
+    }
+
+    public String getScalarType() {
+        return scalar_type;
+    }
+
+    public void refine_scalar_type(String type_name) {
+        scalar_type = type_name;
     }
 }

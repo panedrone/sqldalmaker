@@ -271,6 +271,7 @@
                 class FieldInfo:
                     String getName()
                     String getType()
+                    String getScalarType()
                     String getColumnName()
                     int getColumnSize()
                     boolean isAI()
