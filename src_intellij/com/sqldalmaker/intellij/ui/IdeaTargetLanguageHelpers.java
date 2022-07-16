@@ -376,7 +376,7 @@ public class IdeaTargetLanguageHelpers {
                     package_rel_path = target_folder;
                 } else {
                     throw new Exception("The scopes of DTO and DAO are different, " +
-                            "so the scope of DTO must be specified in the format of Golang 'import'");
+                            "so they both must be specified in the format of Golang 'import'");
                 }
             } else {
                 String[] dto_scope_parts = dto_scope.split("/");
@@ -406,7 +406,7 @@ public class IdeaTargetLanguageHelpers {
                     package_rel_path = target_folder;
                 } else {
                     throw new Exception("The scopes of DTO and DAO are different, " +
-                            "so the scope of DAO must be specified in the format of Golang 'import'");
+                            "so they both must be specified in the format of Golang 'import'");
                 }
             } else {
                 String[] dao_scope_parts = dao_scope.split("/");
