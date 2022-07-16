@@ -116,7 +116,7 @@ public class SdmActionGroup extends ActionGroup {
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
                 try {
-                    IdeaTargetLanguageHelpers.open_editor_sync(project, root_file, settings, dao_class_name, settings.getDao().getScope());
+                    IdeaTargetLanguageHelpers.open_dao_sync(project, root_file, settings, dao_class_name);
                 } catch (Exception e) {
                     e.printStackTrace();
                     IdeaMessageHelpers.show_error_in_ui_thread(e);
@@ -175,7 +175,7 @@ public class SdmActionGroup extends ActionGroup {
 
     @NotNull
     @Override
-    public AnAction[] getChildren(@Nullable AnActionEvent anActionEvent) {
+    public AnAction @NotNull [] getChildren(@Nullable AnActionEvent anActionEvent) {
         try {
             if (anActionEvent == null) {
                 return AnAction.EMPTY_ARRAY;

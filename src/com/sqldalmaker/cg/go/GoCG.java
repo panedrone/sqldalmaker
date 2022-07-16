@@ -14,6 +14,8 @@ import com.sqldalmaker.jaxb.dto.DtoClasses;
 import com.sqldalmaker.jaxb.settings.Settings;
 
 import java.io.StringWriter;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.util.*;
 
@@ -62,6 +64,25 @@ public class GoCG {
         return type_part;
     }
 
+    private static String _get_package_name(Settings settings, String scope) {
+        String pkg;
+        if (scope.length() == 0) {
+            String target_folder = settings.getFolders().getTarget();
+            Path p = Paths.get(target_folder);
+            String target_folder_last_segment = p.getFileName().toString();
+            pkg = target_folder_last_segment;
+        } else {
+            Path p = Paths.get(scope);
+            String dto_scope_last_segment = p.getFileName().toString();
+            if (dto_scope_last_segment.equals(scope)) {
+                pkg = scope;
+            } else {
+                pkg = dto_scope_last_segment;
+            }
+        }
+        return pkg;
+    }
+
     public static class DTO implements IDtoCG {
 
         private final String dto_package;
@@ -71,15 +92,15 @@ public class GoCG {
         private final TemplateEngine te;
         private final JdbcUtils db_utils;
 
-        public DTO(String dto_package,
-                   DtoClasses jaxb_dto_classes,
+        public DTO(DtoClasses jaxb_dto_classes,
                    Settings jaxb_settings,
                    Connection connection,
                    String sql_root_abs_path,
                    FieldNamesMode field_names_mode,
                    String vm_template) throws Exception {
 
-            this.dto_package = dto_package;
+            String dto_scope = jaxb_settings.getDto().getScope().replace('\\', '/').trim();
+            this.dto_package = _get_package_name(jaxb_settings, dto_scope);
             this.jaxb_dto_classes = jaxb_dto_classes;
             this.sql_root_abs_path = sql_root_abs_path;
             if (vm_template == null) {
@@ -153,7 +174,7 @@ public class GoCG {
 
     public static class DAO implements IDaoCG {
 
-        // private final String dto_package;
+        private final String dto_package;
         private final String dao_package;
 
         private final String sql_root_abs_path;
@@ -161,19 +182,22 @@ public class GoCG {
         private final Set<String> imports = new HashSet<String>();
         private final TemplateEngine te;
         private final JdbcUtils db_utils;
+        private final Settings settings;
 
         private String dao_class_name;
 
-        public DAO(String dao_package,
-                   DtoClasses jaxb_dto_classes,
+        public DAO(DtoClasses jaxb_dto_classes,
                    Settings jaxb_settings,
                    Connection connection,
                    String sql_root_abs_path,
                    FieldNamesMode field_names_mode,
                    String vm_template) throws Exception {
 
-            //this.dto_package = dto_package;
-            this.dao_package = dao_package;
+            this.settings = jaxb_settings;
+            String dto_scope = jaxb_settings.getDto().getScope().replace('\\', '/').trim();
+            this.dto_package = _get_package_name(jaxb_settings, dto_scope);
+            String dao_scope = jaxb_settings.getDao().getScope().replace('\\', '/').trim();
+            this.dao_package = _get_package_name(jaxb_settings, dao_scope);
             this.jaxb_dto_classes = jaxb_dto_classes;
             this.sql_root_abs_path = sql_root_abs_path;
             if (vm_template == null) {
@@ -295,10 +319,27 @@ public class GoCG {
             if (model_end != -1) {
                 dto_class_nm = dto_class_nm.substring(model_end + 1);
             }
-            return dto_class_nm;
+            if (this.dto_package.equals(dao_package)) {
+                return dto_class_nm;
+            }
+            return dto_package + "." + dto_class_nm;
         }
 
         private void _process_dto_class_name(String dto_class_name) {
+            if (this.dto_package.equals(dao_package)) {
+                return;
+            }
+            String dto_import = settings.getDto().getScope();
+            boolean found = false;
+            for (String imp : imports) {
+                if (imp.equals(dto_import)) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                imports.add(dto_import);
+            }
         }
 
         @Override

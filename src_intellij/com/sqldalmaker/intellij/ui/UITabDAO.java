@@ -204,7 +204,7 @@ public class UITabDAO {
             final Settings settings = IdeaHelpers.load_settings(root_file);
             String v = (String) table.getValueAt(selectedRows[0], 0);
             String dao_class_name = Helpers.get_dao_class_name(v);
-            IdeaTargetLanguageHelpers.open_editor_sync(project, root_file, settings, dao_class_name, settings.getDao().getScope());
+            IdeaTargetLanguageHelpers.open_dao_sync(project, root_file, settings, dao_class_name);
         } catch (Exception e) {
             e.printStackTrace();
             IdeaMessageHelpers.show_error_in_ui_thread(e);

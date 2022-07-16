@@ -1,20 +1,24 @@
-package dal
+package dao
 
 import (
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
-var ds = &DataStore{}
+var ds = &_DS{}
 
-func (ds *DataStore) initDb() (err error) {
-	ds.db, err = gorm.Open(sqlite.Open("./todolist.sqlite3"), &gorm.Config{})
+func (ds *_DS) initDb() (err error) {
+	ds.db, err = gorm.Open(sqlite.Open("./todolist.sqlite3"), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Info),
+	})
 	return
 }
 
 func Db() *gorm.DB {
 	return ds.db
 }
+
 func OpenDB() error {
 	return ds.Open()
 }
@@ -23,10 +27,6 @@ func CloseDB() error {
 	return ds.Close()
 }
 
-func NewTasksDao() *TasksDao {
-	return &TasksDao{Ds: ds}
-}
-
 func NewGroupsDao() *GroupsDao {
-	return &GroupsDao{Ds: ds}
+	return &GroupsDao{ds: ds}
 }

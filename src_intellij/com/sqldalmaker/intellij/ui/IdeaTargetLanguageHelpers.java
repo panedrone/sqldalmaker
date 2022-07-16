@@ -24,6 +24,7 @@ import com.sqldalmaker.jaxb.settings.Settings;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Connection;
 import java.util.ArrayList;
@@ -83,15 +84,35 @@ public class IdeaTargetLanguageHelpers {
         return rel_path;
     }
 
-    public static void open_editor_sync(Project project,
-                                        VirtualFile root_file,
-                                        Settings settings,
-                                        String class_name,
-                                        String class_scope) throws Exception {
+    public static void open_dto_sync(Project project,
+                                     VirtualFile root_file,
+                                     Settings settings,
+                                     String dto_class_name) throws Exception {
 
-        String rel_path = get_target_folder_rel_path(project, root_file, settings, class_name, class_scope);
+        String target_file_abs_path = get_dto_file_abs_path(project, root_file, settings, dto_class_name);
+        String rel_path = IdeaHelpers.get_relative_path(project, target_file_abs_path);
         IdeaEditorHelpers.open_project_file_in_editor_sync(project, rel_path);
     }
+
+    public static void open_dao_sync(Project project,
+                                     VirtualFile root_file,
+                                     Settings settings,
+                                     String dao_class_name) throws Exception {
+
+        String target_file_abs_path = get_dao_file_abs_path(project, root_file, settings, dao_class_name);
+        String rel_path = IdeaHelpers.get_relative_path(project, target_file_abs_path);
+        IdeaEditorHelpers.open_project_file_in_editor_sync(project, rel_path);
+    }
+
+//    public static void open_editor_sync(Project project,
+//                                        VirtualFile root_file,
+//                                        Settings settings,
+//                                        String class_name,
+//                                        String class_scope) throws Exception {
+//
+//        String rel_path = get_target_folder_rel_path(project, root_file, settings, class_name, class_scope);
+//        IdeaEditorHelpers.open_project_file_in_editor_sync(project, rel_path);
+//    }
 
     public static void prepare_generated_file_data(VirtualFile root_file,
                                                    String class_name,
@@ -108,12 +129,11 @@ public class IdeaTargetLanguageHelpers {
     public static void validate_dto(Project project,
                                     VirtualFile root_file,
                                     Settings settings,
-                                    String class_name,
+                                    String dto_class_name,
                                     String[] file_content,
                                     StringBuilder validation_buff) throws Exception {
 
-        String target_folder_abs_path = get_target_folder_abs_path(project, root_file, settings, settings.getDto().getScope());
-        String target_file_abs_path = TargetLangUtils.get_target_file_path(root_file.getName(), target_folder_abs_path, class_name);
+        String target_file_abs_path = get_dto_file_abs_path(project, root_file, settings, dto_class_name);
         String old_text = Helpers.load_text_from_file(target_file_abs_path);
         if (old_text.length() == 0) {
             validation_buff.append(Const.OUTPUT_FILE_IS_MISSING);
@@ -136,6 +156,42 @@ public class IdeaTargetLanguageHelpers {
         return TargetLangUtils.get_target_folder_abs_path(class_scope, root_file_fn, target_folder_rel_path, module_root);
     }
 
+    private static String get_dto_file_abs_path(Project project,
+                                                VirtualFile root_file,
+                                                Settings settings,
+                                                String dto_class_name) throws Exception {
+
+        String root_file_fn = root_file.getName();
+        String target_folder_abs_path;
+        if (RootFileName.GO.equals(root_file_fn)) {
+            String dto_folder_rel_path = get_golang_dto_folder_rel_path(settings);
+            String module_root = IdeaHelpers.get_project_base_dir(project).getPath();
+            target_folder_abs_path = Helpers.concat_path(module_root, dto_folder_rel_path);
+        } else {
+            target_folder_abs_path = get_target_folder_abs_path(project, root_file, settings, settings.getDto().getScope());
+        }
+        String target_file_abs_path = TargetLangUtils.get_target_file_path(root_file_fn, target_folder_abs_path, dto_class_name);
+        return target_file_abs_path;
+    }
+
+    private static String get_dao_file_abs_path(Project project,
+                                                VirtualFile root_file,
+                                                Settings settings,
+                                                String dao_class_name) throws Exception {
+
+        String root_file_fn = root_file.getName();
+        String target_folder_abs_path;
+        if (RootFileName.GO.equals(root_file_fn)) {
+            String dao_folder_rel_path = get_golang_dao_folder_rel_path(settings);
+            String module_root = IdeaHelpers.get_project_base_dir(project).getPath();
+            target_folder_abs_path = Helpers.concat_path(module_root, dao_folder_rel_path);
+        } else {
+            target_folder_abs_path = get_target_folder_abs_path(project, root_file, settings, settings.getDao().getScope());
+        }
+        String target_file_abs_path = TargetLangUtils.get_target_file_path(root_file_fn, target_folder_abs_path, dao_class_name);
+        return target_file_abs_path;
+    }
+
     public static void validate_dao(Project project,
                                     VirtualFile root_file,
                                     Settings settings,
@@ -143,8 +199,7 @@ public class IdeaTargetLanguageHelpers {
                                     String[] file_content,
                                     StringBuilder validation_buff) throws Exception {
 
-        String target_folder_abs_path = get_target_folder_abs_path(project, root_file, settings, settings.getDao().getScope());
-        String target_file_abs_path = TargetLangUtils.get_target_file_path(root_file.getName(), target_folder_abs_path, dao_class_name);
+        String target_file_abs_path = get_dao_file_abs_path(project, root_file, settings, dao_class_name);
         String old_text = Helpers.load_text_from_file(target_file_abs_path);
         if (old_text.length() == 0) {
             validation_buff.append(Const.OUTPUT_FILE_IS_MISSING);
@@ -188,26 +243,26 @@ public class IdeaTargetLanguageHelpers {
                 RootFileName.GO.equals(file.getName());
     }
 
-    private static String get_dto_template(Settings settings,
-                                           String project_abs_path) throws Exception {
+    private static String get_dto_vm_template(Settings settings,
+                                              String project_abs_path) throws Exception {
 
-        String m_name = settings.getDto().getMacro();
-        return get_template(m_name, settings, project_abs_path);
+        String macro_name = settings.getDto().getMacro();
+        return get_vm_template(macro_name, settings, project_abs_path);
     }
 
-    private static String get_dao_template(Settings settings,
-                                           String project_abs_path) throws Exception {
+    private static String get_dao_vm_template(Settings settings,
+                                              String project_abs_path) throws Exception {
 
-        String m_name = settings.getDao().getMacro();
-        return get_template(m_name, settings, project_abs_path);
+        String macro_name = settings.getDao().getMacro();
+        return get_vm_template(macro_name, settings, project_abs_path);
     }
 
-    private static String get_template(String m_name,
-                                       Settings settings,
-                                       String project_abs_path) throws Exception {
+    private static String get_vm_template(String macro_name,
+                                          Settings settings,
+                                          String project_abs_path) throws Exception {
         String vm_template;
         // read the file or find the macro
-        if (m_name == null || m_name.trim().length() == 0) {
+        if (macro_name == null || macro_name.trim().length() == 0) {
             if (settings.getExternalVmFile().getPath().trim().length() == 0) {
                 return null;
             } else {
@@ -219,20 +274,20 @@ public class IdeaTargetLanguageHelpers {
         }
         Macros.Macro vm_macro = null;
         for (Macros.Macro m : settings.getMacros().getMacro()) {
-            if (m.getName().equalsIgnoreCase(m_name)) {
+            if (m.getName().equalsIgnoreCase(macro_name)) {
                 vm_macro = m;
                 break;
             }
         }
         if (vm_macro == null) {
-            throw new Exception("Macro not found: " + m_name);
+            throw new Exception("Macro not found: " + macro_name);
         }
         if (vm_macro.getVm() != null) {
             vm_template = vm_macro.getVm().trim();
         } else if (vm_macro.getVmXml() != null) {
             vm_template = Xml2Vm.parse(vm_macro.getVmXml());
         } else {
-            throw new Exception("Expected <vm> or <vm-xml> in " + m_name);
+            throw new Exception("Expected <vm> or <vm-xml> in " + macro_name);
         }
         return vm_template;
     }
@@ -244,7 +299,7 @@ public class IdeaTargetLanguageHelpers {
 
         String project_abs_path = IdeaHelpers.get_project_base_dir(project).getPath();
         String sql_root_abs_path = Helpers.concat_path(project_abs_path, settings.getFolders().getSql());
-        String vm_template = get_dto_template(settings, project_abs_path);
+        String vm_template = get_dto_vm_template(settings, project_abs_path);
         String xml_configs_folder_full_path = root_file.getParent().getPath();
         String dto_xml_abs_path = xml_configs_folder_full_path + "/" + Const.DTO_XML;
         String dto_xsd_abs_path = xml_configs_folder_full_path + "/" + Const.DTO_XSD;
@@ -277,8 +332,7 @@ public class IdeaTargetLanguageHelpers {
                 output_dir_rel_path.append(package_rel_path);
             }
             Settings sett = IdeaHelpers.load_settings(root_file);
-            return new CppCG.DTO(dto_classes, sett, connection,
-                    sql_root_abs_path, settings.getCpp().getClassPrefix(), vm_template);
+            return new CppCG.DTO(dto_classes, sett, connection, sql_root_abs_path, settings.getCpp().getClassPrefix(), vm_template);
         } else if (RootFileName.PYTHON.equals(fn)) {
             if (output_dir_rel_path != null) {
                 String package_rel_path = settings.getFolders().getTarget();
@@ -293,30 +347,88 @@ public class IdeaTargetLanguageHelpers {
             return new RubyCG.DTO(dto_classes, settings, connection, sql_root_abs_path, vm_template);
         } else if (RootFileName.GO.equals(fn)) {
             if (output_dir_rel_path != null) {
-                String package_rel_path = settings.getFolders().getTarget();
+                String package_rel_path = get_golang_dto_folder_rel_path(settings);
                 output_dir_rel_path.append(package_rel_path);
             }
-            String dto_package = settings.getDto().getScope();
             FieldNamesMode field_names_mode = Helpers.get_field_names_mode(settings);
-            return new GoCG.DTO(dto_package, dto_classes, settings, connection,
-                    sql_root_abs_path, field_names_mode, vm_template);
+            return new GoCG.DTO(dto_classes, settings, connection, sql_root_abs_path, field_names_mode, vm_template);
         } else {
             throw new Exception(TargetLangUtils.get_unknown_root_file_msg(fn));
         }
     }
 
-    protected static IDaoCG create_dao_cg(Connection con,
-                                          Project project,
-                                          VirtualFile root_file,
-                                          Settings settings,
-                                          StringBuilder output_dir_rel_path) throws Exception {
+    private static String get_golang_dto_folder_rel_path(Settings settings) throws Exception {
+        String dto_scope = settings.getDto().getScope().replace("\\", "/");
+        String package_rel_path;
+        String target_folder = settings.getFolders().getTarget();
+        if (dto_scope.length() == 0) {
+            String dao_scope = settings.getDao().getScope().replace("\\", "/");
+            if (dao_scope.length() != 0) {
+                throw new Exception("If DTO scope is empty, DAO scope must be empty too.");
+            }
+            package_rel_path = target_folder;
+        } else {
+            Path p = Paths.get(dto_scope);
+            String dto_scope_last_segment = p.getFileName().toString();
+            if (dto_scope_last_segment.equals(dto_scope)) { // just package name
+                String dao_scope = settings.getDao().getScope().replace("\\", "/");
+                if (dao_scope.equals(dto_scope)) {
+                    package_rel_path = target_folder;
+                } else {
+                    throw new Exception("The scopes of DTO and DAO are different, " +
+                            "so the scope of DTO must be specified in the format of Golang 'import'");
+                }
+            } else {
+                String[] dto_scope_parts = dto_scope.split("/");
+                String path_after_root_module = dto_scope.substring(dto_scope_parts[0].length() + 1);
+                package_rel_path = path_after_root_module; // just ignore target folder
+            }
+        }
+        return package_rel_path;
+    }
+
+    private static String get_golang_dao_folder_rel_path(Settings settings) throws Exception {
+        String dao_scope = settings.getDao().getScope().replace("\\", "/");
+        String package_rel_path;
+        String target_folder = settings.getFolders().getTarget();
+        if (dao_scope.length() == 0) {
+            String dto_scope = settings.getDto().getScope().replace("\\", "/");
+            if (dto_scope.length() != 0) {
+                throw new Exception("If DAO scope is empty, DTO scope must be empty too.");
+            }
+            package_rel_path = target_folder;
+        } else {
+            Path p = Paths.get(dao_scope);
+            String dao_scope_last_segment = p.getFileName().toString();
+            if (dao_scope_last_segment.equals(dao_scope)) { // just package name
+                String dto_scope = settings.getDto().getScope().replace("\\", "/");
+                if (dao_scope.equals(dto_scope)) {
+                    package_rel_path = target_folder;
+                } else {
+                    throw new Exception("The scopes of DTO and DAO are different, " +
+                            "so the scope of DAO must be specified in the format of Golang 'import'");
+                }
+            } else {
+                String[] dao_scope_parts = dao_scope.split("/");
+                String path_after_root_module = dao_scope.substring(dao_scope_parts[0].length() + 1);
+                package_rel_path = path_after_root_module; // just ignore target folder
+            }
+        }
+        return package_rel_path;
+    }
+
+    public static IDaoCG create_dao_cg(Connection con,
+                                       Project project,
+                                       VirtualFile root_file,
+                                       Settings settings,
+                                       StringBuilder output_dir_rel_path) throws Exception {
 
         String project_abs_path = IdeaHelpers.get_project_base_dir(project).getPath();
         String sql_root_abs_path = Helpers.concat_path(project_abs_path, settings.getFolders().getSql());
         String xml_configs_folder_full_path = root_file.getParent().getPath();
         String dto_xml_abs_path = xml_configs_folder_full_path + "/" + Const.DTO_XML;
         String dto_xsd_abs_path = xml_configs_folder_full_path + "/" + Const.DTO_XSD;
-        String vm_template = get_dao_template(settings, project_abs_path);
+        String vm_template = get_dao_vm_template(settings, project_abs_path);
         String context_path = DtoClasses.class.getPackage().getName();
         XmlParser xml_parser = new XmlParser(context_path, dto_xsd_abs_path);
         DtoClasses dto_classes = xml_parser.unmarshal(dto_xml_abs_path);
@@ -362,12 +474,35 @@ public class IdeaTargetLanguageHelpers {
             return new RubyCG.DAO(dto_classes, settings, con, sql_root_abs_path, vm_template);
         } else if (RootFileName.GO.equals(fn)) {
             if (output_dir_rel_path != null) {
-                String package_rel_path = settings.getFolders().getTarget();
+                String dto_scope = settings.getDto().getScope().replace("\\", "/");
+                String dao_scope = settings.getDao().getScope().replace("\\", "/");
+                String package_rel_path;
+                String target_folder = settings.getFolders().getTarget();
+                if (dao_scope.length() == 0) {
+                    if (dto_scope.length() != 0) {
+                        throw new Exception("If the scope of DAO is empty, the scope of DTO must be empty too.");
+                    }
+                    package_rel_path = target_folder;
+                } else {
+                    Path p = Paths.get(dto_scope);
+                    String dao_scope_last_segment = p.getFileName().toString();
+                    if (dao_scope_last_segment.equals(dto_scope)) { // just package name
+                        if (dao_scope.equals(dto_scope)) {
+                            package_rel_path = target_folder;
+                        } else {
+                            throw new Exception("The scopes of DTO and DAO are different, " +
+                                    "so the scope of DAO must be specified in the format of Golang 'import'");
+                        }
+                    } else {
+                        String[] dao_scope_parts = dao_scope.split("/");
+                        String path_after_root_module = dao_scope.substring(dao_scope_parts[0].length() + 1);
+                        package_rel_path = path_after_root_module; // just ignore target folder
+                    }
+                }
                 output_dir_rel_path.append(package_rel_path);
             }
-            String dao_package = settings.getDao().getScope();
             FieldNamesMode field_names_mode = Helpers.get_field_names_mode(settings);
-            return new GoCG.DAO(dao_package, dto_classes, settings, con, sql_root_abs_path, field_names_mode, vm_template);
+            return new GoCG.DAO(dto_classes, settings, con, sql_root_abs_path, field_names_mode, vm_template);
         } else {
             throw new Exception(TargetLangUtils.get_unknown_root_file_msg(fn));
         }

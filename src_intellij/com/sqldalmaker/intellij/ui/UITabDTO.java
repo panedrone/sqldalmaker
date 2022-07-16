@@ -439,7 +439,7 @@ public class UITabDTO {
             int[] selected_rows = get_selection();
             Settings settings = IdeaHelpers.load_settings(root_file);
             String dto_class_name = (String) table.getValueAt(selected_rows[0], 0);
-            IdeaTargetLanguageHelpers.open_editor_sync(project, root_file, settings, dto_class_name, settings.getDto().getScope());
+            IdeaTargetLanguageHelpers.open_dto_sync(project, root_file, settings, dto_class_name);
         } catch (Exception e) {
             e.printStackTrace();
             IdeaMessageHelpers.show_error_in_ui_thread(e);

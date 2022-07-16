@@ -58,7 +58,7 @@ import (
 
 #end
 type ${class_name} struct {
-	Ds *DataStore
+	ds DataStore
 }
 #foreach($method in ${methods})${method}#end
 ## ====================================================================================================================
@@ -69,7 +69,7 @@ type ${class_name} struct {
 
 func (dao *${class_name}) ${method_name}(p *${dto_param}) (err error) {
 #sql_var(false $sql)
-	res, err := dao.Ds.Insert(sql, "${ai_names}"#foreach($param in ${params}), p.${param.getName()}#end)
+	res, err := dao.ds.Insert(sql, "${ai_names}"#foreach($param in ${params}), p.${param.getName()}#end)
 	if err == nil {
 #foreach ($ai in ${fields_ai})
 		err = assign(&p.${ai.getName()}, res)
@@ -97,7 +97,7 @@ func (dao *${class_name}) ${method_name}(#if(${dto_param} != "")#param_decls_dto
 #end
 		res = append(res, &obj)
 	}
-	err = dao.Ds.QueryAllRows(sql, onDto#if(${dto_param} != "")#foreach($param in ${params}), p.${param.getterMethod()}()#end)#else#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
+	err = dao.ds.QueryAllRows(sql, onDto#if(${dto_param} != "")#foreach($param in ${params}), p.${param.getterMethod()}()#end)#else#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
 	if err == nil {
 		err = errMapToErr(errMap)
 	}
@@ -114,9 +114,9 @@ func (dao *${class_name}) ${method_name}(#if(${dto_param} != "")#param_decls_dto
 		res = append(res, data)
 	}
 #if(${dto_param} != "")
-	err = dao.Ds.QueryAll(sql, onRow#foreach($param in ${params}), p.${param.getName()}#end)
+	err = dao.ds.QueryAll(sql, onRow#foreach($param in ${params}), p.${param.getName()}#end)
 #else
-	err = dao.Ds.QueryAll(sql, onRow#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
+	err = dao.ds.QueryAll(sql, onRow#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
 #end
 	if err == nil {
 		err = errMapToErr(errMap)
@@ -128,7 +128,7 @@ func (dao *${class_name}) ${method_name}(#if(${dto_param} != "")#param_decls_dto
 func (dao *${class_name}) ${method_name}(#if(${dto_param} != "")#param_decls_dto($is_external_sql)${dto_param} p#else#param_decls($is_external_sql $params)#end) (res ${returned_type_name}, err error) {
 #sql_var($is_external_sql $sql)
 #if($use_dto)
-	row, err := dao.Ds.QueryRow(sql#if(${dto_param} != "")#foreach($param in ${params}), p.${param.getterMethod()}()#end)#else#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
+	row, err := dao.ds.QueryRow(sql#if(${dto_param} != "")#foreach($param in ${params}), p.${param.getterMethod()}()#end)#else#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
 	if err != nil {
 		return
 	}
@@ -143,9 +143,9 @@ func (dao *${class_name}) ${method_name}(#if(${dto_param} != "")#param_decls_dto
 #end
 #else
 #if(${dto_param} != "")
-	r, err := dao.Ds.Query(sql#foreach($param in ${params}), p.${param.getterMethod()}()#end)
+	r, err := dao.ds.Query(sql#foreach($param in ${params}), p.${param.getterMethod()}()#end)
 #else
-	r, err := dao.Ds.Query(sql#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
+	r, err := dao.ds.Query(sql#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
 #end
 	if err == nil {
 		err = assign(&res, r)
@@ -169,7 +169,7 @@ func (dao *${class_name}) ${method_name}(#if(${dto_param} != "")#param_decls_dto
 
 func (dao *${class_name}) ${method_name}(#param_decls_dto($is_external_sql)p *${dto_param}) (res int64, err error) {
 #sql_var($is_external_sql $sql)
-	res, err = dao.Ds.Exec(sql#foreach($param in ${params}), p.${param.getName()}#end)
+	res, err = dao.ds.Exec(sql#foreach($param in ${params}), p.${param.getName()}#end)
 	return
 }
 #end
@@ -197,9 +197,9 @@ func (dao *${class_name}) ${method_name}(#param_decls($is_external_sql $params))
 	}
 #end
 #if ($method_type == "CREATE" || $method_type == "UPDATE" || $method_type == "DELETE")
-	res, err = dao.Ds.Exec(sql#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
+	res, err = dao.ds.Exec(sql#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
 #else
-	res, err = dao.Ds.Exec(sql#foreach($param in ${params2}), ${param.getLowerCamelCaseName()}#end)
+	res, err = dao.ds.Exec(sql#foreach($param in ${params2}), ${param.getLowerCamelCaseName()}#end)
 #end
 	if err == nil {
 		err = errMapToErr(errMap)

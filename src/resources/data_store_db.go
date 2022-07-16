@@ -11,7 +11,7 @@ import (
 	// _ "github.com/lib/pq" // PostgeSQL
 )
 
-func initDb(ds *DataStore) (err error) {
+func (ds *_DS)initDb() (err error) {
 	// === PostgeSQL ===========================
 	// ds.paramPrefix = "$"
 	// ds.db, err = sql.Open("postgres", "postgres://postgres:sa@localhost/my-tests?sslmode=disable")
@@ -36,4 +36,22 @@ func initDb(ds *DataStore) (err error) {
 	//ds.paramPrefix = ":"
 	//ds.db, err = sql.Open("godror", `user="ORDERS" password="root" connectString="localhost:1521/orcl"`)
 	return
+}
+
+var ds = &_DS{}
+
+func OpenDB() error {
+	return ds.Open()
+}
+
+func CloseDB() error {
+	return ds.Close()
+}
+
+func NewTasksDao() *TasksDao {
+	return &TasksDao{ds: ds}
+}
+
+func NewGroupsDao() *GroupsDao {
+	return &GroupsDao{ds: ds}
 }

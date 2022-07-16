@@ -13,11 +13,27 @@ import (
 
 /*
    SQL DAL Maker Web-Site: http://sqldalmaker.sourceforge.net
-   This is an example of how to implement the class DataStore for Go + "database/sql".
+   This is an example of how to implement DataStore for Go + "database/sql".
    Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store.go
    Copy-paste this code to your project and change it for your needs.
    Improvements are welcome: sqldalmaker@gmail.com
 */
+
+type DataStore interface {
+	Open() (err error)
+	Close() (err error)
+
+	Begin() (err error)
+	Commit() (err error)
+	Rollback() (err error)
+
+	Insert(sqlStr string, aiNames string, args ...interface{}) (id interface{}, err error)
+	Exec(sqlStr string, args ...interface{}) (res int64, err error)
+	Query(sqlStr string, args ...interface{}) (res interface{}, err error)
+	QueryAll(sqlStr string, onRow func(interface{}), args ...interface{}) (err error)
+	QueryRow(sqlStr string, args ...interface{}) (data map[string]interface{}, err error)
+	QueryAllRows(sqlStr string, onRow func(map[string]interface{}), args ...interface{}) (err error)
+}
 
 type OutParam struct {
 	/*
@@ -44,80 +60,79 @@ type InOutParam struct {
 	Dest interface{}
 }
 
-type DataStore struct {
+type _DS struct {
 	paramPrefix string
 	db          *sql.DB
 	tx          *sql.Tx
 }
 
-func (ds *DataStore) isPostgreSQL() bool {
+func (ds *_DS) isPostgreSQL() bool {
 	return ds.paramPrefix == "$"
 }
 
-func (ds *DataStore) isOracle() bool {
+func (ds *_DS) isOracle() bool {
 	return ds.paramPrefix == ":"
 }
 
-func (ds *DataStore) isSqlServer() bool {
+func (ds *_DS) isSqlServer() bool {
 	return ds.paramPrefix == "@p"
 }
 
 /*
- 	Locate function initDb(ds *DataStore) in an external file. This is an example:
+	Implement the method initDb(ds *_DS) in an external file. This is an example:
 
- // file data_store_db.go
+// file data_store_db.go
 
- package main
+package main
 
- import (
- 	"database/sql"
+import (
+	"database/sql"
+   	// _ "github.com/mattn/go-sqlite3"      // SQLite3
+   	// _ "github.com/denisenkom/go-mssqldb" // SQL Server
+   	// _ "github.com/godror/godror"			// Oracle
+   	_ "github.com/go-sql-driver/mysql"      // MySQL
+   	// _ "github.com/ziutek/mymysql/godrv"  // MySQL
+   	// _ "github.com/lib/pq"                // PostgeSQL
+)
 
-    	// _ "github.com/mattn/go-sqlite3"      // SQLite3
-    	// _ "github.com/denisenkom/go-mssqldb" // SQL Server
-    	// _ "github.com/godror/godror"			// Oracle
-    	_ "github.com/go-sql-driver/mysql"      // MySQL
-    	// _ "github.com/ziutek/mymysql/godrv"  // MySQL
-    	// _ "github.com/lib/pq"                // PostgeSQL
- )
-
- func initDb(ds *DataStore) (err error) {
- 	// === PostgeSQL ===========================
- 	ds.paramPrefix = "$"
- 	ds.db, err = sql.Open("postgres", "postgres://postgres:sa@localhost/my-tests?sslmode=disable")
- 	// ds.db, err = sql.Open("postgres", "postgres://postgres:sa@localhost/my-tests?sslmode=verify-full")
- 	// === SQLite3 =============================
- 	// ds.db, err = sql.Open("sqlite3", "./log.sqlite")
- 	// ds.db, err = sql.Open("sqlite3", "./northwindEF.sqlite")
- 	// === MySQL ===============================
- 	// ds.db, err = sql.Open("mysql", "root:root@/sakila")
- 	// ds.db, err = sql.Open("mymysql", "sakila/root/root")
- 	// === SQL Server ==========================
- 	// https://github.com/denisenkom/go-mssqldb
- 	// The sqlserver driver uses normal MS SQL Server syntax and expects parameters in the
- 	// sql query to be in the form of either @Name or @p1 to @pN (ordinal position).
- 	// ensure sqlserver:// in beginning. this one is not valid:
- 	// ------ ds.db, err = sql.Open("sqlserver", "sa:root@/localhost:1433/SQLExpress?database=AdventureWorks2014")
- 	// this one is ok:
- 	ds.paramPrefix = "@p"
- 	ds.db, err = sql.Open("sqlserver", "sqlserver://sa:root@localhost:1433?database=AdventureWorks2014")
- 	// === Oracle =============================
- 	// "github.com/godror/godror"
- 	//ds.paramPrefix = ":"
- 	//ds.db, err = sql.Open("godror", `user="ORDERS" password="root" connectString="localhost:1521/orcl"`)
- 	return
- }
+func initDb(ds *_DS) (err error) {
+	// === PostgeSQL ===========================
+	ds.paramPrefix = "$"
+	ds.db, err = sql.Open("postgres", "postgres://postgres:sa@localhost/my-tests?sslmode=disable")
+	// ds.db, err = sql.Open("postgres", "postgres://postgres:sa@localhost/my-tests?sslmode=verify-full")
+	// === SQLite3 =============================
+	// ds.db, err = sql.Open("sqlite3", "./log.sqlite")
+	// ds.db, err = sql.Open("sqlite3", "./northwindEF.sqlite")
+	// === MySQL ===============================
+	// ds.db, err = sql.Open("mysql", "root:root@/sakila")
+	// ds.db, err = sql.Open("mymysql", "sakila/root/root")
+	// === SQL Server ==========================
+	// https://github.com/denisenkom/go-mssqldb
+	// The sqlserver driver uses normal MS SQL Server syntax and expects parameters in the
+	// sql query to be in the form of either @Name or @p1 to @pN (ordinal position).
+	// ensure sqlserver:// in beginning. this one is not valid:
+	// ------ ds.db, err = sql.Open("sqlserver", "sa:root@/localhost:1433/SQLExpress?database=AdventureWorks2014")
+	// this one is ok:
+	ds.paramPrefix = "@p"
+	ds.db, err = sql.Open("sqlserver", "sqlserver://sa:root@localhost:1433?database=AdventureWorks2014")
+	// === Oracle =============================
+	// "github.com/godror/godror"
+	//ds.paramPrefix = ":"
+	//ds.db, err = sql.Open("godror", `user="ORDERS" password="root" connectString="localhost:1521/orcl"`)
+	return
+}
 
 */
 
-func (ds *DataStore) Open() error {
+func (ds *_DS) Open() error {
 	return initDb(ds)
 }
 
-func (ds *DataStore) Close() error {
+func (ds *_DS) Close() error {
 	return ds.db.Close()
 }
 
-func (ds *DataStore) Begin() (err error) {
+func (ds *_DS) Begin() (err error) {
 	if ds.tx != nil {
 		return errors.New("ds.tx already started")
 	}
@@ -125,7 +140,7 @@ func (ds *DataStore) Begin() (err error) {
 	return
 }
 
-func (ds *DataStore) Commit() (err error) {
+func (ds *_DS) Commit() (err error) {
 	if ds.tx == nil {
 		return errors.New("ds.tx not started")
 	}
@@ -134,7 +149,7 @@ func (ds *DataStore) Commit() (err error) {
 	return
 }
 
-func (ds *DataStore) Rollback() (err error) {
+func (ds *_DS) Rollback() (err error) {
 	if ds.tx == nil {
 		return nil // commit() was called, just do nothing:
 	}
@@ -143,25 +158,25 @@ func (ds *DataStore) Rollback() (err error) {
 	return
 }
 
-func (ds *DataStore) _query(sqlStr string, args ...interface{}) (*sql.Rows, error) {
+func (ds *_DS) _query(sqlStr string, args ...interface{}) (*sql.Rows, error) {
 	if ds.tx == nil {
 		return ds.db.Query(sqlStr, args...)
 	}
 	return ds.tx.Query(sqlStr, args...)
 }
 
-func (ds *DataStore) _exec(sqlStr string, args ...interface{}) (sql.Result, error) {
+func (ds *_DS) _exec(sqlStr string, args ...interface{}) (sql.Result, error) {
 	if ds.tx == nil {
 		return ds.db.Exec(sqlStr, args...)
 	}
 	return ds.tx.Exec(sqlStr, args...)
 }
 
-func (ds *DataStore) PGFetch(cursor string) string {
+func (ds *_DS) PGFetch(cursor string) string {
 	return fmt.Sprintf(`fetch all from "%s"`, cursor)
 }
 
-func (ds *DataStore) _pgInsert(sqlStr string, aiNames string, args ...interface{}) (id interface{}, err error) {
+func (ds *_DS) _pgInsert(sqlStr string, aiNames string, args ...interface{}) (id interface{}, err error) {
 	// fetching of multiple AI values is not implemented so far:
 	sqlStr += " RETURNING " + aiNames
 	rows, err := ds._query(sqlStr, args...)
@@ -180,7 +195,7 @@ func (ds *DataStore) _pgInsert(sqlStr string, aiNames string, args ...interface{
 	return
 }
 
-func (ds *DataStore) _oracleInsert(sqlStr string, aiNames string, args ...interface{}) (id interface{}, err error) {
+func (ds *_DS) _oracleInsert(sqlStr string, aiNames string, args ...interface{}) (id interface{}, err error) {
 	// fetching of multiple AI values is not implemented so far:
 	sqlStr = fmt.Sprintf("%s returning %s  into :%d", sqlStr, aiNames, len(args)+1)
 	// https://ddcode.net/2019/05/11/how-does-go-call-oracles-stored-procedures-and-get-the-return-value-of-the-stored-procedures/
@@ -196,7 +211,7 @@ func (ds *DataStore) _oracleInsert(sqlStr string, aiNames string, args ...interf
 	return id64, nil
 }
 
-func (ds *DataStore) _mssqlInsert(sqlStr string, args ...interface{}) (id interface{}, err error) {
+func (ds *_DS) _mssqlInsert(sqlStr string, args ...interface{}) (id interface{}, err error) {
 	// SQL Server https://github.com/denisenkom/go-mssqldb
 	// LastInsertId should not be used with this driver (or SQL Server) due to
 	// how the TDS protocol works. Please use the OUTPUT Clause or add a select
@@ -219,7 +234,7 @@ func (ds *DataStore) _mssqlInsert(sqlStr string, args ...interface{}) (id interf
 	return
 }
 
-func (ds *DataStore) _defaultInsert(sqlStr string, args ...interface{}) (id interface{}, err error) {
+func (ds *_DS) _defaultInsert(sqlStr string, args ...interface{}) (id interface{}, err error) {
 	res, err := ds._exec(sqlStr, args...)
 	if err != nil {
 		return
@@ -228,9 +243,9 @@ func (ds *DataStore) _defaultInsert(sqlStr string, args ...interface{}) (id inte
 	return
 }
 
-func (ds *DataStore) Insert(sqlStr string, aiNames string, args ...interface{}) (id interface{}, err error) {
+func (ds *_DS) Insert(sqlStr string, aiNames string, args ...interface{}) (id interface{}, err error) {
 	if len(aiNames) == 0 { // len(nil) == 0
-		err = errors.New("DataStore.insert is not applicable for aiNames = " + aiNames)
+		err = errors.New("_DS.insert is not applicable for aiNames = " + aiNames)
 		return
 	}
 	// Builtin LastInsertId works only with MySQL and SQLite3
@@ -273,7 +288,7 @@ func _validateDest(dest interface{}) (err error) {
 	return
 }
 
-func (ds *DataStore) _processExecParams(args []interface{}, onRowArr *[]func(map[string]interface{}),
+func (ds *_DS) _processExecParams(args []interface{}, onRowArr *[]func(map[string]interface{}),
 	queryArgs *[]interface{}) (implicitCursors bool, outCursors bool, err error) {
 	implicitCursors = false
 	outCursors = false
@@ -339,7 +354,7 @@ func (ds *DataStore) _processExecParams(args []interface{}, onRowArr *[]func(map
 	return
 }
 
-func (ds *DataStore) _queryAllImplicitRcOracle(sqlStr string, onRowArr []func(map[string]interface{}), queryArgs ...interface{}) (err error) {
+func (ds *_DS) _queryAllImplicitRcOracle(sqlStr string, onRowArr []func(map[string]interface{}), queryArgs ...interface{}) (err error) {
 	rows, err := ds._query(sqlStr, queryArgs...)
 	if err != nil {
 		return
@@ -375,7 +390,7 @@ func (ds *DataStore) _queryAllImplicitRcOracle(sqlStr string, onRowArr []func(ma
 	return
 }
 
-func (ds *DataStore) _queryAllImplicitRcMySQL(sqlStr string, onRowArr []func(map[string]interface{}), queryArgs ...interface{}) (err error) {
+func (ds *_DS) _queryAllImplicitRcMySQL(sqlStr string, onRowArr []func(map[string]interface{}), queryArgs ...interface{}) (err error) {
 	rows, err := ds._query(sqlStr, queryArgs...)
 	if err != nil {
 		return
@@ -409,7 +424,7 @@ func (ds *DataStore) _queryAllImplicitRcMySQL(sqlStr string, onRowArr []func(map
 	return
 }
 
-func (ds *DataStore) _exec2(sqlStr string, onRowArr []func(map[string]interface{}), args ...interface{}) (execRes int64, err error) {
+func (ds *_DS) _exec2(sqlStr string, onRowArr []func(map[string]interface{}), args ...interface{}) (execRes int64, err error) {
 	res, err := ds._exec(sqlStr, args...)
 	if err != nil {
 		return
@@ -459,7 +474,7 @@ func _fetchAllFromCursor(rows driver.Rows, onRow func(map[string]interface{})) (
 	return
 }
 
-func (ds *DataStore) Exec(sqlStr string, args ...interface{}) (res int64, err error) {
+func (ds *_DS) Exec(sqlStr string, args ...interface{}) (res int64, err error) {
 	sqlStr = ds._formatSQL(sqlStr)
 	var onRowArr []func(map[string]interface{})
 	var queryArgs []interface{}
@@ -479,7 +494,7 @@ func (ds *DataStore) Exec(sqlStr string, args ...interface{}) (res int64, err er
 	return ds._exec2(sqlStr, onRowArr, queryArgs...)
 }
 
-func (ds *DataStore) _queryRowValues(sqlStr string, queryArgs ...interface{}) (values []interface{}, err error) {
+func (ds *_DS) _queryRowValues(sqlStr string, queryArgs ...interface{}) (values []interface{}, err error) {
 	rows, err := ds._query(sqlStr, queryArgs...)
 	if err != nil {
 		return
@@ -516,7 +531,7 @@ func (ds *DataStore) _queryRowValues(sqlStr string, queryArgs ...interface{}) (v
 	return
 }
 
-func (ds *DataStore) Query(sqlStr string, args ...interface{}) (arr interface{}, err error) {
+func (ds *_DS) Query(sqlStr string, args ...interface{}) (arr interface{}, err error) {
 	sqlStr = ds._formatSQL(sqlStr)
 	var onRowArr []func(map[string]interface{})
 	var queryArgs []interface{}
@@ -532,7 +547,7 @@ func (ds *DataStore) Query(sqlStr string, args ...interface{}) (arr interface{},
 	return // it returns []interface{} for cases like 'SELECT @value, @name;'
 }
 
-func (ds *DataStore) QueryAll(sqlStr string, onRow func(interface{}), args ...interface{}) (err error) {
+func (ds *_DS) QueryAll(sqlStr string, onRow func(interface{}), args ...interface{}) (err error) {
 	sqlStr = ds._formatSQL(sqlStr)
 	rows, err := ds._query(sqlStr, args...)
 	if err != nil {
@@ -567,7 +582,7 @@ func (ds *DataStore) QueryAll(sqlStr string, onRow func(interface{}), args ...in
 	return
 }
 
-func (ds *DataStore) QueryRow(sqlStr string, args ...interface{}) (data map[string]interface{}, err error) {
+func (ds *_DS) QueryRow(sqlStr string, args ...interface{}) (data map[string]interface{}, err error) {
 	sqlStr = ds._formatSQL(sqlStr)
 	rows, err := ds._query(sqlStr, args...)
 	if err != nil {
@@ -598,7 +613,7 @@ func (ds *DataStore) QueryRow(sqlStr string, args ...interface{}) (data map[stri
 	return
 }
 
-func (ds *DataStore) QueryAllRows(sqlStr string, onRow func(map[string]interface{}), args ...interface{}) (err error) {
+func (ds *_DS) QueryAllRows(sqlStr string, onRow func(map[string]interface{}), args ...interface{}) (err error) {
 	// many thanks to:
 	// https://stackoverflow.com/questions/51731423/how-to-read-a-row-from-a-table-to-a-map-without-knowing-columns
 	sqlStr = ds._formatSQL(sqlStr)
@@ -634,12 +649,12 @@ func (ds *DataStore) QueryAllRows(sqlStr string, onRow func(map[string]interface
 }
 
 /*
- // MySQL: if string is ok for all types (no conversions needed), use this:
- func (ds *DataStore) _prepareFetch(rows *sql.Rows) ([]string, map[string]interface{}, []string, []interface{}) {
- 	// ...
- 	values := make([]string, len(colNames))
+// MySQL: if string is ok for all types (no conversions needed), use this:
+func (ds *_DS) _prepareFetch(rows *sql.Rows) ([]string, map[string]interface{}, []string, []interface{}) {
+	// ...
+	values := make([]string, len(colNames))
 */
-func (ds *DataStore) _prepareFetch(rows *sql.Rows) (colNames []string, data map[string]interface{}, values []interface{}, valuePointers []interface{}, err error) {
+func (ds *_DS) _prepareFetch(rows *sql.Rows) (colNames []string, data map[string]interface{}, values []interface{}, valuePointers []interface{}, err error) {
 	colNames, err = rows.Columns()
 	if err != nil {
 		return
@@ -656,7 +671,7 @@ func (ds *DataStore) _prepareFetch(rows *sql.Rows) (colNames []string, data map[
 	return
 }
 
-func (ds *DataStore) _formatSQL(sqlStr string) string {
+func (ds *_DS) _formatSQL(sqlStr string) string {
 	if len(ds.paramPrefix) == 0 {
 		return sqlStr
 	}
@@ -781,14 +796,6 @@ func _assignTime(d *time.Time, value interface{}) bool {
 	switch v := value.(type) {
 	case time.Time:
 		*d = v
-	case []uint8: // MySQL
-		s := string(v)
-		layout := "2006-01-02 15:04:05"
-		t, err := time.Parse(layout, s)
-		if err != nil {
-			return false
-		}
-		*d = t
 	default:
 		return false
 	}
@@ -845,7 +852,7 @@ func _assign(dstRef interface{}, value interface{}) error {
 		return nil
 	}
 	if !assigned {
-		return errors.New(fmt.Sprintf("%T <- %T fail", dstRef, value))
+		return errors.New(fmt.Sprintf("%T <- %T", dstRef, value))
 	}
 	return nil
 }
@@ -873,7 +880,7 @@ func assign(dstRef interface{}, value interface{}) error {
 			*d = v
 		default:
 			// use "default:" instead of "case []interface{}":
-			// because "dstRef" may be like "*float64" with a "value" like
+			// because "dstRef" may be "*float64" and value may be like
 			// []interface{}{[]uint16{49, 46, 50, 48}} // []uint16 in here is a string like 1.20
 			// (e.g. PG + Query(`select get_test_rating(?)`, tId))
 			v0 := v[0]
@@ -899,7 +906,7 @@ func fromRow(dstRef interface{}, row map[string]interface{}, colName string, err
 	}
 	err := assign(dstRef, value)
 	if err != nil {
-		key := fmt.Sprintf("%s(%s)", colName, err.Error())
+		key := fmt.Sprintf("%s: %s", colName, err.Error())
 		count, ok := errMap[key]
 		if ok {
 			errMap[key] = count + 1
