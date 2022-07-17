@@ -164,7 +164,7 @@ public class IdeaTargetLanguageHelpers {
         String root_file_fn = root_file.getName();
         String target_folder_abs_path;
         if (RootFileName.GO.equals(root_file_fn)) {
-            String dto_folder_rel_path = get_golang_dto_folder_rel_path(settings);
+            String dto_folder_rel_path = TargetLangUtils.get_golang_dto_folder_rel_path(settings);
             String module_root = IdeaHelpers.get_project_base_dir(project).getPath();
             target_folder_abs_path = Helpers.concat_path(module_root, dto_folder_rel_path);
         } else {
@@ -182,7 +182,7 @@ public class IdeaTargetLanguageHelpers {
         String root_file_fn = root_file.getName();
         String target_folder_abs_path;
         if (RootFileName.GO.equals(root_file_fn)) {
-            String dao_folder_rel_path = get_golang_dao_folder_rel_path(settings);
+            String dao_folder_rel_path = TargetLangUtils.get_golang_dao_folder_rel_path(settings);
             String module_root = IdeaHelpers.get_project_base_dir(project).getPath();
             target_folder_abs_path = Helpers.concat_path(module_root, dao_folder_rel_path);
         } else {
@@ -347,7 +347,7 @@ public class IdeaTargetLanguageHelpers {
             return new RubyCG.DTO(dto_classes, settings, connection, sql_root_abs_path, vm_template);
         } else if (RootFileName.GO.equals(fn)) {
             if (output_dir_rel_path != null) {
-                String package_rel_path = get_golang_dto_folder_rel_path(settings);
+                String package_rel_path = TargetLangUtils.get_golang_dto_folder_rel_path(settings);
                 output_dir_rel_path.append(package_rel_path);
             }
             FieldNamesMode field_names_mode = Helpers.get_field_names_mode(settings);
@@ -355,57 +355,6 @@ public class IdeaTargetLanguageHelpers {
         } else {
             throw new Exception(TargetLangUtils.get_unknown_root_file_msg(fn));
         }
-    }
-
-    private static final String SCOPES_ERR = "Error in 'settings.xml': \n" +
-            "the scopes of DTO and DAO must both be empty or both be fully qualified like in Go 'import' section";
-
-    private static String get_golang_dto_folder_rel_path(Settings settings) throws Exception {
-        String dto_scope = settings.getDto().getScope().replace("\\", "/");
-        String dao_scope = settings.getDao().getScope().replace("\\", "/");
-        String package_rel_path;
-        if (dto_scope.length() == 0) {
-            if (dao_scope.length() != 0) {
-                throw new Exception(SCOPES_ERR);
-            }
-            String target_folder = settings.getFolders().getTarget();
-            package_rel_path = target_folder;
-        } else {
-            Path p = Paths.get(dto_scope);
-            String dto_scope_last_segment = p.getFileName().toString();
-            if (dao_scope.length() == 0 || dto_scope_last_segment.equals(dto_scope)) { // just package name
-                throw new Exception(SCOPES_ERR);
-            } else {
-                String[] dto_scope_parts = dto_scope.split("/");
-                String path_after_root_module = dto_scope.substring(dto_scope_parts[0].length() + 1);
-                package_rel_path = path_after_root_module; // just ignore target folder
-            }
-        }
-        return package_rel_path;
-    }
-
-    private static String get_golang_dao_folder_rel_path(Settings settings) throws Exception {
-        String dao_scope = settings.getDao().getScope().replace("\\", "/");
-        String dto_scope = settings.getDto().getScope().replace("\\", "/");
-        String package_rel_path;
-        if (dao_scope.length() == 0) {
-            if (dto_scope.length() != 0) {
-                throw new Exception(SCOPES_ERR);
-            }
-            String target_folder = settings.getFolders().getTarget();
-            package_rel_path = target_folder;
-        } else {
-            Path p = Paths.get(dao_scope);
-            String dao_scope_last_segment = p.getFileName().toString();
-            if (dto_scope.length() == 0 || dao_scope_last_segment.equals(dao_scope)) { // just package name
-                throw new Exception(SCOPES_ERR);
-            } else {
-                String[] dao_scope_parts = dao_scope.split("/");
-                String path_after_root_module = dao_scope.substring(dao_scope_parts[0].length() + 1);
-                package_rel_path = path_after_root_module; // just ignore target folder
-            }
-        }
-        return package_rel_path;
     }
 
     public static IDaoCG create_dao_cg(Connection con,
