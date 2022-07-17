@@ -55,12 +55,12 @@ class DtoClassInfo {
                                   List<FieldInfo> res_dto_fields) throws Exception {
 
         _refine_by_field_jaxb(jaxb_dto_class, res_dto_fields, fields_map);
-        _refine_scalar_types(res_dto_fields);
+        _refine_scalar_types_by_type_map(res_dto_fields);
         _substitute_built_in_macros(res_dto_fields);
         _substitute_type_params(res_dto_fields);
     }
 
-    private void _refine_scalar_types(List<FieldInfo> dto_fields) {
+    private void _refine_scalar_types_by_type_map(List<FieldInfo> dto_fields) {
         for (FieldInfo fi : dto_fields) {
             String type_name = fi.getScalarType();
             type_name = type_map.get_target_type_name(type_name);
@@ -135,6 +135,7 @@ class DtoClassInfo {
             }
             _refine_fi_by_type_map_and_macros(fi, jaxb_field_type_name);
             refined_by_field_jaxb.add(fi.getColumnName());
+            fi.refine_scalar_type(jaxb_field_type_name);
         }
         for (FieldInfo fi : dto_fields) {
             if (refined_by_field_jaxb.contains(fi.getColumnName())) {

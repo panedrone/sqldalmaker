@@ -208,10 +208,7 @@
         <type detected="doctrine-byte[]" target="${doctrine-type}|0:array|1:array"/>
         <type detected="doctrine-java.lang.Object" target="${doctrine-type}|0:object|1:object"/>
 
-        <!-- ******   raw-SQL params and ret-values for PHP  ****** -->
-
-        <!-- https://www.w3schools.com/php/php_datatypes.asp -->
-        <!-- https://www.php.net/manual/en/language.types.declarations.php-->
+        <!-- ******   PHP raw-SQL ****** -->
 
         <type detected="java.lang.Short" target="int"/>
         <type detected="java.lang.Integer" target="int"/>

@@ -1,6 +1,9 @@
 2022-07-17
 
-    Enabled columns like `api-key`.
+    Enabled columns like `api-key`
+
+    Enabled types in plain PHP DTO and Doctrine models
+        https://github.com/panedrone/sdm_demo_todolist_php_doctrine/blob/master/sdm/settings.xml
 
 2022-07-16
 
