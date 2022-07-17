@@ -186,7 +186,9 @@ func (dao *${class_name}) ${method_name}(#param_decls_dto($is_external_sql)p *${
 
 func (dao *${class_name}) ${method_name}(#param_decls($is_external_sql $params)) (res int64, err error) {
 #sql_var($is_external_sql $sql)
+#if($mappings.size()>0)
 	errMap := make(map[string]int)
+#end
 #foreach($m in ${mappings})
 	${m.get_exec_dml_param_name()} := func(rd map[string]interface{}) {
 		obj := ${m.get_dto_class_name()}{}
@@ -201,9 +203,11 @@ func (dao *${class_name}) ${method_name}(#param_decls($is_external_sql $params))
 #else
 	res, err = dao.ds.Exec(sql#foreach($param in ${params2}), ${param.getLowerCamelCaseName()}#end)
 #end
+#if($mappings.size()>0)
 	if err == nil {
 		err = errMapToErr(errMap)
 	}
+#end
 	return
 }
 #end
