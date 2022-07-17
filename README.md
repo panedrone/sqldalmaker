@@ -17,4 +17,4 @@ Demo-Projects:
 * [Java+Swing](https://github.com/panedrone/sdm_demo_swing_thesaurus), [Java+JSF](https://github.com/panedrone/sdm_demo_jsf_todolist), [Java+JasperReports](https://github.com/panedrone/sdm_demo_jasper_reports_northwindEF), [Java+Android](https://github.com/panedrone/sdm_demo_android_thesaurus)
 * [C++ Qt](https://github.com/panedrone/sdm_demo_qt6_thesaurus)
 * [Python+Django](https://github.com/panedrone/sdm_demo_django_todolist_sqlite3), [Python+Flask-SQLAlchemy](https://github.com/panedrone/sdm_demo_flask_sqlalchemy_todolist), [Python+sqlite3](https://github.com/panedrone/sdm_demo_python_tkinter_github_stat)
-* [Go+Gin+database/sql](https://github.com/panedrone/sdm_demo_go_todolist), [Go+Gin+Gorm](https://github.com/panedrone/sdm_demo_gorm_todolist)
+* [Go+database/sql](https://github.com/panedrone/sdm_demo_go_todolist), [Go+Gorm](https://github.com/panedrone/sdm_demo_gorm_todolist)

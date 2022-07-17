@@ -49,9 +49,10 @@ public class FieldInfo {
         this.scalar_type = original_scalar_type;
         this.database_column_name = jdbc_db_col_name;
         this.rendered_field_type = original_field_type;
-        this.rendered_field_name = jdbc_db_col_name;
-        if ("parameter".equals(comment) == false) {
-            this.rendered_field_name = this.rendered_field_name.replace(" ", "_"); // for mysql!
+        this.rendered_field_name = jdbc_db_col_name.replace("-", "_"); // MySQL allows columns like 'api-key';
+        // if ("parameter".equals(comment) == false)
+        {
+            this.rendered_field_name = this.rendered_field_name.replace(" ", "_"); // for MySQL!
             this.rendered_field_name = this.rendered_field_name.replace("[", "");
             this.rendered_field_name = this.rendered_field_name.replace("]", "");
             this.rendered_field_name = this.rendered_field_name.replace(".", "_"); // [OrderDetails].OrderID
