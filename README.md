@@ -13,8 +13,8 @@ Project Website: [http://sqldalmaker.sourceforge.net/](http://sqldalmaker.source
 Quick-Demo in mp4: [https://github.com/panedrone/sqldalmaker/releases/tag/latest](https://github.com/panedrone/sqldalmaker/releases/tag/latest)
 
 Demo-Projects:
-* [PHP/PDO](https://github.com/panedrone/sdm_demo_php_todolist), [PHP/Doctrine](https://github.com/panedrone/sdm_demo_todolist_php_doctrine)
-* [Java/Swing](https://github.com/panedrone/sdm_demo_swing_thesaurus), [Java/JSF](https://github.com/panedrone/sdm_demo_jsf_todolist), [Java/Jasper-Reports](https://github.com/panedrone/sdm_demo_jasper_reports_northwindEF), [Java/Android](https://github.com/panedrone/sdm_demo_android_thesaurus)
-* [C++/Qt6](https://github.com/panedrone/sdm_demo_qt6_thesaurus)
-* [Python/Django](https://github.com/panedrone/sdm_demo_django_todolist_sqlite3), [Python/Flask-SQLAlchemy](https://github.com/panedrone/sdm_demo_flask_sqlalchemy_todolist), [Python/Tkinter](https://github.com/panedrone/sdm_demo_python_tkinter_github_stat)
-* [Go/Gin](https://github.com/panedrone/sdm_demo_go_todolist), [Go/Gin/GORM](https://github.com/panedrone/sdm_demo_gorm_todolist)
+* [PHP+PDO](https://github.com/panedrone/sdm_demo_php_todolist), [PHP+Doctrine](https://github.com/panedrone/sdm_demo_todolist_php_doctrine)
+* [Java+Swing](https://github.com/panedrone/sdm_demo_swing_thesaurus), [Java+JSF](https://github.com/panedrone/sdm_demo_jsf_todolist), [Java+JasperReports](https://github.com/panedrone/sdm_demo_jasper_reports_northwindEF), [Java+Android](https://github.com/panedrone/sdm_demo_android_thesaurus)
+* [C++ Qt](https://github.com/panedrone/sdm_demo_qt6_thesaurus)
+* [Python+Django](https://github.com/panedrone/sdm_demo_django_todolist_sqlite3), [Python+Flask-SQLAlchemy](https://github.com/panedrone/sdm_demo_flask_sqlalchemy_todolist), [Python+Tk+sqlite3](https://github.com/panedrone/sdm_demo_python_tkinter_github_stat)
+* [Go+Gin+database/sql](https://github.com/panedrone/sdm_demo_go_todolist), [Go+Gin+Gorm](https://github.com/panedrone/sdm_demo_gorm_todolist)
