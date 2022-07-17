@@ -357,27 +357,24 @@ public class IdeaTargetLanguageHelpers {
         }
     }
 
+    private static final String SCOPES_ERR = "Error in 'settings.xml': \n" +
+            "the scopes of DTO and DAO must both be empty or both be fully qualified like in Go 'import' section";
+
     private static String get_golang_dto_folder_rel_path(Settings settings) throws Exception {
         String dto_scope = settings.getDto().getScope().replace("\\", "/");
+        String dao_scope = settings.getDao().getScope().replace("\\", "/");
         String package_rel_path;
-        String target_folder = settings.getFolders().getTarget();
         if (dto_scope.length() == 0) {
-            String dao_scope = settings.getDao().getScope().replace("\\", "/");
             if (dao_scope.length() != 0) {
-                throw new Exception("If DTO scope is empty, DAO scope must be empty too.");
+                throw new Exception(SCOPES_ERR);
             }
+            String target_folder = settings.getFolders().getTarget();
             package_rel_path = target_folder;
         } else {
             Path p = Paths.get(dto_scope);
             String dto_scope_last_segment = p.getFileName().toString();
-            if (dto_scope_last_segment.equals(dto_scope)) { // just package name
-                String dao_scope = settings.getDao().getScope().replace("\\", "/");
-                if (dao_scope.equals(dto_scope)) {
-                    package_rel_path = target_folder;
-                } else {
-                    throw new Exception("The scopes of DTO and DAO are different, " +
-                            "so they both must be specified in the format of Golang 'import'");
-                }
+            if (dao_scope.length() == 0 || dto_scope_last_segment.equals(dto_scope)) { // just package name
+                throw new Exception(SCOPES_ERR);
             } else {
                 String[] dto_scope_parts = dto_scope.split("/");
                 String path_after_root_module = dto_scope.substring(dto_scope_parts[0].length() + 1);
@@ -389,25 +386,19 @@ public class IdeaTargetLanguageHelpers {
 
     private static String get_golang_dao_folder_rel_path(Settings settings) throws Exception {
         String dao_scope = settings.getDao().getScope().replace("\\", "/");
+        String dto_scope = settings.getDto().getScope().replace("\\", "/");
         String package_rel_path;
-        String target_folder = settings.getFolders().getTarget();
         if (dao_scope.length() == 0) {
-            String dto_scope = settings.getDto().getScope().replace("\\", "/");
             if (dto_scope.length() != 0) {
-                throw new Exception("If DAO scope is empty, DTO scope must be empty too.");
+                throw new Exception(SCOPES_ERR);
             }
+            String target_folder = settings.getFolders().getTarget();
             package_rel_path = target_folder;
         } else {
             Path p = Paths.get(dao_scope);
             String dao_scope_last_segment = p.getFileName().toString();
-            if (dao_scope_last_segment.equals(dao_scope)) { // just package name
-                String dto_scope = settings.getDto().getScope().replace("\\", "/");
-                if (dao_scope.equals(dto_scope)) {
-                    package_rel_path = target_folder;
-                } else {
-                    throw new Exception("The scopes of DTO and DAO are different, " +
-                            "so they both must be specified in the format of Golang 'import'");
-                }
+            if (dto_scope.length() == 0 || dao_scope_last_segment.equals(dao_scope)) { // just package name
+                throw new Exception(SCOPES_ERR);
             } else {
                 String[] dao_scope_parts = dao_scope.split("/");
                 String path_after_root_module = dao_scope.substring(dao_scope_parts[0].length() + 1);
