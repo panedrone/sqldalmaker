@@ -1,3 +1,7 @@
+2022-07-17
+
+    Enabled columns like `api-key`.
+
 2022-07-16
 
     + Golang: enabled separate modules for DTO and DAO
@@ -10,34 +14,32 @@
 
 2022-05-28
 
-    fixes regarding PHP namespaces.
+    Fixes regarding PHP namespaces.
 
 2022-05-21
 
     + DataStore_Doctrine_ORM.php
 
-    https://github.com/panedrone/sdm_demo_todolist_php_doctrine
+        https://github.com/panedrone/sdm_demo_todolist_php_doctrine
 
 2022-05-12
 
-    + GORM
+    + Gorm
 
 2022-05-03
 
-    + XML wrappers for VM templates (update XSD files and see the reference "settings.xml")
+    + XML wrappers for VM templates.
 
 2022-04-30
 
     + django.db models
 
-    See -->
-
-    https://github.com/panedrone/sqldalmaker/blob/master/src/resources/settings.xml
-    https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store.py
+        https://github.com/panedrone/sqldalmaker/blob/master/src/resources/settings.xml
+        https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store.py
 
 2022-04-29
 
-    VM templates for global macros.
+    + VM templates for global macros.
 
 2022-04-25
 

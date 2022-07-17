@@ -189,7 +189,7 @@ func (dao *${class_name}) ${method_name}(#param_decls($is_external_sql $params))
 #if($mappings.size()>0)
 	errMap := make(map[string]int)
 #end
-#foreach($m in ${mappings})
+#foreach($m in $mappings)
 	${m.get_exec_dml_param_name()} := func(rd map[string]interface{}) {
 		obj := ${m.get_dto_class_name()}{}
 #foreach($f in ${m.get_fields()})

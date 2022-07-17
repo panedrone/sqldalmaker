@@ -713,12 +713,12 @@ public class UITabAdmin {
         pythonVmButton = new JButton();
         pythonVmButton.setText("python.vm");
         panel9.add(pythonVmButton);
-        btn_golangVM = new JButton();
-        btn_golangVM.setText("go.vm");
-        panel9.add(btn_golangVM);
         rubyVmButton = new JButton();
         rubyVmButton.setText("ruby.vm");
         panel9.add(rubyVmButton);
+        btn_golangVM = new JButton();
+        btn_golangVM.setText("go.vm");
+        panel9.add(btn_golangVM);
         final JPanel panel10 = new JPanel();
         panel10.setLayout(new BorderLayout(0, 0));
         gbc = new GridBagConstraints();

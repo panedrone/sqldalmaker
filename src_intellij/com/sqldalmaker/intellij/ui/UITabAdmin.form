@@ -367,16 +367,16 @@
                           <text value="python.vm"/>
                         </properties>
                       </component>
-                      <component id="b9c18" class="javax.swing.JButton" binding="btn_golangVM">
-                        <constraints/>
-                        <properties>
-                          <text value="go.vm"/>
-                        </properties>
-                      </component>
                       <component id="2dce" class="javax.swing.JButton" binding="rubyVmButton" default-binding="true">
                         <constraints/>
                         <properties>
                           <text value="ruby.vm"/>
+                        </properties>
+                      </component>
+                      <component id="b9c18" class="javax.swing.JButton" binding="btn_golangVM">
+                        <constraints/>
+                        <properties>
+                          <text value="go.vm"/>
                         </properties>
                       </component>
                     </children>
