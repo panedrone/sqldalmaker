@@ -8,7 +8,6 @@
                 <xs:element ref="folders"/>
                 <xs:element ref="dto"/>
                 <xs:element ref="dao"/>
-                <xs:element ref="external-vm-file"/>
                 <xs:element ref="ide"/>
                 <xs:element ref="cpp"/>
                 <xs:element ref="jdbc"/>
@@ -35,11 +34,6 @@
         <xs:complexType>
             <xs:attribute name="scope" use="required" type="xs:string"/>
             <xs:attribute name="macro" use="required" type="xs:string"/>
-        </xs:complexType>
-    </xs:element>
-    <xs:element name="external-vm-file">
-        <xs:complexType>
-            <xs:attribute name="path" use="required" type="xs:string"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="ide">

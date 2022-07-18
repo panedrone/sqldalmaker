@@ -260,17 +260,15 @@ public class IdeaTargetLanguageHelpers {
     private static String get_vm_template(String macro_name,
                                           Settings settings,
                                           String project_abs_path) throws Exception {
-        String vm_template;
         // read the file or find the macro
         if (macro_name == null || macro_name.trim().length() == 0) {
-            if (settings.getExternalVmFile().getPath().trim().length() == 0) {
-                return null;
-            } else {
-                String vm_file_system_path = Helpers.concat_path(project_abs_path, settings.getExternalVmFile().getPath());
-                // https://stackoverflow.com/questions/4716503/reading-a-plain-text-file-in-java
-                vm_template = new String(Files.readAllBytes(Paths.get(vm_file_system_path)));
-                return vm_template;
-            }
+            return null;
+        }
+        String vm_template;
+        if (macro_name.endsWith(".vm")) {
+            String vm_file_system_path = Helpers.concat_path(project_abs_path, macro_name);
+            vm_template = new String(Files.readAllBytes(Paths.get(vm_file_system_path)));
+            return vm_template;
         }
         Macros.Macro vm_macro = null;
         for (Macros.Macro m : settings.getMacros().getMacro()) {
@@ -414,31 +412,7 @@ public class IdeaTargetLanguageHelpers {
             return new RubyCG.DAO(dto_classes, settings, con, sql_root_abs_path, vm_template);
         } else if (RootFileName.GO.equals(fn)) {
             if (output_dir_rel_path != null) {
-                String dto_scope = settings.getDto().getScope().replace("\\", "/");
-                String dao_scope = settings.getDao().getScope().replace("\\", "/");
-                String package_rel_path;
-                String target_folder = settings.getFolders().getTarget();
-                if (dao_scope.length() == 0) {
-                    if (dto_scope.length() != 0) {
-                        throw new Exception("If the scope of DAO is empty, the scope of DTO must be empty too.");
-                    }
-                    package_rel_path = target_folder;
-                } else {
-                    Path p = Paths.get(dto_scope);
-                    String dao_scope_last_segment = p.getFileName().toString();
-                    if (dao_scope_last_segment.equals(dto_scope)) { // just package name
-                        if (dao_scope.equals(dto_scope)) {
-                            package_rel_path = target_folder;
-                        } else {
-                            throw new Exception("The scopes of DTO and DAO are different, " +
-                                    "so the scope of DAO must be specified in the format of Golang 'import'");
-                        }
-                    } else {
-                        String[] dao_scope_parts = dao_scope.split("/");
-                        String path_after_root_module = dao_scope.substring(dao_scope_parts[0].length() + 1);
-                        package_rel_path = path_after_root_module; // just ignore target folder
-                    }
-                }
+                String package_rel_path = TargetLangUtils.get_golang_dao_folder_rel_path(settings);
                 output_dir_rel_path.append(package_rel_path);
             }
             FieldNamesMode field_names_mode = Helpers.get_field_names_mode(settings);

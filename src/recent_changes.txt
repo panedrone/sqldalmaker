@@ -1,3 +1,16 @@
+2022-07-18
+
+    Instead of "<external-vm-file path="...", use
+
+        <dto ... macro="<rel_path_from_project_root>.vm"/> and
+        <dao ... macro="<rel_path_from_project_root>.vm"/>.
+
+    Ending ".vm" means the path to VM file, not a macro from 'settings.xml'.
+    Update XSD files and remove tag "<external-vm-file...".
+    Single VM file for both DTO and DAO is OK (see VM examples from the tab "Admin").
+    Separate VM files for DTO and DAO are OK too. Prev. functionality remains working.
+    So you still can use built-in VM (default) or VM you specified in "settings.xml".
+
 2022-07-17
 
     Enabled columns like `api-key`

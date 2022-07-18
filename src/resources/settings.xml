@@ -24,7 +24,12 @@
     <!-- field-names-mode (PHP, Java, Go): 0 - TitleCase, 1 - camelCase; 2 - snake_case -->
     <!-- macro: VM template to render DTO classes.
          This template is located in "<macros>...<macro><vm>..." or "<macros>...<macro><vm-xml>..." below.
-         Internal VM template is used if "macro" is empty (default).-->
+         Internal VM template is used if "macro" is empty (default).
+         Ending ".vm" means the path to VM file, not a macro from 'settings.xml':
+            <dto ... macro="<rel_path_from_project_root>.vm"/>
+         Single VM template for both DTO and DAO is OK (see VM examples from the tab "Admin").
+         Separate VM templates for DTO and DAO are OK too.
+    -->
 
     <dto scope="module_name_from_go_mod/.../dto" inheritance="" field-names-mode="0" macro=""/>
 
@@ -39,13 +44,14 @@
     -->
     <!-- macro: VM template to render DAO classes.
          This template is located in "<macros>...<macro><vm>..." or "<macros>...<macro><vm-xml>..." below.
-         Internal VM template is used if "macro" is empty (default).-->
+         Internal VM template is used if "macro" is empty (default).
+         Ending ".vm" means the path to VM file, not a macro from 'settings.xml':
+            <dao ... macro="<rel_path_from_project_root>.vm"/>
+         Single VM template for both DTO and DAO is OK (see VM examples from the tab "Admin").
+         Separate VM templates for DTO and DAO are OK too.
+    -->
 
     <dao scope="module_name_from_go_mod/.../dao" macro=""/>
-
-    <!-- location of external VM file (relative to the project root): -->
-
-    <external-vm-file path=""/>
 
     <!-- IDE integration -->
 

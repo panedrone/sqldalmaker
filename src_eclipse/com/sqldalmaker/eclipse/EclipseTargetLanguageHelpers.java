@@ -228,13 +228,12 @@ public class EclipseTargetLanguageHelpers {
 			return gen;
 		} else if (RootFileName.GO.equals(root_file_name)) {
 			if (output_dir != null) {
-				String rel_path = settings.getFolders().getTarget();
+				String rel_path = TargetLangUtils.get_golang_dto_folder_rel_path(settings);
 				String abs_path = EclipseHelpers.get_absolute_dir_path_str(project, rel_path);
 				output_dir.append(abs_path);
 			}
-			String dto_package = settings.getDto().getScope();
 			FieldNamesMode field_names_mode = Helpers.get_field_names_mode(settings);
-			GoCG.DTO gen = new GoCG.DTO(dto_package, dto_classes, settings, conn, sql_root_abs_path, field_names_mode,
+			GoCG.DTO gen = new GoCG.DTO(dto_classes, settings, conn, sql_root_abs_path, field_names_mode,
 					vm_template);
 			return gen;
 		} else {
@@ -256,7 +255,7 @@ public class EclipseTargetLanguageHelpers {
 
 		String sql_root_abs_path = EclipseHelpers.get_absolute_dir_path_str(project, settings.getFolders().getSql());
 		String project_abs_path = project.getLocation().toPortableString();
-        String vm_template = get_dao_template(settings, project_abs_path);
+		String vm_template = get_dao_template(settings, project_abs_path);
 		String context_path = DtoClasses.class.getPackage().getName();
 		XmlParser xml_parser = new XmlParser(context_path, dto_xsd_abs_path);
 		DtoClasses dto_classes = xml_parser.unmarshal(dto_xml_abs_path);
@@ -308,19 +307,16 @@ public class EclipseTargetLanguageHelpers {
 				output_dir.append(abs_path);
 			}
 			String class_prefix = settings.getCpp().getClassPrefix();
-			CppCG.DAO gen = new CppCG.DAO(dto_classes, settings, conn, sql_root_abs_path, class_prefix,
-					vm_template);
+			CppCG.DAO gen = new CppCG.DAO(dto_classes, settings, conn, sql_root_abs_path, class_prefix, vm_template);
 			return gen;
 		} else if (RootFileName.GO.equals(root_fn)) {
 			if (output_dir != null) {
-				String rel_path = settings.getFolders().getTarget();
+				String rel_path = TargetLangUtils.get_golang_dao_folder_rel_path(settings);
 				String abs_path = EclipseHelpers.get_absolute_dir_path_str(project, rel_path);
 				output_dir.append(abs_path);
 			}
-			String dao_package = settings.getDao().getScope();
 			FieldNamesMode field_names_mode = Helpers.get_field_names_mode(settings);
-			GoCG.DAO gen = new GoCG.DAO(dao_package, dto_classes, settings, conn, sql_root_abs_path, field_names_mode,
-					vm_template);
+			GoCG.DAO gen = new GoCG.DAO(dto_classes, settings, conn, sql_root_abs_path, field_names_mode, vm_template);
 			return gen;
 		} else {
 			throw new Exception(TargetLangUtils.get_unknown_root_file_msg(root_fn));
