@@ -84,7 +84,7 @@ func (ds *_DS) isSqlServer() bool {
 
 // data_store_gorm_ex.go
 
-package dal
+package models
 
 import (
 	"gorm.io/driver/sqlite"
@@ -185,7 +185,8 @@ func (ds *_DS) _pgInsert(sqlStr string, aiNames string, args ...interface{}) (id
 		return nil, err
 	}
 	defer func() {
-		err = rows.Close()
+		// dont overwrite err
+		_ = rows.Close()
 	}()
 	if rows.Next() {
 		var data interface{}
@@ -224,7 +225,8 @@ func (ds *_DS) _mssqlInsert(sqlStr string, args ...interface{}) (id interface{},
 		return
 	}
 	defer func() {
-		err = rows.Close()
+		// dont overwrite err
+		_ = rows.Close()
 	}()
 	if rows.Next() {
 		var data interface{}
@@ -364,7 +366,8 @@ func (ds *_DS) _queryAllImplicitRcOracle(sqlStr string, onRowArr []func(map[stri
 		return
 	}
 	defer func() {
-		err = rows.Close()
+		// dont overwrite err
+		_ = rows.Close()
 	}()
 	onRowIndex := 0
 	for {
@@ -400,7 +403,8 @@ func (ds *_DS) _queryAllImplicitRcMySQL(sqlStr string, onRowArr []func(map[strin
 		return
 	}
 	defer func() {
-		err = rows.Close()
+		// dont overwrite err
+		_ = rows.Close()
 	}()
 	onRowIndex := 0
 	for {
@@ -461,7 +465,8 @@ func (ds *_DS) _exec2(sqlStr string, onRowArr []func(map[string]interface{}), ar
 
 func _fetchAllFromCursor(rows driver.Rows, onRow func(map[string]interface{})) (err error) {
 	defer func() {
-		err = rows.Close()
+		// dont overwrite err
+		_ = rows.Close()
 	}()
 	colNames := rows.Columns()
 	data := make(map[string]interface{})
@@ -505,7 +510,8 @@ func (ds *_DS) _queryRowValues(sqlStr string, queryArgs ...interface{}) (values 
 		return
 	}
 	defer func() {
-		err = rows.Close()
+		// dont overwrite err
+		_ = rows.Close()
 	}()
 	outParamIndex := 0
 	_, _, values, valuePointers, err := ds._prepareFetch(rows)
@@ -559,10 +565,8 @@ func (ds *_DS) QueryAll(sqlStr string, onRow func(interface{}), args ...interfac
 		return
 	}
 	defer func() {
-		err1 := rows.Close()
-		if err1 != nil {
-			err = err1
-		}
+		// dont overwrite err
+		_ = rows.Close()
 	}()
 	for {
 		// re-detect columns for each ResultSet
@@ -594,7 +598,8 @@ func (ds *_DS) QueryRow(sqlStr string, args ...interface{}) (data map[string]int
 		return
 	}
 	defer func() {
-		err = rows.Close()
+		// dont overwrite err
+		_ = rows.Close()
 	}()
 	colNames, data, values, valuePointers, pfErr := ds._prepareFetch(rows)
 	if pfErr != nil {
@@ -627,7 +632,8 @@ func (ds *_DS) QueryAllRows(sqlStr string, onRow func(map[string]interface{}), a
 		return
 	}
 	defer func() {
-		err = rows.Close()
+		// dont overwrite err
+		_ = rows.Close()
 	}()
 	for {
 		// re-detect columns for each ResultSet
