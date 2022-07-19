@@ -11,6 +11,7 @@ import com.intellij.openapi.fileTypes.FileTypes;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.testFramework.LightVirtualFile;
+import com.sqldalmaker.cg.Helpers;
 import com.sqldalmaker.common.Const;
 import com.sqldalmaker.common.InternalException;
 import com.sqldalmaker.common.SdmUtils;
@@ -188,10 +189,10 @@ public class IdeaEditorHelpers {
         }
     }
 
-    public static void gen_tmp_field_tags(String class_name,
-                                          String ref,
-                                          Project project,
-                                          VirtualFile root_file) throws Exception {
+    public static void gen_field_wizard_jaxb(String class_name,
+                                             String ref,
+                                             Project project,
+                                             VirtualFile root_file) throws Exception {
 
         Settings settings = IdeaHelpers.load_settings(root_file);
         Connection con = IdeaHelpers.get_connection(project, settings);
@@ -204,7 +205,7 @@ public class IdeaEditorHelpers {
             dto_classes.getDtoClass().add(cls);
             VirtualFile project_dir = IdeaHelpers.get_project_base_dir(project);
             final String module_root = project_dir.getPath();
-            String sql_root_folder_full_path = module_root + "/" + settings.getFolders().getSql();
+            String sql_root_folder_full_path = Helpers.concat_path(module_root, settings.getFolders().getSql());
             SdmUtils.gen_field_wizard_jaxb(settings, con, object_factory, cls, sql_root_folder_full_path);
             open_dto_xml_in_editor(object_factory, project, dto_classes);
         } finally {

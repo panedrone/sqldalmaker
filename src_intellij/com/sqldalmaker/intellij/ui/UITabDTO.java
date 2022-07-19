@@ -110,7 +110,7 @@ public class UITabDTO {
         btn_genTmpFieldTags.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                gen_tmp_field_tags();
+                gen_field_wizard_jaxb();
             }
         });
         btn_CrudXML.addActionListener(new ActionListener() {
@@ -446,12 +446,12 @@ public class UITabDTO {
         }
     }
 
-    protected void gen_tmp_field_tags() {
+    protected void gen_field_wizard_jaxb() {
         try {
             int[] selected_rows = get_selection();
             String class_name = (String) table.getValueAt(selected_rows[0], 0);
             String ref = (String) table.getValueAt(selected_rows[0], 1);
-            IdeaEditorHelpers.gen_tmp_field_tags(class_name, ref, project, root_file);
+            IdeaEditorHelpers.gen_field_wizard_jaxb(class_name, ref, project, root_file);
         } catch (Exception e) {
             e.printStackTrace();
             IdeaMessageHelpers.show_error_in_ui_thread(e);
@@ -488,6 +488,8 @@ public class UITabDTO {
                                              AbstractTableModel model,
                                              Settings settings) {
 
+        ProgressManager progressManager = ProgressManager.getInstance();
+        // ProgressIndicator indicator = progressManager.getProgressIndicator();
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
@@ -495,14 +497,14 @@ public class UITabDTO {
                 // "Cannot read the array length because "<local3>" is null"
                 int rc = model.getRowCount();
                 for (int i = 0; i < rc; i++) {
+//                    if (indicator.isCanceled()) {
+//                        break;
+//                    }
                     String dto_class_name = (String) model.getValueAt(i, 0);
                     ProgressManager.progress(dto_class_name);
+                    progressManager.getProgressIndicator().setText(dto_class_name);
                     try {
                         Thread.sleep(50);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    try {
                         String[] fileContent = gen.translate(dto_class_name);
                         StringBuilder validationBuff = new StringBuilder();
                         IdeaTargetLanguageHelpers.validate_dto(project, root_file, settings, dto_class_name, fileContent, validationBuff);
@@ -533,7 +535,7 @@ public class UITabDTO {
                                                               boolean canBeCanceled,
                                                               @Nullable Project project);
          */
-        ProgressManager.getInstance().runProcessWithProgressSynchronously(runnable, "Validation", false, project);
+        progressManager.runProcessWithProgressSynchronously(runnable, "Validation", false, project);
     }
 
     protected void generate() {
