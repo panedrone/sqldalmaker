@@ -36,14 +36,22 @@ class DtoClassInfo {
         this.dto_field_names_mode = dto_field_names_mode;
     }
 
+    public Map<String, FieldInfo> get_dto_field_info2(boolean ignore_model,
+                                                      DtoClass jaxb_dto_class,
+                                                      String sql_root_abs_path,
+                                                      List<FieldInfo> res_dto_fields) throws Exception {
+        // this one is used for field wizard
+        Map<String, FieldInfo> fields_map = _prepare_by_jdbc(ignore_model, jaxb_dto_class, sql_root_abs_path, res_dto_fields);
+        refine_field_info(fields_map, jaxb_dto_class, res_dto_fields);
+        return fields_map;
+    }
+
     public Map<String, FieldInfo> get_dto_field_info(boolean ignore_model,
                                                      DtoClass jaxb_dto_class,
                                                      String sql_root_abs_path,
                                                      List<FieldInfo> res_dto_fields) throws Exception {
         try {
-            Map<String, FieldInfo> fields_map = _prepare_by_jdbc(ignore_model, jaxb_dto_class, sql_root_abs_path, res_dto_fields);
-            refine_field_info(fields_map, jaxb_dto_class, res_dto_fields);
-            return fields_map;
+            return get_dto_field_info2(ignore_model, jaxb_dto_class, sql_root_abs_path, res_dto_fields);
         } catch (Exception e) {
             throw new Exception(String.format("<dto-class name=\"%s\"... %s: %s",
                     jaxb_dto_class.getName(), e.getClass().getName(), e.getMessage()));

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2020 sqldalmaker@gmail.com
+ * Copyright 2011-2022 sqldalmaker@gmail.com
  * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
  * Read LICENSE.txt in the root of this project/archive for details.
  *

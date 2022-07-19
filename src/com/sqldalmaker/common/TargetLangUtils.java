@@ -1,9 +1,16 @@
+/*
+    Copyright 2011-2022 sqldalmaker@gmail.com
+    SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
+    Read LICENSE.txt in the root of this project/archive for details.
+ */
 package com.sqldalmaker.common;
 
+import com.intellij.openapi.vfs.VirtualFile;
 import com.sqldalmaker.cg.Helpers;
 import com.sqldalmaker.cg.Xml2Vm;
 import com.sqldalmaker.jaxb.settings.Macros;
 import com.sqldalmaker.jaxb.settings.Settings;
+import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -30,6 +37,16 @@ public class TargetLangUtils {
             return Helpers.convert_file_name_to_snake_case(class_name, "go");
         }
         throw new Exception(get_unknown_root_file_msg(root_fn));
+    }
+
+    public static boolean accept(String root_fn) {
+
+        return RootFileName.JAVA.equals(root_fn) ||
+                RootFileName.CPP.equals(root_fn) ||
+                RootFileName.PHP.equals(root_fn) ||
+                RootFileName.PYTHON.equals(root_fn) ||
+                RootFileName.RUBY.equals(root_fn) ||
+                RootFileName.GO.equals(root_fn);
     }
 
     public static String get_unknown_root_file_msg(String fn) {

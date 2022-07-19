@@ -498,6 +498,11 @@ public class UITabDTO {
                     String dto_class_name = (String) model.getValueAt(i, 0);
                     ProgressManager.progress(dto_class_name);
                     try {
+                        Thread.sleep(50);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    try {
                         String[] fileContent = gen.translate(dto_class_name);
                         StringBuilder validationBuff = new StringBuilder();
                         IdeaTargetLanguageHelpers.validate_dto(project, root_file, settings, dto_class_name, fileContent, validationBuff);
@@ -522,6 +527,12 @@ public class UITabDTO {
                 }
             }
         };
+        /*
+        public abstract boolean runProcessWithProgressSynchronously(@NotNull Runnable process,
+                                                              @NotNull @ProgressTitle String progressTitle,
+                                                              boolean canBeCanceled,
+                                                              @Nullable Project project);
+         */
         ProgressManager.getInstance().runProcessWithProgressSynchronously(runnable, "Validation", false, project);
     }
 

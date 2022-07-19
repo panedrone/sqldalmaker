@@ -329,7 +329,7 @@ public class SdmUtils {
 
         JdbcUtils db_utils = new JdbcUtils(connection, FieldNamesMode.AS_IS, FieldNamesMode.AS_IS, settings);
         ArrayList<FieldInfo> fields = new ArrayList<FieldInfo>();
-        db_utils.get_dto_field_info(dto_class, sql_root_abs_path, fields);
+        db_utils.get_field_info_for_wizard(dto_class, sql_root_abs_path, fields);
         for (FieldInfo f : fields) {
             DtoClass.Field df = object_factory.createDtoClassField();
             df.setColumn(f.getColumnName());

@@ -113,20 +113,25 @@ public class IdeaMessageHelpers {
         });
     }
 
-    public static void show_error_in_ui_thread(final Throwable e) {
+    public static void show_error_in_ui_thread(Throwable e) {
+        String m;
+        if (e instanceof InternalException) {
+            m = e.getMessage();
+        } else {
+            m = e.getClass().getName() + ":\n" + e.getMessage();
+        }
+        // Messages.show... ---- if there is "<" in messages, the text is now shown
+        final String msg = m.replace("<", "");
         ApplicationManager.getApplication().invokeLater(new Runnable() {
             public void run() {
-                String msg = "";
-                if (!(e instanceof InternalException)) {
-                    msg += e.getClass().getName() + ":\n";
-                }
-                msg += e.getMessage();
                 Messages.showErrorDialog(msg, "Error");
             }
         });
     }
 
-    public static void show_info_in_ui_thread(final String msg) {
+    public static void show_info_in_ui_thread(String m) {
+        // Messages.show... ---- if there is "<" in messages, the text is now shown
+        final String msg = m.replace("<", "");
         ApplicationManager.getApplication().invokeLater(new Runnable() {
             public void run() {
                 Messages.showInfoMessage(msg, "Info");

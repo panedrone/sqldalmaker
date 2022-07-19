@@ -103,16 +103,6 @@ public class IdeaTargetLanguageHelpers {
         IdeaEditorHelpers.open_project_file_in_editor_sync(project, rel_path);
     }
 
-//    public static void open_editor_sync(Project project,
-//                                        VirtualFile root_file,
-//                                        Settings settings,
-//                                        String class_name,
-//                                        String class_scope) throws Exception {
-//
-//        String rel_path = get_target_folder_rel_path(project, root_file, settings, class_name, class_scope);
-//        IdeaEditorHelpers.open_project_file_in_editor_sync(project, rel_path);
-//    }
-
     public static void prepare_generated_file_data(VirtualFile root_file,
                                                    String class_name,
                                                    String[] file_content,
@@ -233,13 +223,7 @@ public class IdeaTargetLanguageHelpers {
 
     public static boolean accept(@NotNull VirtualFile file) {
 
-        return RootFileName.JAVA.equals(file.getName()) ||
-                RootFileName.CPP.equals(file.getName()) ||
-                // ProfileNames.OBJC.equals(file.getName()) ||
-                RootFileName.PHP.equals(file.getName()) ||
-                RootFileName.PYTHON.equals(file.getName()) ||
-                RootFileName.RUBY.equals(file.getName()) ||
-                RootFileName.GO.equals(file.getName());
+        return TargetLangUtils.accept(file.getName());
     }
 
     public static IDtoCG create_dto_cg(Connection connection,

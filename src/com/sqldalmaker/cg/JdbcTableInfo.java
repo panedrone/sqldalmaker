@@ -279,7 +279,7 @@ class JdbcTableInfo {
         if (table_name.contains(".")) {
             String[] parts = table_name.split("\\.");
             if (parts.length != 2) {
-                throw new Exception("Unexpected table name: '" + table_name + "'");
+                throw new Exception("Invalid table name: '" + table_name + "'");
             }
             return md.getPrimaryKeys(null, parts[0], parts[1]);
         }
@@ -294,9 +294,10 @@ class JdbcTableInfo {
             while (rs.next()) {
                 String pk_col_name = rs.getString("COLUMN_NAME");
                 String pk_col_name_alias = _get_pk_col_name_alias(pk_col_name);
-                if (res.contains(pk_col_name_alias)) {
-                    throw new Exception("Duplickated PK column name alias: " + pk_col_name_alias);
-                }
+                // 2 'id' happened with MySQL!
+//                if (res.contains(pk_col_name_alias)) {
+//                    throw new Exception("Multiple PK column name alias: " + pk_col_name_alias);
+//                }
                 res.add(pk_col_name_alias);
             }
             return res;

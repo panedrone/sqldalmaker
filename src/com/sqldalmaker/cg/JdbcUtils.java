@@ -94,6 +94,14 @@ public class JdbcUtils {
         return info.get_dto_field_info(false, jaxb_dto_class, sql_root_abs_path, res_dto_fields);
     }
 
+    public Map<String, FieldInfo> get_field_info_for_wizard(DtoClass jaxb_dto_class,
+                                                            String sql_root_abs_path,
+                                                            List<FieldInfo> res_dto_fields) throws Exception {
+
+        DtoClassInfo info = new DtoClassInfo(conn, type_map, global_markers, dto_field_names_mode);
+        return info.get_dto_field_info2(false, jaxb_dto_class, sql_root_abs_path, res_dto_fields);
+    }
+
     // DAO. Raw-SQL -------------------------------------------
     //
     // ---------------------------------------------------------
