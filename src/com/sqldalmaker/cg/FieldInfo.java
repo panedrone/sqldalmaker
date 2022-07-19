@@ -77,7 +77,7 @@ public class FieldInfo {
         this.rendered_field_name = name;
     }
 
-    public String getLowerCamelCaseName() {
+    public String getLowerCamelCaseName() { // for Golang VM template
         String res = Helpers.to_lower_camel_or_title_case(this.rendered_field_name, false);
         return res;
     }

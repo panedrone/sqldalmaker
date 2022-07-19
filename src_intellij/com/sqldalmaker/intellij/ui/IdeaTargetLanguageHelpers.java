@@ -10,7 +10,10 @@ import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.FileTypeConsumer;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.sqldalmaker.cg.*;
+import com.sqldalmaker.cg.FieldNamesMode;
+import com.sqldalmaker.cg.Helpers;
+import com.sqldalmaker.cg.IDaoCG;
+import com.sqldalmaker.cg.IDtoCG;
 import com.sqldalmaker.cg.cpp.CppCG;
 import com.sqldalmaker.cg.go.GoCG;
 import com.sqldalmaker.cg.java.JavaCG;
@@ -19,13 +22,9 @@ import com.sqldalmaker.cg.python.PythonCG;
 import com.sqldalmaker.cg.ruby.RubyCG;
 import com.sqldalmaker.common.*;
 import com.sqldalmaker.jaxb.dto.DtoClasses;
-import com.sqldalmaker.jaxb.settings.Macros;
 import com.sqldalmaker.jaxb.settings.Settings;
 import org.jetbrains.annotations.NotNull;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
@@ -243,53 +242,6 @@ public class IdeaTargetLanguageHelpers {
                 RootFileName.GO.equals(file.getName());
     }
 
-    private static String get_dto_vm_template(Settings settings,
-                                              String project_abs_path) throws Exception {
-
-        String macro_name = settings.getDto().getMacro();
-        return get_vm_template(macro_name, settings, project_abs_path);
-    }
-
-    private static String get_dao_vm_template(Settings settings,
-                                              String project_abs_path) throws Exception {
-
-        String macro_name = settings.getDao().getMacro();
-        return get_vm_template(macro_name, settings, project_abs_path);
-    }
-
-    private static String get_vm_template(String macro_name,
-                                          Settings settings,
-                                          String project_abs_path) throws Exception {
-        // read the file or find the macro
-        if (macro_name == null || macro_name.trim().length() == 0) {
-            return null;
-        }
-        String vm_template;
-        if (macro_name.endsWith(".vm")) {
-            String vm_file_system_path = Helpers.concat_path(project_abs_path, macro_name);
-            vm_template = new String(Files.readAllBytes(Paths.get(vm_file_system_path)));
-            return vm_template;
-        }
-        Macros.Macro vm_macro = null;
-        for (Macros.Macro m : settings.getMacros().getMacro()) {
-            if (m.getName().equalsIgnoreCase(macro_name)) {
-                vm_macro = m;
-                break;
-            }
-        }
-        if (vm_macro == null) {
-            throw new Exception("Macro not found: " + macro_name);
-        }
-        if (vm_macro.getVm() != null) {
-            vm_template = vm_macro.getVm().trim();
-        } else if (vm_macro.getVmXml() != null) {
-            vm_template = Xml2Vm.parse(vm_macro.getVmXml());
-        } else {
-            throw new Exception("Expected <vm> or <vm-xml> in " + macro_name);
-        }
-        return vm_template;
-    }
-
     public static IDtoCG create_dto_cg(Connection connection,
                                        Project project, VirtualFile root_file,
                                        Settings settings,
@@ -297,7 +249,7 @@ public class IdeaTargetLanguageHelpers {
 
         String project_abs_path = IdeaHelpers.get_project_base_dir(project).getPath();
         String sql_root_abs_path = Helpers.concat_path(project_abs_path, settings.getFolders().getSql());
-        String vm_template = get_dto_vm_template(settings, project_abs_path);
+        String vm_template = TargetLangUtils.get_dto_vm_template(settings, project_abs_path);
         String xml_configs_folder_full_path = root_file.getParent().getPath();
         String dto_xml_abs_path = xml_configs_folder_full_path + "/" + Const.DTO_XML;
         String dto_xsd_abs_path = xml_configs_folder_full_path + "/" + Const.DTO_XSD;
@@ -366,7 +318,7 @@ public class IdeaTargetLanguageHelpers {
         String xml_configs_folder_full_path = root_file.getParent().getPath();
         String dto_xml_abs_path = xml_configs_folder_full_path + "/" + Const.DTO_XML;
         String dto_xsd_abs_path = xml_configs_folder_full_path + "/" + Const.DTO_XSD;
-        String vm_template = get_dao_vm_template(settings, project_abs_path);
+        String vm_template = TargetLangUtils.get_dao_vm_template(settings, project_abs_path);
         String context_path = DtoClasses.class.getPackage().getName();
         XmlParser xml_parser = new XmlParser(context_path, dto_xsd_abs_path);
         DtoClasses dto_classes = xml_parser.unmarshal(dto_xml_abs_path);

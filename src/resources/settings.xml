@@ -3,55 +3,63 @@
           xsi:noNamespaceSchemaLocation="settings.xsd">
 
     <!-- target: base folder of generated files (relative to the project root) -->
+
     <!-- sql: base folder of SQL files (relative to the project root) -->
 
     <folders target="" sql="sdm/sql"/>
 
     <!-- scope (only PHP, Java, Go):
+
             - PHP. The name of DTO namespace. An empty one is OK.
             - Java. The name of DTO package.
             - Go options:
                 1. Empty. The name of DTO package will be equal to the last segment of "<folders target".
                    DAO scope must be empty too.
                 2. The name of Go "package" for DTO classes. DAO scope must be the same.
-                3. A value in the format of Go "import" for DTO classes. The value of "<folders target" is ignored.
-    -->
+                3. A value in the format of Go "import" for DTO classes. The value of "<folders target" is ignored. -->
+
     <!-- inheritance (only Java). Fully-qualified name of base class:
                 inheritance="implements com.google.gwt.user.client.rpc.IsSerializable"
                     target class:
-                        "public class Word implements com.google.gwt.user.client.rpc.IsSerializable..."
-    -->
+                        "public class Word implements com.google.gwt.user.client.rpc.IsSerializable..."  -->
+
     <!-- field-names-mode (PHP, Java, Go): 0 - TitleCase, 1 - camelCase; 2 - snake_case -->
+
     <!-- macro: VM template to render DTO classes.
-         This template is located in "<macros>...<macro><vm>..." or "<macros>...<macro><vm-xml>..." below.
-         Internal VM template is used if "macro" is empty (default).
-         Ending ".vm" means the path to VM file, not a macro from 'settings.xml':
-            <dto ... macro="<rel_path_from_project_root>.vm"/>
-         Single VM template for both DTO and DAO is OK (see VM examples from the tab "Admin").
-         Separate VM templates for DTO and DAO are OK too.
-    -->
+
+            1. Internal VM template is used if "macro" is empty (default).
+            2. VM template is located in "<macros>...<macro><vm>|<vm-xml>..." section below.
+            2. Ending ".vm" means using of VM file and specifies the path to this file relative to the project root:
+                    <dto ... macro="<path>/<name>.vm"/>
+
+         Single VM template for both DTO and DAO is OK (like in VM examples from the tab "Admin").
+         Separate VM templates for DTO and DAO are OK too.    -->
 
     <dto scope="module_name_from_go_mod/.../dto" inheritance="" field-names-mode="0" macro=""/>
+    <!--    <dto scope="com.mycom.myjavaapp.dbal.dto" inheritance="" field-names-mode="1" macro=""/>-->
 
     <!-- scope (only PHP, Java, Go):
+
             - PHP. The name of DAO namespace. An empty one is OK.
             - Java. The name of DAO package.
             - Go options:
                 1. Empty. The name of DAO package will be equal to the last segment of "<folders target".
                    DTO scope must be empty too.
                 2. The name of Go "package" for DAO classes. DTO scope must be the same.
-                3. A value in the format of Go "import" for DAO classes. The value of "<folders target" is ignored.
-    -->
+                3. A value in the format of Go "import" for DAO classes. The value of "<folders target" is ignored. -->
+
     <!-- macro: VM template to render DAO classes.
-         This template is located in "<macros>...<macro><vm>..." or "<macros>...<macro><vm-xml>..." below.
-         Internal VM template is used if "macro" is empty (default).
-         Ending ".vm" means the path to VM file, not a macro from 'settings.xml':
-            <dao ... macro="<rel_path_from_project_root>.vm"/>
-         Single VM template for both DTO and DAO is OK (see VM examples from the tab "Admin").
-         Separate VM templates for DTO and DAO are OK too.
-    -->
+
+            1. Internal VM template is used if "macro" is empty (default).
+            2. VM template is located in "<macros>...<macro><vm>|<vm-xml>..." section below.
+            3. Ending ".vm" means using of VM file and specifies the path to this file relative to the project root:
+                    <dao ... macro="<path>/<name>.vm"/>
+
+         Single VM template for both DTO and DAO is OK (like in VM examples from the tab "Admin").
+         Separate VM templates for DTO and DAO are OK too. -->
 
     <dao scope="module_name_from_go_mod/.../dao" macro=""/>
+    <!--    <dao scope="com.mycom.myjavaapp.dbal.dao" macro=""/>-->
 
     <!-- IDE integration -->
 
@@ -62,10 +70,14 @@
     <cpp class-prefix=""/>
 
     <!-- jar: location of JDBC driver JAR file (relative to the project root); -->
+
     <!-- class: JDBC driver class name; -->
+
     <!-- url: JDBC connection URL (use $PROJECT_DIR$ or ${project_loc} if you
         need to specify project path); -->
+
     <!-- user: user name; -->
+
     <!-- pwd: password; -->
 
     <!--    <jdbc jar="lib/mysql-connector-java-5.1.22-bin.jar"-->

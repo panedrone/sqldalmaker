@@ -5,8 +5,6 @@
 */
 package com.sqldalmaker.eclipse;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +19,6 @@ import com.sqldalmaker.cg.FieldNamesMode;
 import com.sqldalmaker.cg.Helpers;
 import com.sqldalmaker.cg.IDaoCG;
 import com.sqldalmaker.cg.IDtoCG;
-import com.sqldalmaker.cg.Xml2Vm;
 import com.sqldalmaker.cg.cpp.CppCG;
 import com.sqldalmaker.cg.go.GoCG;
 import com.sqldalmaker.cg.java.JavaCG;
@@ -33,7 +30,6 @@ import com.sqldalmaker.common.SdmUtils;
 import com.sqldalmaker.common.TargetLangUtils;
 import com.sqldalmaker.common.XmlParser;
 import com.sqldalmaker.jaxb.dto.DtoClasses;
-import com.sqldalmaker.jaxb.settings.Macros;
 import com.sqldalmaker.jaxb.settings.Settings;
 
 /**
@@ -113,52 +109,6 @@ public class EclipseTargetLanguageHelpers {
 		return null;
 	}
 
-	private static String get_dto_template(Settings settings, String project_abs_path) throws Exception {
-
-		String m_name = settings.getDto().getMacro();
-		return get_template(m_name, settings, project_abs_path);
-	}
-
-	private static String get_dao_template(Settings settings, String project_abs_path) throws Exception {
-
-		String m_name = settings.getDao().getMacro();
-		return get_template(m_name, settings, project_abs_path);
-	}
-
-	private static String get_template(String m_name, Settings settings, String project_abs_path) throws Exception {
-		String vm_template;
-// read the file or find the macro
-		if (m_name == null || m_name.trim().length() == 0) {
-			if (settings.getExternalVmFile().getPath().trim().length() == 0) {
-				return null;
-			} else {
-				String vm_file_system_path = Helpers.concat_path(project_abs_path,
-						settings.getExternalVmFile().getPath());
-// https://stackoverflow.com/questions/4716503/reading-a-plain-text-file-in-java
-				vm_template = new String(Files.readAllBytes(Paths.get(vm_file_system_path)));
-				return vm_template;
-			}
-		}
-		Macros.Macro vm_macro = null;
-		for (Macros.Macro m : settings.getMacros().getMacro()) {
-			if (m.getName().equalsIgnoreCase(m_name)) {
-				vm_macro = m;
-				break;
-			}
-		}
-		if (vm_macro == null) {
-			throw new Exception("Macro not found: " + m_name);
-		}
-		if (vm_macro.getVm() != null) {
-			vm_template = vm_macro.getVm().trim();
-		} else if (vm_macro.getVmXml() != null) {
-			vm_template = Xml2Vm.parse(vm_macro.getVmXml());
-		} else {
-			throw new Exception("Expected <vm> or <vm-xml> in " + m_name);
-		}
-		return vm_template;
-	}
-
 	public static IDtoCG create_dto_cg(Connection conn, IEditor2 editor2, Settings settings, StringBuilder output_dir)
 			throws Exception {
 
@@ -174,7 +124,7 @@ public class EclipseTargetLanguageHelpers {
 
 		String sql_root_abs_path = EclipseHelpers.get_absolute_dir_path_str(project, settings.getFolders().getSql());
 		String project_abs_path = project.getLocation().toPortableString();
-		String vm_template = get_dto_template(settings, project_abs_path);
+		String vm_template = TargetLangUtils.get_dto_vm_template(settings, project_abs_path);
 		String context_path = DtoClasses.class.getPackage().getName();
 		XmlParser xml_parser = new XmlParser(context_path, dto_xsd_abs_path);
 		DtoClasses dto_classes = xml_parser.unmarshal(dto_xml_abs_path);
@@ -255,7 +205,7 @@ public class EclipseTargetLanguageHelpers {
 
 		String sql_root_abs_path = EclipseHelpers.get_absolute_dir_path_str(project, settings.getFolders().getSql());
 		String project_abs_path = project.getLocation().toPortableString();
-		String vm_template = get_dao_template(settings, project_abs_path);
+		String vm_template = TargetLangUtils.get_dao_vm_template(settings, project_abs_path);
 		String context_path = DtoClasses.class.getPackage().getName();
 		XmlParser xml_parser = new XmlParser(context_path, dto_xsd_abs_path);
 		DtoClasses dto_classes = xml_parser.unmarshal(dto_xml_abs_path);

@@ -1,8 +1,11 @@
 package com.sqldalmaker.common;
 
 import com.sqldalmaker.cg.Helpers;
+import com.sqldalmaker.cg.Xml2Vm;
+import com.sqldalmaker.jaxb.settings.Macros;
 import com.sqldalmaker.jaxb.settings.Settings;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -113,5 +116,52 @@ public class TargetLangUtils {
             }
         }
         return package_rel_path;
+    }
+
+    public static String get_dto_vm_template(Settings settings,
+                                              String project_abs_path) throws Exception {
+
+        String macro_name = settings.getDto().getMacro();
+        return get_vm_template(macro_name, settings, project_abs_path);
+    }
+
+    public static String get_dao_vm_template(Settings settings,
+                                              String project_abs_path) throws Exception {
+
+        String macro_name = settings.getDao().getMacro();
+        return get_vm_template(macro_name, settings, project_abs_path);
+    }
+
+    private static String get_vm_template(String macro_name,
+                                          Settings settings,
+                                          String project_abs_path) throws Exception {
+        // read the file or find the macro
+        if (macro_name == null || macro_name.trim().length() == 0) {
+            return null;
+        }
+        String vm_template;
+        if (macro_name.endsWith(".vm")) {
+            String vm_file_system_path = Helpers.concat_path(project_abs_path, macro_name);
+            vm_template = new String(Files.readAllBytes(Paths.get(vm_file_system_path)));
+            return vm_template;
+        }
+        Macros.Macro vm_macro = null;
+        for (Macros.Macro m : settings.getMacros().getMacro()) {
+            if (m.getName().equalsIgnoreCase(macro_name)) {
+                vm_macro = m;
+                break;
+            }
+        }
+        if (vm_macro == null) {
+            throw new Exception("Macro not found: " + macro_name);
+        }
+        if (vm_macro.getVm() != null) {
+            vm_template = vm_macro.getVm().trim();
+        } else if (vm_macro.getVmXml() != null) {
+            vm_template = Xml2Vm.parse(vm_macro.getVmXml());
+        } else {
+            throw new Exception("Expected <vm> or <vm-xml> in " + macro_name);
+        }
+        return vm_template;
     }
 }
