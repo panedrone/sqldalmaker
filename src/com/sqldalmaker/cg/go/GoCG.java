@@ -231,13 +231,14 @@ public class GoCG {
             StringWriter sw = new StringWriter();
             te.merge(context, sw);
             String text = sw.toString();
-            // seems like Go fmt makes \n
+            // seems that Go fmt makes \n
             text = text.replace("\r\n", "\n");
             return new String[]{text};
         }
 
         @Override
         public StringBuilder render_jaxb_query(Object jaxb_element) throws Exception {
+
             QueryMethodInfo mi = new QueryMethodInfo(jaxb_element);
             String xml_node_name = JaxbUtils.get_jaxb_node_name(jaxb_element);
             Helpers.check_required_attr(xml_node_name, mi.jaxb_method);
@@ -271,9 +272,10 @@ public class GoCG {
         //
         private StringBuilder _render_query(String dao_query_jdbc_sql,
                                             boolean is_external_sql,
-                                            String jaxb_dto_or_return_type,
-                                            boolean jaxb_return_type_is_dto,
-                                            boolean fetch_list, String method_name,
+                                            String dto_or_scalar_return_type,
+                                            boolean return_type_is_dto,
+                                            boolean fetch_list,
+                                            String method_name,
                                             String dto_param_type,
                                             String crud_table,
                                             List<FieldInfo> fields,
@@ -283,8 +285,8 @@ public class GoCG {
                 return Helpers.get_no_pk_warning(method_name);
             }
             String returned_type_name;
-            if (jaxb_return_type_is_dto) {
-                returned_type_name = _get_rendered_dto_class_name(jaxb_dto_or_return_type);
+            if (return_type_is_dto) {
+                returned_type_name = _get_rendered_dto_class_name(dto_or_scalar_return_type);
             } else {
                 FieldInfo ret_fi = fields.get(0);
                 returned_type_name = _get_type_without_import_and_tag(ret_fi);
@@ -294,6 +296,11 @@ public class GoCG {
             Map<String, Object> context = new HashMap<String, Object>();
             context.put("mode", "dao_query");
             context.put("class_name", dao_class_name);
+            if (return_type_is_dto) {
+                _set_model(dto_or_scalar_return_type, context);
+            } else {
+                context.put("model", "");
+            }
             context.put("fields", fields);
             method_name = Helpers.get_method_name(method_name, db_utils.get_dto_field_names_mode());
             context.put("method_name", method_name);
@@ -301,7 +308,7 @@ public class GoCG {
             context.put("ref", crud_table);
             context.put("sql", go_sql_str);
             context.put("is_external_sql", is_external_sql);
-            context.put("use_dto", jaxb_return_type_is_dto);
+            context.put("use_dto", return_type_is_dto);
             context.put("returned_type_name", returned_type_name);
             context.put("fetch_list", fetch_list);
             _assign_params_and_imports(params, dto_param_type, context);
@@ -313,6 +320,7 @@ public class GoCG {
         }
 
         private String _get_rendered_dto_class_name(String dto_class_name) throws Exception {
+
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
             String dto_class_nm = jaxb_dto_class.getName();
             int model_end = dto_class_nm.indexOf('-');
@@ -326,6 +334,7 @@ public class GoCG {
         }
 
         private void _process_dto_class_name(String dto_class_name) {
+
             if (this.dto_package.equals(dao_package)) {
                 return;
             }
@@ -344,6 +353,7 @@ public class GoCG {
 
         @Override
         public StringBuilder render_jaxb_exec_dml(ExecDml jaxb_exec_dml) throws Exception {
+
             String method = jaxb_exec_dml.getMethod();
             String ref = jaxb_exec_dml.getRef();
             String xml_node_name = JaxbUtils.get_jaxb_node_name(jaxb_exec_dml);
@@ -454,6 +464,7 @@ public class GoCG {
         }
 
         private static String[] _parse_param_descriptor(String param_descriptor) {
+
             String[] parts = null;
             if (param_descriptor.contains("~")) {
                 parts = param_descriptor.split("~");
@@ -465,6 +476,7 @@ public class GoCG {
         }
 
         private MappingInfo _create_mapping(String[] parts) throws Exception {
+
             MappingInfo m = new MappingInfo();
             m.method_param_name = Helpers.to_lower_camel_or_title_case(parts[0].trim(), false);
             String cb_param_name = String.format("%sMapper", m.method_param_name);
@@ -534,6 +546,16 @@ public class GoCG {
             return new String[]{method_name, dto_param_type, param_descriptors};
         }
 
+        private static void _set_model(String dto_class_name,
+                                       Map<String, Object> context) {
+            String model = "";
+            int model_name_end_index = dto_class_name.indexOf('-');
+            if (model_name_end_index != -1) {
+                model = dto_class_name.substring(0, model_name_end_index);
+            }
+            context.put("model", model);
+        }
+
         @Override
         public StringBuilder render_crud_create(String class_name,
                                                 String method_name,
@@ -549,8 +571,10 @@ public class GoCG {
             String go_sql_str = SqlUtils.format_jdbc_sql_for_go(dao_jdbc_sql);
             Map<String, Object> context = new HashMap<String, Object>();
             context.put("method_type", "CREATE");
+            context.put("crud", true);
             context.put("table_name", table_name);
             context.put("class_name", dao_class_name);
+            _set_model(dto_class_name, context);
             context.put("sql", go_sql_str);
             context.put("method_name", method_name);
             context.put("params", fields_not_ai);
@@ -613,7 +637,9 @@ public class GoCG {
             String go_sql_str = SqlUtils.format_jdbc_sql_for_go(dao_jdbc_sql);
             Map<String, Object> context = new HashMap<String, Object>();
             context.put("mode", "dao_exec_dml");
+            context.put("crud", true);
             context.put("class_name", this.dao_class_name);
+            _set_model(dto_class_name, context);
             context.put("table_name", table_name);
             context.put("method_type", "UPDATE");
             context.put("method_name", method_name);
@@ -648,8 +674,12 @@ public class GoCG {
             Map<String, Object> context = new HashMap<String, Object>();
             context.put("mode", "dao_exec_dml");
             context.put("class_name", dao_class_name);
+            String dto_param_type = _get_rendered_dto_class_name(dto_class_name);
+            context.put("dto_param_type", dto_param_type);
+            _set_model(dto_class_name, context);
             context.put("table_name", table_name);
             context.put("method_type", "DELETE");
+            context.put("crud", true);
             context.put("method_name", method_name);
             context.put("sql", go_sql_str);
             context.put("is_external_sql", false);
@@ -662,10 +692,12 @@ public class GoCG {
         }
 
         @Override
-        public StringBuilder render_jaxb_crud(String dao_class_name, TypeCrud jaxb_type_crud) throws Exception {
+        public StringBuilder render_jaxb_crud(String dao_class_name,
+                                              TypeCrud jaxb_type_crud) throws Exception {
+
             String node_name = JaxbUtils.get_jaxb_node_name(jaxb_type_crud);
             String dto_class_name = jaxb_type_crud.getDto();
-            if (dto_class_name.length() == 0) {
+            if (dto_class_name == null || dto_class_name.length() == 0) {
                 throw new Exception("<" + node_name + "...\nDTO class is not set");
             }
             String table_attr = jaxb_type_crud.getTable();

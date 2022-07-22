@@ -109,38 +109,38 @@
 
         <!-- Example for Go and MySQL|SQLite3: -->
 
-        <!-- ******   raw-SQL params and ret-values   ****** -->
+        <!-- ******   Scalar fields, params, and ret-values for Go   ****** -->
 
-        <!--        <type detected="java.lang.Short" target="int16${0}"/>-->
-        <!--        <type detected="java.lang.Integer" target="int32${0}"/> &lt;!&ndash; Google: java.lang.Integer size bits &ndash;&gt;-->
-        <!--        <type detected="java.lang.Long" target="int64${0}"/>-->
-        <!--        <type detected="java.lang.String" target="string${0}"/>-->
-        <!--        <type detected="java.util.Date" target="time:time.Time${0}"/>-->
-        <!--        <type detected="byte[]" target="string${0}"/>-->
-        <!--        <type detected="java.lang.Boolean" target="int64${0}"/>-->
-        <!--        <type detected="java.lang.Float" target="float64${0}"/>-->
-        <!--        <type detected="java.math.BigDecimal" target="float64${0}"/>-->
-        <!--        <type detected="float" target="float64${0}"/>-->
-        <!--        <type detected="java.lang.Object" target="interface{}${0}"/>-->
+        <type detected="java.lang.Short" target="int16${0}"/>
+        <type detected="java.lang.Integer" target="int32${0}"/> <!-- Google: java.lang.Integer size bits -->
+        <type detected="java.lang.Long" target="int64${0}"/>
+        <type detected="java.lang.String" target="string${0}"/>
+        <type detected="java.util.Date" target="time:time.Time${0}"/>
+        <type detected="byte[]" target="string${0}"/>
+        <type detected="java.lang.Boolean" target="int64${0}"/>
+        <type detected="java.lang.Float" target="float64${0}"/>
+        <type detected="java.math.BigDecimal" target="float64${0}"/>
+        <type detected="float" target="float64${0}"/>
+        <type detected="java.lang.Object" target="interface{}${0}"/>
 
-        <!-- ******   GORM ("gorm-" prefix for detected types)  ****** -->
+        <!-- ******   Gorm ("gorm-" prefix for detected types)  ****** -->
 
-        <!--        <type detected="gorm-java.lang.Short" target="int16${json-gorm}"/>-->
-        <!--        <type detected="gorm-java.lang.Integer" target="int32${json-gorm}"/>-->
-        <!--        <type detected="gorm-java.lang.Long" target="int64${json-gorm}"/>-->
-        <!--        <type detected="gorm-java.lang.String" target="string${json-gorm}"/>-->
-        <!--        <type detected="gorm-java.util.Date" target="time:time.Time${json-gorm}"/>-->
-        <!--        <type detected="gorm-byte[]" target="string${json-gorm}"/>-->
-        <!--        <type detected="gorm-java.lang.Boolean" target="int64${json-gorm}"/>-->
-        <!--        <type detected="gorm-java.lang.Float" target="float64${json-gorm}"/>-->
-        <!--        <type detected="gorm-java.math.BigDecimal" target="float64${json-gorm}"/>-->
-        <!--        <type detected="gorm-java.lang.Object" target="interface{}${json-gorm}"/>-->
+        <type detected="gorm-java.lang.Short" target="int16${json-gorm}"/>
+        <type detected="gorm-java.lang.Integer" target="int32${json-gorm}"/>
+        <type detected="gorm-java.lang.Long" target="int64${json-gorm}"/>
+        <type detected="gorm-java.lang.String" target="string${json-gorm}"/>
+        <type detected="gorm-java.util.Date" target="time:time.Time${json-gorm}"/>
+        <type detected="gorm-byte[]" target="string${json-gorm}"/>
+        <type detected="gorm-java.lang.Boolean" target="int64${json-gorm}"/>
+        <type detected="gorm-java.lang.Float" target="float64${json-gorm}"/>
+        <type detected="gorm-java.math.BigDecimal" target="float64${json-gorm}"/>
+        <type detected="gorm-java.lang.Object" target="interface{}${json-gorm}"/>
 
-        <!-- ***** SQLAlchemy (sa-) ****************** -->
+        <!-- ***** SQLAlchemy ("sqlalchemy-" or "sa-" prefix for detected types) ****************** -->
 
         <!-- https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store_sqlalchemy.py-->
 
-        <!-- numerics for all except oracle_cx -->
+        <!-- Numerics for all except oracle_cx -->
 
         <type detected="sa-java.lang.Short" target="${sa-type}|0:SmallInteger"/>
         <type detected="sa-java.lang.Integer" target="${sa-type}|0:Integer"/>
@@ -150,7 +150,7 @@
         <type detected="sa-java.lang.Double" target="${sa-type}|0:Float"/>
         <type detected="sa-java.math.BigDecimal" target="${sa-type}|0:Float"/>
 
-        <!-- all numerics for oracle_cx -->
+        <!-- All numerics for oracle_cx -->
 
         <!--        <type detected="sa-java.math.BigDecimal" target="${sa-type}|0:NUMBER"/>-->
 
@@ -161,7 +161,7 @@
 
         <type detected="sa-java.lang.Object" target="${sa-type-unknown}"/>
 
-        <!-- ***** Django (dj-) ****************** -->
+        <!-- ***** Django ("django-" or "dj-" prefix for detected types) ****************** -->
 
         <type detected="dj-java.lang.Short" target="${dj-type}|0:IntegerField"/>
         <type detected="dj-java.lang.Integer" target="${dj-type}|0:IntegerField"/>
@@ -190,7 +190,7 @@
 
         <type detected="dj-object" target="${dj-type}|0:CharField"/>
 
-        <!-- ******   raw-SQL params and ret-values for Python  ****** -->
+        <!-- ******   Python scalar fields, params, and ret-values  ****** -->
 
         <!--        <type detected="java.lang.Short" target="int"/>-->
         <!--        <type detected="java.lang.Integer" target="int"/>-->
@@ -205,8 +205,6 @@
         <!--        <type detected="java.lang.Boolean" target="bool"/>-->
         <!--        <type detected="byte[]" target="bytes"/>-->
         <!--        <type detected="java.lang.Object" target="object"/>-->
-
-        <!-- Example for PHP -->
 
         <!-- ******   PHP Doctrine ORM  ****** -->
 
@@ -226,26 +224,26 @@
         <type detected="doctrine-byte[]" target="${doctrine-type}|0:array|1:array"/>
         <type detected="doctrine-java.lang.Object" target="${doctrine-type}|0:object|1:object"/>
 
-        <!-- ******   PHP raw-SQL ****** -->
+        <!-- ******  PHP scalar fields, params, and ret-values ****** -->
 
-        <type detected="java.lang.Short" target="int"/>
-        <type detected="java.lang.Integer" target="int"/>
-        <type detected="java.lang.Long" target="int"/>
+        <!--        <type detected="java.lang.Short" target="int"/>-->
+        <!--        <type detected="java.lang.Integer" target="int"/>-->
+        <!--        <type detected="java.lang.Long" target="int"/>-->
 
-        <type detected="java.lang.Float" target="float"/>
-        <type detected="java.lang.Double" target="float"/>
-        <type detected="java.math.BigDecimal" target="float"/>
+        <!--        <type detected="java.lang.Float" target="float"/>-->
+        <!--        <type detected="java.lang.Double" target="float"/>-->
+        <!--        <type detected="java.math.BigDecimal" target="float"/>-->
 
-        <type detected="java.util.Date" target="\DateTime"/>
-        <type detected="java.lang.String" target="string"/>
-        <type detected="java.lang.Boolean" target="bool"/>
-        <type detected="byte[]" target="array"/>
-        <type detected="java.lang.Object" target="object"/>
+        <!--        <type detected="java.util.Date" target="\DateTime"/>-->
+        <!--        <type detected="java.lang.String" target="string"/>-->
+        <!--        <type detected="java.lang.Boolean" target="bool"/>-->
+        <!--        <type detected="byte[]" target="array"/>-->
+        <!--        <type detected="java.lang.Object" target="object"/>-->
 
         <!-- Example for C++ and SQLite3: -->
 
         <!--        <type detected="java.lang.Integer" target="CLong"/>-->
-        <!--        <type detected="java.lang.Double" target="CDouble"/>-->   <!-- sqlite3_northwindEF -->
+        <!--        <type detected="java.lang.Double" target="CDouble"/>-->
         <!--        <type detected="java.lang.Float" target="CDouble"/>-->
         <!--        <type detected="java.lang.String" target="CText"/>-->
         <!--        <type detected="byte[]" target="CBlob"/>-->
@@ -264,12 +262,12 @@
 
         <!-- Go tags: -->
 
-        <macro name="${col}" value="${lower_snake_case(column)}"/>
+        <macro name="${json_col}" value="${lower_snake_case(column)}"/>
 
-        <macro name="${json}" value=" `json:&quot;${col}${1}&quot;`"/>
+        <macro name="${json}" value=" `json:&quot;${json_col}${1}&quot;`"/>
 
         <macro name="${json-gorm}"
-               value=" `json:&quot;${col}${0}&quot; gorm:&quot;column:${column}${gorm-params}&quot;`"/>
+               value=" `json:&quot;${json_col}${0}&quot; gorm:&quot;column:${column}${gorm-params}&quot;`"/>
 
         <!-- SQLAlchemy column: -->
 

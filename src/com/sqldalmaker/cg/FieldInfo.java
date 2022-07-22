@@ -16,6 +16,7 @@ public class FieldInfo {
     private final String original_field_type;
     private final String original_scalar_type;
     private String scalar_type;
+    private String model;
 
     private final String database_column_name; // original name in database without conversions to lower/camel case etc.
 
@@ -41,10 +42,13 @@ public class FieldInfo {
         }
         this.original_field_type = original_field_type;
         String[] parts = original_field_type.split("-");
-        if (parts.length > 1) {
+        if (parts.length == 2) {
+        	this.model = parts[0];
             this.original_scalar_type = parts[1];
-        } else {
+        } else if(parts.length == 1) {
             this.original_scalar_type = original_field_type;
+        } else {
+        	throw new Exception("Invalid field type: " + original_field_type);
         }
         this.scalar_type = original_scalar_type;
         this.database_column_name = jdbc_db_col_name;
@@ -187,4 +191,8 @@ public class FieldInfo {
     public void refine_scalar_type(String type_name) {
         scalar_type = type_name;
     }
+
+	public String getModel() {
+		return model;
+	}
 }

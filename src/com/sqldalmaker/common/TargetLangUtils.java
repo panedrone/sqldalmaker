@@ -5,12 +5,10 @@
  */
 package com.sqldalmaker.common;
 
-import com.intellij.openapi.vfs.VirtualFile;
 import com.sqldalmaker.cg.Helpers;
 import com.sqldalmaker.cg.Xml2Vm;
 import com.sqldalmaker.jaxb.settings.Macros;
 import com.sqldalmaker.jaxb.settings.Settings;
-import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -136,22 +134,22 @@ public class TargetLangUtils {
     }
 
     public static String get_dto_vm_template(Settings settings,
-                                              String project_abs_path) throws Exception {
+                                             String project_abs_path) throws Exception {
 
         String macro_name = settings.getDto().getMacro();
-        return get_vm_template(macro_name, settings, project_abs_path);
+        return _get_vm_template(macro_name, settings, project_abs_path);
     }
 
     public static String get_dao_vm_template(Settings settings,
-                                              String project_abs_path) throws Exception {
+                                             String project_abs_path) throws Exception {
 
         String macro_name = settings.getDao().getMacro();
-        return get_vm_template(macro_name, settings, project_abs_path);
+        return _get_vm_template(macro_name, settings, project_abs_path);
     }
 
-    private static String get_vm_template(String macro_name,
-                                          Settings settings,
-                                          String project_abs_path) throws Exception {
+    private static String _get_vm_template(String macro_name,
+                                           Settings settings,
+                                           String project_abs_path) throws Exception {
         // read the file or find the macro
         if (macro_name == null || macro_name.trim().length() == 0) {
             return null;
