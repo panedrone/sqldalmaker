@@ -126,7 +126,7 @@ public class EclipseXmlAttrHelpers {
 		IEditorPart part = EclipseEditorHelpers.open_editor_sync(shell, file);
 		// google: eclipse plugin api editor set caret position
 		// https://stackoverflow.com/questions/35591397/eclipseget-and-set-caret-position-of-the-editor
-		Control control = part.getAdapter(Control.class);
+		Control control = (Control) part.getAdapter(Control.class);
 		// For a text editor the control will be StyledText
 		if (control instanceof StyledText) {
 			StyledText styledText = (StyledText) control;

@@ -163,6 +163,12 @@ public class GoCG {
             context.put("ref", jaxb_dto_class.getRef());
             context.put("fields", fields);
             context.put("mode", "dto_class");
+            String ref = jaxb_dto_class.getRef();
+            if (SqlUtils.is_table_ref(ref)) {
+                context.put("table", ref);
+            } else {
+                context.put("table", "");
+            }
             StringWriter sw = new StringWriter();
             te.merge(context, sw);
             String text = sw.toString();
@@ -304,8 +310,12 @@ public class GoCG {
             context.put("fields", fields);
             method_name = Helpers.get_method_name(method_name, db_utils.get_dto_field_names_mode());
             context.put("method_name", method_name);
-            context.put("crud", crud_table != null);
+            if (crud_table == null) {
+                crud_table = "";
+            }
+            context.put("crud", !"".equals(crud_table));
             context.put("ref", crud_table);
+            context.put("table_name", crud_table);
             context.put("sql", go_sql_str);
             context.put("is_external_sql", is_external_sql);
             context.put("use_dto", return_type_is_dto);
@@ -314,8 +324,11 @@ public class GoCG {
             _assign_params_and_imports(params, dto_param_type, context);
             StringWriter sw = new StringWriter();
             te.merge(context, sw);
+            String text = sw.toString();
+            // seems that Go fmt makes \n
+            text = text.replace("\r\n", "\n");
             StringBuilder buff = new StringBuilder();
-            buff.append(sw.getBuffer());
+            buff.append(text);
             return buff;
         }
 
@@ -500,7 +513,8 @@ public class GoCG {
                     throw new Exception("DTO parameter specified but SQL-query does not contain any parameters");
                 }
                 _process_dto_class_name(dto_param_type);
-                context.put("dto_param", _get_rendered_dto_class_name(dto_param_type));
+                String rendered_dto_class_name = _get_rendered_dto_class_name(dto_param_type);
+                context.put("dto_param", rendered_dto_class_name);
                 plain_params = false;
             } else {
                 context.put("dto_param", "");
@@ -674,16 +688,14 @@ public class GoCG {
             Map<String, Object> context = new HashMap<String, Object>();
             context.put("mode", "dao_exec_dml");
             context.put("class_name", dao_class_name);
-            String dto_param_type = _get_rendered_dto_class_name(dto_class_name);
-            context.put("dto_param_type", dto_param_type);
-            _set_model(dto_class_name, context);
             context.put("table_name", table_name);
             context.put("method_type", "DELETE");
             context.put("crud", true);
             context.put("method_name", method_name);
             context.put("sql", go_sql_str);
             context.put("is_external_sql", false);
-            _assign_params_and_imports(fields_pk, "", context);
+            _assign_params_and_imports(fields_pk, dto_class_name, context);
+            _set_model(dto_class_name, context);
             StringWriter sw = new StringWriter();
             te.merge(context, sw);
             StringBuilder buffer = new StringBuilder();

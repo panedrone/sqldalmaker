@@ -67,6 +67,8 @@ public class PhpCG {
             String ref = jaxb_dto_class.getRef();
             if (SqlUtils.is_table_ref(ref)) {
                 context.put("table", ref);
+            } else {
+                context.put("table", "");
             }
             context.put("class_name", dto_class_name);
             context.put("ref", ref);

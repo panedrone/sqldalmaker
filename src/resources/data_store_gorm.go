@@ -1,4 +1,4 @@
-package dao
+package dbal
 
 import (
 	"database/sql"
@@ -14,13 +14,15 @@ import (
 
 /*
    SQL DAL Maker Web-Site: http://sqldalmaker.sourceforge.net
-   This is an example of how to implement DataStore for Go + GORM.
+   This is an example of how to implement DataStore for Go + Gorm.
    Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store_gorm.go
    Copy-paste this code to your project and change it for your needs.
    Improvements are welcome: sqldalmaker@gmail.com
 */
 
 type DataStore interface {
+	Db() *gorm.DB
+
 	Open() (err error)
 	Close() (err error)
 
@@ -28,7 +30,16 @@ type DataStore interface {
 	Commit() (err error)
 	Rollback() (err error)
 
-	Insert(sqlStr string, aiNames string, args ...interface{}) (id interface{}, err error)
+	// CRUD
+
+	Create(table string, dataObjRef interface{}) (err error)
+	ReadAll(table string, sliceOfDataObjRef interface{}) (err error)
+	Read(table string, dataObjRef interface{}, pk ...interface{}) (err error)
+	Update(table string, dataObjRef interface{}) (rowsAffected int64, err error)
+	Delete(table string, dataObjRef interface{}) (rowsAffected int64, err error)
+
+	// raw-SQL
+
 	Exec(sqlStr string, args ...interface{}) (res int64, err error)
 	Query(sqlStr string, args ...interface{}) (res interface{}, err error)
 	QueryAll(sqlStr string, onRow func(interface{}), args ...interface{}) (err error)
@@ -65,6 +76,10 @@ type _DS struct {
 	paramPrefix string
 	db          *gorm.DB
 	tx          *gorm.DB
+}
+
+func (ds *_DS) Db() *gorm.DB {
+	return ds.db
 }
 
 func (ds *_DS) isPostgreSQL() bool {
@@ -154,6 +169,36 @@ func (ds *_DS) Rollback() (err error) {
 	return
 }
 
+// CRUD -----------------------------------
+
+func (ds *_DS) Create(table string, dataObjRef interface{}) error {
+	return ds.db.Table(table).Create(dataObjRef).Error
+}
+
+func (ds *_DS) ReadAll(table string, sliceOfDataObjRef interface{}) error {
+	return ds.db.Table(table).Find(sliceOfDataObjRef).Error
+}
+
+func (ds *_DS) Read(table string, dataObjRef interface{}, pk ...interface{}) error {
+	return ds.db.Table(table).Take(dataObjRef, pk...).Error
+}
+
+func (ds *_DS) Update(table string, dataObjRef interface{}) (rowsAffected int64, err error) {
+	db := ds.db.Table(table).Save(dataObjRef)
+	err = db.Error
+	rowsAffected = db.RowsAffected
+	return
+}
+
+func (ds *_DS) Delete(table string, dataObjRef interface{}) (rowsAffected int64, err error) {
+	db := ds.db.Table(table).Delete(dataObjRef)
+	err = db.Error
+	rowsAffected = db.RowsAffected
+	return
+}
+
+// raw-SQL --------------------------------
+
 func (ds *_DS) _query(sqlStr string, args ...interface{}) (*sql.Rows, error) {
 	var raw *gorm.DB
 	if ds.tx == nil {
@@ -175,97 +220,6 @@ func (ds *_DS) _exec(sqlStr string, args ...interface{}) error {
 
 func (ds *_DS) PGFetch(cursor string) string {
 	return fmt.Sprintf(`fetch all from "%s"`, cursor)
-}
-
-func (ds *_DS) _pgInsert(sqlStr string, aiNames string, args ...interface{}) (id interface{}, err error) {
-	// fetching of multiple AI values is not implemented so far:
-	sqlStr += " RETURNING " + aiNames
-	rows, err := ds._query(sqlStr, args...)
-	if err != nil {
-		return nil, err
-	}
-	defer func() {
-		// dont overwrite err
-		_ = rows.Close()
-	}()
-	if rows.Next() {
-		var data interface{}
-		err = rows.Scan(&data)
-		return data, err
-	}
-	err = errors.New("rows.Next() FAILED:" + sqlStr)
-	return
-}
-
-func (ds *_DS) _oracleInsert(sqlStr string, aiNames string, args ...interface{}) (id interface{}, err error) {
-	// fetching of multiple AI values is not implemented so far:
-	sqlStr = fmt.Sprintf("%s returning %s  into :%d", sqlStr, aiNames, len(args)+1)
-	// https://ddcode.net/2019/05/11/how-does-go-call-oracles-stored-procedures-and-get-the-return-value-of-the-stored-procedures/
-	var id64 float64
-	// var id64 interface{} --- error
-	// var id64 int64 --- it works, but...
-	args = append(args, sql.Out{Dest: &id64, In: false})
-	// ----------------
-	err = ds._exec(sqlStr, args...)
-	if err != nil {
-		return
-	}
-	return id64, nil
-}
-
-func (ds *_DS) _mssqlInsert(sqlStr string, args ...interface{}) (id interface{}, err error) {
-	// SQL Server https://github.com/denisenkom/go-mssqldb
-	// LastInsertId should not be used with this driver (or SQL Server) due to
-	// how the TDS protocol works. Please use the OUTPUT Clause or add a select
-	// ID = convert(bigint, SCOPE_IDENTITY()); to the end of your query (ref SCOPE_IDENTITY).
-	//  This will ensure you are getting the correct ID and will prevent a network round trip.
-	sqlStr += ";SELECT @@IDENTITY;"
-	rows, err := ds._query(sqlStr, args...)
-	if err != nil {
-		return
-	}
-	defer func() {
-		// dont overwrite err
-		_ = rows.Close()
-	}()
-	if rows.Next() {
-		var data interface{}
-		err = rows.Scan(&data) // returns []uint8
-		return data, err
-	}
-	err = errors.New("SELECT @@IDENTITY FAILED: " + sqlStr)
-	return
-}
-
-//func (ds *_DS) _defaultInsert(sqlStr string, args ...interface{}) (id interface{}, err error) {
-//	//res, err := ds._exec(sqlStr, args...)
-//	//if err != nil {
-//	//	return
-//	//}
-//	//id, err = res.LastInsertId()
-//	//
-//	//
-//	return
-//}
-
-func (ds *_DS) Insert(sqlStr string, aiNames string, args ...interface{}) (id interface{}, err error) {
-	if len(aiNames) == 0 { // len(nil) == 0
-		err = errors.New("_DS.insert is not applicable for aiNames = " + aiNames)
-		return
-	}
-	// Builtin LastInsertId works only with MySQL and SQLite3
-	sqlStr = ds._formatSQL(sqlStr)
-	if ds.isPostgreSQL() {
-		return ds._pgInsert(sqlStr, aiNames, args...)
-	} else if ds.isSqlServer() {
-		return ds._mssqlInsert(sqlStr, args...)
-	} else if ds.isOracle() {
-		// Oracle: specify AI values explicitly:
-		// <crud-auto dto="ProjectInfo" table="PROJECTS" generated="P_ID"/>
-		return ds._oracleInsert(sqlStr, aiNames, args...)
-	}
-	return -1, errors.New("nothing like LastInsertId in GORM :(") // TODO
-	// return ds._defaultInsert(sqlStr, args...)
 }
 
 func _isPtr(p interface{}) bool {
