@@ -88,7 +88,8 @@ func (dao *${class_name}) ${method_name}(p *${dto_param}) (err error) {
 	}
 	return
 }
-#end## ======================================================================================
+#end
+## ======================================================================================
 #elseif($mode=="dao_query")
 
 #if($crud)
@@ -196,17 +197,20 @@ func (dao *${class_name}) ${method_name}(#param_decls($is_external_sql $params))
 #end
 }
 #end
-#end## ======================================================================================
+#end
+## ======================================================================================
 #elseif($mode=="dao_exec_dml")
 
 #if($method_type == "CREATE")
 // (C)RUD: ${table_name}
+
 #elseif($method_type == "UPDATE")
 // CR(U)D: ${table_name}
+
 #elseif($method_type == "DELETE")
 // CRU(D): ${table_name}
-#end
 
+#end
 #if(${dto_param} != "")
 func (dao *${class_name}) ${method_name}(#param_decls_dto($is_external_sql)p *${dto_param}) (rowsAffected int64, err error) {
 #if($crud && $model != "")
@@ -221,7 +225,7 @@ func (dao *${class_name}) ${method_name}(#param_decls_dto($is_external_sql)p *${
 #end
 	return
 }
-#else## ---------- not-dto params ----------------------
+#else
 func (dao *${class_name}) ${method_name}(#param_decls($is_external_sql $params)) (rowsAffected int64, err error) {
 #sql_var($is_external_sql $sql)
 #if($mappings.size()>0)
