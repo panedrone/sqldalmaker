@@ -206,16 +206,17 @@ func (ds *_DS) _query(sqlStr string, args ...interface{}) (*sql.Rows, error) {
 	} else {
 		raw = ds.tx.Raw(sqlStr, args...)
 	}
-	// func (db *DB) Rows() (*sql.Rows, error) {
 	return raw.Rows()
 }
 
-func (ds *_DS) _exec(sqlStr string, args ...interface{}) error {
-	if ds.tx == nil { // TODO no sql.Result
-		return ds.db.Exec(sqlStr, args...).Error
+func (ds *_DS) _exec(sqlStr string, args ...interface{}) (rowsAffected int64, err error) {
+	var res *gorm.DB
+	if ds.tx == nil {
+		res = ds.db.Exec(sqlStr, args...)
 	} else {
-		return ds.tx.Exec(sqlStr, args...).Error
+		res = ds.tx.Exec(sqlStr, args...)
 	}
+	return res.RowsAffected, res.Error
 }
 
 func (ds *_DS) PGFetch(cursor string) string {
@@ -386,8 +387,8 @@ func (ds *_DS) _queryAllImplicitRcMySQL(sqlStr string, onRowArr []func(map[strin
 	return
 }
 
-func (ds *_DS) _exec2(sqlStr string, onRowArr []func(map[string]interface{}), args ...interface{}) (execRes int64, err error) {
-	err = ds._exec(sqlStr, args...)
+func (ds *_DS) _exec2(sqlStr string, onRowArr []func(map[string]interface{}), args ...interface{}) (rowsAffected int64, err error) {
+	rowsAffected, err = ds._exec(sqlStr, args...)
 	if err != nil {
 		return
 	}
@@ -409,11 +410,6 @@ func (ds *_DS) _exec2(sqlStr string, onRowArr []func(map[string]interface{}), ar
 			}
 		}
 	}
-	// TODO no sql.Result
-	//execRes, err = res.RowsAffected()
-	//if err != nil {
-	//	execRes = -1
-	//}
 	return
 }
 
