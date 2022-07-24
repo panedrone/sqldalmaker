@@ -190,8 +190,8 @@ public class TargetLangUtils {
 
         String sql_root_abs_path = Helpers.concat_path(project_abs_path, settings.getFolders().getSql());
         String vm_template = TargetLangUtils.get_dto_vm_template(settings, project_abs_path);
-        String dto_xml_abs_path = xml_configs_folder_full_path + "/" + Const.DTO_XML;
-        String dto_xsd_abs_path = xml_configs_folder_full_path + "/" + Const.DTO_XSD;
+        String dto_xml_abs_path = Helpers.concat_path(xml_configs_folder_full_path, Const.DTO_XML);
+        String dto_xsd_abs_path = Helpers.concat_path(xml_configs_folder_full_path, Const.DTO_XSD);
         String context_path = DtoClasses.class.getPackage().getName();
         XmlParser xml_parser = new XmlParser(context_path, dto_xsd_abs_path);
         DtoClasses dto_classes = xml_parser.unmarshal(dto_xml_abs_path);
@@ -252,8 +252,8 @@ public class TargetLangUtils {
                                        StringBuilder output_dir_rel_path) throws Exception {
 
         String sql_root_abs_path = Helpers.concat_path(project_abs_path, settings.getFolders().getSql());
-        String dto_xml_abs_path = xml_configs_folder_full_path + "/" + Const.DTO_XML;
-        String dto_xsd_abs_path = xml_configs_folder_full_path + "/" + Const.DTO_XSD;
+        String dto_xml_abs_path = Helpers.concat_path(xml_configs_folder_full_path, Const.DTO_XML);
+        String dto_xsd_abs_path = Helpers.concat_path(xml_configs_folder_full_path, Const.DTO_XSD);
         String vm_template = TargetLangUtils.get_dao_vm_template(settings, project_abs_path);
         String context_path = DtoClasses.class.getPackage().getName();
         XmlParser xml_parser = new XmlParser(context_path, dto_xsd_abs_path);
