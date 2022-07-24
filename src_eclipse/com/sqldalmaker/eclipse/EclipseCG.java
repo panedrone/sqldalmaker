@@ -43,10 +43,10 @@ public class EclipseCG {
 			IProject project = root_file.getProject();
 			Connection con = EclipseHelpers.get_connection(project, settings);
 			try {
+				IDtoCG gen = EclipseTargetLanguageHelpers.create_dto_cg(con, project, settings, root_file.getName(),
+						xml_mp_abs_path, output_dir);
 				String dto_xml_abs_path = xml_file.getLocation().toPortableString();
 				String dto_xsd_abs_path = Helpers.concat_path(xml_mp_abs_path, Const.DTO_XSD);
-				IDtoCG gen = EclipseTargetLanguageHelpers.create_dto_cg(con, project, settings, root_file.getName(),
-						dto_xml_abs_path, dto_xsd_abs_path, output_dir);
 				List<DtoClass> dto_classes = SdmUtils.get_dto_classes(dto_xml_abs_path, dto_xsd_abs_path);
 				for (DtoClass cls : dto_classes) {
 					try {
@@ -88,10 +88,10 @@ public class EclipseCG {
 			IProject project = root_file.getProject();
 			Connection con = EclipseHelpers.get_connection(project, settings);
 			try {
+				IDtoCG gen = EclipseTargetLanguageHelpers.create_dto_cg(con, project, settings, root_file.getName(),
+						xml_mp_abs_path, output_dir);
 				String dto_xml_abs_path = xml_file.getLocation().toPortableString();
 				String dto_xsd_abs_path = Helpers.concat_path(xml_mp_abs_path, Const.DTO_XSD);
-				IDtoCG gen = EclipseTargetLanguageHelpers.create_dto_cg(con, project, settings, root_file.getName(),
-						dto_xml_abs_path, dto_xsd_abs_path, output_dir);
 				List<DtoClass> dto_classes = SdmUtils.get_dto_classes(dto_xml_abs_path, dto_xsd_abs_path);
 				for (DtoClass cls : dto_classes) {
 					try {
@@ -139,7 +139,6 @@ public class EclipseCG {
 
 	public static void generate_dao(IFile root_file, IFile xml_file) {
 
-		StringBuilder output_dir = new StringBuilder();
 		Error error = new Error();
 		try {
 			String xml_mp_abs_path = root_file.getParent().getLocation().toPortableString();
@@ -147,10 +146,9 @@ public class EclipseCG {
 			IProject project = root_file.getProject();
 			Connection conn = EclipseHelpers.get_connection(project, settings);
 			try {
-				String dto_xml_abs_path = Helpers.concat_path(xml_mp_abs_path, Const.DTO_XML);
-				String dto_xsd_abs_path = Helpers.concat_path(xml_mp_abs_path, Const.DTO_XSD);
+				StringBuilder output_dir_abs_path = new StringBuilder();
 				IDaoCG gen = EclipseTargetLanguageHelpers.create_dao_cg(conn, project, root_file.getName(), settings,
-						dto_xml_abs_path, dto_xsd_abs_path, output_dir);
+						xml_mp_abs_path, output_dir_abs_path);
 				String dao_xsd_abs_path = Helpers.concat_path(xml_mp_abs_path, Const.DAO_XSD);
 				String context_path = DaoClass.class.getPackage().getName();
 				XmlParser dao_xml_parser = new XmlParser(context_path, dao_xsd_abs_path);
@@ -160,7 +158,7 @@ public class EclipseCG {
 				try {
 					String[] file_content = gen.translate(dao_class_name, dao_class);
 					String target_file_path = TargetLangUtils.get_target_file_path(root_file.getName(),
-							output_dir.toString(), dao_class_name);
+							output_dir_abs_path.toString(), dao_class_name);
 					EclipseHelpers.save_text_to_file(target_file_path, file_content[0]);
 				} catch (Throwable e) {
 					String msg = e.getMessage();
@@ -190,7 +188,6 @@ public class EclipseCG {
 		if (current_xml_file_path.startsWith("/")) {
 			current_xml_file_path = current_xml_file_path.substring(1);
 		}
-		StringBuilder output_dir = new StringBuilder();
 		Error error = new Error();
 		try {
 			String xml_mp_abs_path = root_file.getParent().getLocation().toPortableString();
@@ -198,10 +195,9 @@ public class EclipseCG {
 			IProject project = root_file.getProject();
 			Connection conn = EclipseHelpers.get_connection(project, settings);
 			try {
-				String dto_xml_abs_path = Helpers.concat_path(xml_mp_abs_path, Const.DTO_XML);
-				String dto_xsd_abs_path = Helpers.concat_path(xml_mp_abs_path, Const.DTO_XSD);
+				StringBuilder output_dir_abs_path = new StringBuilder();
 				IDaoCG gen = EclipseTargetLanguageHelpers.create_dao_cg(conn, project, root_file.getName(), settings,
-						dto_xml_abs_path, dto_xsd_abs_path, output_dir);
+						xml_mp_abs_path, output_dir_abs_path);
 				String dao_xsd_abs_path = Helpers.concat_path(xml_mp_abs_path, Const.DAO_XSD);
 				String context_path = DaoClass.class.getPackage().getName();
 				XmlParser dao_xml_parser = new XmlParser(context_path, dao_xsd_abs_path);
@@ -211,7 +207,7 @@ public class EclipseCG {
 				try {
 					String[] file_content = gen.translate(dao_class_name, dao_class);
 					String target_file_path = TargetLangUtils.get_target_file_path(root_file.getName(),
-							output_dir.toString(), dao_class_name);
+							output_dir_abs_path.toString(), dao_class_name);
 					StringBuilder validation_buff = new StringBuilder();
 					String oldText = Helpers.load_text_from_file(target_file_path);
 					if (oldText == null) {

@@ -376,9 +376,9 @@ public class UIEditorPageDTO extends Composite {
 				try {
 					EclipseConsoleHelpers.init_console();
 					Settings settings = EclipseHelpers.load_settings(editor2);
-					StringBuilder output_dir = new StringBuilder();
+					StringBuilder output_dir_abs_path = new StringBuilder();
 					// !!!! after 'try'
-					IDtoCG gen = EclipseTargetLanguageHelpers.create_dto_cg(con, editor2, settings, output_dir);
+					IDtoCG gen = EclipseTargetLanguageHelpers.create_dto_cg(con, editor2, settings, output_dir_abs_path);
 					for (int i = 0; i < items.size(); i++) {
 						if (monitor.isCanceled()) {
 							return;
@@ -387,9 +387,9 @@ public class UIEditorPageDTO extends Composite {
 						monitor.subTask(dto_class_name);
 						try {
 							String file_content[] = gen.translate(dto_class_name);
-							String file_name = EclipseTargetLanguageHelpers.get_rel_path(editor2, output_dir.toString(),
+							String file_abs_path = EclipseTargetLanguageHelpers.get_rel_path(editor2, output_dir_abs_path.toString(),
 									dto_class_name);
-							String old_text = Helpers.load_text_from_file(file_name);
+							String old_text = Helpers.load_text_from_file(file_abs_path);
 							StringBuilder validation_buff = new StringBuilder();
 							if (old_text == null) {
 								validation_buff.append("Generated file is missing");
