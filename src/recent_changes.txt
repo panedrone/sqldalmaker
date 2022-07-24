@@ -1,3 +1,7 @@
+2022-07-23
+
+    + DAO CRUD methods for Doctrine
+
 2022-07-22
 
     + DAO CRUD methods for Gorm

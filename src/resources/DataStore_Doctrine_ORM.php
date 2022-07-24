@@ -2,13 +2,15 @@
 
 /*
     SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
-    This is an example of how to implement DataStore in PHP + Doctrine\ORM.
+    This is an example of how to implement DataStore in PHP + Doctrine ORM/DBAL.
     Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/DataStore_Doctrine_ORM.php
     Copy-paste this code to your project and change it for your needs.
     Improvements are welcome: sqldalmaker@gmail.com
  */
 
 use Doctrine\DBAL\Connection;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Exception\ORMException;
 
 class DataStore
 {
@@ -19,11 +21,67 @@ class DataStore
      * @var Connection
      */
     private $db;
+    /**
+     * @var EntityManager
+     */
+    private $em;
 
-    function __construct(Connection $db)
+    function __construct(EntityManager $em)
     {
-        $this->db = $db;
+        $this->em = $em;
+        $this->db = $em->getConnection();
     }
+
+    public function em(): EntityManager
+    {
+        return $this->em;
+    }
+
+    // ---------- ORM CRUD -----------------------------
+
+    /**
+     * @throws ORMException
+     */
+    public function create($p)
+    {
+        $this->em->persist($p);
+    }
+
+    public function readAll(string $entityName)
+    {
+        $rep = $this->em->getRepository($entityName);
+        return $rep->findAll();
+    }
+
+    public function read(string $entityName, $id)
+    {
+        $rp = $this->em->getRepository($entityName);
+        // TODO compound PK?
+        return $rp->find($id);
+    }
+
+    /**
+     * @throws ORMException
+     */
+    public function update($p)
+    {
+        $this->em->persist($p);
+        return 1;
+    }
+
+    /**
+     * For CRUD+Compound_PK, use raw-SQL
+     * @throws ORMException
+     */
+    public function delete($entityName, $id)
+    {
+        // TODO compound PK?
+        $pr = $this->em->getPartialReference($entityName, $id);
+        $this->em->remove($pr);
+        return 1;
+    }
+
+    // ---------- raw-SQL -----------------------------
 
     /**
      * @throws \Doctrine\DBAL\Exception
@@ -48,11 +106,6 @@ class DataStore
     public function rollback()
     {
         $this->db->rollback();
-    }
-
-    public function insert($sql, array $params, array &$ai_values)
-    {
-        // use Doctrine\ORM instead :)
     }
 
     /**

@@ -20,7 +20,8 @@ At the stage of code generation, the target database must exist and be available
 
     <change-notes>
         <![CDATA[
-<li>+ <a href="https://github.com/panedrone/sdm_demo_gorm_todolist">Go CRUD methods based on Gorm</a></li>
+<li>+ <a href="https://github.com/panedrone/sdm_demo_todolist_php_doctrine">Doctrine DAO classes using both ORM and raw-SQL</a></li>
+<li>+ <a href="https://github.com/panedrone/sdm_demo_gorm_todolist">Gorm DAO classes using both ORM and raw-SQL</a></li>
 <li>+ <a href="https://github.com/panedrone/sdm_demo_todolist_php_doctrine">Doctrine models</a></li>
 <li>+ <a href="https://github.com/panedrone/sdm_demo_gorm_todolist">Gorm models</a></li>
 <li>+ <a href="https://github.com/panedrone/sdm_demo_django_todolist_sqlite3">Django models</a></li>

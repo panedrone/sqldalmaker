@@ -42,7 +42,7 @@ array(#foreach ($param in ${params2})#set($p=$param.getName())#list_item(${veloc
 namespace ${namespace};
 #end
 
-#if ($model=="doctrine" || $model=="dct")
+#if ($model=="doctrine")
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -56,7 +56,7 @@ class ${class_name}
 {
 #foreach($f in ${fields})
     /**
-#if ($model=="doctrine" || $model=="dct")
+#if ($model=="doctrine")
      * $f.getType()
 #else
      * @var $f.getType()
@@ -77,7 +77,7 @@ class ${class_name}
     }
 #end
 }
-## ====================================================================================================================
+## ================================================================================================
 #elseif($mode=="dao_class")
 <?php
 
@@ -102,25 +102,36 @@ use ${u};
 #end
 class ${class_name}
 {
+    /**
+     * @var \DataStore
+     */
     protected ${d}ds;
 
     public function __construct($ds)
     {
         ${d}this->ds = ${d}ds;
     }
-#foreach($method in ${methods})${method}#end
-
+#foreach($method in ${methods})
+${method}
+#end
 }
-## ====================================================================================================================
+## =================================================================================================
 #elseif($mode=="dao_create")
 
     /**
      * (C)RUD: ${table_name}
-     * Generated values are passed to DTO.
+     * Generated/AI values are passed to ${d}p param
      * @param ${dto_param} ${d}p
-     * @return TRUE|FALSE on success|failure
+     * @return void
+     * @throws \Exception
      */
-    public function ${method_name}(${dto_param} ${d}p)
+#if ($crud &&  $model=="doctrine")
+    public function ${method_name}(${d}p)
+    {
+        ${d}this->ds->create(${d}p);
+    }
+#else
+    public function ${method_name}(${d}p)
     {
 #sql_var(false $sql)
         ${d}ai_values = array(#foreach ($key in ${keys})#set($p='"'+${key.getColumnName()}+'"'+" => null")#list_item(${velocityCount} $p)#end);
@@ -128,10 +139,11 @@ class ${class_name}
 #foreach ($key in ${keys})
 #set($i = ${velocityCount})
         ${d}p->${key.setterMethod()}(${d}ai_values["$key.getColumnName()"]);
-#end
         return ${d}res;
+#end
     }
-## ====================================================================================================================
+#end
+## ==================================================================================================
 #elseif($mode=="dao_query")
 
     /**
@@ -163,7 +175,17 @@ class ${class_name}
 #end
      */
 #if($fetch_list)
-    public function ${method_name}(#if(${dto_param} != "")#param_decls_dto($is_external_sql)${dto_param} ${d}p#else#param_decls($is_external_sql $params)#end)
+#if ($crud)
+    public function ${method_name}()
+    {
+        return ${d}this->ds->readAll(${returned_type_name}::class);
+    }
+#else
+#if(${dto_param} != "")
+    public function ${method_name}(#param_decls_dto($is_external_sql)${dto_param} ${d}p)
+#else
+    public function ${method_name}(#param_decls($is_external_sql $params))
+#end
     {
 #sql_var(${is_external_sql} $sql)
 #if($use_dto)
@@ -181,8 +203,19 @@ class ${class_name}
         return ${d}this->ds->queryList(${d}sql, #param_array($dto_param));
 #end
     }
+#end
 #else
-    public function ${method_name}(#if(${dto_param} != "")#param_decls_dto($is_external_sql)${dto_param} ${d}p#else#param_decls($is_external_sql $params)#end)
+#if ($crud)
+    public function ${method_name}(#param_decls(false $params))
+    {
+        return ${d}this->ds->read(${returned_type_name}::class, #param_decls(false $params));
+    }
+#else
+#if(${dto_param} != "")
+    public function ${method_name}(#param_decls_dto($is_external_sql)${dto_param} ${d}p)
+#else
+    public function ${method_name}(#param_decls($is_external_sql $params))
+#end
     {
 #sql_var(${is_external_sql} $sql)
 #if($use_dto)
@@ -200,31 +233,50 @@ class ${class_name}
 #end
     }
 #end
-## ====================================================================================================================
+#end
+## ================================================================================================
 #elseif($mode=="dao_exec_dml")
 
     /**
-#if($method_type == "CREATE")
+#if ($method_type == "CREATE")
      * (C)RUD: ${table_name}
-#elseif($method_type == "UPDATE")
+#elseif ($method_type == "UPDATE")
      * CR(U)D: ${table_name}
-#elseif($method_type == "DELETE")
+#elseif ($method_type == "DELETE")
      * CRU(D): ${table_name}
 #end
-#if(${is_external_sql})
+#if (${is_external_sql})
      * @param String ${d}sql external SQL statement
 #end
-#if(${dto_param} != "")
+#if (${dto_param} != "" && $method_type != "DELETE")
      * @param ${dto_param} ${d}p
 #else
 #foreach($param in ${params})
      * @param ${param.getType()} ${d}${param.getName()}
 #end
 #end
+#if ($crud)
+     * @throws \Exception
+#else
      * @return int the affected rows count
+#end
      */
-    public function ${method_name}(#if(${dto_param} != "")#param_decls_dto($is_external_sql)${dto_param} ${d}p#else#param_decls($is_external_sql $params)#end)
+#if(${dto_param} == "" ||  $method_type == "DELETE")
+    public function ${method_name}(#param_decls($is_external_sql $params))
+#else
+    public function ${method_name}(#param_decls_dto($is_external_sql)${d}p)
+#end
     {
+#if ($crud &&  $model=="doctrine")
+#if ($method_type == "CREATE" || $method_type == "UPDATE")
+        return ${d}this->ds->update(${d}p);
+#elseif ( $method_type == "DELETE")
+        return ${d}this->ds->delete(${dto_param}::class, #param_decls(false $params));
+#else
+        // ------------- invalid method_type
+#end
+    }
+#else
 #sql_var(${is_external_sql} $sql)
 #foreach($m in ${mappings})
         ${m.get_exec_dml_param_name()} = function (${d}row) use (&${d}${m.get_method_param_name()}) {
@@ -241,4 +293,5 @@ class ${class_name}
         return ${d}this->ds->execDML(${d}sql, #param_array2($dto_param));
 #end
     }
+#end
 #end

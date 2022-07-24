@@ -97,6 +97,7 @@ public class PhpCG {
         private final TemplateEngine te;
         private final JdbcUtils db_utils;
         private final Settings jaxb_settings;
+        private String model = "";
 
         public DAO(DtoClasses jaxb_dto_classes,
                    Settings jaxb_settings,
@@ -135,6 +136,7 @@ public class PhpCG {
             context.put("class_name", dao_class_name);
             context.put("methods", methods);
             context.put("mode", "dao_class");
+            context.put("model", model);
             String dao_namespace = jaxb_settings.getDao().getScope();
             if (dao_namespace == null) {
                 dao_namespace = "";
@@ -145,9 +147,6 @@ public class PhpCG {
             StringWriter sw = new StringWriter();
             te.merge(context, sw);
             String text = sw.toString();
-            text = text.replace("java.lang.", "");
-            text = text.replace("java.util.", "");
-            text = text.replace("java.math.", "");
             return new String[]{text};
         }
 
@@ -205,6 +204,7 @@ public class PhpCG {
             String php_sql_str = SqlUtils.jdbc_sql_to_php_str(dao_query_jdbc_sql);
             Map<String, Object> context = new HashMap<String, Object>();
             context.put("mode", "dao_query");
+            context.put("model", model);
             context.put("fields", fields);
             context.put("method_name", method_name);
             context.put("crud", crud_table != null);
@@ -241,6 +241,11 @@ public class PhpCG {
             String dto_class_nm = _jaxb_dto_class.getName();
             int model_end = dto_class_nm.indexOf('-');
             if (model_end != -1) {
+                String m = dto_class_nm.substring(0, model_end);
+                if (this.model.length() > 0 && this.model.equals(m) == false) {
+                    throw new Exception(String.format("Multiple models not allowed: %s, %s", this.model, m));
+                }
+                this.model = m;
                 dto_class_nm = dto_class_nm.substring(model_end + 1);
             }
             // do not add "use" if both namespaces are empty or equal
@@ -274,6 +279,7 @@ public class PhpCG {
 
         @Override
         public StringBuilder render_jaxb_exec_dml(ExecDml element) throws Exception {
+
             String method = element.getMethod();
             String ref = element.getRef();
             String xml_node_name = JaxbUtils.get_jaxb_node_name(element);
@@ -371,6 +377,7 @@ public class PhpCG {
         }
 
         private static String[] _parse_param_descriptor(String param_descriptor) {
+
             String[] parts = null;
             if (param_descriptor.contains("~")) {
                 parts = param_descriptor.split("~");
@@ -382,6 +389,7 @@ public class PhpCG {
         }
 
         private MappingInfo _create_mapping(String[] parts) throws Exception {
+
             MappingInfo m = new MappingInfo();
             m.method_param_name = parts[0].trim();
             String cb_param_name = String.format("$_map_cb_%s", m.method_param_name);
@@ -417,6 +425,7 @@ public class PhpCG {
         }
 
         private String[] _parse_method_declaration(String method_text) throws Exception {
+
             String dto_param_type = "";
             String param_descriptors = "";
             String method_name;
@@ -452,13 +461,13 @@ public class PhpCG {
             String sql_str = SqlUtils.jdbc_sql_to_php_str(dao_jdbc_sql);
             Map<String, Object> context = new HashMap<String, Object>();
             context.put("method_type", "CREATE");
+            context.put("model", model);
+            context.put("crud", true);
             context.put("table_name", table_name);
             context.put("class_name", class_name);
             context.put("sql", sql_str);
             context.put("method_name", method_name);
             context.put("params", fields_not_ai);
-            // 1) you cannot overload PHP functions.
-            // 2) more useful for update is version with DTO parameter:
             StringBuilder rendered_class_name = new StringBuilder();
             _process_rendered_dto_class_name(dto_class_name, rendered_class_name);
             context.put("dto_param", rendered_class_name.toString());
@@ -513,6 +522,8 @@ public class PhpCG {
             Map<String, Object> context = new HashMap<String, Object>();
             context.put("mode", "dao_exec_dml");
             context.put("method_type", "UPDATE");
+            context.put("model", model);
+            context.put("crud", true);
             context.put("dao_class_name", dao_class_name);
             context.put("method_name", method_name);
             context.put("sql", sql_str);
@@ -552,13 +563,19 @@ public class PhpCG {
             Map<String, Object> context = new HashMap<String, Object>();
             context.put("mode", "dao_exec_dml");
             context.put("method_type", "DELETE");
+            context.put("model", model);
+            context.put("crud", true);
             context.put("class_name", dao_class_name);
             context.put("method_name", method_name);
             context.put("sql", sql_str);
             context.put("table_name", table_name);
-            // You cannot overload PHP functions. More useful for update is
-            // version with DTO parameter:
-            context.put("dto_param", ""); // #if(${dto_param} != "")
+            if (model.length() == 0) {
+                context.put("dto_param", "");
+            } else {
+                StringBuilder rendered_class_name = new StringBuilder();
+                _process_rendered_dto_class_name(dto_class_name, rendered_class_name);
+                context.put("dto_param", rendered_class_name.toString());
+            }
             context.put("params", fields_pk);
             context.put("is_external_sql", false);
             StringWriter sw = new StringWriter();
