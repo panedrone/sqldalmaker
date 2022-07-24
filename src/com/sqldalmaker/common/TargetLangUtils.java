@@ -5,14 +5,21 @@
  */
 package com.sqldalmaker.common;
 
-import com.sqldalmaker.cg.Helpers;
-import com.sqldalmaker.cg.Xml2Vm;
+import com.sqldalmaker.cg.*;
+import com.sqldalmaker.cg.cpp.CppCG;
+import com.sqldalmaker.cg.go.GoCG;
+import com.sqldalmaker.cg.java.JavaCG;
+import com.sqldalmaker.cg.php.PhpCG;
+import com.sqldalmaker.cg.python.PythonCG;
+import com.sqldalmaker.cg.ruby.RubyCG;
+import com.sqldalmaker.jaxb.dto.DtoClasses;
 import com.sqldalmaker.jaxb.settings.Macros;
 import com.sqldalmaker.jaxb.settings.Settings;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Connection;
 
 public class TargetLangUtils {
 
@@ -57,17 +64,11 @@ public class TargetLangUtils {
     }
 
     public static boolean snake_case_needed(String fn) {
-        if (RootFileName.RUBY.equals(fn) || RootFileName.PYTHON.equals(fn)) {
-            return true;
-        }
-        return false;
+        return RootFileName.RUBY.equals(fn) || RootFileName.PYTHON.equals(fn);
     }
 
     public static boolean lower_camel_case_needed(String fn) {
-        if (RootFileName.GO.equals(fn)) {
-            return true;
-        }
-        return false;
+        return RootFileName.GO.equals(fn);
     }
 
     public static String get_target_folder_abs_path(String class_scope,
@@ -178,5 +179,133 @@ public class TargetLangUtils {
             throw new Exception("Expected <vm> or <vm-xml> in " + macro_name);
         }
         return vm_template;
+    }
+
+    public static IDtoCG create_dto_cg(String root_fn,
+                                       String project_abs_path,
+                                       String xml_configs_folder_full_path,
+                                       Connection connection,
+                                       Settings settings,
+                                       StringBuilder output_dir_rel_path) throws Exception {
+
+        String sql_root_abs_path = Helpers.concat_path(project_abs_path, settings.getFolders().getSql());
+        String vm_template = TargetLangUtils.get_dto_vm_template(settings, project_abs_path);
+        String dto_xml_abs_path = xml_configs_folder_full_path + "/" + Const.DTO_XML;
+        String dto_xsd_abs_path = xml_configs_folder_full_path + "/" + Const.DTO_XSD;
+        String context_path = DtoClasses.class.getPackage().getName();
+        XmlParser xml_parser = new XmlParser(context_path, dto_xsd_abs_path);
+        DtoClasses dto_classes = xml_parser.unmarshal(dto_xml_abs_path);
+        ////////////////////////////////////////////////////
+        if (RootFileName.PHP.equals(root_fn)) {
+            if (output_dir_rel_path != null) {
+                String dto_package = settings.getDto().getScope();
+                String package_rel_path = SdmUtils.get_package_relative_path(settings, dto_package);
+                output_dir_rel_path.append(package_rel_path);
+            }
+            FieldNamesMode field_names_mode = Helpers.get_field_names_mode(settings);
+            return new PhpCG.DTO(dto_classes, settings, connection, sql_root_abs_path, vm_template, field_names_mode);
+        } else if (RootFileName.JAVA.equals(root_fn)) {
+            FieldNamesMode field_names_mode = Helpers.get_field_names_mode(settings);
+            String dto_inheritance = settings.getDto().getInheritance();
+            String dto_package = settings.getDto().getScope();
+            if (output_dir_rel_path != null) {
+                String package_rel_path = SdmUtils.get_package_relative_path(settings, dto_package);
+                output_dir_rel_path.append(package_rel_path);
+            }
+            return new JavaCG.DTO(dto_classes, settings, connection, dto_package,
+                    sql_root_abs_path, dto_inheritance, field_names_mode, vm_template);
+        } else if (RootFileName.CPP.equals(root_fn)) {
+            if (output_dir_rel_path != null) {
+                String package_rel_path = settings.getFolders().getTarget();
+                output_dir_rel_path.append(package_rel_path);
+            }
+            return new CppCG.DTO(dto_classes, settings, connection, sql_root_abs_path, settings.getCpp().getClassPrefix(), vm_template);
+        } else if (RootFileName.PYTHON.equals(root_fn)) {
+            if (output_dir_rel_path != null) {
+                String package_rel_path = settings.getFolders().getTarget();
+                output_dir_rel_path.append(package_rel_path);
+            }
+            return new PythonCG.DTO(dto_classes, settings, connection, sql_root_abs_path, vm_template);
+        } else if (RootFileName.RUBY.equals(root_fn)) {
+            if (output_dir_rel_path != null) {
+                String package_rel_path = settings.getFolders().getTarget();
+                output_dir_rel_path.append(package_rel_path);
+            }
+            return new RubyCG.DTO(dto_classes, settings, connection, sql_root_abs_path, vm_template);
+        } else if (RootFileName.GO.equals(root_fn)) {
+            if (output_dir_rel_path != null) {
+                String package_rel_path = TargetLangUtils.get_golang_dto_folder_rel_path(settings);
+                output_dir_rel_path.append(package_rel_path);
+            }
+            FieldNamesMode field_names_mode = Helpers.get_field_names_mode(settings);
+            return new GoCG.DTO(dto_classes, settings, connection, sql_root_abs_path, field_names_mode, vm_template);
+        } else {
+            throw new Exception(TargetLangUtils.get_unknown_root_file_msg(root_fn));
+        }
+    }
+
+    public static IDaoCG create_dao_cg(String root_fn,
+                                       String project_abs_path,
+                                       String xml_configs_folder_full_path,
+                                       Connection con,
+                                       Settings settings,
+                                       StringBuilder output_dir_rel_path) throws Exception {
+
+        String sql_root_abs_path = Helpers.concat_path(project_abs_path, settings.getFolders().getSql());
+        String dto_xml_abs_path = xml_configs_folder_full_path + "/" + Const.DTO_XML;
+        String dto_xsd_abs_path = xml_configs_folder_full_path + "/" + Const.DTO_XSD;
+        String vm_template = TargetLangUtils.get_dao_vm_template(settings, project_abs_path);
+        String context_path = DtoClasses.class.getPackage().getName();
+        XmlParser xml_parser = new XmlParser(context_path, dto_xsd_abs_path);
+        DtoClasses dto_classes = xml_parser.unmarshal(dto_xml_abs_path);
+        ////////////////////////////////////////////////////
+        if (RootFileName.PHP.equals(root_fn)) {
+            if (output_dir_rel_path != null) {
+                String dao_package = settings.getDao().getScope();
+                String package_rel_path = SdmUtils.get_package_relative_path(settings, dao_package);
+                output_dir_rel_path.append(package_rel_path);
+            }
+            FieldNamesMode field_names_mode = Helpers.get_field_names_mode(settings);
+            return new PhpCG.DAO(dto_classes, settings, con, sql_root_abs_path, vm_template, field_names_mode);
+        } else if (RootFileName.JAVA.equals(root_fn)) {
+            FieldNamesMode field_names_mode = Helpers.get_field_names_mode(settings);
+            String dto_package = settings.getDto().getScope();
+            String dao_package = settings.getDao().getScope();
+            if (output_dir_rel_path != null) {
+                String package_rel_path = SdmUtils.get_package_relative_path(settings, dao_package);
+                output_dir_rel_path.append(package_rel_path);
+            }
+            return new JavaCG.DAO(dto_classes, settings, con, dto_package, dao_package,
+                    sql_root_abs_path, field_names_mode, vm_template);
+        } else if (RootFileName.CPP.equals(root_fn)) {
+            if (output_dir_rel_path != null) {
+                String package_rel_path = settings.getFolders().getTarget();
+                output_dir_rel_path.append(package_rel_path);
+            }
+            String class_prefix = settings.getCpp().getClassPrefix();
+            return new CppCG.DAO(dto_classes, settings, con, sql_root_abs_path, class_prefix, vm_template);
+        } else if (RootFileName.PYTHON.equals(root_fn)) {
+            String package_rel_path = settings.getFolders().getTarget();
+            if (output_dir_rel_path != null) {
+                output_dir_rel_path.append(package_rel_path);
+            }
+            String dto_package = package_rel_path.replace("/", ".").replace("\\", ".");
+            return new PythonCG.DAO(dto_package, dto_classes, settings, con, sql_root_abs_path, vm_template);
+        } else if (RootFileName.RUBY.equals(root_fn)) {
+            if (output_dir_rel_path != null) {
+                String package_rel_path = settings.getFolders().getTarget();
+                output_dir_rel_path.append(package_rel_path);
+            }
+            return new RubyCG.DAO(dto_classes, settings, con, sql_root_abs_path, vm_template);
+        } else if (RootFileName.GO.equals(root_fn)) {
+            if (output_dir_rel_path != null) {
+                String package_rel_path = TargetLangUtils.get_golang_dao_folder_rel_path(settings);
+                output_dir_rel_path.append(package_rel_path);
+            }
+            FieldNamesMode field_names_mode = Helpers.get_field_names_mode(settings);
+            return new GoCG.DAO(dto_classes, settings, con, sql_root_abs_path, field_names_mode, vm_template);
+        } else {
+            throw new Exception(TargetLangUtils.get_unknown_root_file_msg(root_fn));
+        }
     }
 }
