@@ -38,37 +38,44 @@ public class FieldInfo {
 
     public FieldInfo(FieldNamesMode field_names_mode, String original_field_type, String jdbc_db_col_name, String comment) throws Exception {
         if (original_field_type == null) {
-            throw new Exception("<field type=null. Ensure that XSD and XML are valid.");
+            throw new Exception("<field type=null. Ensure that XSD and XML files of meta-program are valid.");
         }
         this.original_field_type = original_field_type;
         String[] parts = original_field_type.split("-");
         if (parts.length == 2) {
-        	this.model = parts[0];
+            this.model = parts[0];
             this.original_scalar_type = parts[1];
-        } else if(parts.length == 1) {
+        } else if (parts.length == 1) {
             this.original_scalar_type = original_field_type;
         } else {
-        	throw new Exception("Invalid field type: " + original_field_type);
+            throw new Exception("Invalid field type: " + original_field_type);
         }
         this.scalar_type = original_scalar_type;
         this.database_column_name = jdbc_db_col_name;
         this.rendered_field_type = original_field_type;
-        this.rendered_field_name = jdbc_db_col_name.replace("-", "_"); // MySQL allows columns like 'api-key';
-        // if ("parameter".equals(comment) == false)
-        {
-            this.rendered_field_name = this.rendered_field_name.replace(" ", "_"); // for MySQL!
-            this.rendered_field_name = this.rendered_field_name.replace("[", "");
-            this.rendered_field_name = this.rendered_field_name.replace("]", "");
+        this.rendered_field_name = jdbc_db_col_name;
+
+        if (this.rendered_field_name.contains("func(") == false &&
+                this.rendered_field_name.contains("new RowHandler[]") == false) {
+
+            this.rendered_field_name = this.rendered_field_name.replace("-", "_"); // for MySQL: `api-key`
             this.rendered_field_name = this.rendered_field_name.replace(".", "_"); // [OrderDetails].OrderID
             this.rendered_field_name = this.rendered_field_name.replace(":", "_"); // CustomerID:1 -- xerial SQLite3
-        }
-        if (FieldNamesMode.LOWER_CAMEL_CASE.equals(field_names_mode)) {
-            this.rendered_field_name = Helpers.to_lower_camel_or_title_case(this.rendered_field_name, false);
-        } else if (FieldNamesMode.TITLE_CASE.equals(field_names_mode)) {
-            this.rendered_field_name = Helpers.to_lower_camel_or_title_case(this.rendered_field_name, true);
-        } else if (FieldNamesMode.SNAKE_CASE.equals(field_names_mode)) {
-            this.rendered_field_name = Helpers.camel_case_to_lower_snake_case(this.rendered_field_name);
-            this.name_prefix = "_";
+            if ("parameter".equals(comment) == false) {
+                // apply only for fields
+                this.rendered_field_name = this.rendered_field_name.replace(" ", "_"); // for MySQL!
+                this.rendered_field_name = this.rendered_field_name.replace("[", "");  // [OrderDetails].OrderID
+                this.rendered_field_name = this.rendered_field_name.replace("]", "");  // [OrderDetails].OrderID
+            }
+            // don't apply to callback-params
+            if (FieldNamesMode.LOWER_CAMEL_CASE.equals(field_names_mode)) {
+                this.rendered_field_name = Helpers.to_lower_camel_or_title_case(this.rendered_field_name, false);
+            } else if (FieldNamesMode.TITLE_CASE.equals(field_names_mode)) {
+                this.rendered_field_name = Helpers.to_lower_camel_or_title_case(this.rendered_field_name, true);
+            } else if (FieldNamesMode.SNAKE_CASE.equals(field_names_mode)) {
+                this.rendered_field_name = Helpers.camel_case_to_lower_snake_case(this.rendered_field_name);
+                this.name_prefix = "_";
+            }
         }
         this.comment = comment;
     }
@@ -192,7 +199,7 @@ public class FieldInfo {
         scalar_type = type_name;
     }
 
-	public String getModel() {
-		return model;
-	}
+    public String getModel() {
+        return model;
+    }
 }

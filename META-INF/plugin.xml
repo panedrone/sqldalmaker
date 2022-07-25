@@ -2,7 +2,7 @@
     <id>dal-mpe</id>
     <name>SQL DAL Maker</name>
     <category>Database</category>
-    <version>1.257.2207</version>
+    <version>1.258.2207</version>
     <vendor email="sqldalmaker@gmail.com"/>
     <idea-version since-build="181.5684.4"/>
 
@@ -18,11 +18,9 @@ At the stage of code generation, the target database must exist and be available
 <a href="https://github.com/panedrone/sqldalmaker/releases/tag/latest">Quick-Demo in mp4</a>
     ]]></description>
 
-    <change-notes>
-        <![CDATA[
-<li>+ <a href="https://github.com/panedrone/sdm_demo_todolist_php_doctrine">Support of Doctrine's ORM\Mapping, ORM\EntityManager, and DBAL\Connection</a></li>
-<li>+ <a href="https://github.com/panedrone/sdm_demo_gorm_todolist">Gorm-based DAO classes: ORM for CRUD and raw-SQL</a></li>
-<li>+ <a href="https://github.com/panedrone/sdm_demo_gorm_todolist">Gorm entities</a></li>
+    <change-notes><![CDATA[
+<li>+ <a href="https://github.com/panedrone/sdm_demo_todolist_php_doctrine">Support of Doctrine PHP libraries</a></li>
+<li>+ <a href="https://github.com/panedrone/sdm_demo_gorm_todolist">Gorm entities and Gorm-based DAO classes: ORM + raw-SQL</a></li>
 <li>+ <a href="https://github.com/panedrone/sdm_demo_django_todolist_sqlite3">Django models</a></li>
 <li>+ <a href="https://github.com/panedrone/sdm_demo_flask_sqlalchemy_todolist">Flask-SQLAlchemy models</a></li>
 </ul>]]></change-notes>
