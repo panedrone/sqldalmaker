@@ -31,6 +31,8 @@ array(#foreach ($param in ${params2})#set($p=$param.getName())#list_item(${veloc
         ${d}sql = ${sql};
 #end
 #end
+#macro(pk_array $params)
+array(#foreach($p in $params)#if($velocityCount>1), #end"$p.getName()" => ${d}$p.getName()#end)#end
 ## ====================================================================================================================
 #if ($mode=="dto_class")
 <?php
@@ -208,7 +210,7 @@ ${method}
 #if ($crud)
     public function ${method_name}(#param_decls(false $params))
     {
-        return ${d}this->ds->read(${returned_type_name}::class, #param_decls(false $params));
+        return ${d}this->ds->read(${returned_type_name}::class, #pk_array($params));
     }
 #else
 #if(${dto_param} != "")
@@ -271,7 +273,7 @@ ${method}
 #if ($method_type == "CREATE" || $method_type == "UPDATE")
         return ${d}this->ds->update(${d}p);
 #elseif ( $method_type == "DELETE")
-        return ${d}this->ds->delete(${dto_param}::class, #param_decls(false $params));
+        return ${d}this->ds->delete(${dto_param}::class, #pk_array($params));
 #else
         // ------------- invalid method_type
 #end
