@@ -113,9 +113,7 @@ class ${class_name}
     {
         ${d}this->ds = ${d}ds;
     }
-#foreach($method in ${methods})
-${method}
-#end
+#foreach($method in ${methods})${method}#end
 }
 ## =================================================================================================
 #elseif($mode=="dao_create")
@@ -175,6 +173,7 @@ ${method}
      * @return mixed ${returned_type_name} ${fields.get(0).getColumnName()} or FALSE on failure
 #end
 #end
+     * @throws \Exception
      */
 #if($fetch_list)
 #if ($crud)
@@ -184,10 +183,8 @@ ${method}
     }
 #else
 #if(${dto_param} != "")
-    public function ${method_name}(#param_decls_dto($is_external_sql)${dto_param} ${d}p)
-#else
-    public function ${method_name}(#param_decls($is_external_sql $params))
-#end
+    public function ${method_name}(#param_decls_dto($is_external_sql)${dto_param} ${d}p)#else
+    public function ${method_name}(#param_decls($is_external_sql $params))#end
     {
 #sql_var(${is_external_sql} $sql)
 #if($use_dto)
@@ -257,11 +254,10 @@ ${method}
      * @param ${param.getType()} ${d}${param.getName()}
 #end
 #end
-#if ($crud)
-     * @throws \Exception
-#else
+#if (!$crud)
      * @return int the affected rows count
 #end
+     * @throws \Exception
      */
 #if(${dto_param} == "" ||  $method_type == "DELETE")
     public function ${method_name}(#param_decls($is_external_sql $params))
