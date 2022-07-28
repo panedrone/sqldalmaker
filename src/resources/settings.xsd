@@ -33,6 +33,7 @@
     <xs:element name="dao">
         <xs:complexType>
             <xs:attribute name="scope" use="required" type="xs:string"/>
+            <xs:attribute name="field-assign-mode" use="required" type="xs:int"/>
             <xs:attribute name="macro" use="required" type="xs:string"/>
         </xs:complexType>
     </xs:element>

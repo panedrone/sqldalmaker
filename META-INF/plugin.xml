@@ -2,14 +2,14 @@
     <id>dal-mpe</id>
     <name>SQL DAL Maker</name>
     <category>Database</category>
-    <version>1.259.2207</version>
+    <version>1.260.2207</version>
     <vendor email="sqldalmaker@gmail.com"/>
     <idea-version since-build="181.5684.4"/>
 
     <depends>com.intellij.modules.lang</depends>
 
     <description><![CDATA[
-SQL DAL Maker is a generator of DTO, Model, and DAO/raw-SQL classes to access relational databases.
+SQL DAL Maker is a generator of DTO, Model, and DAO classes to access relational databases.
 Target programming languages: PHP, Java, C++, Python, Ruby, and Go. To generate the class, you declare it in XML meta-program.<br/>
 <br/>
 At the stage of code generation, the target database must exist and be available for JDBC connection.
@@ -19,10 +19,10 @@ At the stage of code generation, the target database must exist and be available
     ]]></description>
 
     <change-notes><![CDATA[
-<li>+ <a href="https://github.com/panedrone/sdm_demo_todolist_php_doctrine">Support of Doctrine PHP libraries</a></li>
-<li>+ <a href="https://github.com/panedrone/sdm_demo_gorm_todolist">Gorm entities and Gorm-based DAO classes: ORM + raw-SQL</a></li>
+<li>+ <a href="https://github.com/panedrone/sdm_demo_todolist_php_doctrine">Doctrine entities and Doctrine-based DAO classes (ORM + raw-SQL)</a></li>
+<li>+ <a href="https://github.com/panedrone/sdm_demo_gorm_todolist">Gorm entities and Gorm-based DAO classes (ORM + raw-SQL)</a></li>
 <li>+ <a href="https://github.com/panedrone/sdm_demo_django_todolist_sqlite3">Django models</a></li>
-<li>+ <a href="https://github.com/panedrone/sdm_demo_flask_sqlalchemy_todolist">Flask-SQLAlchemy models</a></li>
+<li>+ <a href="https://github.com/panedrone/sdm_demo_flask_sqlalchemy_todolist">(Flask-)SQLAlchemy models</a></li>
 </ul>]]></change-notes>
 
     <application-components>

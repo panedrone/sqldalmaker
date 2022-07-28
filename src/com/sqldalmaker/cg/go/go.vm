@@ -113,7 +113,6 @@ func (dao *${class_name}) ${method_name}(#param_decls($is_external_sql $params))
 	onDto := func(row map[string]interface{}) {
 		obj := ${returned_type_name}{}
 #foreach($f in ${fields})
-#set($i = ${velocityCount} - 1)
 		fromRow(&obj.${f.getName()}, row, "${f.getColumnName()}", errMap)
 #end
 		res = append(res, &obj)
@@ -178,7 +177,6 @@ func (dao *${class_name}) ${method_name}(#param_decls($is_external_sql $params))
 	res = &${returned_type_name}{}
 	errMap := make(map[string]int)
 #foreach($f in ${fields})
-#set($i = ${velocityCount} - 1)
 	fromRow(&res.${f.getName()}, row, "${f.getColumnName()}", errMap)
 #end
 	err = errMapToErr(errMap)

@@ -1,4 +1,4 @@
-package dal
+package dbal
 
 import (
 	"database/sql"
@@ -27,12 +27,17 @@ type DataStore interface {
 	Commit() (err error)
 	Rollback() (err error)
 
+	// the methods called by generated code:
+
 	Insert(sqlStr string, aiNames string, args ...interface{}) (id interface{}, err error)
-	Exec(sqlStr string, args ...interface{}) (res int64, err error)
+	Exec(sqlStr string, args ...interface{}) (rowsAffected int64, err error)
 	Query(sqlStr string, args ...interface{}) (res interface{}, err error)
 	QueryAll(sqlStr string, onRow func(interface{}), args ...interface{}) (err error)
 	QueryRow(sqlStr string, args ...interface{}) (data map[string]interface{}, err error)
 	QueryAllRows(sqlStr string, onRow func(map[string]interface{}), args ...interface{}) (err error)
+
+	QueryByFA(sqlStr string, row []interface{}, args ...interface{}) (err error)
+	QueryAllByFA(sqlStr string, onRow func() []interface{}, args ...interface{}) (err error)
 }
 
 type OutParam struct {
@@ -428,7 +433,7 @@ func (ds *_DS) _queryAllImplicitRcMySQL(sqlStr string, onRowArr []func(map[strin
 	return
 }
 
-func (ds *_DS) _exec2(sqlStr string, onRowArr []func(map[string]interface{}), args ...interface{}) (execRes int64, err error) {
+func (ds *_DS) _exec2(sqlStr string, onRowArr []func(map[string]interface{}), args ...interface{}) (rowsAffected int64, err error) {
 	res, err := ds._exec(sqlStr, args...)
 	if err != nil {
 		return
@@ -451,9 +456,9 @@ func (ds *_DS) _exec2(sqlStr string, onRowArr []func(map[string]interface{}), ar
 			}
 		}
 	}
-	execRes, err = res.RowsAffected()
+	rowsAffected, err = res.RowsAffected()
 	if err != nil {
-		execRes = -1
+		rowsAffected = -1
 	}
 	return
 }
@@ -479,7 +484,7 @@ func _fetchAllFromCursor(rows driver.Rows, onRow func(map[string]interface{})) (
 	return
 }
 
-func (ds *_DS) Exec(sqlStr string, args ...interface{}) (res int64, err error) {
+func (ds *_DS) Exec(sqlStr string, args ...interface{}) (rowsAffected int64, err error) {
 	sqlStr = ds._formatSQL(sqlStr)
 	var onRowArr []func(map[string]interface{})
 	var queryArgs []interface{}
@@ -646,6 +651,55 @@ func (ds *_DS) QueryAllRows(sqlStr string, onRow func(map[string]interface{}), a
 				data[colName] = values[i]
 			}
 			onRow(data)
+		}
+		if !rows.NextResultSet() {
+			break
+		}
+	}
+	return
+}
+
+func (ds *_DS) QueryByFA(sqlStr string, row []interface{}, args ...interface{}) (err error) {
+	sqlStr = ds._formatSQL(sqlStr)
+	rows, err := ds._query(sqlStr, args...)
+	if err != nil {
+		return
+	}
+	defer func() {
+		// dont overwrite err
+		_ = rows.Close()
+	}()
+	if !rows.Next() {
+		err = sql.ErrNoRows
+		return
+	}
+	err = rows.Scan(row...)
+	if err != nil {
+		return
+	}
+	if rows.Next() {
+		err = errors.New(fmt.Sprintf("More than 1 row found for %s", sqlStr))
+	}
+	return
+}
+
+func (ds *_DS) QueryAllByFA(sqlStr string, onRow func() []interface{}, args ...interface{}) (err error) {
+	sqlStr = ds._formatSQL(sqlStr)
+	rows, err := ds._query(sqlStr, args...)
+	if err != nil {
+		return
+	}
+	defer func() {
+		// dont overwrite err
+		_ = rows.Close()
+	}()
+	for {
+		for rows.Next() {
+			row := onRow()
+			err = rows.Scan(row...)
+			if err != nil {
+				return
+			}
 		}
 		if !rows.NextResultSet() {
 			break

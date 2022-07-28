@@ -307,6 +307,8 @@ public class GoCG {
             } else {
                 context.put("model", "");
             }
+            int fam = settings.getDao().getFieldAssignMode();
+            context.put("assign_mode", fam);
             context.put("fields", fields);
             method_name = Helpers.get_method_name(method_name, db_utils.get_dto_field_names_mode());
             context.put("method_name", method_name);

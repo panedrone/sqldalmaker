@@ -20,7 +20,7 @@ class DataStore
     /**
      * @var Connection
      */
-    private $db;
+    private $conn;
     /**
      * @var EntityManager
      */
@@ -29,7 +29,7 @@ class DataStore
     function __construct(EntityManager $em)
     {
         $this->em = $em;
-        $this->db = $em->getConnection();
+        $this->conn = $em->getConnection();
     }
 
     public function em(): EntityManager
@@ -47,35 +47,32 @@ class DataStore
         $this->em->persist($p);
     }
 
-    public function readAll(string $entityName)
+    public function readAll(string $entityName): array
     {
         $rep = $this->em->getRepository($entityName);
         return $rep->findAll();
     }
 
-    public function read(string $entityName, $id)
+    public function read(string $entityName, array $id)
     {
         $rp = $this->em->getRepository($entityName);
-        // TODO compound PK?
         return $rp->find($id);
     }
 
     /**
      * @throws ORMException
      */
-    public function update($p)
+    public function update($p): int
     {
         $this->em->persist($p);
         return 1;
     }
 
     /**
-     * For CRUD+Compound_PK, use raw-SQL
      * @throws ORMException
      */
-    public function delete($entityName, $id)
+    public function delete(string $entityName, array $id): int
     {
-        // TODO compound PK?
         $pr = $this->em->getPartialReference($entityName, $id);
         $this->em->remove($pr);
         return 1;
@@ -89,7 +86,7 @@ class DataStore
     public function beginTransaction()
     {
         // https://www.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/transactions.html#transactions
-        $this->db->beginTransaction();
+        $this->conn->beginTransaction();
     }
 
     /**
@@ -97,7 +94,7 @@ class DataStore
      */
     public function commit()
     {
-        $this->db->commit();
+        $this->conn->commit();
     }
 
     /**
@@ -105,34 +102,34 @@ class DataStore
      */
     public function rollback()
     {
-        $this->db->rollback();
+        $this->conn->rollback();
     }
 
     /**
      * Executes a prepared statement with the given SQL and parameters and returns the affected rows count
      * @throws \Doctrine\DBAL\Exception
      */
-    public function execDML($sql, array $params): int
+    public function execDML(string $sql, array $params): int
     {
-        return $this->db->executeStatement($sql, $params);
+        return $this->conn->executeStatement($sql, $params);
     }
 
     /**
      * Retrieve only the value of the first column of the first result row.
      * @throws \Doctrine\DBAL\Exception
      */
-    public function query($sql, array $params)
+    public function query(string $sql, array $params)
     {
-        return $this->db->fetchOne($sql, $params);
+        return $this->conn->fetchOne($sql, $params);
     }
 
     /**
      * Retrieve the values of the first column of all result rows.
      * @throws \Doctrine\DBAL\Exception
      */
-    public function queryList($sql, array $params): array
+    public function queryList(string $sql, array $params): array
     {
-        $resultSet = $this->db->executeQuery($sql, $params);
+        $resultSet = $this->conn->executeQuery($sql, $params);
         $res = array();
         if ($resultSet) {
             $rows = $resultSet->fetchAllNumeric();
@@ -147,22 +144,22 @@ class DataStore
      * Retrieve associative array of the first result row.
      * @throws \Doctrine\DBAL\Exception
      */
-    public function queryRow($sql, array $params)
+    public function queryRow(string $sql, array $params)
     {
-        return $this->db->fetchAssociative($sql, $params);
+        return $this->conn->fetchAssociative($sql, $params);
     }
 
     /**
      * Retrieve associative arrays of all result rows.
      * @throws \Doctrine\DBAL\Exception
      */
-    public function queryRowList($sql, array $params, $callback)
+    public function queryRowList(string $sql, array $params, callable $onRow)
     {
-        $resultSet = $this->db->executeQuery($sql, $params);
+        $resultSet = $this->conn->executeQuery($sql, $params);
         if ($resultSet) {
             $rows = $resultSet->fetchAllAssociative();
             foreach ($rows as $row) {
-                $callback($row);
+                $onRow($row);
             }
         }
     }

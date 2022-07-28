@@ -45,6 +45,9 @@ type DataStore interface {
 	QueryAll(sqlStr string, onRow func(interface{}), args ...interface{}) (err error)
 	QueryRow(sqlStr string, args ...interface{}) (data map[string]interface{}, err error)
 	QueryAllRows(sqlStr string, onRow func(map[string]interface{}), args ...interface{}) (err error)
+
+	QueryByFA(sqlStr string, row []interface{}, args ...interface{}) (err error)
+	QueryAllByFA(sqlStr string, onRow func() []interface{}, args ...interface{}) (err error)
 }
 
 type OutParam struct {
@@ -601,6 +604,55 @@ func (ds *_DS) QueryAllRows(sqlStr string, onRow func(map[string]interface{}), a
 				data[colName] = values[i]
 			}
 			onRow(data)
+		}
+		if !rows.NextResultSet() {
+			break
+		}
+	}
+	return
+}
+
+func (ds *_DS) QueryByFA(sqlStr string, row []interface{}, args ...interface{}) (err error) {
+	sqlStr = ds._formatSQL(sqlStr)
+	rows, err := ds._query(sqlStr, args...)
+	if err != nil {
+		return
+	}
+	defer func() {
+		// dont overwrite err
+		_ = rows.Close()
+	}()
+	if !rows.Next() {
+		err = sql.ErrNoRows
+		return
+	}
+	err = rows.Scan(row...)
+	if err != nil {
+		return
+	}
+	if rows.Next() {
+		err = errors.New(fmt.Sprintf("More than 1 row found for %s", sqlStr))
+	}
+	return
+}
+
+func (ds *_DS) QueryAllByFA(sqlStr string, onRow func() []interface{}, args ...interface{}) (err error) {
+	sqlStr = ds._formatSQL(sqlStr)
+	rows, err := ds._query(sqlStr, args...)
+	if err != nil {
+		return
+	}
+	defer func() {
+		// dont overwrite err
+		_ = rows.Close()
+	}()
+	for {
+		for rows.Next() {
+			row := onRow()
+			err = rows.Scan(row...)
+			if err != nil {
+				return
+			}
 		}
 		if !rows.NextResultSet() {
 			break
