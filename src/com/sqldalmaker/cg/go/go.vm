@@ -1,4 +1,4 @@
-## Go ===============================================================================================================
+## Go ===================================================================================
 #macro(list_item_base $index $value $separator)
 #if( $index == 1 )${value}#else${separator}${value}#end
 #end
@@ -71,7 +71,7 @@ type ${class_name} struct {
 #elseif($mode=="dao_create")
 
 // (C)RUD: ${table_name}
-// Generated values are passed to DTO/model.
+// Generated/AI values are passed to DTO/model.
 
 func (dao *${class_name}) ${method_name}(p *${dto_param}) (err error) {
 #if($crud && $model != "")
@@ -261,6 +261,7 @@ func (dao *${class_name}) ${method_name}(#param_decls_dto($is_external_sql)p *${
 #else
 func (dao *${class_name}) ${method_name}(#param_decls($is_external_sql $params)) (rowsAffected int64, err error) {
 #sql_var($is_external_sql $sql)
+#if ($assign_mode == 0)
 #if($mappings.size()>0)
 	errMap := make(map[string]int)
 #end
@@ -273,12 +274,26 @@ func (dao *${class_name}) ${method_name}(#param_decls($is_external_sql $params))
 		${m.get_method_param_name()}(&obj)
 	}
 #end
+#else
+#foreach($m in $mappings)
+	${m.get_exec_dml_param_name()} := func() ([]interface{}, func()) {
+		_obj := ${m.get_dto_class_name()}{}
+		return []interface{}{
+#foreach($f in ${m.get_fields()})
+				&_obj.${f.getName()},
+#end
+			}, func() {
+				${m.get_method_param_name()}(&_obj)
+			}
+	}
+#end
+#end
 #if ($method_type == "CREATE" || $method_type == "UPDATE" || $method_type == "DELETE")
 	rowsAffected, err = dao.ds.Exec(sql#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
 #else
 	rowsAffected, err = dao.ds.Exec(sql#foreach($param in ${params2}), ${param.getLowerCamelCaseName()}#end)
 #end
-#if($mappings.size()>0)
+#if($assign_mode == 0 && $mappings.size()>0)
 	if err == nil {
 		err = errMapToErr(errMap)
 	}
