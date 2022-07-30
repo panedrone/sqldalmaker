@@ -1,3 +1,40 @@
+2022-07-30
+
+    + <dao ... field-assign-mode="0|1" (Go only), update XSD files.
+
+        "Row-->DTO" by column name, field-assign-mode="0":
+
+        func (dao *ActorDao) ReadActorInfo(actorId int32) (res *ActorInfo, err error) {
+            sql := `select * from actor_info where actor_id=?`
+            row, err := dao.ds.QueryRow(sql, actorId)
+            if err != nil {
+                return
+            }
+            res = &ActorInfo{}
+            errMap := make(map[string]int)
+            fromRow(&res.ActorId, row, "actor_id", errMap)
+            fromRow(&res.FirstName, row, "first_name", errMap)
+            fromRow(&res.LastName, row, "last_name", errMap)
+            fromRow(&res.FilmInfo, row, "film_info", errMap)
+            err = errMapToErr(errMap)
+            return
+        }
+
+        "Row-->DTO" by field order (faster but less reliable), field-assign-mode="1":
+
+        func (dao *ActorDao) ReadActorInfo(actorId int32) (res *ActorInfo, err error) {
+            sql := `select * from actor_info where actor_id=?`
+            res = &ActorInfo{}
+            _fa := []interface{}{
+                &res.ActorId,
+                &res.FirstName,
+                &res.LastName,
+                &res.FilmInfo,
+            }
+            err = dao.ds.QueryByFA(sql, _fa, actorId)
+            return
+        }
+
 2022-07-28
 
     + Direct assignment of DTO field values while fetching the rows

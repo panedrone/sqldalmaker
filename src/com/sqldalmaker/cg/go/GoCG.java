@@ -437,7 +437,7 @@ public class GoCG {
                         method_params.add(new FieldInfo(FieldNamesMode.LOWER_CAMEL_CASE, func_type, m.method_param_name, "parameter"));
                         cb_elements.add(m.exec_dml_param_name);
                     }
-                    String exec_xml_param = "[]func(map[string]interface{}){" + String.join(", ", cb_elements) + "}";
+                    String exec_xml_param = "[]interface{}{" + String.join(", ", cb_elements) + "}";
                     if (pd_i == 0) {
                         exec_xml_param = "(Object) " + exec_xml_param;
                     }
@@ -472,6 +472,8 @@ public class GoCG {
             context.put("sql_path", sql_path);
             context.put("is_external_sql", is_external_sql);
             context.put("mode", "dao_exec_dml");
+            int fam = settings.getDao().getFieldAssignMode();
+            context.put("assign_mode", fam);
             _assign_params_and_imports(method_params, dto_param_type, context);
             StringWriter sw = new StringWriter();
             te.merge(context, sw);
@@ -496,11 +498,12 @@ public class GoCG {
             m.method_param_name = Helpers.to_lower_camel_or_title_case(parts[0].trim(), false);
             String cb_param_name = String.format("%sMapper", m.method_param_name);
             m.exec_dml_param_name = cb_param_name;
-            m.dto_class_name = parts[1].trim();
+            String declared_dto_class_name = parts[1].trim();
             List<FieldInfo> fields = new ArrayList<FieldInfo>();
-            DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(m.dto_class_name, jaxb_dto_classes);
+            DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(declared_dto_class_name, jaxb_dto_classes);
             _process_dto_class_name(jaxb_dto_class.getName()); // extends imports
             db_utils.get_dto_field_info(jaxb_dto_class, sql_root_abs_path, fields);
+            m.dto_class_name = _get_rendered_dto_class_name(declared_dto_class_name);
             m.fields.addAll(fields);
             return m;
         }

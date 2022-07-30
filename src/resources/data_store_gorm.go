@@ -47,7 +47,7 @@ type DataStore interface {
 	QueryAllRows(sqlStr string, onRow func(map[string]interface{}), args ...interface{}) (err error)
 
 	QueryByFA(sqlStr string, row []interface{}, args ...interface{}) (err error)
-	QueryAllByFA(sqlStr string, onRow func() []interface{}, args ...interface{}) (err error)
+	QueryAllByFA(sqlStr string, onRow func() ([]interface{}, func()), args ...interface{}) (err error)
 }
 
 type OutParam struct {
@@ -79,6 +79,15 @@ type _DS struct {
 	paramPrefix string
 	db          *gorm.DB
 	tx          *gorm.DB
+}
+
+type CanClose interface {
+	Close() error
+}
+
+func _close(obj CanClose) {
+	// dont overwrite err
+	_ = obj.Close()
 }
 
 func (ds *_DS) Db() *gorm.DB {
@@ -252,7 +261,7 @@ func _validateDest(dest interface{}) (err error) {
 	return
 }
 
-func (ds *_DS) _processExecParams(args []interface{}, onRowArr *[]func(map[string]interface{}),
+func (ds *_DS) _processExecParams(args []interface{}, onRowArr *[]interface{},
 	queryArgs *[]interface{}) (implicitCursors bool, outCursors bool, err error) {
 	implicitCursors = false
 	outCursors = false
@@ -264,8 +273,35 @@ func (ds *_DS) _processExecParams(args []interface{}, onRowArr *[]func(map[strin
 				return
 			}
 			implicitCursors = true
-			*onRowArr = append(*onRowArr, param...) // add an array of func
+			for _, fn := range param {
+				*onRowArr = append(*onRowArr, fn)
+			}
 		case func(map[string]interface{}):
+			if implicitCursors {
+				err = errors.New(fmt.Sprintf("Forbidden: %v", args))
+				return
+			}
+			outCursors = true
+			*onRowArr = append(*onRowArr, param) // add single func
+			var rows driver.Rows
+			*queryArgs = append(*queryArgs, sql.Out{Dest: &rows, In: false})
+		case []interface{}:
+			if outCursors {
+				err = errors.New(fmt.Sprintf("Forbidden: %v", args))
+				return
+			}
+			implicitCursors = true
+			for _, fn := range param {
+				_, ok1 := fn.(func() ([]interface{}, func()))
+				_, ok2 := fn.(func(map[string]interface{}))
+				if !ok1 && !ok2 {
+					err = errors.New(fmt.Sprintf("Expected: 'func(map[string]interface{})' || "+
+						"'func() ([]interface{}, func())'. Got: %v", reflect.TypeOf(fn)))
+					return
+				}
+				*onRowArr = append(*onRowArr, fn)
+			}
+		case func() ([]interface{}, func()):
 			if implicitCursors {
 				err = errors.New(fmt.Sprintf("Forbidden: %v", args))
 				return
@@ -318,15 +354,12 @@ func (ds *_DS) _processExecParams(args []interface{}, onRowArr *[]func(map[strin
 	return
 }
 
-func (ds *_DS) _queryAllImplicitRcOracle(sqlStr string, onRowArr []func(map[string]interface{}), queryArgs ...interface{}) (err error) {
+func (ds *_DS) _queryAllImplicitRcOracle(sqlStr string, onRowArr []interface{}, queryArgs ...interface{}) (err error) {
 	rows, err := ds._query(sqlStr, queryArgs...)
 	if err != nil {
 		return
 	}
-	defer func() {
-		// dont overwrite err
-		_ = rows.Close()
-	}()
+	defer _close(rows)
 	onRowIndex := 0
 	for {
 		// 1) unlike MySQL, it must be done before _prepareFetch -> rows.Next()
@@ -334,53 +367,78 @@ func (ds *_DS) _queryAllImplicitRcOracle(sqlStr string, onRowArr []func(map[stri
 		if !rows.NextResultSet() {
 			break
 		}
-		// re-detect columns for each ResultSet
-		colNames, data, values, valuePointers, pfeErr := ds._prepareFetch(rows)
-		if pfeErr != nil {
-			err = pfeErr
-			return
-		}
-		for rows.Next() {
-			err = rows.Scan(valuePointers...)
-			if err != nil {
+		switch onRow := onRowArr[onRowIndex].(type) {
+		case func(map[string]interface{}):
+			// re-detect columns for each ResultSet
+			colNames, data, values, valuePointers, pfeErr := ds._prepareFetch(rows)
+			if pfeErr != nil {
+				err = pfeErr
 				return
 			}
-			for i, colName := range colNames {
-				data[colName] = values[i]
+			for rows.Next() {
+				err = rows.Scan(valuePointers...)
+				if err != nil {
+					return
+				}
+				for i, colName := range colNames {
+					data[colName] = values[i]
+				}
+				onRow(data)
 			}
-			onRowArr[onRowIndex](data)
+		case func() ([]interface{}, func()):
+			for rows.Next() {
+				fa, onRowCompleted := onRow()
+				err = rows.Scan(fa...)
+				if err != nil {
+					return
+				}
+				onRowCompleted()
+			}
+		default:
+			return errors.New(fmt.Sprintf("Unexpected type: %v", onRow))
 		}
 		onRowIndex++
 	}
 	return
 }
 
-func (ds *_DS) _queryAllImplicitRcMySQL(sqlStr string, onRowArr []func(map[string]interface{}), queryArgs ...interface{}) (err error) {
+func (ds *_DS) _queryAllImplicitRcMySQL(sqlStr string, onRowArr []interface{}, queryArgs ...interface{}) (err error) {
 	rows, err := ds._query(sqlStr, queryArgs...)
 	if err != nil {
 		return
 	}
-	defer func() {
-		// dont overwrite err
-		_ = rows.Close()
-	}()
+	defer _close(rows)
 	onRowIndex := 0
 	for {
-		// re-detect columns for each ResultSet
-		colNames, data, values, valuePointers, pfeErr := ds._prepareFetch(rows)
-		if pfeErr != nil {
-			err = pfeErr
-			return
-		}
-		for rows.Next() {
-			err = rows.Scan(valuePointers...)
-			if err != nil {
+		switch onRow := onRowArr[onRowIndex].(type) {
+		case func(map[string]interface{}):
+			// re-detect columns for each ResultSet
+			colNames, data, values, valuePointers, pfeErr := ds._prepareFetch(rows)
+			if pfeErr != nil {
+				err = pfeErr
 				return
 			}
-			for i, colName := range colNames {
-				data[colName] = values[i]
+			for rows.Next() {
+				err = rows.Scan(valuePointers...)
+				if err != nil {
+					return
+				}
+				for i, colName := range colNames {
+					data[colName] = values[i]
+				}
+				onRow(data)
 			}
-			onRowArr[onRowIndex](data)
+		case func() ([]interface{}, func()):
+			for rows.Next() {
+				fa, onRowCompleted := onRow()
+				err = rows.Scan(fa...)
+				if err != nil {
+					return
+				}
+				onRowCompleted()
+			}
+		default:
+			return errors.New(fmt.Sprintf("Unexpected type: %v", onRow))
 		}
 		if !rows.NextResultSet() {
 			break
@@ -390,7 +448,7 @@ func (ds *_DS) _queryAllImplicitRcMySQL(sqlStr string, onRowArr []func(map[strin
 	return
 }
 
-func (ds *_DS) _exec2(sqlStr string, onRowArr []func(map[string]interface{}), args ...interface{}) (rowsAffected int64, err error) {
+func (ds *_DS) _exec2(sqlStr string, onRowArr []interface{}, args ...interface{}) (rowsAffected int64, err error) {
 	rowsAffected, err = ds._exec(sqlStr, args...)
 	if err != nil {
 		return
@@ -416,30 +474,47 @@ func (ds *_DS) _exec2(sqlStr string, onRowArr []func(map[string]interface{}), ar
 	return
 }
 
-func _fetchAllFromCursor(rows driver.Rows, onRow func(map[string]interface{})) (err error) {
-	defer func() {
-		// dont overwrite err
-		_ = rows.Close()
-	}()
+func _fetchAllFromCursor(rows driver.Rows, onRowFunc interface{}) (err error) {
+	defer _close(rows)
 	colNames := rows.Columns()
-	data := make(map[string]interface{})
 	values := make([]driver.Value, len(colNames))
-	for {
-		err = rows.Next(values)
-		if err != nil {
-			break
+	switch onRow := onRowFunc.(type) {
+	case func(map[string]interface{}):
+		data := make(map[string]interface{})
+		for {
+			err = rows.Next(values)
+			if err != nil {
+				break
+			}
+			for i, colName := range colNames {
+				data[colName] = values[i]
+			}
+			onRow(data)
 		}
-		for i, colName := range colNames {
-			data[colName] = values[i]
+	case func() ([]interface{}, func()):
+		for {
+			err = rows.Next(values)
+			if err != nil {
+				break
+			}
+			fa, onRowCompleted := onRow()
+			for i, v := range values {
+				err = _assign(fa[i], v)
+				if err != nil {
+					return
+				}
+			}
+			onRowCompleted()
 		}
-		onRow(data)
+	default:
+		return errors.New(fmt.Sprintf("Unexpected type: %v", onRow))
 	}
 	return
 }
 
 func (ds *_DS) Exec(sqlStr string, args ...interface{}) (res int64, err error) {
 	sqlStr = ds._formatSQL(sqlStr)
-	var onRowArr []func(map[string]interface{})
+	var onRowArr []interface{}
 	var queryArgs []interface{}
 	// Syntax like [on_test1:Test, on_test2:Test] is used to call SP with IMPLICIT cursors
 	implicitCursors, _, err := ds._processExecParams(args, &onRowArr, &queryArgs)
@@ -462,10 +537,7 @@ func (ds *_DS) _queryRowValues(sqlStr string, queryArgs ...interface{}) (values 
 	if err != nil {
 		return
 	}
-	defer func() {
-		// dont overwrite err
-		_ = rows.Close()
-	}()
+	defer _close(rows)
 	outParamIndex := 0
 	_, _, values, valuePointers, err := ds._prepareFetch(rows)
 	if err != nil {
@@ -497,7 +569,7 @@ func (ds *_DS) _queryRowValues(sqlStr string, queryArgs ...interface{}) (values 
 
 func (ds *_DS) Query(sqlStr string, args ...interface{}) (arr interface{}, err error) {
 	sqlStr = ds._formatSQL(sqlStr)
-	var onRowArr []func(map[string]interface{})
+	var onRowArr []interface{}
 	var queryArgs []interface{}
 	implicitCursors, outCursors, err := ds._processExecParams(args, &onRowArr, &queryArgs)
 	if err != nil {
@@ -517,10 +589,7 @@ func (ds *_DS) QueryAll(sqlStr string, onRow func(interface{}), args ...interfac
 	if err != nil {
 		return
 	}
-	defer func() {
-		// dont overwrite err
-		_ = rows.Close()
-	}()
+	defer _close(rows)
 	for {
 		// re-detect columns for each ResultSet
 		// fetch all columns! if to fetch less, Scan returns nil-s
@@ -550,10 +619,7 @@ func (ds *_DS) QueryRow(sqlStr string, args ...interface{}) (data map[string]int
 	if err != nil {
 		return
 	}
-	defer func() {
-		// dont overwrite err
-		_ = rows.Close()
-	}()
+	defer _close(rows)
 	colNames, data, values, valuePointers, pfErr := ds._prepareFetch(rows)
 	if pfErr != nil {
 		err = pfErr
@@ -584,10 +650,7 @@ func (ds *_DS) QueryAllRows(sqlStr string, onRow func(map[string]interface{}), a
 	if err != nil {
 		return
 	}
-	defer func() {
-		// dont overwrite err
-		_ = rows.Close()
-	}()
+	defer _close(rows)
 	for {
 		// re-detect columns for each ResultSet
 		colNames, data, values, valuePointers, pfErr := ds._prepareFetch(rows)
@@ -618,10 +681,7 @@ func (ds *_DS) QueryByFA(sqlStr string, row []interface{}, args ...interface{}) 
 	if err != nil {
 		return
 	}
-	defer func() {
-		// dont overwrite err
-		_ = rows.Close()
-	}()
+	defer _close(rows)
 	if !rows.Next() {
 		err = sql.ErrNoRows
 		return
@@ -636,23 +696,21 @@ func (ds *_DS) QueryByFA(sqlStr string, row []interface{}, args ...interface{}) 
 	return
 }
 
-func (ds *_DS) QueryAllByFA(sqlStr string, onRow func() []interface{}, args ...interface{}) (err error) {
+func (ds *_DS) QueryAllByFA(sqlStr string, onRow func() ([]interface{}, func()), args ...interface{}) (err error) {
 	sqlStr = ds._formatSQL(sqlStr)
 	rows, err := ds._query(sqlStr, args...)
 	if err != nil {
 		return
 	}
-	defer func() {
-		// dont overwrite err
-		_ = rows.Close()
-	}()
+	defer _close(rows)
 	for {
 		for rows.Next() {
-			row := onRow()
+			row, onRowCompleted := onRow()
 			err = rows.Scan(row...)
 			if err != nil {
 				return
 			}
+			onRowCompleted()
 		}
 		if !rows.NextResultSet() {
 			break

@@ -53,7 +53,7 @@
                 2. The name of Go "package" for DAO classes. DTO scope must be the same.
                 3. A value in the format of Go "import" for DAO classes. The value of "<folders target" is ignored. -->
 
-    <!-- field-assign-mode (Go only) use="optional": 0 (default) - by column name, 1 - by position. -->
+    <!-- field-assign-mode (Go only) use="optional": 0 - by column name, 1 - by position. -->
 
     <!-- macro: VM template to render DAO classes.
 
@@ -123,7 +123,8 @@
         <type detected="java.lang.Integer" target="int32${0}"/> <!-- Google: java.lang.Integer size bits -->
         <type detected="java.lang.Long" target="int64${0}"/>
         <type detected="java.lang.String" target="string${0}"/>
-        <type detected="java.util.Date" target="time:time.Time${0}"/>
+        <!--        <type detected="java.util.Date" target="time:time.Time${json}"/>-->
+        <type detected="java.util.Date" target="string${json}"/>
         <type detected="byte[]" target="string${0}"/>
         <type detected="java.lang.Boolean" target="int64${0}"/>
         <type detected="java.lang.Float" target="float64${0}"/>
