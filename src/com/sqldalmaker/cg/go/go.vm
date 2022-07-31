@@ -261,6 +261,9 @@ func (dao *${class_name}) ${method_name}(#param_decls_dto($is_external_sql)p *${
 #else
 func (dao *${class_name}) ${method_name}(#param_decls($is_external_sql $params)) (rowsAffected int64, err error) {
 #sql_var($is_external_sql $sql)
+#if ($method_type == "CREATE" || $method_type == "UPDATE" || $method_type == "DELETE")
+	rowsAffected, err = dao.ds.Exec(sql#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
+#else
 #if ($assign_mode == 0)
 #if($mappings.size()>0)
 	errMap := make(map[string]int)
@@ -288,15 +291,12 @@ func (dao *${class_name}) ${method_name}(#param_decls($is_external_sql $params))
 	}
 #end
 #end
-#if ($method_type == "CREATE" || $method_type == "UPDATE" || $method_type == "DELETE")
-	rowsAffected, err = dao.ds.Exec(sql#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
-#else
 	rowsAffected, err = dao.ds.Exec(sql#foreach($param in ${params2}), ${param.getLowerCamelCaseName()}#end)
-#end
 #if($assign_mode == 0 && $mappings.size()>0)
 	if err == nil {
 		err = errMapToErr(errMap)
 	}
+#end
 #end
 	return
 }

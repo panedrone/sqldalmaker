@@ -15,21 +15,11 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 
-import com.sqldalmaker.cg.FieldNamesMode;
-import com.sqldalmaker.cg.Helpers;
 import com.sqldalmaker.cg.IDaoCG;
 import com.sqldalmaker.cg.IDtoCG;
-import com.sqldalmaker.cg.cpp.CppCG;
-import com.sqldalmaker.cg.go.GoCG;
-import com.sqldalmaker.cg.java.JavaCG;
-import com.sqldalmaker.cg.php.PhpCG;
-import com.sqldalmaker.cg.python.PythonCG;
-import com.sqldalmaker.cg.ruby.RubyCG;
 import com.sqldalmaker.common.RootFileName;
 import com.sqldalmaker.common.SdmUtils;
 import com.sqldalmaker.common.TargetLangUtils;
-import com.sqldalmaker.common.XmlParser;
-import com.sqldalmaker.jaxb.dto.DtoClasses;
 import com.sqldalmaker.jaxb.settings.Settings;
 
 /**

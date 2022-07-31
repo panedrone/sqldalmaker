@@ -19,10 +19,12 @@ At the stage of code generation, the target database must exist and be available
     ]]></description>
 
     <change-notes><![CDATA[
-<li>+ <a href="https://github.com/panedrone/sdm_demo_todolist_php_doctrine">Doctrine entities + Doctrine-based DAO classes</a></li>
-<li>+ <a href="https://github.com/panedrone/sdm_demo_gorm_todolist">Gorm entities + Gorm-based DAO classes</a></li>
-<li>+ <a href="https://github.com/panedrone/sdm_demo_django_todolist_sqlite3">Django models</a></li>
-<li>+ <a href="https://github.com/panedrone/sdm_demo_flask_sqlalchemy_todolist">SQLAlchemy models</a></li>
+<p>+ ORM Entities/Models and ORM-based DAO classes including raw-SQL:</p>
+<ul>
+<li><a href="https://github.com/panedrone/sdm_demo_todolist_php_doctrine">PHP Doctrine</a></li>
+<li><a href="https://github.com/panedrone/sdm_demo_gorm_todolist">Gorm</a></li>
+<li><a href="https://github.com/panedrone/sdm_demo_django_todolist_sqlite3">Django</a></li>
+<li><a href="https://github.com/panedrone/sdm_demo_flask_sqlalchemy_todolist">SQLAlchemy</a></li>
 </ul>]]></change-notes>
 
     <application-components>

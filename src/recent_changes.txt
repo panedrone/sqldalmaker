@@ -1,8 +1,8 @@
 2022-07-30
 
-    + <dao ... field-assign-mode="0|1" (Go only), update XSD files.
+    + <dao ... field-assign-mode="0|1" (Go only) --> Update XSD files and add "field-assign-mode" to "settings.xml".
 
-        "Row-->DTO" by column name, field-assign-mode="0":
+        "Row --> DTO" by column name, field-assign-mode="0":
 
         func (dao *ActorDao) ReadActorInfo(actorId int32) (res *ActorInfo, err error) {
             sql := `select * from actor_info where actor_id=?`
@@ -20,7 +20,7 @@
             return
         }
 
-        "Row-->DTO" by field order (faster but less reliable), field-assign-mode="1":
+        "Row --> DTO" by field order (faster but less reliable), field-assign-mode="1":
 
         func (dao *ActorDao) ReadActorInfo(actorId int32) (res *ActorInfo, err error) {
             sql := `select * from actor_info where actor_id=?`
@@ -35,25 +35,21 @@
             return
         }
 
-2022-07-28
-
-    + Direct assignment of DTO field values while fetching the rows
-
 2022-07-26
 
-    + Compound PK for Doctrine
+    + Enabled compound PK-s for Doctrine
 
 2022-07-23
 
-    + DAO CRUD methods for Doctrine
+    + ORM-based CRUD methods for Doctrine
 
 2022-07-22
 
-    + DAO CRUD methods for Gorm
+    + ORM-based CRUD methods for Gorm
 
 2022-07-19
 
-    The situation handled when MySQL JDBC getPrimaryKeys returns the same PK several times.
+    The situation handled when MySQL JDBC getPrimaryKeys returns the same PK several times (MySQL).
 
 2022-07-18
 
