@@ -315,7 +315,11 @@ public class GoCG {
             if (crud_table == null) {
                 crud_table = "";
             }
-            context.put("crud", !"".equals(crud_table));
+            if (crud_table.length() == 0) {
+                context.put("method_type", "");
+            } else {
+                context.put("method_type", "READ");
+            }
             context.put("ref", crud_table);
             context.put("table_name", crud_table);
             context.put("sql", go_sql_str);
@@ -656,11 +660,10 @@ public class GoCG {
             String go_sql_str = SqlUtils.format_jdbc_sql_for_go(dao_jdbc_sql);
             Map<String, Object> context = new HashMap<String, Object>();
             context.put("mode", "dao_exec_dml");
-            context.put("crud", true);
+            context.put("method_type", "UPDATE");
             context.put("class_name", this.dao_class_name);
             _set_model(dto_class_name, context);
             context.put("table_name", table_name);
-            context.put("method_type", "UPDATE");
             context.put("method_name", method_name);
             context.put("is_external_sql", false);
             context.put("sql", go_sql_str);
@@ -695,7 +698,6 @@ public class GoCG {
             context.put("class_name", dao_class_name);
             context.put("table_name", table_name);
             context.put("method_type", "DELETE");
-            context.put("crud", true);
             context.put("method_name", method_name);
             context.put("sql", go_sql_str);
             context.put("is_external_sql", false);

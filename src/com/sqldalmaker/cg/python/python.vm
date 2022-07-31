@@ -133,7 +133,7 @@ class $class_name:
 #if($fetch_list)
     def $method_name(#if($dto_param != "")#param_decls_dto($is_external_sql)p#else#param_decls($is_external_sql $params)#end#if($out_params), out_params#end):
         """
-#if($crud)
+#if($method_type == "READ")
         C(R)UD: $ref
 #end
 #if($is_external_sql)
@@ -170,7 +170,7 @@ class $class_name:
 #else
     def $method_name(#if($dto_param != "")#param_decls_dto($is_external_sql)p, obj#else#param_decls($is_external_sql $params)#if($use_dto), obj#end#end#if($out_params), out_params#end):
         """
-#if($crud)
+#if($method_type == "READ")
         C(R)UD: $ref
 #end
 #if($is_external_sql)

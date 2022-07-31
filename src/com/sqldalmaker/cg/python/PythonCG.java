@@ -227,7 +227,12 @@ public class PythonCG {
             context.put("mode", "dao_query");
             context.put("fields", fields_all);
             context.put("method_name", method_name);
-            context.put("crud", crud_table != null);
+            if (crud_table == null) {
+                crud_table = "";
+                context.put("method_type", "");
+            } else {
+                context.put("method_type", "READ");
+            }
             context.put("ref", crud_table);
             context.put("sql", python_sql_str);
             context.put("use_dto", jaxb_return_type_is_dto);
@@ -530,7 +535,6 @@ public class PythonCG {
             context.put("method_name", method_name);
             context.put("sql", python_sql_str);
             context.put("method_type", "DELETE");
-            context.put("crud", "delete");
             context.put("table_name", table_name);
             context.put("dto_param", "");
             context.put("params", fields_pk);
