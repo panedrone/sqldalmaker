@@ -181,7 +181,7 @@ public class SdmActionGroup extends ActionGroup {
                 return AnAction.EMPTY_ARRAY;
             }
             if (anActionEvent.isFromActionToolbar()) {
-                // === panedrone: this trick is aimed to prevent asking for children if SDM toolbar drop-down is hidden
+                // === panedrone: to prevent asking for children if SDM toolbar drop-down is hidden
                 return AnAction.EMPTY_ARRAY;
             }
             Project project = anActionEvent.getProject(); // @Nullable
@@ -190,7 +190,7 @@ public class SdmActionGroup extends ActionGroup {
             }
             List<AnAction> drop_down_actions_list = new ArrayList<AnAction>();
             add_xml_file_actions(project, drop_down_actions_list);
-            // there may be severaal MP in one project. start searching from project_base_dir:
+            // there may be several MP in one project. start searching from project_base_dir:
             VirtualFile project_base_dir = IdeaHelpers.get_project_base_dir(project);
             List<VirtualFile> root_files = new ArrayList<VirtualFile>();
             enum_root_files(project, project_base_dir, root_files);
