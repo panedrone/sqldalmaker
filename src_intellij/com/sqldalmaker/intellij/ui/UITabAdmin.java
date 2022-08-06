@@ -652,11 +652,9 @@ public class UITabAdmin {
         SQLAlchemyButton.setText("sqlalchemy");
         panel7.add(SQLAlchemyButton);
         btn_cx_Oracle = new JButton();
-        btn_cx_Oracle.setLabel("cx_oracle");
         btn_cx_Oracle.setText("cx_oracle");
         panel7.add(btn_cx_Oracle);
         datastore_pyodbc = new JButton();
-        datastore_pyodbc.setLabel("ms sql");
         datastore_pyodbc.setText("ms sql");
         panel7.add(datastore_pyodbc);
         final JPanel panel8 = new JPanel();

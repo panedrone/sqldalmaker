@@ -443,7 +443,7 @@ public class RubyCG {
 
         @Override
         public StringBuilder render_jaxb_crud(String dao_class_name,
-                                              TypeCrud jaxb_type_crud) throws Exception {
+                                              Crud jaxb_type_crud) throws Exception {
 
             String node_name = JaxbUtils.get_jaxb_node_name(jaxb_type_crud);
             String dto_class_name = jaxb_type_crud.getDto();

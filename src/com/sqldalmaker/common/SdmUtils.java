@@ -47,14 +47,12 @@ public class SdmUtils {
 
         Set<String> res = new HashSet<String>();
         DaoClass dao_class = xml_parser.unmarshal(xml_file_abs_path);
-        if (dao_class.getCrudOrCrudAutoOrQuery() != null) {
-            for (int i = 0; i < dao_class.getCrudOrCrudAutoOrQuery().size(); i++) {
-                Object element = dao_class.getCrudOrCrudAutoOrQuery().get(i);
+        List<Object> tags = dao_class.getCrudOrQueryOrQueryList();
+        if (tags != null) {
+            for (int i = 0; i < tags.size(); i++) {
+                Object element = tags.get(i);
                 if (element instanceof Crud) {
                     Crud c = (Crud) element;
-                    res.add(c.getDto());
-                } else if (element instanceof CrudAuto) {
-                    CrudAuto c = (CrudAuto) element;
                     res.add(c.getDto());
                 }
             }
@@ -177,7 +175,7 @@ public class SdmUtils {
                                                           FieldNamesMode field_names_mode) throws SQLException {
 
         DaoClass root = object_factory.createDaoClass();
-        List<Object> nodes = root.getCrudOrCrudAutoOrQuery();
+        List<Object> nodes = root.getCrudOrQueryOrQueryList();
         ResultSet rs = JdbcUtils.get_tables_rs(conn, selected_schema, include_views);
         try {
             while (rs.next()) {
@@ -189,7 +187,7 @@ public class SdmUtils {
                     }
                     if (!in_use.contains(dto_class_name)) {
                         if (crud_auto) {
-                            CrudAuto ca = object_factory.createCrudAuto();
+                            Crud ca = object_factory.createCrud();
                             ca.setTable(table_name);
                             ca.setDto(dto_class_name);
                             nodes.add(ca);
@@ -267,7 +265,7 @@ public class SdmUtils {
                                              FieldNamesMode field_names_mode) throws SQLException {
 
         DaoClass root = object_factory.createDaoClass();
-        List<Object> nodes = root.getCrudOrCrudAutoOrQuery();
+        List<Object> nodes = root.getCrudOrQueryOrQueryList();
         ResultSet rs = JdbcUtils.get_tables_rs(conn, selected_schema, /* include_views */ false); // no FK in views
         try {
             while (rs.next()) {

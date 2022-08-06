@@ -8,7 +8,7 @@ package com.sqldalmaker.cg.go;
 import com.sqldalmaker.cg.*;
 import com.sqldalmaker.jaxb.dao.DaoClass;
 import com.sqldalmaker.jaxb.dao.ExecDml;
-import com.sqldalmaker.jaxb.dao.TypeCrud;
+import com.sqldalmaker.jaxb.dao.Crud;
 import com.sqldalmaker.jaxb.dto.DtoClass;
 import com.sqldalmaker.jaxb.dto.DtoClasses;
 import com.sqldalmaker.jaxb.settings.Settings;
@@ -712,7 +712,7 @@ public class GoCG {
 
         @Override
         public StringBuilder render_jaxb_crud(String dao_class_name,
-                                              TypeCrud jaxb_type_crud) throws Exception {
+                                              Crud jaxb_type_crud) throws Exception {
 
             String node_name = JaxbUtils.get_jaxb_node_name(jaxb_type_crud);
             String dto_class_name = jaxb_type_crud.getDto();

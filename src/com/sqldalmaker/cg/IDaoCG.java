@@ -7,7 +7,7 @@ package com.sqldalmaker.cg;
 
 import com.sqldalmaker.jaxb.dao.DaoClass;
 import com.sqldalmaker.jaxb.dao.ExecDml;
-import com.sqldalmaker.jaxb.dao.TypeCrud;
+import com.sqldalmaker.jaxb.dao.Crud;
 
 /**
  * @author sqldalmaker@gmail.com
@@ -20,7 +20,7 @@ public interface IDaoCG {
 
     StringBuilder render_jaxb_exec_dml(ExecDml jaxb_exec_dml) throws Exception;
 
-    StringBuilder render_jaxb_crud(String dao_class_name, TypeCrud jaxb_type_crud) throws Exception;
+    StringBuilder render_jaxb_crud(String dao_class_name, Crud jaxb_type_crud) throws Exception;
 
     StringBuilder render_crud_create(String dao_class_name,
                                      String method_name,

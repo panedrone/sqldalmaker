@@ -35,7 +35,7 @@ public class UIDialogSelectDbSchema extends JDialog {
     private JTable table;
     private JCheckBox chk_omit;
     private JCheckBox chk_singular;
-    private JRadioButton crudRadioButton;
+    private JRadioButton crudDetailedRadioButton;
     private JRadioButton crudAutoRadioButton;
     private JPanel radioPanel;
     private JCheckBox chk_add_fk_access;
@@ -297,12 +297,12 @@ public class UIDialogSelectDbSchema extends JDialog {
         gbc.weighty = 1.0;
         gbc.fill = GridBagConstraints.BOTH;
         panel4.add(radioPanel, gbc);
-        crudRadioButton = new JRadioButton();
-        crudRadioButton.setSelected(true);
-        crudRadioButton.setText("crud");
-        radioPanel.add(crudRadioButton);
+        crudDetailedRadioButton = new JRadioButton();
+        crudDetailedRadioButton.setSelected(true);
+        crudDetailedRadioButton.setText("crud detailed");
+        radioPanel.add(crudDetailedRadioButton);
         crudAutoRadioButton = new JRadioButton();
-        crudAutoRadioButton.setText("crud-auto");
+        crudAutoRadioButton.setText("crud empty");
         radioPanel.add(crudAutoRadioButton);
         chk_add_fk_access = new JCheckBox();
         chk_add_fk_access.setSelected(true);
@@ -352,7 +352,7 @@ public class UIDialogSelectDbSchema extends JDialog {
         ButtonGroup buttonGroup;
         buttonGroup = new ButtonGroup();
         buttonGroup.add(crudAutoRadioButton);
-        buttonGroup.add(crudRadioButton);
+        buttonGroup.add(crudDetailedRadioButton);
         buttonGroup = new ButtonGroup();
         buttonGroup.add(radio_user_as_schema);
         buttonGroup.add(radio_selected_schema);

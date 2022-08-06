@@ -105,17 +105,17 @@
                     <properties/>
                     <border type="none"/>
                     <children>
-                      <component id="e402b" class="javax.swing.JRadioButton" binding="crudRadioButton" default-binding="true">
+                      <component id="e402b" class="javax.swing.JRadioButton" binding="crudDetailedRadioButton" default-binding="true">
                         <constraints/>
                         <properties>
                           <selected value="true"/>
-                          <text value="crud"/>
+                          <text value="crud detailed"/>
                         </properties>
                       </component>
                       <component id="60116" class="javax.swing.JRadioButton" binding="crudAutoRadioButton" default-binding="true">
                         <constraints/>
                         <properties>
-                          <text value="crud-auto"/>
+                          <text value="crud empty"/>
                         </properties>
                       </component>
                     </children>

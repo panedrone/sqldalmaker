@@ -1,3 +1,8 @@
+2022-08-06
+
+    Starting from v1.261, <crud-auto... does not exist anymore.
+    Do "Create/Overwrite XSD files", then replace <crud-auto... with just empty <crud...
+
 2022-07-30
 
     + <dao ... field-assign-mode="0|1" (Go only) --> Update XSD files and add "field-assign-mode" to "settings.xml".

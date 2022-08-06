@@ -274,14 +274,12 @@
                       <component id="df46c" class="javax.swing.JButton" binding="btn_cx_Oracle">
                         <constraints/>
                         <properties>
-                          <label value="cx_oracle"/>
                           <text value="cx_oracle"/>
                         </properties>
                       </component>
                       <component id="f94b3" class="javax.swing.JButton" binding="datastore_pyodbc">
                         <constraints/>
                         <properties>
-                          <label value="ms sql"/>
                           <text value="ms sql"/>
                         </properties>
                       </component>
