@@ -23,8 +23,8 @@ At the stage of code generation, the target database must exist and be available
 <ul>
 <li><a href="https://github.com/panedrone/sdm_demo_todolist_php_doctrine">Doctrine</a></li>
 <li><a href="https://github.com/panedrone/sdm_demo_gorm_todolist">Gorm</a></li>
-<li><a href="https://github.com/panedrone/sdm_demo_django_todolist_sqlite3">Django (dao in progress)</a></li>
-<li><a href="https://github.com/panedrone/sdm_demo_flask_sqlalchemy_todolist">SQLAlchemy (dao in progress)</a></li>
+<li><a href="https://github.com/panedrone/sdm_demo_django_todolist_sqlite3">Django (no orm-based dao crud so far)</a></li>
+<li><a href="https://github.com/panedrone/sdm_demo_flask_sqlalchemy_todolist">SQLAlchemy (no orm-based dao crud so far)</a></li>
 </ul>]]></change-notes>
 
     <application-components>

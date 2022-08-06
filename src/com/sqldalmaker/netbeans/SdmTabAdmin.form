@@ -276,7 +276,7 @@
                     </Component>
                     <Component class="javax.swing.JButton" name="jButton27">
                       <Properties>
-                        <Property name="label" type="java.lang.String" value="doctrine"/>
+                        <Property name="text" type="java.lang.String" value="Doctrine"/>
                       </Properties>
                       <Events>
                         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton27ActionPerformed"/>

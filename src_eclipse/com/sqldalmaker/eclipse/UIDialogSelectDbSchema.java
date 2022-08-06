@@ -275,10 +275,10 @@ public class UIDialogSelectDbSchema extends TitleAreaDialog {
 
 		radioCrud = new Button(compositeCrud, SWT.RADIO);
 		radioCrud.setSelection(true);
-		radioCrud.setText("crud");
+		radioCrud.setText("crud detailed");
 
 		radioCrudAuto = new Button(compositeCrud, SWT.RADIO);
-		radioCrudAuto.setText("crud-auto");
+		radioCrudAuto.setText("crud empty");
 
 		delS = chk_delEndingS.getSelection();
 
