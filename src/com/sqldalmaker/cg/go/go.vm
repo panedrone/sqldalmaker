@@ -109,8 +109,9 @@ func (dao *${class_name}) ${method_name}(#param_decls($is_external_sql $params))
 }
 #else
 #sql_var($is_external_sql $sql)
+#if ($assign_mode > 0)
 #if ($assign_mode == 1)
-	_onRow := func() ([]interface{}, func()) {
+	_onRow := func() (interface{}, func()) {
 		_obj := &${returned_type_name}{}
 		return []interface{}{
 #foreach ($f in ${fields})
@@ -120,6 +121,14 @@ func (dao *${class_name}) ${method_name}(#param_decls($is_external_sql $params))
 				res = append(res, _obj)
 			}
 	}
+#else
+	_onRow := func() (interface{}, func()) {
+    	_obj := &${returned_type_name}{}
+    	return _obj, func() {
+			res = append(res, _obj)
+		}
+	}
+#end
 #if(${dto_param} != "")
 	err = dao.ds.QueryAllByFA(sql, _onRow#foreach($param in ${params}), p.${param.getName()}()#end))
 #else
@@ -186,6 +195,7 @@ func (dao *${class_name}) ${method_name}(#param_decls($is_external_sql $params))
 #else
 #sql_var($is_external_sql $sql)
 #if($use_dto)
+#if ($assign_mode > 0)
 #if ($assign_mode == 1)
 	res = &${returned_type_name}{}
 	_fa := []interface{}{
@@ -193,6 +203,9 @@ func (dao *${class_name}) ${method_name}(#param_decls($is_external_sql $params))
 		&res.${f.getName()},
 #end
 	}
+#else
+	_fa := &${returned_type_name}{}
+#end
 #if(${dto_param} != "")
 	err = dao.ds.QueryByFA(sql, _fa#foreach($param in ${params}), p.${param.getName()}()#end))
 #else

@@ -36,8 +36,8 @@ type DataStore interface {
 	QueryRow(sqlStr string, args ...interface{}) (data map[string]interface{}, err error)
 	QueryAllRows(sqlStr string, onRow func(map[string]interface{}), args ...interface{}) (err error)
 
-	QueryByFA(sqlStr string, row []interface{}, args ...interface{}) (err error)
-	QueryAllByFA(sqlStr string, onRow func() ([]interface{}, func()), args ...interface{}) (err error)
+	QueryByFA(sqlStr string, fa interface{}, args ...interface{}) (err error)
+	QueryAllByFA(sqlStr string, onRow func() (interface{}, func()), args ...interface{}) (err error)
 }
 
 type OutParam struct {
@@ -716,7 +716,7 @@ func (ds *_DS) QueryAllRows(sqlStr string, onRow func(map[string]interface{}), a
 	return
 }
 
-func (ds *_DS) QueryByFA(sqlStr string, row []interface{}, args ...interface{}) (err error) {
+func (ds *_DS) QueryByFA(sqlStr string, fa interface{}, args ...interface{}) (err error) {
 	sqlStr = ds._formatSQL(sqlStr)
 	rows, err := ds._query(sqlStr, args...)
 	if err != nil {
@@ -727,7 +727,12 @@ func (ds *_DS) QueryByFA(sqlStr string, row []interface{}, args ...interface{}) 
 		err = sql.ErrNoRows
 		return
 	}
-	err = rows.Scan(row...)
+	faArr, ok := fa.([]interface{})
+	if ok {
+		err = rows.Scan(faArr...)
+	} else {
+		err = errors.New("not implemented yet")
+	}
 	if err != nil {
 		return
 	}
@@ -737,7 +742,7 @@ func (ds *_DS) QueryByFA(sqlStr string, row []interface{}, args ...interface{}) 
 	return
 }
 
-func (ds *_DS) QueryAllByFA(sqlStr string, onRow func() ([]interface{}, func()), args ...interface{}) (err error) {
+func (ds *_DS) QueryAllByFA(sqlStr string, onRow func() (interface{}, func()), args ...interface{}) (err error) {
 	sqlStr = ds._formatSQL(sqlStr)
 	rows, err := ds._query(sqlStr, args...)
 	if err != nil {
@@ -747,7 +752,12 @@ func (ds *_DS) QueryAllByFA(sqlStr string, onRow func() ([]interface{}, func()),
 	for {
 		for rows.Next() {
 			fa, onRowComplete := onRow()
-			err = rows.Scan(fa...)
+			faArr, ok := fa.([]interface{})
+			if ok {
+				err = rows.Scan(faArr...)
+			} else {
+				err = errors.New("not implemented yet")
+			}
 			if err != nil {
 				return
 			}
