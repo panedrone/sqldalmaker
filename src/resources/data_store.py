@@ -5,7 +5,6 @@
 # import mysql.connector
 
 # uncomment the code below to use with django.db:
-
 import os
 
 import django.db
@@ -35,6 +34,53 @@ class OutParam:
 
 
 class DataStore:
+
+    def begin(self): pass
+
+    def commit(self): pass
+
+    def rollback(self): pass
+
+    # raw-SQL
+
+    def get_one_raw(self, cls, params=None): pass
+
+    def get_all_raw(self, cls, params=None) -> []: pass
+
+    # ORM helpers
+
+    def filter(self, cls, params=None): pass
+
+    def delete_by_filter(self, cls, params=None): pass
+
+    # ORM-based CRUD
+
+    def create_one(self, serializer): pass
+
+    def read_all(self, cls) -> []: pass
+
+    def read_one(self, cls, params=None): pass
+
+    def update_one(self, serializer): pass
+
+    def delete_one(self, cls, params=None): pass
+
+    # the methods called by generated dao classes
+
+    def insert_row(self, sql, params, ai_values): pass
+
+    def exec_dml(self, sql, params): pass
+
+    def query_scalar(self, sql, params): pass
+
+    def query_all_scalars(self, sql, params) -> []: pass
+
+    def query_row(self, sql, params): pass
+
+    def query_all_rows(self, sql, params, callback) -> []: pass
+
+
+class _DS(DataStore):
     """
         SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
         This is an example of how to implement DataStore in Python + sqlite3/psycopg2/mysql/django.db -->
@@ -95,22 +141,48 @@ class DataStore:
             self.conn.close()
             self.conn = None
 
-    @staticmethod
-    def get_all(cls, params=None) -> []:
+    # raw-SQL
+
+    def get_all_raw(self, cls, params=None) -> []:
         if not params:
             params = ()
         raw_query_set = cls.objects.raw(cls.SQL, params)
         res = [r for r in raw_query_set]
         return res
 
-    @staticmethod
-    def get_one(cls, params=None):
-        rows = DataStore.get_all(cls, params)
+    def get_one_raw(self, cls, params=None):
+        rows = self.get_all_raw(cls, params)
         if len(rows) == 0:
             raise Exception('No rows')
         if len(rows) > 1:
             raise Exception('More than 1 row exists')
         return rows[0]
+
+    # ORM helpers
+
+    def filter(self, cls, params=None):
+        return cls.objects.filter(**params)
+
+    def delete_by_filter(self, cls, params=None):
+        self.filter(cls, params).delete()
+
+    # CRUD
+
+    def create_one(self, serializer):
+        serializer.save()
+
+    def read_all(self, cls) -> []:
+        return cls.objects.all()
+
+    def read_one(self, cls, params=None):
+        return cls.objects.get(**params)
+
+    def update_one(self, serializer):
+        serializer.save()
+
+    def delete_one(self, cls, params=None):
+        queryset = self.read_one(cls, params)
+        queryset.delete()
 
     # uncomment to use without django.db:
 
@@ -131,16 +203,13 @@ class DataStore:
 
     # uncomment to use with django.db:
 
-    @staticmethod
-    def begin():
+    def begin(self):
         django.db.transaction.set_autocommit(False)
 
-    @staticmethod
-    def commit():
+    def commit(self):
         django.db.transaction.commit()
 
-    @staticmethod
-    def rollback():
+    def rollback(self):
         django.db.transaction.rollback()
 
     def insert_row(self, sql, params, ai_values):
@@ -400,3 +469,10 @@ class DataStore:
         for i in range(len(params)):
             if isinstance(params[i], OutParam):
                 params[i].value = result_args[i]
+
+
+_ds = _DS()
+
+
+def ds() -> DataStore:
+    return _ds
