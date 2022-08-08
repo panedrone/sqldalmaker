@@ -123,8 +123,8 @@ func (dao *${class_name}) ${method_name}(#param_decls($is_external_sql $params))
 	}
 #else
 	_onRow := func() (interface{}, func()) {
-    	_obj := &${returned_type_name}{}
-    	return _obj, func() {
+		_obj := &${returned_type_name}{}
+		return _obj, func() {
 			res = append(res, _obj)
 		}
 	}

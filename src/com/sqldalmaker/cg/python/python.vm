@@ -28,6 +28,8 @@ self#if($external_sql), sql#end, #end
         sql = """$sql"""
 #end
 #end
+#macro (params_dict $params)
+{#foreach ($param in $params)#if($velocityCount != 1), #end'$param.getColumnName()': $param.getName()#end}#end
 ## ====================================================================================================================
 #if ($mode=="dto_class")
 """
@@ -120,12 +122,16 @@ class $class_name:
         @rtype: None
         @raise: Exception if no rows inserted.
         """
+#if ($model != "")
+	    self.ds.create_one(p)
+#else
 #sql_var(false $sql)
         _ai_values = [#foreach ($key in $keys)#set($p='["'+${key.getColumnName()} +'", None]')#list_item($velocityCount $p)#end]
         self.ds.insert_row(sql, [#foreach ($param in $params)#set($p="p."+${param.getName()})#list_item($velocityCount $p)#end], _ai_values)
 #foreach ($key in $keys)
 #set($i = $velocityCount - 1)
         p.$key.getName() = _ai_values[$i][1]
+#end
 #end
 ## ====================================================================================================================
 #elseif($mode=="dao_query")
@@ -151,6 +157,9 @@ class $class_name:
 #end
         @rtype: list[$returned_type_name]
         """
+#if ($use_dto && $method_type == "READ" && $model != "")
+	    return self.ds.read_all(${returned_type_name})
+#else
 #sql_var($is_external_sql $sql)
 #if($use_dto)
         _res = []
@@ -167,8 +176,13 @@ class $class_name:
 #else
         return self.ds.query_all_scalars(sql, #param_array($dto_param)#if($out_params), out_params#end)
 #end
+#end
+#else
+#if ($use_dto && $method_type == "READ" && $model != "")
+    def $method_name(#param_decls($is_external_sql $params)):
 #else
     def $method_name(#if($dto_param != "")#param_decls_dto($is_external_sql)p, obj#else#param_decls($is_external_sql $params)#if($use_dto), obj#end#end#if($out_params), out_params#end):
+#end
         """
 #if($method_type == "READ")
         C(R)UD: $ref
@@ -183,6 +197,9 @@ class $class_name:
         @type $param.getName(): $param.getType()
 #end
 #end
+#if ($use_dto && $method_type == "READ" && $model != "")
+        @rtype: $returned_type_name
+#else
 #if($use_dto)
         @type obj: $returned_type_name
 #if($out_params)
@@ -195,8 +212,12 @@ class $class_name:
 #end
         @rtype: $returned_type_name
 #end
+#end
         @raise: Exception if amount of returned rows != 1.
         """
+#if ($use_dto && $method_type == "READ" && $model != "")
+	    return self.ds.read_one(${returned_type_name}, #params_dict($params))
+#else
 #sql_var($is_external_sql $sql)
 #if($use_dto)
         row = self.ds.query_row(sql, #param_array($dto_param)#if($out_params), out_params#end)
@@ -205,6 +226,7 @@ class $class_name:
 #end
 #else
         return self.ds.query_scalar(sql, #param_array($dto_param)#if($out_params), out_params#end)
+#end
 #end
 #end
 ## ====================================================================================================================
@@ -231,6 +253,13 @@ class $class_name:
 #end
         @rtype: int (the number of affected rows)
         """
+#if ($model != "")
+#if ($method_type == "CREATE" || $method_type == "UPDATE")
+	    self.ds.update_one(p)
+#else
+	    self.ds.delete_one(${dto_class_name}, #params_dict($params))
+#end
+#else
 #foreach($m in ${mappings})
         def ${m.get_exec_dml_param_name()}(row):
             _obj = ${m.get_dto_class_name()}()
@@ -245,5 +274,6 @@ class $class_name:
         return self.ds.exec_dml(sql, #param_array($dto_param))
 #else
         return self.ds.exec_dml(sql, #param_array2($dto_param))
+#end
 #end
 #end

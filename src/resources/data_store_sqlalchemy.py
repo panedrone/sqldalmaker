@@ -1,77 +1,79 @@
 import flask_sqlalchemy
-from flask_sqlalchemy import SQLAlchemy
 
 # import cx_Oracle
 
+
+# if flask_sqlalchemy:
+
 from app import app
 
-if flask_sqlalchemy:
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///todolist.sqlite'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///todolist.sqlite'
 
-    # add mysql-connector-python to requirements.txt
-    # app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:sa@localhost/todolist'
+# add mysql-connector-python to requirements.txt
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:sa@localhost/todolist'
 
-    # add psycopg2 to requirements.txt
-    # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:sa@localhost/my-tests'
+# add psycopg2 to requirements.txt
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:sa@localhost/my-tests'
 
-    # add cx_oracle to requirements.txt
-    # if cx_Oracle:
-    #     user = 'MY_TESTS'
-    #     pwd = 'sa'
-    #     dsn = cx_Oracle.makedsn(
-    #         'localhost', 1521,
-    #         service_name="orcl"
-    #         # service_name='your_service_name_if_any'
-    #     )
-    #     app.config['SQLALCHEMY_DATABASE_URI'] = f'oracle+cx_oracle://{user}:{pwd}@{dsn}'
+# add cx_oracle to requirements.txt
+# if cx_Oracle:
+#     user = 'MY_TESTS'
+#     pwd = 'sa'
+#     dsn = cx_Oracle.makedsn(
+#         'localhost', 1521,
+#         service_name="orcl"
+#         # service_name='your_service_name_if_any'
+#     )
+#     app.config['SQLALCHEMY_DATABASE_URI'] = f'oracle+cx_oracle://{user}:{pwd}@{dsn}'
 
-    # FSADeprecationWarning: SQLALCHEMY_TRACK_MODIFICATIONS adds
-    # significant overhead and will be disabled by default in the future.
-    # Set it to True or False to suppress this warning.
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# FSADeprecationWarning: SQLALCHEMY_TRACK_MODIFICATIONS adds
+# significant overhead and will be disabled by default in the future.
+# Set it to True or False to suppress this warning.
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-    db = SQLAlchemy(app)
+db = flask_sqlalchemy.SQLAlchemy(app)
 
-    Base = db.Model
+Base = db.Model
 
-    Column = db.Column
-    ForeignKey = db.ForeignKey
+Column = db.Column
+ForeignKey = db.ForeignKey
 
-    # if not cx_Oracle:
-    SmallInteger = db.SmallInteger
-    Integer = db.Integer
-    BigInteger = db.BigInteger
+# if not cx_Oracle:
+SmallInteger = db.SmallInteger
+Integer = db.Integer
+BigInteger = db.BigInteger
 
-    Float = db.Float
+Float = db.Float
 
-    DateTime = db.DateTime
+DateTime = db.DateTime
 
-    String = db.String
-    Boolean = db.Boolean
-    LargeBinary = db.LargeBinary
+String = db.String
+Boolean = db.Boolean
+LargeBinary = db.LargeBinary
 
-else:
-    # code below is for SQLAlchemy without flask
 
-    import sqlalchemy.ext.declarative
-    from sqlalchemy.orm import declarative_base, sessionmaker
-
-    Base = declarative_base()
-
-    Column = sqlalchemy.Column
-    ForeignKey = sqlalchemy.ForeignKey
-
-    SmallInteger = sqlalchemy.SmallInteger
-    Integer = sqlalchemy.Integer
-    BigInteger = sqlalchemy.BigInteger
-
-    Float = sqlalchemy.Float
-
-    DateTime = sqlalchemy.DateTime
-
-    String = sqlalchemy.String
-    Boolean = sqlalchemy.Boolean
-    LargeBinary = sqlalchemy.LargeBinary
+# else:
+#     # the code below is for SQLAlchemy without flask
+#
+#     import sqlalchemy.ext.declarative
+#     from sqlalchemy.orm import declarative_base, sessionmaker
+#
+#     Base = declarative_base()
+#
+#     Column = sqlalchemy.Column
+#     ForeignKey = sqlalchemy.ForeignKey
+#
+#     SmallInteger = sqlalchemy.SmallInteger
+#     Integer = sqlalchemy.Integer
+#     BigInteger = sqlalchemy.BigInteger
+#
+#     Float = sqlalchemy.Float
+#
+#     DateTime = sqlalchemy.DateTime
+#
+#     String = sqlalchemy.String
+#     Boolean = sqlalchemy.Boolean
+#     LargeBinary = sqlalchemy.LargeBinary
 
 
 # if cx_Oracle:
@@ -110,11 +112,29 @@ class DataStore:
 
     def rollback(self): pass
 
-    # helpers
+    # raw-SQL
 
-    def get_one(self, cls, params=None): pass
+    def get_one_raw(self, cls, params=None): pass
 
-    def get_all(self, cls, params=None) -> []: pass
+    def get_all_raw(self, cls, params=None) -> []: pass
+
+    # ORM helpers
+
+    def filter(self, cls, params=None): pass
+
+    def delete_by_filter(self, cls, params=None): pass
+
+    # ORM-based CRUD
+
+    def create_one(self, instance): pass
+
+    def read_all(self, cls) -> []: pass
+
+    def read_one(self, cls, params=None): pass
+
+    def update_one(self, instance): pass
+
+    def delete_one(self, cls, params=None): pass
 
     # the methods called by generated dao classes
 
@@ -184,10 +204,10 @@ class _DS(DataStore):
         # self.engine = sqlalchemy.create_engine(f'oracle+cx_oracle://{user}:{pwd}@{dsn}', echo=False)
         # self.engine_type = self.EngineType.oracle
 
-        if db:
-            self.session = db.session
-        else:
-            self.session = sessionmaker(bind=self.engine)()
+        # if db:
+        self.session = db.session
+        # else:
+        #     self.session = sessionmaker(bind=self.engine)()
 
     # code below is for SQLAlchemy without flask
     #
@@ -224,7 +244,14 @@ class _DS(DataStore):
         self.transaction.rollback()
         self.transaction = None
 
-    def get_all(self, cls, params=None) -> []:
+    def get_all_raw(self, cls, params=None) -> []:
+        # https://stackoverflow.com/questions/17972020/how-to-execute-raw-sql-in-flask-sqlalchemy-app
+        # user = session.query(User).from_statement(
+        #     text("""SELECT * FROM users where name=:name""")
+        # ).params(name="ed").all()
+
+        # query = self.ds.engine.execute(GroupExModel.SQL) # it returns an array of tuples
+        # return query.all()
         """
         :param cls: An __abstract_ model class or plain DTO class containing a static field "SQL"
         :param params: [] the values of SQL params
@@ -247,13 +274,40 @@ class _DS(DataStore):
         finally:
             cursor.close()
 
-    def get_one(self, cls, params=None):
-        rows = self.get_all(cls, params)
+    def get_one_raw(self, cls, params=None):
+        rows = self.get_all_raw(cls, params)
         if len(rows) == 0:
             raise Exception('No rows')
         if len(rows) > 1:
             raise Exception('More than 1 row exists')
         return rows[0]
+
+    def filter(self, cls, params=None):
+        if params:
+            found = self.session.query(cls).filter_by(**params)
+        else:
+            found = self.session.query(cls)
+        return found
+
+    def delete_by_filter(self, cls, params=None):
+        found = self.filter(cls, params)
+        found.delete()
+
+    def create_one(self, instance):
+        return self.session.add(instance)
+
+    def read_all(self, cls):
+        return self.session.query(cls).all()
+
+    def read_one(self, cls, params=None):
+        return self.session.query(cls).get(params)
+
+    def update_one(self, instance):
+        pass
+
+    def delete_one(self, cls, params=None):
+        found = self.read_one(cls, params)
+        self.session.delete(found)
 
     def insert_row(self, sql, params, ai_values):
         """
@@ -524,11 +578,3 @@ _ds = _DS()
 
 def ds() -> DataStore:
     return _ds
-
-
-if flask_sqlalchemy:
-    def session() -> flask_sqlalchemy.SessionBase:
-        return _ds.session
-else:
-    def session():
-        return _ds.session

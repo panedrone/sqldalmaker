@@ -41,11 +41,29 @@ class DataStore:
 
     def rollback(self): pass
 
-    # helpers
+    # raw-SQL
 
-    def get_one(self, cls, params=None): pass
+    def get_one_raw(self, cls, params=None): pass
 
-    def get_all(self, cls, params=None) -> []: pass
+    def get_all_raw(self, cls, params=None) -> []: pass
+
+    # ORM helpers
+
+    def filter(self, cls, params=None): pass
+
+    def delete_by_filter(self, cls, params=None): pass
+
+    # ORM-based CRUD
+
+    def create_one(self, serializer): pass
+
+    def read_all(self, cls) -> []: pass
+
+    def read_one(self, cls, params=None): pass
+
+    def update_one(self, serializer): pass
+
+    def delete_one(self, cls, params=None): pass
 
     # the methods called by generated dao classes
 
@@ -123,20 +141,48 @@ class _DS(DataStore):
             self.conn.close()
             self.conn = None
 
-    def get_all(self, cls, params=None) -> []:
+    # raw-SQL
+
+    def get_all_raw(self, cls, params=None) -> []:
         if not params:
             params = ()
         raw_query_set = cls.objects.raw(cls.SQL, params)
         res = [r for r in raw_query_set]
         return res
 
-    def get_one(self, cls, params=None):
-        rows = self.get_all(cls, params)
+    def get_one_raw(self, cls, params=None):
+        rows = self.get_all_raw(cls, params)
         if len(rows) == 0:
             raise Exception('No rows')
         if len(rows) > 1:
             raise Exception('More than 1 row exists')
         return rows[0]
+
+    # ORM helpers
+
+    def filter(self, cls, params=None):
+        return cls.objects.filter(**params)
+
+    def delete_by_filter(self, cls, params=None):
+        self.filter(cls, params).delete()
+
+    # CRUD
+
+    def create_one(self, serializer):
+        serializer.save()
+
+    def read_all(self, cls) -> []:
+        return cls.objects.all()
+
+    def read_one(self, cls, params=None):
+        return cls.objects.get(**params)
+
+    def update_one(self, serializer):
+        serializer.save()
+
+    def delete_one(self, cls, params=None):
+        queryset = self.read_one(cls, params)
+        queryset.delete()
 
     # uncomment to use without django.db:
 

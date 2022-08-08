@@ -235,6 +235,14 @@ public class PythonCG {
             }
             context.put("ref", crud_table);
             context.put("sql", python_sql_str);
+            String model = "";
+            if (jaxb_return_type_is_dto) {
+                model = _get_model(jaxb_dto_or_return_type);
+                if (model.length() > 0) {
+                    _get_rendered_dto_class_name(jaxb_dto_or_return_type, true); // add to import
+                }
+            }
+            context.put("model", model);
             context.put("use_dto", jaxb_return_type_is_dto);
             context.put("returned_type_name", returned_type_name);
             context.put("fetch_list", fetch_list);
@@ -425,6 +433,15 @@ public class PythonCG {
             return new String[]{method_name, dto_param_type, param_descriptors};
         }
 
+        private static String _get_model(String dto_class_name) {
+            String model = "";
+            int model_name_end_index = dto_class_name.indexOf('-');
+            if (model_name_end_index != -1) {
+                model = dto_class_name.substring(0, model_name_end_index);
+            }
+            return model;
+        }
+
         @Override
         public StringBuilder render_crud_create(String class_name,
                                                 String method_name,
@@ -445,7 +462,9 @@ public class PythonCG {
             context.put("sql", sql_str);
             context.put("method_name", method_name);
             context.put("params", fields_not_ai);
-            dto_class_name = _get_rendered_dto_class_name(dto_class_name, false); // "false" because it is only for comments
+            String model = _get_model(dto_class_name);
+            context.put("model", model);
+            dto_class_name = _get_rendered_dto_class_name(dto_class_name, model.length() > 0); // "false" because it is only for comments
             context.put("dto_param", dto_class_name);
             if (fetch_generated && fields_ai.size() > 0) {
                 context.put("keys", fields_ai);
@@ -503,9 +522,12 @@ public class PythonCG {
             context.put("method_name", method_name);
             context.put("sql", sql_str);
             context.put("table_name", table_name);
+            String model = _get_model(dto_class_name);
+            context.put("model", model);
             dto_class_name = _get_rendered_dto_class_name(dto_class_name, false); // "false" because it is only for comments
-            // context.put("dto_param", dto_class_name);
-            context.put("dto_param", scalar_params ? "" : dto_class_name);
+            context.put("dto_class_name", dto_class_name);
+            String dto_param = scalar_params ? "" : dto_class_name;
+            context.put("dto_param", dto_param);
             context.put("params", updated_fields);
             context.put("is_external_sql", false);
             StringWriter sw = new StringWriter();
@@ -532,6 +554,12 @@ public class PythonCG {
             Map<String, Object> context = new HashMap<String, Object>();
             context.put("mode", "dao_exec_dml");
             context.put("class_name", dao_class_name);
+            String model = _get_model(dto_class_name);
+            context.put("model", model);
+            if (model.length() > 0) {
+                dto_class_name = _get_rendered_dto_class_name(dto_class_name, true);
+                context.put("dto_class_name", dto_class_name);
+            }
             context.put("method_name", method_name);
             context.put("sql", python_sql_str);
             context.put("method_type", "DELETE");
