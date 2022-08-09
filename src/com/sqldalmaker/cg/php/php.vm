@@ -125,7 +125,7 @@ class ${class_name}
      * @return void
      * @throws \Exception
      */
-#if ($crud &&  $model=="doctrine")
+#if ($crud &&  $model != "")
     public function ${method_name}(${d}p)
     {
         ${d}this->ds->create(${d}p);
@@ -176,7 +176,7 @@ class ${class_name}
      * @throws \Exception
      */
 #if($fetch_list)
-#if ($crud)
+#if ($crud &&  $model != "")
     public function ${method_name}()
     {
         return ${d}this->ds->readAll(${returned_type_name}::class);
@@ -204,7 +204,7 @@ class ${class_name}
     }
 #end
 #else
-#if ($crud)
+#if ($crud &&  $model != "")
     public function ${method_name}(#param_decls(false $params))
     {
         return ${d}this->ds->read(${returned_type_name}::class, #pk_array($params));
@@ -265,7 +265,7 @@ class ${class_name}
     public function ${method_name}(#param_decls_dto($is_external_sql)${d}p)
 #end
     {
-#if ($crud &&  $model=="doctrine")
+#if ($crud &&  $model != "")
 #if ($method_type == "CREATE" || $method_type == "UPDATE")
         return ${d}this->ds->update(${d}p);
 #elseif ( $method_type == "DELETE")
