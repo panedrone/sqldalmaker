@@ -262,8 +262,10 @@ func (dao *${class_name}) ${method_name}(#param_decls_dto($is_external_sql)p *${
 #if ($model != "")
 #if ($method_type == "CREATE" || $method_type == "UPDATE")
 	rowsAffected, err = dao.ds.Update("${table_name}", p)
-#else
+#elseif ( $method_type == "DELETE")
 	rowsAffected, err = dao.ds.Delete("${table_name}", p)
+#else
+	// ------------- invalid method_type
 #end
 #else
 #sql_var($is_external_sql $sql)

@@ -476,6 +476,7 @@ public class GoCG {
             context.put("sql_path", sql_path);
             context.put("is_external_sql", is_external_sql);
             context.put("mode", "dao_exec_dml");
+            context.put("model", "");
             int fam = settings.getDao().getFieldAssignMode();
             context.put("assign_mode", fam);
             _assign_params_and_imports(method_params, dto_param_type, context);

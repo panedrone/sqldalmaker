@@ -371,6 +371,7 @@ public class PhpCG {
             context.put("sql_path", sql_path);
             context.put("is_external_sql", is_external_sql);
             context.put("mode", "dao_exec_dml");
+            context.put("model", "");
             StringWriter sw = new StringWriter();
             te.merge(context, sw);
             buffer.append(sw.getBuffer());

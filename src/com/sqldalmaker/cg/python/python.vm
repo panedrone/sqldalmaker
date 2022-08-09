@@ -256,8 +256,10 @@ class $class_name:
 #if ($model != "")
 #if ($method_type == "CREATE" || $method_type == "UPDATE")
 	    self.ds.update_one(p)
-#else
+#elseif ( $method_type == "DELETE")
 	    return self.ds.delete_one(${dto_class_name}, #params_dict($params))
+#else
+        #  ------------- invalid method_type
 #end
 #else
 #foreach($m in ${mappings})
