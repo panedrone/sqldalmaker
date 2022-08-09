@@ -3,15 +3,16 @@
 // include_once 'DataStore.php'; // uncomment if you need inheritance
 
 /*
-    SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
-    This is an example of how to implement DataStore in PHP + PDO + SQLite3.
-    Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/DataStore_PDO_SQLite3.php
-    Copy-paste this code to your project and change it for your needs.
-    Improvements are welcome: sqldalmaker@gmail.com
+  SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
+
+  This is an example of how to implement DataStore in PHP + PDO + SQLite3.
+  Copy-paste this code to your project and change it for your needs.
+
+  Improvements are welcome: sdm@gmail.com
 
  */
 
-// class PDODataStore implements DataStore 
+// class PDODataStore implements DataStore
 class DataStore { // no inheritance is also OK
 
     private $db;
@@ -25,12 +26,12 @@ class DataStore { // no inheritance is also OK
         if (!is_null($this->db)) {
             throw new Exception("Already open");
         }
-        $db_name = 'thesaurus.sqlite';
-        $this->db = new PDO("sqlite:dal/$db_name");
+        $db_name = '../todolist.sqlite';
+        $this->db = new PDO("sqlite:$db_name");
         // http://stackoverflow.com/questions/15058129/php-pdo-inserting-data
         // By default, PDO does not throw exceptions. To make it throw exceptions on error, call
         $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        // $this->db->setAttribute(PDO::ATTR_PERSISTENT , true);
+        $this->db->setAttribute(PDO::ATTR_PERSISTENT, true);
     }
 
     public function beginTransaction() {
@@ -46,11 +47,12 @@ class DataStore { // no inheritance is also OK
     }
 
     public function close() {
-        if (is_null($this->db)) {
-            throw new Exception("Already closed");
-        }
-        /*         * * close the database connection ** */
-        $this->db = null;
+        // ------------ do nothing because of PDO::ATTR_PERSISTENT, true
+//        if (is_null($this->db)) {
+//            throw new Exception("Already closed");
+//        }
+//        /*         * * close the database connection ** */
+//        $this->db = null;
     }
 
     public function insert($sql, array $params, array &$ai_values) {
@@ -65,7 +67,7 @@ class DataStore { // no inheritance is also OK
             // of a sequence object for the name parameter.
             // This method may not return a meaningful or consistent result across different PDO drivers,
             // because the underlying database may not even support the notion of auto-increment fields or sequences.
-            foreach ($ai_values as $key) {
+            foreach (array_keys($ai_values) as $key) {
                 $id = $this->db->lastInsertId($key);
                 $ai_values[$key] = $id;
             }
