@@ -51,7 +51,7 @@ class DataStore:
 
     def filter(self, cls, params=None): pass
 
-    def delete_by_filter(self, cls, params=None): pass
+    def delete_by_filter(self, cls, params=None) -> int: pass
 
     # ORM-based CRUD
 
@@ -63,7 +63,7 @@ class DataStore:
 
     def update_one(self, serializer): pass
 
-    def delete_one(self, cls, params=None): pass
+    def delete_one(self, cls, params=None) -> int: pass
 
     # the methods called by generated dao classes
 
@@ -163,8 +163,10 @@ class _DS(DataStore):
     def filter(self, cls, params=None):
         return cls.objects.filter(**params)
 
-    def delete_by_filter(self, cls, params=None):
-        self.filter(cls, params).delete()
+    def delete_by_filter(self, cls, params=None) -> int:
+        queryset = self.filter(cls, params)
+        res_tuple = queryset.delete() # (1, {'dal.Group': 1})
+        return res_tuple[0]
 
     # CRUD
 
@@ -180,9 +182,11 @@ class _DS(DataStore):
     def update_one(self, serializer):
         serializer.save()
 
-    def delete_one(self, cls, params=None):
-        queryset = self.read_one(cls, params)
-        queryset.delete()
+    def delete_one(self, cls, params=None) -> int:
+        # queryset = self.read_one(cls, params) # it returns an entity -> fetching
+        # queryset.delete()
+        rc = self.delete_by_filter(cls, params) # no fetch!
+        return rc
 
     # uncomment to use without django.db:
 

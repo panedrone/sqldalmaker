@@ -257,7 +257,7 @@ class $class_name:
 #if ($method_type == "CREATE" || $method_type == "UPDATE")
 	    self.ds.update_one(p)
 #else
-	    self.ds.delete_one(${dto_class_name}, #params_dict($params))
+	    return self.ds.delete_one(${dto_class_name}, #params_dict($params))
 #end
 #else
 #foreach($m in ${mappings})
