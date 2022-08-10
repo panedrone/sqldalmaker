@@ -183,8 +183,10 @@ class ${class_name}
     }
 #else
 #if(${dto_param} != "")
-    public function ${method_name}(#param_decls_dto($is_external_sql)${dto_param} ${d}p)#else
-    public function ${method_name}(#param_decls($is_external_sql $params))#end
+    public function ${method_name}(#param_decls_dto($is_external_sql)${dto_param} ${d}p)
+#else
+    public function ${method_name}(#param_decls($is_external_sql $params))
+#end
     {
 #sql_var(${is_external_sql} $sql)
 #if($use_dto)
