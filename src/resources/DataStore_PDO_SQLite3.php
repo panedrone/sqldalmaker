@@ -8,7 +8,7 @@
   This is an example of how to implement DataStore in PHP + PDO + SQLite3.
   Copy-paste this code to your project and change it for your needs.
 
-  Improvements are welcome: sdm@gmail.com
+  Improvements are welcome: sqldalmaker@gmail.com
 
  */
 

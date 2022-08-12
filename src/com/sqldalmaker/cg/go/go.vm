@@ -294,7 +294,8 @@ func (dao *${class_name}) ${method_name}(#param_decls($is_external_sql $params))
 #end
 #else
 #foreach ($m in $mappings)
-	${m.get_exec_dml_param_name()} := func() ([]interface{}, func()) {
+	${m.get_exec_dml_param_name()} := func() (interface{}, func()) {
+#if ($assign_mode == 1)
 		_obj := ${m.get_dto_class_name()}{}
 		return []interface{}{
 #foreach($f in ${m.get_fields()})
@@ -303,6 +304,12 @@ func (dao *${class_name}) ${method_name}(#param_decls($is_external_sql $params))
 			}, func() {
 				${m.get_method_param_name()}(&_obj)
 			}
+#else
+		_obj := &${m.get_dto_class_name()}{}
+        return _obj, func() {
+            ${m.get_method_param_name()}(_obj)
+        }
+#end
 	}
 #end
 #end

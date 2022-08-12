@@ -329,11 +329,11 @@ func (ds *_DS) _processExecParams(args []interface{}, onRowArr *[]interface{},
 			}
 			implicitCursors = true
 			for _, fn := range param {
-				_, ok1 := fn.(func() ([]interface{}, func()))
+				_, ok1 := fn.(func() (interface{}, func()))
 				_, ok2 := fn.(func(map[string]interface{}))
 				if !ok1 && !ok2 {
 					err = errors.New(fmt.Sprintf("Expected: 'func(map[string]interface{})' || "+
-						"'func() ([]interface{}, func())'. Got: %v", reflect.TypeOf(fn)))
+						"'func() (interface{}, func())'. Got: %v", reflect.TypeOf(fn)))
 					return
 				}
 				*onRowArr = append(*onRowArr, fn)
@@ -422,19 +422,32 @@ func (ds *_DS) _queryAllImplicitRcOracle(sqlStr string, onRowArr []interface{}, 
 				}
 				onRow(data)
 			}
-		case func() ([]interface{}, func()):
-			for rows.Next() {
-				fa, onRowCompleted := onRow()
-				err = rows.Scan(fa...)
-				if err != nil {
-					return
-				}
-				onRowCompleted()
+		case func() (interface{}, func()):
+			err = ds._fetchRows(rows, onRow)
+			if err != nil {
+				return
 			}
 		default:
-			return errors.New(fmt.Sprintf("Unexpected type: %v", onRow))
+			return errors.New(fmt.Sprintf("Unexpected type: %v", reflect.TypeOf(onRow)))
 		}
 		onRowIndex++
+	}
+	return
+}
+
+func (ds *_DS) _fetchRows(rows *sql.Rows, onRow func() (interface{}, func())) (err error) {
+	for rows.Next() {
+		fa, onRowCompleted := onRow()
+		switch _fa := fa.(type) {
+		case []interface{}:
+			err = rows.Scan(_fa...)
+		default:
+			err = errors.New(fmt.Sprintf("Unexpected type: %v", reflect.TypeOf(_fa)))
+		}
+		if err != nil {
+			return
+		}
+		onRowCompleted()
 	}
 	return
 }
@@ -465,17 +478,13 @@ func (ds *_DS) _queryAllImplicitRcMySQL(sqlStr string, onRowArr []interface{}, q
 				}
 				onRow(data)
 			}
-		case func() ([]interface{}, func()):
-			for rows.Next() {
-				fa, onRowCompleted := onRow()
-				err = rows.Scan(fa...)
-				if err != nil {
-					return
-				}
-				onRowCompleted()
+		case func() (interface{}, func()):
+			err = ds._fetchRows(rows, onRow)
+			if err != nil {
+				return
 			}
 		default:
-			return errors.New(fmt.Sprintf("Unexpected type: %v", onRow))
+			return errors.New(fmt.Sprintf("Unexpected type: %v", reflect.TypeOf(onRow)))
 		}
 		if !rows.NextResultSet() {
 			break
@@ -532,23 +541,28 @@ func _fetchAllFromCursor(rows driver.Rows, onRowFunc interface{}) (err error) {
 			}
 			onRow(data)
 		}
-	case func() ([]interface{}, func()):
+	case func() (interface{}, func()):
 		for {
 			err = rows.Next(values)
 			if err != nil {
 				break
 			}
 			fa, onRowCompleted := onRow()
-			for i, v := range values {
-				err = _assign(fa[i], v)
-				if err != nil {
-					return
+			switch _fa := fa.(type) {
+			case []interface{}:
+				for i, v := range values {
+					err = _assign(_fa[i], v)
+					if err != nil {
+						return
+					}
 				}
+			default:
+				err = errors.New(fmt.Sprintf("Unexpected type: %v", reflect.TypeOf(_fa)))
 			}
 			onRowCompleted()
 		}
 	default:
-		return errors.New(fmt.Sprintf("Unexpected type: %v", onRow))
+		return errors.New(fmt.Sprintf("Unexpected type: %v", reflect.TypeOf(onRow)))
 	}
 	return
 }
