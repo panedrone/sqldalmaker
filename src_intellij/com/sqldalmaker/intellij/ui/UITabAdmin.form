@@ -34,22 +34,10 @@
                     <properties/>
                     <border type="none"/>
                     <children>
-                      <component id="9578a" class="javax.swing.JButton" binding="editSettingsXmlButton" default-binding="true">
-                        <constraints/>
-                        <properties>
-                          <text value="Edit settings.xml"/>
-                        </properties>
-                      </component>
                       <component id="9a86e" class="javax.swing.JButton" binding="referenceSettingsXmlButton" default-binding="true">
                         <constraints/>
                         <properties>
                           <text value="Reference settings.xml"/>
-                        </properties>
-                      </component>
-                      <component id="72e18" class="javax.swing.JButton" binding="btn_validate_all">
-                        <constraints/>
-                        <properties>
-                          <text value="Validate All"/>
                         </properties>
                       </component>
                       <component id="a821f" class="javax.swing.JButton" binding="recentChangesButton" default-binding="true">
@@ -64,6 +52,12 @@
                           <editable value="false"/>
                           <horizontalAlignment value="4"/>
                           <text value="v. ?"/>
+                        </properties>
+                      </component>
+                      <component id="72e18" class="javax.swing.JButton" binding="btn_validate_all">
+                        <constraints/>
+                        <properties>
+                          <text value="Validate All"/>
                         </properties>
                       </component>
                     </children>

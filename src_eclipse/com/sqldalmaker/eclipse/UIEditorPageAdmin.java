@@ -43,7 +43,7 @@ public class UIEditorPageAdmin extends Composite {
 	private Text text_1;
 
 	private IEditor2 editor2;
-	private Action action_settings_xml;
+//	private Action action_settings_xml;
 	private Action action_test_conn;
 	private Action action_validate_all;
 	private Text txtV;
@@ -73,19 +73,9 @@ public class UIEditorPageAdmin extends Composite {
 		toolkit.paintBordersFor(composite_top);
 
 		Composite composite_0 = new Composite(composite_top, SWT.NONE);
-		composite_0.setLayout(new GridLayout(5, false));
+		composite_0.setLayout(new GridLayout(4, false));
 		toolkit.adapt(composite_0);
 		toolkit.paintBordersFor(composite_0);
-
-		Button btnNewButton = new Button(composite_0, SWT.NONE);
-		btnNewButton.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				editSettings();
-			}
-		});
-		toolkit.adapt(btnNewButton, true, true);
-		btnNewButton.setText("Edit settings.xml");
 
 		Button btnReferenceSettingsxml = new Button(composite_0, SWT.NONE);
 		btnReferenceSettingsxml.addSelectionListener(new SelectionAdapter() {
@@ -97,6 +87,21 @@ public class UIEditorPageAdmin extends Composite {
 		});
 		btnReferenceSettingsxml.setText("Reference settings.xml");
 		toolkit.adapt(btnReferenceSettingsxml, true, true);
+				
+						Button btnRecentChanges = new Button(composite_0, SWT.NONE);
+						btnRecentChanges.addSelectionListener(new SelectionAdapter() {
+							@Override
+							public void widgetSelected(SelectionEvent e) {
+								EclipseResourceEditorHelpers.open_resource_file_in_editor("recent_changes.txt", "recent_changes.txt");
+							}
+						});
+						toolkit.adapt(btnRecentChanges, true, true);
+						btnRecentChanges.setText("Recent changes");
+		
+				txtV = new Text(composite_0, SWT.CENTER);
+				txtV.setEditable(false);
+				txtV.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, false, 1, 1));
+				toolkit.adapt(txtV, true, true);
 
 		Button btnNewButton_1 = new Button(composite_0, SWT.NONE);
 		btnNewButton_1.addSelectionListener(new SelectionAdapter() {
@@ -425,21 +430,6 @@ public class UIEditorPageAdmin extends Composite {
 
 		Composite composite_3 = new Composite(composite_top, SWT.NONE);
 		composite_3.setLayout(new GridLayout(6, false));
-
-		Button btnRecentChanges = new Button(composite_0, SWT.NONE);
-		btnRecentChanges.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				EclipseResourceEditorHelpers.open_resource_file_in_editor("recent_changes.txt", "recent_changes.txt");
-			}
-		});
-		toolkit.adapt(btnRecentChanges, true, true);
-		btnRecentChanges.setText("Recent changes");
-
-		txtV = new Text(composite_0, SWT.CENTER);
-		txtV.setEditable(false);
-		txtV.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, false, 1, 1));
-		toolkit.adapt(txtV, true, true);
 		toolkit.adapt(composite_3);
 		toolkit.paintBordersFor(composite_3);
 
@@ -609,26 +599,26 @@ public class UIEditorPageAdmin extends Composite {
 		}
 	}
 
-	protected void editSettings() {
-		try {
-			IFile file = editor2.find_settings_xml();
-			EclipseEditorHelpers.open_editor_sync(getShell(), file);
-		} catch (Throwable ex) {
-			ex.printStackTrace();
-			EclipseMessageHelpers.show_error(ex);
-		}
-	}
+//	protected void editSettings() {
+//		try {
+//			IFile file = editor2.find_settings_xml();
+//			EclipseEditorHelpers.open_editor_sync(getShell(), file);
+//		} catch (Throwable ex) {
+//			ex.printStackTrace();
+//			EclipseMessageHelpers.show_error(ex);
+//		}
+//	}
 
 	private void createActions() {
-		action_settings_xml = new Action("") {
-			@Override
-			public void run() {
-				editSettings();
-			}
-		};
-		action_settings_xml.setToolTipText("Edit settings.xml");
-		action_settings_xml
-				.setImageDescriptor(ResourceManager.getImageDescriptor(UIEditorPageAdmin.class, "/img/XMLFile.gif"));
+//		action_settings_xml = new Action("") {
+//			@Override
+//			public void run() {
+//				editSettings();
+//			}
+//		};
+//		action_settings_xml.setToolTipText("Edit settings.xml");
+//		action_settings_xml
+//				.setImageDescriptor(ResourceManager.getImageDescriptor(UIEditorPageAdmin.class, "/img/XMLFile.gif"));
 		action_test_conn = new Action("") {
 			@Override
 			public void run() {

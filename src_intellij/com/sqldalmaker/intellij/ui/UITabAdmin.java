@@ -12,7 +12,6 @@ import com.sqldalmaker.common.Const;
 import com.sqldalmaker.jaxb.settings.Settings;
 
 import javax.swing.*;
-import javax.swing.border.TitledBorder;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.plaf.FontUIResource;
@@ -29,7 +28,7 @@ import java.util.Locale;
  * Date: 21.06.12
  */
 public class UITabAdmin {
-    private JButton editSettingsXmlButton;
+    //private JButton editSettingsXmlButton;
     private JButton btn_validate_all;
     private JButton createOverwriteXSDFilesButton;
     private JButton createOverwriteSettingsXmlButton;
@@ -165,12 +164,12 @@ public class UITabAdmin {
                 }
             }
         });
-        editSettingsXmlButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                IdeaEditorHelpers.open_settings_xml_sync(project, root_file);
-            }
-        });
+//        editSettingsXmlButton.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                IdeaEditorHelpers.open_settings_xml_sync(project, root_file);
+//            }
+//        });
         btn_validate_all.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -504,15 +503,9 @@ public class UITabAdmin {
         gbc.weighty = 1.0;
         gbc.anchor = GridBagConstraints.NORTHWEST;
         panel2.add(panel3, gbc);
-        editSettingsXmlButton = new JButton();
-        editSettingsXmlButton.setText("Edit settings.xml");
-        panel3.add(editSettingsXmlButton);
         referenceSettingsXmlButton = new JButton();
         referenceSettingsXmlButton.setText("Reference settings.xml");
         panel3.add(referenceSettingsXmlButton);
-        btn_validate_all = new JButton();
-        btn_validate_all.setText("Validate All");
-        panel3.add(btn_validate_all);
         recentChangesButton = new JButton();
         recentChangesButton.setText("News");
         panel3.add(recentChangesButton);
@@ -521,6 +514,9 @@ public class UITabAdmin {
         vTextField.setHorizontalAlignment(4);
         vTextField.setText("v. ?");
         panel3.add(vTextField);
+        btn_validate_all = new JButton();
+        btn_validate_all.setText("Validate All");
+        panel3.add(btn_validate_all);
         final JPanel panel4 = new JPanel();
         panel4.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
         gbc = new GridBagConstraints();
