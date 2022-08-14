@@ -36,13 +36,13 @@ class DtoClassInfo {
         this.dto_field_names_mode = dto_field_names_mode;
     }
 
-    public Map<String, FieldInfo> get_dto_field_info2(boolean ignore_model,
-                                                      DtoClass jaxb_dto_class,
-                                                      String sql_root_abs_path,
-                                                      List<FieldInfo> res_dto_fields) throws Exception {
-        // this one is used for field wizard
-        Map<String, FieldInfo> fields_map = _prepare_by_jdbc(ignore_model, jaxb_dto_class, sql_root_abs_path, res_dto_fields);
-        refine_field_info(fields_map, jaxb_dto_class, res_dto_fields);
+    public Map<String, FieldInfo> get_field_info_for_wizard(DtoClass jaxb_dto_class,
+                                                            String sql_root_abs_path,
+                                                            List<FieldInfo> res_dto_fields) throws Exception {
+        // boolean ignore_model = true;
+        // it considers type-map internally
+        Map<String, FieldInfo> fields_map = _prepare_by_jdbc(true, jaxb_dto_class, sql_root_abs_path, res_dto_fields);
+        _refine_scalar_types_by_type_map(res_dto_fields);
         return fields_map;
     }
 
@@ -51,7 +51,9 @@ class DtoClassInfo {
                                                      String sql_root_abs_path,
                                                      List<FieldInfo> res_dto_fields) throws Exception {
         try {
-            return get_dto_field_info2(ignore_model, jaxb_dto_class, sql_root_abs_path, res_dto_fields);
+            Map<String, FieldInfo> fields_map = _prepare_by_jdbc(ignore_model, jaxb_dto_class, sql_root_abs_path, res_dto_fields);
+            refine_field_info(fields_map, jaxb_dto_class, res_dto_fields);
+            return fields_map;
         } catch (Exception e) {
             throw new Exception(String.format("<dto-class name=\"%s\"... %s: %s",
                     jaxb_dto_class.getName(), e.getClass().getName(), e.getMessage()));

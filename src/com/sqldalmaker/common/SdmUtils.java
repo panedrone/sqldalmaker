@@ -331,7 +331,7 @@ public class SdmUtils {
         for (FieldInfo f : fields) {
             DtoClass.Field df = object_factory.createDtoClassField();
             df.setColumn(f.getColumnName());
-            df.setType(f.getOriginalType());
+            df.setType(f.getScalarType());
             dto_class.getField().add(df);
         }
     }
