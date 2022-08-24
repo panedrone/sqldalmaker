@@ -503,6 +503,9 @@ public class UITabAdmin {
         gbc.weighty = 1.0;
         gbc.anchor = GridBagConstraints.NORTHWEST;
         panel2.add(panel3, gbc);
+        btn_validate_all = new JButton();
+        btn_validate_all.setText("Validate All");
+        panel3.add(btn_validate_all);
         referenceSettingsXmlButton = new JButton();
         referenceSettingsXmlButton.setText("Reference settings.xml");
         panel3.add(referenceSettingsXmlButton);
@@ -514,9 +517,6 @@ public class UITabAdmin {
         vTextField.setHorizontalAlignment(4);
         vTextField.setText("v. ?");
         panel3.add(vTextField);
-        btn_validate_all = new JButton();
-        btn_validate_all.setText("Validate All");
-        panel3.add(btn_validate_all);
         final JPanel panel4 = new JPanel();
         panel4.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
         gbc = new GridBagConstraints();

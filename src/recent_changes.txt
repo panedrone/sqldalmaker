@@ -1,10 +1,22 @@
+2022-08-24
+
+    For Gorm and Beego. Added field-assign-mode="3" - direct ptr to resulting slice:
+
+        func (dao *GroupsDao) GetAllGroupsLI() (res []*models.GroupLI, err error) {
+            sql := `select g.*,
+                (select count(*) from tasks where g_id=g.g_id) as g_tasks_count
+                from groups g`
+            err = dao.ds.QueryByFA(sql, &res)
+            return
+        }
+
 2022-08-14
 
-    fixes of DTO fields wizard
+    Fixes of DTO fields wizard
 
 2022-08-10
 
-    fixes for PHP
+    Fixes for PHP
 
 2022-08-08
 

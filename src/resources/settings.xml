@@ -53,7 +53,12 @@
                 2. The name of Go "package" for DAO classes. DTO scope must be the same.
                 3. A value in the format of Go "import" for DAO classes. The value of "<folders target" is ignored. -->
 
-    <!-- field-assign-mode (Go only) use="optional": 0 - by column name, 1 - by position, 2 - ptr to DTO. -->
+    <!-- field-assign-mode (Go only) use="optional":
+    
+            0 - by column name
+            1 - by position
+            2 - ptr to DTO (Gorm only)
+            3 - direct ptr to resulting slice of DTO-s (Gorm and Beego). -->
 
     <!-- macro: VM template to render DAO classes.
 
