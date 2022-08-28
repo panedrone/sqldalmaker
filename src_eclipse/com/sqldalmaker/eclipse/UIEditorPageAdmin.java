@@ -76,6 +76,16 @@ public class UIEditorPageAdmin extends Composite {
 		composite_0.setLayout(new GridLayout(4, false));
 		toolkit.adapt(composite_0);
 		toolkit.paintBordersFor(composite_0);
+		
+				Button btnNewButton_1 = new Button(composite_0, SWT.NONE);
+				btnNewButton_1.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(SelectionEvent e) {
+						validate_all();
+					}
+				});
+				toolkit.adapt(btnNewButton_1, true, true);
+				btnNewButton_1.setText("Validate All");
 
 		Button btnReferenceSettingsxml = new Button(composite_0, SWT.NONE);
 		btnReferenceSettingsxml.addSelectionListener(new SelectionAdapter() {
@@ -102,16 +112,6 @@ public class UIEditorPageAdmin extends Composite {
 				txtV.setEditable(false);
 				txtV.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, false, 1, 1));
 				toolkit.adapt(txtV, true, true);
-
-		Button btnNewButton_1 = new Button(composite_0, SWT.NONE);
-		btnNewButton_1.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				validate_all();
-			}
-		});
-		toolkit.adapt(btnNewButton_1, true, true);
-		btnNewButton_1.setText("Validate All");
 
 		Composite composite_1 = new Composite(composite_top, SWT.NONE);
 		composite_1.setLayout(new GridLayout(3, false));
