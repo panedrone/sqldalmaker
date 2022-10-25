@@ -98,12 +98,13 @@ class DtoClassInfo {
             }
         }
         String jaxb_dto_class_ref = jaxb_dto_class.getRef();
-        Map<String, FieldInfo> fields_map = _prepare_by_jdbc(model, jaxb_dto_class_ref, sql_root_abs_path, res_dto_fields);
+        Map<String, FieldInfo> fields_map = _prepare_by_jdbc(model, jaxb_dto_class_ref, jaxb_dto_class.getAuto(), sql_root_abs_path, res_dto_fields);
         return fields_map;
     }
 
     private Map<String, FieldInfo> _prepare_by_jdbc(String model,
                                                     String jaxb_dto_class_ref,
+                                                    String jaxb_dto_class_auto,
                                                     String sql_root_abs_path,
                                                     List<FieldInfo> res_dto_fields) throws Exception {
 
@@ -115,11 +116,11 @@ class DtoClassInfo {
             JdbcSqlInfo.get_field_info_by_jdbc_sql(model, conn, dto_field_names_mode, jdbc_sql, fields_map, res_dto_fields);
             if (SqlUtils.is_table_ref(jaxb_dto_class_ref)) {
                 String table_name = jaxb_dto_class_ref;
-                _fill_by_table(model, table_name, res_dto_fields, fields_map);
+                _fill_by_table(jaxb_dto_class_auto, model, table_name, res_dto_fields, fields_map);
             } else if (SqlUtils.is_sql_shortcut_ref(jaxb_dto_class_ref)) {
                 String[] parts = SqlUtils.parse_sql_shortcut_ref(jaxb_dto_class_ref);
                 String table_name = parts[0];
-                _fill_by_table(model, table_name, res_dto_fields, fields_map);
+                _fill_by_table(jaxb_dto_class_auto, model, table_name, res_dto_fields, fields_map);
             }
         }
         return fields_map;
@@ -156,13 +157,14 @@ class DtoClassInfo {
         }
     }
 
-    private void _fill_by_table(String model,
+    private void _fill_by_table(String auto_column,
+                                String model,
                                 String table_name,
                                 List<FieldInfo> res_dto_fields,
                                 Map<String, FieldInfo> fields_map) throws Exception {
 
         String explicit_pk = "*";
-        JdbcTableInfo info = new JdbcTableInfo(model, conn, type_map, dto_field_names_mode, table_name, explicit_pk);
+        JdbcTableInfo info = new JdbcTableInfo(model, conn, type_map, dto_field_names_mode, table_name, explicit_pk, auto_column);
         res_dto_fields.clear();
         res_dto_fields.addAll(info.fields_all);
         fields_map.clear();

@@ -27,21 +27,48 @@ class JdbcTableInfo {
     private final String model;
     private final String table_name;
 
+    private final String auto_column_name;
+    private final String auto_column_generation_type;
+
     public JdbcTableInfo(String model,
                          Connection conn,
                          JaxbUtils.JaxbTypeMap type_map,
                          FieldNamesMode dto_field_names_mode,
                          String table_name,
-                         String explicit_pk) throws Exception {
+                         String explicit_pk,
+                         String explicit_auto_column) throws Exception {
 
         this.conn = conn;
         this.type_map = type_map;
 
+        if (model == null) {
+            model = "";
+        }
         this.model = model;
         if (!SqlUtils.is_table_ref(table_name)) {
             throw new Exception("Table name expected: " + table_name);
         }
         this.table_name = table_name;
+
+        if (explicit_auto_column == null) {
+            explicit_auto_column = "";
+        } else {
+            explicit_auto_column = explicit_auto_column.trim();
+        }
+        if (explicit_auto_column.length() == 0) {
+            auto_column_name = "";
+            auto_column_generation_type = "";
+        } else {
+            // consider auto like "o_id:identity"
+            String[] auto_parts = explicit_auto_column.split(":");
+            if (auto_parts.length < 2) {
+                auto_column_name = explicit_auto_column;
+                auto_column_generation_type = "auto";
+            } else {
+                auto_column_name = auto_parts[0];
+                auto_column_generation_type = auto_parts[1];
+            }
+        }
 
         validate_table_name(conn, table_name); // Oracle PK are not detected with lower case table name
 
@@ -254,7 +281,12 @@ class JdbcTableInfo {
 
     private void _refine_by_type_map() {
         for (FieldInfo fi : fields_map.values()) {
-            String type_name = fi.getType();
+            String type_name;
+            if (fi.getName().equals(auto_column_name) && model.length() > 0) {
+                type_name = fi.getType() + "+" + auto_column_generation_type;
+            } else {
+                type_name = fi.getType();
+            }
             type_name = get_target_type_by_type_map(type_name);
             fi.refine_rendered_type(type_name);
         }

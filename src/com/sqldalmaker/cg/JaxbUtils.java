@@ -206,6 +206,7 @@ public class JaxbUtils {
                                                      Crud jaxb_type_crud,
                                                      String dto_class_name,
                                                      String table_name,
+                                                     String auto_column,
                                                      FieldNamesMode field_names_mode,
                                                      StringBuilder code_buff) throws Exception {
         if (jaxb_type_crud.getCreate() == null) {
@@ -217,9 +218,7 @@ public class JaxbUtils {
         }
         method_name = Helpers.get_method_name(method_name, field_names_mode);
         boolean fetch_generated = jaxb_type_crud.isFetchGenerated();
-        String generated = jaxb_type_crud.getGenerated();
-        StringBuilder tmp = dao_cg.render_crud_create(null, method_name, table_name, dto_class_name, fetch_generated,
-                generated);
+        StringBuilder tmp = dao_cg.render_crud_create(null, method_name, table_name, dto_class_name, fetch_generated, auto_column);
         code_buff.append(tmp);
         return true;
     }
@@ -319,14 +318,14 @@ public class JaxbUtils {
                                                   FieldNamesMode field_names_mode,
                                                   Crud jaxb_type_crud,
                                                   String dao_class_name,
-                                                  String dto_class_name) throws Exception {
+                                                  String dto_class_name,
+                                                  String auto_column) throws Exception {
 
         String table_name = jaxb_type_crud.getTable();
         String explicit_primary_keys = jaxb_type_crud.getPk();
         boolean is_empty = true;
         StringBuilder code_buff = new StringBuilder();
-        if (_process_jaxb_crud_create(dao_cg, jaxb_type_crud, dto_class_name, table_name, field_names_mode,
-                code_buff)) {
+        if (_process_jaxb_crud_create(dao_cg, jaxb_type_crud, dto_class_name, table_name, auto_column, field_names_mode, code_buff)) {
             is_empty = false;
         }
         if (_process_jaxb_crud_read_all(dao_cg, jaxb_type_crud, dto_class_name, table_name, field_names_mode,
@@ -351,7 +350,7 @@ public class JaxbUtils {
             jaxb_type_crud.setReadAll(new TypeMethod());
             jaxb_type_crud.setUpdate(new TypeMethod());
             jaxb_type_crud.setDelete(new TypeMethod());
-            return process_jaxb_crud(dao_cg, field_names_mode, jaxb_type_crud, dao_class_name, dto_class_name);
+            return process_jaxb_crud(dao_cg, field_names_mode, jaxb_type_crud, dao_class_name, dto_class_name, auto_column);
         }
         return code_buff;
     }

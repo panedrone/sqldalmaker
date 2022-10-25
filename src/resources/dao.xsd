@@ -40,7 +40,6 @@
 	        <xs:attribute ref="dto" use="required"/>
 	        <xs:attribute name="table" type="xs:NCName" use="required"/>
 	        <xs:attribute name="pk" type="xs:string" default="*"/>
-	        <xs:attribute name="generated" type="xs:string" default="*"/>
         <xs:attribute name="fetch-generated" type="xs:boolean" default="true"/>        
 		</xs:complexType>
     </xs:element>

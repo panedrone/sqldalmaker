@@ -48,6 +48,8 @@ type DataStore interface {
 
 	QueryByFA(sqlStr string, fa interface{}, args ...interface{}) (err error)
 	QueryAllByFA(sqlStr string, onRow func() (fa interface{}, onRowCompleted func()), args ...interface{}) (err error)
+
+	// PGFetch(cursor string) string
 }
 
 type OutParam struct {

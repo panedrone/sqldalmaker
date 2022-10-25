@@ -99,11 +99,11 @@ public class DaoClassInfo {
         String[] parts = SqlUtils.parse_sql_shortcut_ref(dao_jaxb_ref); // class name is not available here
         String dao_table_name = parts[0];
         String no_model = ""; // TODO - info about PK and FK is not needed for sql_shortcuts
-        JdbcTableInfo t_info = new JdbcTableInfo(no_model, conn, type_map, dto_field_names_mode, dao_table_name, "*");
+        DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(jaxb_dto_or_return_type, jaxb_dto_classes);
+        JdbcTableInfo t_info = new JdbcTableInfo(no_model, conn, type_map, dto_field_names_mode, dao_table_name, "*", jaxb_dto_class.getAuto());
         res_fields.addAll(t_info.fields_all); // always add them all to enable checks in _get_shortcut_info
         if (jaxb_return_type_is_dto) {
             // 1) dto class name is available 2) dto info considers jaxb from <field...
-            DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(jaxb_dto_or_return_type, jaxb_dto_classes);
             _refine_dao_fields_by_dto_fields(jaxb_dto_class, res_fields);
         } else {
             // return type is scalar, so dto class name is not available
@@ -317,7 +317,7 @@ public class DaoClassInfo {
         // should not be cached/shared, because of modyfying of FieldInfo
 
         String no_model = ""; // TODO - info about PK and FK is not needed for crud_create
-        JdbcTableInfo t_info = new JdbcTableInfo(no_model, conn, type_map, dto_field_names_mode, table_name, "*");
+        JdbcTableInfo t_info = new JdbcTableInfo(no_model, conn, type_map, dto_field_names_mode, table_name, "*", jaxb_dto_class.getAuto());
         List<FieldInfo> dao_fields_all = t_info.fields_all;
         for (FieldInfo dao_field : dao_fields_all) {
             String dao_col_name = dao_field.getColumnName();
@@ -343,7 +343,7 @@ public class DaoClassInfo {
                                                  String table_name,
                                                  String explicit_pk) throws Exception {
         String no_model = "";
-        JdbcTableInfo t_info = new JdbcTableInfo(no_model, conn, type_map, dto_field_names_mode, table_name, explicit_pk);
+        JdbcTableInfo t_info = new JdbcTableInfo(no_model, conn, type_map, dto_field_names_mode, table_name, explicit_pk, jaxb_dto_class.getAuto());
         _refine_dao_fields_by_dto_fields(jaxb_dto_class, t_info.fields_all);
         return t_info;
     }

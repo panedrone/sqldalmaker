@@ -534,8 +534,10 @@ public class JavaCG {
             try {
                 db_utils.validate_table_name(table_attr);
                 _process_dto_class_name(dto_class_name);
+                DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
+                String auto_column = jaxb_dto_class.getAuto();
                 StringBuilder code_buff = JaxbUtils.process_jaxb_crud(this, db_utils.get_dto_field_names_mode(),
-                        jaxb_type_crud, dao_class_name, dto_class_name);
+                        jaxb_type_crud, dao_class_name, dto_class_name, auto_column);
                 return code_buff;
             } catch (Throwable e) {
                 // e.printStackTrace();
