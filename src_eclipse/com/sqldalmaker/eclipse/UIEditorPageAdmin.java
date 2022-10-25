@@ -77,41 +77,41 @@ public class UIEditorPageAdmin extends Composite {
 		toolkit.adapt(composite_0);
 		toolkit.paintBordersFor(composite_0);
 		
-				Button btnNewButton_1 = new Button(composite_0, SWT.NONE);
-				btnNewButton_1.addSelectionListener(new SelectionAdapter() {
+				Button btnReferenceSettingsxml = new Button(composite_0, SWT.NONE);
+				btnReferenceSettingsxml.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent e) {
-						validate_all();
+						EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/" + Const.SETTINGS_XML,
+								"reference_" + Const.SETTINGS_XML);
 					}
 				});
-				toolkit.adapt(btnNewButton_1, true, true);
-				btnNewButton_1.setText("Validate All");
-
-		Button btnReferenceSettingsxml = new Button(composite_0, SWT.NONE);
-		btnReferenceSettingsxml.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/" + Const.SETTINGS_XML,
-						"reference_" + Const.SETTINGS_XML);
-			}
-		});
-		btnReferenceSettingsxml.setText("Reference settings.xml");
-		toolkit.adapt(btnReferenceSettingsxml, true, true);
-				
-						Button btnRecentChanges = new Button(composite_0, SWT.NONE);
-						btnRecentChanges.addSelectionListener(new SelectionAdapter() {
-							@Override
-							public void widgetSelected(SelectionEvent e) {
-								EclipseResourceEditorHelpers.open_resource_file_in_editor("recent_changes.txt", "recent_changes.txt");
-							}
-						});
-						toolkit.adapt(btnRecentChanges, true, true);
-						btnRecentChanges.setText("Recent changes");
-		
-				txtV = new Text(composite_0, SWT.CENTER);
-				txtV.setEditable(false);
-				txtV.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, false, 1, 1));
-				toolkit.adapt(txtV, true, true);
+				btnReferenceSettingsxml.setText("Reference settings.xml");
+				toolkit.adapt(btnReferenceSettingsxml, true, true);
+								
+										Button btnNewButton_1 = new Button(composite_0, SWT.NONE);
+										btnNewButton_1.addSelectionListener(new SelectionAdapter() {
+											@Override
+											public void widgetSelected(SelectionEvent e) {
+												validate_all();
+											}
+										});
+										toolkit.adapt(btnNewButton_1, true, true);
+										btnNewButton_1.setText("Validate Configuration");
+						
+								Button btnRecentChanges = new Button(composite_0, SWT.NONE);
+								btnRecentChanges.addSelectionListener(new SelectionAdapter() {
+									@Override
+									public void widgetSelected(SelectionEvent e) {
+										EclipseResourceEditorHelpers.open_resource_file_in_editor("recent_changes.txt", "recent_changes.txt");
+									}
+								});
+								toolkit.adapt(btnRecentChanges, true, true);
+								btnRecentChanges.setText("News");
+						
+								txtV = new Text(composite_0, SWT.CENTER);
+								txtV.setEditable(false);
+								txtV.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, false, 1, 1));
+								toolkit.adapt(txtV, true, true);
 
 		Composite composite_1 = new Composite(composite_top, SWT.NONE);
 		composite_1.setLayout(new GridLayout(3, false));
@@ -248,7 +248,7 @@ public class UIEditorPageAdmin extends Composite {
 			}
 		});
 		toolkit.adapt(btnDoctrineOrm, true, true);
-		btnDoctrineOrm.setText("Doctrine ORM");
+		btnDoctrineOrm.setText("Doctrine");
 
 		Composite composite_4 = new Composite(composite_2, SWT.NONE);
 		toolkit.adapt(composite_4);

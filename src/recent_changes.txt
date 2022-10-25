@@ -1,9 +1,9 @@
 2022-10-25
 
-    This update is about workarounds of "extreme" cases in CRUD scenario
-    like "missing PK" or "AutoIncrement is not detected".
+    This update is about workarounds of "extreme" cases in CRUD scenario:
+    "lack of primary key in data table" and "AutoIncrement is not detected".
 
-    After updating the plugin, overwrite XSD files with the fresh versions.
+    After updating the plugin, overwrite XSD files with fresh versions (tab "Admin").
 
     Helper attributes <crud pk="..." generated="..."... were moved to <dto-class...
 
