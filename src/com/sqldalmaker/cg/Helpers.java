@@ -513,4 +513,21 @@ public class Helpers {
         }
         return sb.toString();
     }
+
+    public static String get_pk_col_name_alias(String pk_col_name) {
+        // === panederone: WHY ALIASES:
+        //   1) xerial SQLite3: getPrimaryKeys may return pk_col_names in lower case
+        //      For other JDBC drivers, it may differ.
+        //   2) xerial SQLite3 returns pk_col_names in the format
+        //     '[employeeid] asc' (compound PK)
+        pk_col_name = pk_col_name.toLowerCase().replace("[", "").replace("]", "").trim();
+        if (pk_col_name.endsWith(" asc")) {
+            pk_col_name = pk_col_name.split(" asc")[0];
+        }
+        if (pk_col_name.endsWith(" desc")) {
+            pk_col_name = pk_col_name.split(" desc")[1];
+        }
+        pk_col_name = pk_col_name.trim();
+        return pk_col_name;
+    }
 }

@@ -49,6 +49,7 @@ public class PythonCG {
 
         @Override
         public String[] translate(String dto_class_name) throws Exception {
+
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
             List<FieldInfo> fields = new ArrayList<FieldInfo>();
             db_utils.get_dto_field_info(jaxb_dto_class, sql_root_abs_path, fields);
@@ -159,6 +160,7 @@ public class PythonCG {
 
         @Override
         public StringBuilder render_jaxb_query(Object jaxb_query) throws Exception {
+
             QueryMethodInfo mi = new QueryMethodInfo(jaxb_query);
             String jaxb_node_name = JaxbUtils.get_jaxb_node_name(jaxb_query);
             Helpers.check_required_attr(jaxb_node_name, mi.jaxb_method);
@@ -257,7 +259,9 @@ public class PythonCG {
             return buff;
         }
 
-        private String _get_rendered_dto_class_name(String dto_class_name, boolean add_to_import) throws Exception {
+        private String _get_rendered_dto_class_name(String dto_class_name,
+                                                    boolean add_to_import) throws Exception {
+
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
             String dto_class_nm = jaxb_dto_class.getName();
             int model_end = dto_class_nm.indexOf('-');
@@ -277,6 +281,7 @@ public class PythonCG {
 
         @Override
         public StringBuilder render_jaxb_exec_dml(ExecDml element) throws Exception {
+
             String method = element.getMethod();
             String ref = element.getRef();
             String xml_node_name = JaxbUtils.get_jaxb_node_name(element);
@@ -370,6 +375,7 @@ public class PythonCG {
         }
 
         private static String[] _parse_param_descriptor(String param_descriptor) {
+
             String[] parts = null;
             if (param_descriptor.contains("~")) {
                 parts = param_descriptor.split("~");
@@ -381,6 +387,7 @@ public class PythonCG {
         }
 
         private MappingInfo _create_ref_cursor_mapping(String[] parts) throws Exception {
+
             String dto_class_name_with_model = parts[1].trim();
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name_with_model, jaxb_dto_classes);
             MappingInfo m = new MappingInfo();
@@ -414,6 +421,7 @@ public class PythonCG {
         }
 
         private String[] _parse_method_declaration(String method_text) throws Exception {
+
             String dto_param_type = "";
             String param_descriptors = "";
             String method_name;
@@ -435,6 +443,7 @@ public class PythonCG {
         }
 
         private static String _get_model(String dto_class_name) {
+
             String model = "";
             int model_name_end_index = dto_class_name.indexOf('-');
             if (model_name_end_index != -1) {
@@ -592,9 +601,10 @@ public class PythonCG {
                 db_utils.validate_table_name(table_name);
                 // dto_class_name = _get_rendered_dto_class_name(dto_class_name, true);
                 DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
-                String auto_column = jaxb_dto_class.getAuto();
+                String explicit_auto_column = jaxb_dto_class.getAuto();
+                String explicit_primary_keys = jaxb_dto_class.getPk();
                 StringBuilder code_buff = JaxbUtils.process_jaxb_crud(this, db_utils.get_dto_field_names_mode(),
-                        jaxb_type_crud, dao_class_name, dto_class_name, auto_column);
+                        jaxb_type_crud, dao_class_name, dto_class_name, explicit_primary_keys, explicit_auto_column);
                 return code_buff;
             } catch (Throwable e) {
                 // e.printStackTrace();

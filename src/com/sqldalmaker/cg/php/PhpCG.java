@@ -54,6 +54,7 @@ public class PhpCG {
 
         @Override
         public String[] translate(String dto_class_name) throws Exception {
+
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
             List<FieldInfo> fields = new ArrayList<FieldInfo>();
             db_utils.get_dto_field_info(jaxb_dto_class, sql_root_abs_path, fields);
@@ -152,6 +153,7 @@ public class PhpCG {
 
         @Override
         public StringBuilder render_jaxb_query(Object jaxb_element) throws Exception {
+
             QueryMethodInfo mi = new QueryMethodInfo(jaxb_element);
             String xml_node_name = JaxbUtils.get_jaxb_node_name(jaxb_element);
             Helpers.check_required_attr(xml_node_name, mi.jaxb_method);
@@ -184,7 +186,8 @@ public class PhpCG {
                                             boolean is_external_sql,
                                             String jaxb_dto_or_return_type,
                                             boolean jaxb_return_type_is_dto,
-                                            boolean fetch_list, String method_name,
+                                            boolean fetch_list,
+                                            String method_name,
                                             String dto_param_type,
                                             String crud_table,
                                             List<FieldInfo> fields,
@@ -223,7 +226,8 @@ public class PhpCG {
             return buff;
         }
 
-        private void _process_rendered_dto_class_name(String _dto_class_name, StringBuilder rendered_class_name) throws Exception {
+        private void _process_rendered_dto_class_name(String _dto_class_name,
+                                                      StringBuilder rendered_class_name) throws Exception {
 
             String dao_namespace = jaxb_settings.getDao().getScope();
             if (dao_namespace == null) {
@@ -488,7 +492,8 @@ public class PhpCG {
 
         @Override
         public StringBuilder render_crud_read(String method_name,
-                                              String dao_table_name, String dto_class_name,
+                                              String dao_table_name,
+                                              String dto_class_name,
                                               String explicit_pk,
                                               boolean fetch_list) throws Exception {
 
@@ -603,9 +608,10 @@ public class PhpCG {
                 db_utils.validate_table_name(table_attr);
                 _process_rendered_dto_class_name(dto_class_name, null);
                 DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
-                String auto_column = jaxb_dto_class.getAuto();
+                String explicit_auto_column = jaxb_dto_class.getAuto();
+                String explicit_primary_keys = jaxb_dto_class.getPk();
                 StringBuilder code_buff = JaxbUtils.process_jaxb_crud(this, db_utils.get_dto_field_names_mode(),
-                        jaxb_type_crud, dao_class_name, dto_class_name, auto_column);
+                        jaxb_type_crud, dao_class_name, dto_class_name, explicit_primary_keys, explicit_auto_column);
                 return code_buff;
             } catch (Throwable e) {
                 // e.printStackTrace();

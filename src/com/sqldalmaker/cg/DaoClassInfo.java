@@ -18,14 +18,14 @@ public class DaoClassInfo {
     private final FieldNamesMode dto_field_names_mode;
     private final FieldNamesMode method_params_names_mode;
 
-    private final JaxbUtils.JaxbMacros markers;
-    private final JaxbUtils.JaxbTypeMap type_map;
+    private final JaxbMacros markers;
+    private final JaxbTypeMap type_map;
 
     public DaoClassInfo(Connection conn,
                         FieldNamesMode dto_field_names_mode,
                         FieldNamesMode method_params_names_mode,
-                        JaxbUtils.JaxbMacros markers,
-                        JaxbUtils.JaxbTypeMap type_map) {
+                        JaxbMacros markers,
+                        JaxbTypeMap type_map) {
 
         this.conn = conn;
         this.dto_field_names_mode = dto_field_names_mode;
@@ -149,7 +149,7 @@ public class DaoClassInfo {
             FieldInfo fi = fields_filter.get(i);
             String curr_type = fi.getType();
             String default_param_type_name = type_map.get_target_type_name(curr_type);
-            FieldInfo pi = JdbcSqlInfo.create_param_info(type_map, param_names_mode, param_descriptor, default_param_type_name);
+            FieldInfo pi = JdbcSqlParamInfo.create_param_info(type_map, param_names_mode, param_descriptor, default_param_type_name);
             res_params.add(pi);
         }
     }
@@ -229,7 +229,7 @@ public class DaoClassInfo {
         try {
             Map<String, FieldInfo> dao_fields_map = new HashMap<String, FieldInfo>();
             // no model!
-            JdbcSqlInfo.get_field_info_by_jdbc_sql("", conn, dto_field_names_mode, dao_query_jdbc_sql, dao_fields_map, dao_fields);
+            JdbcSqlFieldInfo.get_field_info_by_jdbc_sql("", conn, dto_field_names_mode, dao_query_jdbc_sql, "", dao_fields_map, dao_fields);
         } catch (Exception e) {
             error.append(e.getMessage());
         }
@@ -298,7 +298,7 @@ public class DaoClassInfo {
         } else {
             _get_custom_sql_fields_info(sql_root_abs_path, dao_query_jdbc_sql,
                     jaxb_dto_or_return_type, jaxb_return_type_is_dto, jaxb_dto_classes, res_fields);
-            JdbcSqlInfo.get_jdbc_sql_params_info(conn, type_map, dao_query_jdbc_sql, param_names_mode, method_param_descriptors, res_params);
+            JdbcSqlParamInfo.get_jdbc_sql_params_info(conn, type_map, dao_query_jdbc_sql, param_names_mode, method_param_descriptors, res_params);
         }
         for (FieldInfo fi : res_fields) {
             String type_name = type_map.get_target_type_name(fi.getType());

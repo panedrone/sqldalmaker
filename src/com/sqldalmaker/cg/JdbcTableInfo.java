@@ -22,7 +22,7 @@ class JdbcTableInfo {
     public final Map<String, FieldInfo> fields_map = new HashMap<String, FieldInfo>();
 
     private final Connection conn;
-    private final JaxbUtils.JaxbTypeMap type_map;
+    private final JaxbTypeMap type_map;
 
     private final String model;
     private final String table_name;
@@ -30,13 +30,15 @@ class JdbcTableInfo {
     private final String auto_column_name;
     private final String auto_column_generation_type;
 
+    // private final Set<String> explicit_pk_column_names;
+
     public JdbcTableInfo(String model,
                          Connection conn,
-                         JaxbUtils.JaxbTypeMap type_map,
+                         JaxbTypeMap type_map,
                          FieldNamesMode dto_field_names_mode,
                          String table_name,
-                         String explicit_pk,
-                         String explicit_auto_column) throws Exception {
+                         String jaxb_explicit_pk,
+                         String jaxb_explicit_auto_column) throws Exception {
 
         this.conn = conn;
         this.type_map = type_map;
@@ -50,34 +52,33 @@ class JdbcTableInfo {
         }
         this.table_name = table_name;
 
-        if (explicit_auto_column == null) {
-            explicit_auto_column = "";
+        if (jaxb_explicit_auto_column == null) {
+            jaxb_explicit_auto_column = "";
         } else {
-            explicit_auto_column = explicit_auto_column.trim();
+            jaxb_explicit_auto_column = jaxb_explicit_auto_column.trim();
         }
-        if (explicit_auto_column.length() == 0) {
+        if (jaxb_explicit_auto_column.length() == 0) {
             auto_column_name = "";
             auto_column_generation_type = "";
         } else {
             // consider auto like "o_id:identity"
-            String[] auto_parts = explicit_auto_column.split(":");
+            String[] auto_parts = jaxb_explicit_auto_column.split(":");
             if (auto_parts.length < 2) {
-                auto_column_name = explicit_auto_column;
+                auto_column_name = jaxb_explicit_auto_column;
                 auto_column_generation_type = "auto";
             } else {
                 auto_column_name = auto_parts[0];
                 auto_column_generation_type = auto_parts[1];
             }
         }
-
         validate_table_name(conn, table_name); // Oracle PK are not detected with lower case table name
-
+        //////////////////////////////////////
         String jdbc_sql = _jdbc_sql_by_table_name(table_name);
-        JdbcSqlInfo.get_field_info_by_jdbc_sql(model, conn, dto_field_names_mode, jdbc_sql, fields_map, fields_all);
-        Set<String> lower_case_pk_col_names = _get_lower_case_pk_col_names(table_name, explicit_pk);
+        JdbcSqlFieldInfo.get_field_info_by_jdbc_sql(model, conn, dto_field_names_mode, jdbc_sql, "", fields_map, fields_all);
+        Set<String> lower_case_pk_col_names = _get_lower_case_pk_col_names(table_name, jaxb_explicit_pk);
         for (FieldInfo fi : fields_all) {
             String col_name = fi.getColumnName();
-            String lower_case_col_name = _get_pk_col_name_alias(col_name);
+            String lower_case_col_name = Helpers.get_pk_col_name_alias(col_name);
             if (lower_case_pk_col_names.contains(lower_case_col_name)) {
                 fields_pk.add(fi);
                 fi.setPK(true);
@@ -302,7 +303,7 @@ class JdbcTableInfo {
         if ("*".equals(explicit_pk)) {
             return _get_pk_col_name_aliases_from_table(table_name);
         }
-        return _get_pk_col_name_aliaces_from_jaxb(explicit_pk);
+        return JaxbUtils.get_pk_col_name_aliaces_from_jaxb(explicit_pk);
     }
 
     private ResultSet _get_pk_rs(DatabaseMetaData md,
@@ -325,7 +326,7 @@ class JdbcTableInfo {
             Set<String> res = new HashSet<String>();
             while (rs.next()) {
                 String pk_col_name = rs.getString("COLUMN_NAME");
-                String pk_col_name_alias = _get_pk_col_name_alias(pk_col_name);
+                String pk_col_name_alias = Helpers.get_pk_col_name_alias(pk_col_name);
                 // 2 'id' happened with MySQL!
 //                if (res.contains(pk_col_name_alias)) {
 //                    throw new Exception("Multiple PK column name alias: " + pk_col_name_alias);
@@ -336,32 +337,5 @@ class JdbcTableInfo {
         } finally {
             rs.close();
         }
-    }
-
-    private String _get_pk_col_name_alias(String pk_col_name) {
-        // === panederone: WHY ALIASES:
-        //   1) xerial SQLite3: getPrimaryKeys may return pk_col_names in lower case
-        //      For other JDBC drivers, it may differ.
-        //   2) xerial SQLite3 returns pk_col_names in the format
-        //     '[employeeid] asc' (compound PK)
-        pk_col_name = pk_col_name.toLowerCase().replace("[", "").replace("]", "").trim();
-        if (pk_col_name.endsWith(" asc")) {
-            pk_col_name = pk_col_name.split(" asc")[0];
-        }
-        if (pk_col_name.endsWith(" desc")) {
-            pk_col_name = pk_col_name.split(" desc")[1];
-        }
-        pk_col_name = pk_col_name.trim();
-        return pk_col_name;
-    }
-
-    private Set<String> _get_pk_col_name_aliaces_from_jaxb(String explicit_pk) throws Exception {
-        // if PK are specified explicitely, don't use getPrimaryKeys at all
-        String[] gen_keys_arr = Helpers.get_listed_items(explicit_pk, false);
-        Helpers.check_duplicates(gen_keys_arr);
-        for (int i = 0; i < gen_keys_arr.length; i++) {
-            gen_keys_arr[i] = _get_pk_col_name_alias(gen_keys_arr[i].toLowerCase());
-        }
-        return new HashSet<String>(Arrays.asList(gen_keys_arr));
     }
 }

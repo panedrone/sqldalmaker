@@ -21,8 +21,8 @@ public class JdbcUtils {
     private final FieldNamesMode dto_field_names_mode;
     private final FieldNamesMode method_params_names_mode;
 
-    private final JaxbUtils.JaxbMacros global_markers;
-    private final JaxbUtils.JaxbTypeMap type_map;
+    private final JaxbMacros global_markers;
+    private final JaxbTypeMap type_map;
 
     public JdbcUtils(Connection conn,
                      FieldNamesMode dto_field_names_mode,
@@ -33,8 +33,8 @@ public class JdbcUtils {
         this.dto_field_names_mode = dto_field_names_mode;
         this.method_params_names_mode = method_params_names_mode;
 
-        this.global_markers = new JaxbUtils.JaxbMacros(jaxb_settings.getMacros());
-        this.type_map = new JaxbUtils.JaxbTypeMap(jaxb_settings.getTypeMap());
+        this.global_markers = new JaxbMacros(jaxb_settings.getMacros());
+        this.type_map = new JaxbTypeMap(jaxb_settings.getTypeMap());
     }
 
     // Public Utils --------------------------------------------
@@ -134,7 +134,7 @@ public class JdbcUtils {
         } else {
             param_names_mode = dto_field_names_mode;
         }
-        JdbcSqlInfo.get_jdbc_sql_params_info(conn, type_map, dao_jdbc_sql, param_names_mode, method_param_descriptors, res_params);
+        JdbcSqlParamInfo.get_jdbc_sql_params_info(conn, type_map, dao_jdbc_sql, param_names_mode, method_param_descriptors, res_params);
     }
 
     // DAO. CRUD -----------------------------------------------
@@ -227,5 +227,18 @@ public class JdbcUtils {
             return null; // just render info comment instead of method
         }
         return SqlUtils.create_crud_delete_sql(dao_table_name, res_fields_pk);
+    }
+
+    public static PreparedStatement prepare_jdbc_sql(Connection conn,
+                                                       String jdbc_sql) throws SQLException {
+
+        boolean is_sp = SqlUtils.is_jdbc_stored_proc_call(jdbc_sql);
+        if (is_sp) {
+            return conn.prepareCall(jdbc_sql);
+        } else {
+            // For MySQL, prepareStatement doesn't throw Exception for
+            // invalid SQL statements and doesn't return null as well
+            return conn.prepareStatement(jdbc_sql);
+        }
     }
 }

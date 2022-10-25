@@ -1,3 +1,36 @@
+2022-10-25
+
+    This update is about workarounds of "extreme" cases in CRUD scenario
+    like "missing PK" or "AutoIncrement is not detected".
+
+    After updating the plugin, overwrite XSD files with the fresh versions.
+
+    Helper attributes <crud pk="..." generated="..."... were moved to <dto-class...
+
+    Attribute "generated" was renamed to "auto".
+
+    Moving of "pk" allows specifying just <dto-class name="Group" ref="groups" pk="g_id"/>
+
+    instead of tricks like this
+
+        <dto-class name="Group" ref="groups">
+                <field column="g_id" type="|1:, primary_key=True"/>
+        </dto-class>
+
+    Use "auto" when AutoIncrement is not detected. If you obtain this
+
+        g_id = models.IntegerField(db_column='g_id', primary_key=True)
+
+    instead of
+
+        g_id = models.AutoField(db_column='g_id', primary_key=True)
+
+    then
+
+        1. extend type-map: <type detected="dj-java.lang.Integer+auto" target="${dj-type}|0:AutoField"/>
+
+        2. specify "auto" explicitly: <dto-class auto="g_id"...
+
 2022-08-24
 
     For Gorm and Beego. Added field-assign-mode="3" - direct ptr to resulting slice:

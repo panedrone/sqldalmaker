@@ -19,14 +19,14 @@ class DtoClassInfo {
 
     private final Connection conn;
 
-    private final JaxbUtils.JaxbTypeMap type_map;
-    private final JaxbUtils.JaxbMacros macros;
+    private final JaxbTypeMap type_map;
+    private final JaxbMacros macros;
 
     private final FieldNamesMode dto_field_names_mode;
 
     public DtoClassInfo(Connection conn,
-                        JaxbUtils.JaxbTypeMap type_map,
-                        JaxbUtils.JaxbMacros macros,
+                        JaxbTypeMap type_map,
+                        JaxbMacros macros,
                         FieldNamesMode dto_field_names_mode) {
 
         this.conn = conn;
@@ -98,13 +98,15 @@ class DtoClassInfo {
             }
         }
         String jaxb_dto_class_ref = jaxb_dto_class.getRef();
-        Map<String, FieldInfo> fields_map = _prepare_by_jdbc(model, jaxb_dto_class_ref, jaxb_dto_class.getAuto(), sql_root_abs_path, res_dto_fields);
+        Map<String, FieldInfo> fields_map = _prepare_by_jdbc(model, jaxb_dto_class_ref,
+                jaxb_dto_class.getAuto(), jaxb_dto_class.getPk(), sql_root_abs_path, res_dto_fields);
         return fields_map;
     }
 
     private Map<String, FieldInfo> _prepare_by_jdbc(String model,
                                                     String jaxb_dto_class_ref,
                                                     String jaxb_dto_class_auto,
+                                                    String jaxb_dto_class_explicit_pk,
                                                     String sql_root_abs_path,
                                                     List<FieldInfo> res_dto_fields) throws Exception {
 
@@ -113,7 +115,8 @@ class DtoClassInfo {
         if (!SqlUtils.is_empty_ref(jaxb_dto_class_ref)) {
             String jdbc_sql = SqlUtils.jdbc_sql_by_dto_class_ref(jaxb_dto_class_ref, sql_root_abs_path);
             // get fields from sql first to omit invisible/db-specific fields
-            JdbcSqlInfo.get_field_info_by_jdbc_sql(model, conn, dto_field_names_mode, jdbc_sql, fields_map, res_dto_fields);
+            JdbcSqlFieldInfo.get_field_info_by_jdbc_sql(model, conn, dto_field_names_mode, jdbc_sql, jaxb_dto_class_explicit_pk,
+                    fields_map, res_dto_fields);
             if (SqlUtils.is_table_ref(jaxb_dto_class_ref)) {
                 String table_name = jaxb_dto_class_ref;
                 _fill_by_table(jaxb_dto_class_auto, model, table_name, res_dto_fields, fields_map);

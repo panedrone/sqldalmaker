@@ -34,10 +34,10 @@
                     <properties/>
                     <border type="none"/>
                     <children>
-                      <component id="72e18" class="javax.swing.JButton" binding="btn_validate_all">
+                      <component id="a821f" class="javax.swing.JButton" binding="recentChangesButton" default-binding="true">
                         <constraints/>
                         <properties>
-                          <text value="Validate All"/>
+                          <text value="News"/>
                         </properties>
                       </component>
                       <component id="9a86e" class="javax.swing.JButton" binding="referenceSettingsXmlButton" default-binding="true">
@@ -46,10 +46,10 @@
                           <text value="Reference settings.xml"/>
                         </properties>
                       </component>
-                      <component id="a821f" class="javax.swing.JButton" binding="recentChangesButton" default-binding="true">
+                      <component id="72e18" class="javax.swing.JButton" binding="btn_validate_all">
                         <constraints/>
                         <properties>
-                          <text value="News"/>
+                          <text value="Validate All"/>
                         </properties>
                       </component>
                       <component id="6d08f" class="javax.swing.JTextField" binding="vTextField" default-binding="true">

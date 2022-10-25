@@ -26,7 +26,8 @@
             </xs:sequence>
             <xs:attribute name="name" use="required" type="xs:string"/>
             <xs:attribute name="ref" use="required" type="xs:string"/>
-            <xs:attribute name="auto" use="optional" type="xs:string" default="*"/>
+	        <xs:attribute name="pk" use="optional" type="xs:string" default="*"/>
+            <xs:attribute name="auto" use="optional" type="xs:string"/>
         </xs:complexType>
         <xs:unique name="field-column">
             <xs:selector xpath="./*"/>
