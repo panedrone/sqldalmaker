@@ -25,8 +25,13 @@ import java.util.List;
  * Created with IntelliJ IDEA.
  * User: sqldalmaker@gmail.com
  * Date: 21.06.12
+ *
+ * Google --> intellij ActionGroup always enabled
+ * -->
+ * ActionGroup is disabled. Why?
+ * https://intellij-support.jetbrains.com/hc/en-us/community/posts/360008627020-ActionGroup-is-disabled-Why-
  */
-public class SdmActionGroup extends ActionGroup {
+public class SdmActionGroup extends ActionGroup implements AlwaysVisibleActionGroup {
 
     abstract static class SdmAction extends AnAction {
         SdmAction(String text) {
@@ -211,8 +216,9 @@ public class SdmActionGroup extends ActionGroup {
         }
     }
 
-    public boolean disableIfNoVisibleChildren() {
-        // in other case, it calls getChildren each 3 sec.
-        return false;
-    }
+    // it cannot be overridden because of warnings of intellij checker
+//    public boolean disableIfNoVisibleChildren() {
+//        // in other case, it calls getChildren each 3 sec.
+//        return false;
+//    }
 }
