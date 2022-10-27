@@ -282,14 +282,15 @@ class JdbcTableInfo {
 
     private void _refine_by_type_map() {
         for (FieldInfo fi : fields_map.values()) {
-            String type_name;
-            if (fi.getName().equals(auto_column_name) && model.length() > 0) {
-                type_name = fi.getType() + "+" + auto_column_generation_type;
+            String field_type_name;
+            String db_col_name = fi.getColumnName();
+            if (db_col_name.equalsIgnoreCase(auto_column_name) && model.length() > 0) {
+                field_type_name = fi.getType() + "+" + auto_column_generation_type;
             } else {
-                type_name = fi.getType();
+                field_type_name = fi.getType();
             }
-            type_name = get_target_type_by_type_map(type_name);
-            fi.refine_rendered_type(type_name);
+            field_type_name = get_target_type_by_type_map(field_type_name);
+            fi.refine_rendered_type(field_type_name);
         }
     }
 

@@ -185,6 +185,8 @@
         <type detected="dj-java.lang.Double" target="${dj-type}|0:FloatField"/>
         <type detected="dj-java.math.BigDecimal" target="${dj-type}|0:DecimalField"/>
 
+        <type detected="dj-java.math.BigDecimal+auto" target="${dj-type}|0:BigAutoField"/>
+
         <type detected="dj-java.util.Date" target="${dj-type}|0:DateTimeField"/>
         <type detected="dj-java.lang.String" target="${dj-type}|0:CharField"/>
         <type detected="dj-java.lang.Boolean" target="${dj-type}|0:BooleanField"/>
