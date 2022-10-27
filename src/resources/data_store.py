@@ -3,6 +3,7 @@
 # import sqlite3
 # import psycopg2
 # import mysql.connector
+# import cx_oracle
 
 # uncomment the code below to use with django.db:
 import os
@@ -83,19 +84,25 @@ class DataStore:
 class _DS(DataStore):
     """
         SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
-        This is an example of how to implement DataStore in Python + sqlite3/psycopg2/mysql/django.db -->
+        This is an example of how to implement DataStore in Python + sqlite3/psycopg2/mysql/cx_oracle/django.db -->
         Executing custom SQL directly https://docs.djangoproject.com/en/3.2/topics/db/sql/
         Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store.py
         Copy-paste this code to your project and change it for your needs.
         Improvements are welcome: sqldalmaker@gmail.com
-        Successfully tested in django projects:
+
+        Successfully tested in Django projects:
+
         - 'django.db.backends.sqlite3' ---------------- built-in
+
         - 'django.db.backends.postgresql_psycopg2' ---- pip install psycopg2
+
         - 'mysql.connector.django' -------------------- pip install mysql-connector-python
            ^^ instead of built-in 'django.db.backends.mysql' to enable cursor.stored_results().
            MySQL SP returning result-sets --> http://www.mysqltutorial.org/calling-mysql-stored-procedures-python/
            MySQL Connector/Python as Django Engine? -->
            https://stackoverflow.com/questions/26573984/django-how-to-install-mysql-connector-python-with-pip3)
+
+        - 'django.db.backends.oracle' ------------------ pip install cx_oracle
     """
 
     class EngineType:

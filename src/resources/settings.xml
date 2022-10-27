@@ -183,7 +183,7 @@
 
         <type detected="dj-java.lang.Float" target="${dj-type}|0:FloatField"/>
         <type detected="dj-java.lang.Double" target="${dj-type}|0:FloatField"/>
-        <type detected="dj-java.math.BigDecimal" target="${dj-type}|0:DecimalField"/>
+        <type detected="dj-java.math.BigDecimal" target="${dj-type}|0:DecimalField|1:, max_digits=10, decimal_places=2"/>
 
         <type detected="dj-java.math.BigDecimal+auto" target="${dj-type}|0:BigAutoField"/>
 
