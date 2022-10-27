@@ -29,7 +29,7 @@ self#if($external_sql), sql#end, #end
 #end
 #end
 #macro (params_dict $params)
-{#foreach ($param in $params)#if($velocityCount != 1), #end'$param.getColumnName()': $param.getName()#end}#end
+{#foreach ($param in $params)#if($velocityCount != 1), #end'$param.getName()': $param.getName()#end}#end
 ## ====================================================================================================================
 #if ($mode=="dto_class")
 """

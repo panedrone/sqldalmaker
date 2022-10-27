@@ -102,6 +102,7 @@ class _DS(DataStore):
         sqlite3 = 1
         mysql = 2
         postgresql = 3
+        oracle = 4
 
     def __init__(self):
         self.conn = None
@@ -132,6 +133,8 @@ class _DS(DataStore):
             self.engine_type = self.EngineType.mysql
         elif 'postgresql' in engine:
             self.engine_type = self.EngineType.postgresql
+        elif 'oracle' in engine:
+            self.engine_type = self.EngineType.oracle
         else:
             raise Exception('Unexpected: ' + engine)
         self.conn = con
