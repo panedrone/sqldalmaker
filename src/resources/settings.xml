@@ -133,8 +133,9 @@
         <type detected="byte[]" target="string${0}"/>
         <type detected="java.lang.Boolean" target="int64${0}"/>
         <type detected="java.lang.Float" target="float64${0}"/>
-        <type detected="java.math.BigDecimal" target="float64${0}"/>
         <type detected="float" target="float64${0}"/>
+        <type detected="java.math.BigDecimal" target="float64${0}"/>
+
         <type detected="java.lang.Object" target="interface{}${0}"/>
 
         <!-- ******   Gorm ("gorm-" prefix for detected types)  ****** -->
@@ -147,7 +148,10 @@
         <type detected="gorm-byte[]" target="string${json-gorm}"/>
         <type detected="gorm-java.lang.Boolean" target="int64${json-gorm}"/>
         <type detected="gorm-java.lang.Float" target="float64${json-gorm}"/>
+
         <type detected="gorm-java.math.BigDecimal" target="float64${json-gorm}"/>
+        <type detected="gorm-java.math.BigDecimal+auto" target="int64$${json-gorm}|1:;autoIncrement"/>
+
         <type detected="gorm-java.lang.Object" target="interface{}${json-gorm}"/>
 
         <!-- ***** SQLAlchemy ("sqlalchemy-" or "sa-" prefix for detected types) ****************** -->
@@ -183,8 +187,9 @@
 
         <type detected="dj-java.lang.Float" target="${dj-type}|0:FloatField"/>
         <type detected="dj-java.lang.Double" target="${dj-type}|0:FloatField"/>
-        <type detected="dj-java.math.BigDecimal" target="${dj-type}|0:DecimalField|1:, max_digits=10, decimal_places=2"/>
 
+        <type detected="dj-java.math.BigDecimal"
+              target="${dj-type}|0:DecimalField|1:, max_digits=10, decimal_places=2"/>
         <type detected="dj-java.math.BigDecimal+auto" target="${dj-type}|0:BigAutoField"/>
 
         <type detected="dj-java.util.Date" target="${dj-type}|0:DateTimeField"/>
@@ -282,8 +287,12 @@
 
         <macro name="${json}" value=" `json:&quot;${json_col}${1}&quot;`"/>
 
+        <!-- Gorm tags: -->
+
         <macro name="${json-gorm}"
                value=" `json:&quot;${json_col}${0}&quot; gorm:&quot;column:${column}${gorm-params}&quot;`"/>
+
+        <macro name="${no-gorm}" value=" `gorm:&quot;-&quot;` // not included into INSERT SQL"/>
 
         <!-- SQLAlchemy column: -->
 
@@ -353,19 +362,16 @@
         </macro>
 
         <macro name="${gorm-params}">
-
-            <!-- https://developpaper.com/getting-started-with-gorm/-->
-
-            <vm-xml>
+            <vm-xml> <!-- https://gorm.io/docs/models.html -->
                 <if var="$fi.PK">
-                    <print var=";primary_key"/>
+                    <print var=";primaryKey"/>
                 </if>
                 <if var="$fi.AI">
-                    <print var=";auto_increment"/>
+                    <print var=";autoIncrement"/>
                 </if>
                 <if var="!$fi.PK">
                     <if var="$fi.Unique &amp;&amp; $fi.Indexed">
-                        <print var=";unique_index"/>
+                        <print var=";uniqueIndex"/>
                         <else>
                             <if var="$fi.Unique">
                                 <print var=";unique"/>
