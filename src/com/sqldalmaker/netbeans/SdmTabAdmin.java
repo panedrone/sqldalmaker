@@ -314,7 +314,6 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
 
         jButton11.setText("sqlite3");
         jButton11.setFocusPainted(false);
-        jButton11.setPreferredSize(new java.awt.Dimension(64, 22));
         jButton11.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton11ActionPerformed(evt);
@@ -350,7 +349,6 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         jPanel1.add(jButton33);
 
         jButton30.setText("ms sql");
-        jButton30.setPreferredSize(new java.awt.Dimension(64, 22));
         jButton30.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton30ActionPerformed(evt);
@@ -367,7 +365,7 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         });
         jPanel1.add(jButton26);
 
-        jButton27.setLabel("doctrine");
+        jButton27.setText("Doctrine");
         jButton27.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton27ActionPerformed(evt);
@@ -456,7 +454,7 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         jLabel9.setPreferredSize(new java.awt.Dimension(40, 14));
         jPanel9.add(jLabel9);
 
-        jButton7.setText("sqlite3, mysql.connector, psycopg2, django");
+        jButton7.setText("sqlite3, mysql, cx_oracle, psycopg2, django.db");
         jButton7.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton7ActionPerformed(evt);
