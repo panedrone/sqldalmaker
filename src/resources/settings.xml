@@ -171,6 +171,8 @@
         <!-- All numerics for oracle_cx -->
 
         <!--        <type detected="sa-java.math.BigDecimal" target="${sa-type}|0:NUMBER"/>-->
+        <!--        <type detected="sa-java.math.BigDecimal+auto"-->
+        <!--              target="${sa-type}|0:NUMBER|1:, autoincrement=True|comment:  # IDENTITY"/>-->
 
         <type detected="sa-java.util.Date" target="${sa-type}|0:DateTime"/>
         <type detected="sa-java.lang.String" target="${sa-type}|0:String"/>
@@ -397,7 +399,7 @@
 #if($fi.Indexed), index=True#end
 #if($fi.Unique), unique=True#end
 #if($fi.Nullable), nullable=True#end
-#end)${comment}]]>
+#end${1})${comment}]]>
             </vm>
         </macro>
 
