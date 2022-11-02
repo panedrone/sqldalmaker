@@ -199,7 +199,8 @@
         <type detected="dj-java.lang.Boolean" target="${dj-type}|0:BooleanField"/>
         <type detected="dj-byte[]" target="${dj-type}|0:BinaryField"/>
 
-        <type detected="dj-java.lang.Object" target="${dj-type}|0:CharField"/>
+        <type detected="dj-java.lang.Object" target="${dj-type}|0:TextField"/> <!-- TextField doesn't want max_length -->
+<!--        <type detected="dj-java.lang.Object" target="${dj-type}|0:CharField|1:, max_length=1024"/>-->
 
         <type detected="dj-int" target="${dj-type}|0:IntegerField"/>
         <type detected="dj-long" target="${dj-type}|0:BigIntegerField"/>

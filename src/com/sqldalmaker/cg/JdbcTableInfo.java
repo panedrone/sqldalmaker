@@ -27,8 +27,8 @@ class JdbcTableInfo {
     private final String model;
     private final String table_name;
 
-    private final String auto_column_name;
-    private final String auto_column_generation_type;
+    private final String explicit_auto_column_name;
+    private final String explicit_auto_column_generation_type;
 
     // private final Set<String> explicit_pk_column_names;
 
@@ -58,17 +58,17 @@ class JdbcTableInfo {
             jaxb_explicit_auto_column = jaxb_explicit_auto_column.trim();
         }
         if (jaxb_explicit_auto_column.length() == 0) {
-            auto_column_name = "";
-            auto_column_generation_type = "";
+            explicit_auto_column_name = "";
+            explicit_auto_column_generation_type = "";
         } else {
             // consider auto like "o_id:identity"
             String[] auto_parts = jaxb_explicit_auto_column.split(":");
             if (auto_parts.length < 2) {
-                auto_column_name = jaxb_explicit_auto_column;
-                auto_column_generation_type = "auto";
+                explicit_auto_column_name = jaxb_explicit_auto_column; // if it is default "*", then just nothing will happen
+                explicit_auto_column_generation_type = "auto";
             } else {
-                auto_column_name = auto_parts[0];
-                auto_column_generation_type = auto_parts[1];
+                explicit_auto_column_name = auto_parts[0];
+                explicit_auto_column_generation_type = auto_parts[1];
             }
         }
         validate_table_name(conn, table_name); // Oracle PK are not detected with lower case table name
@@ -175,8 +175,11 @@ class JdbcTableInfo {
                     }
                 }
                 fi.setComment("t");
-                String string_type = _get_type_name(String.class.getName());
-                if (string_type.equals(fi.getType())) {
+                String string_type = String.class.getName();
+//                String string_type = _get_type_name(String.class.getName());
+                // String big_decimal_type = _get_type_name(BigDecimal.class.getName()); // COLUMN_SIZE == 0 (useless)
+                String fi_type = fi.getScalarType();
+                if (string_type.equals(fi_type)) {
                     try {
                         int size = columns_rs.getInt("COLUMN_SIZE");
                         if (size > 0xffff) { // sqlite3 2000000000
@@ -187,10 +190,21 @@ class JdbcTableInfo {
                         System.err.println("COLUMN_SIZE: " + e.getMessage());
                     }
                 }
+
+                try {
+                    // it is always -127 for Oracle NUMERIC-s and always 10 for all SQLite types
+                    // https://stackoverflow.com/questions/12931061/how-to-get-oracle-number-with-syncdb
+                    int decimal_digits = columns_rs.getInt("DECIMAL_DIGITS");
+//                    System.out.println(decimal_digits);
+                    fi.setDecimalDigits(decimal_digits);
+                } catch (Exception e) {
+                    System.err.println("DECIMAL_DIGITS: " + e.getMessage());
+                }
+
                 if (!fi.isAI()) {
                     try {
                         // IS_AUTOINCREMENT may work incorrectly (sqlite-jdbc-3.19.3.jar).
-                        // So, use it only if AI was not set by SQL colums metadata
+                        // So, use it only if AI was not set by SQL columns metadata
                         Object is_ai = columns_rs.getObject("IS_AUTOINCREMENT");
                         if ("yes".equals(is_ai) || "YES".equals(is_ai)) {
                             fi.setAI(true);
@@ -284,8 +298,8 @@ class JdbcTableInfo {
         for (FieldInfo fi : fields_map.values()) {
             String field_type_name;
             String db_col_name = fi.getColumnName();
-            if (db_col_name.equalsIgnoreCase(auto_column_name) && model.length() > 0) {
-                field_type_name = fi.getType() + "+" + auto_column_generation_type;
+            if (db_col_name.equalsIgnoreCase(explicit_auto_column_name) && model.length() > 0) {
+                field_type_name = fi.getType() + "+" + explicit_auto_column_generation_type;
             } else {
                 field_type_name = fi.getType();
             }

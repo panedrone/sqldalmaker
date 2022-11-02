@@ -27,6 +27,8 @@ public class FieldInfo {
 
     private boolean is_nullable = false;
 
+    private int decimal_digits;
+
     private String foreign_key = null;
 
     private boolean is_indexed = false;
@@ -106,6 +108,9 @@ public class FieldInfo {
     }
 
     public int getColumnSize() { // this method is for use in VM templates
+        if (this.is_auto_increment) {
+            return 0;
+        }
         return this.database_column_size;
     }
 
@@ -201,5 +206,13 @@ public class FieldInfo {
 
     public String getModel() {
         return model;
+    }
+
+    public int getDecimalDigits() { // this method is for use in VM templates
+        return this.decimal_digits;
+    }
+
+    public void setDecimalDigits(int decimal_digits) {
+        this.decimal_digits = decimal_digits;
     }
 }

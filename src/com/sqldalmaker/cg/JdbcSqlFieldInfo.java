@@ -32,13 +32,23 @@ class JdbcSqlFieldInfo {
                 String col_name = _get_jdbc_col_name(rsmd, col_num);
                 String type_name = model + _get_jdbc_col_type_name(rsmd, col_num);
                 //FieldInfo field = new FieldInfo(dto_field_names_mode, type_name, col_name, "q(" + col_name + ")");
-                FieldInfo field = new FieldInfo(dto_field_names_mode, type_name, col_name, "q");
+                FieldInfo fi = new FieldInfo(dto_field_names_mode, type_name, col_name, "q");
                 // === panedrone: it is nullable for all columns except PK (sqlite3)
                 // field.setNullable(rsmd.isNullable(col_num) == ResultSetMetaData.columnNullable);
                 boolean is_ai = rsmd.isAutoIncrement(col_num);
-                field.setAI(is_ai);
-                fields_map.put(col_name, field);
-                fields_all.add(field);
+                fi.setAI(is_ai);
+                fields_map.put(col_name, fi);
+                fields_all.add(fi);
+
+                // useless 2147483647 for all cols (SQLite)
+//                int displaySize = rsmd.getColumnDisplaySize(col_num);
+
+                int scale = rsmd.getScale(col_num);
+                fi.setDecimalDigits(scale);
+//                System.out.println(scale);
+
+//                int precision = rsmd.getPrecision(col_num);
+//                System.out.println(precision);
             }
         } finally {
             ps.close();

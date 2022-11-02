@@ -1,3 +1,7 @@
+2022-11-0-02
+
+    Fixes for Django
+
 2022-10-25
 
     This update is about workarounds of "extreme" cases in CRUD scenario:
