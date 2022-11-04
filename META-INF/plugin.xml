@@ -2,7 +2,7 @@
     <id>dal-mpe</id>
     <name>SQL DAL Maker</name>
     <category>Database</category>
-    <version>1.267.2210</version>
+    <version>1.267.2211</version>
     <vendor email="sqldalmaker@gmail.com"/>
     <idea-version since-build="181.5684.4"/>
 
@@ -19,7 +19,7 @@ At the stage of code generation, the target database must exist and be available
     ]]></description>
 
     <change-notes><![CDATA[
-<p>+ ORM Entities/Models and ORM-based DAO classes for CRUD and raw-SQL:</p>
+<p>ORM Models and DAO classes implemented using ORM:</p>
 1. <a href="https://github.com/panedrone/sdm_demo_todolist_php_doctrine">Doctrine</a>
 2. <a href="https://github.com/panedrone/sdm_demo_gorm_todolist">Gorm</a>
 3. <a href="https://github.com/panedrone/sdm_demo_django_todolist_sqlite3">Django, <a href="https://github.com/panedrone/sdm_demo_flask_sqlalchemy_todolist">SQLAlchemy]]></change-notes>
