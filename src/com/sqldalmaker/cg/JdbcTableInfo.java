@@ -30,8 +30,6 @@ class JdbcTableInfo {
     private final String explicit_auto_column_name;
     private final String explicit_auto_column_generation_type;
 
-    // private final Set<String> explicit_pk_column_names;
-
     public JdbcTableInfo(String model,
                          Connection conn,
                          JaxbTypeMap type_map,
@@ -92,10 +90,10 @@ class JdbcTableInfo {
     }
 
     public static void validate_table_name(Connection conn,
-                                           String table_name_parretn) throws Exception {
+                                           String table_name_pattern) throws Exception {
 
         // it may include schema like "public.%"
-        ResultSet rs = get_tables_rs(conn, table_name_parretn, true);
+        ResultSet rs = get_tables_rs(conn, table_name_pattern, true);
         try {
             if (rs.next()) {
                 return;
@@ -103,20 +101,20 @@ class JdbcTableInfo {
         } finally {
             rs.close();
         }
-        throw new Exception("Not found: '" + table_name_parretn + "'. The search is case-sensitive.");
+        throw new Exception("Not found: '" + table_name_pattern + "'. The search is case-sensitive.");
     }
 
     public static ResultSet get_tables_rs(Connection conn,
-                                          String table_name_parretn, // it may include schema like "public.%"
+                                          String table_name_pattern, // it may include schema like "public.%"
                                           boolean include_views) throws SQLException {
         String schema_name = null;
-        if (table_name_parretn.contains(".")) {
-            String[] parts = table_name_parretn.split("\\.");
+        if (table_name_pattern.contains(".")) {
+            String[] parts = table_name_pattern.split("\\.");
             if (parts.length != 2) {
-                throw new SQLException("Invalid table name: '" + table_name_parretn + "'");
+                throw new SQLException("Invalid table name: '" + table_name_pattern + "'");
             }
             schema_name = parts[0];
-            table_name_parretn = parts[1];
+            table_name_pattern = parts[1];
         }
         String[] types;
         if (include_views) {
@@ -124,14 +122,15 @@ class JdbcTableInfo {
         } else {
             types = new String[]{"TABLE"};
         }
-        DatabaseMetaData dbmd = conn.getMetaData();
+        DatabaseMetaData db_md = conn.getMetaData();
         ResultSet rs_tables;
         String catalog = conn.getCatalog();
-        rs_tables = dbmd.getTables(catalog, schema_name, table_name_parretn, types);
+        rs_tables = db_md.getTables(catalog, schema_name, table_name_pattern, types);
         return rs_tables;
     }
 
     private void _refine_field_info_by_table_metadata() throws Exception {
+
         String schema_nm;
         String table_nm;
         String[] parts = table_name.split("\\.", -1); // -1 to leave empty strings
@@ -142,9 +141,9 @@ class JdbcTableInfo {
             schema_nm = table_name.substring(0, table_name.lastIndexOf('.'));
             table_nm = parts[parts.length - 1];
         }
-        Map<String, String> unique = _index_names_by_lo_case_col_names(conn, schema_nm, table_name, true);
-        Map<String, String> indexed = _index_names_by_lo_case_col_names(conn, schema_nm, table_name, false);
-        Map<String, String[]> fk = _get_lower_case_FK_col_names(conn, schema_nm, table_name);
+        Map<String, String> lower_case_unique = _index_names_by_lo_case_col_names(conn, schema_nm, table_name, true);
+        Map<String, String> lower_case_indexed = _index_names_by_lo_case_col_names(conn, schema_nm, table_name, false);
+        Map<String, String[]> lower_case_fk = _get_lower_case_FK_col_names(conn, schema_nm, table_name);
         DatabaseMetaData md = conn.getMetaData();
         ResultSet columns_rs = md.getColumns(conn.getCatalog(), schema_nm, table_nm, "%");
         try {
@@ -160,93 +159,107 @@ class JdbcTableInfo {
                     continue;
                 }
                 FieldInfo fi = fields_map.get(db_col_name);
-                String sql_type = fi.getOriginalType();
-                String no_type = _get_type_name(Object.class.getName());
-                if (no_type.equals(sql_type)) {
-                    // don't re-define sql_type to avoid type conversions at run-time
-                    try {
-                        int type = columns_rs.getInt("DATA_TYPE");
-                        String apache_java_type_name = TypesMapping.getJavaBySqlType(type);
-                        fi.refine_scalar_type(apache_java_type_name);
-                        String rendered_type_name = _get_type_name(apache_java_type_name);
-                        fi.refine_rendered_type(rendered_type_name);
-                    } catch (Exception e) {
-                        System.err.println("DATA_TYPE: " + e.getMessage());
-                    }
-                }
                 fi.setComment("t");
-                String string_type = String.class.getName();
-//                String string_type = _get_type_name(String.class.getName());
-                // String big_decimal_type = _get_type_name(BigDecimal.class.getName()); // COLUMN_SIZE == 0 (useless)
-                String fi_type = fi.getScalarType();
-                if (string_type.equals(fi_type)) {
-                    try {
-                        int size = columns_rs.getInt("COLUMN_SIZE");
-                        if (size > 0xffff) { // sqlite3 2000000000
-                            size = 0xffff;
-                        }
-                        fi.setColumnSize(size);
-                    } catch (Exception e) {
-                        System.err.println("COLUMN_SIZE: " + e.getMessage());
-                    }
-                }
-
-                try {
-                    // it is always -127 for Oracle NUMERIC-s and always 10 for all SQLite types
-                    // https://stackoverflow.com/questions/12931061/how-to-get-oracle-number-with-syncdb
-                    int decimal_digits = columns_rs.getInt("DECIMAL_DIGITS");
-//                    System.out.println(decimal_digits);
-                    fi.setDecimalDigits(decimal_digits);
-                } catch (Exception e) {
-                    System.err.println("DECIMAL_DIGITS: " + e.getMessage());
-                }
-
-                if (!fi.isAI()) {
-                    try {
-                        // IS_AUTOINCREMENT may work incorrectly (sqlite-jdbc-3.19.3.jar).
-                        // So, use it only if AI was not set by SQL columns metadata
-                        Object is_ai = columns_rs.getObject("IS_AUTOINCREMENT");
-                        if ("yes".equals(is_ai) || "YES".equals(is_ai)) {
-                            fi.setAI(true);
-                        }
-                    } catch (Exception e) {
-                        System.err.println("IS_AUTOINCREMENT: " + e.getMessage());
-                    }
-                }
+                _set_data_type(fi, columns_rs);
+                _set_col_size(fi, columns_rs);
+                _set_decimal_digits(fi, columns_rs);
+                _set_ai(fi, columns_rs);
+                _set_nullable(fi, columns_rs);
                 // Exception: Invalid column Info
-//                Object is_gk = columns_rs.getObject("IS_GENERATEDCOLUMN"); // NO for oracle Indentity
-//                if ("yes".equals(is_gk) || "YES".equals(is_gk)) {
-//                    fi.setGenerated(true);
-//                }
-                try {
-                    int nullable = columns_rs.getInt("NULLABLE");
-                    if (nullable == DatabaseMetaData.columnNullable) {
-                        // http://www.java2s.com/Code/Java/Database-SQL-JDBC/IsColumnNullable.htm
-                        fi.setNullable(true);
-                    } else {
-                        fi.setNullable(false);
-                    }
-                } catch (Exception e) {
-                    System.err.println("NULLABLE: " + e.getMessage());
-                }
+                // Object is_gk = columns_rs.getObject("IS_GENERATEDCOLUMN"); // "NO" for oracle IDENTITY
+                // if ("yes".equals(is_gk) || "YES".equals(is_gk)) {
+                //      fi.setGenerated(true);
                 String lo_case_col_name = db_col_name.toLowerCase();
-                if (fk.containsKey(lo_case_col_name)) {
-                    String[] res = fk.get(lo_case_col_name);
+                if (lower_case_fk.containsKey(lo_case_col_name)) {
+                    String[] res = lower_case_fk.get(lo_case_col_name);
                     String pk_table_name = res[0];
                     String pk_column_name = res[1];
                     fi.setFK(String.format("%s.%s", pk_table_name, pk_column_name));
                 }
-                if (indexed.containsKey(lo_case_col_name)) {
-                    //String res = indexed.get(lo_case_col_name);
+                if (lower_case_indexed.containsKey(lo_case_col_name)) {
                     fi.setIndexed(true);
                 }
-                if (unique.containsKey(lo_case_col_name)) {
-                    //String res = unique.get(lo_case_col_name);
+                if (lower_case_unique.containsKey(lo_case_col_name)) {
                     fi.setUnique(true);
                 }
             }
         } finally {
             columns_rs.close();
+        }
+    }
+
+    private static void _set_nullable(FieldInfo fi, ResultSet columns_rs) {
+        try {
+            int nullable = columns_rs.getInt("NULLABLE");
+            if (nullable == DatabaseMetaData.columnNullable) {
+                // http://www.java2s.com/Code/Java/Database-SQL-JDBC/IsColumnNullable.htm
+                fi.setNullable(true);
+            } else {
+                fi.setNullable(false);
+            }
+        } catch (Exception e) {
+            System.err.println("NULLABLE: " + e.getMessage());
+        }
+    }
+
+    private static void _set_ai(FieldInfo fi, ResultSet columns_rs) {
+        if (!fi.isAI()) {
+            try {
+                // IS_AUTOINCREMENT may work incorrectly (sqlite-jdbc-3.19.3.jar).
+                // So, use it only if AI was not set by SQL columns metadata
+                Object is_ai = columns_rs.getObject("IS_AUTOINCREMENT");
+                if ("yes".equals(is_ai) || "YES".equals(is_ai)) {
+                    fi.setAI(true);
+                }
+            } catch (Exception e) {
+                System.err.println("IS_AUTOINCREMENT: " + e.getMessage());
+            }
+        }
+    }
+
+    private static void _set_decimal_digits(FieldInfo fi, ResultSet columns_rs) {
+        try {
+            // it is always -127 for Oracle NUMERIC-s and always 10 for all SQLite types
+            // https://stackoverflow.com/questions/12931061/how-to-get-oracle-number-with-syncdb
+            int decimal_digits = columns_rs.getInt("DECIMAL_DIGITS");
+            fi.setDecimalDigits(decimal_digits);
+        } catch (Exception e) {
+            System.err.println("DECIMAL_DIGITS: " + e.getMessage());
+        }
+    }
+
+    private static void _set_col_size(FieldInfo fi, ResultSet columns_rs) {
+
+        String string_type = String.class.getName();
+        String fi_type = fi.getScalarType();
+        if (string_type.equals(fi_type)) {
+            try {
+                int size = columns_rs.getInt("COLUMN_SIZE");
+                if (size > 0xffff) { // sqlite3 2000000000
+                    size = 0xffff;
+                }
+                fi.setColumnSize(size);
+            } catch (Exception e) {
+                System.err.println("COLUMN_SIZE: " + e.getMessage());
+            }
+        }
+    }
+
+    private void _set_data_type(FieldInfo fi, ResultSet columns_rs) {
+
+        String sql_type = fi.getOriginalType();
+        String no_type = _get_type_name(Object.class.getName());
+        if (no_type.equals(sql_type)) {
+            // don't re-define sql_type to avoid type conversions at run-time
+            try {
+                int type = columns_rs.getInt("DATA_TYPE");
+                String apache_java_type_name = TypesMapping.getJavaBySqlType(type);
+                fi.refine_scalar_type(apache_java_type_name);
+                String rendered_type_name = _get_type_name(apache_java_type_name);
+                fi.refine_rendered_type(rendered_type_name);
+            } catch (Exception e) {
+                System.err.println("DATA_TYPE: " + e.getMessage());
+            }
         }
     }
 
@@ -270,8 +283,8 @@ class JdbcTableInfo {
     private static Map<String, String[]> _get_lower_case_FK_col_names(Connection conn,
                                                                       String schema,
                                                                       String table_name) throws SQLException {
-        DatabaseMetaData dbmd = conn.getMetaData();
-        ResultSet rs = dbmd.getImportedKeys(conn.getCatalog(), schema, table_name);
+        DatabaseMetaData db_md = conn.getMetaData();
+        ResultSet rs = db_md.getImportedKeys(conn.getCatalog(), schema, table_name);
         Map<String, String[]> map = new HashMap<String, String[]>();
         try {
             while (rs.next()) {
@@ -287,14 +300,17 @@ class JdbcTableInfo {
     }
 
     private String _get_type_name(String type_name) {
+
         return model + type_name;
     }
 
     private static String _jdbc_sql_by_table_name(String table_name) {
+
         return "select * from " + table_name + " where 1 = 0";
     }
 
     private void _refine_by_type_map() {
+
         for (FieldInfo fi : fields_map.values()) {
             String field_type_name;
             String db_col_name = fi.getColumnName();
@@ -309,6 +325,7 @@ class JdbcTableInfo {
     }
 
     private String get_target_type_by_type_map(String detected) {
+
         String target_type_name = type_map.get_target_type_name(detected);
         return target_type_name;
     }
@@ -335,6 +352,7 @@ class JdbcTableInfo {
     }
 
     private Set<String> _get_pk_col_name_aliases_from_table(String table_name) throws Exception {
+
         DatabaseMetaData md = conn.getMetaData(); // no close() method
         ResultSet rs = _get_pk_rs(md, table_name);
         try {
@@ -343,9 +361,8 @@ class JdbcTableInfo {
                 String pk_col_name = rs.getString("COLUMN_NAME");
                 String pk_col_name_alias = Helpers.get_pk_col_name_alias(pk_col_name);
                 // 2 'id' happened with MySQL!
-//                if (res.contains(pk_col_name_alias)) {
-//                    throw new Exception("Multiple PK column name alias: " + pk_col_name_alias);
-//                }
+                //if (res.contains(pk_col_name_alias)) {
+                //    throw new Exception("Multiple PK column name alias: " + pk_col_name_alias);
                 res.add(pk_col_name_alias);
             }
             return res;

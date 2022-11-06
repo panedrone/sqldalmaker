@@ -2,6 +2,7 @@
   <dictionary name="panedrone">
     <words>
       <w>decls</w>
+      <w>panedrone</w>
       <w>sprintf</w>
       <w>sqldalmaker</w>
     </words>
