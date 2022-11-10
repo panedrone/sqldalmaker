@@ -349,7 +349,7 @@ public class UIEditorPageAdmin extends Composite {
 			}
 		});
 		toolkit.adapt(btnSqliteMysqlconnectorPsycopg, true, true);
-		btnSqliteMysqlconnectorPsycopg.setText("sqlite3, mysql.connector, psycopg2, django.db");
+		btnSqliteMysqlconnectorPsycopg.setText("sqlite3, mysql, cx_oracle, psycopg2, django.db");
 
 		Button btnSqlalchemy = new Button(composite_5, SWT.NONE);
 		btnSqlalchemy.addSelectionListener(new SelectionAdapter() {
