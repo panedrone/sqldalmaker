@@ -204,24 +204,21 @@ func (dao *${class_name}) ${method_name}(#param_decls($is_external_sql $params))
 #sql_var($is_external_sql $sql)
 #if($use_dto)
 #if ($assign_mode > 0)
-#if ($assign_mode == 1)
 	res = &${returned_type_name}{}
+#if ($assign_mode == 1)
 	_fa := []interface{}{
 #foreach($f in ${fields})
 		&res.${f.getName()},
 #end
 	}
 #else
-	_fa := &${returned_type_name}{}
+	_fa := res
 #end
 #if(${dto_param} != "")
 	err = dao.ds.QueryByFA(sql, _fa#foreach($param in ${params}), p.${param.getName()}()#end))
 #else
 	err = dao.ds.QueryByFA(sql, _fa#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
 #end
-	if err == nil {
-		res = _fa
-	}
 	return
 #else
 #if(${dto_param} != "")
