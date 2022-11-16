@@ -76,8 +76,6 @@ public class UIEditorPageDAO extends Composite {
 	private TableViewer tableViewer;
 	private Table table;
 	private Action action_refresh;
-	private Action action_selAll;
-	private Action action_unselAll;
 	private Action action_generate;
 	private Action action_validate;
 	private Action action_newXml;
@@ -132,8 +130,6 @@ public class UIEditorPageDAO extends Composite {
 		toolBarManager.add(action_getCrudDao);
 		toolBarManager.add(action_FK);
 		toolBarManager.add(action_refresh);
-		toolBarManager.add(action_unselAll);
-		toolBarManager.add(action_selAll);
 		toolBarManager.add(action_generate);
 		toolBarManager.add(action_validate);
 
@@ -214,18 +210,6 @@ public class UIEditorPageDAO extends Composite {
 					.setImageDescriptor(ResourceManager.getImageDescriptor(UIEditorPageDAO.class, "/img/refresh.gif"));
 		}
 		{
-			action_selAll = new Action("") {
-				@Override
-				public void run() {
-					table.selectAll();
-					do_on_selection_changed();
-				}
-			};
-			action_selAll.setToolTipText("Select all");
-			action_selAll
-					.setImageDescriptor(ResourceManager.getImageDescriptor(UIEditorPageDAO.class, "/img/text.gif"));
-		}
-		{
 			action_getCrudDao = new Action("") {
 
 				@Override
@@ -236,18 +220,6 @@ public class UIEditorPageDAO extends Composite {
 			action_getCrudDao.setToolTipText("DAO CRUD XML Assistant");
 			action_getCrudDao
 					.setImageDescriptor(ResourceManager.getImageDescriptor(UIEditorPageDAO.class, "/img/180.png"));
-		}
-		{
-			action_unselAll = new Action("") {
-				@Override
-				public void run() {
-					table.deselectAll();
-					do_on_selection_changed();
-				}
-			};
-			action_unselAll.setToolTipText("Deselect all");
-			action_unselAll
-					.setImageDescriptor(ResourceManager.getImageDescriptor(UIEditorPageDAO.class, "/img/none.gif"));
 		}
 		{
 			action_generate = new Action("") {
@@ -414,8 +386,17 @@ public class UIEditorPageDAO extends Composite {
 		return res;
 	}
 
+	@SuppressWarnings("unchecked")
+	private List<Item> get_items() {
+		List<Item> items = prepare_selected_items();
+		if (items == null) {
+			items = (List<Item>) tableViewer.getInput();
+		}
+		return items;
+	}
+
 	private void generate() {
-		final List<Item> items = prepare_selected_items();
+		final List<Item> items = get_items();
 		if (items == null) {
 			return;
 		}
@@ -722,13 +703,14 @@ public class UIEditorPageDAO extends Composite {
 	private void do_on_selection_changed() {
 		@SuppressWarnings("unchecked")
 		List<Item> items = (List<Item>) tableViewer.getInput();
-		boolean enabled;
-		if (items.size() == 1) {
-			enabled = true;
-		} else {
-			int[] indexes = table.getSelectionIndices();
-			enabled = indexes.length > 0;
-		}
+		boolean enabled = items.size() > 0;
+//		boolean enabled;
+//		if (items.size() == 1) {
+//			enabled = true;
+//		} else {
+//			int[] indexes = table.getSelectionIndices();
+//			enabled = indexes.length > 0;
+//		}
 		action_generate.setEnabled(enabled);
 		action_openXml.setEnabled(enabled);
 		action_goto_source.setEnabled(enabled);

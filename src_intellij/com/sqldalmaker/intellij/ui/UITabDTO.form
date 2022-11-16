@@ -108,34 +108,6 @@
                   <toolTipText value="Refresh"/>
                 </properties>
               </component>
-              <component id="ec14a" class="javax.swing.JButton" binding="btn_DeselAll">
-                <constraints/>
-                <properties>
-                  <borderPainted value="false"/>
-                  <icon value="img/none.gif"/>
-                  <margin top="0" left="0" bottom="0" right="0"/>
-                  <maximumSize width="32" height="32"/>
-                  <minimumSize width="32" height="32"/>
-                  <opaque value="false"/>
-                  <preferredSize width="32" height="32"/>
-                  <text value=""/>
-                  <toolTipText value="Deselect all"/>
-                </properties>
-              </component>
-              <component id="37d0" class="javax.swing.JButton" binding="btn_SelAll">
-                <constraints/>
-                <properties>
-                  <borderPainted value="false"/>
-                  <icon value="img/text.gif"/>
-                  <margin top="0" left="0" bottom="0" right="0"/>
-                  <maximumSize width="32" height="32"/>
-                  <minimumSize width="32" height="32"/>
-                  <opaque value="false"/>
-                  <preferredSize width="32" height="32"/>
-                  <text value=""/>
-                  <toolTipText value="Select all"/>
-                </properties>
-              </component>
               <component id="8ad7c" class="javax.swing.JButton" binding="btn_Generate">
                 <constraints/>
                 <properties>

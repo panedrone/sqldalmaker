@@ -35,8 +35,6 @@ public class UITabDAO {
     private JTable table;
     protected JPanel rootPanel;
     private JButton btn_Refresh;
-    private JButton btn_SelAll;
-    private JButton btn_DeselAll;
     private JButton btn_Generate;
     private JButton btn_Validate;
     private JButton btn_OpenXML;
@@ -56,19 +54,6 @@ public class UITabDAO {
             @Override
             public void actionPerformed(ActionEvent e) {
                 reload_table(true);
-            }
-        });
-        btn_SelAll.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ListSelectionModel selectionModel = table.getSelectionModel();
-                selectionModel.setSelectionInterval(0, table.getRowCount() - 1);
-            }
-        });
-        btn_DeselAll.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                table.clearSelection();
             }
         });
         btn_Validate.addActionListener(new ActionListener() {
@@ -228,7 +213,7 @@ public class UITabDAO {
                         table.setValueAt("", row, 1);
                     }
                     // to prevent:
-                    // WARN - tellij.ide.HackyRepaintManager
+                    // WARN - Intellij.ide.HackyRepaintManager
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                             table.updateUI();
@@ -494,28 +479,6 @@ public class UITabDAO {
         btn_Refresh.setText("");
         btn_Refresh.setToolTipText("Refresh");
         tool_panel.add(btn_Refresh);
-        btn_DeselAll = new JButton();
-        btn_DeselAll.setBorderPainted(false);
-        btn_DeselAll.setIcon(new ImageIcon(getClass().getResource("/img/none.gif")));
-        btn_DeselAll.setMargin(new Insets(0, 0, 0, 0));
-        btn_DeselAll.setMaximumSize(new Dimension(32, 32));
-        btn_DeselAll.setMinimumSize(new Dimension(32, 32));
-        btn_DeselAll.setOpaque(false);
-        btn_DeselAll.setPreferredSize(new Dimension(32, 32));
-        btn_DeselAll.setText("");
-        btn_DeselAll.setToolTipText("Deselect all");
-        tool_panel.add(btn_DeselAll);
-        btn_SelAll = new JButton();
-        btn_SelAll.setBorderPainted(false);
-        btn_SelAll.setIcon(new ImageIcon(getClass().getResource("/img/text.gif")));
-        btn_SelAll.setMargin(new Insets(0, 0, 0, 0));
-        btn_SelAll.setMaximumSize(new Dimension(32, 32));
-        btn_SelAll.setMinimumSize(new Dimension(32, 32));
-        btn_SelAll.setOpaque(false);
-        btn_SelAll.setPreferredSize(new Dimension(32, 32));
-        btn_SelAll.setText("");
-        btn_SelAll.setToolTipText("Select all");
-        tool_panel.add(btn_SelAll);
         btn_Generate = new JButton();
         btn_Generate.setBorderPainted(false);
         btn_Generate.setContentAreaFilled(false);

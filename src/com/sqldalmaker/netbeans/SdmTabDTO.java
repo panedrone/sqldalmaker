@@ -134,14 +134,14 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
         }
     }
 
-    private void select_all() {
-        ListSelectionModel selectionModel = table.getSelectionModel();
-        selectionModel.setSelectionInterval(0, table.getRowCount() - 1);
-    }
-
-    private void deselect_all() {
-        table.clearSelection();
-    }
+//    private void select_all() {
+//        ListSelectionModel selectionModel = table.getSelectionModel();
+//        selectionModel.setSelectionInterval(0, table.getRowCount() - 1);
+//    }
+//
+//    private void deselect_all() {
+//        table.clearSelection();
+//    }
 
     private void generate() throws Exception {
         final Settings settings = NbpHelpers.load_settings(obj);
@@ -569,8 +569,6 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
         jButton4 = new javax.swing.JButton();
         jButton5 = new javax.swing.JButton();
         jButton6 = new javax.swing.JButton();
-        jButton7 = new javax.swing.JButton();
-        jButton8 = new javax.swing.JButton();
         jButton9 = new javax.swing.JButton();
         jButton10 = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
@@ -579,7 +577,6 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
 
         setLayout(new java.awt.BorderLayout());
 
-        jToolBar1.setFloatable(false);
         jToolBar1.setRollover(true);
         jToolBar1.add(jSeparator1);
 
@@ -661,32 +658,6 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
         });
         jToolBar1.add(jButton6);
 
-        jButton7.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/none.gif"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(jButton7, org.openide.util.NbBundle.getMessage(SdmTabDTO.class, "SdmTabDTO.jButton7.text")); // NOI18N
-        jButton7.setToolTipText(org.openide.util.NbBundle.getMessage(SdmTabDTO.class, "SdmTabDTO.jButton7.toolTipText")); // NOI18N
-        jButton7.setFocusable(false);
-        jButton7.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jButton7.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jButton7.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton7ActionPerformed(evt);
-            }
-        });
-        jToolBar1.add(jButton7);
-
-        jButton8.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/text.gif"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(jButton8, org.openide.util.NbBundle.getMessage(SdmTabDTO.class, "SdmTabDTO.jButton8.text")); // NOI18N
-        jButton8.setToolTipText(org.openide.util.NbBundle.getMessage(SdmTabDTO.class, "SdmTabDTO.jButton8.toolTipText")); // NOI18N
-        jButton8.setFocusable(false);
-        jButton8.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jButton8.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jButton8.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton8ActionPerformed(evt);
-            }
-        });
-        jToolBar1.add(jButton8);
-
         jButton9.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/compile.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(jButton9, org.openide.util.NbBundle.getMessage(SdmTabDTO.class, "SdmTabDTO.jButton9.text")); // NOI18N
         jButton9.setToolTipText(org.openide.util.NbBundle.getMessage(SdmTabDTO.class, "SdmTabDTO.jButton9.toolTipText")); // NOI18N
@@ -732,14 +703,6 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
         open_dto_xml();
     }//GEN-LAST:event_jButton1ActionPerformed
 
-    private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
-        deselect_all();
-    }//GEN-LAST:event_jButton7ActionPerformed
-
-    private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
-        select_all();
-    }//GEN-LAST:event_jButton8ActionPerformed
-
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         open_generated_source_file();
     }//GEN-LAST:event_jButton3ActionPerformed
@@ -777,8 +740,6 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton6;
-    private javax.swing.JButton jButton7;
-    private javax.swing.JButton jButton8;
     private javax.swing.JButton jButton9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;

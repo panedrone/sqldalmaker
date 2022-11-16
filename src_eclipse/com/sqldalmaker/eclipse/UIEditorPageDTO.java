@@ -77,8 +77,6 @@ public class UIEditorPageDTO extends Composite {
 	private TableViewer tableViewer;
 	private Table table;
 	private Action action_refresh;
-	private Action action_selAll;
-	private Action action_unselAll;
 	private Action action_generate;
 	private Action action_validate;
 	private Action action_openSQL;
@@ -130,8 +128,6 @@ public class UIEditorPageDTO extends Composite {
 		toolBarManager.add(action_genTmpFieldTags);
 		toolBarManager.add(action_import);
 		toolBarManager.add(action_refresh);
-		toolBarManager.add(action_unselAll);
-		toolBarManager.add(action_selAll);
 		toolBarManager.add(action_generate);
 		toolBarManager.add(action_validate);
 
@@ -223,19 +219,6 @@ public class UIEditorPageDTO extends Composite {
 					.setImageDescriptor(ResourceManager.getImageDescriptor(UIEditorPageDTO.class, "/img/refresh.gif"));
 		}
 		{
-			action_selAll = new Action("") {
-				@Override
-				public void run() {
-					table.selectAll();
-					do_on_selection_changed();
-				}
-			};
-			action_selAll.setToolTipText("Select all");
-			action_selAll
-					.setImageDescriptor(ResourceManager.getImageDescriptor(UIEditorPageDTO.class, "/img/text.gif"));
-		}
-
-		{
 			action_import = new Action("") {
 				@Override
 				public void run() {
@@ -244,19 +227,6 @@ public class UIEditorPageDTO extends Composite {
 			};
 			action_import.setToolTipText("DTO CRUD XML Assistant");
 			action_import.setImageDescriptor(ResourceManager.getImageDescriptor(UIEditorPageDTO.class, "/img/180.png"));
-		}
-
-		{
-			action_unselAll = new Action("") {
-				@Override
-				public void run() {
-					table.deselectAll();
-					do_on_selection_changed();
-				}
-			};
-			action_unselAll.setToolTipText("Deselect all");
-			action_unselAll
-					.setImageDescriptor(ResourceManager.getImageDescriptor(UIEditorPageDTO.class, "/img/none.gif"));
 		}
 		{
 			action_generate = new Action("") {
@@ -333,7 +303,7 @@ public class UIEditorPageDTO extends Composite {
 
 	protected void gen_tmp_field_tags() {
 		try {
-			List<Item> items = prepareSelectedItems();
+			List<Item> items = prepare_selected_items();
 			if (items == null) {
 				return;
 			}
@@ -430,7 +400,7 @@ public class UIEditorPageDTO extends Composite {
 		EclipseSyncActionHelper.run_with_progress(getShell(), action);
 	}
 
-	private List<Item> prepareSelectedItems() {
+	private List<Item> prepare_selected_items() {
 		@SuppressWarnings("unchecked")
 		List<Item> items = (List<Item>) tableViewer.getInput();
 		if (items == null || items.size() == 0) {
@@ -456,8 +426,17 @@ public class UIEditorPageDTO extends Composite {
 		return res;
 	}
 
+	@SuppressWarnings("unchecked")
+	private List<Item> get_items() {
+		List<Item> items = prepare_selected_items();
+		if (items == null) {
+			items = (List<Item>) tableViewer.getInput();
+		}
+		return items;
+	}
+	
 	private void generate() {
-		final List<Item> items = prepareSelectedItems();
+		final List<Item> items = get_items();
 		if (items == null) {
 			return;
 		}
@@ -535,7 +514,7 @@ public class UIEditorPageDTO extends Composite {
 
 	protected void open_sql() {
 		try {
-			List<Item> items = prepareSelectedItems();
+			List<Item> items = prepare_selected_items();
 			if (items == null) {
 				return;
 			}
@@ -566,7 +545,7 @@ public class UIEditorPageDTO extends Composite {
 			if (file == null) {
 				throw new InternalException("File not found: " + Const.DTO_XML);
 			}
-			final List<Item> items = prepareSelectedItems();
+			final List<Item> items = prepare_selected_items();
 			if (items == null || items.size() == 0) {
 				EclipseEditorHelpers.open_editor_sync(getShell(), file);
 				return;
@@ -580,7 +559,7 @@ public class UIEditorPageDTO extends Composite {
 
 	protected void open_generated_source_file() {
 		try {
-			List<Item> items = prepareSelectedItems();
+			List<Item> items = prepare_selected_items();
 			if (items == null) {
 				return;
 			}
@@ -749,13 +728,14 @@ public class UIEditorPageDTO extends Composite {
 	private void do_on_selection_changed() {
 		@SuppressWarnings("unchecked")
 		List<Item> items = (List<Item>) tableViewer.getInput();
-		boolean enabled;
-		if (items.size() == 1) {
-			enabled = true;
-		} else {
-			int[] indexes = table.getSelectionIndices();
-			enabled = indexes.length > 0;
-		}
+		boolean enabled = items.size() > 0;
+//		boolean enabled;
+//		if (items.size() == 1) {
+//			enabled = true;
+//		} else {
+//			int[] indexes = table.getSelectionIndices();
+//			enabled = indexes.length > 0;
+//		}
 		action_generate.setEnabled(enabled);
 		action_openSQL.setEnabled(enabled);
 		action_open_target.setEnabled(enabled);
