@@ -216,7 +216,7 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         jPanel3.setPreferredSize(new java.awt.Dimension(710, 32));
         jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jButton5.setText("Edit settings.xml");
+        jButton5.setText("settings.xml");
         jButton5.setFocusPainted(false);
         jButton5.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -234,7 +234,7 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         });
         jPanel3.add(jButton25);
 
-        jButton6.setText("Validate All");
+        jButton6.setText("Validate Configuration");
         jButton6.setFocusPainted(false);
         jButton6.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {

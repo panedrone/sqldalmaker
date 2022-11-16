@@ -89,7 +89,7 @@
                   <SubComponents>
                     <Component class="javax.swing.JButton" name="jButton5">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="Edit settings.xml"/>
+                        <Property name="text" type="java.lang.String" value="settings.xml"/>
                         <Property name="focusPainted" type="boolean" value="false"/>
                       </Properties>
                       <Events>
@@ -107,7 +107,7 @@
                     </Component>
                     <Component class="javax.swing.JButton" name="jButton6">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="Validate All"/>
+                        <Property name="text" type="java.lang.String" value="Validate Configuration"/>
                         <Property name="focusPainted" type="boolean" value="false"/>
                       </Properties>
                       <Events>
