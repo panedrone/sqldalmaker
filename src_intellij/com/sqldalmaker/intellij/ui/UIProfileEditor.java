@@ -1,6 +1,6 @@
 /*
     Copyright 2011-2021 sqldalmaker@gmail.com
-    SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
+    SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
 package com.sqldalmaker.intellij.ui;
@@ -25,12 +25,10 @@ public class UIProfileEditor {
 
     private static final String DTO = "DTO";
     private static final String DAO = "DAO";
-    private static final String Settings = "Settings";
     private static final String Admin = "Admin";
 
     private final JButton buttonDto;
     private final JButton buttonDao;
-    private final JButton buttonSettings;
     private final JButton buttonAdmin;
 
     private static final Cursor hand = new Cursor(Cursor.HAND_CURSOR);
@@ -69,20 +67,11 @@ public class UIProfileEditor {
         makeUnderline(buttonAdmin, Admin, false);
     }
 
-    public void openSettings() {
-//        makeUnderline(buttonDto, DTO, false);
-//        makeUnderline(buttonDao, DAO, false);
-//        makeUnderline(buttonSettings, Settings, true);
-//        makeUnderline(buttonAdmin, Admin, false);
-        IdeaEditorHelpers.open_settings_xml_sync(project, root_file);
-    }
-    
     public void openAdmin() {
         CardLayout cl = (CardLayout) (cards1.getLayout());
         cl.show(cards1, Admin);
         makeUnderline(buttonDto, DTO, false);
         makeUnderline(buttonDao, DAO, false);
-        makeUnderline(buttonSettings, Settings, false);
         makeUnderline(buttonAdmin, Admin, true);
     }
 
@@ -90,7 +79,6 @@ public class UIProfileEditor {
         $$$setupUI$$$();
         buttonDto = createSimpleButton(DTO);
         buttonDao = createSimpleButton(DAO);
-        buttonSettings = createSimpleButton(Settings);
         buttonAdmin = createSimpleButton(Admin);
         buttonDto.addActionListener(new ActionListener() {
             @Override
@@ -104,12 +92,6 @@ public class UIProfileEditor {
                 openDAO();
             }
         });
-        buttonSettings.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                openSettings();
-            }
-        });
         buttonAdmin.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -118,7 +100,6 @@ public class UIProfileEditor {
         });
         panel_1.add(buttonDto);
         panel_1.add(buttonDao);
-        panel_1.add(buttonSettings);
         panel_1.add(buttonAdmin);
         openDTO();
     }

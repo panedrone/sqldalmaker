@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2018 sqldalmaker@gmail.com
- * SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
+ * Copyright 2011-2022 sqldalmaker@gmail.com
+ * SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
  * Read LICENSE.txt in the root of this project/archive for details.
  */
 package com.sqldalmaker.eclipse;
@@ -18,12 +18,10 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.eclipse.ui.forms.events.IHyperlinkListener;
 import org.eclipse.ui.forms.widgets.FormToolkit;
@@ -233,7 +231,6 @@ public class Editor2 extends EditorPart implements IEditor2 {
 	private final FormToolkit formToolkit = new FormToolkit(Display.getDefault());
 	private Hyperlink hprlnkDao;
 	private Hyperlink hprlnkAdmin;
-	private Hyperlink hprlnkSettings;
 	private Composite composite_toolbar;
 
 	@Override
@@ -289,30 +286,6 @@ public class Editor2 extends EditorPart implements IEditor2 {
 		});
 		hprlnkDao.setUnderlined(false);
 		formToolkit.paintBordersFor(hprlnkDao);
-		
-		hprlnkSettings = formToolkit.createHyperlink(buttons, "Settings", SWT.NONE);
-		hprlnkSettings.setForeground(SWTResourceManager.getColor(51, 102, 153));
-		hprlnkSettings.addHyperlinkListener(new IHyperlinkListener() {
-			public void linkActivated(HyperlinkEvent e) {
-
-				try {
-					Shell active_shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-					IFile file = find_settings_xml();
-					EclipseEditorHelpers.open_editor_sync(active_shell, file);
-				} catch (Throwable ex) {
-					ex.printStackTrace();
-					EclipseMessageHelpers.show_error(ex);
-				}
-			}
-
-			public void linkEntered(HyperlinkEvent e) {
-			}
-
-			public void linkExited(HyperlinkEvent e) {
-			}
-		});
-		hprlnkSettings.setUnderlined(false);
-		formToolkit.paintBordersFor(hprlnkSettings);
 		
 		hprlnkAdmin = formToolkit.createHyperlink(buttons, "Admin", SWT.NONE);
 		hprlnkAdmin.setForeground(SWTResourceManager.getColor(51, 102, 153));

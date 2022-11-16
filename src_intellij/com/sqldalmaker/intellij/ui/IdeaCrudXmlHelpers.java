@@ -1,7 +1,7 @@
 /*
  * Copyright 2011-2021 sqldalmaker@gmail.com
  * Read LICENSE.txt in the root of this project/archive.
- * Project web-site: http://sqldalmaker.sourceforge.net
+ * Project web-site: https://sqldalmaker.sourceforge.net/
  */
 package com.sqldalmaker.intellij.ui;
 

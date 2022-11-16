@@ -51,7 +51,7 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         String v = m.getSpecificationVersion().toString();
         String jv = System.getProperty("java.version");
         jTextField1.setText("v" + v + " on Java " + jv);
-        jTextField1.setBorder(javax.swing.BorderFactory.createEmptyBorder());
+//        jTextField1.setBorder(javax.swing.BorderFactory.createEmptyBorder());
         ////////////////////////////////////////
         jTextPane1.setEditable(false);
         jTextPane1.setContentType("text/html");
@@ -144,8 +144,8 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         jButton5 = new javax.swing.JButton();
         jButton25 = new javax.swing.JButton();
         jButton6 = new javax.swing.JButton();
-        jButton13 = new javax.swing.JButton();
         jTextField1 = new javax.swing.JTextField();
+        jButton13 = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
@@ -243,22 +243,21 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         });
         jPanel3.add(jButton6);
 
+        jTextField1.setEditable(false);
+        jTextField1.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        jTextField1.setText("v. ?");
+        jTextField1.setMargin(new java.awt.Insets(2, 10, 2, 2));
+        jPanel3.add(jTextField1);
+
         jButton13.setText("News");
         jButton13.setFocusPainted(false);
+        jButton13.setPreferredSize(new java.awt.Dimension(64, 22));
         jButton13.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton13ActionPerformed(evt);
             }
         });
         jPanel3.add(jButton13);
-
-        jTextField1.setEditable(false);
-        jTextField1.setHorizontalAlignment(javax.swing.JTextField.LEFT);
-        jTextField1.setText("v. ?");
-        jTextField1.setMargin(new java.awt.Insets(2, 10, 2, 2));
-        jTextField1.setMinimumSize(new java.awt.Dimension(63, 22));
-        jTextField1.setPreferredSize(new java.awt.Dimension(180, 22));
-        jPanel3.add(jTextField1);
 
         jPanel8.add(jPanel3);
 
@@ -304,7 +303,7 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         jButton10.setFocusPainted(false);
         jButton10.setMaximumSize(new java.awt.Dimension(60, 22));
         jButton10.setMinimumSize(new java.awt.Dimension(60, 22));
-        jButton10.setPreferredSize(new java.awt.Dimension(60, 22));
+        jButton10.setPreferredSize(new java.awt.Dimension(64, 22));
         jButton10.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton10ActionPerformed(evt);
@@ -386,7 +385,7 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         jButton4.setFocusPainted(false);
         jButton4.setMaximumSize(new java.awt.Dimension(60, 22));
         jButton4.setMinimumSize(new java.awt.Dimension(60, 22));
-        jButton4.setPreferredSize(new java.awt.Dimension(60, 22));
+        jButton4.setPreferredSize(new java.awt.Dimension(64, 22));
         jButton4.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton4ActionPerformed(evt);
@@ -398,7 +397,7 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         jButton8.setFocusPainted(false);
         jButton8.setMaximumSize(new java.awt.Dimension(60, 22));
         jButton8.setMinimumSize(new java.awt.Dimension(60, 22));
-        jButton8.setPreferredSize(new java.awt.Dimension(60, 22));
+        jButton8.setPreferredSize(new java.awt.Dimension(64, 22));
         jButton8.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton8ActionPerformed(evt);
@@ -420,6 +419,7 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
 
         jButton24.setText("Qt");
         jButton24.setFocusPainted(false);
+        jButton24.setPreferredSize(new java.awt.Dimension(64, 22));
         jButton24.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton24ActionPerformed(evt);
@@ -499,6 +499,7 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         jButton18.setText("DBI");
         jButton18.setToolTipText("");
         jButton18.setFocusPainted(false);
+        jButton18.setPreferredSize(new java.awt.Dimension(64, 22));
         jButton18.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton18ActionPerformed(evt);
@@ -522,6 +523,7 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         jPanel5.add(jButton34);
 
         jButton16.setText("gorm");
+        jButton16.setPreferredSize(new java.awt.Dimension(64, 22));
         jButton16.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton16ActionPerformed(evt);

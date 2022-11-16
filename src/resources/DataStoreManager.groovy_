@@ -4,7 +4,7 @@ import com.sqldalmaker.DataStore
 
 /*
 This is an example of how to implement and use DataStore for Groovy.
-Web-site: http://sqldalmaker.sourceforge.net
+Web-site: https://sqldalmaker.sourceforge.net/
 Contact: sqldalmaker@gmail.com
 Copy-paste this code to your project and change it for your needs.
 */

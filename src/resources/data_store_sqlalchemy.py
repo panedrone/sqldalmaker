@@ -1,6 +1,6 @@
 """
 
-SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
+SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
 
 This is an example of how to implement DataStore in Python + SQLAlchemy.
 

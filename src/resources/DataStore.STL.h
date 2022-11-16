@@ -2,7 +2,7 @@
 #define __DataStore_H_
 
 /*
-    SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
+    SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     This is an example of how to implement DataStore in C++, SQLite3 C Library, and STL.
     Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/DataStore.STL.h
     Copy-paste this code to your project and change it for your needs.

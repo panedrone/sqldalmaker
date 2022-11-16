@@ -12,7 +12,7 @@ import (
 )
 
 /*
-   SQL DAL Maker Web-Site: http://sqldalmaker.sourceforge.net
+   SQL DAL Maker Web-Site: https://sqldalmaker.sourceforge.net/
    This is an example of how to implement DataStore for Go + "database/sql".
    Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store.go
    Copy-paste this code to your project and change it for your needs.

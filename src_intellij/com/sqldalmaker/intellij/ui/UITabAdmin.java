@@ -1,6 +1,6 @@
 /*
     Copyright 2011-2022 sqldalmaker@gmail.com
-    SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
+    SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
 package com.sqldalmaker.intellij.ui;
@@ -71,6 +71,7 @@ public class UITabAdmin {
     private JButton SQLAlchemyButton;
     private JButton gormButton;
     private JButton doctrineORMButton;
+    private JButton buttonSettings;
 
     private Project project;
     private VirtualFile root_file;
@@ -377,6 +378,16 @@ public class UITabAdmin {
                 IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "DataStore_Doctrine_ORM.php", "DataStore_Doctrine_ORM.php");
             }
         });
+        buttonSettings.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                openSettings();
+            }
+        });
+    }
+
+    public void openSettings() {
+        IdeaEditorHelpers.open_settings_xml_sync(project, root_file);
     }
 
     private static String get_err_msg(Throwable ex) {
@@ -503,21 +514,24 @@ public class UITabAdmin {
         gbc.weighty = 1.0;
         gbc.anchor = GridBagConstraints.NORTHWEST;
         panel2.add(panel3, gbc);
+        buttonSettings = new JButton();
+        buttonSettings.setText("settings.xml");
+        panel3.add(buttonSettings);
         referenceSettingsXmlButton = new JButton();
         referenceSettingsXmlButton.setText("Reference settings.xml");
         panel3.add(referenceSettingsXmlButton);
         btn_validate_all = new JButton();
         btn_validate_all.setText("Validate Configuration");
         panel3.add(btn_validate_all);
+        vTextField = new JTextField();
+        vTextField.setEditable(false);
+        vTextField.setHorizontalAlignment(0);
+        vTextField.setText("v. ?");
+        panel3.add(vTextField);
         recentChangesButton = new JButton();
         recentChangesButton.setPreferredSize(new Dimension(60, 30));
         recentChangesButton.setText("News");
         panel3.add(recentChangesButton);
-        vTextField = new JTextField();
-        vTextField.setEditable(false);
-        vTextField.setHorizontalAlignment(4);
-        vTextField.setText("v. ?");
-        panel3.add(vTextField);
         final JPanel panel4 = new JPanel();
         panel4.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
         gbc = new GridBagConstraints();

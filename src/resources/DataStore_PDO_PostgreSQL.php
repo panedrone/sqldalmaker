@@ -1,7 +1,7 @@
 <?php
 
 /*
-  SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
+  SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
   This is an example of how to implement DataStore in PHP + PDO + PostgreSQL.
   Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/DataStore_PDO_PostgreSQL.php
   Copy-paste this code to your project and change it for your needs.

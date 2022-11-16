@@ -82,7 +82,7 @@ class DataStore:
 
 class _DS(DataStore):
     """
-        SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
+        SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
         This is an example of how to implement DataStore in Python + sqlite3/psycopg2/mysql/django.db -->
         Executing custom SQL directly https://docs.djangoproject.com/en/3.2/topics/db/sql/
         Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store.py

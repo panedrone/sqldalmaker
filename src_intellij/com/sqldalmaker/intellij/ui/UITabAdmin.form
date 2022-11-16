@@ -34,6 +34,12 @@
                     <properties/>
                     <border type="none"/>
                     <children>
+                      <component id="4ffe5" class="javax.swing.JButton" binding="buttonSettings">
+                        <constraints/>
+                        <properties>
+                          <text value="settings.xml"/>
+                        </properties>
+                      </component>
                       <component id="9a86e" class="javax.swing.JButton" binding="referenceSettingsXmlButton" default-binding="true">
                         <constraints/>
                         <properties>
@@ -46,19 +52,19 @@
                           <text value="Validate Configuration"/>
                         </properties>
                       </component>
+                      <component id="6d08f" class="javax.swing.JTextField" binding="vTextField" default-binding="true">
+                        <constraints/>
+                        <properties>
+                          <editable value="false"/>
+                          <horizontalAlignment value="0"/>
+                          <text value="v. ?"/>
+                        </properties>
+                      </component>
                       <component id="a821f" class="javax.swing.JButton" binding="recentChangesButton" default-binding="true">
                         <constraints/>
                         <properties>
                           <preferredSize width="60" height="30"/>
                           <text value="News"/>
-                        </properties>
-                      </component>
-                      <component id="6d08f" class="javax.swing.JTextField" binding="vTextField" default-binding="true">
-                        <constraints/>
-                        <properties>
-                          <editable value="false"/>
-                          <horizontalAlignment value="4"/>
-                          <text value="v. ?"/>
                         </properties>
                       </component>
                     </children>

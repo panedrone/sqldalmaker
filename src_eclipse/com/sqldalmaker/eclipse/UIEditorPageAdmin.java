@@ -1,7 +1,7 @@
 /*
- * Copyright 2011-2021 sqldalmaker@gmail.com
+ * Copyright 2011-2022 sqldalmaker@gmail.com
  * Read LICENSE.txt in the root of this project/archive.
- * Project web-site: http://sqldalmaker.sourceforge.net
+ * Project web-site: https://sqldalmaker.sourceforge.net/
  */
 package com.sqldalmaker.eclipse;
 
@@ -22,7 +22,9 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.wb.swt.ResourceManager;
 import org.osgi.framework.Bundle;
@@ -73,45 +75,62 @@ public class UIEditorPageAdmin extends Composite {
 		toolkit.paintBordersFor(composite_top);
 
 		Composite composite_0 = new Composite(composite_top, SWT.NONE);
-		composite_0.setLayout(new GridLayout(4, false));
+		composite_0.setLayout(new GridLayout(5, false));
 		toolkit.adapt(composite_0);
 		toolkit.paintBordersFor(composite_0);
-		
-				Button btnReferenceSettingsxml = new Button(composite_0, SWT.NONE);
-				btnReferenceSettingsxml.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(SelectionEvent e) {
-						EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/" + Const.SETTINGS_XML,
-								"reference_" + Const.SETTINGS_XML);
-					}
-				});
-				btnReferenceSettingsxml.setText("Reference settings.xml");
-				toolkit.adapt(btnReferenceSettingsxml, true, true);
-								
-										Button btnNewButton_1 = new Button(composite_0, SWT.NONE);
-										btnNewButton_1.addSelectionListener(new SelectionAdapter() {
-											@Override
-											public void widgetSelected(SelectionEvent e) {
-												validate_all();
-											}
-										});
-										toolkit.adapt(btnNewButton_1, true, true);
-										btnNewButton_1.setText("Validate Configuration");
-						
-								Button btnRecentChanges = new Button(composite_0, SWT.NONE);
-								btnRecentChanges.addSelectionListener(new SelectionAdapter() {
-									@Override
-									public void widgetSelected(SelectionEvent e) {
-										EclipseResourceEditorHelpers.open_resource_file_in_editor("recent_changes.txt", "recent_changes.txt");
-									}
-								});
-								toolkit.adapt(btnRecentChanges, true, true);
-								btnRecentChanges.setText("News");
-						
-								txtV = new Text(composite_0, SWT.CENTER);
-								txtV.setEditable(false);
-								txtV.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, false, 1, 1));
-								toolkit.adapt(txtV, true, true);
+
+		Button btnSettingsxml = new Button(composite_0, SWT.NONE);
+		btnSettingsxml.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				try {
+					Shell active_shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+					IFile file = editor2.find_settings_xml();
+					EclipseEditorHelpers.open_editor_sync(active_shell, file);
+				} catch (Throwable ex) {
+					ex.printStackTrace();
+					EclipseMessageHelpers.show_error(ex);
+				}
+			}
+		});
+		toolkit.adapt(btnSettingsxml, true, true);
+		btnSettingsxml.setText("settings.xml");
+
+		Button btnReferenceSettingsxml = new Button(composite_0, SWT.NONE);
+		btnReferenceSettingsxml.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/" + Const.SETTINGS_XML,
+						"reference_" + Const.SETTINGS_XML);
+			}
+		});
+		btnReferenceSettingsxml.setText("Reference settings.xml");
+		toolkit.adapt(btnReferenceSettingsxml, true, true);
+
+		Button btnNewButton_1 = new Button(composite_0, SWT.NONE);
+		btnNewButton_1.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				validate_all();
+			}
+		});
+		toolkit.adapt(btnNewButton_1, true, true);
+		btnNewButton_1.setText("Validate Configuration");
+
+		txtV = new Text(composite_0, SWT.CENTER);
+		txtV.setEditable(false);
+		txtV.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, false, 1, 1));
+		toolkit.adapt(txtV, true, true);
+
+		Button btnRecentChanges = new Button(composite_0, SWT.NONE);
+		btnRecentChanges.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("recent_changes.txt", "recent_changes.txt");
+			}
+		});
+		toolkit.adapt(btnRecentChanges, true, true);
+		btnRecentChanges.setText("News");
 
 		Composite composite_1 = new Composite(composite_top, SWT.NONE);
 		composite_1.setLayout(new GridLayout(3, false));
@@ -238,7 +257,7 @@ public class UIEditorPageAdmin extends Composite {
 		});
 		toolkit.adapt(btnNewButton_12, true, true);
 		btnNewButton_12.setText("sqlite3");
-		
+
 		Button btnDoctrineOrm = new Button(composite, SWT.NONE);
 		btnDoctrineOrm.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -422,7 +441,8 @@ public class UIEditorPageAdmin extends Composite {
 		btnNewButton_8_1_1.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/data_store_gorm.go", "data_store_gorm.go_");
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/data_store_gorm.go",
+						"data_store_gorm.go_");
 			}
 		});
 		btnNewButton_8_1_1.setText("gorm");

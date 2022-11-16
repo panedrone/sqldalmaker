@@ -153,7 +153,18 @@ func (ds *_DS) Open() error {
 }
 
 func (ds *_DS) Close() (err error) {
-	// ds.db.Close() // TODO
+	// https://stackoverflow.com/questions/63816057/how-do-i-close-database-instance-in-gorm-1-20-0
+	var sqlDB *sql.DB
+	sqlDB, err = ds.db.DB()
+	if err != nil {
+		println(err.Error())
+		return
+	}
+	err = sqlDB.Close()
+	if err != nil {
+		println(err.Error())
+		return
+	}
 	return
 }
 

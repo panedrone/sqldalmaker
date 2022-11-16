@@ -1,5 +1,5 @@
 """
-    SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
+    SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     This is an example of how to implement DataStore in Python + sqlite3/psycopg2/mysql/django.db -->
     Executing custom SQL directly https://docs.djangoproject.com/en/3.2/topics/db/sql/
     Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store.py
@@ -19,14 +19,14 @@
     Improvements are welcome: sqldalmaker@gmail.com
 """
 
-# uncomment one of the imports below to use without django.db
+# uncomment one of the imports below for the projects without django.db
 
 # import sqlite3
 # import psycopg2
 # import mysql.connector
 # import cx_oracle
 
-# uncomment the imports and code below to use with django.db:
+# uncomment the imports and code below for the projects which use django.db:
 
 import django.db
 from django.apps import AppConfig

@@ -8,7 +8,7 @@ At the stage of code generation, the target database must exist and be available
 
 Implemented as plug-ins for [Eclipse IDE](http://marketplace.eclipse.org/content/sql-dal-maker), [IntelliJ-Platform](http://plugins.jetbrains.com/plugin/7092), and [NetBeans 11+](https://github.com/panedrone/sqldalmaker/releases/tag/latest).
 
-Project Website: [http://sqldalmaker.sourceforge.net/](http://sqldalmaker.sourceforge.net/)
+Project Website: [https://sqldalmaker.sourceforge.net//](https://sqldalmaker.sourceforge.net//)
 
 Quick-Demo in mp4: [https://github.com/panedrone/sqldalmaker/releases/tag/latest](https://github.com/panedrone/sqldalmaker/releases/tag/latest)
 

@@ -1,8 +1,8 @@
-<idea-plugin url="http://sqldalmaker.sourceforge.net/">
+<idea-plugin url="https://sqldalmaker.sourceforge.net//">
     <id>dal-mpe</id>
     <name>SQL DAL Maker</name>
     <category>Database</category>
-    <version>1.268.2211</version>
+    <version>1.269.2211</version>
     <vendor email="sqldalmaker@gmail.com"/>
     <idea-version since-build="181.5684.4"/>
 

@@ -3,7 +3,7 @@
 // include_once 'DataStore.php'; // uncomment if you need inheritance
 
 /*
-  SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
+  SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
 
   This is an example of how to implement DataStore in PHP + PDO + SQLite3.
   Copy-paste this code to your project and change it for your needs.
