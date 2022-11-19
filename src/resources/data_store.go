@@ -1,6 +1,7 @@
 package dbal
 
 import (
+	"context"
 	"database/sql"
 	"database/sql/driver"
 	"errors"
@@ -12,7 +13,7 @@ import (
 )
 
 /*
-   SQL DAL Maker Web-Site: https://sqldalmaker.sourceforge.net/
+   SQL DAL Maker Web-Site: http://sqldalmaker.sourceforge.net
    This is an example of how to implement DataStore for Go + "database/sql".
    Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store.go
    Copy-paste this code to your project and change it for your needs.
@@ -20,26 +21,26 @@ import (
 */
 
 type DataStore interface {
-	Open() (err error)
-	Close() (err error)
+	Open() error
+	Close() error
 
-	Begin() (err error)
-	Commit() (err error)
-	Rollback() (err error)
+	Begin(ctx context.Context) (txCtx context.Context, err error)
+	Commit(txCtx *context.Context) error
+	Rollback(txCtx *context.Context) error
 
 	// the methods called by generated code:
 
-	Insert(sqlStr string, aiNames string, args ...interface{}) (id interface{}, err error)
-	Exec(sqlStr string, args ...interface{}) (rowsAffected int64, err error)
-	Query(sqlStr string, args ...interface{}) (res interface{}, err error)
-	QueryAll(sqlStr string, onRow func(interface{}), args ...interface{}) (err error)
-	QueryRow(sqlStr string, args ...interface{}) (data map[string]interface{}, err error)
-	QueryAllRows(sqlStr string, onRow func(map[string]interface{}), args ...interface{}) (err error)
+	Insert(ctx context.Context, sqlStr string, aiNames string, args ...interface{}) (id interface{}, err error)
+	Exec(ctx context.Context, sqlStr string, args ...interface{}) (rowsAffected int64, err error)
+	Query(ctx context.Context, sqlStr string, args ...interface{}) (res interface{}, err error)
+	QueryAll(ctx context.Context, sqlStr string, onRow func(interface{}), args ...interface{}) error
+	QueryRow(ctx context.Context, sqlStr string, args ...interface{}) (data map[string]interface{}, err error)
+	QueryAllRows(ctx context.Context, sqlStr string, onRow func(map[string]interface{}), args ...interface{}) error
 
-	QueryByFA(sqlStr string, fa interface{}, args ...interface{}) (err error)
-	QueryAllByFA(sqlStr string, onRow func() (interface{}, func()), args ...interface{}) (err error)
+	QueryByFA(ctx context.Context, sqlStr string, fa interface{}, args ...interface{}) error
+	QueryAllByFA(ctx context.Context, sqlStr string, onRow func() (interface{}, func()), args ...interface{}) error
 
-	// PGFetch(cursor string) string
+	PGFetch(cursor string) string
 }
 
 type OutParam struct {
@@ -70,15 +71,13 @@ type InOutParam struct {
 type _DS struct {
 	paramPrefix string
 	db          *sql.DB
-	tx          *sql.Tx
 }
 
-type CanClose interface {
+type MyCanClose interface {
 	Close() error
 }
 
-func _close(obj CanClose) {
-	// dont overwrite err
+func _close(obj MyCanClose) {
 	_ = obj.Close()
 }
 
@@ -148,54 +147,71 @@ func (ds *_DS) Close() error {
 	return ds.db.Close()
 }
 
-func (ds *_DS) Begin() (err error) {
-	if ds.tx != nil {
-		return errors.New("ds.tx already started")
+func getTx(ctx context.Context) *sql.Tx {
+	tx, _ := ctx.Value("tx").(*sql.Tx)
+	return tx
+}
+
+func (ds *_DS) Begin(ctx context.Context) (txCtx context.Context, err error) {
+	tx := getTx(ctx)
+	if tx != nil {
+		return nil, errors.New("tx already started")
 	}
-	ds.tx, err = ds.db.Begin()
+	tx, err = ds.db.Begin()
+	txCtx = context.WithValue(ctx, "tx", tx)
 	return
 }
 
-func (ds *_DS) Commit() (err error) {
-	if ds.tx == nil {
+func (ds *_DS) Commit(txCtx *context.Context) (err error) {
+	if txCtx == nil {
+		return errors.New("no tx to commit")
+	}
+	tx := getTx(*txCtx)
+	if tx == nil {
 		return errors.New("ds.tx not started")
 	}
-	err = ds.tx.Commit()
-	ds.tx = nil // to prevent ds.tx.Rollback() in defer
+	err = tx.Commit()
+	*txCtx = nil // to prevent ds.tx.Rollback() in defer
 	return
 }
 
-func (ds *_DS) Rollback() (err error) {
-	if ds.tx == nil {
+func (ds *_DS) Rollback(txCtx *context.Context) (err error) {
+	if txCtx == nil {
+		return errors.New("no tx to rollback")
+	}
+	tx := getTx(*txCtx)
+	if tx == nil {
 		return nil // commit() was called, just do nothing:
 	}
-	err = ds.tx.Rollback()
-	ds.tx = nil
+	err = tx.Rollback()
+	*txCtx = nil
 	return
 }
 
-func (ds *_DS) _query(sqlStr string, args ...interface{}) (*sql.Rows, error) {
-	if ds.tx == nil {
-		return ds.db.Query(sqlStr, args...)
+func (ds *_DS) _query(ctx context.Context, sqlStr string, args ...interface{}) (*sql.Rows, error) {
+	tx := getTx(ctx)
+	if tx == nil {
+		return ds.db.QueryContext(ctx, sqlStr, args...)
 	}
-	return ds.tx.Query(sqlStr, args...)
+	return tx.QueryContext(ctx, sqlStr, args...)
 }
 
-func (ds *_DS) _exec(sqlStr string, args ...interface{}) (sql.Result, error) {
-	if ds.tx == nil {
-		return ds.db.Exec(sqlStr, args...)
+func (ds *_DS) _exec(ctx context.Context, sqlStr string, args ...interface{}) (sql.Result, error) {
+	tx := getTx(ctx)
+	if tx == nil {
+		return ds.db.ExecContext(ctx, sqlStr, args...)
 	}
-	return ds.tx.Exec(sqlStr, args...)
+	return tx.ExecContext(ctx, sqlStr, args...)
 }
 
 func (ds *_DS) PGFetch(cursor string) string {
 	return fmt.Sprintf(`fetch all from "%s"`, cursor)
 }
 
-func (ds *_DS) _pgInsert(sqlStr string, aiNames string, args ...interface{}) (id interface{}, err error) {
+func (ds *_DS) _pgInsert(ctx context.Context, sqlStr string, aiNames string, args ...interface{}) (id interface{}, err error) {
 	// fetching of multiple AI values is not implemented so far:
 	sqlStr += " RETURNING " + aiNames
-	rows, err := ds._query(sqlStr, args...)
+	rows, err := ds._query(ctx, sqlStr, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -209,7 +225,7 @@ func (ds *_DS) _pgInsert(sqlStr string, aiNames string, args ...interface{}) (id
 	return
 }
 
-func (ds *_DS) _oracleInsert(sqlStr string, aiNames string, args ...interface{}) (id interface{}, err error) {
+func (ds *_DS) _oracleInsert(ctx context.Context, sqlStr string, aiNames string, args ...interface{}) (id interface{}, err error) {
 	// fetching of multiple AI values is not implemented so far:
 	sqlStr = fmt.Sprintf("%s returning %s  into :%d", sqlStr, aiNames, len(args)+1)
 	// https://ddcode.net/2019/05/11/how-does-go-call-oracles-stored-procedures-and-get-the-return-value-of-the-stored-procedures/
@@ -218,21 +234,21 @@ func (ds *_DS) _oracleInsert(sqlStr string, aiNames string, args ...interface{})
 	// var id64 int64 --- it works, but...
 	args = append(args, sql.Out{Dest: &id64, In: false})
 	// ----------------
-	_, err = ds._exec(sqlStr, args...)
+	_, err = ds._exec(ctx, sqlStr, args...)
 	if err != nil {
 		return
 	}
 	return id64, nil
 }
 
-func (ds *_DS) _mssqlInsert(sqlStr string, args ...interface{}) (id interface{}, err error) {
+func (ds *_DS) _mssqlInsert(ctx context.Context, sqlStr string, args ...interface{}) (id interface{}, err error) {
 	// SQL Server https://github.com/denisenkom/go-mssqldb
 	// LastInsertId should not be used with this driver (or SQL Server) due to
 	// how the TDS protocol works. Please use the OUTPUT Clause or add a select
 	// ID = convert(bigint, SCOPE_IDENTITY()); to the end of your query (ref SCOPE_IDENTITY).
 	//  This will ensure you are getting the correct ID and will prevent a network round trip.
 	sqlStr += ";SELECT @@IDENTITY;"
-	rows, err := ds._query(sqlStr, args...)
+	rows, err := ds._query(ctx, sqlStr, args...)
 	if err != nil {
 		return
 	}
@@ -246,8 +262,8 @@ func (ds *_DS) _mssqlInsert(sqlStr string, args ...interface{}) (id interface{},
 	return
 }
 
-func (ds *_DS) _defaultInsert(sqlStr string, args ...interface{}) (id interface{}, err error) {
-	res, err := ds._exec(sqlStr, args...)
+func (ds *_DS) _defaultInsert(ctx context.Context, sqlStr string, args ...interface{}) (id interface{}, err error) {
+	res, err := ds._exec(ctx, sqlStr, args...)
 	if err != nil {
 		return
 	}
@@ -255,7 +271,7 @@ func (ds *_DS) _defaultInsert(sqlStr string, args ...interface{}) (id interface{
 	return
 }
 
-func (ds *_DS) Insert(sqlStr string, aiNames string, args ...interface{}) (id interface{}, err error) {
+func (ds *_DS) Insert(ctx context.Context, sqlStr string, aiNames string, args ...interface{}) (id interface{}, err error) {
 	if len(aiNames) == 0 { // len(nil) == 0
 		err = errors.New("_DS.insert is not applicable for aiNames = " + aiNames)
 		return
@@ -263,15 +279,15 @@ func (ds *_DS) Insert(sqlStr string, aiNames string, args ...interface{}) (id in
 	// Builtin LastInsertId works only with MySQL and SQLite3
 	sqlStr = ds._formatSQL(sqlStr)
 	if ds.isPostgreSQL() {
-		return ds._pgInsert(sqlStr, aiNames, args...)
+		return ds._pgInsert(ctx, sqlStr, aiNames, args...)
 	} else if ds.isSqlServer() {
-		return ds._mssqlInsert(sqlStr, args...)
+		return ds._mssqlInsert(ctx, sqlStr, args...)
 	} else if ds.isOracle() {
 		// Oracle: specify AI values explicitly:
 		// <crud-auto dto="ProjectInfo" table="PROJECTS" generated="P_ID"/>
-		return ds._oracleInsert(sqlStr, aiNames, args...)
+		return ds._oracleInsert(ctx, sqlStr, aiNames, args...)
 	}
-	return ds._defaultInsert(sqlStr, args...)
+	return ds._defaultInsert(ctx, sqlStr, args...)
 }
 
 func _isPtr(p interface{}) bool {
@@ -393,8 +409,8 @@ func (ds *_DS) _processExecParams(args []interface{}, onRowArr *[]interface{},
 	return
 }
 
-func (ds *_DS) _queryAllImplicitRcOracle(sqlStr string, onRowArr []interface{}, queryArgs ...interface{}) (err error) {
-	rows, err := ds._query(sqlStr, queryArgs...)
+func (ds *_DS) _queryAllImplicitRcOracle(ctx context.Context, sqlStr string, onRowArr []interface{}, queryArgs ...interface{}) (err error) {
+	rows, err := ds._query(ctx, sqlStr, queryArgs...)
 	if err != nil {
 		return
 	}
@@ -454,8 +470,8 @@ func (ds *_DS) _fetchRows(rows *sql.Rows, onRow func() (interface{}, func())) (e
 	return
 }
 
-func (ds *_DS) _queryAllImplicitRcMySQL(sqlStr string, onRowArr []interface{}, queryArgs ...interface{}) (err error) {
-	rows, err := ds._query(sqlStr, queryArgs...)
+func (ds *_DS) _queryAllImplicitRcMySQL(ctx context.Context, sqlStr string, onRowArr []interface{}, queryArgs ...interface{}) (err error) {
+	rows, err := ds._query(ctx, sqlStr, queryArgs...)
 	if err != nil {
 		return
 	}
@@ -496,8 +512,8 @@ func (ds *_DS) _queryAllImplicitRcMySQL(sqlStr string, onRowArr []interface{}, q
 	return
 }
 
-func (ds *_DS) _exec2(sqlStr string, onRowArr []interface{}, args ...interface{}) (rowsAffected int64, err error) {
-	res, err := ds._exec(sqlStr, args...)
+func (ds *_DS) _exec2(ctx context.Context, sqlStr string, onRowArr []interface{}, args ...interface{}) (rowsAffected int64, err error) {
+	res, err := ds._exec(ctx, sqlStr, args...)
 	if err != nil {
 		return
 	}
@@ -569,7 +585,7 @@ func _fetchAllFromCursor(rows driver.Rows, onRowFunc interface{}) (err error) {
 	return
 }
 
-func (ds *_DS) Exec(sqlStr string, args ...interface{}) (rowsAffected int64, err error) {
+func (ds *_DS) Exec(ctx context.Context, sqlStr string, args ...interface{}) (rowsAffected int64, err error) {
 	sqlStr = ds._formatSQL(sqlStr)
 	var onRowArr []interface{}
 	var queryArgs []interface{}
@@ -580,17 +596,17 @@ func (ds *_DS) Exec(sqlStr string, args ...interface{}) (rowsAffected int64, err
 	}
 	if implicitCursors {
 		if ds.isOracle() {
-			err = ds._queryAllImplicitRcOracle(sqlStr, onRowArr, queryArgs...)
+			err = ds._queryAllImplicitRcOracle(ctx, sqlStr, onRowArr, queryArgs...)
 		} else {
-			err = ds._queryAllImplicitRcMySQL(sqlStr, onRowArr, queryArgs...) // it works with MySQL SP
+			err = ds._queryAllImplicitRcMySQL(ctx, sqlStr, onRowArr, queryArgs...) // it works with MySQL SP
 		}
 		return
 	}
-	return ds._exec2(sqlStr, onRowArr, queryArgs...)
+	return ds._exec2(ctx, sqlStr, onRowArr, queryArgs...)
 }
 
-func (ds *_DS) _queryRowValues(sqlStr string, queryArgs ...interface{}) (values []interface{}, err error) {
-	rows, err := ds._query(sqlStr, queryArgs...)
+func (ds *_DS) _queryRowValues(ctx context.Context, sqlStr string, queryArgs ...interface{}) (values []interface{}, err error) {
+	rows, err := ds._query(ctx, sqlStr, queryArgs...)
 	if err != nil {
 		return
 	}
@@ -624,7 +640,7 @@ func (ds *_DS) _queryRowValues(sqlStr string, queryArgs ...interface{}) (values 
 	return
 }
 
-func (ds *_DS) Query(sqlStr string, args ...interface{}) (arr interface{}, err error) {
+func (ds *_DS) Query(ctx context.Context, sqlStr string, args ...interface{}) (arr interface{}, err error) {
 	sqlStr = ds._formatSQL(sqlStr)
 	var onRowArr []interface{}
 	var queryArgs []interface{}
@@ -636,13 +652,13 @@ func (ds *_DS) Query(sqlStr string, args ...interface{}) (arr interface{}, err e
 		err = errors.New("not supported in Query: implicitCursors || outCursors")
 		return
 	}
-	arr, err = ds._queryRowValues(sqlStr, queryArgs...)
+	arr, err = ds._queryRowValues(ctx, sqlStr, queryArgs...)
 	return // it returns []interface{} for cases like 'SELECT @value, @name;'
 }
 
-func (ds *_DS) QueryAll(sqlStr string, onRow func(interface{}), args ...interface{}) (err error) {
+func (ds *_DS) QueryAll(ctx context.Context, sqlStr string, onRow func(interface{}), args ...interface{}) (err error) {
 	sqlStr = ds._formatSQL(sqlStr)
-	rows, err := ds._query(sqlStr, args...)
+	rows, err := ds._query(ctx, sqlStr, args...)
 	if err != nil {
 		return
 	}
@@ -670,9 +686,9 @@ func (ds *_DS) QueryAll(sqlStr string, onRow func(interface{}), args ...interfac
 	return
 }
 
-func (ds *_DS) QueryRow(sqlStr string, args ...interface{}) (data map[string]interface{}, err error) {
+func (ds *_DS) QueryRow(ctx context.Context, sqlStr string, args ...interface{}) (data map[string]interface{}, err error) {
 	sqlStr = ds._formatSQL(sqlStr)
-	rows, err := ds._query(sqlStr, args...)
+	rows, err := ds._query(ctx, sqlStr, args...)
 	if err != nil {
 		return
 	}
@@ -699,11 +715,11 @@ func (ds *_DS) QueryRow(sqlStr string, args ...interface{}) (data map[string]int
 	return
 }
 
-func (ds *_DS) QueryAllRows(sqlStr string, onRow func(map[string]interface{}), args ...interface{}) (err error) {
+func (ds *_DS) QueryAllRows(ctx context.Context, sqlStr string, onRow func(map[string]interface{}), args ...interface{}) (err error) {
 	// many thanks to:
 	// https://stackoverflow.com/questions/51731423/how-to-read-a-row-from-a-table-to-a-map-without-knowing-columns
 	sqlStr = ds._formatSQL(sqlStr)
-	rows, err := ds._query(sqlStr, args...)
+	rows, err := ds._query(ctx, sqlStr, args...)
 	if err != nil {
 		return
 	}
@@ -732,9 +748,9 @@ func (ds *_DS) QueryAllRows(sqlStr string, onRow func(map[string]interface{}), a
 	return
 }
 
-func (ds *_DS) QueryByFA(sqlStr string, fa interface{}, args ...interface{}) (err error) {
+func (ds *_DS) QueryByFA(ctx context.Context, sqlStr string, fa interface{}, args ...interface{}) (err error) {
 	sqlStr = ds._formatSQL(sqlStr)
-	rows, err := ds._query(sqlStr, args...)
+	rows, err := ds._query(ctx, sqlStr, args...)
 	if err != nil {
 		return
 	}
@@ -758,9 +774,9 @@ func (ds *_DS) QueryByFA(sqlStr string, fa interface{}, args ...interface{}) (er
 	return
 }
 
-func (ds *_DS) QueryAllByFA(sqlStr string, onRow func() (interface{}, func()), args ...interface{}) (err error) {
+func (ds *_DS) QueryAllByFA(ctx context.Context, sqlStr string, onRow func() (interface{}, func()), args ...interface{}) (err error) {
 	sqlStr = ds._formatSQL(sqlStr)
-	rows, err := ds._query(sqlStr, args...)
+	rows, err := ds._query(ctx, sqlStr, args...)
 	if err != nil {
 		return
 	}

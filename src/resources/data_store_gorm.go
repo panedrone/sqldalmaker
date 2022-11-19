@@ -1,6 +1,7 @@
-package dbal
+package dal
 
 import (
+	"context"
 	"database/sql"
 	"database/sql/driver"
 	"errors"
@@ -21,35 +22,35 @@ import (
 */
 
 type DataStore interface {
-	Db() *gorm.DB
+	Session(ctx context.Context) *gorm.DB
 
-	Open() (err error)
-	Close() (err error)
+	Open() error
+	Close() error
 
-	Begin() (err error)
-	Commit() (err error)
-	Rollback() (err error)
+	Begin(ctx context.Context) (txCtx context.Context, err error)
+	Commit(txCtx *context.Context) error
+	Rollback(txCtx *context.Context) error
 
 	// CRUD
 
-	Create(table string, dataObjRef interface{}) (err error)
-	ReadAll(table string, sliceOfDataObjRef interface{}) (err error)
-	Read(table string, dataObjRef interface{}, pk ...interface{}) (err error)
-	Update(table string, dataObjRef interface{}) (rowsAffected int64, err error)
-	Delete(table string, dataObjRef interface{}) (rowsAffected int64, err error)
+	Create(ctx context.Context, table string, dataObjRef interface{}) error
+	ReadAll(ctx context.Context, table string, sliceOfDataObjRef interface{}) error
+	Read(ctx context.Context, table string, dataObjRef interface{}, pk ...interface{}) error
+	Update(ctx context.Context, table string, dataObjRef interface{}) (rowsAffected int64, err error)
+	Delete(ctx context.Context, table string, dataObjRef interface{}) (rowsAffected int64, err error)
 
 	// raw-SQL
 
-	Exec(sqlStr string, args ...interface{}) (res int64, err error)
-	Query(sqlStr string, args ...interface{}) (res interface{}, err error)
-	QueryAll(sqlStr string, onRow func(interface{}), args ...interface{}) (err error)
-	QueryRow(sqlStr string, args ...interface{}) (data map[string]interface{}, err error)
-	QueryAllRows(sqlStr string, onRow func(map[string]interface{}), args ...interface{}) (err error)
+	Exec(ctx context.Context, sqlStr string, args ...interface{}) (res int64, err error)
+	Query(ctx context.Context, sqlStr string, args ...interface{}) (res interface{}, err error)
+	QueryAll(ctx context.Context, sqlStr string, onRow func(interface{}), args ...interface{}) error
+	QueryRow(ctx context.Context, sqlStr string, args ...interface{}) (data map[string]interface{}, err error)
+	QueryAllRows(ctx context.Context, sqlStr string, onRow func(map[string]interface{}), args ...interface{}) error
 
-	QueryByFA(sqlStr string, fa interface{}, args ...interface{}) (err error)
-	QueryAllByFA(sqlStr string, onRow func() (fa interface{}, onRowCompleted func()), args ...interface{}) (err error)
+	QueryByFA(ctx context.Context, sqlStr string, fa interface{}, args ...interface{}) error
+	QueryAllByFA(ctx context.Context, sqlStr string, onRow func() (fa interface{}, onRowCompleted func()), args ...interface{}) error
 
-	// PGFetch(cursor string) string
+	PGFetch(cursor string) string
 }
 
 type OutParam struct {
@@ -79,8 +80,7 @@ type InOutParam struct {
 
 type _DS struct {
 	paramPrefix string
-	db          *gorm.DB
-	tx          *gorm.DB
+	rootDb      *gorm.DB
 }
 
 type CanClose interface {
@@ -90,10 +90,6 @@ type CanClose interface {
 func _close(obj CanClose) {
 	// dont overwrite err
 	_ = obj.Close()
-}
-
-func (ds *_DS) Db() *gorm.DB {
-	return ds.db
 }
 
 func (ds *_DS) isPostgreSQL() bool {
@@ -113,10 +109,11 @@ func (ds *_DS) isSqlServer() bool {
 
 // data_store_gorm_ex.go
 
-package models
+package dal
 
 import (
-	"gorm.io/driver/sqlite"
+	"context"
+	"github.com/cengsin/oracle"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
@@ -124,14 +121,21 @@ import (
 var ds = &_DS{}
 
 func (ds *_DS) initDb() (err error) {
-	ds.db, err = gorm.Open(sqlite.Open("./todolist.sqlite3"), &gorm.Config{
+	dsn := "MY_TESTS/sa@127.0.0.1:1521/XEPDB1?charset=utf8mb4&parseTime=True&loc=Local"
+	ds.rootDb, err = gorm.Open(oracle.Open(dsn), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Info),
 	})
 	return
 }
 
-func Db() *gorm.DB {
-	return ds.db
+// it can be used in a middleware to start separate sessions for incoming web-requests
+//
+// api := r.Group("", func(ctx *gin.Context) {
+//		ctx.Set("db", dal.WithContext(ctx))
+//	})
+
+func WithContext(ctx context.Context) *gorm.DB {
+	return ds.rootDb.WithContext(ctx)
 }
 
 func OpenDB() error {
@@ -146,77 +150,109 @@ func NewGroupsDao() *GroupsDao {
 	return &GroupsDao{ds: ds}
 }
 
+func NewTasksDao() *TasksDao {
+	return &TasksDao{ds: ds}
+}
+
 */
 
 func (ds *_DS) Open() error {
 	return ds.initDb()
 }
 
-func (ds *_DS) Close() (err error) {
+func (ds *_DS) Close() error {
 	// https://stackoverflow.com/questions/63816057/how-do-i-close-database-instance-in-gorm-1-20-0
-	var sqlDB *sql.DB
-	sqlDB, err = ds.db.DB()
+	sqlDB, err := ds.rootDb.DB()
 	if err != nil {
-		println(err.Error())
-		return
+		return err
 	}
 	err = sqlDB.Close()
 	if err != nil {
-		println(err.Error())
-		return
+		return err
 	}
+	return nil
+}
+
+func (ds *_DS) db(ctx context.Context) *gorm.DB {
+	db, ok := ctx.Value("db").(*gorm.DB)
+	if ok {
+		return db
+	}
+	return ds.rootDb
+}
+
+func (ds *_DS) tx(ctx context.Context) *gorm.DB {
+	tx, _ := ctx.Value("tx").(*gorm.DB)
+	return tx
+}
+
+func (ds *_DS) Begin(ctx context.Context) (txCtx context.Context, err error) {
+	tx := ds.tx(ctx)
+	if tx != nil {
+		return nil, errors.New("tx already started")
+	}
+	tx = ds.db(ctx).Begin()
+	txCtx = context.WithValue(ctx, "tx", tx)
 	return
 }
 
-func (ds *_DS) Begin() (err error) {
-	if ds.tx != nil {
-		return errors.New("ds.tx already started")
+func (ds *_DS) Commit(txCtx *context.Context) (err error) {
+	if txCtx == nil {
+		return errors.New("no tx to commit")
 	}
-	ds.tx = ds.db.Begin()
-	return
-}
-
-func (ds *_DS) Commit() (err error) {
-	if ds.tx == nil {
+	tx := ds.tx(*txCtx)
+	if tx == nil {
 		return errors.New("ds.tx not started")
 	}
-	ds.tx.Commit()
-	ds.tx = nil // to prevent ds.tx.Rollback() in defer
+	tx.Commit()
+	*txCtx = nil // to prevent ds.tx.Rollback() in defer
 	return
 }
 
-func (ds *_DS) Rollback() (err error) {
-	if ds.tx == nil {
-		return nil // commit() was called, just do nothing:
+func (ds *_DS) Rollback(txCtx *context.Context) (err error) {
+	if txCtx == nil {
+		return nil // commit() was called, just do nothing
 	}
-	ds.tx.Rollback()
-	ds.tx = nil
+	tx := ds.tx(*txCtx)
+	if tx == nil {
+		return errors.New("ds.tx not started")
+	}
+	tx.Rollback()
+	*txCtx = nil
 	return
 }
 
 // CRUD -----------------------------------
 
-func (ds *_DS) Create(table string, dataObjRef interface{}) error {
-	return ds.db.Table(table).Create(dataObjRef).Error
+func (ds *_DS) Session(ctx context.Context) *gorm.DB {
+	tx := ds.tx(ctx)
+	if tx == nil {
+		return ds.db(ctx)
+	}
+	return tx
 }
 
-func (ds *_DS) ReadAll(table string, sliceOfDataObjRef interface{}) error {
-	return ds.db.Table(table).Find(sliceOfDataObjRef).Error
+func (ds *_DS) Create(ctx context.Context, table string, dataObjRef interface{}) error {
+	return ds.Session(ctx).Table(table).Create(dataObjRef).Error
 }
 
-func (ds *_DS) Read(table string, dataObjRef interface{}, pk ...interface{}) error {
-	return ds.db.Table(table).Take(dataObjRef, pk...).Error
+func (ds *_DS) ReadAll(ctx context.Context, table string, sliceOfDataObjRef interface{}) error {
+	return ds.Session(ctx).Table(table).Find(sliceOfDataObjRef).Error
 }
 
-func (ds *_DS) Update(table string, dataObjRef interface{}) (rowsAffected int64, err error) {
-	db := ds.db.Table(table).Save(dataObjRef)
+func (ds *_DS) Read(ctx context.Context, table string, dataObjRef interface{}, pk ...interface{}) error {
+	return ds.Session(ctx).Table(table).Take(dataObjRef, pk...).Error
+}
+
+func (ds *_DS) Update(ctx context.Context, table string, dataObjRef interface{}) (rowsAffected int64, err error) {
+	db := ds.Session(ctx).Table(table).Save(dataObjRef)
 	err = db.Error
 	rowsAffected = db.RowsAffected
 	return
 }
 
-func (ds *_DS) Delete(table string, dataObjRef interface{}) (rowsAffected int64, err error) {
-	db := ds.db.Table(table).Delete(dataObjRef)
+func (ds *_DS) Delete(ctx context.Context, table string, dataObjRef interface{}) (rowsAffected int64, err error) {
+	db := ds.Session(ctx).Table(table).Delete(dataObjRef)
 	err = db.Error
 	rowsAffected = db.RowsAffected
 	return
@@ -224,23 +260,13 @@ func (ds *_DS) Delete(table string, dataObjRef interface{}) (rowsAffected int64,
 
 // raw-SQL --------------------------------
 
-func (ds *_DS) _query(sqlStr string, args ...interface{}) (*sql.Rows, error) {
-	var raw *gorm.DB
-	if ds.tx == nil {
-		raw = ds.db.Raw(sqlStr, args...)
-	} else {
-		raw = ds.tx.Raw(sqlStr, args...)
-	}
+func (ds *_DS) _query(ctx context.Context, sqlStr string, args ...interface{}) (*sql.Rows, error) {
+	raw := ds.Session(ctx).Raw(sqlStr, args...)
 	return raw.Rows()
 }
 
-func (ds *_DS) _exec(sqlStr string, args ...interface{}) (rowsAffected int64, err error) {
-	var res *gorm.DB
-	if ds.tx == nil {
-		res = ds.db.Exec(sqlStr, args...)
-	} else {
-		res = ds.tx.Exec(sqlStr, args...)
-	}
+func (ds *_DS) _exec(ctx context.Context, sqlStr string, args ...interface{}) (rowsAffected int64, err error) {
+	res := ds.Session(ctx).Exec(sqlStr, args...)
 	return res.RowsAffected, res.Error
 }
 
@@ -367,8 +393,8 @@ func (ds *_DS) _processExecParams(args []interface{}, onRowArr *[]interface{},
 	return
 }
 
-func (ds *_DS) _queryAllImplicitRcOracle(sqlStr string, onRowArr []interface{}, queryArgs ...interface{}) (err error) {
-	rows, err := ds._query(sqlStr, queryArgs...)
+func (ds *_DS) _queryAllImplicitRcOracle(ctx context.Context, sqlStr string, onRowArr []interface{}, queryArgs ...interface{}) (err error) {
+	rows, err := ds._query(ctx, sqlStr, queryArgs...)
 	if err != nil {
 		return
 	}
@@ -399,7 +425,7 @@ func (ds *_DS) _queryAllImplicitRcOracle(sqlStr string, onRowArr []interface{}, 
 				onRow(data)
 			}
 		case func() (interface{}, func()):
-			err = ds._fetchRows(rows, onRow)
+			err = ds._fetchRows(ctx, rows, onRow)
 			if err != nil {
 				return
 			}
@@ -411,14 +437,14 @@ func (ds *_DS) _queryAllImplicitRcOracle(sqlStr string, onRowArr []interface{}, 
 	return
 }
 
-func (ds *_DS) _fetchRows(rows *sql.Rows, onRow func() (interface{}, func())) (err error) {
+func (ds *_DS) _fetchRows(ctx context.Context, rows *sql.Rows, onRow func() (interface{}, func())) (err error) {
 	for rows.Next() {
 		fa, onRowCompleted := onRow()
 		switch _fa := fa.(type) {
 		case []interface{}:
 			err = rows.Scan(_fa...)
 		case interface{}:
-			err = ds.db.ScanRows(rows, fa)
+			err = ds.Session(ctx).ScanRows(rows, fa)
 		default:
 			err = errors.New(fmt.Sprintf("Unexpected type: %v", reflect.TypeOf(_fa)))
 		}
@@ -430,8 +456,8 @@ func (ds *_DS) _fetchRows(rows *sql.Rows, onRow func() (interface{}, func())) (e
 	return
 }
 
-func (ds *_DS) _queryAllImplicitRcMySQL(sqlStr string, onRowArr []interface{}, queryArgs ...interface{}) (err error) {
-	rows, err := ds._query(sqlStr, queryArgs...)
+func (ds *_DS) _queryAllImplicitRcMySQL(ctx context.Context, sqlStr string, onRowArr []interface{}, queryArgs ...interface{}) (err error) {
+	rows, err := ds._query(ctx, sqlStr, queryArgs...)
 	if err != nil {
 		return
 	}
@@ -457,7 +483,7 @@ func (ds *_DS) _queryAllImplicitRcMySQL(sqlStr string, onRowArr []interface{}, q
 				onRow(data)
 			}
 		case func() (interface{}, func()):
-			err = ds._fetchRows(rows, onRow)
+			err = ds._fetchRows(ctx, rows, onRow)
 			if err != nil {
 				return
 			}
@@ -472,8 +498,8 @@ func (ds *_DS) _queryAllImplicitRcMySQL(sqlStr string, onRowArr []interface{}, q
 	return
 }
 
-func (ds *_DS) _exec2(sqlStr string, onRowArr []interface{}, args ...interface{}) (rowsAffected int64, err error) {
-	rowsAffected, err = ds._exec(sqlStr, args...)
+func (ds *_DS) _exec2(ctx context.Context, sqlStr string, onRowArr []interface{}, args ...interface{}) (rowsAffected int64, err error) {
+	rowsAffected, err = ds._exec(ctx, sqlStr, args...)
 	if err != nil {
 		return
 	}
@@ -536,7 +562,7 @@ func _fetchAllFromCursor(rows driver.Rows, onRowFunc interface{}) (err error) {
 	return
 }
 
-func (ds *_DS) Exec(sqlStr string, args ...interface{}) (res int64, err error) {
+func (ds *_DS) Exec(ctx context.Context, sqlStr string, args ...interface{}) (res int64, err error) {
 	sqlStr = ds._formatSQL(sqlStr)
 	var onRowArr []interface{}
 	var queryArgs []interface{}
@@ -547,17 +573,17 @@ func (ds *_DS) Exec(sqlStr string, args ...interface{}) (res int64, err error) {
 	}
 	if implicitCursors {
 		if ds.isOracle() {
-			err = ds._queryAllImplicitRcOracle(sqlStr, onRowArr, queryArgs...)
+			err = ds._queryAllImplicitRcOracle(ctx, sqlStr, onRowArr, queryArgs...)
 		} else {
-			err = ds._queryAllImplicitRcMySQL(sqlStr, onRowArr, queryArgs...) // it works with MySQL SP
+			err = ds._queryAllImplicitRcMySQL(ctx, sqlStr, onRowArr, queryArgs...) // it works with MySQL SP
 		}
 		return
 	}
-	return ds._exec2(sqlStr, onRowArr, queryArgs...)
+	return ds._exec2(ctx, sqlStr, onRowArr, queryArgs...)
 }
 
-func (ds *_DS) _queryRowValues(sqlStr string, queryArgs ...interface{}) (values []interface{}, err error) {
-	rows, err := ds._query(sqlStr, queryArgs...)
+func (ds *_DS) _queryRowValues(ctx context.Context, sqlStr string, queryArgs ...interface{}) (values []interface{}, err error) {
+	rows, err := ds._query(ctx, sqlStr, queryArgs...)
 	if err != nil {
 		return
 	}
@@ -591,7 +617,7 @@ func (ds *_DS) _queryRowValues(sqlStr string, queryArgs ...interface{}) (values 
 	return
 }
 
-func (ds *_DS) Query(sqlStr string, args ...interface{}) (arr interface{}, err error) {
+func (ds *_DS) Query(ctx context.Context, sqlStr string, args ...interface{}) (arr interface{}, err error) {
 	sqlStr = ds._formatSQL(sqlStr)
 	var onRowArr []interface{}
 	var queryArgs []interface{}
@@ -603,13 +629,13 @@ func (ds *_DS) Query(sqlStr string, args ...interface{}) (arr interface{}, err e
 		err = errors.New("not supported in Query: implicitCursors || outCursors")
 		return
 	}
-	arr, err = ds._queryRowValues(sqlStr, queryArgs...)
+	arr, err = ds._queryRowValues(ctx, sqlStr, queryArgs...)
 	return // it returns []interface{} for cases like 'SELECT @value, @name;'
 }
 
-func (ds *_DS) QueryAll(sqlStr string, onRow func(interface{}), args ...interface{}) (err error) {
+func (ds *_DS) QueryAll(ctx context.Context, sqlStr string, onRow func(interface{}), args ...interface{}) (err error) {
 	sqlStr = ds._formatSQL(sqlStr)
-	rows, err := ds._query(sqlStr, args...)
+	rows, err := ds._query(ctx, sqlStr, args...)
 	if err != nil {
 		return
 	}
@@ -637,9 +663,9 @@ func (ds *_DS) QueryAll(sqlStr string, onRow func(interface{}), args ...interfac
 	return
 }
 
-func (ds *_DS) QueryRow(sqlStr string, args ...interface{}) (data map[string]interface{}, err error) {
+func (ds *_DS) QueryRow(ctx context.Context, sqlStr string, args ...interface{}) (data map[string]interface{}, err error) {
 	sqlStr = ds._formatSQL(sqlStr)
-	rows, err := ds._query(sqlStr, args...)
+	rows, err := ds._query(ctx, sqlStr, args...)
 	if err != nil {
 		return
 	}
@@ -666,11 +692,11 @@ func (ds *_DS) QueryRow(sqlStr string, args ...interface{}) (data map[string]int
 	return
 }
 
-func (ds *_DS) QueryAllRows(sqlStr string, onRow func(map[string]interface{}), args ...interface{}) (err error) {
+func (ds *_DS) QueryAllRows(ctx context.Context, sqlStr string, onRow func(map[string]interface{}), args ...interface{}) (err error) {
 	// many thanks to:
 	// https://stackoverflow.com/questions/51731423/how-to-read-a-row-from-a-table-to-a-map-without-knowing-columns
 	sqlStr = ds._formatSQL(sqlStr)
-	rows, err := ds._query(sqlStr, args...)
+	rows, err := ds._query(ctx, sqlStr, args...)
 	if err != nil {
 		return
 	}
@@ -699,9 +725,9 @@ func (ds *_DS) QueryAllRows(sqlStr string, onRow func(map[string]interface{}), a
 	return
 }
 
-func (ds *_DS) QueryByFA(sqlStr string, fa interface{}, args ...interface{}) (err error) {
+func (ds *_DS) QueryByFA(ctx context.Context, sqlStr string, fa interface{}, args ...interface{}) (err error) {
 	sqlStr = ds._formatSQL(sqlStr)
-	rows, err := ds._query(sqlStr, args...)
+	rows, err := ds._query(ctx, sqlStr, args...)
 	if err != nil {
 		return
 	}
@@ -714,7 +740,7 @@ func (ds *_DS) QueryByFA(sqlStr string, fa interface{}, args ...interface{}) (er
 	if ok {
 		err = rows.Scan(faArr...)
 	} else {
-		err = ds.db.ScanRows(rows, fa)
+		err = ds.Session(ctx).ScanRows(rows, fa)
 	}
 	if err != nil {
 		return
@@ -725,9 +751,9 @@ func (ds *_DS) QueryByFA(sqlStr string, fa interface{}, args ...interface{}) (er
 	return
 }
 
-func (ds *_DS) QueryAllByFA(sqlStr string, onRow func() (fa interface{}, onRowCompleted func()), args ...interface{}) (err error) {
+func (ds *_DS) QueryAllByFA(ctx context.Context, sqlStr string, onRow func() (fa interface{}, onRowCompleted func()), args ...interface{}) (err error) {
 	sqlStr = ds._formatSQL(sqlStr)
-	rows, err := ds._query(sqlStr, args...)
+	rows, err := ds._query(ctx, sqlStr, args...)
 	if err != nil {
 		return
 	}
@@ -739,7 +765,7 @@ func (ds *_DS) QueryAllByFA(sqlStr string, onRow func() (fa interface{}, onRowCo
 			if ok {
 				err = rows.Scan(faArr...)
 			} else {
-				err = ds.db.ScanRows(rows, fa)
+				err = ds.Session(ctx).ScanRows(rows, fa)
 			}
 			if err != nil {
 				return
