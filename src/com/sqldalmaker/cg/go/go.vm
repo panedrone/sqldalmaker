@@ -52,7 +52,7 @@ package ${package}
 // https://sqldalmaker.sourceforge.net/
 
 import (
-    "context"
+	"context"
 #foreach($imp in ${imports})
 	"${imp}"
 #end
@@ -197,8 +197,8 @@ func (dao *${class_name}) ${method_name}(ctx context.Context#param_decls($is_ext
 }
 #else
 #sql_var($is_external_sql $sql)
-#if($use_dto)
-#if ($assign_mode > 0)
+#if($use_dto)## ------------------------------------------------------------ $use_dto
+#if ($assign_mode > 0)## ---------------- $assign_mode > 0 --> QueryByFA
 	res = &${returned_type_name}{}
 #if ($assign_mode == 1)
 	_fa := []interface{}{
@@ -215,11 +215,11 @@ func (dao *${class_name}) ${method_name}(ctx context.Context#param_decls($is_ext
 	err = dao.ds.QueryByFA(ctx, sql, _fa#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
 #end
 	return
-#else
+#else## ---------------------------------- $assign_mode == 0 --> QueryRow
 #if(${dto_param} != "")
 	row, err := dao.ds.QueryRow(ctx, sql#foreach($param in ${params}), p.${param.getName()}()#end))
 #else
-	row, err := dao.ds.QueryRow(ctx, sql#foreach($param in ${params}), ${param.getLowerCamelCaseName()})
+	row, err := dao.ds.QueryRow(ctx, sql#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
 #end
 	if err != nil {
 		return
@@ -231,9 +231,8 @@ func (dao *${class_name}) ${method_name}(ctx context.Context#param_decls($is_ext
 #end
 	err = errMapToErr(errMap)
 	return
-#end
-#end
-#else
+#end## ----------------------------------- $assign_mode == 0
+#else## ------------------------------------------------------------ NOT $use_dto
 #if (${dto_param} != "")
 	r, err := dao.ds.Query(ctx, sql#foreach($p in ${params}), p.${p.getName()}()#end)
 #else
@@ -245,7 +244,7 @@ func (dao *${class_name}) ${method_name}(ctx context.Context#param_decls($is_ext
 	return
 #end
 }
-#end
+#end## ------------------------------------------------------------ NOT $use_dto
 #end
 ## ======================================================================================
 #elseif ($mode=="dao_exec_dml")
