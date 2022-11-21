@@ -1,3 +1,7 @@
+2022-11-20
+
+    "go.vm" --> "dao_query" divided to "dao_query_all" and "dao_query_all_dto". See "go.vm" in the tab "Admin".
+
 2022-11-02
 
     Fixes for Django

@@ -300,7 +300,15 @@ public class GoCG {
             }
             String go_sql_str = SqlUtils.format_jdbc_sql_for_go(dao_query_jdbc_sql);
             Map<String, Object> context = new HashMap<String, Object>();
-            context.put("mode", "dao_query");
+            if (fetch_list) {
+                if (return_type_is_dto) {
+                    context.put("mode", "dao_query_all_dto");
+                } else {
+                    context.put("mode", "dao_query_all");
+                }
+            } else {
+                context.put("mode", "dao_query_one");
+            }
             context.put("class_name", dao_class_name);
             if (return_type_is_dto) {
                 _set_model(dto_or_scalar_return_type, context);
@@ -326,7 +334,6 @@ public class GoCG {
             context.put("is_external_sql", is_external_sql);
             context.put("use_dto", return_type_is_dto);
             context.put("returned_type_name", returned_type_name);
-            context.put("fetch_list", fetch_list);
             _assign_params_and_imports(params, dto_param_type, context);
             StringWriter sw = new StringWriter();
             te.merge(context, sw);

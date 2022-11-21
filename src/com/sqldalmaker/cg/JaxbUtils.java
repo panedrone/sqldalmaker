@@ -5,15 +5,23 @@
  */
 package com.sqldalmaker.cg;
 
-import com.sqldalmaker.jaxb.dao.*;
-import com.sqldalmaker.jaxb.dto.DtoClass;
-import com.sqldalmaker.jaxb.dto.DtoClasses;
-import com.sqldalmaker.jaxb.settings.Macros;
-import com.sqldalmaker.jaxb.settings.Type;
-import com.sqldalmaker.jaxb.settings.TypeMap;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.*;
+
+import com.sqldalmaker.jaxb.dao.Crud;
+import com.sqldalmaker.jaxb.dao.DaoClass;
+import com.sqldalmaker.jaxb.dao.ExecDml;
+import com.sqldalmaker.jaxb.dao.Query;
+import com.sqldalmaker.jaxb.dao.QueryDto;
+import com.sqldalmaker.jaxb.dao.QueryDtoList;
+import com.sqldalmaker.jaxb.dao.QueryList;
+import com.sqldalmaker.jaxb.dao.TypeMethod;
+import com.sqldalmaker.jaxb.dto.DtoClass;
+import com.sqldalmaker.jaxb.dto.DtoClasses;
 
 /**
  * @author sqldalmaker@gmail.com

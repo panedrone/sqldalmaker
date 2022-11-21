@@ -85,82 +85,8 @@ func (dao *${class_name}) ${method_name}(ctx context.Context, p *${dto_param}) (
 }
 #end
 ## ======================================================================================
-#elseif ($mode=="dao_query")
+#elseif ($mode=="dao_query_all")
 
-#if ($method_type == "READ")
-// C(R)UD: ${ref}
-
-#end
-#if ($fetch_list)
-#if ($use_dto)
-#if (${dto_param} != "")
-func (dao *${class_name}) ${method_name}(ctx context.Context#param_decls_dto($is_external_sql)${dto_param} p) (res []*${returned_type_name}, err error) {
-#else
-func (dao *${class_name}) ${method_name}(ctx context.Context#param_decls($is_external_sql $params)) (res []*${returned_type_name}, err error) {
-#end
-#if ($method_type == "READ" && $model != "")
-	err = dao.ds.ReadAll(ctx, "${table_name}", &res)
-	return
-}
-#else
-#sql_var($is_external_sql $sql)
-#if ($assign_mode > 0)
-#if ($assign_mode == 1)
-	_onRow := func() (interface{}, func()) {
-		_obj := &${returned_type_name}{}
-		return []interface{}{
-#foreach ($f in ${fields})
-				&_obj.${f.getName()},
-#end
-			}, func() {
-				res = append(res, _obj)
-			}
-	}
-#elseif ($assign_mode == 2)
-	_onRow := func() (interface{}, func()) {
-		_obj := &${returned_type_name}{}
-		return _obj, func() {
-			res = append(res, _obj)
-		}
-	}
-#end
-#if ($assign_mode == 3)
-#if(${dto_param} != "")
-	err = dao.ds.QueryByFA(ctx, sql, &res#foreach($param in ${params}), p.${param.getName()}()#end))
-#else
-	err = dao.ds.QueryByFA(ctx, sql, &res#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
-#end
-#else
-#if(${dto_param} != "")
-	err = dao.ds.QueryAllByFA(ctx, sql, _onRow#foreach($param in ${params}), p.${param.getName()}()#end))
-#else
-	err = dao.ds.QueryAllByFA(ctx, sql, _onRow#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
-#end
-#end
-	return
-}
-#else
-	errMap := make(map[string]int)
-	_onRow := func(row map[string]interface{}) {
-		obj := ${returned_type_name}{}
-#foreach($f in ${fields})
-		fromRow(&obj.${f.getName()}, row, "${f.getColumnName()}", errMap)
-#end
-		res = append(res, &obj)
-	}
-#if(${dto_param} != "")
-	err = dao.ds.QueryAllRows(ctx, sql, _onRow#foreach($p in ${params}), p.${p.getName()}()#end)
-#else
-	err = dao.ds.QueryAllRows(ctx, sql, _onRow#foreach($p in ${params}), ${p.getLowerCamelCaseName()}#end)
-	if err == nil {
-		err = errMapToErr(errMap)
-	}
-	return
-}
-#end
-#end
-#end
-#else
 #if (${dto_param} != "")
 func (dao *${class_name}) ${method_name}(ctx context.Context#param_decls_dto($is_external_sql)${dto_param} p) (res []${returned_type_name}, err error) {
 #else
@@ -183,8 +109,85 @@ func (dao *${class_name}) ${method_name}(ctx context.Context#param_decls($is_ext
 	}
 	return
 }
+## ======================================================================================
+#elseif ($mode=="dao_query_all_dto")
+
+#if ($method_type == "READ")
+// C(R)UD: ${ref}
+
 #end
+#if (${dto_param} != "")
+func (dao *${class_name}) ${method_name}(ctx context.Context#param_decls_dto($is_external_sql)${dto_param} p) (res []*${returned_type_name}, err error) {
 #else
+func (dao *${class_name}) ${method_name}(ctx context.Context#param_decls($is_external_sql $params)) (res []*${returned_type_name}, err error) {
+#end
+#if ($method_type == "READ" && $model != "")
+	err = dao.ds.ReadAll(ctx, "${table_name}", &res)
+	return
+}
+#else## --------------------------------------------------------
+#sql_var($is_external_sql $sql)
+#if ($assign_mode == 0)## --------------------------------------------------------
+	errMap := make(map[string]int)
+	_onRow := func(row map[string]interface{}) {
+		obj := ${returned_type_name}{}
+#foreach($f in ${fields})
+		fromRow(&obj.${f.getName()}, row, "${f.getColumnName()}", errMap)
+#end
+		res = append(res, &obj)
+	}
+#if(${dto_param} != "")
+	err = dao.ds.QueryAllRows(ctx, sql, _onRow#foreach($p in ${params}), p.${p.getName()}()#end)
+#else
+	err = dao.ds.QueryAllRows(ctx, sql, _onRow#foreach($p in ${params}), ${p.getLowerCamelCaseName()}#end)
+#end
+	if err == nil {
+		err = errMapToErr(errMap)
+	}
+#elseif ($assign_mode == 3)## ----------------------------------------------------
+#if(${dto_param} != "")
+	err = dao.ds.QueryByFA(ctx, sql, &res#foreach($param in ${params}), p.${param.getName()}()#end))
+#else
+	err = dao.ds.QueryByFA(ctx, sql, &res#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
+#end
+#else## --------------------------------------------------------------------------
+#if ($assign_mode == 1)
+	_onRow := func() (interface{}, func()) {
+		_obj := &${returned_type_name}{}
+		return []interface{}{
+#foreach ($f in ${fields})
+				&_obj.${f.getName()},
+#end
+			}, func() {
+				res = append(res, _obj)
+			}
+	}
+#elseif ($assign_mode == 2)
+	_onRow := func() (interface{}, func()) {
+		_obj := &${returned_type_name}{}
+		return _obj, func() {
+			res = append(res, _obj)
+		}
+	}
+#else
+	// unknown: $assign_mode
+#end
+#if(${dto_param} != "")
+	err = dao.ds.QueryAllByFA(ctx, sql, _onRow#foreach($param in ${params}), p.${param.getName()}()#end))
+#else
+	err = dao.ds.QueryAllByFA(ctx, sql, _onRow#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
+#end
+#end## $assign_mode == 1 || 2
+	return
+}
+#end## $method_type == "READ" && $model != ""
+### ======================================================================================
+#elseif ($mode=="dao_query_one")
+
+#if ($method_type == "READ")
+// C(R)UD: ${ref}
+
+#end
 #if (${dto_param} != "")
 func (dao *${class_name}) ${method_name}(ctx context.Context#param_decls_dto($is_external_sql)${dto_param} p) (res #if($use_dto)*#end${returned_type_name}, err error) {
 #else
@@ -244,7 +247,6 @@ func (dao *${class_name}) ${method_name}(ctx context.Context#param_decls($is_ext
 	return
 #end
 }
-#end## ------------------------------------------------------------ NOT $use_dto
 #end
 ## ======================================================================================
 #elseif ($mode=="dao_exec_dml")
@@ -308,9 +310,9 @@ func (dao *${class_name}) ${method_name}(ctx context.Context#param_decls($is_ext
 			}
 #else
 		_obj := &${m.get_dto_class_name()}{}
-        return _obj, func() {
-            ${m.get_method_param_name()}(_obj)
-        }
+		return _obj, func() {
+			${m.get_method_param_name()}(_obj)
+		}
 #end
 	}
 #end
