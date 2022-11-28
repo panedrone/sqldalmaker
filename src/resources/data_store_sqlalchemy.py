@@ -1,25 +1,21 @@
 """
-
-SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
-
-This is an example of how to implement DataStore in Python + SQLAlchemy.
-
+This file is a part of SQL DAL Maker project: https://sqldalmaker.sourceforge.net
+It demonstrates how to implement interface DataStore in Python + SQLAlchemy.
+More about DataStore: https://sqldalmaker.sourceforge.net/data_store.html
 Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store_sqlalchemy.py
 
-Copy-paste this code to your project and change it for your needs.
-
 Successfully tested with:
-
     - sqlite3 ---------------- built-in
     - postgresql ------------- pip install psycopg2
     - mysql+mysqlconnector --- pip install mysql-connector-python
     - cx_Oracle -------------- pip install cx_oracle
 
+Copy-paste this code to your project and change it for your needs.
 Improvements are welcome: sqldalmaker@gmail.com
-
 """
 
-import flask_sqlalchemy
+import flask_sqlalchemy  # remove it for a "not flask" version
+import sqlalchemy.orm
 
 
 # import cx_Oracle
@@ -38,17 +34,15 @@ class DataStore:
 
     def rollback(self): pass
 
-    # raw-SQL
-
-    def get_one_raw(self, cls, params=None): pass
-
-    def get_all_raw(self, cls, params=None) -> []: pass
-
-    # ORM helpers
+    # Helpers
 
     def filter(self, cls, params=None): pass
 
     def delete_by_filter(self, cls, params=None) -> int: pass
+
+    def get_one_raw(self, cls, params=None): pass
+
+    def get_all_raw(self, cls, params=None) -> []: pass
 
     # ORM-based CRUD
 
@@ -62,22 +56,89 @@ class DataStore:
 
     def delete_one(self, cls, params=None) -> int: pass
 
-    # the methods called by generated dao classes
+    # ORM-based methods for raw-SQL
 
-    def insert_row(self, sql, params, ai_values): pass
+    # === raw-SQL INSERT is not used with sqlalchemy: def insert_row(self, sql, params, ai_values): pass
 
-    def exec_dml(self, sql, params): pass
+    def exec_dml(self, sql, params):
+        """
+        :param sql: str
+        :param params: (array, optional): Values of SQL parameters
+        :return: int: amount of affected rows
+        """
+        pass
 
-    def query_scalar(self, sql, params): pass
+    def query_scalar(self, sql, params):
+        """
+        :param sql: str
+        :param params: (array, optional), values of SQL parameters
+        :return single scalar value
+        :raise Exception: if amount of fetched rows != 1
+        """
+        pass
 
-    def query_all_scalars(self, sql, params) -> []: pass
+    def query_all_scalars(self, sql, params) -> []:
+        """
+        :param sql: str
+        :param params: (array, optional), values of SQL parameters
+        :return array of scalar values
+        """
+        pass
 
-    def query_row(self, sql, params): pass
+    def query_row(self, sql, params):
+        """
+        :param sql: str
+        :param params: (array, optional), values of SQL parameters
+        :return single fetched row
+        :raise Exception: if amount of rows != 1
+        """
+        pass
 
-    def query_all_rows(self, sql, params, callback) -> []: pass
+    def query_all_rows(self, sql, params, callback):
+        """
+        :param sql: str
+        :param params: (array, optional), values of SQL parameters.
+        :param callback: а function delivering fetched rows to caller
+        :return: None
+        """
+        pass
 
 
 if flask_sqlalchemy:
+    #
+    # How to pre-configure flask_sqlalchemy (do it somewhere in __main__):
+    #
+    # flask_app = flask.Flask(__name__)
+    #
+    # dir_path = os.path.dirname(os.path.realpath(__file__))
+    # flask_app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{dir_path}/todolist.sqlite"
+    #
+    # # add mysql-connector-python to requirements.txt
+    # # app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:sa@localhost/todolist'
+    #
+    # # add psycopg2 to requirements.txt
+    # # flask_app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:sa@localhost/my-tests'
+    #
+    # # add cx_oracle to requirements.txt
+    # # if cx_Oracle:
+    # #     user = 'MY_TESTS'
+    # #     pwd = 'sa'
+    # #     dsn = cx_Oracle.makedsn(
+    # #         'localhost', 1521,
+    # #         service_name="orcl"
+    # #         # service_name='your_service_name_if_any'
+    # #     )
+    # # flask_app.config['SQLALCHEMY_DATABASE_URI'] = f'oracle+cx_oracle://{user}:{pwd}@{dsn}'
+    #
+    # # FSADeprecationWarning: SQLALCHEMY_TRACK_MODIFICATIONS adds
+    # # significant overhead and will be disabled by default in the future.
+    # # Set it to True or False to suppress this warning.
+    # flask_app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    #
+    # db = flask_sqlalchemy.SQLAlchemy(flask_app)
+    #
+    # init_ds(db)
+
     Base = None
 
     Column = None
@@ -96,40 +157,10 @@ if flask_sqlalchemy:
     Boolean = None
     LargeBinary = None
 
-    # ======== Below is an example of pre-configuring for flask_sqlalchemy (do it somewhere in __main__). ========
 
-    # flask_app = flask.Flask(__name__)
-    #
-    # dir_path = os.path.dirname(os.path.realpath(__file__))
-    # flask_app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{dir_path}/todolist.sqlite"
-    #
-    # # add mysql-connector-python to requirements.txt
-    # # app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:sa@localhost/todolist'
-    #
-    # # add psycopg2 to requirements.txt
-    # # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:sa@localhost/my-tests'
-    #
-    # # add cx_oracle to requirements.txt
-    # # if cx_Oracle:
-    # #     user = 'MY_TESTS'
-    # #     pwd = 'sa'
-    # #     dsn = cx_Oracle.makedsn(
-    # #         'localhost', 1521,
-    # #         service_name="orcl"
-    # #         # service_name='your_service_name_if_any'
-    # #     )
-    # #     app.config['SQLALCHEMY_DATABASE_URI'] = f'oracle+cx_oracle://{user}:{pwd}@{dsn}'
-    #
-    # # FSADeprecationWarning: SQLALCHEMY_TRACK_MODIFICATIONS adds
-    # # significant overhead and will be disabled by default in the future.
-    # # Set it to True or False to suppress this warning.
-    # flask_app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    #
-    # db = flask_sqlalchemy.SQLAlchemy(flask_app)
-    #
-    # MyApp.ds = create_ds(db) # DataStore as an singleton
-
-    def create_ds(db: flask_sqlalchemy.SQLAlchemy) -> DataStore:  # factory
+    def init_ds(db: flask_sqlalchemy.SQLAlchemy):
+        # _DS.Session = db.session()   ----------- RuntimeError: Working outside of application context.
+        _DS.Session = db.session
 
         global Base, Column, ForeignKey, \
             SmallInteger, Integer, BigInteger, Float, DateTime, String, Boolean, LargeBinary
@@ -151,8 +182,6 @@ if flask_sqlalchemy:
         String = db.String
         Boolean = db.Boolean
         LargeBinary = db.LargeBinary
-
-        return _DS(db)
 
 
 # else:
@@ -201,6 +230,9 @@ if flask_sqlalchemy:
 #     #     ``DATE`` type supports a time value.
 #     DateTime = oracle.DATE  # (timezone=False)
 
+def scoped_ds() -> DataStore:  # factory
+    return _DS()
+
 
 class _DS(DataStore):
     class EngineType:
@@ -213,8 +245,8 @@ class _DS(DataStore):
     #     self.conn = None
     #     self.transaction = None
     #     self.engine = None
-    #     #########################################
-    #     # code below is for SQLAlchemy without flask
+    #     #
+    #     # === the code below is for SQLAlchemy without flask
     #     #
     #     # self.engine = sqlalchemy.create_engine('sqlite:///todolist.sqlite')
     #     self.engine_type = self.EngineType.sqlite3
@@ -236,14 +268,28 @@ class _DS(DataStore):
     #     # self.engine = sqlalchemy.create_engine(f'oracle+cx_oracle://{user}:{pwd}@{dsn}', echo=False)
     #     # self.engine_type = self.EngineType.oracle
     #
-    #     # self.session = sessionmaker(bind=self.engine)()
+    #     # self.session = sessionmaker(bind=self.engine)()  # TODO engine as singleton + scoped_session
 
-    def __init__(self, db: flask_sqlalchemy.SQLAlchemy):
+    # static field
+    Session: sqlalchemy.orm.scoped_session
+
+    def __init__(self):
         self.conn = None
         self.transaction = None
         self.engine = None
         self.engine_type = self.EngineType.sqlite3
-        self.session = db.session
+
+        # https://docs.sqlalchemy.org/en/13/orm/contextual.html
+        # >>> session_factory = sessionmaker(bind=some_engine)
+        # >>> Session = scoped_session(session_factory)
+        # The scoped_session object we’ve created will now call upon the sessionmaker when we “call” the registry:
+        # >>> some_session = Session()
+
+        self.session = _DS.Session()
+
+        # === panedrone: flask_sqlalchemy._teardown_session -->
+        # there may be more than 1 sessions in the registry because of parallel API calls
+        # (i.e 'GET /groups/<int:g_id>' + 'GET /groups/<int:g_id>/tasks')
 
     # code below is for SQLAlchemy without flask
     #
@@ -351,33 +397,6 @@ class _DS(DataStore):
         self.session.flush()
         return rc
 
-    def insert_row(self, sql, params, ai_values):
-        """
-        Returns:
-            Nothing.
-        Arguments:
-            sql (string): SQL statement.
-            params (array, optional): Values of SQL parameters.
-            ai_values (array, optional): Array like [["o_id", 1], ...] for auto-increment values.
-        Raises:
-            Exception: if no rows inserted.
-        """
-        sql = self._format_sql(sql)
-        if len(ai_values) > 0:
-            if self.engine_type == self.EngineType.postgresql:
-                sql += ' RETURNING ' + ai_values[0][0]
-        cursor = self._exec(sql, params)
-        try:
-            if len(ai_values) > 0:
-                if self.engine_type == self.EngineType.postgresql:
-                    ai_values[0][1] = cursor.fetchone()[0]
-                else:
-                    ai_values[0][1] = cursor.lastrowid
-            if cursor.rowcount == 0:
-                raise Exception('No rows inserted')
-        finally:
-            cursor.close()
-
     def _exec(self, sql, params):
         """
         :param sql:
@@ -441,14 +460,7 @@ class _DS(DataStore):
         finally:
             raw_conn.close()
 
-    def exec_dml(self, sql, params):
-        """
-        Arguments:
-            sql (string): SQL statement.
-            params (array, optional): Values of SQL parameters.
-        Returns:
-            Number of updated rows.
-        """
+    def exec_dml(self, sql, params) -> int:
         sql = self._format_sql(sql)
         sp = _get_sp_name(sql)
         if sp is None:
@@ -466,15 +478,6 @@ class _DS(DataStore):
         return 0
 
     def query_scalar(self, sql, params):
-        """
-        Returns:
-            Single scalar value.
-        Arguments:
-            sql (string): SQL statement.
-            params (array, optional): Values of SQL parameters if needed.
-        Raises:
-            Exception: if amount of rows != 1.
-        """
         rows = self.query_all_scalars(sql, params)
         if len(rows) == 0:
             raise Exception('No rows')
@@ -486,13 +489,6 @@ class _DS(DataStore):
             return rows[0]  # 'select get_test_rating(?)' returns just scalar value, not array of arrays
 
     def query_all_scalars(self, sql, params):
-        """
-        Returns:
-            array of scalar values
-        Arguments:
-            sql (string): SQL statement.
-            params (array, optional): Values of SQL parameters if needed.
-        """
         sql = self._format_sql(sql)
         res = []
         sp = _get_sp_name(sql)
@@ -515,15 +511,6 @@ class _DS(DataStore):
         return res
 
     def query_row(self, sql, params):
-        """
-        Returns:
-            Single row
-        Arguments:
-            sql (string): SQL statement.
-            params (array, optional): Values of SQL parameters if needed.
-        Raises:
-            Exception: if amount of rows != 1.
-        """
         rows = []
         self.query_all_rows(sql, params, lambda row: rows.append(row))
         if len(rows) == 0:
@@ -533,14 +520,6 @@ class _DS(DataStore):
         return rows[0]
 
     def query_all_rows(self, sql, params, callback):
-        """
-        Returns:
-            None
-        Arguments:
-            sql (string): SQL statement.
-            params (array, optional): Values of SQL parameters if needed.
-            callback
-        """
         sql = self._format_sql(sql)
         sp = _get_sp_name(sql)
         if sp is None:
