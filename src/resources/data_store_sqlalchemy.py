@@ -187,10 +187,7 @@ if flask_sqlalchemy:
 # else:
 #     # the code below is for SQLAlchemy without Flask
 #
-#     import sqlalchemy.ext.declarative
-#     from sqlalchemy.orm import declarative_base, sessionmaker
-#
-#     Base = declarative_base()
+#     Base = sqlalchemy.orm.declarative_base()
 #
 #     Column = sqlalchemy.Column
 #     ForeignKey = sqlalchemy.ForeignKey
@@ -428,7 +425,7 @@ class _DS(DataStore):
             cursor.close()
 
     def _exec_sp_mysql(self, sp, params):
-        call_params = _get_call_params(params)
+        call_params = self._get_call_params(params)
         # https://stackoverflow.com/questions/45979950/sqlalchemy-error-when-calling-mysql-stored-procedure
         raw_conn = self.session.raw_connection()
         try:
@@ -439,15 +436,15 @@ class _DS(DataStore):
                         i = 0
                         for result in cursor.stored_results():
                             callback = p[i]
-                            _fetch_all(result, callback)
+                            self._fetch_all(result, callback)
                             i += 1
                         break
-                _assign_out_params(params, result_args)
+                self._assign_out_params(params, result_args)
         finally:
             raw_conn.close()
 
     def _query_sp_mysql(self, sp, on_result, params):
-        call_params = _get_call_params(params)
+        call_params = self._get_call_params(params)
         # https://stackoverflow.com/questions/45979950/sqlalchemy-error-when-calling-mysql-stored-procedure
         raw_conn = self.session.raw_connection()
         try:
@@ -456,13 +453,13 @@ class _DS(DataStore):
                 result_args = cursor.callproc(sp, call_params)
                 for result in cursor.stored_results():
                     on_result(result)
-                _assign_out_params(params, result_args)
+                self._assign_out_params(params, result_args)
         finally:
             raw_conn.close()
 
     def exec_dml(self, sql, params) -> int:
         sql = self._format_sql(sql)
-        sp = _get_sp_name(sql)
+        sp = self._get_sp_name(sql)
         if sp is None:
             cursor = self._exec(sql, params)
             try:
@@ -491,7 +488,7 @@ class _DS(DataStore):
     def query_all_scalars(self, sql, params):
         sql = self._format_sql(sql)
         res = []
-        sp = _get_sp_name(sql)
+        sp = self._get_sp_name(sql)
         if sp is None:
             cursor = self._exec(sql, params)
             try:
@@ -521,7 +518,7 @@ class _DS(DataStore):
 
     def query_all_rows(self, sql, params, callback):
         sql = self._format_sql(sql)
-        sp = _get_sp_name(sql)
+        sp = self._get_sp_name(sql)
         if sp is None:
             cursor = self._exec(sql, params)
             try:
@@ -532,63 +529,63 @@ class _DS(DataStore):
                 cursor.close()
         if self.engine_type != self.EngineType.mysql:
             raise Exception('Not supported for this engine')
-        self._query_sp_mysql(sp, lambda result: _fetch_all(result, callback), params)
+        self._query_sp_mysql(sp, lambda result: self._fetch_all(result, callback), params)
 
     def _format_sql(self, sql):
         if self.engine_type == self.EngineType.sqlite3:
             return sql
         return sql.replace("?", "%s")
 
+    @staticmethod
+    def _fetch_all(cursor, callback):
+        # https://stackoverflow.com/questions/34030020/mysql-python-connector-get-columns-names-from-select-statement-in-stored-procedu
+        # https://kadler.github.io/2018/01/08/fetching-python-database-cursors-by-column-name.html#
+        for r in cursor:
+            # https://stackoverflow.com/questions/1958219/how-to-convert-sqlalchemy-row-object-to-a-python-dict
+            # How to convert SQLAlchemy row object to a Python dict?
+            row = dict(r)
+            # i = 0
+            # for d in result.description:
+            #     col_name = d[0]
+            #     value = r[i]
+            #     row[col_name] = value
+            #     i = i + 1
+            callback(row)
 
-def _fetch_all(cursor, callback):
-    # https://stackoverflow.com/questions/34030020/mysql-python-connector-get-columns-names-from-select-statement-in-stored-procedu
-    # https://kadler.github.io/2018/01/08/fetching-python-database-cursors-by-column-name.html#
-    for r in cursor:
-        # https://stackoverflow.com/questions/1958219/how-to-convert-sqlalchemy-row-object-to-a-python-dict
-        # How to convert SQLAlchemy row object to a Python dict?
-        row = dict(r)
-        # i = 0
-        # for d in result.description:
-        #     col_name = d[0]
-        #     value = r[i]
-        #     row[col_name] = value
-        #     i = i + 1
-        callback(row)
+    @staticmethod
+    def _get_sp_name(sql):
+        parts = sql.split()
+        if len(parts) >= 2 and parts[0].strip().lower() == "call":
+            name = parts[1]
+            end = name.find("(")
+            if end == -1:
+                return name
+            else:
+                return name[0:end]
+        return None
 
+    @staticmethod
+    def _get_call_params(params):
+        """
+        COMMENT FROM SOURCES OF MySQL Connector => cursor.py:
 
-def _get_sp_name(sql):
-    parts = sql.split()
-    if len(parts) >= 2 and parts[0].strip().lower() == "call":
-        name = parts[1]
-        end = name.find("(")
-        if end == -1:
-            return name
-        else:
-            return name[0:end]
-    return None
+        For OUT and INOUT parameters the user should provide the
+        type of the parameter as well. The argument should be a
+        tuple with first item as the value of the parameter to pass
+        and second argument the type of the argument.
+        """
+        call_params = []
+        for p in params:
+            if isinstance(p, OutParam):
+                call_params.append(p.value)
+            elif isinstance(p, list) and callable(p[0]):
+                pass  # MySQL SP returning result-sets
+            else:
+                call_params.append(p)
+        return call_params
 
-
-def _get_call_params(params):
-    """
-    COMMENT FROM SOURCES OF MySQL Connector => cursor.py:
-
-    For OUT and INOUT parameters the user should provide the
-    type of the parameter as well. The argument should be a
-    tuple with first item as the value of the parameter to pass
-    and second argument the type of the argument.
-    """
-    call_params = []
-    for p in params:
-        if isinstance(p, OutParam):
-            call_params.append(p.value)
-        elif isinstance(p, list) and callable(p[0]):
-            pass  # MySQL SP returning result-sets
-        else:
-            call_params.append(p)
-    return call_params
-
-
-def _assign_out_params(params, result_args):
-    for i in range(len(params)):
-        if isinstance(params[i], OutParam):
-            params[i].value = result_args[i]
+    @staticmethod
+    def _assign_out_params(params, result_args):
+        for i in range(len(params)):
+            if isinstance(params[i], OutParam):
+                params[i].value = result_args[i]
