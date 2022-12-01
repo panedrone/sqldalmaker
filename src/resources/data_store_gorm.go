@@ -1,4 +1,4 @@
-package dal
+package dbal
 
 import (
 	"context"
@@ -14,11 +14,20 @@ import (
 )
 
 /*
-   SQL DAL Maker Web-Site: http://sqldalmaker.sourceforge.net
-   This is an example of how to implement DataStore for Go + Gorm.
-   Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store_gorm.go
-   Copy-paste this code to your project and change it for your needs.
-   Improvements are welcome: sqldalmaker@gmail.com
+	This file is a part of SQL DAL Maker project: https://sqldalmaker.sourceforge.net
+	It demonstrates how to implement interface DataStore in Go + Gorm.
+	More about DataStore: https://sqldalmaker.sourceforge.net/data_store.html
+	Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store_gorm.go
+
+	Successfully tested with:
+
+		- "gorm.io/driver/sqlite"
+		- "gorm.io/driver/mysql"
+		- "github.com/cengsin/oracle"
+		- "gorm.io/driver/postgres"
+
+	Copy-paste this code to your project and change it for your needs.
+	Improvements are welcome: sqldalmaker@gmail.com
 */
 
 type DataStore interface {
@@ -109,7 +118,7 @@ func (ds *_DS) isSqlServer() bool {
 
 // data_store_gorm_ex.go
 
-package dal
+package dbal
 
 import (
 	"context"
