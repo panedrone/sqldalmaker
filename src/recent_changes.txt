@@ -1,3 +1,16 @@
+2022-12-04
+
+    Improvements of code generator for Python. Update data_store_sqlalchemy.py and data_store.py according to examples:
+
+        https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store_sqlalchemy.py
+        https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store.py
+
+    See also updated demo projects:
+
+        https://github.com/panedrone/sdm_demo_django_todolist_sqlite3
+        https://github.com/panedrone/sdm_demo_flask_sqlalchemy_todolist
+        https://github.com/panedrone/sdm_demo_todolist_fastapi_sqlalchemy
+
 2022-11-20
 
     "go.vm" --> "dao_query" divided to "dao_query_all" and "dao_query_all_dto". See "go.vm" in the tab "Admin".

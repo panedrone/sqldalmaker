@@ -513,18 +513,18 @@ public class PythonCG {
                                                 String dto_class_name,
                                                 boolean scalar_params) throws Exception {
 
-            List<FieldInfo> updated_fields = new ArrayList<FieldInfo>();
-            List<FieldInfo> fields_pk = new ArrayList<FieldInfo>();
+            List<FieldInfo> fi_updated = new ArrayList<FieldInfo>();
+            List<FieldInfo> fi_pk = new ArrayList<FieldInfo>();
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
-            String dao_jdbc_sql = db_utils.get_dao_crud_update_info(table_name, jaxb_dto_class, explicit_pk, updated_fields, fields_pk);
-            if (fields_pk.isEmpty()) {
+            String dao_jdbc_sql = db_utils.get_dao_crud_update_info(table_name, jaxb_dto_class, explicit_pk, fi_updated, fi_pk);
+            if (fi_pk.isEmpty()) {
                 return Helpers.get_no_pk_warning(method_name);
             }
-            if (updated_fields.isEmpty()) {
+            if (fi_updated.isEmpty()) {
                 return Helpers.get_only_pk_warning(method_name);
             }
             String sql_str = SqlUtils.jdbc_sql_to_python_string(dao_jdbc_sql);
-            updated_fields.addAll(fields_pk);
+            fi_updated.addAll(fi_pk);
             Map<String, Object> context = new HashMap<String, Object>();
             context.put("mode", "dao_exec_dml");
             context.put("method_type", "UPDATE");
@@ -536,9 +536,13 @@ public class PythonCG {
             context.put("model", model);
             dto_class_name = _get_rendered_dto_class_name(dto_class_name, false); // "false" because it is only for comments
             context.put("dto_class_name", dto_class_name);
-            String dto_param = scalar_params ? "" : dto_class_name;
+            String dto_param = scalar_params || model.length() > 0 ? "" : dto_class_name;
             context.put("dto_param", dto_param);
-            context.put("params", updated_fields);
+            if (model.length() > 0) {
+                context.put("params", fi_pk);
+            } else {
+                context.put("params", fi_updated);
+            }
             context.put("is_external_sql", false);
             StringWriter sw = new StringWriter();
             te.merge(context, sw);

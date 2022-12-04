@@ -83,7 +83,7 @@ class $class_name(models.Model):
 class $class_name:
     """
 #foreach($f in $fields)
-    @type $f.getName(): $f.getType() | None
+    :param $f.getName(): $f.getType() | None
 #end
     """
 
@@ -118,9 +118,9 @@ class $class_name:
         """
         (C)RUD: $table_name
         Generated values are passed to DTO.
-        @type p: $dto_param
-        @rtype: None
-        @raise: Exception if no rows inserted.
+        :param p: $dto_param
+        :returns: None
+        :raises: Exception if no rows inserted.
         """
 #if ($model != "")
 	    self.ds.create_one(p)
@@ -143,19 +143,19 @@ class $class_name:
         C(R)UD: $ref
 #end
 #if($is_external_sql)
-        @type sql: str
+        :param sql: str
 #end
 #if($dto_param != "")
-        @type p: $dto_param
+        :param p: $dto_param
 #else
 #foreach($param in $params)
-        @type $param.getName(): $param.getType()
+        :param $param.getName(): $param.getType()
 #end
 #if($out_params)
-        @type out_params: OutParams
+        :param out_params: OutParams
 #end
 #end
-        @rtype: list[$returned_type_name]
+        :returns: list[$returned_type_name]
         """
 #if ($use_dto && $method_type == "READ" && $model != "")
 	    return self.ds.read_all(${returned_type_name})
@@ -188,32 +188,32 @@ class $class_name:
         C(R)UD: $ref
 #end
 #if($is_external_sql)
-        @type sql: str
+        :param sql: str
 #end
 #if($dto_param != "")
-        @type p: $dto_param
+        :param p: $dto_param
 #else
 #foreach($param in $params)
-        @type $param.getName(): $param.getType()
+        :param $param.getName(): $param.getType()
 #end
 #end
 #if ($use_dto && $method_type == "READ" && $model != "")
-        @rtype: $returned_type_name
+        :returns: $returned_type_name
 #else
 #if($use_dto)
-        @type obj: $returned_type_name
+        :param obj: $returned_type_name
 #if($out_params)
-        @type out_params: OutParams
+        :param out_params: OutParams
 #end
-        @rtype: None
+        :returns: None
 #else
 #if($out_params)
-        @type out_params: OutParams
+        :param out_params: OutParams
 #end
-        @rtype: $returned_type_name
+        :returns: $returned_type_name
 #end
 #end
-        @raise: Exception if amount of returned rows != 1.
+        :raises: Exception if amount of returned rows != 1.
         """
 #if ($use_dto && $method_type == "READ" && $model != "")
 	    return self.ds.read_one(${returned_type_name}, #params_dict($params))
@@ -232,7 +232,7 @@ class $class_name:
 ## ====================================================================================================================
 #elseif($mode=="dao_exec_dml")
 
-    def $method_name(#if($dto_param != "")#param_decls_dto($is_external_sql)p#else#param_decls($is_external_sql $params)#end):
+    def $method_name(#if($dto_param != "")#param_decls_dto($is_external_sql)p#else#param_decls($is_external_sql $params)#end#if ($model != "" && $method_type == "UPDATE"), data#end):
         """
 #if ($method_type == "CREATE")
         (C)RUD: $table_name
@@ -242,22 +242,27 @@ class $class_name:
         CRU(D): $table_name
 #end
 #if ($is_external_sql)
-        @type sql: str
+        :param sql: str
 #end
 #if ($dto_param != "")
-        @type p: $dto_param
+        :param p: $dto_param
 #else
 #foreach($param in $params)
-        @type $param.getName(): $param.getType()
+        :param $param.getName(): $param.getType()
 #end
 #end
-        @rtype: int (the number of affected rows)
+#if ($method_type == "UPDATE")
+        :param data: dict
+#end
+        :returns: int (the number of affected rows)
         """
 #if ($model != "")
-#if ($method_type == "CREATE" || $method_type == "UPDATE")
-	    self.ds.update_one(p)
-#elseif ( $method_type == "DELETE")
-	    return self.ds.delete_one(${dto_class_name}, #params_dict($params))
+#if ($method_type == "CREATE")
+        self.ds.create_one(p)
+#elseif ($method_type == "UPDATE")
+        self.ds.update_one(${dto_class_name}, data, #params_dict($params))
+#elseif ($method_type == "DELETE")
+        return self.ds.delete_one(${dto_class_name}, #params_dict($params))
 #else
         #  ------------- invalid method_type
 #end
