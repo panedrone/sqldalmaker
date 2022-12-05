@@ -83,7 +83,7 @@ class $class_name(models.Model):
 class $class_name:
     """
 #foreach($f in $fields)
-    :param $f.getName(): $f.getType() | None
+    @type $f.getName(): $f.getType() | None
 #end
     """
 
@@ -119,8 +119,8 @@ class $class_name:
         (C)RUD: $table_name
         Generated values are passed to DTO.
         :param p: $dto_param
-        :returns: None
-        :raises: Exception if no rows inserted.
+        :return: None
+        :raises Exception: if no rows inserted.
         """
 #if ($model != "")
 	    self.ds.create_one(p)
@@ -155,7 +155,7 @@ class $class_name:
         :param out_params: OutParams
 #end
 #end
-        :returns: list[$returned_type_name]
+        :return: list[$returned_type_name]
         """
 #if ($use_dto && $method_type == "READ" && $model != "")
 	    return self.ds.read_all(${returned_type_name})
@@ -198,22 +198,22 @@ class $class_name:
 #end
 #end
 #if ($use_dto && $method_type == "READ" && $model != "")
-        :returns: $returned_type_name
+        :return: $returned_type_name
 #else
 #if($use_dto)
         :param obj: $returned_type_name
 #if($out_params)
         :param out_params: OutParams
 #end
-        :returns: None
+        :return: None
 #else
 #if($out_params)
         :param out_params: OutParams
 #end
-        :returns: $returned_type_name
+        :return: $returned_type_name
 #end
 #end
-        :raises: Exception if amount of returned rows != 1.
+        :raises Exception: if amount of returned rows != 1.
         """
 #if ($use_dto && $method_type == "READ" && $model != "")
 	    return self.ds.read_one(${returned_type_name}, #params_dict($params))
@@ -251,10 +251,10 @@ class $class_name:
         :param $param.getName(): $param.getType()
 #end
 #end
-#if ($method_type == "UPDATE")
+#if ($method_type == "UPDATE" && $model != "")
         :param data: dict
 #end
-        :returns: int (the number of affected rows)
+        :return: int (the number of affected rows)
         """
 #if ($model != "")
 #if ($method_type == "CREATE")
