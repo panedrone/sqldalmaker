@@ -18,5 +18,5 @@ Quick-Demo in mp4: [https://github.com/panedrone/sqldalmaker/releases/tag/latest
 | Java JDBC    | [Swing](https://github.com/panedrone/sdm_demo_swing_thesaurus), [JSF](https://github.com/panedrone/sdm_demo_jsf_todolist), [JasperReports](https://github.com/panedrone/sdm_demo_jasper_reports_northwindEF) |
 | Java Android | [Android](https://github.com/panedrone/sdm_demo_android_thesaurus) |
 | C++          | [Qt](https://github.com/panedrone/sdm_demo_qt6_thesaurus)
-| Python       | [Django](https://github.com/panedrone/sdm_demo_django_todolist_sqlite3), [FastAPI+SQLAlchemy](https://github.com/panedrone/sdm_demo_todolist_fastapi_sqlalchemy), [Flask-SQLAlchemy](https://github.com/panedrone/sdm_demo_flask_sqlalchemy_todolist), [sqlite3](https://github.com/panedrone/sdm_demo_python_tkinter_github_stat) |
+| Python       | [Django](https://github.com/panedrone/sdm_demo_django_todolist_sqlite3), [FastAPI + SQLAlchemy](https://github.com/panedrone/sdm_demo_todolist_fastapi_sqlalchemy), [Flask + Flask-SQLAlchemy](https://github.com/panedrone/sdm_demo_flask_sqlalchemy_todolist), [sqlite3](https://github.com/panedrone/sdm_demo_python_tkinter_github_stat) |
 | Go           | [database/sql](https://github.com/panedrone/sdm_demo_go_todolist), [Gorm](https://github.com/panedrone/sdm_demo_gorm_todolist) |
