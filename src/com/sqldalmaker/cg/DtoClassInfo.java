@@ -134,6 +134,7 @@ class DtoClassInfo {
                                        Map<String, FieldInfo> fields_map) throws Exception {
 
         Set<String> refined_by_field_jaxb = new HashSet<String>();
+        Set<FieldInfo> excluded_fields = new HashSet<FieldInfo>();
         List<DtoClass.Field> jaxb_fields = jaxb_dto_class.getField(); // not null!!
         for (DtoClass.Field jaxb_field : jaxb_fields) {
             String jaxb_field_col_name = jaxb_field.getColumn();
@@ -147,9 +148,15 @@ class DtoClassInfo {
                 dto_fields.add(fi);
                 fields_map.put(jaxb_field_col_name, fi);
             }
+            if (jaxb_field.getType().trim().equals("-")) {
+                excluded_fields.add(fi);
+            }
             _refine_fi_by_type_map_and_macros(fi, jaxb_field_type_name);
             refined_by_field_jaxb.add(fi.getColumnName());
             fi.refine_scalar_type(jaxb_field_type_name);
+        }
+        for (FieldInfo fi : excluded_fields) {
+            dto_fields.remove(fi);
         }
         for (FieldInfo fi : dto_fields) {
             if (refined_by_field_jaxb.contains(fi.getColumnName())) {

@@ -43,14 +43,18 @@ public class FieldInfo {
             throw new Exception("<field type=null. Ensure that XSD and XML files of meta-program are valid.");
         }
         this.original_field_type = original_field_type;
-        String[] parts = original_field_type.split("-");
-        if (parts.length == 2) {
-            this.model = parts[0];
-            this.original_scalar_type = parts[1];
-        } else if (parts.length == 1) {
-            this.original_scalar_type = original_field_type;
+        if ("-".equals(original_field_type.trim())) {
+            this.original_scalar_type = original_field_type; // excluded field
         } else {
-            throw new Exception("Invalid field type: " + original_field_type);
+            String[] parts = original_field_type.split("-");
+            if (parts.length == 2) {
+                this.model = parts[0];
+                this.original_scalar_type = parts[1];
+            } else if (parts.length == 1) {
+                this.original_scalar_type = original_field_type;
+            } else {
+                throw new Exception("Invalid field type: " + original_field_type);
+            }
         }
         this.scalar_type = original_scalar_type;
         this.database_column_name = jdbc_db_col_name;

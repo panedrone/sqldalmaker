@@ -55,10 +55,11 @@ class DataStore:
 
     # ORM-based helpers
 
-    def filter(self, cls, params: dict):
+    def filter(self, cls, params: dict, fields: list = None):
         """
         :param cls: a model class
         :param params: dict of named filter params
+        :param fields: list of fields
         :return: a QuerySet
         """
         pass
@@ -439,8 +440,12 @@ class _DS(DataStore):
             raise Exception('More than 1 row exists')
         return rows[0]
 
-    def filter(self, cls, params: dict):
-        return self.session.query(cls).filter_by(**params)
+    def filter(self, cls, params: dict, fields: list = None):
+        if fields:
+            # https://stackoverflow.com/questions/11530196/flask-sqlalchemy-query-specify-column-names
+            return self.session.query(cls).options(sqlalchemy.orm.load_only(*fields)).filter_by(**params)
+        else:
+            return self.session.query(cls).filter_by(**params)
 
     def delete_by_filter(self, cls, params: dict) -> int:
         found = self.filter(cls, params)

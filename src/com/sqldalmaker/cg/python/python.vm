@@ -42,6 +42,9 @@ from .data_store import *
 
 
 class $class_name(Base):
+#if($options)
+$options
+#end
 #if($tablename)
     __tablename__ = '$tablename'
 
@@ -64,6 +67,9 @@ class $class_name(models.Model):
 #foreach($f in $fields)
     $f.getName() $f.getType()
 #end
+#if($options)
+$options
+#end
 #if($tablename)
 
     class Meta:
@@ -83,9 +89,12 @@ class $class_name(models.Model):
 class $class_name:
     """
 #foreach($f in $fields)
-    @type $f.getName(): $f.getType() | None
+    :type $f.getName(): $f.getType() | None
 #end
     """
+#if($options)
+$options
+#end
 
     def __init__(self):
 #foreach($f in $fields)

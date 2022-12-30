@@ -16,15 +16,21 @@
 	</xs:element>
 	<xs:element name="dto-class">
 		<xs:complexType>
-			<xs:sequence minOccurs="0" maxOccurs="unbounded">
-				<xs:element name="field">
-					<xs:complexType>
-						<xs:attribute name="column" use="required" type="xs:string" />
-						<xs:attribute name="type" use="required" type="xs:string" />
-					</xs:complexType>
-				</xs:element>
+			<xs:sequence>
+				<xs:element name="options" type="xs:string" minOccurs="0" maxOccurs="1"/>
+				<xs:sequence minOccurs="0" maxOccurs="unbounded">
+					<xs:element name="field">
+						<xs:complexType>
+							<xs:attribute name="column" use="required"
+								type="xs:string" />
+							<xs:attribute name="type" use="required"
+								type="xs:string" />
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>
 			</xs:sequence>
-			<xs:attribute name="name" use="required" type="xs:string" />
+			<xs:attribute name="name" use="required"
+				type="xs:string" />
 			<xs:attribute name="ref" use="required" type="xs:string" />
 			<xs:attribute name="pk" use="optional" type="xs:string" default="*" />
 			<xs:attribute name="auto" use="optional" type="xs:string" default="*" />

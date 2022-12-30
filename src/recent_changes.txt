@@ -1,3 +1,47 @@
+2022-12-30
+
+    ======== <dto-class...<options... (python only so far) and <field type="-"... (exclude)
+
+        <dto-class name="sa-TaskLI" ref="TASKS">
+
+            <options><![CDATA[    """
+        Task list item
+        """
+        __table_args__ = {'extend_existing': True}]]></options>
+
+            <field column="T_COMMENTS" type="-"/>
+
+        </dto-class>
+
+        -->
+
+        class TaskLI(Base):
+            """
+            Task list item
+            """
+            __table_args__ = {'extend_existing': True}
+            __tablename__ = 'TASKS'
+
+            t_id = Column('T_ID', NUMBER, primary_key=True)
+            g_id = Column('G_ID', NUMBER)
+            t_date = Column('T_DATE', DateTime)
+            t_subject = Column('T_SUBJECT', String(200))
+            t_priority = Column('T_PRIORITY', NUMBER)
+
+        ======== update XDS files to use =========
+
+    ======== improvement of DataStore-->filter(...) for SQLAlchemy:
+
+        def filter(self, cls, params: dict, fields: list = None):
+            if fields:
+                # https://stackoverflow.com/questions/11530196/flask-sqlalchemy-query-specify-column-names
+                return self.session.query(cls).options(sqlalchemy.orm.load_only(*fields)).filter_by(**params)
+            else:
+                return self.session.query(cls).filter_by(**params)
+
+        https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store_sqlalchemy.py
+        https://github.com/panedrone/sdm_demo_flask_sqlalchemy_todolist
+
 2022-12-04
 
     Improvements of code generator for Python. Update data_store_sqlalchemy.py and data_store.py according to examples:

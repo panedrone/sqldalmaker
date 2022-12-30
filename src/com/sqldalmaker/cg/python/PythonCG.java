@@ -72,6 +72,8 @@ public class PythonCG {
                     System.err.println(ex.getMessage());
                 }
             }
+            String options = jaxb_dto_class.getOptions();
+            context.put("options", options);
             context.put("ref", jaxb_dto_class.getRef());
             context.put("class_name", dto_class_name);
             context.put("fields", fields);
