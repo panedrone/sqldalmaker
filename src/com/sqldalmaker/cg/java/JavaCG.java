@@ -60,6 +60,8 @@ public class JavaCG {
             List<FieldInfo> fields = new ArrayList<FieldInfo>();
             db_utils.get_dto_field_info(jaxb_dto_class, sql_root_abs_path, fields);
             Map<String, Object> context = new HashMap<String, Object>();
+            String header = jaxb_dto_class.getHeader();
+            context.put("header", header);
             context.put("package", dto_package);
             context.put("class_name", dto_class_name);
             context.put("ref", jaxb_dto_class.getRef());

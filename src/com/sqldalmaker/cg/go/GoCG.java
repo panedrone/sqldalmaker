@@ -158,6 +158,8 @@ public class GoCG {
                 }
                 fi.refine_rendered_type(type_name);
             }
+            String header = jaxb_dto_class.getHeader();
+            context.put("header", header);
             context.put("imports", imports);
             context.put("class_name", dto_class_name);
             context.put("ref", jaxb_dto_class.getRef());

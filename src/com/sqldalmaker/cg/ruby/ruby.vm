@@ -29,6 +29,9 @@
 # $class_name is a generated DTO class. Don't modify it manually.
 # https://sqldalmaker.sourceforge.net/
 
+#if($header)
+$header
+#end
 class $class_name
 
 #foreach($field in $fields)

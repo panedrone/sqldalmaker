@@ -38,6 +38,9 @@ import (
 )
 
 #end
+#if($header)
+$header
+#end
 type ${class_name} struct {
 #foreach ($f in ${fields})
 	${f.getName()} ${f.getType()}

@@ -80,6 +80,8 @@ public class PhpCG {
             } else {
                 dto_namespace = dto_namespace.trim().replace('/', '\\');
             }
+            String header = jaxb_dto_class.getHeader();
+            context.put("header", header);
             context.put("namespace", dto_namespace);
             context.put("mode", "dto_class");
             StringWriter sw = new StringWriter();

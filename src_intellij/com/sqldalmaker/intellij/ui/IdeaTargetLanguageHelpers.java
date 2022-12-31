@@ -139,10 +139,10 @@ public class IdeaTargetLanguageHelpers {
         return TargetLangUtils.get_target_folder_abs_path(class_scope, root_file_fn, target_folder_rel_path, module_root);
     }
 
-    private static String get_dto_file_abs_path(Project project,
-                                                VirtualFile root_file,
-                                                Settings settings,
-                                                String dto_class_name) throws Exception {
+    public static String get_dto_file_abs_path(Project project,
+                                               VirtualFile root_file,
+                                               Settings settings,
+                                               String dto_class_name) throws Exception {
 
         String root_file_fn = root_file.getName();
         String target_folder_abs_path;

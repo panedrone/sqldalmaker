@@ -17,7 +17,7 @@
 	<xs:element name="dto-class">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element name="options" type="xs:string" minOccurs="0" maxOccurs="1"/>
+				<xs:element name="header" type="xs:string" minOccurs="0" maxOccurs="1"/>
 				<xs:sequence minOccurs="0" maxOccurs="unbounded">
 					<xs:element name="field">
 						<xs:complexType>

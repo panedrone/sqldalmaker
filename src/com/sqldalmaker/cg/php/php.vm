@@ -47,6 +47,9 @@ namespace ${namespace};
 #if ($model=="doctrine")
 use Doctrine\ORM\Mapping as ORM;
 
+#if($header)
+$header
+#end
 /**
  * @ORM\Entity
 #if ($table)

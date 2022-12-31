@@ -13,8 +13,6 @@ import com.intellij.psi.PsiManager;
 import com.intellij.psi.xml.XmlAttribute;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
-import com.sqldalmaker.cg.Helpers;
-import com.sqldalmaker.common.TargetLangUtils;
 import com.sqldalmaker.intellij.ui.IdeaEditorHelpers;
 import com.sqldalmaker.intellij.ui.IdeaHelpers;
 import com.sqldalmaker.intellij.ui.IdeaTargetLanguageHelpers;
@@ -118,22 +116,10 @@ public class IdeaReferenceCompletion {
         } catch (Exception e) {
             return null;
         }
-        String target_folder_abs_path;
+        String target_file_rel_path;
         try {
-            target_folder_abs_path = IdeaTargetLanguageHelpers.get_target_folder_abs_path(project, root_file, settings, settings.getDto().getScope());
-        } catch (Exception e) {
-            return null;
-        }
-        String target_file_name;
-        try {
-            target_file_name = TargetLangUtils.file_name_from_class_name(root_file.getName(), dto_class_name);
-        } catch (Exception e) {
-            return null;
-        }
-        String target_file_abs_path = Helpers.concat_path(target_folder_abs_path, target_file_name);
-        String rel_path;
-        try {
-            rel_path = IdeaHelpers.get_relative_path(project, target_file_abs_path);
+            String target_file_abs_path = IdeaTargetLanguageHelpers.get_dto_file_abs_path(project, root_file, settings, dto_class_name);
+            target_file_rel_path = IdeaHelpers.get_relative_path(project, target_file_abs_path);
         } catch (Exception e) {
             return null;
         }
@@ -145,11 +131,11 @@ public class IdeaReferenceCompletion {
         }
         VirtualFile target_file;
         try {
-            target_file = IdeaEditorHelpers.find_case_sensitive(project_dir, rel_path);
+            target_file = IdeaEditorHelpers.find_case_sensitive(project_dir, target_file_rel_path);
         } catch (Exception e) {
             return null;
         }
-        PsiElement res = PsiManager.getInstance(project).findFile(target_file);// @Nullable
+        PsiElement res = PsiManager.getInstance(project).findFile(target_file); // @Nullable
         return res;
     }
 }

@@ -69,6 +69,8 @@ public class RubyCG {
             Map<String, Object> context = new HashMap<String, Object>();
             context.put("class_name", dto_class_name);
             Helpers.convert_to_ruby_type_names(fields);
+            String header = jaxb_dto_class.getHeader();
+            context.put("header", header);
             context.put("fields", fields);
             context.put("mode", "dto_class");
             StringWriter sw = new StringWriter();
