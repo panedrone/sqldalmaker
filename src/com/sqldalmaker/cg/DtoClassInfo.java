@@ -157,6 +157,8 @@ class DtoClassInfo {
         }
         for (FieldInfo fi : excluded_fields) {
             dto_fields.remove(fi);
+            String col_nm = fi.getColumnName();
+            fields_map.remove(col_nm);
         }
         for (FieldInfo fi : dto_fields) {
             if (refined_by_field_jaxb.contains(fi.getColumnName())) {
