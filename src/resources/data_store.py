@@ -83,10 +83,11 @@ class DataStore:
 
     # ORM-based helpers
 
-    def filter(self, cls, params: dict):
+    def filter(self, cls, params: dict, fields: list = None):
         """
         :param cls: a model class
         :param params: dict of named filter params
+        :param fields: list of fields
         :return: a QuerySet
         """
         pass
@@ -275,10 +276,17 @@ class _DS(DataStore):
 
     # ORM-based helpers
 
-    def filter(self, cls, params: dict):
-        # Django Filter Model by Dictionary
-        # https://stackoverflow.com/questions/16018497/django-filter-model-by-dictionary
-        return cls.objects.filter(**params)
+    def filter(self, cls, params: dict, fields: list = None):
+        if fields:
+            # How to obtain a QuerySet of all rows, with specific fields for each one of them?
+            # https://stackoverflow.com/questions/7503241/how-to-obtain-a-queryset-of-all-rows-with-specific-fields-for-each-one-of-them
+            # call with arguments unpacked from a list
+            # https://stackoverflow.com/questions/4960689/python-array-as-list-of-parameters
+            return cls.objects.filter(**params).only(*fields)
+        else:
+            # Django Filter Model by Dictionary
+            # https://stackoverflow.com/questions/16018497/django-filter-model-by-dictionary
+            return cls.objects.filter(**params)
 
     def delete_by_filter(self, cls, params: dict) -> int:
         # Entry.objects.filter(blog=b).delete()
