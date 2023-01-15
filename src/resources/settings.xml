@@ -120,25 +120,10 @@
 
     <type-map default="">
 
-        <!-- Example for Go and MySQL|SQLite3: -->
+        <!-- Example for Go: -->
 
-        <!-- ******   Scalar fields, params, and ret-values for Go   ****** -->
-
-        <type detected="java.lang.Short" target="int16${0}"/>
-        <type detected="java.lang.Integer" target="int32${0}"/> <!-- Google: java.lang.Integer size bits -->
-        <type detected="java.lang.Long" target="int64${0}"/>
-        <type detected="java.lang.String" target="string${0}"/>
-        <!--        <type detected="java.util.Date" target="time:time.Time${json}"/>-->
-        <type detected="java.util.Date" target="string${json}"/>
-        <type detected="byte[]" target="string${0}"/>
-        <type detected="java.lang.Boolean" target="int64${0}"/>
-        <type detected="java.lang.Float" target="float64${0}"/>
-        <type detected="float" target="float64${0}"/>
-        <type detected="java.math.BigDecimal" target="float64${0}"/>
-
-        <type detected="java.lang.Object" target="interface{}${0}"/>
-
-        <!-- ******   Gorm ("gorm-" prefix for detected types)  ****** -->
+        <type detected="gorm-java.util.UUID" target="github.com/google/uuid:uuid.UUID${json-gorm}"/>
+        <type detected="gorm-java.sql.Array" target="github.com/lib/pq:pq.StringArray${json-gorm}|1:;type:text[]"/>
 
         <type detected="gorm-java.lang.Short" target="int16${json-gorm}"/>
         <type detected="gorm-java.lang.Integer" target="int32${json-gorm}"/>
@@ -148,11 +133,25 @@
         <type detected="gorm-byte[]" target="string${json-gorm}"/>
         <type detected="gorm-java.lang.Boolean" target="int64${json-gorm}"/>
         <type detected="gorm-java.lang.Float" target="float64${json-gorm}"/>
-
         <type detected="gorm-java.math.BigDecimal" target="float64${json-gorm}"/>
-        <type detected="gorm-java.math.BigDecimal+auto" target="int64$${json-gorm}|1:;autoIncrement"/>
 
         <type detected="gorm-java.lang.Object" target="interface{}${json-gorm}"/>
+
+        <type detected="java.util.UUID" target="github.com/google/uuid:uuid.UUID"/>
+        <type detected="java.sql.Array" target="[]string"/>
+
+        <type detected="java.lang.Short" target="int16${0}"/>
+        <type detected="java.lang.Integer" target="int32${0}"/> <!-- Google: java.lang.Integer size bits -->
+        <type detected="java.lang.Long" target="int64${0}"/>
+        <type detected="java.lang.String" target="string${0}"/>
+        <type detected="java.util.Date" target="time:time.Time${0}"/>
+        <type detected="byte[]" target="string${0}"/>
+        <type detected="java.lang.Boolean" target="int64${0}"/>
+        <type detected="java.lang.Float" target="float64${0}"/>
+        <type detected="java.math.BigDecimal" target="float64${0}"/>
+        <type detected="float" target="float64${0}"/>
+
+        <type detected="java.lang.Object" target="interface{}${0}"/>
 
         <!-- ***** SQLAlchemy ("sqlalchemy-" or "sa-" prefix for detected types) ****************** -->
 
