@@ -1,3 +1,15 @@
+2023-01-19
+
+    Possible SQL-shortcuts:
+
+            // table()
+            // table() / field1, field2, ...
+            // table / field1, field2, ...
+            // table(param1, param2, ...)
+            // table(param1, param2, ...) / field1, field2, ...
+
+    NOTE. SQL-shortcuts are sometime better than just SQL because the types of column/param are obtained from table.
+
 2022-12-31
 
     ======== <dto-class...<header... and <field type="-"... (exclude)

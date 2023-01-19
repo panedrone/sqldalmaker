@@ -47,7 +47,7 @@ public class CppCG {
             } else {
                 te = new TemplateEngine(vm_template, "cpp");
             }
-            db_utils = new JdbcUtils(connection, FieldNamesMode.AS_IS, FieldNamesMode.AS_IS, jaxb_settings);
+            db_utils = new JdbcUtils(connection, FieldNamesMode.AS_IS, FieldNamesMode.AS_IS, jaxb_settings, sql_root_abs_path);
         }
 
         @Override
@@ -90,7 +90,7 @@ public class CppCG {
             } else {
                 te = new TemplateEngine(vm_template, "cpp");
             }
-            db_utils = new JdbcUtils(connection, FieldNamesMode.AS_IS, FieldNamesMode.AS_IS, jaxb_settings);
+            db_utils = new JdbcUtils(connection, FieldNamesMode.AS_IS, FieldNamesMode.AS_IS, jaxb_settings, sql_root_abs_path);
         }
 
         @Override

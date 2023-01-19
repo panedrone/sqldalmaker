@@ -52,7 +52,7 @@ class DtoClassInfo {
                                                      List<FieldInfo> res_dto_fields) throws Exception {
         try {
             Map<String, FieldInfo> fields_map = _prepare_by_jdbc(ignore_model, jaxb_dto_class, sql_root_abs_path, res_dto_fields);
-            refine_field_info(fields_map, jaxb_dto_class, res_dto_fields);
+            _refine_field_info(fields_map, jaxb_dto_class, res_dto_fields);
             return fields_map;
         } catch (Exception e) {
             throw new Exception(String.format("<dto-class name=\"%s\"... %s: %s",
@@ -60,9 +60,9 @@ class DtoClassInfo {
         }
     }
 
-    public void refine_field_info(Map<String, FieldInfo> fields_map,
-                                  DtoClass jaxb_dto_class,
-                                  List<FieldInfo> res_dto_fields) throws Exception {
+    private void _refine_field_info(Map<String, FieldInfo> fields_map,
+                                    DtoClass jaxb_dto_class,
+                                    List<FieldInfo> res_dto_fields) throws Exception {
 
         _refine_by_field_jaxb(jaxb_dto_class, res_dto_fields, fields_map);
         _refine_scalar_types_by_type_map(res_dto_fields);
@@ -178,9 +178,15 @@ class DtoClassInfo {
         String explicit_pk = "*";
         JdbcTableInfo info = new JdbcTableInfo(model, conn, type_map, dto_field_names_mode, table_name, explicit_pk, auto_column);
         res_dto_fields.clear();
-        res_dto_fields.addAll(info.fields_all);
-        fields_map.clear();
-        fields_map.putAll(info.fields_map);
+        for (FieldInfo fi : info.fields_all) {
+            String col_nm = fi.getColumnName();
+            if (fields_map.containsKey(col_nm)) {
+                res_dto_fields.add(fi);
+                fields_map.replace(col_nm, fi);
+            } else {
+                fields_map.remove(col_nm);
+            }
+        }
     }
 
     private void _refine_fi_by_type_map_and_macros(FieldInfo fi,

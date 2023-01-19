@@ -13,11 +13,13 @@ import (
 )
 
 /*
-   SQL DAL Maker Web-Site: http://sqldalmaker.sourceforge.net
-   This is an example of how to implement DataStore for Go + "database/sql".
-   Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store.go
-   Copy-paste this code to your project and change it for your needs.
-   Improvements are welcome: sqldalmaker@gmail.com
+	This file is a part of SQL DAL Maker project: https://sqldalmaker.sourceforge.net
+	It demonstrates how to implement interface DataStore in Go + "database/sql".
+	More about DataStore: https://sqldalmaker.sourceforge.net/data_store.html
+	Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store.go
+
+	Copy-paste this code to your project and change it for your needs.
+	Improvements are welcome: sqldalmaker@gmail.com
 */
 
 type DataStore interface {
@@ -1001,6 +1003,35 @@ func _assign(dstRef interface{}, value interface{}) error {
 			*d = bv
 			return nil
 		}
+	//case *uuid.UUID:
+	//	switch bv := value.(type) {
+	//	case []byte:
+	//		err := d.Scan(bv)
+	//		if err != nil {
+	//			return err
+	//		}
+	//		return nil
+	//	}
+	//case *[]string:
+	//	switch bv := value.(type) {
+	//	case []byte:
+	//		sa := pq.StringArray{}
+	//		err := sa.Scan(bv)
+	//		if err != nil {
+	//			return err
+	//		}
+	//		*d = sa
+	//		return nil
+	//	}
+	//case *pq.StringArray:
+	//	switch bv := value.(type) {
+	//	case []byte:
+	//		err := d.Scan(bv)
+	//		if err != nil {
+	//			return err
+	//		}
+	//		return nil
+	//	}
 	case *interface{}:
 		*d = value
 		return nil

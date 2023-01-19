@@ -51,7 +51,7 @@ public class JavaCG {
             } else {
                 te = new TemplateEngine(vm_template, "java");
             }
-            db_utils = new JdbcUtils(connection, field_names_mode, FieldNamesMode.AS_IS, jaxb_settings);
+            db_utils = new JdbcUtils(connection, field_names_mode, FieldNamesMode.AS_IS, jaxb_settings, sql_root_abs_path);
         }
 
         @Override
@@ -104,7 +104,7 @@ public class JavaCG {
             } else {
                 te = new TemplateEngine(vm_template, "java");
             }
-            db_utils = new JdbcUtils(connection, field_names_mode, FieldNamesMode.AS_IS, jaxb_settings);
+            db_utils = new JdbcUtils(connection, field_names_mode, FieldNamesMode.AS_IS, jaxb_settings, sql_root_abs_path);
         }
 
         @Override

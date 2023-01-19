@@ -325,7 +325,7 @@ public class SdmUtils {
                                              DtoClass dto_class,
                                              String sql_root_abs_path) throws Exception {
 
-        JdbcUtils db_utils = new JdbcUtils(connection, FieldNamesMode.AS_IS, FieldNamesMode.AS_IS, settings);
+        JdbcUtils db_utils = new JdbcUtils(connection, FieldNamesMode.AS_IS, FieldNamesMode.AS_IS, settings, sql_root_abs_path);
         ArrayList<FieldInfo> fields = new ArrayList<FieldInfo>();
         db_utils.get_field_info_for_wizard(dto_class, sql_root_abs_path, fields);
         for (FieldInfo f : fields) {

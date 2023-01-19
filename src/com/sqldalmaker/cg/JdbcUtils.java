@@ -24,10 +24,13 @@ public class JdbcUtils {
     private final JaxbMacros global_markers;
     private final JaxbTypeMap type_map;
 
+    private final String sql_root_abs_path;
+
     public JdbcUtils(Connection conn,
                      FieldNamesMode dto_field_names_mode,
                      FieldNamesMode method_params_names_mode,
-                     Settings jaxb_settings) throws Exception {
+                     Settings jaxb_settings,
+                     String sql_root_abs_path) throws Exception {
 
         this.conn = conn;
         this.dto_field_names_mode = dto_field_names_mode;
@@ -35,6 +38,8 @@ public class JdbcUtils {
 
         this.global_markers = new JaxbMacros(jaxb_settings.getMacros());
         this.type_map = new JaxbTypeMap(jaxb_settings.getTypeMap());
+
+        this.sql_root_abs_path = sql_root_abs_path;
     }
 
     // Public Utils --------------------------------------------
@@ -177,7 +182,7 @@ public class JdbcUtils {
             return _table_info.get(key);
         }
         DaoClassInfo info = new DaoClassInfo(conn, dto_field_names_mode, method_params_names_mode, global_markers, type_map);
-        JdbcTableInfo t_info = info.get_dao_fields_for_crud(jaxb_dto_class, table_name, explicit_pk);
+        JdbcTableInfo t_info = info.get_dao_fields_for_crud(jaxb_dto_class, table_name, explicit_pk, sql_root_abs_path);
         _table_info.put(key, t_info);
         return t_info;
     }

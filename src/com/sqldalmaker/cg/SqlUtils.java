@@ -289,15 +289,25 @@ public class SqlUtils {
         if (is_sql_file_ref_base(ref)) {
             return false;
         }
-        String[] parts;
         try {
-            parts = parse_sql_shortcut_ref(ref);
+            // table()
+            // table() / field1, field2, ...
+            // table / field1, field2, ...
+            // table(param1, param2, ...)
+            // table(param1, param2, ...) / field1, field2, ...
+            String[] parts = parse_sql_shortcut_ref(ref);
             String table_name = parts[0];
-            if (!is_table_ref(table_name)) {
-                return false;
+//            if (!is_table_ref(table_name)) {
+//                return false;
+//            }
+            String params = parts[1];
+            if (params != null) {
+                Helpers.get_listed_items(params, false);
+            } else {
+                if (parts[2] == null) {
+                    return false;
+                }
             }
-            String inside_brackets = parts[1];
-            Helpers.get_listed_items(inside_brackets, false);
         } catch (Exception e) {
             return false;
         }
@@ -410,40 +420,66 @@ public class SqlUtils {
     }
 
     static String[] parse_sql_shortcut_ref(String ref) throws Exception {
-        String before_brackets;
-        String inside_brackets;
+        ref = ref.trim();
+        String []mm = ref.split("/");
+        String col_names;
+        if (mm.length == 2) {
+            ref = mm[0].trim();
+            col_names = mm[1].trim();
+        } else if (mm.length > 2) {
+            throw new Exception("Invalid 'ref' in SQL-shortcut: " + ref);
+        } else {
+            col_names = null;
+        }
+        String table_name;
+        String params;
         ref = ref.trim();
         int pos = ref.indexOf('(');
-        if (pos == -1) {
-            throw new Exception("'(' expected in ref shortcut");
-        } else {
-            if (!ref.endsWith(")")) {
-                throw new Exception("')' expected in ref shortcut");
+        if (ref.endsWith(")")) { // trimmed
+            if (pos < 1) {
+                throw new Exception("Invalid 'ref' in SQL-shortcut: '(' expected");
             }
-            before_brackets = ref.substring(0, pos);
-            inside_brackets = ref.substring(before_brackets.length() + 1, ref.length() - 1);
+            table_name = ref.substring(0, pos).trim();
+            params = ref.substring(pos + 1, ref.length() - 1).trim();
+            if (params.length() == 0) {
+                params = null;
+            }
+        } else {
+            table_name = ref;
+            params = null;
         }
-        return new String[]{before_brackets, inside_brackets};
+        return new String[]{table_name, params, col_names};
     }
 
     private static String _sql_shortcut_to_jdbc_sql(String ref) throws Exception {
-        String[] parts2 = parse_sql_shortcut_ref(ref);
-        String table_name = parts2[0];
+        String[] ref_parts = parse_sql_shortcut_ref(ref);
+        String table_name = ref_parts[0];
         // validate_table_name(table_name); // TODO: PostgreSQL JDBC prepareStatement
         // passes wrong table names
-        String param_descriptors = parts2[1];
-        if (param_descriptors.trim().length() == 0) {
-            return "select * from " + table_name;
+        String params = null;
+        String param_descriptors = ref_parts[1];
+        if (param_descriptors != null && param_descriptors.trim().length() > 0) {
+            String[] param_arr = Helpers.get_listed_items(param_descriptors, false);
+            if (param_arr.length < 1) {
+                throw new Exception("Not empty list of parameters expected in SQL shortcut");
+            }
+            params = param_arr[0] + "=?";
+            for (int i = 1; i < param_arr.length; i++) {
+                params += " and " + param_arr[i] + "=?";
+            }
         }
-        String[] param_arr = Helpers.get_listed_items(param_descriptors, false);
-        if (param_arr.length < 1) {
-            throw new Exception("Not empty list of parameters expected in SQL shortcut");
+        String sql;
+        String col_list = ref_parts[2];
+        if (col_list == null) {
+            sql = "select * from " + table_name;
+        } else {
+            sql ="select " + col_list + " from " + table_name;
         }
-        String params = param_arr[0] + "=?";
-        for (int i = 1; i < param_arr.length; i++) {
-            params += " and " + param_arr[i] + "=?";
+        if (params == null) {
+            return sql;
         }
-        return "select * from " + table_name + " where " + params;
+        sql = sql + " where " + params;
+        return sql;
     }
 
     public static String create_crud_create_sql(String dao_table_name, List<FieldInfo> fields_not_ai) throws Exception {

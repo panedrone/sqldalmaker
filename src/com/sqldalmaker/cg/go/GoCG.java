@@ -108,7 +108,7 @@ public class GoCG {
             } else {
                 te = new TemplateEngine(vm_template, "golang");
             }
-            db_utils = new JdbcUtils(connection, field_names_mode, FieldNamesMode.LOWER_CAMEL_CASE, jaxb_settings);
+            db_utils = new JdbcUtils(connection, field_names_mode, FieldNamesMode.LOWER_CAMEL_CASE, jaxb_settings, sql_root_abs_path);
         }
 
         @Override
@@ -213,7 +213,7 @@ public class GoCG {
             } else {
                 te = new TemplateEngine(vm_template, "golang");
             }
-            db_utils = new JdbcUtils(connection, field_names_mode, FieldNamesMode.LOWER_CAMEL_CASE, jaxb_settings);
+            db_utils = new JdbcUtils(connection, field_names_mode, FieldNamesMode.LOWER_CAMEL_CASE, jaxb_settings, sql_root_abs_path);
         }
 
         @Override

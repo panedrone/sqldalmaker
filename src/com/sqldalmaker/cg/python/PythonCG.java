@@ -44,7 +44,7 @@ public class PythonCG {
             } else {
                 te = new TemplateEngine(vm_template, "python");
             }
-            db_utils = new JdbcUtils(conn, FieldNamesMode.SNAKE_CASE, FieldNamesMode.SNAKE_CASE, jaxb_settings);
+            db_utils = new JdbcUtils(conn, FieldNamesMode.SNAKE_CASE, FieldNamesMode.SNAKE_CASE, jaxb_settings, sql_root_abs_path);
         }
 
         @Override
@@ -128,7 +128,7 @@ public class PythonCG {
             } else {
                 te = new TemplateEngine(vm_template, "python");
             }
-            db_utils = new JdbcUtils(conn, FieldNamesMode.SNAKE_CASE, FieldNamesMode.SNAKE_CASE, jaxb_settings);
+            db_utils = new JdbcUtils(conn, FieldNamesMode.SNAKE_CASE, FieldNamesMode.SNAKE_CASE, jaxb_settings, sql_root_abs_path);
         }
 
         @Override
