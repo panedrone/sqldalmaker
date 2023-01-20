@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2022 sqldalmaker@gmail.com
+    Copyright 2011-2023 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -58,17 +58,16 @@ public class JdbcUtils {
     public static ResultSet get_tables_rs(Connection conn,
                                           String schema_name,
                                           boolean include_views) throws SQLException {
-        String table_name_parretn;
+        String table_name_pattern;
         if (schema_name == null) {
-            table_name_parretn = "%";
+            table_name_pattern = "%";
         } else {
-            table_name_parretn = schema_name + ".%";
+            table_name_pattern = schema_name + ".%";
         }
-        return JdbcTableInfo.get_tables_rs(conn, table_name_parretn, include_views);
+        return JdbcTableInfo.get_tables_rs(conn, table_name_pattern, include_views);
     }
 
     public static List<String> get_schema_names(Connection con) throws SQLException {
-
         List<String> res = new ArrayList<String>();
         DatabaseMetaData db_info = con.getMetaData();
         ResultSet rs;
@@ -235,7 +234,7 @@ public class JdbcUtils {
     }
 
     public static PreparedStatement prepare_jdbc_sql(Connection conn,
-                                                       String jdbc_sql) throws SQLException {
+                                                     String jdbc_sql) throws SQLException {
 
         boolean is_sp = SqlUtils.is_jdbc_stored_proc_call(jdbc_sql);
         if (is_sp) {

@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2022 sqldalmaker@gmail.com
+    Copyright 2011-2023 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -57,7 +57,8 @@ public class DaoClassInfo {
                                                   List<FieldInfo> dao_fields) throws Exception {
 
         DtoClassInfo info = new DtoClassInfo(conn, type_map, markers, dto_field_names_mode);
-        Map<String, FieldInfo> dto_fields_map = info.get_dto_field_info(false, jaxb_dto_class, sql_root_abs_path, new ArrayList<FieldInfo>());
+        final boolean ignore_model = true;
+        Map<String, FieldInfo> dto_fields_map = info.get_dto_field_info(ignore_model, jaxb_dto_class, sql_root_abs_path, new ArrayList<FieldInfo>());
         Set<FieldInfo> excluded_dao_fields = new HashSet<FieldInfo>();
         for (FieldInfo dao_fi : dao_fields) {
             String dao_col_name = dao_fi.getColumnName();
@@ -98,14 +99,13 @@ public class DaoClassInfo {
         res_params.clear();
         String[] parts = SqlUtils.parse_sql_shortcut_ref(dao_jaxb_ref); // class name is not available here
         String dao_table_name = parts[0];
-        String no_model = ""; // TODO - info about PK and FK is not needed for sql_shortcuts
+        String no_model = "";
         DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(jaxb_dto_or_return_type, jaxb_dto_classes);
         JdbcTableInfo t_info = new JdbcTableInfo(no_model, conn, type_map, dto_field_names_mode, dao_table_name, "*", jaxb_dto_class.getAuto());
         String filter_col_names_str = parts[1];
         if (filter_col_names_str != null) {
             String[] filter_col_names = Helpers.get_listed_items(filter_col_names_str, false);
             Helpers.check_duplicates(filter_col_names);
-            // !!! before _refine_dao_fields_by_dto_fields
             _get_shortcut_params(param_names_mode, method_param_descriptors, t_info.fields_all, filter_col_names, res_params);
         }
         String col_list = parts[2];
@@ -176,7 +176,7 @@ public class DaoClassInfo {
 
         if (ResultSet.class.getName().equals(dao_fields_jdbc.get(0).getType())) {
             // the story about PostgreSQL + 'select * from get_tests_by_rating_rc(?)' (UDF
-            // returning REFCURSOR)
+            // returning REF_CURSOR)
             dao_fields_res.addAll(dto_fields);
             String comment = dao_fields_res.get(0).getComment() + " [INFO] Column 0 is of type ResultSet";
             if (error.length() > 0) {
@@ -327,8 +327,8 @@ public class DaoClassInfo {
                                                List<FieldInfo> res_dao_fields_not_generated,
                                                List<FieldInfo> res_dao_fields_generated) throws Exception {
 
-        // The istance of JdbcTableInfo for "crud-create"
-        // should not be cached/shared, because of modyfying of FieldInfo
+        // The instance of JdbcTableInfo for "crud-create"
+        // should not be cached/shared, because of modifying of FieldInfo
 
         String no_model = ""; // TODO - info about PK and FK is not needed for crud_create
         JdbcTableInfo t_info = new JdbcTableInfo(no_model, conn, type_map, dto_field_names_mode, table_name, "*", jaxb_dto_class.getAuto());
