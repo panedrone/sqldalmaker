@@ -1,4 +1,4 @@
-2023-01-19
+2023-01-20
 
     Possible SQL-shortcuts:
 
@@ -8,7 +8,8 @@
             // table(param1, param2, ...)
             // table(param1, param2, ...) / field1, field2, ...
 
-    NOTE. SQL-shortcuts are sometime better than just SQL because the types of column/param are obtained from table.
+    NOTE. Column/param info for SQL-shortcuts is obtained directly from data table.
+          It may be used as workaround if such info obtained from SQL is incorrect/incomplete.
 
 2022-12-31
 

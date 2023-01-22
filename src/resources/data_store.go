@@ -6,6 +6,7 @@ import (
 	"database/sql/driver"
 	"errors"
 	"fmt"
+	//"github.com/godror/godror"
 	"reflect"
 	"strconv"
 	"strings"
@@ -96,11 +97,11 @@ func (ds *_DS) isSqlServer() bool {
 }
 
 /*
-	Implement the method initDb(ds *_DS) in an external file. This is an example:
+	Implement the method initDb() in an external file. This is an example:
 
 // file data_store_db.go
 
-package main
+package dbal
 
 import (
 	"database/sql"
@@ -112,7 +113,9 @@ import (
    	// _ "github.com/lib/pq"                // PostgeSQL
 )
 
-func initDb(ds *_DS) (err error) {
+var ds = &_DS{}
+
+func (ds *_DS) initDb() (err error) {
 	// === PostgeSQL ===========================
 	ds.paramPrefix = "$"
 	ds.db, err = sql.Open("postgres", "postgres://postgres:sa@localhost/my-tests?sslmode=disable")
@@ -137,6 +140,18 @@ func initDb(ds *_DS) (err error) {
 	//ds.paramPrefix = ":"
 	//ds.db, err = sql.Open("godror", `user="ORDERS" password="root" connectString="localhost:1521/orcl"`)
 	return
+}
+
+func OpenDB() error {
+	return ds.Open()
+}
+
+func CloseDB() error {
+	return ds.Close()
+}
+
+func NewTasksDao() *TasksDao {
+	return &TasksDao{ds: ds}
 }
 
 */
@@ -972,9 +987,9 @@ func _assignBoolean(d *bool, value interface{}) bool {
 	return true
 }
 
-func _assign(dstRef interface{}, value interface{}) error {
+func _assign(dstPtr interface{}, value interface{}) error {
 	if value == nil {
-		switch d := dstRef.(type) {
+		switch d := dstPtr.(type) {
 		case *interface{}:
 			*d = nil
 			return nil
@@ -982,7 +997,7 @@ func _assign(dstRef interface{}, value interface{}) error {
 		return nil // leave as-is
 	}
 	assigned := false
-	switch d := dstRef.(type) {
+	switch d := dstPtr.(type) {
 	case *string:
 		assigned = _assignString(d, value)
 	case *int32:
@@ -1003,6 +1018,14 @@ func _assign(dstRef interface{}, value interface{}) error {
 			*d = bv
 			return nil
 		}
+	//case *godror.Number:
+	//	switch v := value.(type) {
+	//	case godror.Number:
+	//		*d = v
+	//		assigned = true
+	//	default:
+	//		assigned = false
+	//	}
 	//case *uuid.UUID:
 	//	switch bv := value.(type) {
 	//	case []byte:
@@ -1037,13 +1060,13 @@ func _assign(dstRef interface{}, value interface{}) error {
 		return nil
 	}
 	if !assigned {
-		return errors.New(fmt.Sprintf("%T <- %T", dstRef, value))
+		return errors.New(fmt.Sprintf("%T <- %T", dstPtr, value))
 	}
 	return nil
 }
 
-func fromVal(dstRef interface{}, value interface{}, errMap map[string]int) {
-	err := assign(dstRef, value)
+func fromVal(dstPtr interface{}, value interface{}, errMap map[string]int) {
+	err := assign(dstPtr, value)
 	if err == nil {
 		return
 	}
@@ -1056,11 +1079,11 @@ func fromVal(dstRef interface{}, value interface{}, errMap map[string]int) {
 	}
 }
 
-func assign(dstRef interface{}, value interface{}) error {
+func assign(dstPtr interface{}, value interface{}) error {
 	var err error
 	switch v := value.(type) {
 	case []interface{}:
-		switch d := dstRef.(type) {
+		switch d := dstPtr.(type) {
 		case *[]interface{}:
 			*d = v
 		default:
@@ -1069,15 +1092,15 @@ func assign(dstRef interface{}, value interface{}) error {
 			// []interface{}{[]uint16{49, 46, 50, 48}} // []uint16 in here is a string like 1.20
 			// (e.g. PG + Query(`select get_test_rating(?)`, tId))
 			v0 := v[0]
-			err = _assign(dstRef, v0)
+			err = _assign(dstPtr, v0)
 		}
 	default:
-		err = _assign(dstRef, value)
+		err = _assign(dstPtr, value)
 	}
 	return err
 }
 
-func fromRow(dstRef interface{}, row map[string]interface{}, colName string, errMap map[string]int) {
+func fromRow(dstPtr interface{}, row map[string]interface{}, colName string, errMap map[string]int) {
 	value, ok := row[colName]
 	if !ok {
 		key := fmt.Sprintf("%s: no such column", colName)
@@ -1089,7 +1112,7 @@ func fromRow(dstRef interface{}, row map[string]interface{}, colName string, err
 		}
 		return
 	}
-	err := assign(dstRef, value)
+	err := assign(dstPtr, value)
 	if err != nil {
 		key := fmt.Sprintf("%s: %s", colName, err.Error())
 		count, ok := errMap[key]
