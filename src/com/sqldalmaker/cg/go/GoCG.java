@@ -124,13 +124,13 @@ public class GoCG {
                 context.put("model", model);
             }
             context.put("package", dto_package);
-            Set<String> imports = new HashSet<String>();
+            Set<String> imports_set = new HashSet<String>();
             int max_name_len = -1;
             int max_type_name_len = -1;
             for (FieldInfo fi : fields) {
                 String imp = _get_type_import(fi);
                 if (imp != null) {
-                    imports.add(imp);
+                    imports_set.add(imp);
                 }
                 int name_len = fi.getName().length();
                 if (name_len > max_name_len) {
@@ -160,7 +160,9 @@ public class GoCG {
             }
             String header = jaxb_dto_class.getHeader();
             context.put("header", header);
-            context.put("imports", imports);
+            String[] imports_arr = imports_set.toArray(new String[0]);
+            Arrays.sort(imports_arr);
+            context.put("imports", imports_arr);
             context.put("class_name", dto_class_name);
             context.put("ref", jaxb_dto_class.getRef());
             context.put("fields", fields);
@@ -187,7 +189,7 @@ public class GoCG {
 
         private final String sql_root_abs_path;
         private final DtoClasses jaxb_dto_classes;
-        private final Set<String> imports = new HashSet<String>();
+        private final Set<String> imports_set = new HashSet<String>();
         private final TemplateEngine te;
         private final JdbcUtils db_utils;
         private final Settings settings;
@@ -219,7 +221,7 @@ public class GoCG {
         @Override
         public String[] translate(String dao_class_name,
                                   DaoClass dao_class) throws Exception {
-            imports.clear();
+            imports_set.clear();
             this.dao_class_name = dao_class_name;
             List<String> methods = new ArrayList<String>();
             JaxbUtils.process_jaxb_dao_class(this, dao_class_name, dao_class, methods);
@@ -229,8 +231,7 @@ public class GoCG {
             }
             Map<String, Object> context = new HashMap<String, Object>();
             context.put("package", dao_package);
-            String[] arr = new String[imports.size()];
-            String[] imports_arr = imports.toArray(arr);
+            String[] imports_arr = imports_set.toArray(new String[0]);
             Arrays.sort(imports_arr);
             context.put("imports", imports_arr);
             context.put("class_name", dao_class_name);
@@ -368,14 +369,14 @@ public class GoCG {
             }
             String dto_import = settings.getDto().getScope();
             boolean found = false;
-            for (String imp : imports) {
+            for (String imp : imports_set) {
                 if (imp.equals(dto_import)) {
                     found = true;
                     break;
                 }
             }
             if (!found) {
-                imports.add(dto_import);
+                imports_set.add(dto_import);
             }
         }
 
@@ -421,7 +422,7 @@ public class GoCG {
             for (FieldInfo pi : _params) {
                 String imp = _get_type_import(pi);
                 if (imp != null) {
-                    imports.add(imp);
+                    imports_set.add(imp);
                 }
                 String just_type = _get_type_without_import_and_tag(pi);
                 pi.refine_rendered_type(just_type);
@@ -544,7 +545,7 @@ public class GoCG {
                 for (FieldInfo pi : params) {
                     String imp = _get_type_import(pi);
                     if (imp != null) {
-                        imports.add(imp);
+                        imports_set.add(imp);
                     }
                     String just_type = _get_type_without_import_and_tag(pi);
                     pi.refine_rendered_type(just_type);
@@ -554,7 +555,7 @@ public class GoCG {
             if (context.get("imports") != null) {
                 throw new Exception("Invalid assignment of 'imports'");
             }
-            context.put("imports", imports);
+            context.put("imports", imports_set);
         }
 
         private String[] _parse_method_declaration(String method_text,
