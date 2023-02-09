@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"gorm.io/gorm"
+	"io"
 	"reflect"
 	"strconv"
 	"strings"
@@ -92,12 +93,7 @@ type _DS struct {
 	rootDb      *gorm.DB
 }
 
-type CanClose interface {
-	Close() error
-}
-
-func _close(obj CanClose) {
-	// dont overwrite err
+func _close(obj io.Closer) {
 	_ = obj.Close()
 }
 
@@ -114,7 +110,7 @@ func (ds *_DS) isSqlServer() bool {
 }
 
 /*
-	Implement the method initDb(ds *_DS) in an external file. This is an example:
+	Implement the method initDb() in an external file. This is an example:
 
 // data_store_gorm_ex.go
 
@@ -254,7 +250,7 @@ func (ds *_DS) Read(ctx context.Context, table string, dataObjRef interface{}, p
 }
 
 func (ds *_DS) Update(ctx context.Context, table string, dataObjRef interface{}) (rowsAffected int64, err error) {
-	db := ds.Session(ctx).Table(table).Save(dataObjRef)
+	db := ds.Session(ctx).Table(table).Updates(dataObjRef)
 	err = db.Error
 	rowsAffected = db.RowsAffected
 	return

@@ -25,11 +25,10 @@ import java.util.List;
  * Created with IntelliJ IDEA.
  * User: sqldalmaker@gmail.com
  * Date: 21.06.12
- *
  * Google --> intellij ActionGroup always enabled
  * -->
  * ActionGroup is disabled. Why?
- * https://intellij-support.jetbrains.com/hc/en-us/community/posts/360008627020-ActionGroup-is-disabled-Why-
+ * <a href="https://intellij-support.jetbrains.com/hc/en-us/community/posts/360008627020-ActionGroup-is-disabled-Why-">...</a>
  */
 public class SdmActionGroup extends ActionGroup implements AlwaysVisibleActionGroup {
 
@@ -180,7 +179,7 @@ public class SdmActionGroup extends ActionGroup implements AlwaysVisibleActionGr
 
     @NotNull
     @Override
-    public AnAction @NotNull [] getChildren(@Nullable AnActionEvent anActionEvent) {
+    public AnAction [] getChildren(@Nullable AnActionEvent anActionEvent) {
         try {
             if (anActionEvent == null) {
                 return AnAction.EMPTY_ARRAY;

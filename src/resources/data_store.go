@@ -6,6 +6,7 @@ import (
 	"database/sql/driver"
 	"errors"
 	"fmt"
+	"io"
 	//"github.com/godror/godror"
 	"reflect"
 	"strconv"
@@ -76,11 +77,7 @@ type _DS struct {
 	db          *sql.DB
 }
 
-type MyCanClose interface {
-	Close() error
-}
-
-func _close(obj MyCanClose) {
+func _close(obj io.Closer) {
 	_ = obj.Close()
 }
 

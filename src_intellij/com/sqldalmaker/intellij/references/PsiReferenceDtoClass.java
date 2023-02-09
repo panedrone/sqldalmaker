@@ -21,7 +21,7 @@ import org.jetbrains.annotations.Nullable;
  * on 17.02.2015.
  * <p/>
  * usage of PsiReferenceBase<PsiElement> is based on
- * https://confluence.jetbrains.com/display/IntelliJIDEA/Reference+Contributor
+ * <a href="https://confluence.jetbrains.com/display/IntelliJIDEA/Reference+Contributor">...</a>
  */
 @SuppressWarnings("unchecked")
 public class PsiReferenceDtoClass extends PsiReferenceBase<PsiElement> {
@@ -66,7 +66,7 @@ public class PsiReferenceDtoClass extends PsiReferenceBase<PsiElement> {
     }
 
     @NotNull
-    public Object @NotNull [] getVariants() {
+    public Object [] getVariants() {
         // code completion is not implemented for this attribute value yet
         return ArrayUtil.EMPTY_OBJECT_ARRAY;
     }
