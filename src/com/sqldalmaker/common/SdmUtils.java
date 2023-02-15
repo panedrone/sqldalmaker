@@ -326,12 +326,11 @@ public class SdmUtils {
                                              String sql_root_abs_path) throws Exception {
 
         JdbcUtils db_utils = new JdbcUtils(connection, FieldNamesMode.AS_IS, FieldNamesMode.AS_IS, settings, sql_root_abs_path);
-        ArrayList<FieldInfo> fields = new ArrayList<FieldInfo>();
-        db_utils.get_field_info_for_wizard(dto_class, sql_root_abs_path, fields);
+        List<FieldInfo> fields = db_utils.get_field_info_for_wizard(dto_class, sql_root_abs_path);
         for (FieldInfo f : fields) {
             DtoClass.Field df = object_factory.createDtoClassField();
             df.setColumn(f.getColumnName());
-            df.setType(f.getScalarType());
+            df.setType(f.getType());
             dto_class.getField().add(df);
         }
     }

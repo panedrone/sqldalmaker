@@ -2,7 +2,7 @@
     <id>dal-mpe</id>
     <name>SQL DAL Maker</name>
     <category>Database</category>
-    <version>1.277.2302</version>
+    <version>1.278.2302</version>
     <vendor email="sqldalmaker@gmail.com"/>
     <idea-version since-build="181.5684.4"/>
 
@@ -58,7 +58,7 @@ At the stage of code generation, the target database must exist and be available
         <fileEditorProvider implementation="com.sqldalmaker.intellij.ui.RootFileEditorProvider"/>
         <editorTabTitleProvider implementation="com.sqldalmaker.intellij.ui.RootFileEditorTabTitleProvider"/>
         <psi.referenceContributor
-                implementation="com.sqldalmaker.intellij.references.PsiReferenceContributorCommon"/>
+                implementation="com.sqldalmaker.intellij.references.PsiReferenceContributorCommon" language="XML"/>
         <completion.contributor language="XML"
                                 implementationClass="com.sqldalmaker.intellij.references.CompletionContributorCommon"/>
     </extensions>

@@ -1,15 +1,14 @@
 /*
-    Copyright 2011-2022 sqldalmaker@gmail.com
+    Copyright 2011-2023 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
 package com.sqldalmaker.intellij;
 
 import com.intellij.openapi.actionSystem.*;
-import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
-import com.intellij.openapi.fileEditor.TextEditor;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.sqldalmaker.cg.Helpers;
 import com.sqldalmaker.common.FileSearchHelpers;
@@ -134,14 +133,23 @@ public class SdmActionGroup extends ActionGroup implements AlwaysVisibleActionGr
         FileEditorManager fm = FileEditorManager.getInstance(project);
         // FileEditor editor = fm.getSelectedEditor(); // since 182.711
         VirtualFile[] files = fm.getSelectedFiles();
-        FileEditor editor = files.length == 0 ? null : fm.getSelectedEditor(files[0]);
-        if (!(editor instanceof TextEditor)) {
+        if (files.length == 0) {
             return false;
         }
-        VirtualFile xml_file = editor.getFile(); // @Nullable
-        if (xml_file == null) {
+        VirtualFile xml_file = files[0];
+        String ext = xml_file.getExtension();
+        if (!"xml".equals(ext)) {
             return false;
         }
+        // === panedrone: getSelectedEditor throws ProcessCanceledException on Goland 2022
+//        FileEditor editor = files.length == 0 ? null : fm.getSelectedEditor(files[0]);
+//        if (!(editor instanceof TextEditor)) {
+//            return false;
+//        }
+//        VirtualFile xml_file = editor.getFile(); // @Nullable
+//        if (xml_file == null) {
+//            return false;
+//        }
         VirtualFile xml_file_dir = xml_file.getParent();
         if (xml_file_dir == null) {
             return false;
@@ -179,7 +187,7 @@ public class SdmActionGroup extends ActionGroup implements AlwaysVisibleActionGr
 
     @NotNull
     @Override
-    public AnAction [] getChildren(@Nullable AnActionEvent anActionEvent) {
+    public AnAction[] getChildren(@Nullable AnActionEvent anActionEvent) {
         try {
             if (anActionEvent == null) {
                 return AnAction.EMPTY_ARRAY;
@@ -188,7 +196,16 @@ public class SdmActionGroup extends ActionGroup implements AlwaysVisibleActionGr
                 // === panedrone: to prevent asking for children if SDM toolbar drop-down is hidden
                 return AnAction.EMPTY_ARRAY;
             }
-            Project project = anActionEvent.getProject(); // @Nullable
+            Project project = null;
+            try {
+                // === panedrone: anActionEvent.getProject() throws ProcessCanceledException on Goland 2022
+                project = anActionEvent.getProject(); // @Nullable
+            } catch (Throwable t) {
+                Project[] pp = ProjectManager.getInstance().getOpenProjects();
+                if (pp.length > 0) {
+                    project = pp[0];
+                }
+            }
             if (project == null) {
                 return AnAction.EMPTY_ARRAY;
             }

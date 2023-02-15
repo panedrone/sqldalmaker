@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2022 sqldalmaker@gmail.com
+    Copyright 2011-2023 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -36,14 +36,17 @@ class DtoClassInfo {
         this.dto_field_names_mode = dto_field_names_mode;
     }
 
-    public Map<String, FieldInfo> get_field_info_for_wizard(DtoClass jaxb_dto_class,
-                                                            String sql_root_abs_path,
-                                                            List<FieldInfo> res_dto_fields) throws Exception {
-        // boolean ignore_model = true;
-        // it considers type-map internally
-        Map<String, FieldInfo> fields_map = _prepare_by_jdbc(true, jaxb_dto_class, sql_root_abs_path, res_dto_fields);
-        _refine_scalar_types_by_type_map(res_dto_fields);
-        return fields_map;
+    public List<FieldInfo> get_field_info_for_wizard(DtoClass jaxb_dto_class,
+                                                     String sql_root_abs_path) throws Exception {
+
+        List<FieldInfo> res_dto_fields = new ArrayList<FieldInfo>();
+        _prepare_by_jdbc(false, jaxb_dto_class, sql_root_abs_path, res_dto_fields);
+        for (FieldInfo fi : res_dto_fields) {
+            String type_name = fi.getType();
+            type_name = type_map.get_target_type_name(type_name);
+            fi.refine_rendered_type(type_name); // field wizard wants rendered types
+        }
+        return res_dto_fields;
     }
 
     public Map<String, FieldInfo> get_dto_field_info(boolean ignore_model,
