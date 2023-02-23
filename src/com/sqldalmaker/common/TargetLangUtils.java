@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2022 sqldalmaker@gmail.com
+    Copyright 2011-2023 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -17,7 +17,6 @@ import com.sqldalmaker.jaxb.settings.Macros;
 import com.sqldalmaker.jaxb.settings.Settings;
 
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Connection;
 
@@ -85,53 +84,20 @@ public class TargetLangUtils {
         return res;
     }
 
-    private static final String SCOPES_ERR = "Error in 'settings.xml': \n" +
-            "the scopes of DTO and DAO must both be empty or both be fully qualified like in Go 'import' section";
-
     public static String get_golang_dto_folder_rel_path(Settings settings) throws Exception {
-        String dto_scope = settings.getDto().getScope().replace("\\", "/");
-        String dao_scope = settings.getDao().getScope().replace("\\", "/");
-        String package_rel_path;
+        String dto_scope = settings.getDto().getScope().replace("\\", "/").trim();
         if (dto_scope.length() == 0) {
-            if (dao_scope.length() != 0) {
-                throw new Exception(SCOPES_ERR);
-            }
-            package_rel_path = settings.getFolders().getTarget().replace("\\", "/");
-        } else {
-            Path p = Paths.get(dto_scope);
-            String dto_scope_last_segment = p.getFileName().toString();
-            if (dao_scope.length() == 0 || dto_scope_last_segment.equals(dto_scope)) { // just package name
-                throw new Exception(SCOPES_ERR);
-            } else {
-                String[] dto_scope_parts = dto_scope.split("/");
-                String path_after_root_module = dto_scope.substring(dto_scope_parts[0].length() + 1);
-                package_rel_path = path_after_root_module; // just ignore target folder
-            }
+            throw new Exception(Const.GOLANG_SCOPES_ERR);
         }
-        return package_rel_path;
+        return dto_scope;
     }
 
     public static String get_golang_dao_folder_rel_path(Settings settings) throws Exception {
-        String dao_scope = settings.getDao().getScope().replace("\\", "/");
-        String dto_scope = settings.getDto().getScope().replace("\\", "/");
-        String package_rel_path;
+        String dao_scope = settings.getDao().getScope().replace("\\", "/").trim();
         if (dao_scope.length() == 0) {
-            if (dto_scope.length() != 0) {
-                throw new Exception(SCOPES_ERR);
-            }
-            package_rel_path = settings.getFolders().getTarget().replace("\\", "/");
-        } else {
-            Path p = Paths.get(dao_scope);
-            String dao_scope_last_segment = p.getFileName().toString();
-            if (dto_scope.length() == 0 || dao_scope_last_segment.equals(dao_scope)) { // just package name
-                throw new Exception(SCOPES_ERR);
-            } else {
-                String[] dao_scope_parts = dao_scope.split("/");
-                String path_after_root_module = dao_scope.substring(dao_scope_parts[0].length() + 1);
-                package_rel_path = path_after_root_module; // just ignore target folder
-            }
+            throw new Exception(Const.GOLANG_SCOPES_ERR);
         }
-        return package_rel_path;
+        return dao_scope;
     }
 
     public static String get_dto_vm_template(Settings settings,

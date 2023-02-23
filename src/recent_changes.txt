@@ -1,3 +1,17 @@
+2023-02-23
+
+    "<folders target":
+
+            - Golang: the same as "module" in "go.mod"
+
+    "<dto scope":
+
+            - Golang: base folder of generated DTO files (relative to the project root)
+
+    "<dao scope":
+
+            - Golang: base folder of generated DAO files (relative to the project root)
+
 2023-01-28
 
     Sorting of imports in Golang DTO-s.

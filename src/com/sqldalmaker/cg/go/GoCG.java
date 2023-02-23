@@ -1,14 +1,15 @@
 /*
-    Copyright 2011-2022 sqldalmaker@gmail.com
+    Copyright 2011-2023 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
 package com.sqldalmaker.cg.go;
 
 import com.sqldalmaker.cg.*;
+import com.sqldalmaker.common.Const;
+import com.sqldalmaker.jaxb.dao.Crud;
 import com.sqldalmaker.jaxb.dao.DaoClass;
 import com.sqldalmaker.jaxb.dao.ExecDml;
-import com.sqldalmaker.jaxb.dao.Crud;
 import com.sqldalmaker.jaxb.dto.DtoClass;
 import com.sqldalmaker.jaxb.dto.DtoClasses;
 import com.sqldalmaker.jaxb.settings.Settings;
@@ -64,13 +65,10 @@ public class GoCG {
         return type_part;
     }
 
-    private static String _get_package_name(Settings settings, String scope) {
+    private static String _get_package_name(String scope) throws Exception {
         String pkg;
-        if (scope.length() == 0) {
-            String target_folder = settings.getFolders().getTarget();
-            Path p = Paths.get(target_folder);
-            String target_folder_last_segment = p.getFileName().toString();
-            pkg = target_folder_last_segment;
+        if (scope.trim().length() == 0) {
+            throw new Exception(Const.GOLANG_SCOPES_ERR);
         } else {
             Path p = Paths.get(scope);
             String dto_scope_last_segment = p.getFileName().toString();
@@ -100,7 +98,7 @@ public class GoCG {
                    String vm_template) throws Exception {
 
             String dto_scope = jaxb_settings.getDto().getScope().replace('\\', '/').trim();
-            this.dto_package = _get_package_name(jaxb_settings, dto_scope);
+            this.dto_package = _get_package_name(dto_scope);
             this.jaxb_dto_classes = jaxb_dto_classes;
             this.sql_root_abs_path = sql_root_abs_path;
             if (vm_template == null) {
@@ -205,9 +203,9 @@ public class GoCG {
 
             this.settings = jaxb_settings;
             String dto_scope = jaxb_settings.getDto().getScope().replace('\\', '/').trim();
-            this.dto_package = _get_package_name(jaxb_settings, dto_scope);
+            this.dto_package = _get_package_name(dto_scope);
             String dao_scope = jaxb_settings.getDao().getScope().replace('\\', '/').trim();
-            this.dao_package = _get_package_name(jaxb_settings, dao_scope);
+            this.dao_package = _get_package_name(dao_scope);
             this.jaxb_dto_classes = jaxb_dto_classes;
             this.sql_root_abs_path = sql_root_abs_path;
             if (vm_template == null) {
@@ -247,7 +245,6 @@ public class GoCG {
 
         @Override
         public StringBuilder render_jaxb_query(Object jaxb_element) throws Exception {
-
             QueryMethodInfo mi = new QueryMethodInfo(jaxb_element);
             String xml_node_name = JaxbUtils.get_jaxb_node_name(jaxb_element);
             Helpers.check_required_attr(xml_node_name, mi.jaxb_method);
@@ -349,7 +346,6 @@ public class GoCG {
         }
 
         private String _get_rendered_dto_class_name(String dto_class_name) throws Exception {
-
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
             String dto_class_nm = jaxb_dto_class.getName();
             int model_end = dto_class_nm.indexOf('-');
@@ -363,26 +359,25 @@ public class GoCG {
         }
 
         private void _process_dto_class_name(String dto_class_name) {
-
             if (this.dto_package.equals(dao_package)) {
                 return;
             }
-            String dto_import = settings.getDto().getScope();
-            boolean found = false;
-            for (String imp : imports_set) {
-                if (imp.equals(dto_import)) {
-                    found = true;
-                    break;
-                }
+            String dto_scope = settings.getDto().getScope();
+            String dto_import;
+            String module = settings.getFolders().getTarget();
+            if (module.trim().length() == 0) {
+                dto_import = dto_scope;
+            } else {
+                dto_import = Helpers.concat_path(module, dto_scope);
             }
-            if (!found) {
-                imports_set.add(dto_import);
+            if (imports_set.contains(dto_import)) {
+                return;
             }
+            imports_set.add(dto_import);
         }
 
         @Override
         public StringBuilder render_jaxb_exec_dml(ExecDml jaxb_exec_dml) throws Exception {
-
             String method = jaxb_exec_dml.getMethod();
             String ref = jaxb_exec_dml.getRef();
             String xml_node_name = JaxbUtils.get_jaxb_node_name(jaxb_exec_dml);
