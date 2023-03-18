@@ -18,8 +18,8 @@
 import flask_sqlalchemy  # remove it for a "not flask" version
 import sqlalchemy.orm
 
-
 # import cx_Oracle
+from sqlalchemy import text
 
 
 class OutParam:
@@ -55,11 +55,16 @@ class DataStore:
 
     # ORM-based helpers
 
-    def filter(self, cls, params: dict, fields: list = None):
+    def get_query(self, cls):
+        """
+        :param cls: a model class
+        """
+        pass
+
+    def filter(self, cls, params: dict):
         """
         :param cls: a model class
         :param params: dict of named filter params
-        :param fields: list of fields
         :return: a QuerySet
         """
         pass
@@ -357,7 +362,8 @@ class _DS(DataStore):
 
         self.session: sqlalchemy.orm.session = _DS.Session()
 
-    # constructor used in FastAPI demo
+        # constructor used in FastAPI demo
+
     # https://github.com/panedrone/sdm_demo_todolist_fastapi_sqlalchemy
 
     # def __init__(self, session: sqlalchemy.orm.Session):
@@ -421,16 +427,22 @@ class _DS(DataStore):
         if params is None:
             params = []
 
-        # with self._exec(cls.SQL, params) as rows: # .fetchall() -- AttributeError: __enter__
-        cursor = self._exec(cls.SQL, params)
+        # raw_conn.row_factory = sqlite3.Row # not working on python 3.11
+        # raw_conn.row_factory = dict_factory  # not working on python 3.11
+
+        sqla_cursor = self._exec(cls.SQL, params)
         try:
-            # https://stackoverflow.com/questions/31750441/generalised-insert-into-sqlalchemy-using-dictionary
-            # https://stackoverflow.com/questions/3451779/how-to-dynamically-create-an-instance-of-a-class-in-python
-            # https://stackoverflow.com/questions/1958219/how-to-convert-sqlalchemy-row-object-to-a-python-dict
-            res = [cls(**dict(row)) for row in cursor]
+            sqlite3_cursor = sqla_cursor.cursor
+            col_names = [tup[0] for tup in sqlite3_cursor.description]
+            res = []
+            for row in sqla_cursor:
+                row_values = [i for i in row]
+                row_as_dict = dict(zip(col_names, row_values))
+                r = cls(**dict(row_as_dict))
+                res.append(r)
             return res
         finally:
-            cursor.close()
+            sqla_cursor.close()
 
     def get_one_raw(self, cls, params=None):
         rows = self.get_all_raw(cls, params)
@@ -440,12 +452,11 @@ class _DS(DataStore):
             raise Exception('More than 1 row exists')
         return rows[0]
 
-    def filter(self, cls, params: dict, fields: list = None):
-        if fields:
-            # https://stackoverflow.com/questions/11530196/flask-sqlalchemy-query-specify-column-names
-            return self.session.query(cls).options(sqlalchemy.orm.load_only(*fields)).filter_by(**params)
-        else:
-            return self.session.query(cls).filter_by(**params)
+    def get_query(self, cls):
+        return self.session.query(cls)
+
+    def filter(self, cls, params: dict):
+        return self.session.query(cls).filter_by(**params)
 
     def delete_by_filter(self, cls, params: dict) -> int:
         found = self.filter(cls, params)
@@ -486,7 +497,7 @@ class _DS(DataStore):
         :return: <sqlalchemy.engine.cursor.LegacyCursorResult object at 0x00000243D83C5D00>
         """
         pp = tuple(params)
-        txt = sql  # don't use sqlalchemy.text(sql) with '%' as params
+        txt = text(sql)  # don't use sqlalchemy.text(sql) with '%' as params
         return self.session.execute(txt, pp)
 
     def _exec_proc_pg(self, sql, params):
@@ -512,7 +523,7 @@ class _DS(DataStore):
     def _exec_sp_mysql(self, sp, params):
         call_params = self._get_call_params(params)
         # https://stackoverflow.com/questions/45979950/sqlalchemy-error-when-calling-mysql-stored-procedure
-        raw_conn = self.session.raw_connection()
+        raw_conn = self.session.connection()
         try:
             with raw_conn.cursor() as cursor:
                 result_args = cursor.callproc(sp, call_params)
@@ -531,7 +542,7 @@ class _DS(DataStore):
     def _query_sp_mysql(self, sp, on_result, params):
         call_params = self._get_call_params(params)
         # https://stackoverflow.com/questions/45979950/sqlalchemy-error-when-calling-mysql-stored-procedure
-        raw_conn = self.session.raw_connection()
+        raw_conn = self.session.connection()
         try:
             with raw_conn.cursor() as cursor:
                 # result_args: https://pynative.com/python-mysql-execute-stored-procedure/

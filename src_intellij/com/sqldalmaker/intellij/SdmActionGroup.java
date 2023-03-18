@@ -38,8 +38,8 @@ public class SdmActionGroup extends ActionGroup implements AlwaysVisibleActionGr
     }
 
     private static void enum_root_files(Project project, VirtualFile current_folder, List<VirtualFile> root_files) {
-        @SuppressWarnings("UnsafeVfsRecursion")
-        VirtualFile[] children = current_folder.getChildren();
+
+        @SuppressWarnings("UnsafeVfsRecursion") VirtualFile[] children = current_folder.getChildren();
         for (VirtualFile c : children) {
             if (c.isDirectory()) {
                 if (!c.getName().equals("bin")) {
@@ -55,6 +55,7 @@ public class SdmActionGroup extends ActionGroup implements AlwaysVisibleActionGr
     }
 
     private void add_common_actions(Project project, List<AnAction> drop_down_actions_list, List<VirtualFile> root_files) throws Exception {
+
         for (VirtualFile root_file : root_files) {
             String root_file_rel_path = IdeaHelpers.get_relative_path(project, root_file);
             SdmAction action = new SdmAction(root_file_rel_path) {
@@ -72,6 +73,7 @@ public class SdmActionGroup extends ActionGroup implements AlwaysVisibleActionGr
     }
 
     private void add_dto_actions(Project project, List<AnAction> drop_down_actions_list, VirtualFile xml_file) throws Exception {
+
         String xml_file_rel_path = IdeaHelpers.get_relative_path(project, xml_file);
         SdmAction action_generate = new SdmAction(xml_file_rel_path + " -> Generate All") {
             @Override
@@ -90,6 +92,7 @@ public class SdmActionGroup extends ActionGroup implements AlwaysVisibleActionGr
     }
 
     private void add_dao_actions(Project project, List<AnAction> drop_down_actions_list, VirtualFile xml_file) throws Exception {
+
         String xml_file_rel_path = IdeaHelpers.get_relative_path(project, xml_file);
         SdmAction action_generate = new SdmAction(xml_file_rel_path + " -> Generate") {
             @Override
@@ -107,14 +110,12 @@ public class SdmActionGroup extends ActionGroup implements AlwaysVisibleActionGr
         drop_down_actions_list.add(action_validate);
     }
 
-    private void add_open_dao_target_action(Project project, VirtualFile root_file, VirtualFile xml_file,
-                                            List<AnAction> drop_down_actions_list) throws Exception {
+    private void add_open_dao_target_action(Project project, VirtualFile root_file, VirtualFile xml_file, List<AnAction> drop_down_actions_list) throws Exception {
 
         Settings settings = IdeaHelpers.load_settings(root_file);
         String xml_file_path = xml_file.getPath();
         String dao_class_name = Helpers.get_dao_class_name(xml_file_path);
-        String rel_path = IdeaTargetLanguageHelpers.get_target_folder_rel_path(project, root_file, settings,
-                dao_class_name, settings.getDao().getScope());
+        String rel_path = IdeaTargetLanguageHelpers.get_target_folder_rel_path(project, root_file, settings, dao_class_name, settings.getDao().getScope());
         SdmAction action_goto_target = new SdmAction(rel_path) {
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
@@ -130,6 +131,7 @@ public class SdmActionGroup extends ActionGroup implements AlwaysVisibleActionGr
     }
 
     private boolean add_xml_file_actions(Project project, List<AnAction> drop_down_actions_list) throws Exception {
+
         FileEditorManager fm = FileEditorManager.getInstance(project);
         // FileEditor editor = fm.getSelectedEditor(); // since 182.711
         VirtualFile[] files = fm.getSelectedFiles();
