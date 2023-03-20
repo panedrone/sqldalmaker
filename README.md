@@ -17,7 +17,7 @@ Project Website: [https://sqldalmaker.sourceforge.net](https://sqldalmaker.sourc
 Quick-Demo in
 mp4: [https://github.com/panedrone/sqldalmaker/releases/tag/latest](https://github.com/panedrone/sqldalmaker/releases/tag/latest)
 
-|        | Demo-Projects                                                                                                                                                                                                                                                                                         |
+|        | Demo Projects                                                                                                                                                                                                                                                                                         |
 |--------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | PHP    | [PDO + Vue.js](https://github.com/panedrone/sdm_demo_php_todolist), [Doctrine + Vue.js](https://github.com/panedrone/sdm_demo_todolist_php_doctrine)                                                                                                                                                  |
 | Java   | [JDBC + Swing](https://github.com/panedrone/sdm_demo_swing_thesaurus), [JDBC + JSF](https://github.com/panedrone/sdm_demo_jsf_todolist), [JDBC + JasperReports](https://github.com/panedrone/sdm_demo_jasper_reports_northwindEF), [Android](https://github.com/panedrone/sdm_demo_android_thesaurus) |
