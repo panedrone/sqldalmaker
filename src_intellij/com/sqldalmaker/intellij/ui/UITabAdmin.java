@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2022 sqldalmaker@gmail.com
+    Copyright 2011-2023 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -43,10 +43,8 @@ public class UITabAdmin {
     private JButton PDODataStorePhpButton;
     private JButton dataStoreCSTLButton;
     private JButton dataStoreCATLButton;
-    private JButton dataStoreRUBYDBIButton;
     private JButton cppVmButton;
     private JButton pythonVmButton;
-    private JButton rubyVmButton;
     private JPanel rootPanel;
     private JTextPane text1;
     private JButton php_vm;
@@ -201,12 +199,6 @@ public class UITabAdmin {
                 IdeaEditorHelpers.open_or_activate_jar_file_in_editor(project, "com/sqldalmaker/cg/python", "python.vm", "python.vm");
             }
         });
-        rubyVmButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                IdeaEditorHelpers.open_or_activate_jar_file_in_editor(project, "com/sqldalmaker/cg/ruby", "ruby.vm", "ruby.vm");
-            }
-        });
         dataStoreJavaButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -249,24 +241,6 @@ public class UITabAdmin {
             public void actionPerformed(ActionEvent e) {
                 IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "DataStore.cpp", "DataStore.cpp");
                 IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "DataStore.h", "DataStore.h");
-            }
-        });
-//        dataStorePySQLite3Button.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "data_store_sqlite3.py", "data_store.py");
-//            }
-//        });
-//        dataStorePyMySQLButton.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "data_store_mysql.py", "data_store.py");
-//            }
-//        });
-        dataStoreRUBYDBIButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "data_store.rb", "data_store.rb");
             }
         });
         recentChangesButton.addActionListener(new ActionListener() {
@@ -680,26 +654,15 @@ public class UITabAdmin {
         if (label5Font != null) label5.setFont(label5Font);
         label5.setHorizontalAlignment(4);
         label5.setPreferredSize(new Dimension(52, 20));
-        label5.setText(" Ruby ");
+        label5.setText(" Go ");
         panel8.add(label5);
-        dataStoreRUBYDBIButton = new JButton();
-        dataStoreRUBYDBIButton.setPreferredSize(new Dimension(60, 30));
-        dataStoreRUBYDBIButton.setText("DBI");
-        panel8.add(dataStoreRUBYDBIButton);
-        final JLabel label6 = new JLabel();
-        Font label6Font = this.$$$getFont$$$(null, -1, 14, label6.getFont());
-        if (label6Font != null) label6.setFont(label6Font);
-        label6.setHorizontalAlignment(4);
-        label6.setPreferredSize(new Dimension(30, 20));
-        label6.setText(" Go ");
-        panel8.add(label6);
+        gormButton = new JButton();
+        gormButton.setPreferredSize(new Dimension(60, 30));
+        gormButton.setText("Gorm");
+        panel8.add(gormButton);
         btn_golang = new JButton();
         btn_golang.setText("database/sql");
         panel8.add(btn_golang);
-        gormButton = new JButton();
-        gormButton.setPreferredSize(new Dimension(60, 30));
-        gormButton.setText("gorm");
-        panel8.add(gormButton);
         final JPanel panel9 = new JPanel();
         panel9.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
         gbc = new GridBagConstraints();
@@ -722,9 +685,6 @@ public class UITabAdmin {
         pythonVmButton = new JButton();
         pythonVmButton.setText("python.vm");
         panel9.add(pythonVmButton);
-        rubyVmButton = new JButton();
-        rubyVmButton.setText("ruby.vm");
-        panel9.add(rubyVmButton);
         btn_golangVM = new JButton();
         btn_golangVM.setText("go.vm");
         panel9.add(btn_golangVM);

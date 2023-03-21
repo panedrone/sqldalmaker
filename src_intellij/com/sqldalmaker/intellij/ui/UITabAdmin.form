@@ -294,42 +294,26 @@
                     <properties/>
                     <border type="none"/>
                     <children>
-                      <component id="e84a2" class="javax.swing.JLabel">
-                        <constraints/>
-                        <properties>
-                          <font size="14"/>
-                          <horizontalAlignment value="4"/>
-                          <preferredSize width="52" height="20"/>
-                          <text value=" Ruby "/>
-                        </properties>
-                      </component>
-                      <component id="6a2a4" class="javax.swing.JButton" binding="dataStoreRUBYDBIButton" default-binding="true">
-                        <constraints/>
-                        <properties>
-                          <preferredSize width="60" height="30"/>
-                          <text value="DBI"/>
-                        </properties>
-                      </component>
                       <component id="114d7" class="javax.swing.JLabel">
                         <constraints/>
                         <properties>
                           <font size="14"/>
                           <horizontalAlignment value="4"/>
-                          <preferredSize width="30" height="20"/>
+                          <preferredSize width="52" height="20"/>
                           <text value=" Go "/>
-                        </properties>
-                      </component>
-                      <component id="e9ae5" class="javax.swing.JButton" binding="btn_golang">
-                        <constraints/>
-                        <properties>
-                          <text value="database/sql"/>
                         </properties>
                       </component>
                       <component id="5fb52" class="javax.swing.JButton" binding="gormButton" default-binding="true">
                         <constraints/>
                         <properties>
                           <preferredSize width="60" height="30"/>
-                          <text value="gorm"/>
+                          <text value="Gorm"/>
+                        </properties>
+                      </component>
+                      <component id="e9ae5" class="javax.swing.JButton" binding="btn_golang">
+                        <constraints/>
+                        <properties>
+                          <text value="database/sql"/>
                         </properties>
                       </component>
                     </children>
@@ -364,12 +348,6 @@
                         <constraints/>
                         <properties>
                           <text value="python.vm"/>
-                        </properties>
-                      </component>
-                      <component id="2dce" class="javax.swing.JButton" binding="rubyVmButton" default-binding="true">
-                        <constraints/>
-                        <properties>
-                          <text value="ruby.vm"/>
                         </properties>
                       </component>
                       <component id="b9c18" class="javax.swing.JButton" binding="btn_golangVM">
