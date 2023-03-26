@@ -14,7 +14,7 @@ and [NetBeans 11+](https://github.com/panedrone/sqldalmaker/releases/tag/latest)
 
 Project Website: [https://sqldalmaker.sourceforge.net](https://sqldalmaker.sourceforge.net/)
 
-Quick-Demo in
+Quick Demo in
 mp4: [https://github.com/panedrone/sqldalmaker/releases/tag/latest](https://github.com/panedrone/sqldalmaker/releases/tag/latest)
 
 |        | Demo Projects                                                                                                                                                                                                                                                                                         |
@@ -22,5 +22,5 @@ mp4: [https://github.com/panedrone/sqldalmaker/releases/tag/latest](https://gith
 | PHP    | [PDO + Vue.js](https://github.com/panedrone/sdm_demo_php_todolist), [Doctrine + Vue.js](https://github.com/panedrone/sdm_demo_todolist_php_doctrine)                                                                                                                                                  |
 | Java   | [JDBC + Swing](https://github.com/panedrone/sdm_demo_swing_thesaurus), [JDBC + JSF](https://github.com/panedrone/sdm_demo_jsf_todolist), [JDBC + JasperReports](https://github.com/panedrone/sdm_demo_jasper_reports_northwindEF), [Android](https://github.com/panedrone/sdm_demo_android_thesaurus) |
 | C++    | [Qt](https://github.com/panedrone/sdm_demo_qt6_thesaurus)                                                                                                                                                                                                                                             |
-| Python | [Django + Vue.js](https://github.com/panedrone/sdm_demo_todolist_sqlite3_django), [SQLAlchemy + FastAPI + Vue.js](https://github.com/panedrone/sdm_demo_todolist_fastapi_sqlalchemy), [Flask-SQLAlchemy + Vue.js](https://github.com/panedrone/sdm_demo_todolist_flask_sqlalchemy)                    |
+| Python | [Django + Vue.js](https://github.com/panedrone/sdm_demo_todolist_django), [SQLAlchemy + FastAPI + Vue.js](https://github.com/panedrone/sdm_demo_todolist_fastapi_sqlalchemy), [Flask-SQLAlchemy + Vue.js](https://github.com/panedrone/sdm_demo_todolist_flask_sqlalchemy)                            |
 | Go     | ["database/sql" + Vue.js, Gorm + Vue.js](https://github.com/panedrone/sdm_demo_todolist_sqlite3_golang)                                                                                                                                                                                               |
