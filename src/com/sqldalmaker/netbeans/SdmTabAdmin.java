@@ -176,8 +176,6 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         jButton32 = new javax.swing.JButton();
         jButton9 = new javax.swing.JButton();
         jPanel5 = new javax.swing.JPanel();
-        jLabel10 = new javax.swing.JLabel();
-        jButton18 = new javax.swing.JButton();
         jLabel11 = new javax.swing.JLabel();
         jButton34 = new javax.swing.JButton();
         jButton16 = new javax.swing.JButton();
@@ -186,7 +184,6 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         jButton20 = new javax.swing.JButton();
         jButton21 = new javax.swing.JButton();
         jButton22 = new javax.swing.JButton();
-        jButton23 = new javax.swing.JButton();
         jButton31 = new javax.swing.JButton();
         jTextPane1 = new javax.swing.JTextPane();
 
@@ -491,25 +488,9 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
 
         jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jLabel10.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel10.setText("Ruby");
-        jLabel10.setPreferredSize(new java.awt.Dimension(40, 14));
-        jPanel5.add(jLabel10);
-
-        jButton18.setText("DBI");
-        jButton18.setToolTipText("");
-        jButton18.setFocusPainted(false);
-        jButton18.setPreferredSize(new java.awt.Dimension(64, 22));
-        jButton18.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton18ActionPerformed(evt);
-            }
-        });
-        jPanel5.add(jButton18);
-
         jLabel11.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel11.setText("Go");
-        jLabel11.setPreferredSize(new java.awt.Dimension(18, 14));
+        jLabel11.setPreferredSize(new java.awt.Dimension(40, 14));
         jPanel5.add(jLabel11);
 
         jButton34.setText("database/sql");
@@ -572,15 +553,6 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         });
         jPanel7.add(jButton22);
 
-        jButton23.setText("ruby.vm");
-        jButton23.setFocusPainted(false);
-        jButton23.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton23ActionPerformed(evt);
-            }
-        });
-        jPanel7.add(jButton23);
-
         jButton31.setText("go.vm");
         jButton31.setFocusPainted(false);
         jButton31.addActionListener(new java.awt.event.ActionListener() {
@@ -630,10 +602,6 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
     private void jButton34ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton34ActionPerformed
         NbpIdeEditorHelpers.open_resource_file_in_editor_async("data_store.go", "data_store.go");
     }//GEN-LAST:event_jButton34ActionPerformed
-
-    private void jButton18ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton18ActionPerformed
-        NbpIdeEditorHelpers.open_resource_file_in_editor_async("data_store.rb", "data_store.rb");
-    }//GEN-LAST:event_jButton18ActionPerformed
 
     private void jButton9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton9ActionPerformed
         NbpIdeEditorHelpers.open_resource_file_in_editor_async("data_store_pyodbc.py", "data_store_pyodbc.py");
@@ -701,10 +669,6 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
     private void jButton31ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton31ActionPerformed
         NbpIdeEditorHelpers.open_resource_file_in_editor_async("go.vm", "com/sqldalmaker/cg/go", "go.vm");
     }//GEN-LAST:event_jButton31ActionPerformed
-
-    private void jButton23ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton23ActionPerformed
-        NbpIdeEditorHelpers.open_resource_file_in_editor_async("ruby.vm", "com/sqldalmaker/cg/ruby", "ruby.vm");
-    }//GEN-LAST:event_jButton23ActionPerformed
 
     private void jButton22ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton22ActionPerformed
         NbpIdeEditorHelpers.open_resource_file_in_editor_async("python.vm", "com/sqldalmaker/cg/python", "python.vm");
@@ -798,13 +762,11 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
     private javax.swing.JButton jButton15;
     private javax.swing.JButton jButton16;
     private javax.swing.JButton jButton17;
-    private javax.swing.JButton jButton18;
     private javax.swing.JButton jButton19;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton20;
     private javax.swing.JButton jButton21;
     private javax.swing.JButton jButton22;
-    private javax.swing.JButton jButton23;
     private javax.swing.JButton jButton24;
     private javax.swing.JButton jButton25;
     private javax.swing.JButton jButton26;
@@ -823,7 +785,6 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
     private javax.swing.JButton jButton7;
     private javax.swing.JButton jButton8;
     private javax.swing.JButton jButton9;
-    private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel7;
