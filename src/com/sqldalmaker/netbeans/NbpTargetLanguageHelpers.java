@@ -1,26 +1,17 @@
 /*
-    Copyright 2011-2022 sqldalmaker@gmail.com
+    Copyright 2011-2023 sqldalmaker@gmail.com
     SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
     Read LICENSE.txt in the root of this project/archive for details.
  */
 package com.sqldalmaker.netbeans;
 
-import com.sqldalmaker.cg.FieldNamesMode;
 import com.sqldalmaker.cg.Helpers;
 import com.sqldalmaker.cg.IDaoCG;
 import com.sqldalmaker.cg.IDtoCG;
-import com.sqldalmaker.cg.cpp.CppCG;
-import com.sqldalmaker.cg.go.GoCG;
-import com.sqldalmaker.cg.java.JavaCG;
-import com.sqldalmaker.cg.php.PhpCG;
-import com.sqldalmaker.cg.python.PythonCG;
-import com.sqldalmaker.cg.ruby.RubyCG;
 import com.sqldalmaker.common.Const;
 import com.sqldalmaker.common.RootFileName;
 import com.sqldalmaker.common.SdmUtils;
 import com.sqldalmaker.common.TargetLangUtils;
-import com.sqldalmaker.common.XmlParser;
-import com.sqldalmaker.jaxb.dto.DtoClasses;
 import com.sqldalmaker.jaxb.settings.Settings;
 import java.sql.Connection;
 import java.util.ArrayList;
@@ -40,7 +31,7 @@ public class NbpTargetLanguageHelpers {
             return root_files;
         }
         String[] rfn = {RootFileName.PHP, RootFileName.JAVA, RootFileName.CPP,
-            RootFileName.PYTHON, RootFileName.RUBY, RootFileName.GO};
+            RootFileName.PYTHON, RootFileName.GO};
         for (String fn : rfn) {
             FileObject root_file = xml_mp_dir.getFileObject(fn);
             if (root_file != null) {
@@ -187,8 +178,7 @@ public class NbpTargetLanguageHelpers {
                 || RootFileName.CPP.equals(fn)
                 || //ProfileNames.OBJC.equals(fn) ||
                 RootFileName.PHP.equals(fn)
-                || RootFileName.PYTHON.equals(fn)
-                || RootFileName.RUBY.equals(fn)) {
+                || RootFileName.PYTHON.equals(fn)) {
             try {
                 return NbpPathHelpers.get_relative_path(root_folder, file);
             } catch (Exception e) {
