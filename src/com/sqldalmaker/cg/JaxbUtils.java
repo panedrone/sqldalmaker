@@ -248,8 +248,8 @@ public class JaxbUtils {
             if (!SqlUtils.is_table_ref(dto_class_ref)) {
                 String dto_node_name = JaxbUtils.get_jaxb_node_name(jaxb_dto_class);
                 String dto_class_name = jaxb_dto_class.getName();
-                throw new Exception("<crud table=\"*\" (default), but <" + dto_node_name + " name=\"" + dto_class_name +
-                        "\" ref=\"" + dto_class_ref + "\".. is not a table");
+                throw new Exception(", but 'ref' is not a table: <" + dto_node_name + " name=\"" + dto_class_name +
+                        "\" ref=\"" + dto_class_ref + "\"..");
             }
             return dto_class_ref;
         }
