@@ -97,24 +97,24 @@ public class DaoClassInfo {
                                         List<FieldInfo> res_params) throws Exception {
         res_fields.clear();
         res_params.clear();
-        String[] parts = SqlUtils.parse_sql_shortcut_ref(dao_jaxb_ref); // class name is not available here
-        String dao_table_name = parts[0];
+        SqlShortcut shc = SqlUtils.parse_sql_shortcut_ref(dao_jaxb_ref); // class name is not available here
+        String dao_table_name = shc.table_name;
         String no_model = "";
         DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(jaxb_dto_or_return_type, jaxb_dto_classes);
-        JdbcTableInfo t_info = new JdbcTableInfo(no_model, conn, type_map, dto_field_names_mode, dao_table_name, "*", jaxb_dto_class.getAuto());
-        String filter_col_names_str = parts[1];
+        JdbcTableInfo table_info = JdbcTableInfo.forDao(no_model, conn, type_map, dto_field_names_mode, dao_table_name, "*", jaxb_dto_class);
+        String filter_col_names_str = shc.params;
         if (filter_col_names_str != null) {
             String[] filter_col_names = Helpers.get_listed_items(filter_col_names_str, false);
             Helpers.check_duplicates(filter_col_names);
-            _get_shortcut_params(param_names_mode, method_param_descriptors, t_info.fields_all, filter_col_names, res_params);
+            _get_shortcut_params(param_names_mode, method_param_descriptors, table_info.fields_all, filter_col_names, res_params);
         }
-        String col_list = parts[2];
+        String col_list = shc.col_names;
         if (col_list == null) {
-            res_fields.addAll(t_info.fields_all);
+            res_fields.addAll(table_info.fields_all);
         } else {
             String[] cc = Helpers.get_listed_items(col_list, false);
             Set<String> col_names = new HashSet<String>(Arrays.asList(cc));
-            for (FieldInfo fi : t_info.fields_all) {
+            for (FieldInfo fi : table_info.fields_all) {
                 if (col_names.contains(fi.getColumnName())) {
                     res_fields.add(fi);
                 }
@@ -125,7 +125,7 @@ public class DaoClassInfo {
             _refine_dao_fields_by_dto_fields(sql_root_abs_path, jaxb_dto_class, res_fields);
         } else {
             // return type is scalar, so dto class name is not available
-            FieldInfo ret_fi = _get_ret_field_info(jaxb_dto_or_return_type, t_info.fields_all);
+            FieldInfo ret_fi = _get_ret_field_info(jaxb_dto_or_return_type, table_info.fields_all);
             res_fields.add(ret_fi); // need to enable checks even if no columns in record set
         }
         if (res_fields.size() > 0) {
@@ -331,7 +331,7 @@ public class DaoClassInfo {
         // should not be cached/shared, because of modifying of FieldInfo
 
         String no_model = ""; // TODO - info about PK and FK is not needed for crud_create
-        JdbcTableInfo t_info = new JdbcTableInfo(no_model, conn, type_map, dto_field_names_mode, table_name, "*", jaxb_dto_class.getAuto());
+        JdbcTableInfo t_info = JdbcTableInfo.forDao(no_model, conn, type_map, dto_field_names_mode, table_name, "*", jaxb_dto_class);
         List<FieldInfo> dao_fields_all = t_info.fields_all;
         for (FieldInfo dao_field : dao_fields_all) {
             String dao_col_name = dao_field.getColumnName();
@@ -358,7 +358,7 @@ public class DaoClassInfo {
                                                  String explicit_pk,
                                                  String sql_root_abs_path) throws Exception {
         String no_model = "";
-        JdbcTableInfo t_info = new JdbcTableInfo(no_model, conn, type_map, dto_field_names_mode, table_name, explicit_pk, jaxb_dto_class.getAuto());
+        JdbcTableInfo t_info = JdbcTableInfo.forDao(no_model, conn, type_map, dto_field_names_mode, table_name, explicit_pk, jaxb_dto_class);
         _refine_dao_fields_by_dto_fields(sql_root_abs_path, jaxb_dto_class, t_info.fields_all);
         return t_info;
     }

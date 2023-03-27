@@ -529,22 +529,15 @@ public class JavaCG {
             if (dto_class_name.length() == 0) {
                 throw new Exception("<" + node_name + "...\nDTO class is not set");
             }
-            String table_attr = jaxb_type_crud.getTable();
-            if (table_attr == null || table_attr.length() == 0) {
-                throw new Exception("<" + node_name + "...\nRequired attribute is not set");
-            }
             try {
-                db_utils.validate_table_name(table_attr);
                 _process_dto_class_name(dto_class_name);
                 DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
-                String explicit_auto_column = jaxb_dto_class.getAuto();
-                String explicit_primary_keys = jaxb_dto_class.getPk();
                 StringBuilder code_buff = JaxbUtils.process_jaxb_crud(this, db_utils.get_dto_field_names_mode(),
-                        jaxb_type_crud, dao_class_name, dto_class_name, explicit_primary_keys, explicit_auto_column);
+                        jaxb_type_crud, dao_class_name, jaxb_dto_class);
                 return code_buff;
             } catch (Throwable e) {
                 // e.printStackTrace();
-                String msg = "<" + node_name + " dto=\"" + dto_class_name + "\" table=\"" + table_attr + "\"...\n";
+                String msg = "<" + node_name + " dto=\"" + dto_class_name + "\" table=\"" + jaxb_type_crud.getTable() + "\"...\n";
                 throw new Exception(Helpers.get_error_message(msg, e));
             }
         }

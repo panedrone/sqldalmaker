@@ -11,7 +11,6 @@ import com.sqldalmaker.cg.go.GoCG;
 import com.sqldalmaker.cg.java.JavaCG;
 import com.sqldalmaker.cg.php.PhpCG;
 import com.sqldalmaker.cg.python.PythonCG;
-import com.sqldalmaker.cg.ruby.RubyCG;
 import com.sqldalmaker.jaxb.dto.DtoClasses;
 import com.sqldalmaker.jaxb.settings.Macros;
 import com.sqldalmaker.jaxb.settings.Settings;
@@ -33,8 +32,6 @@ public class TargetLangUtils {
             return class_name + ".java";
         } else if (RootFileName.CPP.equals(root_fn)) {
             return class_name + ".h";
-        } else if (RootFileName.RUBY.equals(root_fn)) {
-            return Helpers.convert_file_name_to_snake_case(class_name, "rb");
         } else if (RootFileName.PYTHON.equals(root_fn)) {
             return Helpers.convert_file_name_to_snake_case(class_name, "py");
         } else if (RootFileName.GO.equals(root_fn)) {
@@ -49,7 +46,6 @@ public class TargetLangUtils {
                 RootFileName.CPP.equals(root_fn) ||
                 RootFileName.PHP.equals(root_fn) ||
                 RootFileName.PYTHON.equals(root_fn) ||
-                RootFileName.RUBY.equals(root_fn) ||
                 RootFileName.GO.equals(root_fn);
     }
 
@@ -63,7 +59,7 @@ public class TargetLangUtils {
     }
 
     public static boolean snake_case_needed(String fn) {
-        return RootFileName.RUBY.equals(fn) || RootFileName.PYTHON.equals(fn);
+        return RootFileName.PYTHON.equals(fn);
     }
 
     public static boolean lower_camel_case_needed(String fn) {
@@ -192,12 +188,6 @@ public class TargetLangUtils {
                 output_dir_rel_path.append(package_rel_path);
             }
             return new PythonCG.DTO(dto_classes, settings, connection, sql_root_abs_path, vm_template);
-        } else if (RootFileName.RUBY.equals(root_fn)) {
-            if (output_dir_rel_path != null) {
-                String package_rel_path = settings.getFolders().getTarget();
-                output_dir_rel_path.append(package_rel_path);
-            }
-            return new RubyCG.DTO(dto_classes, settings, connection, sql_root_abs_path, vm_template);
         } else if (RootFileName.GO.equals(root_fn)) {
             if (output_dir_rel_path != null) {
                 String package_rel_path = TargetLangUtils.get_golang_dto_folder_rel_path(settings);
@@ -257,12 +247,6 @@ public class TargetLangUtils {
             }
             String dto_package = package_rel_path.replace("/", ".").replace("\\", ".");
             return new PythonCG.DAO(dto_package, dto_classes, settings, con, sql_root_abs_path, vm_template);
-        } else if (RootFileName.RUBY.equals(root_fn)) {
-            if (output_dir_rel_path != null) {
-                String package_rel_path = settings.getFolders().getTarget();
-                output_dir_rel_path.append(package_rel_path);
-            }
-            return new RubyCG.DAO(dto_classes, settings, con, sql_root_abs_path, vm_template);
         } else if (RootFileName.GO.equals(root_fn)) {
             if (output_dir_rel_path != null) {
                 String package_rel_path = TargetLangUtils.get_golang_dao_folder_rel_path(settings);

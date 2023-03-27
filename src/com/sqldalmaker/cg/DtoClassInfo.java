@@ -124,9 +124,8 @@ class DtoClassInfo {
                 String table_name = jaxb_dto_class_ref;
                 _fill_by_table(jaxb_dto_class_auto, model, table_name, res_dto_fields, fields_map);
             } else if (SqlUtils.is_sql_shortcut_ref(jaxb_dto_class_ref)) {
-                String[] parts = SqlUtils.parse_sql_shortcut_ref(jaxb_dto_class_ref);
-                String table_name = parts[0];
-                _fill_by_table(jaxb_dto_class_auto, model, table_name, res_dto_fields, fields_map);
+                SqlShortcut shc = SqlUtils.parse_sql_shortcut_ref(jaxb_dto_class_ref);
+                _fill_by_table(jaxb_dto_class_auto, model, shc.table_name, res_dto_fields, fields_map);
             }
         }
         return fields_map;
@@ -179,7 +178,7 @@ class DtoClassInfo {
                                 Map<String, FieldInfo> fields_map) throws Exception {
 
         String explicit_pk = "*";
-        JdbcTableInfo info = new JdbcTableInfo(model, conn, type_map, dto_field_names_mode, table_name, explicit_pk, auto_column);
+        JdbcTableInfo info = JdbcTableInfo.forDto(model, conn, type_map, dto_field_names_mode, table_name, explicit_pk, auto_column);
         res_dto_fields.clear();
         for (FieldInfo fi : info.fields_all) {
             String col_nm = fi.getColumnName();

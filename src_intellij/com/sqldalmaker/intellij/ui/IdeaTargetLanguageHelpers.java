@@ -33,7 +33,7 @@ public class IdeaTargetLanguageHelpers {
     public static List<VirtualFile> find_root_files(VirtualFile dir) {
 
         List<VirtualFile> root_files = new ArrayList<VirtualFile>();
-        String[] rf_names = {RootFileName.PHP, RootFileName.JAVA, RootFileName.CPP, RootFileName.PYTHON, RootFileName.RUBY, RootFileName.GO};
+        String[] rf_names = {RootFileName.PHP, RootFileName.JAVA, RootFileName.CPP, RootFileName.PYTHON, RootFileName.GO};
         for (String rf : rf_names) {
             VirtualFile root_file;
             root_file = dir.findFileByRelativePath(rf);
@@ -61,7 +61,6 @@ public class IdeaTargetLanguageHelpers {
         consumer.consume(file_type, new ExactFileNameMatcher(RootFileName.CPP));
         consumer.consume(file_type, new ExactFileNameMatcher(RootFileName.PHP));
         consumer.consume(file_type, new ExactFileNameMatcher(RootFileName.PYTHON));
-        consumer.consume(file_type, new ExactFileNameMatcher(RootFileName.RUBY));
         consumer.consume(file_type, new ExactFileNameMatcher(RootFileName.GO));
     }
 
@@ -204,7 +203,6 @@ public class IdeaTargetLanguageHelpers {
                 || RootFileName.CPP.equals(fn)
                 || RootFileName.PHP.equals(fn)
                 || RootFileName.PYTHON.equals(fn)
-                || RootFileName.RUBY.equals(fn)
                 || RootFileName.GO.equals(fn)) {
             try {
                 return IdeaHelpers.get_relative_path(project, file);

@@ -5,6 +5,8 @@
  */
 package com.sqldalmaker.cg;
 
+import com.sqldalmaker.jaxb.dto.DtoClass;
+import com.sqldalmaker.jaxb.dto.DtoClasses;
 import org.apache.cayenne.dba.TypesMapping;
 
 import java.sql.*;
@@ -30,13 +32,37 @@ class JdbcTableInfo {
     private final String explicit_auto_column_name;
     private final String explicit_auto_column_generation_type;
 
-    public JdbcTableInfo(String model,
-                         Connection conn,
-                         JaxbTypeMap type_map,
-                         FieldNamesMode dto_field_names_mode,
-                         String table_name,
-                         String jaxb_explicit_pk,
-                         String jaxb_explicit_auto_column) throws Exception {
+    public static JdbcTableInfo forDao(String model,
+                                       Connection conn,
+                                       JaxbTypeMap type_map,
+                                       FieldNamesMode dto_field_names_mode,
+                                       String table_name,
+                                       String jaxb_explicit_pk,
+                                       DtoClass jaxb_dto_class) throws Exception {
+
+        return new JdbcTableInfo(model, conn, type_map, dto_field_names_mode, table_name,
+                jaxb_explicit_pk, jaxb_dto_class.getAuto());
+    }
+
+    public static JdbcTableInfo forDto(String model,
+                                       Connection conn,
+                                       JaxbTypeMap type_map,
+                                       FieldNamesMode dto_field_names_mode,
+                                       String table_name,
+                                       String jaxb_explicit_pk,
+                                       String jaxb_explicit_auto_column) throws Exception {
+
+        return new JdbcTableInfo(model, conn, type_map, dto_field_names_mode, table_name,
+                jaxb_explicit_pk, jaxb_explicit_auto_column);
+    }
+
+    private JdbcTableInfo(String model,
+                          Connection conn,
+                          JaxbTypeMap type_map,
+                          FieldNamesMode dto_field_names_mode,
+                          String table_name,
+                          String jaxb_explicit_pk,
+                          String jaxb_explicit_auto_column) throws Exception {
 
         this.conn = conn;
         this.type_map = type_map;

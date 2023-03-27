@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2022 sqldalmaker@gmail.com
+    Copyright 2011-2023 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -293,18 +293,20 @@ public class SqlUtils {
             // table()
             // table() / field1, field2, ...
             // table / field1, field2, ...
+            // table() -> field1, field2, ...
+            // table -> field1, field2, ...
             // table(param1, param2, ...)
             // table(param1, param2, ...) / field1, field2, ...
-            String[] parts = parse_sql_shortcut_ref(ref);
-            String table_name = parts[0];
+            // table(param1, param2, ...) -> field1, field2, ...
+            SqlShortcut shc = parse_sql_shortcut_ref(ref);
+//            String table_name = parts[0];
 //            if (!is_table_ref(table_name)) {
 //                return false;
 //            }
-            String params = parts[1];
-            if (params != null) {
-                Helpers.get_listed_items(params, false);
+            if (shc.params != null) {
+                Helpers.get_listed_items(shc.params, false);
             } else {
-                if (parts[2] == null) {
+                if (shc.col_names == null) {
                     return false;
                 }
             }
@@ -405,59 +407,45 @@ public class SqlUtils {
     //
     private static String _jdbc_sp_call_to_php_sp_call(String jdbc_sql) /*throws java.lang.Exception*/ {
         return jdbc_sql;
-//        jdbc_sql = jdbc_sql.trim();
-//        if (is_jdbc_stored_proc_call(jdbc_sql)) { // confirms syntax {call sp_name(...)}
-//            if (jdbc_sql.startsWith("{") && jdbc_sql.endsWith("}")) {
-//                return jdbc_sql.substring(1, jdbc_sql.length() - 1).trim(); // converted to call sp_name(...)
-//            } else {
-//                return jdbc_sql;
-//            }
-//        } else if (is_stored_proc_call_shortcut(jdbc_sql)) {
-//            return jdbc_sql;
-//        } else {
-//            throw new Exception("Unexpected syntax of CALL: " + jdbc_sql);
-//        }
     }
 
-    static String[] parse_sql_shortcut_ref(String ref) throws Exception {
+    static SqlShortcut parse_sql_shortcut_ref(String ref) throws Exception {
         ref = ref.trim();
-        String []mm = ref.split("/");
-        String col_names;
+        String []mm = ref.split("->");
+        if (mm.length != 2) {
+            mm = ref.split("/");
+        }
+        SqlShortcut res = new SqlShortcut();
         if (mm.length == 2) {
             ref = mm[0].trim();
-            col_names = mm[1].trim();
+            res.col_names = mm[1].trim();
         } else if (mm.length > 2) {
             throw new Exception("Invalid 'ref' in SQL-shortcut: " + ref);
         } else {
-            col_names = null;
+            res.col_names = null;
         }
-        String table_name;
-        String params;
         ref = ref.trim();
         int pos = ref.indexOf('(');
         if (ref.endsWith(")")) { // trimmed
             if (pos < 1) {
                 throw new Exception("Invalid 'ref' in SQL-shortcut: '(' expected");
             }
-            table_name = ref.substring(0, pos).trim();
-            params = ref.substring(pos + 1, ref.length() - 1).trim();
-            if (params.length() == 0) {
-                params = null;
+            res.table_name = ref.substring(0, pos).trim();
+            res.params = ref.substring(pos + 1, ref.length() - 1).trim();
+            if (res.params.length() == 0) {
+                res.params = null;
             }
         } else {
-            table_name = ref;
-            params = null;
+            res.table_name = ref;
+            res.params = null;
         }
-        return new String[]{table_name, params, col_names};
+        return res;
     }
 
     private static String _sql_shortcut_to_jdbc_sql(String ref) throws Exception {
-        String[] ref_parts = parse_sql_shortcut_ref(ref);
-        String table_name = ref_parts[0];
-        // validate_table_name(table_name); // TODO: PostgreSQL JDBC prepareStatement
-        // passes wrong table names
+        SqlShortcut shc = parse_sql_shortcut_ref(ref);
         String params = null;
-        String param_descriptors = ref_parts[1];
+        String param_descriptors = shc.params;
         if (param_descriptors != null && param_descriptors.trim().length() > 0) {
             String[] param_arr = Helpers.get_listed_items(param_descriptors, false);
             if (param_arr.length < 1) {
@@ -469,11 +457,10 @@ public class SqlUtils {
             }
         }
         String sql;
-        String col_list = ref_parts[2];
-        if (col_list == null) {
-            sql = "select * from " + table_name;
+        if (shc.col_names == null) {
+            sql = "select * from " + shc.table_name;
         } else {
-            sql ="select " + col_list + " from " + table_name;
+            sql ="select " + shc.col_names + " from " + shc.table_name;
         }
         if (params == null) {
             return sql;

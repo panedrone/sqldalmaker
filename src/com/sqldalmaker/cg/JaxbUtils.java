@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2022 sqldalmaker@gmail.com
+    Copyright 2011-2023 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -192,11 +192,14 @@ public class JaxbUtils {
                                                   FieldNamesMode field_names_mode,
                                                   Crud jaxb_type_crud,
                                                   String dao_class_name,
-                                                  String dto_class_name,
-                                                  String explicit_primary_keys,
-                                                  String explicit_auto_column) throws Exception {
+                                                  DtoClass jaxb_dto_class) throws Exception {
 
+        String dto_class_name = jaxb_type_crud.getDto();
+        String explicit_primary_keys = jaxb_dto_class.getPk();
+        String explicit_auto_column = jaxb_dto_class.getAuto();
         String table_name = jaxb_type_crud.getTable();
+        table_name = JaxbUtils.refine_table_name(jaxb_dto_class, table_name);
+
         boolean is_empty = true;
         StringBuilder code_buff = new StringBuilder();
         if (_process_jaxb_crud_create(dao_cg, jaxb_type_crud, dto_class_name, table_name, explicit_auto_column, field_names_mode, code_buff)) {
@@ -224,12 +227,11 @@ public class JaxbUtils {
             jaxb_type_crud.setReadAll(new TypeMethod());
             jaxb_type_crud.setUpdate(new TypeMethod());
             jaxb_type_crud.setDelete(new TypeMethod());
-            return process_jaxb_crud(dao_cg, field_names_mode, jaxb_type_crud, dao_class_name, dto_class_name,
-                    explicit_primary_keys, explicit_auto_column);
+            return process_jaxb_crud(dao_cg, field_names_mode, jaxb_type_crud, dao_class_name, jaxb_dto_class);
         }
         return code_buff;
     }
-    
+
     public static Set<String> get_pk_col_name_aliaces_from_jaxb(String explicit_pk) throws Exception {
         // if PK are specified explicitely, don't use getPrimaryKeys at all
         String[] gen_keys_arr = Helpers.get_listed_items(explicit_pk, false);
@@ -238,5 +240,22 @@ public class JaxbUtils {
             gen_keys_arr[i] = Helpers.get_pk_col_name_alias(gen_keys_arr[i].toLowerCase());
         }
         return new HashSet<String>(Arrays.asList(gen_keys_arr));
+    }
+
+    private static String refine_table_name(DtoClass jaxb_dto_class, String dao_table_name) throws Exception {
+        if ("*".equals(dao_table_name)) {
+            String dto_class_ref = jaxb_dto_class.getRef();
+            if (!SqlUtils.is_table_ref(dto_class_ref)) {
+                String dto_node_name = JaxbUtils.get_jaxb_node_name(jaxb_dto_class);
+                String dto_class_name = jaxb_dto_class.getName();
+                throw new Exception("<crud table=\"*\" (default), but <" + dto_node_name + " name=\"" + dto_class_name +
+                        "\" ref=\"" + dto_class_ref + "\".. is not a table");
+            }
+            return dto_class_ref;
+        }
+        if (dao_table_name == null || dao_table_name.length() == 0) {
+            throw new Exception("'table' is empty");
+        }
+        return dao_table_name;
     }
 }

@@ -1,3 +1,21 @@
+2023-03-27
+
+    "<crud table=..." became optional.
+
+    This one
+
+        <crud dto="gorm-Project"/>
+
+    is the same as
+
+        <crud dto="gorm-Project" table="*"/>
+
+    and means using of "PROJECTS" from
+
+        <dto-class name="gorm-Project" ref="PROJECTS"/>
+
+    ^^ Click "Create/Overwrite XSD" on tab "Admin" to enable.
+
 2023-02-23
 
     "<folders target":
