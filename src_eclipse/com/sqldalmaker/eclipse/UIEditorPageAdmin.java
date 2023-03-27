@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2022 sqldalmaker@gmail.com
+ * Copyright 2011-2023 sqldalmaker@gmail.com
  * Read LICENSE.txt in the root of this project/archive.
  * Project web-site: https://sqldalmaker.sourceforge.net/
  */
@@ -272,7 +272,7 @@ public class UIEditorPageAdmin extends Composite {
 		Composite composite_4 = new Composite(composite_2, SWT.NONE);
 		toolkit.adapt(composite_4);
 		toolkit.paintBordersFor(composite_4);
-		composite_4.setLayout(new GridLayout(8, false));
+		composite_4.setLayout(new GridLayout(11, false));
 
 		Label lblJava = new Label(composite_4, SWT.NONE);
 		toolkit.adapt(lblJava, true, true);
@@ -350,6 +350,32 @@ public class UIEditorPageAdmin extends Composite {
 		});
 		toolkit.adapt(btnNewButton_11, true, true);
 		btnNewButton_11.setText("atl, sqlite3");
+				
+						Label lblGo = new Label(composite_4, SWT.NONE);
+						toolkit.adapt(lblGo, true, true);
+						lblGo.setText("Go");
+										
+												Button btnNewButton_8_1_1 = new Button(composite_4, SWT.NONE);
+												btnNewButton_8_1_1.addSelectionListener(new SelectionAdapter() {
+													@Override
+													public void widgetSelected(SelectionEvent e) {
+														EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/data_store_gorm.go",
+																"data_store_gorm.go_");
+													}
+												});
+												btnNewButton_8_1_1.setText("gorm");
+												toolkit.adapt(btnNewButton_8_1_1, true, true);
+								
+										Button btnNewButton_8_1 = new Button(composite_4, SWT.NONE);
+										btnNewButton_8_1.addSelectionListener(new SelectionAdapter() {
+											@Override
+											public void widgetSelected(SelectionEvent e) {
+												// ending '_' because of bugs
+												EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/data_store.go", "data_store.go_");
+											}
+										});
+										btnNewButton_8_1.setText("database/sql");
+										toolkit.adapt(btnNewButton_8_1, true, true);
 
 		Composite composite_5 = new Composite(composite_2, SWT.NONE);
 		toolkit.adapt(composite_5);
@@ -406,50 +432,10 @@ public class UIEditorPageAdmin extends Composite {
 		Composite composite_6 = new Composite(composite_2, SWT.NONE);
 		toolkit.adapt(composite_6);
 		toolkit.paintBordersFor(composite_6);
-		composite_6.setLayout(new GridLayout(5, false));
-
-		Label lblRuby = new Label(composite_6, SWT.NONE);
-		toolkit.adapt(lblRuby, true, true);
-		lblRuby.setText("Ruby");
-
-		Button btnNewButton_8 = new Button(composite_6, SWT.NONE);
-		btnNewButton_8.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/data_store.rb", "data_store.rb");
-			}
-		});
-		toolkit.adapt(btnNewButton_8, true, true);
-		btnNewButton_8.setText("DBI");
-
-		Label lblGo = new Label(composite_6, SWT.NONE);
-		toolkit.adapt(lblGo, true, true);
-		lblGo.setText("Go");
-
-		Button btnNewButton_8_1 = new Button(composite_6, SWT.NONE);
-		btnNewButton_8_1.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				// ending '_' because of bugs
-				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/data_store.go", "data_store.go_");
-			}
-		});
-		btnNewButton_8_1.setText("database/sql");
-		toolkit.adapt(btnNewButton_8_1, true, true);
-
-		Button btnNewButton_8_1_1 = new Button(composite_6, SWT.NONE);
-		btnNewButton_8_1_1.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/data_store_gorm.go",
-						"data_store_gorm.go_");
-			}
-		});
-		btnNewButton_8_1_1.setText("gorm");
-		toolkit.adapt(btnNewButton_8_1_1, true, true);
+		composite_6.setLayout(new GridLayout(1, false));
 
 		Composite composite_3 = new Composite(composite_top, SWT.NONE);
-		composite_3.setLayout(new GridLayout(6, false));
+		composite_3.setLayout(new GridLayout(5, false));
 		toolkit.adapt(composite_3);
 		toolkit.paintBordersFor(composite_3);
 
@@ -496,17 +482,6 @@ public class UIEditorPageAdmin extends Composite {
 		});
 		button_3.setText("python.vm");
 		toolkit.adapt(button_3, true, true);
-
-		Button button_4 = new Button(composite_3, SWT.NONE);
-		button_4.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				EclipseResourceEditorHelpers.open_resource_file_in_text_editor("com/sqldalmaker/cg/ruby/ruby.vm",
-						"ruby.vm");
-			}
-		});
-		button_4.setText("ruby.vm");
-		toolkit.adapt(button_4, true, true);
 
 		Button button_4_1 = new Button(composite_3, SWT.NONE);
 		button_4_1.addSelectionListener(new SelectionAdapter() {

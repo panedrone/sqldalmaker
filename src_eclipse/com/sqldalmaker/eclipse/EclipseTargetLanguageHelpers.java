@@ -1,5 +1,5 @@
 /*
-	Copyright 2011-2022 sqldalmaker@gmail.com
+	Copyright 2011-2023 sqldalmaker@gmail.com
 	Read LICENSE.txt in the root of this project/archive.
 	Project web-site: https://sqldalmaker.sourceforge.net/
 */
@@ -46,8 +46,7 @@ public class EclipseTargetLanguageHelpers {
 			throw new Exception("IFolder expected");
 		}
 		List<IFile> root_files = new ArrayList<IFile>();
-		String[] rf_names = { RootFileName.PHP, RootFileName.JAVA, RootFileName.CPP, RootFileName.RUBY,
-				RootFileName.GO };
+		String[] rf_names = { RootFileName.PHP, RootFileName.JAVA, RootFileName.CPP, RootFileName.GO };
 		for (String rf : rf_names) {
 			IResource res = xml_mp_folder.findMember(rf);
 			if (res instanceof IFile) {
@@ -89,7 +88,7 @@ public class EclipseTargetLanguageHelpers {
 
 		String fn = file.getName();
 		if (RootFileName.JAVA.equals(fn) || RootFileName.CPP.equals(fn) || RootFileName.PHP.equals(fn)
-				|| RootFileName.PYTHON.equals(fn) || RootFileName.RUBY.equals(fn) || RootFileName.GO.equals(fn)) {
+				|| RootFileName.PYTHON.equals(fn) || RootFileName.GO.equals(fn)) {
 			try {
 				return file.getFullPath().toPortableString();
 			} catch (Exception e) {
@@ -133,8 +132,8 @@ public class EclipseTargetLanguageHelpers {
 
 		String project_abs_path = project.getLocation().toPortableString();
 		StringBuilder output_dir_rel_path = new StringBuilder();
-		IDaoCG gen = TargetLangUtils.create_dao_cg(root_fn, project_abs_path, xml_configs_folder_full_path, conn, settings,
-				output_dir_rel_path);
+		IDaoCG gen = TargetLangUtils.create_dao_cg(root_fn, project_abs_path, xml_configs_folder_full_path, conn,
+				settings, output_dir_rel_path);
 		String abs_path = EclipseHelpers.get_absolute_dir_path_str(project, output_dir_rel_path.toString());
 		output_dir_abs_path.append(abs_path);
 		return gen;
