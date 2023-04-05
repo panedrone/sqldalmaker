@@ -81,7 +81,7 @@ class DtoClassInfo {
         }
     }
 
-    private void _substitute_type_params(List<FieldInfo> _dto_fields) {
+    private void _substitute_type_params(List<FieldInfo> _dto_fields) throws Exception {
         for (FieldInfo fi : _dto_fields) {
             this.macros.substitute_type_params(fi);
         }
@@ -343,7 +343,7 @@ class DtoClassInfo {
         return macros;
     }
 
-    private static void _substitute_built_in_macros(List<FieldInfo> fields) {
+    private static void _substitute_built_in_macros(List<FieldInfo> fields) throws Exception {
         Map<String, IMacro> built_in_macros = _get_built_in_macros();
         for (FieldInfo fi : fields) {
             String curr_type = fi.getType();

@@ -1,3 +1,38 @@
+2023-04-05
+
+    <dao scope="raw_sql/dbal" field-assign-mode="0" macro=""/>
+
+    <type-map default="">
+        <type detected="int64" target="int64${json} -> SetInt64"/>
+        <type detected="float64" target="float64${json} -> SetFloat64"/>
+        <type detected="string" target="string${json} -> SetString"/>
+        <type detected="java.lang.Integer" target="int64${json} -> SetInt64"/>
+        <type detected="java.lang.Double" target="float64${json} -> SetFloat64"/>
+        <type detected="java.lang.String" target="string${json} -> SetString"/>
+        <type detected="byte[]" target="byte[]{$json}"/>
+        <type detected="java.lang.Object" target="interface{}{$json}"/>
+    </type-map>
+
+    func (dao *ProjectsDao) GetProjectList(ctx context.Context) (res []*dto.Project, err error) {
+        sql := `select p.*,
+            (select count(*) from tasks where p_id=p.p_id) as p_tasks_count
+            from projects p
+            order by p.p_id`
+        errMap := make(map[string]int)
+        _onRow := func(row map[string]interface{}) {
+            obj := dto.Project{}
+            SetInt64(&obj.PId, row, "p_id", errMap)
+            SetString(&obj.PName, row, "p_name", errMap)
+            SetInt64(&obj.PTasksCount, row, "p_tasks_count", errMap)
+            res = append(res, &obj)
+        }
+        err = dao.ds.QueryAllRows(ctx, sql, _onRow)
+        if err == nil {
+            err = ErrMapToErr(errMap)
+        }
+        return
+    }
+
 2023-03-27
 
     "<crud table=..." became optional.

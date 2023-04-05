@@ -55,7 +55,7 @@ public class JaxbMacros {
         return custom_vm.get(name);
     }
 
-    public void substitute_type_params(FieldInfo fi) {
+    public void substitute_type_params(FieldInfo fi) throws Exception {
 
         String type_name = fi.getType();
         int local_field_type_params_start = type_name.indexOf('|');

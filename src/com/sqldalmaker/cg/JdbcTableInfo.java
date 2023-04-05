@@ -119,7 +119,7 @@ class JdbcTableInfo {
                 fi.setPK(false);
             }
         }
-        _refine_field_info_by_table_metadata();
+        _refine_field_info_by_jdbc_table();
         _refine_by_type_map();
     }
 
@@ -163,7 +163,7 @@ class JdbcTableInfo {
         return rs_tables;
     }
 
-    private void _refine_field_info_by_table_metadata() throws Exception {
+    private void _refine_field_info_by_jdbc_table() throws Exception {
 
         String schema_nm;
         String table_nm;
@@ -194,7 +194,7 @@ class JdbcTableInfo {
                 }
                 FieldInfo fi = fields_map.get(db_col_name);
                 fi.setComment("t");
-                _set_data_type(fi, columns_rs);
+                _init_with_jdbc_type(fi, columns_rs);
                 _set_col_size(fi, columns_rs);
                 _set_decimal_digits(fi, columns_rs);
                 _set_ai(fi, columns_rs);
@@ -279,7 +279,7 @@ class JdbcTableInfo {
         }
     }
 
-    private void _set_data_type(FieldInfo fi, ResultSet columns_rs) {
+    private void _init_with_jdbc_type(FieldInfo fi, ResultSet columns_rs) {
 
         String sql_type = fi.getOriginalType();
         String no_type = _get_type_name(Object.class.getName());
@@ -346,22 +346,16 @@ class JdbcTableInfo {
     private void _refine_by_type_map() {
 
         for (FieldInfo fi : fields_map.values()) {
-            String field_type_name;
+            String detected_type_name;
             String db_col_name = fi.getColumnName();
             if (db_col_name.equalsIgnoreCase(explicit_auto_column_name) && model.length() > 0) {
-                field_type_name = fi.getType() + "+" + explicit_auto_column_generation_type;
+                detected_type_name = fi.getType() + "+" + explicit_auto_column_generation_type;
             } else {
-                field_type_name = fi.getType();
+                detected_type_name = fi.getType();
             }
-            field_type_name = get_target_type_by_type_map(field_type_name);
-            fi.refine_rendered_type(field_type_name);
+            String target_type_name = type_map.get_target_type_name(detected_type_name);
+            fi.refine_rendered_type(target_type_name);
         }
-    }
-
-    private String get_target_type_by_type_map(String detected) {
-
-        String target_type_name = type_map.get_target_type_name(detected);
-        return target_type_name;
     }
 
     private Set<String> _get_lower_case_pk_col_names(String table_name,

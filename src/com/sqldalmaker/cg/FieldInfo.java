@@ -38,6 +38,8 @@ public class FieldInfo {
 
     private String name_prefix = "";
 
+    private String assign_func;
+
     public FieldInfo(FieldNamesMode field_names_mode, String original_field_type, String jdbc_db_col_name, String comment) throws Exception {
         if (original_field_type == null) {
             throw new Exception("<field type=null. Ensure that XSD and XML files of meta-program are valid.");
@@ -86,6 +88,13 @@ public class FieldInfo {
         this.comment = comment;
     }
 
+    public String getAssignFunc() { // this method is for use in VM templates
+        if (assign_func == null || assign_func.trim().length() == 0) {
+            assign_func = "SetAny";
+        }
+        return this.assign_func;
+    }
+
     public String getName() { // this method is for use in VM templates
         return this.rendered_field_name;
     }
@@ -103,8 +112,14 @@ public class FieldInfo {
         return rendered_field_type;
     }
 
-    public void refine_rendered_type(String value) {
-        this.rendered_field_type = value;
+    public void refine_rendered_type(String type) {
+        String[] assign_parts = type.split("->");
+        if (assign_parts.length > 1) {
+            this.rendered_field_type = assign_parts[0].trim();
+            this.assign_func = assign_parts[1].trim();
+            return;
+        }
+        this.rendered_field_type = type.trim();
     }
 
     public String getColumnName() { // this method is for use in VM templates
