@@ -9,13 +9,15 @@
     <depends>com.intellij.modules.lang</depends>
 
     <description><![CDATA[
-SQL DAL Maker is a generator of DTO, Model, and DAO classes to access relational databases.
-Target programming languages: PHP, Java, C++, Python, and Go. To generate the class, you declare it in XML meta-program.<br/>
+SQL DAL Maker is a generator of DTO, model, and DAO classes to access relational databases.
+Target programming languages: PHP, Java, C++, Python, and Go.
+<br/>
+To generate the class, you declare it in XML meta-program.<br/>
 <br/>
 At the stage of code generation, the target database must exist and be available for JDBC connection.
 "Live" JDBC metadata are used to synchronize generated code with the current database schema.<br/>
 <br/>
-<a href="https://github.com/panedrone/sqldalmaker/releases/tag/latest">Quick-Demo in mp4</a>
+<a href="https://github.com/panedrone/sqldalmaker/releases/tag/latest">Quick Start in mp4</a>
     ]]></description>
 
     <change-notes><![CDATA[

@@ -9,6 +9,6 @@ SQL DAL Maker for NetBeans: https://sourceforge.net/projects/sqldalmaker/files/N
 
 Project Website: https://sqldalmaker.sourceforge.net/
 Source Code: https://github.com/panedrone/sqldalmaker
-Quick-Demo in mp4: https://github.com/panedrone/sqldalmaker/releases/tag/latest
+Quick Start in mp4: https://github.com/panedrone/sqldalmaker/releases/tag/latest
 
 Contact: sqldalmaker@gmail.com
