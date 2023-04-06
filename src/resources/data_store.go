@@ -6,8 +6,8 @@ import (
 	"database/sql/driver"
 	"errors"
 	"fmt"
+	//	"github.com/godror/godror"
 	"io"
-	//"github.com/godror/godror"
 	"reflect"
 	"strconv"
 	"strings"
@@ -1093,12 +1093,47 @@ func _setBool(d *bool, value interface{}) error {
 	return nil
 }
 
+func SetBytes(d *[]byte, row map[string]interface{}, colName string, errMap map[string]int) error {
+	value, err := _getValue(row, colName, errMap)
+	if err == nil {
+		return _setBytes(d, value)
+	}
+	return err
+}
+
+func _setBytes(d *[]byte, value interface{}) error {
+	switch v := value.(type) {
+	case []byte:
+		*d = v
+	default:
+		return unknownTypeErr(d, value, "_setBytes")
+	}
+	return nil
+}
+
+//func SetNumber(d *godror.Number, row map[string]interface{}, colName string, errMap map[string]int) error {
+//	value, err := _getValue(row, colName, errMap)
+//	if err == nil {
+//		return _setNumber(d, value)
+//	}
+//	return err
+//}
+//
+//func _setNumber(d *godror.Number, value interface{}) error {
+//	switch v := value.(type) {
+//	case godror.Number:
+//		*d = v
+//	default:
+//		return unknownTypeErr(d, value, "_setNumber")
+//	}
+//	return nil
+//}
+
 func _setAny(dstPtr interface{}, value interface{}) error {
 	if value == nil {
 		switch d := dstPtr.(type) {
 		case *interface{}:
 			*d = nil
-			return nil
 		}
 		return nil // leave as-is
 	}
@@ -1119,31 +1154,19 @@ func _setAny(dstPtr interface{}, value interface{}) error {
 	case *bool:
 		err = _setBool(d, value)
 	case *[]byte: // the same as uint8
-		switch bv := value.(type) {
-		case []byte:
-			*d = bv
-			return nil
-		default:
-			return unknownTypeErr(d, value, "_setAny")
-		}
+		err = _setBytes(d, value)
 	//case *godror.Number:
-	//	switch v := value.(type) {
-	//	case godror.Number:
-	//		*d = v
-	//		return nil
-	//	default:
-	//		return UnknownTypeErr(d, value, "_setAny")
-	//	}
+	//	err = _setNumber(d, value)
 	//case *uuid.UUID:
 	//	switch bv := value.(type) {
 	//	case []byte:
 	//		err := d.Scan(bv)
 	//		if err != nil {
-	//			return AssignErr(d, value, "_setAny", err.Error())
+	//			return assignErr(d, value, "_setAny", err.Error())
 	//		}
 	//		return nil
 	//  default:
-	//      return UnknownTypeErr(d, value, "_setAny")
+	//      return unknownTypeErr(d, value, "_setAny")
 	//	}
 	//case *[]string:
 	//	switch bv := value.(type) {
@@ -1151,23 +1174,23 @@ func _setAny(dstPtr interface{}, value interface{}) error {
 	//		sa := pq.StringArray{}
 	//		err := sa.Scan(bv)
 	//		if err != nil {
-	//			return AssignErr(d, value, "_setAny", err.Error())
+	//			return assignErr(d, value, "_setAny", err.Error())
 	//		}
 	//		*d = sa
 	//		return nil
 	//  default:
-	//      return UnknownTypeErr(d, value, "_setAny")
+	//      return unknownTypeErr(d, value, "_setAny")
 	//	}
 	//case *pq.StringArray:
 	//	switch bv := value.(type) {
 	//	case []byte:
 	//		err := d.Scan(bv)
 	//		if err != nil {
-	//			return AssignErr(d, value, "_setAny", err.Error())
+	//			return assignErr(d, value, "_setAny", err.Error())
 	//		}
 	//		return nil
 	//  default:
-	//      return UnknownTypeErr(d, value, "_setAny")
+	//      return unknownTypeErr(d, value, "_setAny")
 	//	}
 	case *interface{}:
 		*d = value
