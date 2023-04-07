@@ -6,7 +6,7 @@ import (
 	"database/sql/driver"
 	"errors"
 	"fmt"
-	//	"github.com/godror/godror"
+	//"github.com/godror/godror"
 	"io"
 	"reflect"
 	"strconv"
@@ -1120,13 +1120,8 @@ func _setBytes(d *[]byte, value interface{}) error {
 //}
 //
 //func _setNumber(d *godror.Number, value interface{}) error {
-//	switch v := value.(type) {
-//	case godror.Number:
-//		*d = v
-//	default:
-//		return unknownTypeErr(d, value, "_setNumber")
-//	}
-//	return nil
+//	err := d.Scan(value)
+//	return err
 //}
 
 func _setAny(dstPtr interface{}, value interface{}) error {
