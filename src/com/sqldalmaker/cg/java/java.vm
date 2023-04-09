@@ -106,7 +106,7 @@ public class ${class_name} {
                 ${returned_type_name} obj = new ${returned_type_name}();
 #foreach($f in ${fields})
 #set($i = ${velocityCount} - 1)
-                obj.${f.setterMethod()}(rd.getValue(${f.getType()}.class, "${f.getColumnName()}"));  // ${f.getComment()}
+                obj.${f.setterMethod()}(rd.${f.getValueCall()});  // ${f.getComment()}
 #end
                 res.add(obj);
             }
@@ -129,7 +129,7 @@ public class ${class_name} {
         ${returned_type_name} obj = new ${returned_type_name}();
 #foreach($f in ${fields})
 #set($i = ${velocityCount} - 1)
-        obj.${f.setterMethod()}(rd.getValue(${f.getType()}.class, "${f.getColumnName()}"));  // ${f.getComment()}
+        obj.${f.setterMethod()}(rd.${f.getValueCall()});  // ${f.getComment()}
 #end
         return obj;
 #end
@@ -181,7 +181,7 @@ public class ${class_name} {
             public void handleRow(RowData rd) throws Exception {
                 ${m.get_dto_class_name()} obj = new ${m.get_dto_class_name()}();
 #foreach($f in ${m.get_fields()})
-                obj.${f.setterMethod()}(rd.getValue(${f.getType()}.class, "${f.getColumnName()}"));  // ${f.getComment()}
+                obj.${f.setterMethod()}(rd.${f.getValueCall()});  // ${f.getComment()}
 #end
                 ${m.get_method_param_name()}.handle(obj);
             }

@@ -137,7 +137,9 @@ public class JdbcSqlParamInfo {
             param_type_name = parts[0];
             param_name = parts[1];
         }
+        FieldInfo res = new FieldInfo(param_names_mode, param_type_name, param_name, "parameter");
         param_type_name = type_map.get_target_type_name(param_type_name);
-        return new FieldInfo(param_names_mode, param_type_name, param_name, "parameter");
+        res.refine_rendered_type(param_type_name);
+        return res;
     }
 }

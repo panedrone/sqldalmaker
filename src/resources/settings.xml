@@ -107,18 +107,45 @@
     <!--    <type-map default="">-->
     <!--    </type-map>-->
 
-    <!-- The types detected by JDBC and the types of Android run-time may differ: -->
-
-    <!--    <type-map default="">-->
-    <!--        <type detected="java.lang.Integer" target="java.lang.Long"/>-->
-    <!--    </type-map>-->
 
     <type-map default="">
+
+        <!-- Example for Android/SQLite3: -->
+
+        <!-- On Dev. PC, it is Integer, but in Android run-time it is Long -->
+        <!--        <type detected="java.lang.Integer" target="Long -> getLong"/>-->           <!-- Android -->
+        <!--        <type detected="java.lang.Integer" target="Integer -> getInteger"/>-->     <!-- JDBC -->
+        <!--        <type detected="java.lang.Double" target="Double -> getDouble"/>-->
+        <!--        <type detected="java.lang.String" target="String -> getString"/>-->
+        <!--        <type detected="byte[]" target="byte[] -> getBytes"/>-->
+
+        <!-- Example for JDBC and MySQL/PostgreSQL: -->
+
+        <!--        <type detected="java.lang.Short" target="java.lang.Short -> getShort"/>-->
+        <!--        <type detected="java.lang.Integer" target="Integer -> getInteger"/>-->
+        <!--        <type detected="java.lang.Long" target="Long -> getLong"/>-->
+
+        <!--        <type detected="java.lang.Float" target="Float -> getFloat"/>-->
+        <!--        <type detected="java.lang.Double" target="Double -> getDouble"/>-->
+        <!--        <type detected="java.math.BigDecimal" target="java.math.BigDecimal -> getBigDecimal"/>-->
+
+        <!--        <type detected="java.lang.String" target="String -> getString"/>-->
+        <!--        <type detected="java.util.Date" target="java.util.Date -> getDate"/>-->
+        <!--        <type detected="byte[]" target="byte[] -> getBytes"/>-->
+        <!--        <type detected="java.lang.Boolean" target="Boolean -> getBoolean"/>-->
+
+        <!-- Example for JDBC and Oracle: -->
+
+        <!--        <type detected="java.math.BigDecimal" target="java.math.BigDecimal -> getBigDecimal"/>-->
+        <!--        <type detected="java.lang.String" target="String -> getString"/>-->
+        <!--        <type detected="java.util.Date" target="java.util.Date -> getDate"/>-->
+        <!--        <type detected="byte[]" target="byte[] -> getBytes"/>-->
 
         <!-- Example for Go: -->
 
         <type detected="gorm-java.util.UUID" target="github.com/google/uuid:uuid.UUID${json-gorm}|1:;type:uuid"/>
-        <type detected="gorm-java.util.UUID+auto" target="github.com/google/uuid:uuid.UUID${json-gorm}|1:;type:uuid;default:uuid_generate_v4()"/>
+        <type detected="gorm-java.util.UUID+auto"
+              target="github.com/google/uuid:uuid.UUID${json-gorm}|1:;type:uuid;default:uuid_generate_v4()"/>
 
         <type detected="gorm-java.sql.Array" target="github.com/lib/pq:pq.StringArray${json-gorm}|1:;type:text[]"/>
 
@@ -197,8 +224,9 @@
         <type detected="dj-java.lang.Boolean" target="${dj-type}|0:BooleanField"/>
         <type detected="dj-byte[]" target="${dj-type}|0:BinaryField"/>
 
-        <type detected="dj-java.lang.Object" target="${dj-type}|0:TextField"/> <!-- TextField doesn't want max_length -->
-<!--        <type detected="dj-java.lang.Object" target="${dj-type}|0:CharField|1:, max_length=1024"/>-->
+        <type detected="dj-java.lang.Object"
+              target="${dj-type}|0:TextField"/> <!-- TextField doesn't want max_length -->
+        <!--        <type detected="dj-java.lang.Object" target="${dj-type}|0:CharField|1:, max_length=1024"/>-->
 
         <type detected="dj-int" target="${dj-type}|0:IntegerField"/>
         <type detected="dj-long" target="${dj-type}|0:BigIntegerField"/>

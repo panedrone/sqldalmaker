@@ -1,6 +1,61 @@
+2023-04-09
+
+    Strong typing in generated DAO classes, Android + SQLite3:
+
+    <type-map default="">
+        <!-- On Dev. PC, "detected" is Integer, but in Android run-time it is Long -->
+        <type detected="java.lang.Integer" target="Long -> getLong"/>
+        <type detected="java.lang.Double" target="Double -> getDouble"/>
+        <type detected="java.lang.String" target="String -> getString"/>
+        <type detected="byte[]" target="byte[] -> getBytes"/>
+    </type-map>
+
+
+2023-04-08
+
+    Strong typing in generated DAO classes, JDBC + Oracle:
+
+    <type-map default="">
+        <type detected="java.math.BigDecimal" target="java.math.BigDecimal -> getBigDecimal"/>
+        <type detected="java.lang.String" target="String -> getString"/>
+        <type detected="java.util.Date" target="java.util.Date -> getDate"/>
+        <type detected="byte[]" target="byte[] -> getBytes"/>
+    </type-map>
+
+2023-04-07
+
+    Strong typing in generated DAO classes, JDBC + MySQL/PostgreSQL:
+
+    <type-map default="">
+        <type detected="java.lang.Short" target="java.lang.Short -> getShort"/>
+        <type detected="java.lang.Integer" target="Integer -> getInteger"/>
+        <type detected="java.lang.Long" target="Long -> getLong"/>
+
+        <type detected="java.lang.Float" target="Float -> getFloat"/>
+        <type detected="java.lang.Double" target="Double -> getDouble"/>
+        <type detected="java.math.BigDecimal" target="java.math.BigDecimal -> getBigDecimal"/>
+
+        <type detected="java.lang.String" target="String -> getString"/>
+        <type detected="java.util.Date" target="java.util.Date -> getDate"/>
+        <type detected="byte[]" target="byte[] -> getBytes"/>
+        <type detected="java.lang.Boolean" target="Boolean -> getBoolean"/>
+    </type-map>
+
+
+2023-04-06
+
+    Strong typing in generated DAO classes, JDBC + SQLite:
+
+    <type-map default="">
+        <type detected="java.lang.Integer" target="Integer -> getInteger"/>
+        <type detected="java.lang.Double" target="Double -> getDouble"/>
+        <type detected="java.lang.String" target="String -> getString"/>
+        <type detected="byte[]" target="byte[] -> getBytes"/>
+    </type-map>
+
 2023-04-05
 
-    <dao scope="raw_sql/dbal" field-assign-mode="0" macro=""/>
+    Strong typing in generated DAO classes, Golang:
 
     <type-map default="">
         <type detected="int64" target="int64${json} -> SetInt64"/>
