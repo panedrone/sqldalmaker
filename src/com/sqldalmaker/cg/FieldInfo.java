@@ -16,18 +16,18 @@ public class FieldInfo {
     private final String original_type;
     private final String original_scalar_type;
     private String scalar_type;
+
     private String model;
 
     private final String column_name; // original name in database without conversions to lower/camel case etc.
 
     private int column_size = 0;
+    private int decimal_digits = 0;
 
     private boolean is_auto_increment = false;
     private boolean is_pk = false;
 
     private boolean is_nullable = false;
-
-    private int decimal_digits;
 
     private String foreign_key = null;
 
@@ -102,11 +102,15 @@ public class FieldInfo {
         return this.assign_func;
     }
 
+    public void refine_assign_func(String assign_func) {
+        this.assign_func = assign_func;
+    }
+
     public String getName() { // this method is for use in VM templates
         return this.rendered_name;
     }
 
-    public void setName(String name) { // it may be changed
+    public void refine_name(String name) { // Go formatting
         this.rendered_name = name;
     }
 

@@ -143,7 +143,7 @@ public class GoCG {
             for (FieldInfo fi : fields) {
                 String name = fi.getName();
                 name = String.format(name_format, name);
-                fi.setName(name);
+                fi.refine_name(name);
                 String type_name = _get_type_without_import(fi.getType());
                 if (max_type_name_len > 0) {
                     String just_type = _get_type_without_import_and_tag(fi);
