@@ -17,8 +17,8 @@ import (
 
 /*
 	This file is a part of SQL DAL Maker project: https://sqldalmaker.sourceforge.net
-	It demonstrates how to implement interface DataStore in Go + Gorm.
-	More about DataStore: https://sqldalmaker.sourceforge.net/data_store.html
+	It demonstrates how to implement an interface DataStore in Go + Gorm.
+	More about DataStore: https://sqldalmaker.sourceforge.net/preconfiguring.html#ds
 	Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store_gorm.go
 
 	Successfully tested with:

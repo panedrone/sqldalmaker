@@ -27,7 +27,7 @@
     Strong typing in generated DAO classes, JDBC + MySQL/PostgreSQL:
 
     <type-map default="">
-        <type detected="java.lang.Short" target="java.lang.Short -> getShort"/>
+        <type detected="java.lang.Short" target="Short -> getShort"/>
         <type detected="java.lang.Integer" target="Integer -> getInteger"/>
         <type detected="java.lang.Long" target="Long -> getLong"/>
 
@@ -55,27 +55,103 @@
 
 2023-04-05
 
-    Strong typing in generated DAO classes, Golang:
+    Strong typing in generated DAO classes, Golang + Oracle:
 
     <type-map default="">
-        <type detected="int64" target="int64${json} -> SetInt64"/>
-        <type detected="float64" target="float64${json} -> SetFloat64"/>
-        <type detected="string" target="string${json} -> SetString"/>
-        <type detected="java.lang.Integer" target="int64${json} -> SetInt64"/>
-        <type detected="java.lang.Double" target="float64${json} -> SetFloat64"/>
+
+        <type detected="gorm-java.math.BigDecimal" target="github.com/godror/godror:godror.Number${json-gorm} -> SetNumber"/>
+        <type detected="gorm-java.math.BigDecimal+auto" target="github.com/godror/godror:godror.Number${json-gorm}|1:;autoIncrement -> SetNumber"/>
+
+        <type detected="gorm-java.lang.String" target="string${json-gorm} -> SetString"/>
+        <type detected="gorm-java.util.Date" target="time:time.Time${json-gorm} -> SetTime"/>
+        <type detected="gorm-byte[]" target="string${json-gorm}"/>
+        <type detected="gorm-java.lang.Boolean" target="int64${json-gorm} -> SetBool"/>
+
+        <type detected="gorm-java.lang.Object" target="interface{}${json}-gorm"/>
+
+        <type detected="java.math.BigDecimal" target="github.com/godror/godror:godror.Number${json} -> SetNumber"/>
+
         <type detected="java.lang.String" target="string${json} -> SetString"/>
-        <type detected="byte[]" target="byte[]{$json}"/>
-        <type detected="java.lang.Object" target="interface{}{$json}"/>
+        <type detected="java.util.Date" target="time:time.Time${json} -> SetTime"/>
+        <type detected="byte[]" target="string${json}"/>
+        <type detected="java.lang.Boolean" target="int64${json} -> SetBool"/>
+
+        <type detected="java.lang.Object" target="interface{}${json}"/>
+
     </type-map>
 
-    func (dao *ProjectsDao) GetProjectList(ctx context.Context) (res []*dto.Project, err error) {
+2023-04-04
+
+    Strong typing in generated DAO classes, Golang + MySQL and PostgeSQL:
+
+    <type-map default="">
+
+        <type detected="gorm-java.lang.Short" target="int16${json-gorm} -> SetInt16"/>
+        <type detected="gorm-java.lang.Integer" target="int32${json-gorm} -> SetInt32"/>
+        <type detected="gorm-java.lang.Long" target="int64${json-gorm} -> SetInt64"/>
+
+        <type detected="gorm-java.lang.Float" target="float32${json-gorm} -> SetFloat32"/>
+        <type detected="gorm-java.lang.Double" target="float64${json-gorm} -> SetFloat64"/>
+        <type detected="gorm-java.math.BigDecimal" target="float64${json-gorm} -> SetFloat64"/>
+
+        <type detected="gorm-java.lang.String" target="string${json-gorm} -> SetString"/>
+        <type detected="gorm-java.util.Date" target="time:time.Time${json-gorm} -> SetTime"/>
+        <type detected="gorm-byte[]" target="string${json-gorm}"/>
+        <type detected="gorm-java.lang.Boolean" target="bool${json-gorm} -> SetBool"/>
+
+        <type detected="gorm-java.lang.Object" target="interface{}${json-gorm}"/>
+
+        <type detected="java.lang.Short" target="int16${0} -> SetInt16"/>
+        <type detected="java.lang.Integer" target="int32${0} -> SetInt32"/>
+        <type detected="java.lang.Long" target="int64${0} -> SetInt64"/>
+
+        <type detected="java.lang.Float" target="float32${0} -> SetFloat32"/>
+        <type detected="java.lang.Double" target="float64${json-gorm} -> SetFloat64"/>
+        <type detected="java.math.BigDecimal" target="float64${0} -> SetFloat64"/>
+
+        <type detected="java.lang.String" target="string${0} -> SetString"/>
+        <type detected="java.util.Date" target="time:time.Time${0} -> SetTime"/>
+        <type detected="byte[]" target="string${0} -> "/>
+        <type detected="java.lang.Boolean" target="bool${0} -> SetBool"/>
+
+        <type detected="java.lang.Object" target="interface{}${0}"/>
+
+    </type-map>
+
+2023-04-03
+
+    Strong typing in generated DAO classes, Golang + SQLite3:
+
+    <type-map default="">
+
+        <type detected="gorm-java.lang.Integer" target="int64${json-gorm}"/>
+        <type detected="gorm-java.lang.Double" target="float64${json-gorm}"/>
+        <type detected="gorm-java.lang.String" target="string${json-gorm}"/>
+        <type detected="gorm-java.util.Date" target="time:time.Time${json-gorm}"/>
+        <type detected="gorm-byte[]" target="string${json-gorm}"/>
+        <type detected="gorm-java.lang.Object" target="interface{}${json-gorm}"/>
+
+        <type detected="%int64" target="int64${json} -> SetInt64"/>
+        <type detected="%float64" target="float64${json} -> SetFloat64"/>
+        <type detected="%string" target="string${json} -> SetString"/>
+
+        <type detected="java.lang.Integer" target="int64${json}"/>
+        <type detected="java.lang.Double" target="float64${json}"/>
+        <type detected="java.lang.String" target="string${json}"/>
+        <type detected="java.util.Date" target="time:time.Time${json}"/>
+        <type detected="byte[]" target="string${json}"/>
+        <type detected="java.lang.Object" target="interface{}${json}"/>
+
+    </type-map>
+
+    func (dao *ProjectsDao) ReadProjectList(ctx context.Context) (res []*models.ProjectLi, err error) {
         sql := `select p.*,
             (select count(*) from tasks where p_id=p.p_id) as p_tasks_count
             from projects p
             order by p.p_id`
         errMap := make(map[string]int)
         _onRow := func(row map[string]interface{}) {
-            obj := dto.Project{}
+            obj := models.ProjectLi{}
             SetInt64(&obj.PId, row, "p_id", errMap)
             SetString(&obj.PName, row, "p_name", errMap)
             SetInt64(&obj.PTasksCount, row, "p_tasks_count", errMap)
