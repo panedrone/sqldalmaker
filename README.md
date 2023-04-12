@@ -4,7 +4,7 @@ SQL DAL Maker is a generator of DTO, Model, and DAO classes to access relational
 languages: PHP, Java, C++, Python, and Go. To generate the class, you declare it in XML meta-program.
 
 At the stage of code generation, the target database must exist and be available for JDBC connection.
-"Live" JDBC metadata are used to synchronize generated code with the current database schema.
+Generated code is synchronized with the current database schema using "live" JDBC metadata.
 
 ![SQL DAL Maker](sdm_python.png)
 

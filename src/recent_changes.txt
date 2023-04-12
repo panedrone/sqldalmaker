@@ -1,10 +1,26 @@
-2023-04-09
+2023-04-10
 
     Strong typing in generated DAO classes, Android + SQLite3:
 
     <type-map default="">
-        <!-- On Dev. PC, "detected" is Integer, but in Android run-time it is Long -->
+
+        <!-- Detected as "Integer" using JDBC (dev. PC), but must be "Long" on Android: -->
+
         <type detected="java.lang.Integer" target="Long -> getLong"/>
+
+        <type detected="java.lang.Double" target="Double -> getDouble"/>
+        <type detected="java.lang.String" target="String -> getString"/>
+        <type detected="byte[]" target="byte[] -> getBytes"/>
+
+    </type-map>
+
+
+2023-04-09
+
+    Strong typing in generated DAO classes, JDBC + SQLite3:
+
+    <type-map default="">
+        <type detected="java.lang.Integer" target="Integer -> getInteger"/>
         <type detected="java.lang.Double" target="Double -> getDouble"/>
         <type detected="java.lang.String" target="String -> getString"/>
         <type detected="byte[]" target="byte[] -> getBytes"/>
@@ -44,17 +60,6 @@
 
 2023-04-06
 
-    Strong typing in generated DAO classes, JDBC + SQLite:
-
-    <type-map default="">
-        <type detected="java.lang.Integer" target="Integer -> getInteger"/>
-        <type detected="java.lang.Double" target="Double -> getDouble"/>
-        <type detected="java.lang.String" target="String -> getString"/>
-        <type detected="byte[]" target="byte[] -> getBytes"/>
-    </type-map>
-
-2023-04-05
-
     Strong typing in generated DAO classes, Golang + Oracle:
 
     <type-map default="">
@@ -80,7 +85,7 @@
 
     </type-map>
 
-2023-04-04
+2023-04-05
 
     Strong typing in generated DAO classes, Golang + MySQL and PostgeSQL:
 
@@ -101,63 +106,70 @@
 
         <type detected="gorm-java.lang.Object" target="interface{}${json-gorm}"/>
 
-        <type detected="java.lang.Short" target="int16${0} -> SetInt16"/>
-        <type detected="java.lang.Integer" target="int32${0} -> SetInt32"/>
-        <type detected="java.lang.Long" target="int64${0} -> SetInt64"/>
+        <type detected="java.lang.Short" target="int16${json} -> SetInt16"/>
+        <type detected="java.lang.Integer" target="int32${json} -> SetInt32"/>
+        <type detected="java.lang.Long" target="int64${json} -> SetInt64"/>
 
-        <type detected="java.lang.Float" target="float32${0} -> SetFloat32"/>
-        <type detected="java.lang.Double" target="float64${json-gorm} -> SetFloat64"/>
-        <type detected="java.math.BigDecimal" target="float64${0} -> SetFloat64"/>
+        <type detected="java.lang.Float" target="float32${json} -> SetFloat32"/>
+        <type detected="java.lang.Double" target="float64${json} -> SetFloat64"/>
+        <type detected="java.math.BigDecimal" target="float64${json} -> SetFloat64"/>
 
-        <type detected="java.lang.String" target="string${0} -> SetString"/>
-        <type detected="java.util.Date" target="time:time.Time${0} -> SetTime"/>
-        <type detected="byte[]" target="string${0} -> "/>
-        <type detected="java.lang.Boolean" target="bool${0} -> SetBool"/>
+        <type detected="java.lang.String" target="string${json} -> SetString"/>
+        <type detected="java.util.Date" target="time:time.Time${json} -> SetTime"/>
+        <type detected="byte[]" target="string${json} -> "/>
+        <type detected="java.lang.Boolean" target="bool${json} -> SetBool"/>
 
-        <type detected="java.lang.Object" target="interface{}${0}"/>
+        <type detected="java.lang.Object" target="interface{}${json}"/>
 
     </type-map>
 
-2023-04-03
+2023-04-04
 
     Strong typing in generated DAO classes, Golang + SQLite3:
 
     <type-map default="">
 
-        <type detected="gorm-java.lang.Integer" target="int64${json-gorm}"/>
-        <type detected="gorm-java.lang.Double" target="float64${json-gorm}"/>
-        <type detected="gorm-java.lang.String" target="string${json-gorm}"/>
-        <type detected="gorm-java.util.Date" target="time:time.Time${json-gorm}"/>
-        <type detected="gorm-byte[]" target="string${json-gorm}"/>
+        <type detected="gorm-java.lang.Integer" target="int64${json-gorm} -> SetInt64"/>
+
+        <type detected="gorm-java.lang.Float" target="float32${json-gorm} -> SetFloat64"/>
+        <type detected="gorm-java.lang.Double" target="float64${json-gorm} -> SetFloat64"/>
+
+        <type detected="gorm-java.lang.String" target="string${json-gorm} -> SetString"/>
+        <type detected="gorm-java.util.Date" target="time:time.Time${json-gorm} -> SetTime"/>
+        <type detected="gorm-byte[]" target="byte[]{$json-gorm} -> SetBytes"/>
+
         <type detected="gorm-java.lang.Object" target="interface{}${json-gorm}"/>
 
         <type detected="%int64" target="int64${json} -> SetInt64"/>
         <type detected="%float64" target="float64${json} -> SetFloat64"/>
         <type detected="%string" target="string${json} -> SetString"/>
 
-        <type detected="java.lang.Integer" target="int64${json}"/>
-        <type detected="java.lang.Double" target="float64${json}"/>
-        <type detected="java.lang.String" target="string${json}"/>
-        <type detected="java.util.Date" target="time:time.Time${json}"/>
-        <type detected="byte[]" target="string${json}"/>
+        <type detected="java.lang.Integer" target="int64${json} -> SetInt64"/>
+
+        <type detected="java.lang.Float" target="float32${json} -> SetFloat64"/>
+        <type detected="java.lang.Double" target="float64${json} -> SetFloat64"/>
+
+        <type detected="java.lang.String" target="string${json} -> SetString"/>
+        <type detected="java.util.Date" target="time:time.Time${json} -> SetTime"/>
+        <type detected="byte[]" target="byte[]{$json} -> SetBytes"/>
+
         <type detected="java.lang.Object" target="interface{}${json}"/>
 
     </type-map>
 
-    func (dao *ProjectsDao) ReadProjectList(ctx context.Context) (res []*models.ProjectLi, err error) {
-        sql := `select p.*,
-            (select count(*) from tasks where p_id=p.p_id) as p_tasks_count
-            from projects p
-            order by p.p_id`
+    func (dao *TasksDao) GetProjectTasks(ctx context.Context, gId string) (res []*models.TaskLi, err error) {
+        sql := `select t_id, t_priority, t_date, t_subject from tasks where p_id =?
+            order by t_id`
         errMap := make(map[string]int)
         _onRow := func(row map[string]interface{}) {
-            obj := models.ProjectLi{}
-            SetInt64(&obj.PId, row, "p_id", errMap)
-            SetString(&obj.PName, row, "p_name", errMap)
-            SetInt64(&obj.PTasksCount, row, "p_tasks_count", errMap)
+            obj := models.TaskLi{}
+            SetInt64(&obj.TId, row, "t_id", errMap)
+            SetInt64(&obj.TPriority, row, "t_priority", errMap)
+            SetString(&obj.TDate, row, "t_date", errMap)
+            SetString(&obj.TSubject, row, "t_subject", errMap)
             res = append(res, &obj)
         }
-        err = dao.ds.QueryAllRows(ctx, sql, _onRow)
+        err = dao.ds.QueryAllRows(ctx, sql, _onRow, gId)
         if err == nil {
             err = ErrMapToErr(errMap)
         }

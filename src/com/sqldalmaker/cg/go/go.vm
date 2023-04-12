@@ -218,11 +218,14 @@ func (dao *${class_name}) ${method_name}(ctx context.Context#param_decls($is_ext
 	_fa := res
 #end
 #if(${dto_param} != "")
-	return dao.ds.QueryByFA(ctx, sql, _fa#foreach($param in ${params}), p.${param.getName()}()#end))
+	err := dao.ds.QueryByFA(ctx, sql, _fa#foreach($param in ${params}), p.${param.getName()}()#end))
 #else
-	return dao.ds.QueryByFA(ctx, sql, _fa#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
+	err := dao.ds.QueryByFA(ctx, sql, _fa#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
 #end
-	return
+	if err == nil {
+		return res, nil
+	}
+	return nil, err
 #else## ---------------------------------- $assign_mode == 0 --> QueryRow
 #if(${dto_param} != "")
 	row, err := dao.ds.QueryRow(ctx, sql#foreach($param in ${params}), p.${param.getName()}()#end))
