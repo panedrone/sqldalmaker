@@ -858,37 +858,12 @@ func (ds *_DS) _formatSQL(sqlStr string) string {
 	return sqlStr
 }
 
-func _getValue(row map[string]interface{}, colName string, errMap map[string]int) (value interface{}, err error) {
-	var ok bool
-	value, ok = row[colName]
-	if !ok {
-		key := fmt.Sprintf("%s: no such column", colName)
-		count, ok := errMap[key]
-		if ok {
-			errMap[key] = count + 1
-		} else {
-			errMap[key] = 1
-		}
-		err = errors.New(key)
-		return
-	}
-	return
-}
-
-func assignErr(dstPtr interface{}, value interface{}, funcName string, errMsg string) error {
-	return errors.New(fmt.Sprintf("%s %T <- %T %s", funcName, dstPtr, value, errMsg))
-}
-
-func unknownTypeErr(dstPtr interface{}, value interface{}, funcName string) error {
-	return assignErr(dstPtr, value, funcName, "unknown type")
-}
-
-func SetString(d *string, row map[string]interface{}, colName string, errMap map[string]int) error {
+func SetString(d *string, row map[string]interface{}, colName string, errMap map[string]int) {
 	value, err := _getValue(row, colName, errMap)
 	if err == nil {
-		return _setString(d, value)
+		err = _setString(d, value)
+		_updateErrMap(err, colName, errMap)
 	}
-	return nil
 }
 
 func _setString(d *string, value interface{}) error {
@@ -909,12 +884,12 @@ func _setString(d *string, value interface{}) error {
 	return nil
 }
 
-func SetInt64(d *int64, row map[string]interface{}, colName string, errMap map[string]int) error {
+func SetInt64(d *int64, row map[string]interface{}, colName string, errMap map[string]int) {
 	value, err := _getValue(row, colName, errMap)
 	if err == nil {
-		return _setInt64(d, value)
+		err = _setInt64(d, value)
+		_updateErrMap(err, colName, errMap)
 	}
-	return err
 }
 
 func _setInt64(d *int64, value interface{}) error {
@@ -947,12 +922,12 @@ func _setInt64(d *int64, value interface{}) error {
 	return nil
 }
 
-func SetInt32(d *int32, row map[string]interface{}, colName string, errMap map[string]int) error {
+func SetInt32(d *int32, row map[string]interface{}, colName string, errMap map[string]int) {
 	value, err := _getValue(row, colName, errMap)
 	if err == nil {
-		return _setInt32(d, value)
+		err = _setInt32(d, value)
+		_updateErrMap(err, colName, errMap)
 	}
-	return err
 }
 
 func _setInt32(d *int32, value interface{}) error {
@@ -984,12 +959,12 @@ func _setInt32(d *int32, value interface{}) error {
 	return nil
 }
 
-func SetFloat32(d *float32, row map[string]interface{}, colName string, errMap map[string]int) error {
+func SetFloat32(d *float32, row map[string]interface{}, colName string, errMap map[string]int) {
 	value, err := _getValue(row, colName, errMap)
 	if err == nil {
-		return _setFloat32(d, value)
+		err = _setFloat32(d, value)
+		_updateErrMap(err, colName, errMap)
 	}
-	return err
 }
 
 func _setFloat32(d *float32, value interface{}) error {
@@ -1017,12 +992,12 @@ func _setFloat32(d *float32, value interface{}) error {
 	return nil
 }
 
-func SetFloat64(d *float64, row map[string]interface{}, colName string, errMap map[string]int) error {
+func SetFloat64(d *float64, row map[string]interface{}, colName string, errMap map[string]int) {
 	value, err := _getValue(row, colName, errMap)
 	if err == nil {
-		return _setFloat64(d, value)
+		err = _setFloat64(d, value)
+		_updateErrMap(err, colName, errMap)
 	}
-	return err
 }
 
 func _setFloat64(d *float64, value interface{}) error {
@@ -1050,12 +1025,12 @@ func _setFloat64(d *float64, value interface{}) error {
 	return nil
 }
 
-func SetTime(d *time.Time, row map[string]interface{}, colName string, errMap map[string]int) error {
+func SetTime(d *time.Time, row map[string]interface{}, colName string, errMap map[string]int) {
 	value, err := _getValue(row, colName, errMap)
 	if err == nil {
-		return _setTime(d, value)
+		err = _setTime(d, value)
+		_updateErrMap(err, colName, errMap)
 	}
-	return err
 }
 
 func _setTime(d *time.Time, value interface{}) error {
@@ -1068,12 +1043,12 @@ func _setTime(d *time.Time, value interface{}) error {
 	return nil
 }
 
-func SetBool(d *bool, row map[string]interface{}, colName string, errMap map[string]int) error {
+func SetBool(d *bool, row map[string]interface{}, colName string, errMap map[string]int) {
 	value, err := _getValue(row, colName, errMap)
 	if err == nil {
-		return _setBool(d, value)
+		err = _setBool(d, value)
+		_updateErrMap(err, colName, errMap)
 	}
-	return err
 }
 
 func _setBool(d *bool, value interface{}) error {
@@ -1093,12 +1068,12 @@ func _setBool(d *bool, value interface{}) error {
 	return nil
 }
 
-func SetBytes(d *[]byte, row map[string]interface{}, colName string, errMap map[string]int) error {
+func SetBytes(d *[]byte, row map[string]interface{}, colName string, errMap map[string]int) {
 	value, err := _getValue(row, colName, errMap)
 	if err == nil {
-		return _setBytes(d, value)
+		err = _setBytes(d, value)
+		_updateErrMap(err, colName, errMap)
 	}
-	return err
 }
 
 func _setBytes(d *[]byte, value interface{}) error {
@@ -1111,18 +1086,56 @@ func _setBytes(d *[]byte, value interface{}) error {
 	return nil
 }
 
-//func SetNumber(d *godror.Number, row map[string]interface{}, colName string, errMap map[string]int) error {
+//func SetNumber(d *godror.Number, row map[string]interface{}, colName string, errMap map[string]int) {
 //	value, err := _getValue(row, colName, errMap)
 //	if err == nil {
-//		return _setNumber(d, value)
+//		err = _setNumber(d, value)
+//		_updateErrMap(err, colName, errMap)
 //	}
-//	return err
 //}
 //
 //func _setNumber(d *godror.Number, value interface{}) error {
 //	err := d.Scan(value)
 //	return err
 //}
+
+func assignErr(dstPtr interface{}, value interface{}, funcName string, errMsg string) error {
+	return errors.New(fmt.Sprintf("%s %T <- %T %s", funcName, dstPtr, value, errMsg))
+}
+
+func unknownTypeErr(dstPtr interface{}, value interface{}, funcName string) error {
+	return assignErr(dstPtr, value, funcName, "unknown type")
+}
+
+func _getValue(row map[string]interface{}, colName string, errMap map[string]int) (value interface{}, err error) {
+	var ok bool
+	value, ok = row[colName]
+	if !ok {
+		key := fmt.Sprintf("[%s] no such column", colName)
+		count, ok := errMap[key]
+		if ok {
+			errMap[key] = count + 1
+		} else {
+			errMap[key] = 1
+		}
+		err = errors.New(key)
+		return
+	}
+	return
+}
+
+func _updateErrMap(err error, colName string, errMap map[string]int) {
+	if err == nil {
+		return
+	}
+	key := fmt.Sprintf("[%s] %s", colName, err.Error())
+	count, ok := errMap[key]
+	if ok {
+		errMap[key] = count + 1
+	} else {
+		errMap[key] = 1
+	}
+}
 
 func _setAny(dstPtr interface{}, value interface{}) error {
 	if value == nil {
