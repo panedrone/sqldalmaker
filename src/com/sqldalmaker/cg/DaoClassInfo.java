@@ -252,7 +252,8 @@ public class DaoClassInfo {
         if (jaxb_return_type_is_dto) {
             _get_custom_sql_ret_field_info(sql_root_abs_path, jaxb_dto_or_return_type, jaxb_dto_classes, dao_fields_jdbc, dao_fields_res, error);
         } else {
-            dao_fields_res.add(_get_ret_field_info(jaxb_dto_or_return_type, dao_fields_jdbc));
+            FieldInfo fi = _get_ret_field_info(jaxb_dto_or_return_type, dao_fields_jdbc);
+            dao_fields_res.add(fi);
         }
     }
 

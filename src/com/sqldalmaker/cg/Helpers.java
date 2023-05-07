@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2021 sqldalmaker@gmail.com
+    Copyright 2011-2023 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -7,17 +7,12 @@ package com.sqldalmaker.cg;
 
 import com.sqldalmaker.jaxb.settings.Settings;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -91,7 +86,7 @@ public class Helpers {
         }
     }
 
-    public static String process_java_type_name(String java_type_name) throws ClassNotFoundException {
+    public static String refine_java_type_name(String java_type_name) throws ClassNotFoundException {
         java_type_name = java_primitive_name_to_class_name(java_type_name);
         // does not throw Exception for "[B"; returns byte[]
         Class<?> cl = Class.forName(java_type_name);
@@ -167,18 +162,17 @@ public class Helpers {
 
     public static boolean exists(File dir, String filename) {
         if (!dir.isDirectory()) {
-            // === panedrone: don't throw because of targer files were not generated yet
-            return false;
-//            String path = dir.getAbsolutePath();
-//            throw new Exception("Not a directory: " + path);
+            return false; // target files were not generated yet
         }
         String[] files = dir.list();
         if (files == null) {
-            return false; // === panedrone: it may be null in jdk 16
+            return false; // it may be null in jdk 16
         }
-        for (String file : files)
-            if (file.equals(filename))
+        for (String file : files) {
+            if (file.equals(filename)) {
                 return true;
+            }
+        }
         return false;
     }
 
@@ -210,51 +204,51 @@ public class Helpers {
     }
 
     public static String[] get_listed_items(String list, boolean allow_semicolon) throws Exception {
-        if (list != null && list.length() > 0) {
+        if (list == null || list.trim().length() == 0) {
+            return new String[]{};
+        }
+        list = list.trim();
+        int pos = list.indexOf('[');
+        String last_arr = null;
+        if (pos != -1) {
+            if (list.endsWith("]") == false) {
+                throw new Exception("Ending ']' expected");
+            }
+            last_arr = list.substring(pos); // keep []
+            if (pos == 0) {
+                return new String[]{last_arr};
+            }
+            list = list.substring(0, pos);
             list = list.trim();
-            int pos = list.indexOf('[');
-            String last_arr = null;
-            if (pos != -1) {
-                if (list.endsWith("]") == false) {
-                    throw new Exception("Ending ']' expected");
-                }
-                last_arr = list.substring(pos); // keep []
-                if (pos == 0) {
-                    return new String[]{last_arr};
-                }
-                list = list.substring(0, pos);
-                list = list.trim();
-                if (list.endsWith(",")) {
-                    list = list.substring(0, list.length() - 1); // remove ending ','
-                }
-            }
-            String[] items;
-            items = list.split("[,]");
-            for (int i = 0; i < items.length; i++) {
-                items[i] = items[i].trim();
-                String[] parts = items[i].split("\\s+");
-                String name;
-                if (parts.length == 1) {
-                    name = parts[0];
-                } else if (parts.length == 2) {
-                    name = parts[1];
-                } else {
-                    throw new Exception("The item is null or empty: " + list);
-                }
-                check_item(name/* , is_sp */, allow_semicolon);
-            }
-            if (last_arr != null) {
-                int n = items.length;
-                String[] newarr = new String[n + 1];
-                for (int i = 0; i < n; i++)
-                    newarr[i] = items[i];
-                newarr[n] = last_arr;
-                return newarr;
-            } else {
-                return items;
+            if (list.endsWith(",")) {
+                list = list.substring(0, list.length() - 1); // remove ending ','
             }
         }
-        return new String[]{};
+        String[] items;
+        items = list.split(",");
+        for (int i = 0; i < items.length; i++) {
+            items[i] = items[i].trim();
+            String[] parts = items[i].split("\\s+");
+            String name;
+            if (parts.length == 1) {
+                name = parts[0];
+            } else if (parts.length == 2) {
+                name = parts[1];
+            } else {
+                throw new Exception("The item is null or empty: " + list);
+            }
+            check_item(name/* , is_sp */, allow_semicolon);
+        }
+        if (last_arr != null) {
+            int n = items.length;
+            String[] new_arr = new String[n + 1];
+            for (int i = 0; i < n; i++)
+                new_arr[i] = items[i];
+            new_arr[n] = last_arr;
+            return new_arr;
+        } else {
+            return items;
+        }
     }
 
     private static void check_item(String name, boolean allow_semicolon) throws Exception {
@@ -356,55 +350,29 @@ public class Helpers {
         }
     }
 
-//    private static boolean is_class_of(String type, Class<?> clazz) {
-//        // getSimpleName is used for types of parameters that are declared in XML
-//        return (type.equals(clazz.getName()) || type.equals(clazz.getSimpleName()));
-//    }
-//
-//    private static boolean is_java_type(String type) {
-//        try {
-//            Class.forName(type);
-//            return true;
-//        } catch (ClassNotFoundException e) {
-//            return false;
-//        }
-//    }
-
-    public static void convert_to_ruby_type_names(List<FieldInfo> fields) {
-
-    }
-
     public static StringBuilder get_only_pk_warning(String method_name) {
         // if all values of the table are the parts of PK,
-        // SQL will be invalid like ''UPDATE term_groups SET WHERE g_id
+        // SQL will be invalid like "UPDATE term_groups SET WHERE g_id"
         // = ? AND t_id = ?'
         // (missing assignments between SET and WHERE)
-        String msg = Helpers.get_only_pk_message(method_name);
+        String msg = "    // INFO: " + method_name + " is not rendered because all columns are part of PK.";
         StringBuilder buffer = new StringBuilder();
-        Helpers.build_warning_comment(buffer, msg);
+        _build_warning_comment(buffer, msg);
         return buffer;
     }
 
     public static StringBuilder get_no_pk_warning(String method_name) {
-        String msg = Helpers.get_no_pk_message(method_name);
+        String msg = "    // INFO: " + method_name + " is not rendered because PK is not detected.";
         StringBuilder buffer = new StringBuilder();
-        Helpers.build_warning_comment(buffer, msg);
+        _build_warning_comment(buffer, msg);
         return buffer;
     }
 
-    public static void build_warning_comment(StringBuilder buffer, String msg) {
+    private static void _build_warning_comment(StringBuilder buffer, String msg) {
         String ls = System.getProperty("line.separator");
         buffer.append(ls);
         buffer.append(msg);
         buffer.append(ls);
-    }
-
-    public static String get_no_pk_message(String method_name) {
-        return "    // INFO: " + method_name + " is omitted because PK is not detected.";
-    }
-
-    public static String get_only_pk_message(String method_name) {
-        return "    // INFO: " + method_name + " is omitted because all columns are part of PK.";
     }
 
     public static String get_error_message(String msg, Throwable e) {
@@ -413,7 +381,7 @@ public class Helpers {
 
     static void validate_java_type_name(final String type_name) throws Exception {
         if (type_name == null) {
-            throw new Exception("Cannot detect type name. . Try to update XSD files from the tab 'Admin'. Then check existing XML to conform updates.");
+            throw new Exception("Cannot detect type name. Try to update XSD files from the tab 'Admin'. Then check existing XML to conform updates.");
         }
         String type;
         String[] arr_parts = type_name.split("\\[");
@@ -423,11 +391,11 @@ public class Helpers {
             type = type_name;
         }
         try {
-            Helpers.process_java_type_name(type);
+            Helpers.refine_java_type_name(type);
         } catch (ClassNotFoundException e) {
             String java_class_name2 = "java.lang." + type;
             try {
-                Helpers.process_java_type_name(java_class_name2);
+                Helpers.refine_java_type_name(java_class_name2);
             } catch (ClassNotFoundException e1) {
                 throw new Exception("Invalid type name: " + type_name);
             }
@@ -461,7 +429,7 @@ public class Helpers {
     }
 
     public static void check_required_attr(String node_name, String method_name_attr) throws Exception {
-        if (method_name_attr == null || method_name_attr.length() == 0) {
+        if (method_name_attr == null || method_name_attr.trim().length() == 0) {
             throw new Exception("<" + node_name + "...\n'method' is not set.");
         }
     }
@@ -515,9 +483,8 @@ public class Helpers {
     }
 
     public static String get_pk_col_name_alias(String pk_col_name) {
-        // === panederone: WHY ALIASES:
-        //   1) xerial SQLite3: getPrimaryKeys may return pk_col_names in lower case
-        //      For other JDBC drivers, it may differ.
+        // === panedrone: WHY ALIASES:
+        //   1) xerial SQLite3 getPrimaryKeys may return pk_col_names in lower case
         //   2) xerial SQLite3 returns pk_col_names in the format
         //     '[employeeid] asc' (compound PK)
         pk_col_name = pk_col_name.toLowerCase().replace("[", "").replace("]", "").trim();

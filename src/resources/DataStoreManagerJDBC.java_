@@ -13,11 +13,9 @@ import javax.sql.DataSource;
 import sdm.dao.IpRangesDao;
 
 /*
-    SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
-
-    This is an example of how to implement DataStore in Java + JDBC.
+    This class is a part of SQL DAL Maker project (http://sqldalmaker.sourceforge.net).
+    It represents an example of how to implement DataStore in Java + JDBC.
     Copy-paste this code to your project and change it for your needs.
-
     Improvements are welcome: sqldalmaker@gmail.com
  */
 public class DataStoreManager {

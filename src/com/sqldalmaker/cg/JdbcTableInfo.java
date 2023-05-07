@@ -74,7 +74,6 @@ class JdbcTableInfo {
 
         this.conn = conn;
         this.type_map = type_map;
-
         if (model == null) {
             model = "";
         }
@@ -82,8 +81,10 @@ class JdbcTableInfo {
         if (!SqlUtils.is_table_ref(table_name)) {
             throw new Exception("Table name expected: " + table_name);
         }
+        //////////////////////////////////////
+        _validate_table_name(table_name); // Oracle PK are not detected with lower case table name
         this.table_name = table_name;
-
+        //////////////////////////////////////
         if (jaxb_explicit_auto_column == null) {
             jaxb_explicit_auto_column = "";
         } else {
@@ -103,7 +104,6 @@ class JdbcTableInfo {
                 explicit_auto_column_generation_type = auto_parts[1];
             }
         }
-        validate_table_name(conn, table_name); // Oracle PK are not detected with lower case table name
         //////////////////////////////////////
         String jdbc_sql = _jdbc_sql_by_table_name(table_name);
         JdbcSqlFieldInfo.get_field_info_by_jdbc_sql(model, conn, dto_field_names_mode, jdbc_sql, "", fields_map, fields_all);
@@ -123,9 +123,7 @@ class JdbcTableInfo {
         _refine_by_type_map();
     }
 
-    public static void validate_table_name(Connection conn,
-                                           String table_name_pattern) throws Exception {
-
+    private void _validate_table_name(String table_name_pattern) throws Exception {
         // it may include schema like "public.%"
         ResultSet rs = get_tables_rs(conn, table_name_pattern, true);
         try {
@@ -164,7 +162,6 @@ class JdbcTableInfo {
     }
 
     private void _refine_field_info_by_jdbc_table() throws Exception {
-
         String schema_nm;
         String table_nm;
         String[] parts = table_name.split("\\.", -1); // -1 to leave empty strings
@@ -263,7 +260,6 @@ class JdbcTableInfo {
     }
 
     private static void _set_col_size(FieldInfo fi, ResultSet columns_rs) {
-
         String string_type = String.class.getName();
         String fi_type = fi.getScalarType();
         if (string_type.equals(fi_type)) {
@@ -280,7 +276,6 @@ class JdbcTableInfo {
     }
 
     private void _init_with_jdbc_type(FieldInfo fi, ResultSet columns_rs) {
-
         String sql_type = fi.getOriginalType();
         String no_type = _get_type_name(Object.class.getName());
         if (no_type.equals(sql_type)) {
@@ -334,17 +329,14 @@ class JdbcTableInfo {
     }
 
     private String _get_type_name(String type_name) {
-
         return model + type_name;
     }
 
     private static String _jdbc_sql_by_table_name(String table_name) {
-
         return "select * from " + table_name + " where 1 = 0";
     }
 
     private void _refine_by_type_map() {
-
         for (FieldInfo fi : fields_map.values()) {
             String detected_type_name;
             String db_col_name = fi.getColumnName();
@@ -380,7 +372,6 @@ class JdbcTableInfo {
     }
 
     private Set<String> _get_pk_col_name_aliases_from_table(String table_name) throws Exception {
-
         DatabaseMetaData md = conn.getMetaData(); // no close() method
         ResultSet rs = _get_pk_rs(md, table_name);
         try {

@@ -1,3 +1,7 @@
+2023-05-07
+
+    Fixed incorrect returning scalar types.
+
 2023-04-10
 
     Strong typing in generated DAO classes, Android + SQLite3:

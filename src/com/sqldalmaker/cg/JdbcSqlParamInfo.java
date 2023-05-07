@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2022 sqldalmaker@gmail.com
+    Copyright 2011-2023 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -116,7 +116,7 @@ public class JdbcSqlParamInfo {
             // mysql-connector-java-5.1.17-bin.jar:
             // 2) sometime it returns "[B": See comments for Class.getName() API
             java_class_name = pm.getParameterClassName(i_0_n + 1);
-            java_class_name = Helpers.process_java_type_name(java_class_name);
+            java_class_name = Helpers.refine_java_type_name(java_class_name);
         } catch (Exception ex) {
             java_class_name = Object.class.getName();
         }

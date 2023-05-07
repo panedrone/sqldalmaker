@@ -52,7 +52,8 @@ public class JdbcUtils {
 
     public String get_target_type_by_type_map(String detected) {
         String target_type_name = type_map.get_target_type_name(detected);
-        return target_type_name;
+        String[] parts = target_type_name.split("->");
+        return parts[0].trim();
     }
 
     public static ResultSet get_tables_rs(Connection conn,
@@ -80,10 +81,6 @@ public class JdbcUtils {
             rs.close();
         }
         return res;
-    }
-
-    public void validate_table_name(String table_name) throws Exception {
-        JdbcTableInfo.validate_table_name(conn, table_name);
     }
 
     // DTO -----------------------------------------------------

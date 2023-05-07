@@ -5,9 +5,9 @@ import java.util.Date;
 import java.util.List;
 
 /*
- * An abstraction of a lower level data accessing API.
- * SQL DAL Maker Web-Site: http://sqldalmaker.sourceforge.net
- * Contact: sqldalmaker@gmail.com
+ * This class is a part of SQL DAL Maker project (http://sqldalmaker.sourceforge.net).
+ * It is used in generated DAO classes and represents functionality of a lower level data accessing API.
+ * Improvements are welcome: sqldalmaker@gmail.com
  */
 public abstract class DataStore {
 

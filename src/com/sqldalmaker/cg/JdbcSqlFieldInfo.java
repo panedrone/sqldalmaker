@@ -123,7 +123,7 @@ class JdbcSqlFieldInfo {
         try {
             // sometime, it returns "[B": See comments for Class.getName() API
             String java_class_name = rsmd.getColumnClassName(col_num);
-            return Helpers.process_java_type_name(java_class_name);
+            return Helpers.refine_java_type_name(java_class_name);
         } catch (Exception ex) {
             return Object.class.getName();
         }
