@@ -3,7 +3,9 @@
     <name>SQL DAL Maker</name>
     <category>Database</category>
     <version>1.283.2305</version>
-    <vendor email="sqldalmaker@gmail.com"/>
+    <vendor email="sqldalmaker@gmail.com" url="https://sqldalmaker.sourceforge.net">
+        SQL DAL Maker
+    </vendor>
     <idea-version since-build="181.5684.4"/>
 
     <depends>com.intellij.modules.lang</depends>
