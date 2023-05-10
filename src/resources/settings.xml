@@ -102,12 +102,6 @@
 
     <!-- If 'default' is empty, detected type is rendered as-is. -->
 
-    <!-- This is why type-map for Java+JDBC is empty: -->
-
-    <!--    <type-map default="">-->
-    <!--    </type-map>-->
-
-
     <type-map default="">
 
         <!-- Example for Android/SQLite3: -->
@@ -121,7 +115,7 @@
 
         <!-- Example for JDBC and MySQL/PostgreSQL: -->
 
-        <!--        <type detected="java.lang.Short" target="java.lang.Short -> getShort"/>-->
+        <!--        <type detected="java.lang.Short" target="Short -> getShort"/>-->
         <!--        <type detected="java.lang.Integer" target="Integer -> getInteger"/>-->
         <!--        <type detected="java.lang.Long" target="Long -> getLong"/>-->
 
