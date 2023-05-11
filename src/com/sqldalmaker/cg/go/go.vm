@@ -9,9 +9,7 @@
 #if( $index == 1 )"${value}"#else, "${value}"#end
 #end
 #macro(param_decls $external_sql $params)
-#if ($external_sql == true)
-, sql string#if(${params.size()} > 0), #end
-#end
+#if ($external_sql == true), sql string#end
 #foreach($param in ${params})
 , ${param.getLowerCamelCaseName()} ${param.getType()}#end
 #end

@@ -295,6 +295,10 @@ public class GoCG {
                 returned_type_name = _get_rendered_dto_class_name(dto_or_scalar_return_type);
             } else {
                 FieldInfo ret_fi = fields.get(0);
+                String imp = _get_type_import(ret_fi);
+                if (imp != null) {
+                    imports_set.add(imp);
+                }
                 returned_type_name = _get_type_without_import_and_tag(ret_fi);
                 ret_fi.refine_rendered_type(returned_type_name);
             }
@@ -318,7 +322,7 @@ public class GoCG {
             int fam = settings.getDao().getFieldAssignMode();
             context.put("assign_mode", fam);
             context.put("fields", fields);
-            method_name = Helpers.get_method_name(method_name, db_utils.get_dto_field_names_mode());
+            method_name = _refine_method_name(method_name);
             context.put("method_name", method_name);
             if (crud_table == null) {
                 crud_table = "";
@@ -343,6 +347,10 @@ public class GoCG {
             StringBuilder buff = new StringBuilder();
             buff.append(text);
             return buff;
+        }
+
+        private String _refine_method_name(String method_name) {
+            return Helpers.get_method_name(method_name, db_utils.get_dto_field_names_mode());
         }
 
         private String _get_rendered_dto_class_name(String dto_class_name) throws Exception {
@@ -474,7 +482,7 @@ public class GoCG {
             boolean plain_params = dto_param_type.length() == 0;
             context.put("plain_params", plain_params);
             context.put("class_name", dao_class_name);
-            method_name = Helpers.get_method_name(method_name, db_utils.get_dto_field_names_mode());
+            method_name = _refine_method_name(method_name);
             context.put("method_name", method_name);
             context.put("sql", go_sql);
             context.put("xml_node_name", xml_node_name);
