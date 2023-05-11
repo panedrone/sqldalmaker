@@ -161,23 +161,23 @@
 
         <!-- ************************************* -->
 
-        <type detected="java.util.UUID" target="github.com/google/uuid:uuid.UUID${0}"/>
-        <type detected="java.sql.Array" target="[]string${0}"/>
+        <type detected="java.util.UUID" target="github.com/google/uuid:uuid.UUID${json}"/>
+        <type detected="java.sql.Array" target="[]string${json}"/>
 
-        <type detected="java.lang.Short" target="int16${0}"/>
-        <type detected="java.lang.Integer" target="int32${0}"/>
-        <type detected="java.lang.Long" target="int64${0}"/>
+        <type detected="java.lang.Short" target="int16${json} -> SetInt16"/>
+        <type detected="java.lang.Integer" target="int32${json} -> SetInt32"/>
+        <type detected="java.lang.Long" target="int64${json} -> SetInt64"/>
 
-        <type detected="java.lang.Float" target="float32${0}"/>
-        <type detected="java.lang.Double" target="float64${0}"/>
-        <type detected="java.math.BigDecimal" target="float64${0}"/>
+        <type detected="java.lang.Float" target="float32${json} -> SetFloat32"/>
+        <type detected="java.lang.Double" target="float64${json} -> SetFloat64"/>
+        <type detected="java.math.BigDecimal" target="float64${json} -> SetFloat64"/>
 
-        <type detected="java.lang.String" target="string${0}"/>
-        <type detected="java.util.Date" target="time:time.Time${0}"/>
-        <type detected="byte[]" target="string${0}"/>
-        <type detected="java.lang.Boolean" target="int64${0}"/>
+        <type detected="java.lang.String" target="string${json} -> SetString"/>
+        <type detected="java.util.Date" target="time:time.Time${json} -> SetTime"/>
+        <type detected="byte[]" target="string${json} -> SetBytes"/>
+        <type detected="java.lang.Boolean" target="bool${json} -> SetBool"/>
 
-        <type detected="java.lang.Object" target="interface{}${0}"/>
+        <type detected="java.lang.Object" target="interface{}${json}"/>
 
         <!-- ***** SQLAlchemy ("sqlalchemy-" or "sa-" prefix for detected types) ****************** -->
 
