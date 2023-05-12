@@ -68,7 +68,7 @@ public class NbpTargetLanguageHelpers {
             res_buf.append(Const.OUTPUT_FILE_IS_MISSING);
         } else {
             String text = file_content[0];
-            if (!old_text.equals(text)) {
+            if (!Helpers.equal_ignoring_eol(text, old_text)) {
                 res_buf.append(Const.OUTPUT_FILE_IS_OUT_OF_DATE);
             }
         }
@@ -99,7 +99,7 @@ public class NbpTargetLanguageHelpers {
             res_buf.append(Const.OUTPUT_FILE_IS_MISSING);
         } else {
             String text = file_content[0];
-            if (old_text.compareTo(text) != 0) {
+            if (!Helpers.equal_ignoring_eol(text, old_text)) {
                 res_buf.append(Const.OUTPUT_FILE_IS_OUT_OF_DATE);
             }
         }
