@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2022 sqldalmaker@gmail.com
+    Copyright 2011-2023 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -113,17 +113,18 @@ public class IdeaTargetLanguageHelpers {
                                     Settings settings,
                                     String dto_class_name,
                                     String[] file_content,
-                                    StringBuilder validation_buff) throws Exception {
+                                    StringBuilder err_buff) throws Exception {
 
         String target_file_abs_path = get_dto_file_abs_path(project, root_file, settings, dto_class_name);
         String old_text = Helpers.load_text_from_file(target_file_abs_path);
         if (old_text.length() == 0) {
-            validation_buff.append(Const.OUTPUT_FILE_IS_MISSING);
+            err_buff.append(Const.OUTPUT_FILE_IS_MISSING);
         } else {
             String text = file_content[0];
-            if (!old_text.equals(text)) {
-                validation_buff.append(Const.OUTPUT_FILE_IS_OUT_OF_DATE);
+            if (Helpers.equal_ignoring_eol(text, old_text)) {
+                return;
             }
+            err_buff.append(Const.OUTPUT_FILE_IS_OUT_OF_DATE);
         }
     }
 
@@ -179,17 +180,18 @@ public class IdeaTargetLanguageHelpers {
                                     Settings settings,
                                     String dao_class_name,
                                     String[] file_content,
-                                    StringBuilder validation_buff) throws Exception {
+                                    StringBuilder err_buff) throws Exception {
 
         String target_file_abs_path = get_dao_file_abs_path(project, root_file, settings, dao_class_name);
         String old_text = Helpers.load_text_from_file(target_file_abs_path);
         if (old_text.length() == 0) {
-            validation_buff.append(Const.OUTPUT_FILE_IS_MISSING);
+            err_buff.append(Const.OUTPUT_FILE_IS_MISSING);
         } else {
             String text = file_content[0];
-            if (!old_text.equals(text)) {
-                validation_buff.append(Const.OUTPUT_FILE_IS_OUT_OF_DATE);
+            if (Helpers.equal_ignoring_eol(old_text, text)) {
+                return;
             }
+            err_buff.append(Const.OUTPUT_FILE_IS_OUT_OF_DATE);
         }
     }
 

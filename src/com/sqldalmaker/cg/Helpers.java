@@ -497,4 +497,10 @@ public class Helpers {
         pk_col_name = pk_col_name.trim();
         return pk_col_name;
     }
+
+    public static boolean equal_ignoring_eol(String old_text, String text) {
+        old_text = old_text.replace("\r", "\n").replace("\n\n", "\n");
+        text = text.replace("\r", "\n").replace("\n\n", "\n");
+        return !old_text.equals(text);
+    }
 }
