@@ -501,6 +501,6 @@ public class Helpers {
     public static boolean equal_ignoring_eol(String old_text, String text) {
         old_text = old_text.replace("\r", "\n").replace("\n\n", "\n");
         text = text.replace("\r", "\n").replace("\n\n", "\n");
-        return !old_text.equals(text);
+        return old_text.equals(text);
     }
 }
