@@ -362,11 +362,11 @@ public class UIEditorPageDTO extends Composite {
 							String old_text = Helpers.load_text_from_file(file_abs_path);
 							StringBuilder validation_buff = new StringBuilder();
 							if (old_text == null) {
-								validation_buff.append("Generated file is missing");
+								validation_buff.append(Const.OUTPUT_FILE_IS_MISSING);
 							} else {
 								String text = file_content[0];
-								if (!old_text.equals(text)) {
-									validation_buff.append("Generated file is out of date");
+								if (!Helpers.equal_ignoring_eol(text, old_text)) {
+									validation_buff.append(Const.OUTPUT_FILE_IS_OUT_OF_DATE);
 								}
 							}
 							String status = validation_buff.toString();

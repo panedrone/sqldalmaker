@@ -524,13 +524,13 @@ public class UIEditorPageDAO extends Composite {
 							String file_name = EclipseTargetLanguageHelpers.get_rel_path(editor2, output_dir.toString(),
 									dao_class_name);
 							StringBuilder validation_buff = new StringBuilder();
-							String oldText = Helpers.load_text_from_file(file_name);
-							if (oldText == null) {
-								validation_buff.append("Generated file is missing");
+							String old_text = Helpers.load_text_from_file(file_name);
+							if (old_text == null) {
+								validation_buff.append(Const.OUTPUT_FILE_IS_MISSING);
 							} else {
 								String text = file_content[0];
-								if (!oldText.equals(text)) {
-									validation_buff.append("Generated file is out of date");
+								if (!Helpers.equal_ignoring_eol(text, old_text)) {
+									validation_buff.append(Const.OUTPUT_FILE_IS_OUT_OF_DATE);
 								}
 							}
 							String status = validation_buff.toString();
