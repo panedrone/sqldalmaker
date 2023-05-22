@@ -351,7 +351,7 @@ class _DS(DataStore):
     def __init__(self):
         self.conn = None
         self.transaction = None
-        self.engine = None
+        # self.engine = None
         self.engine_type = self.EngineType.sqlite3
 
         # https://docs.sqlalchemy.org/en/13/orm/contextual.html
@@ -430,19 +430,19 @@ class _DS(DataStore):
         # raw_conn.row_factory = sqlite3.Row # not working on python 3.11
         # raw_conn.row_factory = dict_factory  # not working on python 3.11
 
-        sqla_cursor = self._exec(cls.SQL, params)
+        exec_res = self._exec(cls.SQL, params)
         try:
-            sqlite3_cursor = sqla_cursor.cursor
-            col_names = [tup[0] for tup in sqlite3_cursor.description]
+            raw_cursor = exec_res.cursor
+            col_names = [tup[0] for tup in raw_cursor.description]
             res = []
-            for row in sqla_cursor:
+            for row in exec_res:
                 row_values = [i for i in row]
                 row_as_dict = dict(zip(col_names, row_values))
                 r = cls(**dict(row_as_dict))
                 res.append(r)
             return res
         finally:
-            sqla_cursor.close()
+            exec_res.close()
 
     def get_one_raw(self, cls, params=None):
         rows = self.get_all_raw(cls, params)
