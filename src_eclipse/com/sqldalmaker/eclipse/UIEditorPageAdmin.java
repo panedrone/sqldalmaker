@@ -380,7 +380,7 @@ public class UIEditorPageAdmin extends Composite {
 		Composite composite_5 = new Composite(composite_2, SWT.NONE);
 		toolkit.adapt(composite_5);
 		toolkit.paintBordersFor(composite_5);
-		composite_5.setLayout(new GridLayout(5, false));
+		composite_5.setLayout(new GridLayout(3, false));
 
 		Label lblPython = new Label(composite_5, SWT.NONE);
 		toolkit.adapt(lblPython, true, true);
@@ -406,28 +406,6 @@ public class UIEditorPageAdmin extends Composite {
 		});
 		toolkit.adapt(btnSqlalchemy, true, true);
 		btnSqlalchemy.setText("SQLAlchemy");
-
-		Button btnDatastorepycxoracle = new Button(composite_5, SWT.NONE);
-		btnDatastorepycxoracle.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/data_store_cx_oracle.py",
-						"data_store_cx_oracle.py");
-			}
-		});
-		btnDatastorepycxoracle.setText("cx_Oracle");
-		toolkit.adapt(btnDatastorepycxoracle, true, true);
-
-		Button btnNewButton_7_1 = new Button(composite_5, SWT.NONE);
-		btnNewButton_7_1.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/data_store_pyodbc.py",
-						"data_store_pyodbc.py");
-			}
-		});
-		btnNewButton_7_1.setText("pyodbc, mssql");
-		toolkit.adapt(btnNewButton_7_1, true, true);
 
 		Composite composite_3 = new Composite(composite_top, SWT.NONE);
 		composite_3.setLayout(new GridLayout(5, false));
