@@ -1,3 +1,26 @@
+2023-08-01
+
+    Error string instead of exception in Python's query_row:
+
+        def query_row(self, sql, params):
+            rows = []
+            self.query_all_rows(sql, params, lambda row: rows.append(row))
+            if len(rows) == 1:
+                return rows[0]
+            if len(rows) == 0:
+                return 'No rows'
+            return 'More than 1 row exists'
+
+    The same for Python's get_one_raw:
+
+        def get_one_raw(self, cls, params=None):
+            rows = self.get_all_raw(cls, params)
+            if len(rows) == 1:
+                return rows[0]
+            if len(rows) == 0:
+                return 'No rows'
+            return 'More than 1 row exists'
+
 2023-05-07
 
     Fixed incorrect returning scalar types.

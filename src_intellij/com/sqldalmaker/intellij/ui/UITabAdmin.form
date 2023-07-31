@@ -272,18 +272,6 @@
                           <text value="sqlalchemy"/>
                         </properties>
                       </component>
-                      <component id="df46c" class="javax.swing.JButton" binding="btn_cx_Oracle">
-                        <constraints/>
-                        <properties>
-                          <text value="cx_oracle"/>
-                        </properties>
-                      </component>
-                      <component id="f94b3" class="javax.swing.JButton" binding="datastore_pyodbc">
-                        <constraints/>
-                        <properties>
-                          <text value="ms sql"/>
-                        </properties>
-                      </component>
                     </children>
                   </grid>
                   <grid id="cf6d9" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="0">

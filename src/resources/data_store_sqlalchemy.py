@@ -41,7 +41,7 @@ class DataStore:
         """
         :param cls: a model class containing static field SQL
         :param params: a tuple of SQL params
-        :return: a model object
+        :return: a model object or error string
         """
         pass
 
@@ -160,8 +160,7 @@ class DataStore:
         """
         :param sql: str, SQL statement
         :param params: dict, optional, SQL parameters
-        :return single fetched row
-        :raise Exception: if amount of rows != 1
+        :return single fetched row or error string
         """
         pass
 
@@ -446,11 +445,11 @@ class _DS(DataStore):
 
     def get_one_raw(self, cls, params=None):
         rows = self.get_all_raw(cls, params)
+        if len(rows) == 1:
+            return rows[0]
         if len(rows) == 0:
-            raise Exception('No rows')
-        if len(rows) > 1:
-            raise Exception('More than 1 row exists')
-        return rows[0]
+            return 'No rows'
+        return 'More than 1 row exists'
 
     def get_query(self, cls):
         return self.session.query(cls)
@@ -606,11 +605,11 @@ class _DS(DataStore):
     def query_row(self, sql, params):
         rows = []
         self.query_all_rows(sql, params, lambda row: rows.append(row))
+        if len(rows) == 1:
+            return rows[0]
         if len(rows) == 0:
-            raise Exception('No rows')
-        if len(rows) > 1:
-            raise Exception('More than 1 row exists')
-        return rows[0]
+            return 'No rows'
+        return 'More than 1 row exists'
 
     def query_all_rows(self, sql, params, callback):
         sql = self._format_sql(sql)

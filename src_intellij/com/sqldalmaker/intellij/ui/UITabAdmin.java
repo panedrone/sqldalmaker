@@ -54,13 +54,13 @@ public class UITabAdmin {
     private JTextField vTextField;
     private JButton referenceSettingsXmlButton;
     private JScrollPane scroll_pane;
-    private JButton datastore_pyodbc;
+//    private JButton datastore_pyodbc;
     //private JButton dataStorePsycopg2Button;
     private JButton btn_php_pg;
     private JButton btn_mysql;
     private JButton dataStorePhpPDOSQLButton;
     private JButton btn_php_oracle;
-    private JButton btn_cx_Oracle;
+//    private JButton btn_cx_Oracle;
     private JButton dataStorePhpOCI8Button;
     private JButton btn_golang;
     private JButton btn_golangVM;
@@ -262,12 +262,12 @@ public class UITabAdmin {
                 IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, Const.SETTINGS_XML, Const.SETTINGS_XML);
             }
         });
-        datastore_pyodbc.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "data_store_pyodbc.py", "data_store_pyodbc.py");
-            }
-        });
+//        datastore_pyodbc.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "data_store_pyodbc.py", "data_store_pyodbc.py");
+//            }
+//        });
 //        dataStorePsycopg2Button.addActionListener(new ActionListener() {
 //            @Override
 //            public void actionPerformed(ActionEvent e) {
@@ -298,12 +298,12 @@ public class UITabAdmin {
                 IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "DataStore_PDO_Oracle.php", "DataStore_PDO_Oracle.php");
             }
         });
-        btn_cx_Oracle.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "data_store_cx_oracle.py", "data_store_cx_oracle.py");
-            }
-        });
+//        btn_cx_Oracle.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "data_store_cx_oracle.py", "data_store_cx_oracle.py");
+//            }
+//        });
         dataStorePhpOCI8Button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -636,12 +636,6 @@ public class UITabAdmin {
         SQLAlchemyButton = new JButton();
         SQLAlchemyButton.setText("sqlalchemy");
         panel7.add(SQLAlchemyButton);
-        btn_cx_Oracle = new JButton();
-        btn_cx_Oracle.setText("cx_oracle");
-        panel7.add(btn_cx_Oracle);
-        datastore_pyodbc = new JButton();
-        datastore_pyodbc.setText("ms sql");
-        panel7.add(datastore_pyodbc);
         final JPanel panel8 = new JPanel();
         panel8.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
         gbc = new GridBagConstraints();

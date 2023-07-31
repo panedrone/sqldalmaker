@@ -214,7 +214,11 @@ class $class_name:
 #if($out_params)
         :param out_params: OutParams
 #end
+#if($use_dto)
+        :return: None on success or error string
+#else
         :return: None
+#end
 #else
 #if($out_params)
         :param out_params: OutParams
@@ -222,7 +226,9 @@ class $class_name:
         :return: $returned_type_name
 #end
 #end
+#if(!$use_dto)
         :raises Exception: if amount of returned rows != 1.
+#end
         """
 #if ($use_dto && $method_type == "READ" && $model != "")
 	    return self.ds.read_one(${returned_type_name}, #params_dict($params))
@@ -230,6 +236,8 @@ class $class_name:
 #sql_var($is_external_sql $sql)
 #if($use_dto)
         row = self.ds.query_row(sql, #param_array($dto_param)#if($out_params), out_params#end)
+        if isinstance(row, str):
+            return row
 #foreach($f in ${fields})
         obj.${f.getName()} = row["${f.getColumnName()}"]  # ${f.getComment()}
 #end
