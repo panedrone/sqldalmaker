@@ -173,8 +173,6 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         jLabel9 = new javax.swing.JLabel();
         jButton7 = new javax.swing.JButton();
         jButton15 = new javax.swing.JButton();
-        jButton32 = new javax.swing.JButton();
-        jButton9 = new javax.swing.JButton();
         jPanel5 = new javax.swing.JPanel();
         jLabel11 = new javax.swing.JLabel();
         jButton34 = new javax.swing.JButton();
@@ -467,23 +465,6 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         });
         jPanel9.add(jButton15);
 
-        jButton32.setText("cx_Oracle");
-        jButton32.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton32ActionPerformed(evt);
-            }
-        });
-        jPanel9.add(jButton32);
-
-        jButton9.setText("pyodbc, mssql");
-        jButton9.setActionCommand("DataStore (pyodbc, SQL Server)");
-        jButton9.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton9ActionPerformed(evt);
-            }
-        });
-        jPanel9.add(jButton9);
-
         jPanel8.add(jPanel9);
 
         jPanel5.setLayout(new java.awt.FlowLayout(0));
@@ -602,14 +583,6 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
     private void jButton34ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton34ActionPerformed
         NbpIdeEditorHelpers.open_resource_file_in_editor_async("data_store.go", "data_store.go");
     }//GEN-LAST:event_jButton34ActionPerformed
-
-    private void jButton9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton9ActionPerformed
-        NbpIdeEditorHelpers.open_resource_file_in_editor_async("data_store_pyodbc.py", "data_store_pyodbc.py");
-    }//GEN-LAST:event_jButton9ActionPerformed
-
-    private void jButton32ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton32ActionPerformed
-        NbpIdeEditorHelpers.open_resource_file_in_editor_async("data_store_cx_oracle.py", "data_store_cx_oracle.py");
-    }//GEN-LAST:event_jButton32ActionPerformed
 
     private void jButton12ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton12ActionPerformed
         NbpIdeEditorHelpers.open_resource_file_in_editor_async("DataStore.cpp", "DataStore.cpp");
@@ -776,7 +749,6 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton30;
     private javax.swing.JButton jButton31;
-    private javax.swing.JButton jButton32;
     private javax.swing.JButton jButton33;
     private javax.swing.JButton jButton34;
     private javax.swing.JButton jButton4;
@@ -784,7 +756,6 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
     private javax.swing.JButton jButton6;
     private javax.swing.JButton jButton7;
     private javax.swing.JButton jButton8;
-    private javax.swing.JButton jButton9;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel7;
