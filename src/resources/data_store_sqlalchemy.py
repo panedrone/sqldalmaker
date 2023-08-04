@@ -1,7 +1,7 @@
 """
     This file is a part of SQL DAL Maker project: https://sqldalmaker.sourceforge.net
     It demonstrates how to implement an interface DataStore in Python + SQLAlchemy.
-    More about DataStore: https://sqldalmaker.sourceforge.net/data_store.html
+    More about DataStore: https://sqldalmaker.sourceforge.net/preconfig.html#ds
     Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store_sqlalchemy.py
 
     Successfully tested with:

@@ -1,7 +1,7 @@
 """
     This file is a part of SQL DAL Maker project: https://sqldalmaker.sourceforge.net
     It demonstrates how to implement an interface DataStore in Python + sqlite3|psycopg2|mysql|cx_oracle|django.db.
-    More about DataStore: https://sqldalmaker.sourceforge.net/data_store.html
+    More about DataStore: https://sqldalmaker.sourceforge.net/preconfig.html#ds
     Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store.py
 
     Successfully tested with both "no-django" and django.db:

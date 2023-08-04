@@ -1,12 +1,14 @@
 <?php
 
 /*
-  SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
-  This is an example of how to implement DataStore in PHP + PDO + SQL Server.
-  Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/DataStore_PDO_SQL_Server.php
-  Copy-paste this code to your project and change it for your needs.
-  Improvements are welcome: sqldalmaker@gmail.com
- 
+  	This file is a part of SQL DAL Maker project: https://sqldalmaker.sourceforge.net
+  	It demonstrates how to implement an interface DataStore in PHP + PDO/SQLServer.
+  	More about DataStore: https://sqldalmaker.sourceforge.net/preconfiguring.html#ds
+  	Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store.go
+
+  	Copy-paste this code to your project and change it for your needs.
+  	Improvements are welcome: sqldalmaker@gmail.com
+
  */
 
 // include_once 'DataStore.php';
