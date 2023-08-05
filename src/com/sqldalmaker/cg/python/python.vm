@@ -171,6 +171,7 @@ class $class_name:
 #else
 #sql_var($is_external_sql $sql)
 #if($use_dto)
+
         _res = []
 
         def _map_cb(row):
