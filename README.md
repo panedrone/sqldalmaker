@@ -7,8 +7,6 @@ Written in Java. Implemented as plug-ins for [Eclipse IDE](http://marketplace.ec
 [IntelliJ-Platform](http://plugins.jetbrains.com/plugin/7092),
 and [NetBeans 11+](https://github.com/panedrone/sqldalmaker/releases/tag/latest).
 
-Supported both ORM-based and raw-SQL approaches.
-
 At the stage of code generation, the target database must exist and be available for JDBC connection.
 Generated code is being synchronized with the current database schema using "live" JDBC metadata.
 
