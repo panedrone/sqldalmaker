@@ -390,7 +390,7 @@ public class UIEditorPageAdmin extends Composite {
 		btnSqliteMysqlconnectorPsycopg.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/data_store.py", "data_store.py");
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/data_store_no_orm.py", "data_store_no_orm.py");
 			}
 		});
 		toolkit.adapt(btnSqliteMysqlconnectorPsycopg, true, true);

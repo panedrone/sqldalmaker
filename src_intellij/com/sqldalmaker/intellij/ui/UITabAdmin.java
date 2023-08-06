@@ -54,13 +54,13 @@ public class UITabAdmin {
     private JTextField vTextField;
     private JButton referenceSettingsXmlButton;
     private JScrollPane scroll_pane;
-//    private JButton datastore_pyodbc;
+    //    private JButton datastore_pyodbc;
     //private JButton dataStorePsycopg2Button;
     private JButton btn_php_pg;
     private JButton btn_mysql;
     private JButton dataStorePhpPDOSQLButton;
     private JButton btn_php_oracle;
-//    private JButton btn_cx_Oracle;
+    //    private JButton btn_cx_Oracle;
     private JButton dataStorePhpOCI8Button;
     private JButton btn_golang;
     private JButton btn_golangVM;
@@ -70,6 +70,8 @@ public class UITabAdmin {
     private JButton gormButton;
     private JButton doctrineORMButton;
     private JButton buttonSettings;
+    private JButton djangoDbButton;
+    private JButton flaskSqlalchemyButton;
 
     private Project project;
     private VirtualFile root_file;
@@ -271,7 +273,7 @@ public class UITabAdmin {
 //        dataStorePsycopg2Button.addActionListener(new ActionListener() {
 //            @Override
 //            public void actionPerformed(ActionEvent e) {
-//                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "data_store_psycopg2.py", "data_store.py");
+//                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "data_store_psycopg2.py", "data_store_no_orm.py");
 //            }
 //        });
         btn_php_pg.addActionListener(new ActionListener() {
@@ -298,12 +300,6 @@ public class UITabAdmin {
                 IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "DataStore_PDO_Oracle.php", "DataStore_PDO_Oracle.php");
             }
         });
-//        btn_cx_Oracle.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "data_store_cx_oracle.py", "data_store_cx_oracle.py");
-//            }
-//        });
         dataStorePhpOCI8Button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -322,16 +318,10 @@ public class UITabAdmin {
                 IdeaEditorHelpers.open_or_activate_jar_file_in_editor(project, "com/sqldalmaker/cg/go", "go.vm", "go.vm");
             }
         });
-//        djangoDbButton.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "data_store_django.py", "data_store_django.py");
-//            }
-//        });
         sqlite3MysqlConnectorPsycopg2Button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "data_store.py", "data_store.py");
+                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "data_store_no_orm.py", "data_store_no_orm.py");
             }
         });
         SQLAlchemyButton.addActionListener(new ActionListener() {
@@ -356,6 +346,18 @@ public class UITabAdmin {
             @Override
             public void actionPerformed(ActionEvent e) {
                 openSettings();
+            }
+        });
+        djangoDbButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "data_store_django.py", "data_store_django.py");
+            }
+        });
+        flaskSqlalchemyButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "data_store_flask_sqlalchemy.py", "data_store_flask_sqlalchemy.py");
             }
         });
     }
@@ -631,8 +633,11 @@ public class UITabAdmin {
         label4.setText(" Python ");
         panel7.add(label4);
         sqlite3MysqlConnectorPsycopg2Button = new JButton();
-        sqlite3MysqlConnectorPsycopg2Button.setText("sqlite3, mysql, cx_oracle, psycopg2, django.db");
+        sqlite3MysqlConnectorPsycopg2Button.setText("sqlite3, mysql, cx_oracle, psycopg2");
         panel7.add(sqlite3MysqlConnectorPsycopg2Button);
+        djangoDbButton = new JButton();
+        djangoDbButton.setText("django.db");
+        panel7.add(djangoDbButton);
         SQLAlchemyButton = new JButton();
         SQLAlchemyButton.setText("sqlalchemy");
         panel7.add(SQLAlchemyButton);

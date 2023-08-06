@@ -1,54 +1,25 @@
 """
     This file is a part of SQL DAL Maker project: https://sqldalmaker.sourceforge.net
-    It demonstrates how to implement an interface DataStore in Python + sqlite3|psycopg2|mysql|cx_oracle|django.db.
+    It demonstrates how to implement an interface DataStore in Python + sqlite3|psycopg2|mysql|cx_oracle.
     More about DataStore: https://sqldalmaker.sourceforge.net/preconfig.html#ds
     Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store.py
 
-    Successfully tested with both "no-django" and django.db:
+    Successfully tested with:
 
-    - 'django.db.backends.sqlite3' ---------------- built-in
-    - 'django.db.backends.postgresql_psycopg2' ---- pip install psycopg2
-    - 'mysql.connector.django' -------------------- pip install mysql-connector-python
-       ^^ instead of built-in 'django.db.backends.mysql' to enable cursor.stored_results().
-       MySQL SP returning result-sets --> http://www.mysqltutorial.org/calling-mysql-stored-procedures-python/
-       MySQL Connector/Python as Django Engine? -->
-       https://stackoverflow.com/questions/26573984/django-how-to-install-mysql-connector-python-with-pip3)
-    - 'django.db.backends.oracle' ------------------pip install cx_oracle
+    - sqlite3 ------------------- built-in
+    - psycopg2 ------------------ pip install psycopg2
+    - mysql.connector ----------- pip install mysql-connector-python
 
     Copy-paste it to your project and change it for your needs.
     Improvements are welcome: sqldalmaker@gmail.com
 
 """
 
-# uncomment one of the imports below for "no-django"
+import sqlite3
 
-# import sqlite3
+
 # import psycopg2
 # import mysql.connector
-# import cx_oracle
-
-# uncomment the imports and code below while using django.db:
-
-import django.db
-from django.apps import AppConfig
-from django.db import transaction
-from django.db.backends.base.base import BaseDatabaseWrapper
-
-
-class MyDjangoAppConfig(AppConfig):
-    default_auto_field = 'django.db.models.BigAutoField'
-    # default_auto_field = 'django.db.models.AutoField'
-    name = 'dal'  # python package containing generated django models
-
-
-# # there should be "settings.py" in the project root
-# # Google --> django settings.py location
-# os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'settings') # call it in __main__
-
-# django.setup() should be called before importing/using generated django models -->
-# AppRegistryNotReady("Apps aren't loaded yet.")
-# django.setup() # ----------- call it before calling of factory create_ds() -> DataStore:
-
 
 class OutParam:
     def __init__(self):
@@ -62,95 +33,6 @@ class DataStore:
     def commit(self): pass
 
     def rollback(self): pass
-
-    # ORM-based raw-SQL helpers
-
-    def get_one_raw(self, cls, params=None):
-        """
-        :param cls: a model class containing static field SQL
-        :param params: a tuple of SQL params
-        :return: a model object or error string
-        """
-        pass
-
-    def get_all_raw(self, cls, params=None) -> []:
-        """
-        :param cls: a model class containing static field SQL
-        :param params: a tuple of SQL params
-        :return: an array of model objects
-        """
-        pass
-
-    # ORM-based helpers
-
-    def filter(self, cls, params: dict, fields: list = None):
-        """
-        :param cls: a model class
-        :param params: dict of named filter params
-        :param fields: list of fields
-        :return: a QuerySet
-        """
-        pass
-
-    def delete_by_filter(self, cls, params: dict) -> int:
-        """
-        :param cls: a model class
-        :param params: dict of named filter params
-        :return: amount of rows affected
-        """
-        pass
-
-    def update_by_filter(self, cls, data: dict, params: dict) -> int:
-        """
-        :param cls: a model class
-        :param data: dict of column-value to update
-        :param params: dict of filter params
-        :return: amount of rows affected
-        """
-        pass
-
-    # ORM-based CRUD methods
-
-    def create_one(self, obj) -> None:
-        """
-        :param obj: a model object or serializer object
-        :return: None
-        """
-        pass
-
-    def read_all(self, cls):
-        """
-        :param cls: a model class
-        :return: a QuerySet
-        """
-        pass
-
-    def read_one(self, cls, pk: dict):
-        """
-        :param cls: a model class
-        :param pk: primary key as a dict of column-value pairs
-        :return: a model object
-        """
-        pass
-
-    def update_one(self, cls, data: dict, pk: dict) -> int:
-        """
-        :param cls: model class
-        :param data: dict of column-value to update
-        :param pk: primary key as a dict of column-value pairs
-        :return: int, amount of rows affected
-        """
-        pass
-
-    def delete_one(self, cls, pk: dict) -> int:
-        """
-        :param cls: model class
-        :param pk: primary key as a dict of column-value pairs
-        :return: int, amount of rows affected
-        """
-        pass
-
-    # Raw-SQL methods
 
     def insert_row(self, sql, params, ai_values):
         """
@@ -199,7 +81,7 @@ class DataStore:
         """
         :param sql: str
         :param params: array, values of SQL parameters.
-        :param callback: а function delivering fetched rows to caller
+        :param callback: function delivering fetched rows to caller
         :return: None
         """
         pass
@@ -218,14 +100,12 @@ class _DS(DataStore):
 
     def __init__(self):
         self.conn = None
-        self.engine_type = self.EngineType.sqlite3
+        self.engine_type = None
         self.open()
 
     def open(self):
-        # ===== uncomment to use without django.db:
-
-        # self.conn = sqlite3.connect('./task-tracker.sqlite')
-        # self.engine_type = self.EngineType.sqlite3
+        self.conn = sqlite3.connect('./todolist.sqlite')
+        self.engine_type = self.EngineType.sqlite3
 
         # self.conn = mysql.connector.Connect(user='root', password='root', host='127.0.0.1', database='sakila')
         # self.engine_type = self.EngineType.mysql
@@ -233,120 +113,25 @@ class _DS(DataStore):
         # self.conn = psycopg2.connect(host="localhost", database="my-tests", user="postgres", password="sa")
         # self.engine_type = self.EngineType.postgresql
 
-        # print(self.conn.autocommit)
-
-        # ====== uncomment to use with django.db:
-
-        con = django.db.connections['default']
-        engine = con.settings_dict["ENGINE"]
-        if 'sqlite3' in engine:
-            self.engine_type = self.EngineType.sqlite3
-        elif 'mysql' in engine:
-            self.engine_type = self.EngineType.mysql
-        elif 'postgresql' in engine:
-            self.engine_type = self.EngineType.postgresql
-        elif 'oracle' in engine:
-            self.engine_type = self.EngineType.oracle
-        else:
-            raise Exception('Unexpected: ' + engine)
-        self.conn = con
-
     def close(self):
         if self.conn:
             self.conn.close()
             self.conn = None
 
-    # ORM-based raw-SQL helpers
-
-    def get_all_raw(self, cls, params=None) -> []:
-        if not params:
-            params = ()
-        raw_query_set = cls.objects.raw(cls.SQL, params)
-        res = [r for r in raw_query_set]
-        return res
-
-    def get_one_raw(self, cls, params=None):
-        rows = self.get_all_raw(cls, params)
-        if len(rows) == 1:
-            return rows[0]
-        if len(rows) == 0:
-            return 'No rows'
-        return 'More than 1 row exists'
-
-    # ORM-based helpers
-
-    def filter(self, cls, params: dict, fields: list = None):
-        if fields:
-            # How to obtain a QuerySet of all rows, with specific fields for each one of them?
-            # https://stackoverflow.com/questions/7503241/how-to-obtain-a-queryset-of-all-rows-with-specific-fields-for-each-one-of-them
-            # call with arguments unpacked from a list
-            # https://stackoverflow.com/questions/4960689/python-array-as-list-of-parameters
-            return cls.objects.filter(**params).only(*fields)
-        else:
-            # Django Filter Model by Dictionary
-            # https://stackoverflow.com/questions/16018497/django-filter-model-by-dictionary
-            return cls.objects.filter(**params)
-
-    def delete_by_filter(self, cls, params: dict) -> int:
-        # Entry.objects.filter(blog=b).delete()
-        # https://docs.djangoproject.com/en/4.1/ref/models/querysets/
-        queryset = self.filter(cls, params)
-        res_tuple = queryset.delete()  # (1, {'dal.Group': 1})
-        return res_tuple[0]
-
-    def update_by_filter(self, cls, data: dict, params: dict) -> int:
-        # call update(), rather than loading the model object into memory.
-        # Entry.objects.filter(id=10).update(comments_on=False)
-        # https://docs.djangoproject.com/en/4.1/ref/models/querysets/
-        queryset = self.filter(cls, params)
-        rows_affected = queryset.update(**data)
-        return rows_affected
-
-    # ORM-based CRUD methods
-
-    def create_one(self, obj):
-        obj.save()
-
-    def read_all(self, cls):
-        return cls.objects.all()
-
-    def read_one(self, cls, pk: dict):
-        return cls.objects.get(**pk)
-
-    def update_one(self, cls, data: dict, pk: dict) -> int:
-        return self.update_by_filter(cls, data, pk)  # no fetch!
-
-    def delete_one(self, cls, pk: dict) -> int:
-        rc = self.delete_by_filter(cls, pk)  # no fetch!
-        return rc
+    def begin(self):
+        self.conn.execute('begin')  # sqlite3
+        # self.conn.start_transaction() # mysql
+        # self.conn.begin() # psycopg2
 
     # uncomment to use without django.db:
-
-    # def begin(self):
-    #     self.conn.execute('begin')  # sqlite3
-    #     self.conn.start_transaction() # mysql
-    #     self.conn.begin() # psycopg2
-    #
-    # # uncomment to use without django.db:
-    # def commit(self):
-    #     self.conn.execute('commit')  # sqlite3
-    #     self.conn.commit() # psycopg2, mysql
-    #
-    # # uncomment to use without django.db:
-    # def rollback(self):
-    #     self.conn.execute("rollback")  # sqlite3
-    #     self.conn.rollback() # psycopg2, mysql
-
-    # uncomment to use with django.db:
-
-    def begin(self):
-        django.db.transaction.set_autocommit(False)
-
     def commit(self):
-        django.db.transaction.commit()
+        self.conn.execute('commit')  # sqlite3
+        # self.conn.commit() # psycopg2, mysql
 
+    # uncomment to use without django.db:
     def rollback(self):
-        django.db.transaction.rollback()
+        self.conn.execute("rollback")  # sqlite3
+        # self.conn.rollback() # psycopg2, mysql
 
     def insert_row(self, sql, params, ai_values):
         sql = self._format_sql(sql)
@@ -487,21 +272,15 @@ class _DS(DataStore):
         self._exec(fetch_all)
 
     def _exec(self, func: callable):
-        if isinstance(self.conn, BaseDatabaseWrapper):
-            # https://stackoverflow.com/questions/8402898/how-can-i-access-the-low-level-psycopg2-connection-in-django
-            with django.db.connection.cursor() as cursor:
-                func(cursor)
-            return
-        # with self.conn.cursor() as cursor:  # sqlite3 error without django
+        # with self.conn.cursor() as cursor:  # sqlite3 error
         cursor = self.conn.cursor()
         try:
             func(cursor)
         finally:
             cursor.close()
 
-    def _format_sql(self, sql):
-        if isinstance(self.conn, BaseDatabaseWrapper):
-            return sql.replace("?", "%s")
+    @staticmethod
+    def _format_sql(sql):
         return sql
 
     @staticmethod

@@ -263,13 +263,25 @@
                       <component id="85bc6" class="javax.swing.JButton" binding="sqlite3MysqlConnectorPsycopg2Button" default-binding="true">
                         <constraints/>
                         <properties>
-                          <text value="sqlite3, mysql, cx_oracle, psycopg2, django.db"/>
+                          <text value="sqlite3, mysql, cx_oracle, psycopg2"/>
+                        </properties>
+                      </component>
+                      <component id="d494f" class="javax.swing.JButton" binding="djangoDbButton" default-binding="true">
+                        <constraints/>
+                        <properties>
+                          <text value="django.db"/>
                         </properties>
                       </component>
                       <component id="b2f0d" class="javax.swing.JButton" binding="SQLAlchemyButton" default-binding="true">
                         <constraints/>
                         <properties>
                           <text value="sqlalchemy"/>
+                        </properties>
+                      </component>
+                      <component id="538ca" class="javax.swing.JButton" binding="flaskSqlalchemyButton" default-binding="true">
+                        <constraints/>
+                        <properties>
+                          <text value="flask-sqlalchemy"/>
                         </properties>
                       </component>
                     </children>
