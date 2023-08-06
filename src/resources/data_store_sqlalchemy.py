@@ -16,7 +16,6 @@
 """
 
 import sqlalchemy.orm
-from sqlalchemy import text
 
 
 # from sqlalchemy.dialects import oracle
@@ -168,7 +167,7 @@ class DataStore:
         """
         :param sql: str, SQL statement
         :param params: dict, optional, SQL parameters.
-        :param callback: a function which delivers fetched rows to caller
+        :param callback: Ã�Â° function delivering fetched rows to caller
         :return: None
         """
         pass
@@ -245,7 +244,7 @@ def create_ds(orm_session: sqlalchemy.orm.Session) -> DataStore:
 # === panedrone:
 #
 #   1) ^^^ "some_session" is of type "sqlalchemy.orm.Session"
-#   2) no need to call some_session.close() yourself because it is performed automatically in here:
+#   2) no need in "some_session.close()" because it is called automatically in here:
 #           scoped_session.registry.remove()
 #
 # --------------------------------------------------------------------------------------------
@@ -388,23 +387,20 @@ class _DS(DataStore):
         if params is None:
             params = []
 
-        # raw_conn.row_factory = sqlite3.Row # not working on python 3.11
-        # raw_conn.row_factory = dict_factory  # not working on python 3.11
-
-        exec_res = self._exec(cls.SQL, params)
+        cursor_result = self._exec(cls.SQL, params)
         try:
-            raw_cursor = exec_res.cursor
+            cursor = cursor_result.cursor
             # === panedrone: lower() is required because of oracle column names are always in upper case
-            col_names = [tup[0].lower() for tup in raw_cursor.description]
+            col_names = [tup[0].lower() for tup in cursor.description]
             res = []
-            for row in exec_res:
+            for row in cursor_result:
                 row_values = [i for i in row]
                 row_as_dict = dict(zip(col_names, row_values))
                 r = cls(**dict(row_as_dict))
                 res.append(r)
             return res
         finally:
-            exec_res.close()
+            cursor_result.close()
 
     def get_one_raw(self, cls, params=None):
         rows = self.get_all_raw(cls, params)
@@ -456,10 +452,20 @@ class _DS(DataStore):
         """
         :param sql:
         :param params:
-        :return: <sqlalchemy.engine.cursor.LegacyCursorResult object at 0x00000243D83C5D00>
+        :return:
+                    "sqlalchemy.engine.cursor.CursorResult" while using "txt = sqlalchemy.text(sql)" and
+                    "sqlalchemy.engine.cursor.LegacyCursorResult" while using "txt = sql"
         """
         pp = tuple(params)
-        txt = text(sql)  # don't use sqlalchemy.text(sql) with '%' as params
+
+        txt = sqlalchemy.text(sql)
+
+        # while using "txt = sql", "execute(txt, pp): throws randomly this:
+        #
+        #       sqlalchemy.exc.ArgumentError: Textual SQL expression should be explicitly declared as text()
+
+        # txt = sql
+
         return self.orm_session.execute(txt, pp)
 
     def _exec_proc_pg(self, sql, params):
@@ -575,26 +581,24 @@ class _DS(DataStore):
         return 'More than 1 row exists'
 
     def query_all_rows(self, sql, params, callback):
-
         sql = self._format_sql(sql)
         sp = self._get_sp_name(sql)
-
         if sp is None:
-            exec_res = self._exec(sql, params)
+            cursor_result = self._exec(sql, params)
             try:
-                raw_cursor = exec_res.cursor
+                cursor = cursor_result.cursor
                 # === panedrone:
-                #       the same logic as in get_all_raw(...,
-                #       but tup[0].lower() should not be called to leave col_names as-is:
-                col_names = [tup[0] for tup in raw_cursor.description]
-                for row in exec_res:
+                #       the same logic is used in "get_all_raw(...",
+                #       but "tup[0].lower()" should not be used in "query_all_rows(..."
+                #       because "col_names" must be used as-is:
+                col_names = [tup[0] for tup in cursor.description]
+                for row in cursor_result:
                     row_values = [i for i in row]
                     row_as_dict = dict(zip(col_names, row_values))
                     callback(row_as_dict)
                 return
             finally:
-                exec_res.close()
-
+                cursor_result.close()
         if self.engine_type != self.EngineType.mysql:
             raise Exception('Not supported for this engine')
         self._query_sp_mysql(sp, lambda result: self._fetch_all(result, callback), params)
