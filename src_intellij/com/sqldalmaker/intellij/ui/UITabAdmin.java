@@ -641,6 +641,9 @@ public class UITabAdmin {
         SQLAlchemyButton = new JButton();
         SQLAlchemyButton.setText("sqlalchemy");
         panel7.add(SQLAlchemyButton);
+        flaskSqlalchemyButton = new JButton();
+        flaskSqlalchemyButton.setText("flask-sqlalchemy");
+        panel7.add(flaskSqlalchemyButton);
         final JPanel panel8 = new JPanel();
         panel8.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
         gbc = new GridBagConstraints();

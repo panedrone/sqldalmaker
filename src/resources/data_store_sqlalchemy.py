@@ -168,7 +168,7 @@ class DataStore:
         """
         :param sql: str, SQL statement
         :param params: dict, optional, SQL parameters.
-        :param callback: Ð° function delivering fetched rows to caller
+        :param callback: Ã�Â° function delivering fetched rows to caller
         :return: None
         """
         pass
@@ -248,9 +248,9 @@ def create_ds(orm_session: sqlalchemy.orm.Session) -> DataStore:
 #
 #       Scenario 2. Using "sessionmaker" without "scoped_session":
 #
-# SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-#
 # # https://dassum.medium.com/building-rest-apis-using-fastapi-sqlalchemy-uvicorn-8a163ccf3aa1
+#
+# SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 #
 # # # Dependency
 # # def get_db():
@@ -266,13 +266,16 @@ def create_ds(orm_session: sqlalchemy.orm.Session) -> DataStore:
 #
 # # === panedrone:
 #
+# session_maker = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+#
 # # Dependency
 # def get_ds() -> DataStore:
-#     orm_session = SessionLocal()  # "orm_session" will be of type "sqlalchemy.orm.Session"
+#     orm_session = session_maker()  # "orm_session" will be of type "sqlalchemy.orm.Session"
 #     try:
 #         yield create_ds(orm_session)
 #     finally:
 #         orm_session.close()
+#
 # .......................
 #
 # # Usage in FastAPI:
