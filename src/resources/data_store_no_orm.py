@@ -108,7 +108,7 @@ class _DS(DataStore):
         self.engine_type = None
 
     def open(self):
-        self.conn = sqlite3.connect('./todolist.sqlite')
+        self.conn = sqlite3.connect('./todolist.sqlite', check_same_thread=False)
         self.engine_type = self.EngineType.sqlite3
 
         # self.conn = mysql.connector.Connect(user='root', password='root', host='127.0.0.1', database='sakila')
