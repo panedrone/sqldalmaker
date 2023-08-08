@@ -1,3 +1,13 @@
+"""
+    This file is a part of SQL DAL Maker project: https://sqldalmaker.sourceforge.net
+    It demonstrates how to implement an interface DataStore in Python/cx_oracle.
+    More about DataStore: https://sqldalmaker.sourceforge.net/preconfig.html#ds
+    Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store_no_orm_cx_oracle.py
+    Copy-paste it to your project and change it for your needs.
+    Improvements are welcome: sqldalmaker@gmail.com
+
+"""
+
 import cx_Oracle
 
 
@@ -12,13 +22,6 @@ class OutParam:
 
 
 class DataStore:
-    """
-    SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
-    This is an example of how to implement DataStore in Python + cx_Oracle.
-    Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store_cx_oracle.py
-    Copy-paste this code to your project and change it for your needs.
-    Improvements are welcome: sqldalmaker@gmail.com
-    """
     def __init__(self):
         self.conn = None
 

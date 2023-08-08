@@ -2,7 +2,7 @@
     This file is a part of SQL DAL Maker project: https://sqldalmaker.sourceforge.net
     It demonstrates how to implement an interface DataStore in Python + sqlite3|psycopg2|mysql|cx_oracle.
     More about DataStore: https://sqldalmaker.sourceforge.net/preconfig.html#ds
-    Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store.py
+    Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store_no_orm.py
 
     Successfully tested with:
 
