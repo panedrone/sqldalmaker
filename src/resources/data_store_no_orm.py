@@ -15,11 +15,10 @@
 
 """
 
-import sqlite3
-
-
+# import sqlite3
 # import psycopg2
-# import mysql.connector
+import mysql.connector
+
 
 class OutParam:
     def __init__(self):
@@ -93,7 +92,6 @@ class DataStore:
 
 def create_ds() -> DataStore:
     ds = _DS()
-    ds.open()
     return ds
 
 
@@ -108,11 +106,11 @@ class _DS(DataStore):
         self.engine_type = None
 
     def open(self):
-        self.conn = sqlite3.connect('./todolist.sqlite', check_same_thread=False)
-        self.engine_type = self.EngineType.sqlite3
+        # self.conn = sqlite3.connect('./todolist.sqlite', check_same_thread=False)
+        # self.engine_type = self.EngineType.sqlite3
 
-        # self.conn = mysql.connector.Connect(user='root', password='root', host='127.0.0.1', database='sakila')
-        # self.engine_type = self.EngineType.mysql
+        self.conn = mysql.connector.Connect(user='root', password='sa', host='127.0.0.1', database='todolist')
+        self.engine_type = self.EngineType.mysql
 
         # self.conn = psycopg2.connect(host="localhost", database="my-tests", user="postgres", password="sa")
         # self.engine_type = self.EngineType.postgresql
@@ -123,19 +121,28 @@ class _DS(DataStore):
             self.conn = None
 
     def begin(self):
-        self.conn.execute('begin')  # sqlite3
-        # self.conn.start_transaction() # mysql
-        # self.conn.begin() # psycopg2
+        if self.engine_type == self.EngineType.sqlite3:
+            self.conn.execute('begin')
+            return
+        if self.engine_type == self.EngineType.mysql:
+            self.conn.start_transaction()
+            return
+        if self.engine_type == self.EngineType.postgresql:
+            self.conn.begin()
+            return
+        raise Exception(f"Unknown engine_type: {self.engine_type}")
 
-    # uncomment to use without django.db:
     def commit(self):
-        self.conn.execute('commit')  # sqlite3
-        # self.conn.commit() # psycopg2, mysql
+        if self.engine_type == self.EngineType.sqlite3:
+            self.conn.execute('commit')
+            return
+        self.conn.commit()
 
-    # uncomment to use without django.db:
     def rollback(self):
-        self.conn.execute("rollback")  # sqlite3
-        # self.conn.rollback() # psycopg2, mysql
+        if self.engine_type == self.EngineType.sqlite3:
+            self.conn.execute("rollback")
+            return
+        self.conn.rollback()
 
     def insert_row(self, sql, params, ai_values):
         sql = self._format_sql(sql)
@@ -283,9 +290,10 @@ class _DS(DataStore):
         finally:
             cursor.close()
 
-    @staticmethod
-    def _format_sql(sql):
-        return sql
+    def _format_sql(self, sql):
+        if self.engine_type == self.EngineType.sqlite3:
+            return sql
+        return sql.replace("?", "%s")
 
     @staticmethod
     def _fetch_all(result, callback):
