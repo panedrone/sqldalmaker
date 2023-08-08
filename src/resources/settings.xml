@@ -256,6 +256,23 @@
         <!--        <type detected="byte[]" target="bytes"/>-->
         <!--        <type detected="java.lang.Object" target="object"/>-->
 
+        <!-- ******   Python scalar fields, params, and ret-values for Oracle ****** -->
+
+<!--        <type detected="java.lang.Short" target="float"/>-->
+<!--        <type detected="java.lang.Integer" target="float"/>-->
+<!--        <type detected="java.lang.Long" target="float"/>-->
+
+<!--        <type detected="java.lang.Double" target="float"/>-->
+<!--        <type detected="java.lang.Float" target="float"/>-->
+<!--        <type detected="java.math.BigDecimal" target="float"/>-->
+
+<!--        <type detected="java.util.Date" target="datetime.datetime"/>-->
+<!--        <type detected="java.lang.String" target="str"/>-->
+<!--        <type detected="java.lang.Boolean" target="bool"/>-->
+<!--        <type detected="byte[]" target="bytes"/>-->
+
+<!--        <type detected="java.lang.Object" target="object"/>-->
+
         <!-- ******   PHP Doctrine ORM  ****** -->
 
         <!-- https://www.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/types.html-->
