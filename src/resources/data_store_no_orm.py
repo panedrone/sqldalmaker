@@ -2,7 +2,8 @@
     This file is a part of SQL DAL Maker project: https://sqldalmaker.sourceforge.net
     It demonstrates how to implement an interface DataStore in Python + sqlite3|psycopg2|mysql|cx_oracle.
     More about DataStore: https://sqldalmaker.sourceforge.net/preconfig.html#ds
-    Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store_no_orm.py
+    Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store.py
+    Copy-paste it to your project and change it for your needs.
 
     Successfully tested with:
 
@@ -10,7 +11,6 @@
     - psycopg2 ------------------ pip install psycopg2
     - mysql.connector ----------- pip install mysql-connector-python
 
-    Copy-paste it to your project and change it for your needs.
     Improvements are welcome: sqldalmaker@gmail.com
 
 """
@@ -27,6 +27,10 @@ class OutParam:
 
 
 class DataStore:
+
+    def open(self): pass
+
+    def close(self): pass
 
     def begin(self): pass
 
@@ -88,7 +92,9 @@ class DataStore:
 
 
 def create_ds() -> DataStore:
-    return _DS()
+    ds = _DS()
+    ds.open()
+    return ds
 
 
 class _DS(DataStore):
@@ -96,12 +102,10 @@ class _DS(DataStore):
         sqlite3 = 1
         mysql = 2
         postgresql = 3
-        oracle = 4
 
     def __init__(self):
         self.conn = None
         self.engine_type = None
-        self.open()
 
     def open(self):
         self.conn = sqlite3.connect('./todolist.sqlite')

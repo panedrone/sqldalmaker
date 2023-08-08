@@ -22,11 +22,82 @@ class OutParam:
 
 
 class DataStore:
+
+    def open(self): pass
+
+    def close(self): pass
+
+    def begin(self): pass
+
+    def commit(self): pass
+
+    def rollback(self): pass
+
+    def insert_row(self, sql, params, ai_values):
+        """
+        :param sql: str
+        :param params: array, values of SQL parameters
+        :param ai_values: an array like [["o_id", 1], ...] to specify and obtain auto-incremented values
+        :return: None
+        :raise Exception if no rows inserted.
+        """
+        pass
+
+    def exec_dml(self, sql, params):
+        """
+        :param sql: str
+        :param params: array, values of SQL parameters
+        :return: int, amount of rows affected
+        """
+        pass
+
+    def query_scalar(self, sql, params):
+        """
+        :param sql: str
+        :param params: array, values of SQL parameters
+        :return single scalar value
+        :raise Exception if amount of fetched rows != 1
+        """
+        pass
+
+    def query_all_scalars(self, sql, params) -> []:
+        """
+        :param sql: str
+        :param params: array, values of SQL parameters
+        :return array of scalar values
+        """
+        pass
+
+    def query_row(self, sql, params):
+        """
+        :param sql: str
+        :param params: array, values of SQL parameters
+        :return single fetched row or error string
+        """
+        pass
+
+    def query_all_rows(self, sql, params, callback):
+        """
+        :param sql: str
+        :param params: array, values of SQL parameters.
+        :param callback: function delivering fetched rows to caller
+        :return: None
+        """
+        pass
+
+
+def create_ds() -> DataStore:
+    ds = _DS()
+    ds.open()
+    return ds
+
+
+class _DS(DataStore):
     def __init__(self):
         self.conn = None
 
     def open(self):
-        self.conn = cx_Oracle.connect('ORDERS', 'root', 'localhost:1521/orcl', encoding='UTF-8')
+        self.conn = cx_Oracle.connect('MY_TESTS', 'sa', 'localhost:1521/xe', encoding='UTF-8')
         # print(self.conn.autocommit)
 
     def close(self):
@@ -35,7 +106,7 @@ class DataStore:
         self.conn.close()
         self.conn = None
 
-    def start_transaction(self):
+    def begin(self):
         self.conn.begin()
 
     def commit(self):
@@ -45,16 +116,6 @@ class DataStore:
         self.conn.rollback()
 
     def insert_row(self, sql, params, ai_values):
-        """
-        Returns:
-            Nothing.
-        Arguments:
-            sql: SQL statement.
-            params: Values of SQL parameters.
-            ai_values: an array like [["o_id", 1], ...] for generated keys.
-        Raises:
-            Exception: if no rows inserted.
-        """
         with self.conn.cursor() as cursor:
             sql = _format_sql(sql)
             gen_col_param = None
@@ -72,13 +133,6 @@ class DataStore:
                 raise Exception('No rows inserted')
 
     def exec_dml(self, sql, params):
-        """
-        Arguments:
-            sql: SQL statement.
-            params: Values of SQL parameters.
-        Returns:
-            Number of affected rows.
-        """
         sp_sql = _get_sp_sql(sql)
         if sp_sql is not None:
             sql = sp_sql
@@ -138,16 +192,7 @@ class DataStore:
         self._process_call_results(cursor, out_cursors, call_params, params)
 
     def query_scalar(self, sql, params):
-        """
-        Returns:
-            Single scalar value.
-        Arguments:
-            sql: SQL statement.
-            params: Values of SQL parameters if needed.
-        Raises:
-            Exception: if amount of rows != 1.
-        """
-        rows = self.query_scalar_array(sql, params)
+        rows = self.query_all_scalars(sql, params)
         if len(rows) == 0:
             raise Exception('No rows')
         if len(rows) > 1:
@@ -157,14 +202,7 @@ class DataStore:
         else:
             return rows[0]
 
-    def query_scalar_array(self, sql, params):
-        """
-        Returns:
-            array of scalar values
-        Arguments:
-            sql: SQL statement.
-            params: Values of SQL parameters if needed.
-        """
+    def query_all_scalars(self, sql, params):
         sp_sql = _get_sp_sql(sql)
         if sp_sql is not None:
             sql = sp_sql
@@ -177,33 +215,16 @@ class DataStore:
                 res.append(r[0])
         return res
 
-    def query_single_row(self, sql, params):
-        """
-        Returns:
-            Single row
-        Arguments:
-            sql: SQL statement.
-            params: Values of SQL parameters if needed.
-        Raises:
-            Exception: if amount of rows != 1.
-        """
+    def query_row(self, sql, params):
         rows = []
         self.query_all_rows(sql, params, lambda row: rows.append(row))
+        if len(rows) == 1:
+            return rows[0]
         if len(rows) == 0:
-            raise Exception('No rows')
-        if len(rows) > 1:
-            raise Exception('More than 1 row exists')
-        return rows[0]
+            return 'No rows'
+        return 'More than 1 row exists'
 
     def query_all_rows(self, sql, params, callback):
-        """
-        Returns:
-            None
-        Arguments:
-            sql: SQL statement.
-            params: Values of SQL parameters if needed.
-            callback
-        """
         sp_sql = _get_sp_sql(sql)
         if sp_sql is not None:
             sql = sp_sql
