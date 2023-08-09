@@ -182,8 +182,10 @@ class $class_name:
             _res.append(_obj)
 
         self.ds.query_all_rows(sql, #param_array($dto_param), _map_cb#if($out_params), out_params#end)
+
         return _res
 #else
+
         return self.ds.query_all_scalars(sql, #param_array($dto_param)#if($out_params), out_params#end)
 #end
 #end
@@ -235,6 +237,7 @@ class $class_name:
 	    return self.ds.read_one(${returned_type_name}, #params_dict($params))
 #else
 #sql_var($is_external_sql $sql)
+
 #if($use_dto)
         row = self.ds.query_row(sql, #param_array($dto_param)#if($out_params), out_params#end)
         if isinstance(row, str):
@@ -295,6 +298,7 @@ class $class_name:
 
 #end
 #sql_var($is_external_sql $sql)
+
 #if ($method_type == "CREATE" || $method_type == "UPDATE" || $method_type == "DELETE")
         return self.ds.exec_dml(sql, #param_array($dto_param))
 #else
