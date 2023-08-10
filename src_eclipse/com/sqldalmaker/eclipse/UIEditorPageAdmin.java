@@ -380,7 +380,7 @@ public class UIEditorPageAdmin extends Composite {
 		Composite composite_5 = new Composite(composite_2, SWT.NONE);
 		toolkit.adapt(composite_5);
 		toolkit.paintBordersFor(composite_5);
-		composite_5.setLayout(new GridLayout(5, false));
+		composite_5.setLayout(new GridLayout(6, false));
 
 		Label lblPython = new Label(composite_5, SWT.NONE);
 		toolkit.adapt(lblPython, true, true);
@@ -395,7 +395,18 @@ public class UIEditorPageAdmin extends Composite {
 			}
 		});
 		toolkit.adapt(btnSqliteMysqlconnectorPsycopg, true, true);
-		btnSqliteMysqlconnectorPsycopg.setText("sqlite3, mysql, cx_oracle, psycopg2");
+		btnSqliteMysqlconnectorPsycopg.setText("sqlite3, mysql, psycopg2");
+
+		Button btnCxoracle = new Button(composite_5, SWT.NONE);
+		btnCxoracle.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/data_store_no_orm_cx_oracle.py",
+						"data_store.py");
+			}
+		});
+		toolkit.adapt(btnCxoracle, true, true);
+		btnCxoracle.setText("cx_oracle");
 
 		Button btnDjangodb = new Button(composite_5, SWT.NONE);
 		btnDjangodb.addSelectionListener(new SelectionAdapter() {
