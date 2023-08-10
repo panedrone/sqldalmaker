@@ -72,6 +72,7 @@ public class UITabAdmin {
     private JButton buttonSettings;
     private JButton djangoDbButton;
     private JButton flaskSqlalchemyButton;
+    private JButton cx_oracleButton;
 
     private Project project;
     private VirtualFile root_file;
@@ -321,13 +322,13 @@ public class UITabAdmin {
         sqlite3MysqlConnectorPsycopg2Button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "data_store_no_orm.py", "data_store_no_orm.py");
+                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "data_store_no_orm.py", "data_store.py");
             }
         });
         SQLAlchemyButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "data_store_sqlalchemy.py", "data_store_sqlalchemy.py");
+                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "data_store_sqlalchemy.py", "data_store.py");
             }
         });
         gormButton.addActionListener(new ActionListener() {
@@ -351,13 +352,19 @@ public class UITabAdmin {
         djangoDbButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "data_store_django.py", "data_store_django.py");
+                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "data_store_django.py", "data_store.py");
             }
         });
         flaskSqlalchemyButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "data_store_flask_sqlalchemy.py", "data_store_flask_sqlalchemy.py");
+                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "data_store_flask_sqlalchemy.py", "data_store.py");
+            }
+        });
+        cx_oracleButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "data_store_no_orm_cx_oracle.py", "data_store.py");
             }
         });
     }
@@ -633,8 +640,11 @@ public class UITabAdmin {
         label4.setText(" Python ");
         panel7.add(label4);
         sqlite3MysqlConnectorPsycopg2Button = new JButton();
-        sqlite3MysqlConnectorPsycopg2Button.setText("sqlite3, mysql, cx_oracle, psycopg2");
+        sqlite3MysqlConnectorPsycopg2Button.setText("sqlite3, mysql, psycopg2");
         panel7.add(sqlite3MysqlConnectorPsycopg2Button);
+        cx_oracleButton = new JButton();
+        cx_oracleButton.setText("cx_oracle");
+        panel7.add(cx_oracleButton);
         djangoDbButton = new JButton();
         djangoDbButton.setText("django.db");
         panel7.add(djangoDbButton);

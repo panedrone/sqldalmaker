@@ -263,7 +263,13 @@
                       <component id="85bc6" class="javax.swing.JButton" binding="sqlite3MysqlConnectorPsycopg2Button" default-binding="true">
                         <constraints/>
                         <properties>
-                          <text value="sqlite3, mysql, cx_oracle, psycopg2"/>
+                          <text value="sqlite3, mysql, psycopg2"/>
+                        </properties>
+                      </component>
+                      <component id="6e480" class="javax.swing.JButton" binding="cx_oracleButton" default-binding="true">
+                        <constraints/>
+                        <properties>
+                          <text value="cx_oracle"/>
                         </properties>
                       </component>
                       <component id="d494f" class="javax.swing.JButton" binding="djangoDbButton" default-binding="true">
