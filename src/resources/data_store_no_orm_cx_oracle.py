@@ -23,15 +23,20 @@ class OutParam:
 
 class DataStore:
 
-    def open(self): pass
+    def open(self):
+        pass
 
-    def close(self): pass
+    def close(self):
+        pass
 
-    def begin(self): pass
+    def begin(self):
+        pass
 
-    def commit(self): pass
+    def commit(self):
+        pass
 
-    def rollback(self): pass
+    def rollback(self):
+        pass
 
     def insert_row(self, sql, params, ai_values):
         """
@@ -88,7 +93,6 @@ class DataStore:
 
 def create_ds() -> DataStore:
     ds = _DS()
-    ds.open()
     return ds
 
 

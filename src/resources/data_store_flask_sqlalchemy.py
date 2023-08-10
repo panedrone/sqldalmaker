@@ -12,6 +12,7 @@
 
     Copy-paste it to your project and change it for your needs.
     Improvements are welcome: sqldalmaker@gmail.com
+    Demo project: https://github.com/panedrone/sdm_demo_todolist_flask_sqlalchemy
 
 """
 
@@ -28,11 +29,14 @@ class OutParam:
 
 class DataStore:
 
-    def begin(self): pass
+    def begin(self):
+        pass
 
-    def commit(self): pass
+    def commit(self):
+        pass
 
-    def rollback(self): pass
+    def rollback(self):
+        pass
 
     # ORM-based raw-SQL helpers
 

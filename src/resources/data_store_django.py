@@ -10,13 +10,14 @@
     - 'django.db.backends.postgresql_psycopg2' ---- pip install psycopg2
     - 'mysql.connector.django' -------------------- pip install mysql-connector-python
        ^^ instead of built-in 'django.db.backends.mysql' to enable cursor.stored_results().
-       MySQL SP returning result-sets --> http://www.mysqltutorial.org/calling-mysql-stored-procedures-python/
+       MySQL SP returning result-sets --> https://www.mysqltutorial.org/calling-mysql-stored-procedures-python/
        MySQL Connector/Python as Django Engine? -->
        https://stackoverflow.com/questions/26573984/django-how-to-install-mysql-connector-python-with-pip3)
     - 'django.db.backends.oracle' ------------------pip install cx_oracle
 
     Copy-paste it to your project and change it for your needs.
     Improvements are welcome: sqldalmaker@gmail.com
+    Demo project: https://github.com/panedrone/sdm_demo_todolist_django
 
 """
 
@@ -48,11 +49,14 @@ class OutParam:
 
 class DataStore:
 
-    def begin(self): pass
+    def begin(self):
+        pass
 
-    def commit(self): pass
+    def commit(self):
+        pass
 
-    def rollback(self): pass
+    def rollback(self):
+        pass
 
     # ORM-based raw-SQL helpers
 
@@ -222,8 +226,6 @@ class _DS(DataStore):
             self.conn.close()
             self.conn = None
 
-    # ORM-based raw-SQL helpers
-
     def get_all_raw(self, cls, params=None) -> []:
         if not params:
             params = ()
@@ -238,8 +240,6 @@ class _DS(DataStore):
         if len(rows) == 0:
             return 'No rows'
         return 'More than 1 row exists'
-
-    # ORM-based helpers
 
     def filter(self, cls, params: dict, fields: list = None):
         if fields:

@@ -3,7 +3,6 @@
     It demonstrates how to implement an interface DataStore in Python + sqlite3|psycopg2|mysql|cx_oracle.
     More about DataStore: https://sqldalmaker.sourceforge.net/preconfig.html#ds
     Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store.py
-    Copy-paste it to your project and change it for your needs.
 
     Successfully tested with:
 
@@ -11,13 +10,15 @@
     - psycopg2 ------------------ pip install psycopg2
     - mysql.connector ----------- pip install mysql-connector-python
 
+    Copy-paste it to your project and change it for your needs.
     Improvements are welcome: sqldalmaker@gmail.com
+    Demo project: https://github.com/panedrone/sdm_demo_fastapi_no_orm_scenario
 
 """
 
-# import sqlite3
+import sqlite3
 # import psycopg2
-import mysql.connector
+# import mysql.connector
 
 
 class OutParam:
@@ -27,15 +28,20 @@ class OutParam:
 
 class DataStore:
 
-    def open(self): pass
+    def open(self):
+        pass
 
-    def close(self): pass
+    def close(self):
+        pass
 
-    def begin(self): pass
+    def begin(self):
+        pass
 
-    def commit(self): pass
+    def commit(self):
+        pass
 
-    def rollback(self): pass
+    def rollback(self):
+        pass
 
     def insert_row(self, sql, params, ai_values):
         """
@@ -106,11 +112,11 @@ class _DS(DataStore):
         self.engine_type = None
 
     def open(self):
-        # self.conn = sqlite3.connect('./todolist.sqlite', check_same_thread=False)
-        # self.engine_type = self.EngineType.sqlite3
+        self.conn = sqlite3.connect('./todolist.sqlite', check_same_thread=False)
+        self.engine_type = self.EngineType.sqlite3
 
-        self.conn = mysql.connector.Connect(user='root', password='sa', host='127.0.0.1', database='todolist')
-        self.engine_type = self.EngineType.mysql
+        # self.conn = mysql.connector.Connect(user='root', password='sa', host='127.0.0.1', database='todolist')
+        # self.engine_type = self.EngineType.mysql
 
         # self.conn = psycopg2.connect(host="localhost", database="my-tests", user="postgres", password="sa")
         # self.engine_type = self.EngineType.postgresql

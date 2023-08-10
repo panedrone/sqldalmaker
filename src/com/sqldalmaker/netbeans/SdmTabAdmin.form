@@ -389,10 +389,26 @@
                     </Component>
                     <Component class="javax.swing.JButton" name="jButton7">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="sqlite3, mysql, cx_oracle, psycopg2, django.db"/>
+                        <Property name="text" type="java.lang.String" value="sqlite3, mysql, psycopg2 "/>
                       </Properties>
                       <Events>
                         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton7ActionPerformed"/>
+                      </Events>
+                    </Component>
+                    <Component class="javax.swing.JButton" name="jButton23">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="cx_oracle"/>
+                      </Properties>
+                      <Events>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton23ActionPerformed"/>
+                      </Events>
+                    </Component>
+                    <Component class="javax.swing.JButton" name="jButton18">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="django.db"/>
+                      </Properties>
+                      <Events>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton18ActionPerformed"/>
                       </Events>
                     </Component>
                     <Component class="javax.swing.JButton" name="jButton15">
@@ -401,6 +417,14 @@
                       </Properties>
                       <Events>
                         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton15ActionPerformed"/>
+                      </Events>
+                    </Component>
+                    <Component class="javax.swing.JButton" name="jButton9">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="flask-sqlalchemy"/>
+                      </Properties>
+                      <Events>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton9ActionPerformed"/>
                       </Events>
                     </Component>
                   </SubComponents>
