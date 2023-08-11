@@ -1,6 +1,6 @@
 """
     This file is a part of SQL DAL Maker project: https://sqldalmaker.sourceforge.net
-    It demonstrates how to implement an interface DataStore in Python + sqlite3|psycopg2|mysql|cx_oracle.
+    It demonstrates how to implement an interface DataStore in Python + sqlite3|psycopg2|mysql.
     More about DataStore: https://sqldalmaker.sourceforge.net/preconfig.html#ds
     Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store.py
 
@@ -90,7 +90,7 @@ class DataStore:
         """
         :param sql: str
         :param params: array, values of SQL parameters.
-        :param callback: function delivering fetched rows to caller
+        :param callback: a callback function for delivering fetched rows to a caller
         :return: None
         """
         pass

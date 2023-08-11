@@ -171,7 +171,7 @@ class DataStore:
         """
         :param sql: str, SQL statement
         :param params: dict, optional, SQL parameters.
-        :param callback: Ð° function delivering fetched rows to caller
+        :param callback: a callback function for delivering fetched rows to a caller
         :return: None
         """
         pass

@@ -8,7 +8,7 @@
         - sqlite3 ---------------- built-in
         - postgresql ------------- pip install psycopg2
         - mysql+mysqlconnector --- pip install mysql-connector-python
-        - cx_Oracle -------------- pip install cx_oracle
+        - cx_oracle -------------- pip install cx_oracle
 
     Copy-paste it to your project and change it for your needs.
     Improvements are welcome: sqldalmaker@gmail.com
@@ -171,7 +171,7 @@ class DataStore:
         """
         :param sql: str, SQL statement
         :param params: dict, optional, SQL parameters.
-        :param callback: Ã�Â° function delivering fetched rows to caller
+        :param callback: a callback function for delivering fetched rows to a caller
         :return: None
         """
         pass
@@ -223,6 +223,16 @@ LargeBinary = sqlalchemy.LargeBinary
 
 
 # --------------------------------------------------------------------------------------------
+#
+# no orm_session.open() in this scenario, orm_session.close() does not close connection:
+#
+#    def _close_impl(self, invalidate):
+#        self.expunge_all()
+#        if self._transaction is not None:
+#            for transaction in self._transaction._iterate_self_and_parents():
+#                transaction.close(invalidate)
+#
+# --------------------------------------------------------------------------------------------
 
 def create_ds(orm_session: sqlalchemy.orm.Session) -> DataStore:
     return _DS(orm_session)
@@ -230,7 +240,7 @@ def create_ds(orm_session: sqlalchemy.orm.Session) -> DataStore:
 
 # --------------------------------------------------------------------------------------------
 #
-#      ^^ How to obtain "orm_session" for "create_ds(orm_session: sqlalchemy.orm.Session)"
+#      ^^ How to obtain "orm_session" for "create_ds(orm_session: sqlalchemy.orm.Session)":
 #
 # --------------------------------------------------------------------------------------------
 #
@@ -243,7 +253,7 @@ def create_ds(orm_session: sqlalchemy.orm.Session) -> DataStore:
 #
 # The scoped_session object we've created will now call upon the sessionmaker when we "call" the registry:
 #
-# >>> some_session = Session()
+# >>> some_session = Session()  # === panedrone: Session() is calling the factory, not calling of constructor
 #
 # === panedrone:
 #
@@ -253,7 +263,7 @@ def create_ds(orm_session: sqlalchemy.orm.Session) -> DataStore:
 #
 # --------------------------------------------------------------------------------------------
 #
-#       Scenario 2. Using "sessionmaker" without "scoped_session":
+#       Scenario 2. Using "sessionmaker" without "scoped_session" and "yield":
 #
 # SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 #
@@ -307,7 +317,32 @@ def create_ds(orm_session: sqlalchemy.orm.Session) -> DataStore:
 #
 # --------------------------------------------------------------------------------------------
 #
-#       ^^^ How to obtain the "engine" object for Scenarios 1,2,3:
+#       Scenario 4. Using "try...finally" and a callback:
+#
+# -- db.by:
+#
+# session_factory = sessionmaker(bind=engine)  # panedrone: sessionmaker returns a function
+#
+# def process_with_ds(callback):
+#     orm_session = session_factory()
+#     try:
+#         ds = create_ds(orm_session)
+#         callback(ds)
+#     finally:
+#         orm_session.close()
+#
+#
+# def get_customers(ds):
+#     dao = CustomersDao(ds)
+#     products = dao.get_customers_and_suppliers_by_city()
+#     for p in products:
+#         print(f"{p.city}\t{p.company_name}\t{p.contact_name}\t{p.relationship}")
+#
+# process_with_ds(get_customers)
+#
+# --------------------------------------------------------------------------------------------
+#
+#       ^^^ How to obtain the "engine" object for Scenarios 1,2,3,4:
 #
 # --------------------------------------------------------------------------------------------
 #
