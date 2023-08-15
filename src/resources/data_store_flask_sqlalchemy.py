@@ -1,18 +1,20 @@
 """
     This file is a part of SQL DAL Maker project: https://sqldalmaker.sourceforge.net
-    It demonstrates how to implement an interface DataStore in Python/Flask-SQLAlchemy.
+    It demonstrates how to implement an interface DataStore in Python + Flask-SQLAlchemy.
     More about DataStore: https://sqldalmaker.sourceforge.net/preconfig.html#ds
     Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store_flask_sqlalchemy.py
 
     Successfully tested with:
-        - sqlite3 ---------------- built-in
-        - postgresql ------------- pip install psycopg2
-        - mysql+mysqlconnector --- pip install mysql-connector-python
-        - cx_Oracle -------------- pip install cx_oracle
+        
+        sqlite3 ---------------- built-in
+        postgresql ------------- pip install psycopg2
+        mysql+mysqlconnector --- pip install mysql-connector-python
+        cx_Oracle -------------- pip install cx_oracle
 
     Copy-paste it to your project and change it for your needs.
     Improvements are welcome: sqldalmaker@gmail.com
-    Demo project: https://github.com/panedrone/sdm_demo_todolist_flask_sqlalchemy
+    
+	Demo project: https://github.com/panedrone/sdm_demo_todolist_flask_sqlalchemy
 
 """
 

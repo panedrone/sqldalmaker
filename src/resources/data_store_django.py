@@ -18,6 +18,8 @@
     Copy-paste it to your project and change it for your needs.
     Improvements are welcome: sqldalmaker@gmail.com
 
+	Demo project: https://github.com/panedrone/sdm_demo_todolist_django
+
 """
 
 import django.db

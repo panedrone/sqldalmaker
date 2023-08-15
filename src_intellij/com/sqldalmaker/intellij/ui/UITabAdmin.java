@@ -310,7 +310,7 @@ public class UITabAdmin {
         btn_golang.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "data_store.go", "data_store.go");
+                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "data_store_no_orm.go", "data_store_no_orm.go");
             }
         });
         btn_golangVM.addActionListener(new ActionListener() {

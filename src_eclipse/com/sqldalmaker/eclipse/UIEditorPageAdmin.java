@@ -371,7 +371,7 @@ public class UIEditorPageAdmin extends Composite {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				// ending '_' because of bugs
-				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/data_store.go", "data_store.go_");
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/data_store_no_orm.go", "data_store_no_orm.go_");
 			}
 		});
 		btnNewButton_8_1.setText("database/sql");

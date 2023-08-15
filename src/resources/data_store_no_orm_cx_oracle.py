@@ -1,8 +1,9 @@
 """
     This file is a part of SQL DAL Maker project: https://sqldalmaker.sourceforge.net
-    It demonstrates how to implement an interface DataStore in Python + cx_oracle.
+    It demonstrates how to implement an interface DataStore in Python + cx_oracle/no-orm-scenario.
     More about DataStore: https://sqldalmaker.sourceforge.net/preconfig.html#ds
     Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store_no_orm_cx_oracle.py
+
     Copy-paste it to your project and change it for your needs.
     Improvements are welcome: sqldalmaker@gmail.com
 
@@ -92,8 +93,7 @@ class DataStore:
 
 
 def create_ds() -> DataStore:
-    ds = _DS()
-    return ds
+    return _DS()
 
 
 class _DS(DataStore):

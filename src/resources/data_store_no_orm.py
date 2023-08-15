@@ -1,17 +1,18 @@
 """
     This file is a part of SQL DAL Maker project: https://sqldalmaker.sourceforge.net
-    It demonstrates how to implement an interface DataStore in Python + sqlite3|psycopg2|mysql.
+    It demonstrates how to implement an interface DataStore in Python + (sqlite3|psycopg2|mysql)/no-orm-scenario.
     More about DataStore: https://sqldalmaker.sourceforge.net/preconfig.html#ds
-    Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store.py
+    Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store_no_orm.py
 
     Successfully tested with:
 
-    - sqlite3 ------------------- built-in
-    - psycopg2 ------------------ pip install psycopg2
-    - mysql.connector ----------- pip install mysql-connector-python
+	    sqlite3 ------------------- built-in
+	    psycopg2 ------------------ pip install psycopg2
+	    mysql.connector ----------- pip install mysql-connector-python
 
     Copy-paste it to your project and change it for your needs.
     Improvements are welcome: sqldalmaker@gmail.com
+
     Demo project: https://github.com/panedrone/sdm_demo_fastapi_no_orm_scenario
 
 """
@@ -97,8 +98,7 @@ class DataStore:
 
 
 def create_ds() -> DataStore:
-    ds = _DS()
-    return ds
+    return _DS()
 
 
 class _DS(DataStore):

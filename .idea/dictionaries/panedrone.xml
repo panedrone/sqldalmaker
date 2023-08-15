@@ -5,6 +5,7 @@
       <w>panedrone</w>
       <w>postge</w>
       <w>postgre</w>
+      <w>psycopg</w>
       <w>sprintf</w>
       <w>sqldalmaker</w>
     </words>
