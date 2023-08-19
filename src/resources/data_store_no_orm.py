@@ -6,9 +6,9 @@
 
     Successfully tested with:
 
-	    sqlite3 ------------------- built-in
-	    psycopg2 ------------------ pip install psycopg2
-	    mysql.connector ----------- pip install mysql-connector-python
+        sqlite3 ------------------- built-in
+        psycopg2 ------------------ pip install psycopg2
+        mysql.connector ----------- pip install mysql-connector-python
 
     Copy-paste it to your project and change it for your needs.
     Improvements are welcome: sqldalmaker@gmail.com
