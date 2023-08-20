@@ -9,8 +9,6 @@
 
 """
 
-import cx_Oracle
-
 
 class OutParam:
     """
@@ -23,12 +21,6 @@ class OutParam:
 
 
 class DataStore:
-
-    def open(self):
-        pass
-
-    def close(self):
-        pass
 
     def begin(self):
         pass
@@ -92,23 +84,13 @@ class DataStore:
         pass
 
 
-def create_ds() -> DataStore:
-    return _DS()
+def create_ds(conn) -> DataStore:
+    return _DS(conn)
 
 
 class _DS(DataStore):
-    def __init__(self):
-        self.conn = None
-
-    def open(self):
-        self.conn = cx_Oracle.connect('MY_TESTS', 'sa', 'localhost:1521/xe', encoding='UTF-8')
-        # print(self.conn.autocommit)
-
-    def close(self):
-        if self.conn is None:
-            return
-        self.conn.close()
-        self.conn = None
+    def __init__(self, conn):
+        self.conn = conn
 
     def begin(self):
         self.conn.begin()
