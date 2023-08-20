@@ -17,6 +17,7 @@
 
 """
 
+
 # =========== Example of usage:
 #
 # import psycopg2
@@ -150,7 +151,7 @@ class _DS(DataStore):
 
     def in_transaction(self) -> bool:
         if self.engine_type == self.EngineType.postgresql:
-            return False # === panedrone: no in_transaction in psycopg2
+            raise Exception(f"No 'self.conn.in_transaction' in psycopg2")
         if isinstance(self.conn.in_transaction, int):  # mysql
             return self.conn.in_transaction != 0
         return self.conn.in_transaction  # sqlite
@@ -164,8 +165,7 @@ class _DS(DataStore):
             self.conn.start_transaction()
             return
         if self.engine_type == self.EngineType.postgresql:
-            # self.conn.begin() # === panedrone: no begin in psycopg2
-            return
+            raise Exception(f"No 'self.conn.begin()' in psycopg2")
 
         raise Exception(f"Unknown: {self.engine_type}")
 
