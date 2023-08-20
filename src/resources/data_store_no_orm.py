@@ -17,6 +17,32 @@
 
 """
 
+# =========== Example of usage:
+#
+# import psycopg2
+#
+# # import sqlite3
+# # import mysql.connector
+# from dbal.data_store import create_ds, DataStore
+#
+# conn = psycopg2.connect(host="127.0.0.1", database="my_tests", user="postgres", password="sa")
+# # https://pynative.com/python-mysql-transaction-management-using-commit-rollback/
+# conn.autocommit = False
+#
+#
+# # Dependency
+# def get_ds() -> DataStore:
+#     ds = create_ds(conn)
+#     try:
+#         yield ds
+#     except Exception as e:
+#         ds.rollback()
+#         raise e
+#
+#
+# @app.get('/api/projects', tags=["ProjectList"], response_model=List[SchemaProjectLi])
+# def get_all_projects(ds: DataStore = Depends(get_ds)):
+#     return ProjectsDao(ds).get_projects()
 
 class OutParam:
     def __init__(self):

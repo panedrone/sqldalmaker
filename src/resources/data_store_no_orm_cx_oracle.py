@@ -9,6 +9,34 @@
 
 """
 
+# ============ Example of usage:
+#
+# import cx_Oracle
+#
+# from dbal.data_store import create_ds, DataStore
+#
+# conn = cx_Oracle.connect('MY_TESTS', 'sa', 'localhost:1521/xe', encoding='UTF-8')
+#
+# conn.autocommit = False
+#
+#
+# def get_oracle_version():
+#     return conn.version
+#
+#
+# # Dependency
+# def get_ds() -> DataStore:
+#     ds = create_ds(conn)
+#     try:
+#         yield ds
+#     except Exception as e:
+#         ds.rollback()
+#         raise e
+#
+# @app.get('/api/projects', tags=["ProjectList"], response_model=List[SchemaProjectLi])
+# def get_all_projects(ds: DataStore = Depends(get_ds)):
+#     return ProjectsDao(ds).get_projects()
+
 
 class OutParam:
     """
