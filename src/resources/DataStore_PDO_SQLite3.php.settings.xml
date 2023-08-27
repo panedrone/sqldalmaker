@@ -34,6 +34,9 @@
 	<!--    <jdbc jar="ojdbc10.jar" class="oracle.jdbc.driver.OracleDriver"-->
 	<!--          url="jdbc:oracle:thin:@localhost:1521/XE" user="todolist" pwd="sa"/>-->
 
+	<!--    <jdbc jar="mssql-jdbc-8.2.2.jre8.jar" class="com.microsoft.sqlserver.jdbc.SQLServerDriver"-->
+	<!--          url="jdbc:sqlserver://localhost:1433;instance=SQLEXPRESS;databaseName=AdventureWorks2014" user="sa" pwd="root"/>-->
+
 	<type-map default="">
 
 		<type detected="java.lang.Short" target="int"/>

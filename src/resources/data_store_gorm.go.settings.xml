@@ -73,6 +73,10 @@
 
         <!-- mysql, postgres -->
 
+        <!--        <type detected="gorm-java.util.UUID" target="github.com/google/uuid:uuid.UUID${json-gorm}|1:;type:uuid"/>-->
+        <!--        <type detected="gorm-java.util.UUID+auto"-->
+        <!--              target="github.com/google/uuid:uuid.UUID${json-gorm}|1:;type:uuid;default:uuid_generate_v4()"/>-->
+
         <!--        <type detected="gorm-java.lang.Short" target="int16${json-gorm} -> SetInt16"/>-->
         <!--        <type detected="gorm-java.lang.Integer" target="int32${json-gorm} -> SetInt32"/>-->
         <!--        <type detected="gorm-java.lang.Long" target="int64${json-gorm} -> SetInt64"/>-->
@@ -87,6 +91,9 @@
         <!--        <type detected="gorm-java.lang.Boolean" target="bool${json-gorm} -> SetBool"/>-->
 
         <!--        <type detected="gorm-java.lang.Object" target="interface{}${json-gorm}"/>-->
+
+        <!--        <type detected="java.util.UUID" target="github.com/google/uuid:uuid.UUID${json} -> SetUUID"/>-->
+        <!--        <type detected="java.sql.Array" target="[]string${json}"/>-->
 
         <!--        <type detected="java.lang.Short" target="int16${json} -> SetInt16"/>-->
         <!--        <type detected="java.lang.Integer" target="int32${json} -> SetInt32"/>-->

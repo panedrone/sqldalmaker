@@ -50,6 +50,9 @@
 
         <!-- mysql, postgres -->
 
+        <!--        <type detected="java.util.UUID" target="github.com/google/uuid:uuid.UUID${json} -> SetUUID"/>-->
+        <!--        <type detected="java.sql.Array" target="[]string${json}"/>-->
+
         <!--        <type detected="java.lang.Short" target="int16${json} -> SetInt16"/>-->
         <!--        <type detected="java.lang.Integer" target="int32${json} -> SetInt32"/>-->
         <!--        <type detected="java.lang.Long" target="int64${json} -> SetInt64"/>-->
