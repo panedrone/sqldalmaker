@@ -22,6 +22,8 @@ import sdm.android.thesaurus.dao.ThesaurusDao;
     This class is a part of SQL DAL Maker project (http://sqldalmaker.sourceforge.net).
     It represents an example of how to implement DataStore in Java/Android/SQLite.
     More about DataStore: https://sqldalmaker.sourceforge.net/preconfig.html#ds
+    Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/DataStoreManagerAndroid.java_
+
     Copy-paste this code to your project and change it for your needs.
     Improvements are welcome: sqldalmaker@gmail.com
 
