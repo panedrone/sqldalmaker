@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="settings.xsd">
+
+    <!-- target: base folder of generated files (relative to the project root). -->
+
+    <!-- sql: base folder of SQL files (relative to the project root) -->
+
+    <folders target="app/src/main/java" sql="sdm/sql"/>
+
+    <!-- field-names-mode: 0 - TitleCase, 1 - camelCase; 2 - snake_case -->
+
+    <!-- scope: the name of DTO package -->
+
+    <dto scope="sdm.android.thesaurus.dto" inheritance="" field-names-mode="1" macro=""/>
+
+    <!-- scope: the name of DAO package -->
+
+    <dao scope="sdm.android.thesaurus.dao" field-assign-mode="0" macro=""/>
+
+    <ide event-log="true"/>
+
+    <cpp class-prefix=""/>
+
+    <jdbc jar="sdm/sqlite-jdbc-3.41.2.1.jar" class="org.sqlite.JDBC"
+          url="jdbc:sqlite:$PROJECT_DIR$/app/src/main/java/sqldalmaker/thesaurus.sqlite" user="" pwd=""/>
+
+    <type-map default="">
+        <!-- On Dev. PC, it is Integer, but in Android run-time it is Long -->
+        <type detected="java.lang.Integer" target="Long -> getLong"/>
+        <type detected="java.lang.Double" target="Double -> getDouble"/>
+        <type detected="java.lang.String" target="String -> getString"/>
+        <type detected="byte[]" target="byte[] -> getBytes"/>
+    </type-map>
+
+    <macros>
+    </macros>
+
+</settings>

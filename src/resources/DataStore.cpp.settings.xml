@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="settings.xsd">
+
+    <folders target="" sql="sqldalmaker/sql" />
+
+    <dto scope="" inheritance="" field-names-mode="0" macro=""/>
+
+    <dao scope="" field-assign-mode="0" macro=""/>
+
+    <ide event-log="true"/>
+
+    <cpp class-prefix=""/>
+
+    <jdbc jar="lib/sqlite-jdbc-3.42.0.0.jar" class="org.sqlite.JDBC"
+          url="jdbc:sqlite:$PROJECT_DIR$/todolist.sqlite" user="" pwd=""/>
+
+    <type-map default="CValue">
+        <type detected="java.lang.Integer" target="CLong" />
+        <type detected="java.lang.Long" target="CLong" />
+        <type detected="java.lang.Double" target="CDouble" />
+        <type detected="java.lang.String" target="CText" />
+        <type detected="byte[]" target="CBlob" />
+    </type-map>
+
+    <macros>
+    </macros>
+
+</settings>

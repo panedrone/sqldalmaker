@@ -2,7 +2,7 @@
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="com.sqldalmaker.intellij.ui.UITabAdmin">
   <grid id="27dc6" binding="rootPanel" layout-manager="BorderLayout" hgap="0" vgap="0">
     <constraints>
-      <xy x="20" y="20" width="740" height="422"/>
+      <xy x="20" y="20" width="865" height="497"/>
     </constraints>
     <properties/>
     <border type="none">
@@ -26,7 +26,7 @@
                 <properties/>
                 <border type="none"/>
                 <children>
-                  <grid id="ea483" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="1">
+                  <grid id="ea483" layout-manager="GridBagLayout">
                     <constraints>
                       <grid row="0" column="0" row-span="1" col-span="2" vsize-policy="3" hsize-policy="3" anchor="9" fill="0" indent="0" use-parent-layout="false"/>
                       <gridbag weightx="1.0" weighty="1.0"/>
@@ -35,26 +35,47 @@
                     <border type="none"/>
                     <children>
                       <component id="4ffe5" class="javax.swing.JButton" binding="buttonSettings">
-                        <constraints/>
+                        <constraints>
+                          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
                         <properties>
                           <text value="settings.xml"/>
                         </properties>
                       </component>
+                      <component id="91bc4" class="javax.swing.JButton" binding="referenceSettingsXmlButton1" default-binding="true">
+                        <constraints>
+                          <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
+                        <properties>
+                          <text value="Reference settings.xml"/>
+                        </properties>
+                      </component>
                       <component id="72e18" class="javax.swing.JButton" binding="btn_validate_all">
-                        <constraints/>
+                        <constraints>
+                          <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
                         <properties>
                           <text value="Validate Configuration"/>
                         </properties>
                       </component>
                       <component id="a821f" class="javax.swing.JButton" binding="recentChangesButton" default-binding="true">
-                        <constraints/>
+                        <constraints>
+                          <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
                         <properties>
                           <preferredSize width="60" height="30"/>
                           <text value="News"/>
                         </properties>
                       </component>
                       <component id="6d08f" class="javax.swing.JTextField" binding="vTextField" default-binding="true">
-                        <constraints/>
+                        <constraints>
+                          <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
                         <properties>
                           <editable value="false"/>
                           <horizontalAlignment value="0"/>
@@ -63,25 +84,135 @@
                       </component>
                     </children>
                   </grid>
-                  <grid id="a3e0c" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="0">
+                  <grid id="a3e0c" binding="pnl_php" layout-manager="GridBagLayout">
                     <constraints>
-                      <grid row="3" column="0" row-span="1" col-span="2" vsize-policy="3" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                      <grid row="2" column="0" row-span="1" col-span="2" vsize-policy="3" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                       <gridbag weightx="0.0" weighty="0.0"/>
                     </constraints>
                     <properties/>
                     <border type="none"/>
                     <children>
                       <component id="7c1f7" class="javax.swing.JLabel">
-                        <constraints/>
+                        <constraints>
+                          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
                         <properties>
                           <font size="14"/>
                           <horizontalAlignment value="4"/>
-                          <preferredSize width="52" height="20"/>
+                          <preferredSize width="58" height="20"/>
                           <text value=" PHP "/>
                         </properties>
                       </component>
+                      <component id="ca4d1" class="javax.swing.JButton" binding="PDODataStorePhpButton" default-binding="true">
+                        <constraints>
+                          <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
+                        <properties>
+                          <preferredSize width="60" height="30"/>
+                          <text value="sqlite3"/>
+                        </properties>
+                      </component>
+                      <component id="64c00" class="javax.swing.JButton" binding="btn_mysql">
+                        <constraints>
+                          <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
+                        <properties>
+                          <preferredSize width="60" height="30"/>
+                          <text value="mysql"/>
+                        </properties>
+                      </component>
+                      <component id="45f42" class="javax.swing.JButton" binding="btn_php_oracle">
+                        <constraints>
+                          <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
+                        <properties>
+                          <preferredSize width="60" height="30"/>
+                          <text value="oracle"/>
+                        </properties>
+                      </component>
+                      <component id="aff6" class="javax.swing.JButton" binding="dataStorePhpOCI8Button" default-binding="true">
+                        <constraints>
+                          <grid row="0" column="5" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
+                        <properties>
+                          <preferredSize width="60" height="30"/>
+                          <text value="oci8"/>
+                        </properties>
+                      </component>
+                      <component id="cc5cf" class="javax.swing.JButton" binding="dataStorePhpPDOSQLButton" default-binding="true">
+                        <constraints>
+                          <grid row="0" column="6" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
+                        <properties>
+                          <preferredSize width="60" height="30"/>
+                          <text value="ms sql"/>
+                        </properties>
+                      </component>
+                      <component id="2e7e5" class="javax.swing.JButton" binding="doctrineORMButton" default-binding="true">
+                        <constraints>
+                          <grid row="0" column="10" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
+                        <properties>
+                          <text value="Doctrine"/>
+                        </properties>
+                      </component>
+                      <component id="d5492" class="javax.swing.JButton" binding="btn_php_pg">
+                        <constraints>
+                          <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
+                        <properties>
+                          <text value="postgesql"/>
+                        </properties>
+                      </component>
+                      <component id="aefe3" class="javax.swing.JButton" binding="btn_doctrine">
+                        <constraints>
+                          <grid row="0" column="11" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
+                        <properties>
+                          <borderPainted value="false"/>
+                          <contentAreaFilled value="false"/>
+                          <icon value="img/xmldoc_12x12.gif"/>
+                          <margin top="0" left="0" bottom="0" right="0"/>
+                          <maximumSize width="16" height="16"/>
+                          <minimumSize width="16" height="16"/>
+                          <opaque value="false"/>
+                          <preferredSize width="16" height="16"/>
+                          <text value=""/>
+                          <toolTipText value="settings.xml"/>
+                        </properties>
+                      </component>
+                      <component id="6fcb1" class="javax.swing.JButton" binding="btn_php_no_orm">
+                        <constraints>
+                          <grid row="0" column="7" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
+                        <properties>
+                          <borderPainted value="false"/>
+                          <contentAreaFilled value="false"/>
+                          <icon value="img/xmldoc_12x12.gif"/>
+                          <margin top="0" left="0" bottom="0" right="0"/>
+                          <maximumSize width="16" height="16"/>
+                          <minimumSize width="16" height="16"/>
+                          <opaque value="false"/>
+                          <preferredSize width="16" height="16"/>
+                          <text value=""/>
+                          <toolTipText value="settings.xml"/>
+                        </properties>
+                      </component>
                       <component id="687f5" class="javax.swing.JButton" binding="dataStorePhpButton" default-binding="true">
-                        <constraints/>
+                        <constraints>
+                          <grid row="0" column="8" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
                         <properties>
                           <borderPainted value="true"/>
                           <contentAreaFilled value="true"/>
@@ -90,124 +221,106 @@
                           <text value="Base"/>
                         </properties>
                       </component>
-                      <component id="ca4d1" class="javax.swing.JButton" binding="PDODataStorePhpButton" default-binding="true">
-                        <constraints/>
+                      <component id="d80c9" class="javax.swing.JLabel">
+                        <constraints>
+                          <grid row="0" column="9" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
                         <properties>
-                          <preferredSize width="60" height="30"/>
-                          <text value="sqlite3"/>
-                        </properties>
-                      </component>
-                      <component id="64c00" class="javax.swing.JButton" binding="btn_mysql">
-                        <constraints/>
-                        <properties>
-                          <preferredSize width="60" height="30"/>
-                          <text value="mysql"/>
-                        </properties>
-                      </component>
-                      <component id="45f42" class="javax.swing.JButton" binding="btn_php_oracle">
-                        <constraints/>
-                        <properties>
-                          <preferredSize width="60" height="30"/>
-                          <text value="oracle"/>
-                        </properties>
-                      </component>
-                      <component id="aff6" class="javax.swing.JButton" binding="dataStorePhpOCI8Button" default-binding="true">
-                        <constraints/>
-                        <properties>
-                          <preferredSize width="60" height="30"/>
-                          <text value="oci8"/>
-                        </properties>
-                      </component>
-                      <component id="cc5cf" class="javax.swing.JButton" binding="dataStorePhpPDOSQLButton" default-binding="true">
-                        <constraints/>
-                        <properties>
-                          <preferredSize width="60" height="30"/>
-                          <text value="ms sql"/>
-                        </properties>
-                      </component>
-                      <component id="d5492" class="javax.swing.JButton" binding="btn_php_pg">
-                        <constraints/>
-                        <properties>
-                          <text value="postgesql"/>
-                        </properties>
-                      </component>
-                      <component id="2e7e5" class="javax.swing.JButton" binding="doctrineORMButton" default-binding="true">
-                        <constraints/>
-                        <properties>
-                          <text value="Doctrine"/>
+                          <text value="     "/>
                         </properties>
                       </component>
                     </children>
                   </grid>
-                  <grid id="f31f1" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="0">
+                  <grid id="f31f1" binding="pnl_java" layout-manager="GridBagLayout">
                     <constraints>
-                      <grid row="4" column="0" row-span="1" col-span="2" vsize-policy="3" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                      <grid row="3" column="0" row-span="1" col-span="2" vsize-policy="3" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                       <gridbag weightx="0.0" weighty="0.0"/>
                     </constraints>
                     <properties/>
                     <border type="none"/>
                     <children>
                       <component id="1874d" class="javax.swing.JLabel">
-                        <constraints/>
+                        <constraints>
+                          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
                         <properties>
                           <font size="14"/>
                           <horizontalAlignment value="4"/>
-                          <preferredSize width="52" height="20"/>
+                          <preferredSize width="58" height="20"/>
                           <text value=" Java "/>
                         </properties>
                       </component>
-                      <component id="d85b8" class="javax.swing.JButton" binding="dataStoreJavaButton" default-binding="true">
-                        <constraints/>
-                        <properties>
-                          <minimumSize width="40" height="30"/>
-                          <preferredSize width="60" height="30"/>
-                          <text value="Base"/>
-                        </properties>
-                      </component>
                       <component id="a585c" class="javax.swing.JButton" binding="dataStoreJavaDbUtilsButton" default-binding="true">
-                        <constraints/>
+                        <constraints>
+                          <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
                         <properties>
                           <preferredSize width="60" height="30"/>
                           <text value="JDBC"/>
                         </properties>
                       </component>
                       <component id="ffbb4" class="javax.swing.JButton" binding="dataStoreJavaAndroidButton" default-binding="true">
-                        <constraints/>
+                        <constraints>
+                          <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
                         <properties>
                           <text value="Android"/>
                         </properties>
                       </component>
-                      <component id="df8bc" class="javax.swing.JLabel">
-                        <constraints/>
+                      <component id="fe296" class="javax.swing.JButton" binding="btn_android">
+                        <constraints>
+                          <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
                         <properties>
-                          <font size="14"/>
-                          <horizontalAlignment value="4"/>
-                          <preferredSize width="40" height="20"/>
-                          <text value=" C++ "/>
+                          <borderPainted value="false"/>
+                          <contentAreaFilled value="false"/>
+                          <icon value="img/xmldoc_12x12.gif"/>
+                          <margin top="0" left="0" bottom="0" right="0"/>
+                          <maximumSize width="16" height="16"/>
+                          <minimumSize width="16" height="16"/>
+                          <opaque value="false"/>
+                          <preferredSize width="16" height="16"/>
+                          <text value=""/>
+                          <toolTipText value="settings.xml"/>
                         </properties>
                       </component>
-                      <component id="7efb0" class="javax.swing.JButton" binding="dataStoreQt5CButton" default-binding="true">
-                        <constraints/>
+                      <component id="14a89" class="javax.swing.JButton" binding="btn_jdbc">
+                        <constraints>
+                          <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
                         <properties>
+                          <borderPainted value="false"/>
+                          <contentAreaFilled value="false"/>
+                          <icon value="img/xmldoc_12x12.gif"/>
+                          <margin top="0" left="0" bottom="0" right="0"/>
+                          <maximumSize width="16" height="16"/>
+                          <minimumSize width="16" height="16"/>
+                          <opaque value="false"/>
+                          <preferredSize width="16" height="16"/>
+                          <text value=""/>
+                          <toolTipText value="settings.xml"/>
+                        </properties>
+                      </component>
+                      <component id="d85b8" class="javax.swing.JButton" binding="dataStoreJavaButton" default-binding="true">
+                        <constraints>
+                          <grid row="0" column="5" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
+                        <properties>
+                          <minimumSize width="40" height="30"/>
                           <preferredSize width="60" height="30"/>
-                          <text value="Qt"/>
-                        </properties>
-                      </component>
-                      <component id="ac058" class="javax.swing.JButton" binding="dataStoreCSTLButton" default-binding="true">
-                        <constraints/>
-                        <properties>
-                          <text value="STL, sqlite3"/>
-                        </properties>
-                      </component>
-                      <component id="660" class="javax.swing.JButton" binding="dataStoreCATLButton" default-binding="true">
-                        <constraints/>
-                        <properties>
-                          <text value="ATL, sqlite3"/>
+                          <text value="Base"/>
                         </properties>
                       </component>
                     </children>
                   </grid>
-                  <grid id="e5ea7" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="0">
+                  <grid id="e5ea7" binding="pnl_py" layout-manager="GridBagLayout">
                     <constraints>
                       <grid row="5" column="0" row-span="1" col-span="2" vsize-policy="3" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                       <gridbag weightx="0.0" weighty="0.0"/>
@@ -218,112 +331,262 @@
                     <border type="none"/>
                     <children>
                       <component id="53d45" class="javax.swing.JLabel">
-                        <constraints/>
+                        <constraints>
+                          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
                         <properties>
                           <font size="14"/>
                           <horizontalAlignment value="4"/>
-                          <preferredSize width="52" height="20"/>
-                          <text value=" Python "/>
+                          <preferredSize width="58" height="20"/>
+                          <text value="  Python "/>
                         </properties>
                       </component>
                       <component id="85bc6" class="javax.swing.JButton" binding="sqlite3MysqlConnectorPsycopg2Button" default-binding="true">
-                        <constraints/>
+                        <constraints>
+                          <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
                         <properties>
                           <text value="sqlite3, mysql, psycopg2"/>
                         </properties>
                       </component>
                       <component id="6e480" class="javax.swing.JButton" binding="cx_oracleButton" default-binding="true">
-                        <constraints/>
+                        <constraints>
+                          <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
                         <properties>
                           <text value="cx_oracle"/>
                         </properties>
                       </component>
                       <component id="d494f" class="javax.swing.JButton" binding="djangoDbButton" default-binding="true">
-                        <constraints/>
+                        <constraints>
+                          <grid row="0" column="5" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
                         <properties>
                           <text value="django.db"/>
                         </properties>
                       </component>
                       <component id="b2f0d" class="javax.swing.JButton" binding="SQLAlchemyButton" default-binding="true">
-                        <constraints/>
+                        <constraints>
+                          <grid row="0" column="7" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
                         <properties>
                           <text value="SQLAlchemy"/>
                         </properties>
                       </component>
                       <component id="538ca" class="javax.swing.JButton" binding="flaskSqlalchemyButton" default-binding="true">
-                        <constraints/>
+                        <constraints>
+                          <grid row="0" column="8" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
                         <properties>
                           <text value="Flask-SQLAlchemy"/>
                         </properties>
                       </component>
+                      <component id="a376a" class="javax.swing.JButton" binding="btn_py_no_orm">
+                        <constraints>
+                          <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
+                        <properties>
+                          <borderPainted value="false"/>
+                          <contentAreaFilled value="false"/>
+                          <icon value="img/xmldoc_12x12.gif"/>
+                          <margin top="0" left="0" bottom="0" right="0"/>
+                          <maximumSize width="16" height="16"/>
+                          <minimumSize width="16" height="16"/>
+                          <opaque value="false"/>
+                          <preferredSize width="16" height="16"/>
+                          <text value=""/>
+                          <toolTipText value="settings.xml"/>
+                        </properties>
+                      </component>
+                      <component id="c33f2" class="javax.swing.JButton" binding="btn_sqla">
+                        <constraints>
+                          <grid row="0" column="9" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
+                        <properties>
+                          <borderPainted value="false"/>
+                          <contentAreaFilled value="false"/>
+                          <icon value="img/xmldoc_12x12.gif"/>
+                          <margin top="0" left="0" bottom="0" right="0"/>
+                          <maximumSize width="16" height="16"/>
+                          <minimumSize width="16" height="16"/>
+                          <opaque value="false"/>
+                          <preferredSize width="16" height="16"/>
+                          <text value=""/>
+                          <toolTipText value="settings.xml"/>
+                        </properties>
+                      </component>
+                      <component id="336f0" class="javax.swing.JButton" binding="btn_django">
+                        <constraints>
+                          <grid row="0" column="6" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
+                        <properties>
+                          <borderPainted value="false"/>
+                          <contentAreaFilled value="false"/>
+                          <icon value="img/xmldoc_12x12.gif"/>
+                          <margin top="0" left="0" bottom="0" right="0"/>
+                          <maximumSize width="16" height="16"/>
+                          <minimumSize width="16" height="16"/>
+                          <opaque value="false"/>
+                          <preferredSize width="16" height="16"/>
+                          <text value=""/>
+                          <toolTipText value="settings.xml"/>
+                        </properties>
+                      </component>
+                      <component id="b561e" class="javax.swing.JButton" binding="btn_cx_oracle">
+                        <constraints>
+                          <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
+                        <properties>
+                          <borderPainted value="false"/>
+                          <contentAreaFilled value="false"/>
+                          <icon value="img/xmldoc_12x12.gif"/>
+                          <margin top="0" left="0" bottom="0" right="0"/>
+                          <maximumSize width="16" height="16"/>
+                          <minimumSize width="16" height="16"/>
+                          <opaque value="false"/>
+                          <preferredSize width="16" height="16"/>
+                          <text value=""/>
+                          <toolTipText value="settings.xml"/>
+                        </properties>
+                      </component>
                     </children>
                   </grid>
-                  <grid id="cf6d9" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="0">
+                  <grid id="cf6d9" binding="pnl_go" layout-manager="GridBagLayout">
                     <constraints>
-                      <grid row="6" column="0" row-span="1" col-span="2" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                      <grid row="6" column="0" row-span="1" col-span="2" vsize-policy="3" hsize-policy="3" anchor="8" fill="2" indent="0" use-parent-layout="false"/>
                       <gridbag weightx="0.0" weighty="0.0"/>
                     </constraints>
                     <properties/>
                     <border type="none"/>
                     <children>
                       <component id="114d7" class="javax.swing.JLabel">
-                        <constraints/>
+                        <constraints>
+                          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
                         <properties>
                           <font size="14"/>
                           <horizontalAlignment value="4"/>
-                          <preferredSize width="52" height="20"/>
+                          <preferredSize width="58" height="20"/>
                           <text value=" Go "/>
                         </properties>
                       </component>
                       <component id="5fb52" class="javax.swing.JButton" binding="gormButton" default-binding="true">
-                        <constraints/>
+                        <constraints>
+                          <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
                         <properties>
                           <preferredSize width="60" height="30"/>
                           <text value="Gorm"/>
                         </properties>
                       </component>
                       <component id="e9ae5" class="javax.swing.JButton" binding="btn_golang">
-                        <constraints/>
+                        <constraints>
+                          <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
                         <properties>
                           <text value="database/sql"/>
                         </properties>
                       </component>
+                      <component id="3e42" class="javax.swing.JButton" binding="btn_go_no_orm">
+                        <constraints>
+                          <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
+                        <properties>
+                          <borderPainted value="false"/>
+                          <contentAreaFilled value="false"/>
+                          <icon value="img/xmldoc_12x12.gif"/>
+                          <margin top="0" left="0" bottom="0" right="0"/>
+                          <maximumSize width="16" height="16"/>
+                          <minimumSize width="16" height="16"/>
+                          <opaque value="false"/>
+                          <preferredSize width="16" height="16"/>
+                          <text value=""/>
+                          <toolTipText value="settings.xml"/>
+                        </properties>
+                      </component>
+                      <component id="7c564" class="javax.swing.JButton" binding="btn_gorn">
+                        <constraints>
+                          <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
+                        <properties>
+                          <borderPainted value="false"/>
+                          <contentAreaFilled value="false"/>
+                          <icon value="img/xmldoc_12x12.gif"/>
+                          <margin top="0" left="0" bottom="0" right="0"/>
+                          <maximumSize width="16" height="16"/>
+                          <minimumSize width="16" height="16"/>
+                          <opaque value="false"/>
+                          <preferredSize width="16" height="16"/>
+                          <text value=""/>
+                          <toolTipText value="settings.xml"/>
+                        </properties>
+                      </component>
                     </children>
                   </grid>
-                  <grid id="4187c" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="1">
+                  <grid id="4187c" layout-manager="GridBagLayout">
                     <constraints>
-                      <grid row="7" column="0" row-span="1" col-span="3" vsize-policy="3" hsize-policy="3" anchor="9" fill="0" indent="0" use-parent-layout="false"/>
+                      <grid row="7" column="0" row-span="1" col-span="4" vsize-policy="3" hsize-policy="3" anchor="9" fill="0" indent="0" use-parent-layout="false"/>
                       <gridbag weightx="1.0" weighty="1.0"/>
                     </constraints>
                     <properties/>
                     <border type="none"/>
                     <children>
                       <component id="b43bd" class="javax.swing.JButton" binding="php_vm">
-                        <constraints/>
+                        <constraints>
+                          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
                         <properties>
                           <text value="php.vm"/>
                         </properties>
                       </component>
                       <component id="11262" class="javax.swing.JButton" binding="java_vm">
-                        <constraints/>
+                        <constraints>
+                          <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
                         <properties>
                           <text value="java.vm"/>
                         </properties>
                       </component>
                       <component id="10764" class="javax.swing.JButton" binding="cppVmButton" default-binding="true">
-                        <constraints/>
+                        <constraints>
+                          <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
                         <properties>
                           <text value="cpp.vm"/>
                         </properties>
                       </component>
                       <component id="27db8" class="javax.swing.JButton" binding="pythonVmButton" default-binding="true">
-                        <constraints/>
+                        <constraints>
+                          <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
                         <properties>
                           <text value="python.vm"/>
                         </properties>
                       </component>
                       <component id="b9c18" class="javax.swing.JButton" binding="btn_golangVM">
-                        <constraints/>
+                        <constraints>
+                          <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
                         <properties>
                           <text value="go.vm"/>
                         </properties>
@@ -348,120 +611,7 @@
                       </component>
                     </children>
                   </grid>
-                  <grid id="f316b" layout-manager="GridBagLayout">
-                    <constraints>
-                      <grid row="2" column="0" row-span="1" col-span="2" vsize-policy="3" hsize-policy="3" anchor="8" fill="2" indent="0" use-parent-layout="false"/>
-                      <gridbag top="0" left="6" bottom="0" right="0" weightx="0.0" weighty="0.0"/>
-                    </constraints>
-                    <properties/>
-                    <border type="none"/>
-                    <children>
-                      <component id="2f434" class="javax.swing.JButton" binding="PHPNoOrmButton" default-binding="true">
-                        <constraints>
-                          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                          <gridbag weightx="0.0" weighty="0.0"/>
-                        </constraints>
-                        <properties>
-                          <label value="PHP/no-orm"/>
-                          <text value="PHP/no-orm"/>
-                        </properties>
-                      </component>
-                      <component id="dcb9b" class="javax.swing.JButton" binding="PHPDoctrineButton" default-binding="true">
-                        <constraints>
-                          <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                          <gridbag weightx="0.0" weighty="0.0"/>
-                        </constraints>
-                        <properties>
-                          <label value="Doctrine"/>
-                          <text value="Doctrine"/>
-                        </properties>
-                      </component>
-                      <component id="a4863" class="javax.swing.JButton" binding="androidNoOrmButton" default-binding="true">
-                        <constraints>
-                          <grid row="1" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                          <gridbag weightx="0.0" weighty="0.0"/>
-                        </constraints>
-                        <properties>
-                          <text value="Android/no-orm"/>
-                        </properties>
-                      </component>
-                      <component id="9a86e" class="javax.swing.JButton" binding="referenceSettingsXmlButton" default-binding="true">
-                        <constraints>
-                          <grid row="1" column="4" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
-                          <gridbag weightx="0.0" weighty="0.0"/>
-                        </constraints>
-                        <properties>
-                          <preferredSize width="60" height="30"/>
-                          <text value="All"/>
-                        </properties>
-                      </component>
-                      <component id="3aeb3" class="javax.swing.JButton" binding="pythonNoOrmButton" default-binding="true">
-                        <constraints>
-                          <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                          <gridbag weightx="0.0" weighty="0.0"/>
-                        </constraints>
-                        <properties>
-                          <text value="Python/no-orm"/>
-                        </properties>
-                      </component>
-                      <component id="72e75" class="javax.swing.JButton" binding="djangoDbButton1" default-binding="true">
-                        <constraints>
-                          <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                          <gridbag weightx="0.0" weighty="0.0"/>
-                        </constraints>
-                        <properties>
-                          <text value="django.db"/>
-                        </properties>
-                      </component>
-                      <component id="d8eea" class="javax.swing.JButton" binding="SQLAlchemyButton1" default-binding="true">
-                        <constraints>
-                          <grid row="2" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                          <gridbag weightx="0.0" weighty="0.0"/>
-                        </constraints>
-                        <properties>
-                          <text value="SQLAlchemy"/>
-                        </properties>
-                      </component>
-                      <component id="8f425" class="javax.swing.JButton" binding="goNoOrmButton" default-binding="true">
-                        <constraints>
-                          <grid row="2" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                          <gridbag weightx="0.0" weighty="0.0"/>
-                        </constraints>
-                        <properties>
-                          <text value="Go/no-orm"/>
-                        </properties>
-                      </component>
-                      <component id="d110f" class="javax.swing.JButton" binding="gormButton1" default-binding="true">
-                        <constraints>
-                          <grid row="2" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                          <gridbag weightx="0.0" weighty="0.0"/>
-                        </constraints>
-                        <properties>
-                          <preferredSize width="60" height="30"/>
-                          <text value="Gorm"/>
-                        </properties>
-                      </component>
-                      <component id="5e7b7" class="javax.swing.JButton" binding="JDBCNoOrmButton" default-binding="true">
-                        <constraints>
-                          <grid row="1" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                          <gridbag weightx="0.0" weighty="0.0"/>
-                        </constraints>
-                        <properties>
-                          <text value="JDBC/no-orm"/>
-                        </properties>
-                      </component>
-                      <component id="d9561" class="javax.swing.JLabel">
-                        <constraints>
-                          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                          <gridbag top="4" left="4" bottom="4" right="4" weightx="0.0" weighty="0.0"/>
-                        </constraints>
-                        <properties>
-                          <text value="Reference settings.xml"/>
-                        </properties>
-                      </component>
-                    </children>
-                  </grid>
-                  <grid id="150db" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="1">
+                  <grid id="150db" layout-manager="GridBagLayout">
                     <constraints>
                       <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
                       <gridbag weightx="0.0" weighty="0.0"/>
@@ -470,21 +620,98 @@
                     <border type="none"/>
                     <children>
                       <component id="a5303" class="javax.swing.JButton" binding="createOverwriteXSDFilesButton" default-binding="true">
-                        <constraints/>
+                        <constraints>
+                          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
                         <properties>
                           <text value="Create/Overwrite XSD files"/>
                         </properties>
                       </component>
                       <component id="53c87" class="javax.swing.JButton" binding="createOverwriteSettingsXmlButton" default-binding="true">
-                        <constraints/>
+                        <constraints>
+                          <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
                         <properties>
                           <text value="Create settings.xml"/>
                         </properties>
                       </component>
                       <component id="22204" class="javax.swing.JButton" binding="createOverwriteDtoXmlButton" default-binding="true">
-                        <constraints/>
+                        <constraints>
+                          <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
                         <properties>
                           <text value="Create dto.xml"/>
+                        </properties>
+                      </component>
+                    </children>
+                  </grid>
+                  <grid id="b869b" binding="pnl_cpp" layout-manager="GridBagLayout">
+                    <constraints>
+                      <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="8" fill="2" indent="0" use-parent-layout="false"/>
+                      <gridbag weightx="0.0" weighty="0.0"/>
+                    </constraints>
+                    <properties/>
+                    <border type="none"/>
+                    <children>
+                      <component id="df8bc" class="javax.swing.JLabel">
+                        <constraints>
+                          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="1.0" weighty="1.0"/>
+                        </constraints>
+                        <properties>
+                          <font size="14"/>
+                          <horizontalAlignment value="4"/>
+                          <preferredSize width="58" height="20"/>
+                          <text value=" C++ "/>
+                        </properties>
+                      </component>
+                      <component id="7efb0" class="javax.swing.JButton" binding="dataStoreQt5CButton" default-binding="true">
+                        <constraints>
+                          <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
+                        <properties>
+                          <preferredSize width="60" height="30"/>
+                          <text value="Qt"/>
+                        </properties>
+                      </component>
+                      <component id="ac058" class="javax.swing.JButton" binding="dataStoreCSTLButton" default-binding="true">
+                        <constraints>
+                          <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
+                        <properties>
+                          <text value="STL, sqlite3"/>
+                        </properties>
+                      </component>
+                      <component id="660" class="javax.swing.JButton" binding="dataStoreCATLButton" default-binding="true">
+                        <constraints>
+                          <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
+                        <properties>
+                          <text value="ATL, sqlite3"/>
+                        </properties>
+                      </component>
+                      <component id="7da21" class="javax.swing.JButton" binding="btn_cpp">
+                        <constraints>
+                          <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
+                        <properties>
+                          <borderPainted value="false"/>
+                          <contentAreaFilled value="false"/>
+                          <icon value="img/xmldoc_12x12.gif"/>
+                          <margin top="0" left="0" bottom="0" right="0"/>
+                          <maximumSize width="16" height="16"/>
+                          <minimumSize width="16" height="16"/>
+                          <opaque value="false"/>
+                          <preferredSize width="16" height="16"/>
+                          <text value=""/>
+                          <toolTipText value="settings.xml"/>
                         </properties>
                       </component>
                     </children>

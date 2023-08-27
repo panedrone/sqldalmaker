@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="settings.xsd">
+
+    <!-- target: base folder of generated files (relative to the project root) -->
+
+    <!-- sql: base folder of SQL files (relative to the project root) -->
+
+    <folders target="dbal" sql="sdm/sql"/>
+
+    <dto scope="" inheritance="" field-names-mode="0" macro=""/>
+
+    <dao scope="" field-assign-mode="0" macro=""/>
+
+    <ide event-log="true"/>
+
+    <cpp class-prefix=""/>
+
+    <jdbc jar="lib/sqlite-jdbc-3.42.0.0.jar" class="org.sqlite.JDBC"
+          url="jdbc:sqlite:$PROJECT_DIR$/todolist.sqlite" user="" pwd=""/>
+
+    <!--    <jdbc jar="mysql-connector-java-8.0.13.jar" class="com.mysql.cj.jdbc.Driver"-->
+    <!--          url="jdbc:mysql://localhost/todolist" user="root" pwd="sa"/>-->
+
+    <!--    <jdbc jar="postgresql-42.3.4.jar" class="org.postgresql.Driver"-->
+    <!--          url="jdbc:postgresql://localhost:5432/todolist" user="postgres" pwd="sa" />-->
+
+    <!--    <jdbc jar="ojdbc10.jar" class="oracle.jdbc.driver.OracleDriver"-->
+    <!--          url="jdbc:oracle:thin:@localhost:1521/XE" user="todolist" pwd="sa"/>-->
+
+    <type-map default="">
+
+        <!-- ***** sqlalchemy (sa) ****************** -->
+
+        <!-- all numerics for oracle_cx -->
+
+<!--        <type detected="sa-java.math.BigDecimal" target="${sa-type}|0:NUMBER"/>-->
+<!--        <type detected="sa-java.math.BigDecimal+auto"-->
+<!--              target="${sa-type}|0:NUMBER|1:, autoincrement=True|comment:  # IDENTITY"/>-->
+
+        <!-- numerics for others -->
+
+        <type detected="sa-java.lang.Short" target="${sa-type}|0:SmallInteger"/>
+        <type detected="sa-java.lang.Integer" target="${sa-type}|0:Integer"/>
+        <type detected="sa-java.lang.Long" target="${sa-type}|0:BigInteger"/>
+
+        <type detected="sa-java.lang.Float" target="${sa-type}|0:Float"/>
+        <type detected="sa-java.lang.Double" target="${sa-type}|0:Float"/>
+        <type detected="sa-java.math.BigDecimal" target="${sa-type}|0:Float"/>
+
+        <type detected="sa-java.util.Date" target="${sa-type}|0:DateTime"/>
+        <type detected="sa-java.lang.String" target="${sa-type}|0:String"/>
+        <type detected="sa-java.lang.Boolean" target="${sa-type}|0:Boolean"/>
+        <type detected="sa-byte[]" target="${sa-type}|0:LargeBinary"/>
+
+        <type detected="sa-java.lang.Object" target="${sa-type-unknown}"/>
+
+        <!-- ****** raw SQL, params, ret-values ************************ -->
+
+        <type detected="java.lang.Short" target="int"/>
+        <type detected="java.lang.Integer" target="int"/>
+        <type detected="java.lang.Long" target="long"/>
+
+        <type detected="java.lang.Double" target="float"/>
+        <type detected="java.lang.Float" target="float"/>
+        <type detected="java.math.BigDecimal" target="float"/>
+
+        <type detected="java.util.Date" target="str"/>
+        <type detected="java.lang.String" target="str"/>
+        <type detected="java.lang.Boolean" target="bool"/>
+        <type detected="byte[]" target="bytes"/>
+
+        <type detected="java.lang.Object" target="object"/>
+
+    </type-map>
+
+    <macros>
+
+        <!-- =built-in= is a key-word -->
+
+        <macro name="${column}" value="=built-in="/>
+        <macro name="${lower_snake_case(column)}" value="=built-in="/>
+        <macro name="${camelCase(column)}" value="=built-in="/>
+        <macro name="${TitleCase(column)}" value="=built-in="/>
+        <macro name="${kebab-case(column)}" value="=built-in="/>
+
+        <!-- go json tags: -->
+
+        <macro name="${col}" value="${lower_snake_case(column)}"/>
+
+        <macro name="${json}" value=" `json:&quot;${col}${0}&quot;`"/>
+
+        <!-- sqlalchemy Column: -->
+
+        <macro name="${sa-type-unknown}" value="${sa-column-base}|type:"/>
+        <macro name="${sa-type}" value="${sa-column-base}|type:, ${0}"/>
+
+        <!-- In VM-based macros intended to render the fields/columns,
+             "$fi" is a predefined variable of class FieldInfo:
+
+                class FieldInfo:
+                    String getName()
+                    String getType()
+                    String getColumnName()
+                    int getColumnSize()
+                    boolean isAI()
+                    boolean isPK()
+                    String getFK()
+                    boolean isNullable()
+                    boolean isIndexed()
+                    boolean isUnique()
+                    String getComment()
+                    String getterMethod()
+                    String setterMethod()
+                        -->
+
+        <macro name="${sa-column-base}">
+            <vm>
+                <![CDATA[= Column('${column}'${type}#if($fi.ColumnSize>0)($fi.ColumnSize)#end#if($fi.FK), ForeignKey('$fi.FK')#end
+#if($fi.PK), primary_key=True#end
+#if($fi.AI), autoincrement=True#end
+#if(!$fi.PK)
+#if($fi.Indexed), index=True#end
+#if($fi.Unique), unique=True#end
+#if($fi.Nullable), nullable=True#end
+#end)${comment}]]>
+            </vm>
+        </macro>
+
+
+        <macro name="${sa-column-base-vm-xml}">
+            <vm-xml>
+                <print var="= Column('${column}'${type}"/>
+                <if var="$fi.ColumnSize>0">
+                    <print var="($fi.ColumnSize)"/>
+                </if>
+                <if var="$fi.FK">
+                    <print var=", ForeignKey('$fi.FK')"/>
+                </if>
+                <if var="$fi.PK">
+                    <print var=", primary_key=True"/>
+                </if>
+                <if var="$fi.AI">
+                    <print var=", autoincrement=True"/>
+                </if>
+                <if var="!$fi.PK">
+                    <if var="$fi.Indexed">
+                        <print var=", index=True"/>
+                    </if>
+                    <if var="$fi.Unique">
+                        <print var=", unique=True"/>
+                    </if>
+                    <if var="$fi.Nullable">
+                        <print var=", nullable=True"/>
+                    </if>
+                </if>
+                <print var=")${comment}"/>
+            </vm-xml>
+        </macro>
+
+    </macros>
+
+</settings>

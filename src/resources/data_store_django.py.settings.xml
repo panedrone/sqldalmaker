@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="settings.xsd">
+
+    <!-- target: base folder of generated files (relative to the project root) -->
+
+    <!-- sql: base folder of SQL files (relative to the project root) -->
+
+    <folders target="dbal" sql="sdm/sql"/>
+
+    <dto scope="" inheritance="" field-names-mode="0" macro=""/>
+
+    <dao scope="" field-assign-mode="0" macro=""/>
+
+    <ide event-log="true"/>
+
+    <cpp class-prefix=""/>
+
+    <jdbc jar="lib/sqlite-jdbc-3.42.0.0.jar" class="org.sqlite.JDBC"
+          url="jdbc:sqlite:$PROJECT_DIR$/todolist.sqlite" user="" pwd=""/>
+
+    <!--    <jdbc jar="mysql-connector-java-8.0.13.jar" class="com.mysql.cj.jdbc.Driver"-->
+    <!--          url="jdbc:mysql://localhost/todolist" user="root" pwd="sa"/>-->
+
+    <!--    <jdbc jar="postgresql-42.3.4.jar" class="org.postgresql.Driver"-->
+    <!--          url="jdbc:postgresql://localhost:5432/todolist" user="postgres" pwd="sa" />-->
+
+    <!--    <jdbc jar="ojdbc10.jar" class="oracle.jdbc.driver.OracleDriver"-->
+    <!--          url="jdbc:oracle:thin:@localhost:1521/XE" user="todolist" pwd="sa"/>-->
+
+    <type-map default="">
+
+        <!-- ***** django (dj) ****************** -->
+
+        <type detected="dj-java.lang.Short" target="${dj-type}|0:IntegerField"/>
+        <type detected="dj-java.lang.Integer" target="${dj-type}|0:IntegerField"/>
+        <type detected="dj-java.lang.Long" target="${dj-type}|0:BigIntegerField"/>
+
+        <type detected="dj-java.lang.Float" target="${dj-type}|0:FloatField"/>
+        <type detected="dj-java.lang.Double" target="${dj-type}|0:FloatField"/>
+
+        <type detected="dj-java.math.BigDecimal"
+              target="${dj-type}|0:DecimalField|1:, max_digits=12, decimal_places=2"/>
+        <type detected="dj-java.math.BigDecimal+auto" target="${dj-type}|0:BigAutoField"/>
+
+        <type detected="dj-java.util.Date" target="${dj-type}|0:DateTimeField"/>
+        <type detected="dj-java.lang.String" target="${dj-type}|0:CharField"/>
+        <type detected="dj-java.lang.Boolean" target="${dj-type}|0:BooleanField"/>
+        <type detected="dj-byte[]" target="${dj-type}|0:BinaryField"/>
+
+        <type detected="dj-java.lang.Object" target="${dj-type}|0:TextField"/>
+
+        <type detected="dj-java.lang.Integer+autoincrement" target="${dj-type}|0:AutoField"/>
+        <type detected="dj-java.lang.Integer+auto" target="${dj-type}|0:AutoField"/>
+
+        <type detected="dj-int" target="${dj-type}|0:IntegerField"/>
+        <type detected="dj-long" target="${dj-type}|0:BigIntegerField"/>
+
+        <type detected="dj-float" target="${dj-type}|0:FloatField"/>
+
+        <type detected="dj-date" target="${dj-type}|0:DateTimeField"/>
+        <type detected="dj-str" target="${dj-type}|0:CharField"/>
+        <type detected="dj-bool" target="${dj-type}|0:BooleanField"/>
+        <!--        <type detected="dj-byte[]" target="${dj-type}|0:BinaryField"/> -->
+
+        <type detected="dj-object" target="${dj-type}|0:CharField|1:, max_length=256"/>
+
+        <!-- ****** raw SQL, params, ret-values ************************ -->
+
+        <type detected="java.lang.Short" target="int"/>
+        <type detected="java.lang.Integer" target="int"/>
+        <type detected="java.lang.Long" target="long"/>
+
+        <type detected="java.lang.Double" target="float"/>
+        <type detected="java.lang.Float" target="float"/>
+        <type detected="java.math.BigDecimal" target="float"/>
+
+        <type detected="java.util.Date" target="str"/>
+        <type detected="java.lang.String" target="str"/>
+        <type detected="java.lang.Boolean" target="bool"/>
+        <type detected="byte[]" target="bytes"/>
+
+        <type detected="java.lang.Object" target="object"/>
+
+    </type-map>
+
+    <macros>
+
+        <!-- =built-in= is a key-word -->
+
+        <macro name="${column}" value="=built-in="/>
+        <macro name="${lower_snake_case(column)}" value="=built-in="/>
+        <macro name="${camelCase(column)}" value="=built-in="/>
+        <macro name="${TitleCase(column)}" value="=built-in="/>
+        <macro name="${kebab-case(column)}" value="=built-in="/>
+
+        <!-- djando field: -->
+
+        <macro name="${dj-type}" value="${dj-field}"/>
+
+        <!-- In VM-based macros intended to render the fields/columns,
+             "$fi" is a predefined variable of class FieldInfo:
+
+                class FieldInfo:
+                    String getName()
+                    String getType()
+                    String getScalarType()
+                    String getColumnName()
+                    int getColumnSize()
+                    boolean isAI()
+                    boolean isPK()
+                    String getFK()
+                    boolean isNullable()
+                    boolean isIndexed()
+                    boolean isUnique()
+                    String getComment()
+                    String getterMethod()
+                    String setterMethod()
+           -->
+
+        <macro name="${dj-field}">
+            <vm>
+                <![CDATA[
+= models.#if($fi.AI)AutoField#else${0}#end(db_column='$fi.ColumnName'#if($fi.ColumnSize>0), max_length=$fi.ColumnSize#end
+#if($fi.PK), primary_key=True#else
+#if($fi.Indexed), db_index=True#end
+#if($fi.Unique), unique=True#end
+#if($fi.Nullable), blank=True, null=True#end
+#end${1})${comment}]]>
+            </vm>
+        </macro>
+
+        <macro name="${dj-field-vm-xml}">
+            <vm-xml>
+                <print var="= models."/>
+                <if var="$fi.AI">
+                    <print var="AutoField"/>
+                    <else>
+                        <print var="${0}"/>
+                    </else>
+                </if>
+                <print var="(db_column='$fi.ColumnName'"/>
+                <if var="$fi.isPK()">
+                    <print var=", primary_key=True"/>
+                </if>
+                <if var="$fi.ColumnSize>0">
+                    <print var=", max_length=$fi.ColumnSize"/>
+                </if>
+                <if var="!$fi.PK">
+                    <if var="$fi.Indexed">
+                        <print var=", db_index=True"/>
+                    </if>
+                    <if var="$fi.Unique">
+                        <print var=", unique=True"/>
+                    </if>
+                    <if var="$fi.Nullable">
+                        <print var=", blank=True, null=True"/>
+                    </if>
+                </if>
+                <print var="${1})${comment}"/>
+            </vm-xml>
+        </macro>
+
+    </macros>
+
+</settings>

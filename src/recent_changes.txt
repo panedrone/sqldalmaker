@@ -1,6 +1,4 @@
-2023-08-25
-
-    - Separate "Reference settings.xml"
+2023-09 TODO
 
     - Updates of settings.xsd  and settings.xml
 
@@ -18,6 +16,10 @@
         new:
 
             <misc target="sdm_demo_todolist" sql="gorm/sdm/sql" ide-event-log="true" cpp-class-prefix=""/>
+
+2023-08-25
+
+    - Separate examples of "Reference settings.xml"
 
 2023-08-14
 

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="settings.xsd">
+
+    <!-- target: base folder of generated files (relative to the project root) -->
+
+    <!-- sql: base folder of SQL files (relative to the project root) -->
+
+    <folders target="dbal" sql="sdm/sql"/>
+
+    <dto scope="" inheritance="" field-names-mode="0" macro=""/>
+
+    <dao scope="" field-assign-mode="0" macro=""/>
+
+    <ide event-log="true"/>
+
+    <cpp class-prefix=""/>
+
+    <jdbc jar="ojdbc10.jar" class="oracle.jdbc.driver.OracleDriver"
+          url="jdbc:oracle:thin:@localhost:1521/XE" user="todolist" pwd="sa"/>
+
+    <type-map default="">
+
+        <type detected="java.lang.Short" target="int"/>
+        <type detected="java.lang.Integer" target="int"/>
+        <type detected="java.lang.Long" target="long"/>
+
+        <type detected="java.lang.Double" target="float"/>
+        <type detected="java.lang.Float" target="float"/>
+        <type detected="java.math.BigDecimal" target="float"/>
+
+        <type detected="java.util.Date" target="str"/>
+        <type detected="java.lang.String" target="str"/>
+        <type detected="java.lang.Boolean" target="bool"/>
+        <type detected="byte[]" target="bytes"/>
+
+        <type detected="java.lang.Object" target="object"/>
+
+    </type-map>
+
+    <macros>
+    </macros>
+
+</settings>

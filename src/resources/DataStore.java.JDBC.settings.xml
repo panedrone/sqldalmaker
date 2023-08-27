@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="settings.xsd">
+
+    <!-- target: base folder of generated files (relative to the project root). -->
+
+    <!-- sql: base folder of SQL files (relative to the project root) -->
+
+    <folders target="src" sql="sdm/sql"/>
+
+    <!-- field-names-mode: 0 - TitleCase, 1 - camelCase; 2 - snake_case -->
+
+    <!-- scope: the name of DTO package -->
+
+    <dto scope="com.sdm.thesaurus.dto" inheritance="" field-names-mode="1" macro=""/>
+
+    <!-- scope: the name of DAO package -->
+
+    <dao scope="com.sdm.thesaurus.dao" field-assign-mode="0" macro=""/>
+
+    <ide event-log="true"/>
+
+    <cpp class-prefix=""/>
+
+    <jdbc jar="sdm/sqlite-jdbc-3.41.2.1.jar" class="org.sqlite.JDBC"
+          url="jdbc:sqlite:$PROJECT_DIR$/thesaurus.sqlite" user="" pwd=""/>
+
+    <!--    <jdbc jar="lib/mysql-connector-java-8.0.13.jar" class="com.mysql.cj.jdbc.Driver"-->
+    <!--          url="jdbc:mysql://localhost/sakila" user="root" pwd="sa"/>-->
+
+    <!--    <jdbc jar="postgresql-42.2.9.jar" class="org.postgresql.Driver"-->
+    <!--          url="jdbc:postgresql://localhost:5432/orders" user="postgres" pwd="sa" />-->
+
+    <!--    <jdbc jar="lib/ojdbc10.jar" class="oracle.jdbc.driver.OracleDriver"-->
+    <!--          url="jdbc:oracle:thin:@localhost:1521:XE" user="orders" pwd="sa"/>-->
+
+    <type-map default="">
+
+        <!-- sqlite3 -->
+
+        <type detected="java.lang.Integer" target="Integer -> getInteger"/>
+        <type detected="java.lang.Double" target="Double -> getDouble"/>
+        <type detected="java.lang.String" target="String -> getString"/>
+        <type detected="byte[]" target="byte[] -> getBytes"/>
+
+        <!-- mysql, postgres, oracle -->
+
+        <!--        <type detected="java.lang.Short" target="Short -> getShort"/>-->
+        <!--        <type detected="java.lang.Integer" target="Integer -> getInteger"/>-->
+        <!--        <type detected="java.lang.Long" target="Long -> getLong"/>-->
+
+        <!--        <type detected="java.lang.Float" target="Float -> getFloat"/>-->
+        <!--        <type detected="java.lang.Double" target="Double -> getDouble"/>-->
+        <!--        <type detected="java.math.BigDecimal" target="java.math.BigDecimal -> getBigDecimal"/>-->
+
+        <!--        <type detected="java.lang.String" target="String -> getString"/>-->
+        <!--        <type detected="java.util.Date" target="java.util.Date -> getDate"/>-->
+        <!--        <type detected="byte[]" target="byte[] -> getBytes"/>-->
+        <!--        <type detected="java.lang.Boolean" target="Boolean -> getBoolean"/>-->
+
+    </type-map>
+
+    <macros>
+    </macros>
+
+</settings>
