@@ -22,7 +22,7 @@ class InOutParam {
   	This file is a part of SQL DAL Maker project: https://sqldalmaker.sourceforge.net
   	It demonstrates how to implement an interface DataStore in PHP + PDO/MySQL.
   	More about DataStore: https://sqldalmaker.sourceforge.net/preconfiguring.html#ds
-  	Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store.go
+  	Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/DataStore_PDO_MySQL.php
 
   	Copy-paste this code to your project and change it for your needs.
   	Improvements are welcome: sqldalmaker@gmail.com
@@ -32,6 +32,9 @@ class InOutParam {
 // class PDODataStore implements DataStore 
 class DataStore { // no inheritance is also OK
 
+    /**
+     * @var PDO
+     */
     private $db;
 
     function __destruct() {
