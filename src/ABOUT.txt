@@ -5,7 +5,7 @@ and make related fixes if needed.
 *******************
 SQL DAL Maker for Eclipse: https://marketplace.eclipse.org/content/sql-dal-maker
 SQL DAL Maker for IntelliJ-Platform: https://plugins.jetbrains.com/plugin/7092
-SQL DAL Maker for NetBeans: https://sourceforge.net/projects/sqldalmaker/files/NetBeans
+SQL DAL Maker for NetBeans: https://github.com/panedrone/sqldalmaker/releases/tag/latest
 
 Project Website: https://sqldalmaker.sourceforge.net/
 Source Code: https://github.com/panedrone/sqldalmaker

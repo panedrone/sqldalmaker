@@ -3,9 +3,14 @@
 /*
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     This is an example of how to implement DataStore in PHP + Doctrine ORM/DBAL.
+  	More about DataStore: https://sqldalmaker.sourceforge.net/preconfiguring.html#ds
     Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/DataStore_Doctrine_ORM.php
+
     Copy-paste this code to your project and change it for your needs.
     Improvements are welcome: sqldalmaker@gmail.com
+
+    Demo project: https://github.com/panedrone/sdm_demo_todolist_php_doctrine
+
  */
 
 use Doctrine\DBAL\Connection;

@@ -282,7 +282,7 @@ public class UIEditorPageAdmin extends Composite {
 		btnDatastorejava.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore.java_",
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore_JDBC.java_",
 						"DataStore.java");
 			}
 		});

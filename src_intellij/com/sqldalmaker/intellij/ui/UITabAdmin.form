@@ -97,7 +97,7 @@
                       </component>
                       <component id="ca4d1" class="javax.swing.JButton" binding="PDODataStorePhpButton" default-binding="true">
                         <constraints>
-                          <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
                           <gridbag weightx="0.0" weighty="0.0"/>
                         </constraints>
                         <properties>
@@ -107,7 +107,7 @@
                       </component>
                       <component id="64c00" class="javax.swing.JButton" binding="btn_mysql">
                         <constraints>
-                          <grid row="0" column="5" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
                           <gridbag weightx="0.0" weighty="0.0"/>
                         </constraints>
                         <properties>
@@ -117,7 +117,7 @@
                       </component>
                       <component id="45f42" class="javax.swing.JButton" binding="btn_php_oracle">
                         <constraints>
-                          <grid row="0" column="6" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
                           <gridbag weightx="0.0" weighty="0.0"/>
                         </constraints>
                         <properties>
@@ -127,7 +127,7 @@
                       </component>
                       <component id="aff6" class="javax.swing.JButton" binding="dataStorePhpOCI8Button" default-binding="true">
                         <constraints>
-                          <grid row="0" column="7" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <grid row="0" column="5" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
                           <gridbag weightx="0.0" weighty="0.0"/>
                         </constraints>
                         <properties>
@@ -137,7 +137,7 @@
                       </component>
                       <component id="cc5cf" class="javax.swing.JButton" binding="dataStorePhpPDOSQLButton" default-binding="true">
                         <constraints>
-                          <grid row="0" column="8" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <grid row="0" column="6" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
                           <gridbag weightx="0.0" weighty="0.0"/>
                         </constraints>
                         <properties>
@@ -147,7 +147,7 @@
                       </component>
                       <component id="2e7e5" class="javax.swing.JButton" binding="doctrineORMButton" default-binding="true">
                         <constraints>
-                          <grid row="0" column="10" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <grid row="0" column="8" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
                           <gridbag weightx="0.0" weighty="0.0"/>
                         </constraints>
                         <properties>
@@ -156,7 +156,7 @@
                       </component>
                       <component id="d5492" class="javax.swing.JButton" binding="btn_php_pg">
                         <constraints>
-                          <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
                           <gridbag weightx="0.0" weighty="0.0"/>
                         </constraints>
                         <properties>
@@ -164,24 +164,6 @@
                         </properties>
                       </component>
                       <component id="aefe3" class="javax.swing.JButton" binding="btn_doctrine">
-                        <constraints>
-                          <grid row="0" column="11" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
-                          <gridbag weightx="0.0" weighty="0.0"/>
-                        </constraints>
-                        <properties>
-                          <borderPainted value="false"/>
-                          <contentAreaFilled value="false"/>
-                          <icon value="img/xmldoc_12x12.gif"/>
-                          <margin top="0" left="0" bottom="0" right="0"/>
-                          <maximumSize width="16" height="16"/>
-                          <minimumSize width="16" height="16"/>
-                          <opaque value="false"/>
-                          <preferredSize width="16" height="16"/>
-                          <text value=""/>
-                          <toolTipText value="settings.xml"/>
-                        </properties>
-                      </component>
-                      <component id="6fcb1" class="javax.swing.JButton" binding="btn_php_no_orm">
                         <constraints>
                           <grid row="0" column="9" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
                           <gridbag weightx="0.0" weighty="0.0"/>
@@ -199,26 +181,22 @@
                           <toolTipText value="settings.xml"/>
                         </properties>
                       </component>
-                      <component id="687f5" class="javax.swing.JButton" binding="dataStorePhpButton" default-binding="true">
+                      <component id="6fcb1" class="javax.swing.JButton" binding="btn_php_no_orm">
                         <constraints>
-                          <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <grid row="0" column="7" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
                           <gridbag weightx="0.0" weighty="0.0"/>
                         </constraints>
                         <properties>
-                          <borderPainted value="true"/>
-                          <contentAreaFilled value="true"/>
-                          <minimumSize width="40" height="30"/>
-                          <preferredSize width="60" height="30"/>
-                          <text value="Base"/>
-                        </properties>
-                      </component>
-                      <component id="1add6" class="javax.swing.JLabel">
-                        <constraints>
-                          <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                          <gridbag weightx="0.0" weighty="0.0"/>
-                        </constraints>
-                        <properties>
-                          <text value="&gt;"/>
+                          <borderPainted value="false"/>
+                          <contentAreaFilled value="false"/>
+                          <icon value="img/xmldoc_12x12.gif"/>
+                          <margin top="0" left="0" bottom="0" right="0"/>
+                          <maximumSize width="16" height="16"/>
+                          <minimumSize width="16" height="16"/>
+                          <opaque value="false"/>
+                          <preferredSize width="16" height="16"/>
+                          <text value=""/>
+                          <toolTipText value="settings.xml"/>
                         </properties>
                       </component>
                     </children>
@@ -241,16 +219,6 @@
                           <horizontalAlignment value="4"/>
                           <preferredSize width="58" height="20"/>
                           <text value=" Java "/>
-                        </properties>
-                      </component>
-                      <component id="a585c" class="javax.swing.JButton" binding="dataStoreJavaDbUtilsButton" default-binding="true">
-                        <constraints>
-                          <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
-                          <gridbag weightx="0.0" weighty="0.0"/>
-                        </constraints>
-                        <properties>
-                          <preferredSize width="60" height="30"/>
-                          <text value="JDBC"/>
                         </properties>
                       </component>
                       <component id="ffbb4" class="javax.swing.JButton" binding="dataStoreJavaAndroidButton" default-binding="true">
@@ -282,7 +250,7 @@
                       </component>
                       <component id="14a89" class="javax.swing.JButton" binding="btn_jdbc">
                         <constraints>
-                          <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
                           <gridbag weightx="0.0" weighty="0.0"/>
                         </constraints>
                         <properties>
@@ -309,13 +277,27 @@
                           <text value="Base"/>
                         </properties>
                       </component>
-                      <component id="31da8" class="javax.swing.JLabel">
+                      <component id="a585c" class="javax.swing.JButton" binding="dataStoreJavaDbUtilsButton" default-binding="true">
                         <constraints>
-                          <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                          <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
                           <gridbag weightx="0.0" weighty="0.0"/>
                         </constraints>
                         <properties>
-                          <text value="&gt;"/>
+                          <preferredSize width="60" height="30"/>
+                          <text value="JDBC"/>
+                        </properties>
+                      </component>
+                      <component id="687f5" class="javax.swing.JButton" binding="dataStorePhpButton" default-binding="true">
+                        <constraints>
+                          <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
+                        <properties>
+                          <borderPainted value="true"/>
+                          <contentAreaFilled value="true"/>
+                          <minimumSize width="40" height="30"/>
+                          <preferredSize width="60" height="30"/>
+                          <text value="Base"/>
                         </properties>
                       </component>
                     </children>
