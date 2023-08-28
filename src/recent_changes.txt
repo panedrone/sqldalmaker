@@ -19,7 +19,8 @@
 
 2023-08-25
 
-    - Separate examples of "Reference settings.xml"
+    - separate examples of "settings.xml"
+    - minor fixes for PHP
 
 2023-08-14
 

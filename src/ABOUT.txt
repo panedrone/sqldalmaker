@@ -1,6 +1,6 @@
 *******************
 Newer versions of the plug-in may require partial update/rework of existing XSD and XML files.
-Be familiar "News". Use "Validate Configuration", then "Create/Overwrite XSD files"
+Be familiar with "News". Use "Validate Configuration", then "Create/Overwrite XSD files"
 and make related fixes if needed.
 *******************
 SQL DAL Maker for Eclipse: https://marketplace.eclipse.org/content/sql-dal-maker

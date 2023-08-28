@@ -125,8 +125,8 @@ class ${class_name}
      * (C)RUD: ${table_name}
      * Generated/AI values are passed to ${d}p param
      * @param ${dto_param} ${d}p
-     * @return void
-     * @throws \Exception
+     * @return true/false on success/failure
+     * @throws Exception
      */
 #if ($crud &&  $model != "")
     public function ${method_name}(${d}p)
@@ -137,11 +137,13 @@ class ${class_name}
     public function ${method_name}(${d}p)
     {
 #sql_var(false $sql)
-        ${d}ai_values = array(#foreach ($key in ${keys})#set($p='"'+${key.getColumnName()}+'"'+" => null")#list_item(${velocityCount} $p)#end);
+        ${d}ai_values = array(#foreach ($key in ${keys})#set($p='"'+${key.getColumnName()}+'"'+" => 0")#list_item(${velocityCount} $p)#end);
         ${d}res = ${d}this->ds->insert(${d}sql, #param_array($dto_param), ${d}ai_values);
+        if (${d}res) {
 #foreach ($key in ${keys})
 #set($i = ${velocityCount})
-        ${d}p->${key.setterMethod()}(${d}ai_values["$key.getColumnName()"]);
+            ${d}p->${key.setterMethod()}(${d}ai_values["$key.getColumnName()"]);
+        }
         return ${d}res;
 #end
     }
@@ -176,7 +178,7 @@ class ${class_name}
      * @return mixed ${returned_type_name} ${fields.get(0).getColumnName()} or FALSE on failure
 #end
 #end
-     * @throws \Exception
+     * @throws Exception
      */
 #if($fetch_list)
 #if ($crud &&  $model != "")
@@ -262,7 +264,7 @@ class ${class_name}
 #if (!$crud)
      * @return int the affected rows count
 #end
-     * @throws \Exception
+     * @throws Exception
      */
 #if(${dto_param} == "" ||  $method_type == "DELETE")
     public function ${method_name}(#param_decls($is_external_sql $params))
