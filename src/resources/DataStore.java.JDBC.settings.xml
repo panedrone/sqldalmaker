@@ -39,27 +39,18 @@
 
     <type-map default="">
 
-        <!-- sqlite3 -->
-
+        <type detected="java.lang.Short" target="Short -> getShort"/>
         <type detected="java.lang.Integer" target="Integer -> getInteger"/>
+        <type detected="java.lang.Long" target="Long -> getLong"/>
+
+        <type detected="java.lang.Float" target="Float -> getFloat"/>
         <type detected="java.lang.Double" target="Double -> getDouble"/>
+        <type detected="java.math.BigDecimal" target="java.math.BigDecimal -> getBigDecimal"/>
+
         <type detected="java.lang.String" target="String -> getString"/>
+        <type detected="java.util.Date" target="java.util.Date -> getDate"/>
         <type detected="byte[]" target="byte[] -> getBytes"/>
-
-        <!-- mysql, postgres, oracle, ms sql -->
-
-        <!--        <type detected="java.lang.Short" target="Short -> getShort"/>-->
-        <!--        <type detected="java.lang.Integer" target="Integer -> getInteger"/>-->
-        <!--        <type detected="java.lang.Long" target="Long -> getLong"/>-->
-
-        <!--        <type detected="java.lang.Float" target="Float -> getFloat"/>-->
-        <!--        <type detected="java.lang.Double" target="Double -> getDouble"/>-->
-        <!--        <type detected="java.math.BigDecimal" target="java.math.BigDecimal -> getBigDecimal"/>-->
-
-        <!--        <type detected="java.lang.String" target="String -> getString"/>-->
-        <!--        <type detected="java.util.Date" target="java.util.Date -> getDate"/>-->
-        <!--        <type detected="byte[]" target="byte[] -> getBytes"/>-->
-        <!--        <type detected="java.lang.Boolean" target="Boolean -> getBoolean"/>-->
+        <type detected="java.lang.Boolean" target="Boolean -> getBoolean"/>
 
     </type-map>
 
