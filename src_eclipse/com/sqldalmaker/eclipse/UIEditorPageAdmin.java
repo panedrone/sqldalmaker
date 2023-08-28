@@ -33,6 +33,7 @@ import org.osgi.framework.Version;
 import com.sqldalmaker.cg.Helpers;
 import com.sqldalmaker.common.Const;
 import com.sqldalmaker.jaxb.settings.Settings;
+import org.eclipse.wb.swt.SWTResourceManager;
 
 /**
  *
@@ -75,7 +76,7 @@ public class UIEditorPageAdmin extends Composite {
 		toolkit.paintBordersFor(composite_top);
 
 		Composite composite_0 = new Composite(composite_top, SWT.NONE);
-		composite_0.setLayout(new GridLayout(5, false));
+		composite_0.setLayout(new GridLayout(4, false));
 		toolkit.adapt(composite_0);
 		toolkit.paintBordersFor(composite_0);
 
@@ -95,17 +96,6 @@ public class UIEditorPageAdmin extends Composite {
 		});
 		toolkit.adapt(btnSettingsxml, true, true);
 		btnSettingsxml.setText("settings.xml");
-
-		Button btnReferenceSettingsxml = new Button(composite_0, SWT.NONE);
-		btnReferenceSettingsxml.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/" + Const.SETTINGS_XML,
-						"reference_" + Const.SETTINGS_XML);
-			}
-		});
-		btnReferenceSettingsxml.setText("Reference settings.xml");
-		toolkit.adapt(btnReferenceSettingsxml, true, true);
 
 		Button btnNewButton_1 = new Button(composite_0, SWT.NONE);
 		btnNewButton_1.addSelectionListener(new SelectionAdapter() {
@@ -176,21 +166,11 @@ public class UIEditorPageAdmin extends Composite {
 		Composite composite = new Composite(composite_2, SWT.NONE);
 		toolkit.adapt(composite);
 		toolkit.paintBordersFor(composite);
-		composite.setLayout(new GridLayout(9, false));
+		composite.setLayout(new GridLayout(10, false));
 
 		Label lblNewLabel = new Label(composite, SWT.NONE);
 		toolkit.adapt(lblNewLabel, true, true);
 		lblNewLabel.setText("PHP");
-
-		Button btnNewButton_5 = new Button(composite, SWT.NONE);
-		btnNewButton_5.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore.php", "DataStore.php");
-			}
-		});
-		toolkit.adapt(btnNewButton_5, true, true);
-		btnNewButton_5.setText("Base");
 
 		Button btnDatastorephppdoMysql = new Button(composite, SWT.NONE);
 		btnDatastorephppdoMysql.addSelectionListener(new SelectionAdapter() {
@@ -258,6 +238,18 @@ public class UIEditorPageAdmin extends Composite {
 		toolkit.adapt(btnNewButton_12, true, true);
 		btnNewButton_12.setText("sqlite3");
 
+		Button button_1_9 = new Button(composite, SWT.NONE);
+		button_1_9.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				EclipseResourceEditorHelpers.open_resource_file_in_editor(
+						"resources/DataStore_PDO_SQLite3.php.settings.xml", Const.SETTINGS_XML);
+			}
+		});
+		button_1_9.setToolTipText("settings.xml");
+		button_1_9.setImage(SWTResourceManager.getImage(UIEditorPageAdmin.class, "/img/xmldoc_12x12.gif"));
+		toolkit.adapt(button_1_9, true, true);
+
 		Button btnDoctrineOrm = new Button(composite, SWT.NONE);
 		btnDoctrineOrm.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -269,10 +261,22 @@ public class UIEditorPageAdmin extends Composite {
 		toolkit.adapt(btnDoctrineOrm, true, true);
 		btnDoctrineOrm.setText("Doctrine");
 
+		Button button_1_10 = new Button(composite, SWT.NONE);
+		button_1_10.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				EclipseResourceEditorHelpers.open_resource_file_in_editor(
+						"resources/DataStore_Doctrine_ORM.php.settings.xml", Const.SETTINGS_XML);
+			}
+		});
+		button_1_10.setToolTipText("settings.xml");
+		button_1_10.setImage(SWTResourceManager.getImage(UIEditorPageAdmin.class, "/img/xmldoc_12x12.gif"));
+		toolkit.adapt(button_1_10, true, true);
+
 		Composite composite_4 = new Composite(composite_2, SWT.NONE);
 		toolkit.adapt(composite_4);
 		toolkit.paintBordersFor(composite_4);
-		composite_4.setLayout(new GridLayout(11, false));
+		composite_4.setLayout(new GridLayout(17, false));
 
 		Label lblJava = new Label(composite_4, SWT.NONE);
 		toolkit.adapt(lblJava, true, true);
@@ -300,6 +304,29 @@ public class UIEditorPageAdmin extends Composite {
 		btnDatastoreJavaDbutils.setText("JDBC");
 		toolkit.adapt(btnDatastoreJavaDbutils, true, true);
 
+		Button button_1_4 = new Button(composite_4, SWT.NONE);
+		button_1_4.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore.java.JDBC.settings.xml",
+						Const.SETTINGS_XML);
+			}
+		});
+		button_1_4.setToolTipText("settings.xml");
+		button_1_4.setImage(SWTResourceManager.getImage(UIEditorPageAdmin.class, "/img/xmldoc_12x12.gif"));
+		toolkit.adapt(button_1_4, true, true);
+
+		Button btnNewButton_5 = new Button(composite_4, SWT.NONE);
+		btnNewButton_5.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore_Android.java_",
+						"DataStore.java");
+			}
+		});
+		toolkit.adapt(btnNewButton_5, true, true);
+		btnNewButton_5.setText("Base");
+
 		Button btnNewButton_4 = new Button(composite_4, SWT.NONE);
 		btnNewButton_4.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -310,6 +337,18 @@ public class UIEditorPageAdmin extends Composite {
 		});
 		toolkit.adapt(btnNewButton_4, true, true);
 		btnNewButton_4.setText("Android");
+
+		Button button_1_5 = new Button(composite_4, SWT.NONE);
+		button_1_5.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				EclipseResourceEditorHelpers.open_resource_file_in_editor(
+						"resources/DataStore.java.android.settings.xml", Const.SETTINGS_XML);
+			}
+		});
+		button_1_5.setToolTipText("settings.xml");
+		button_1_5.setImage(SWTResourceManager.getImage(UIEditorPageAdmin.class, "/img/xmldoc_12x12.gif"));
+		toolkit.adapt(button_1_5, true, true);
 
 		Label lblC = new Label(composite_4, SWT.NONE);
 		lblC.setAlignment(SWT.RIGHT);
@@ -351,6 +390,18 @@ public class UIEditorPageAdmin extends Composite {
 		toolkit.adapt(btnNewButton_11, true, true);
 		btnNewButton_11.setText("atl, sqlite3");
 
+		Button button_1_6 = new Button(composite_4, SWT.NONE);
+		button_1_6.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore.cpp.settings.xml",
+						Const.SETTINGS_XML);
+			}
+		});
+		button_1_6.setToolTipText("settings.xml");
+		button_1_6.setImage(SWTResourceManager.getImage(UIEditorPageAdmin.class, "/img/xmldoc_12x12.gif"));
+		toolkit.adapt(button_1_6, true, true);
+
 		Label lblGo = new Label(composite_4, SWT.NONE);
 		toolkit.adapt(lblGo, true, true);
 		lblGo.setText("Go");
@@ -366,21 +417,46 @@ public class UIEditorPageAdmin extends Composite {
 		btnNewButton_8_1_1.setText("gorm");
 		toolkit.adapt(btnNewButton_8_1_1, true, true);
 
+		Button button_1_7 = new Button(composite_4, SWT.NONE);
+		button_1_7.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/data_store_gorm.go.settings.xml",
+						Const.SETTINGS_XML);
+			}
+		});
+		button_1_7.setToolTipText("settings.xml");
+		button_1_7.setImage(SWTResourceManager.getImage(UIEditorPageAdmin.class, "/img/xmldoc_12x12.gif"));
+		toolkit.adapt(button_1_7, true, true);
+
 		Button btnNewButton_8_1 = new Button(composite_4, SWT.NONE);
 		btnNewButton_8_1.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				// ending '_' because of bugs
-				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/data_store_no_orm.go", "data_store_no_orm.go_");
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/data_store_no_orm.go",
+						"data_store_no_orm.go_");
 			}
 		});
 		btnNewButton_8_1.setText("database/sql");
 		toolkit.adapt(btnNewButton_8_1, true, true);
 
+		Button button_1_8 = new Button(composite_4, SWT.NONE);
+		button_1_8.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/data_store_no_orm.go.settings.xml",
+						Const.SETTINGS_XML);
+			}
+		});
+		button_1_8.setToolTipText("settings.xml");
+		button_1_8.setImage(SWTResourceManager.getImage(UIEditorPageAdmin.class, "/img/xmldoc_12x12.gif"));
+		toolkit.adapt(button_1_8, true, true);
+
 		Composite composite_5 = new Composite(composite_2, SWT.NONE);
 		toolkit.adapt(composite_5);
 		toolkit.paintBordersFor(composite_5);
-		composite_5.setLayout(new GridLayout(6, false));
+		composite_5.setLayout(new GridLayout(10, false));
 
 		Label lblPython = new Label(composite_5, SWT.NONE);
 		toolkit.adapt(lblPython, true, true);
@@ -397,6 +473,18 @@ public class UIEditorPageAdmin extends Composite {
 		toolkit.adapt(btnSqliteMysqlconnectorPsycopg, true, true);
 		btnSqliteMysqlconnectorPsycopg.setText("sqlite3, mysql, psycopg2");
 
+		Button button_1 = new Button(composite_5, SWT.NONE);
+		button_1.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/data_store_no_orm.py.settings.xml",
+						Const.SETTINGS_XML);
+			}
+		});
+		button_1.setToolTipText("settings.xml");
+		button_1.setImage(SWTResourceManager.getImage(UIEditorPageAdmin.class, "/img/xmldoc_12x12.gif"));
+		toolkit.adapt(button_1, true, true);
+
 		Button btnCxoracle = new Button(composite_5, SWT.NONE);
 		btnCxoracle.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -408,6 +496,18 @@ public class UIEditorPageAdmin extends Composite {
 		toolkit.adapt(btnCxoracle, true, true);
 		btnCxoracle.setText("cx_oracle");
 
+		Button button_1_1 = new Button(composite_5, SWT.NONE);
+		button_1_1.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				EclipseResourceEditorHelpers.open_resource_file_in_editor(
+						"resources/data_store_no_orm_cx_oracle.py.settings.xml", Const.SETTINGS_XML);
+			}
+		});
+		button_1_1.setToolTipText("settings.xml");
+		button_1_1.setImage(SWTResourceManager.getImage(UIEditorPageAdmin.class, "/img/xmldoc_12x12.gif"));
+		toolkit.adapt(button_1_1, true, true);
+
 		Button btnDjangodb = new Button(composite_5, SWT.NONE);
 		btnDjangodb.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -418,6 +518,18 @@ public class UIEditorPageAdmin extends Composite {
 		});
 		btnDjangodb.setText("django.db");
 		toolkit.adapt(btnDjangodb, true, true);
+
+		Button button_1_2 = new Button(composite_5, SWT.NONE);
+		button_1_2.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/data_store_django.py.settings.xml",
+						Const.SETTINGS_XML);
+			}
+		});
+		button_1_2.setToolTipText("settings.xml");
+		button_1_2.setImage(SWTResourceManager.getImage(UIEditorPageAdmin.class, "/img/xmldoc_12x12.gif"));
+		toolkit.adapt(button_1_2, true, true);
 
 		Button btnSqlalchemy = new Button(composite_5, SWT.NONE);
 		btnSqlalchemy.addSelectionListener(new SelectionAdapter() {
@@ -440,6 +552,18 @@ public class UIEditorPageAdmin extends Composite {
 		});
 		btnFlasksqlalchemy.setText("Flask-SQLAlchemy");
 		toolkit.adapt(btnFlasksqlalchemy, true, true);
+
+		Button button_1_3 = new Button(composite_5, SWT.NONE);
+		button_1_3.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				EclipseResourceEditorHelpers.open_resource_file_in_editor(
+						"resources/data_store_sqlalchemy.py.settings.xml", Const.SETTINGS_XML);
+			}
+		});
+		button_1_3.setToolTipText("settings.xml");
+		button_1_3.setImage(SWTResourceManager.getImage(UIEditorPageAdmin.class, "/img/xmldoc_12x12.gif"));
+		toolkit.adapt(button_1_3, true, true);
 
 		Composite composite_3 = new Composite(composite_top, SWT.NONE);
 		composite_3.setLayout(new GridLayout(5, false));
