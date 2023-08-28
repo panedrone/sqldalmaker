@@ -72,7 +72,6 @@ public class UITabAdmin {
     private JButton djangoDbButton;
     private JButton flaskSqlalchemyButton;
     private JButton cx_oracleButton;
-    private JButton referenceSettingsXmlButton1;
     private JPanel pnl_php;
     private JPanel pnl_java;
     private JPanel pnl_py;
@@ -402,12 +401,6 @@ public class UITabAdmin {
                 IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "data_store_no_orm_cx_oracle.py", "data_store.py");
             }
         });
-        referenceSettingsXmlButton1.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, Const.SETTINGS_XML, Const.SETTINGS_XML);
-            }
-        });
         btn_gorn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -611,23 +604,17 @@ public class UITabAdmin {
         gbc.gridx = 0;
         gbc.gridy = 0;
         panel3.add(buttonSettings, gbc);
-        referenceSettingsXmlButton1 = new JButton();
-        referenceSettingsXmlButton1.setText("Reference settings.xml");
-        gbc = new GridBagConstraints();
-        gbc.gridx = 1;
-        gbc.gridy = 0;
-        panel3.add(referenceSettingsXmlButton1, gbc);
         btn_validate_all = new JButton();
         btn_validate_all.setText("Validate Configuration");
         gbc = new GridBagConstraints();
-        gbc.gridx = 2;
+        gbc.gridx = 1;
         gbc.gridy = 0;
         panel3.add(btn_validate_all, gbc);
         recentChangesButton = new JButton();
         recentChangesButton.setPreferredSize(new Dimension(60, 30));
         recentChangesButton.setText("News");
         gbc = new GridBagConstraints();
-        gbc.gridx = 3;
+        gbc.gridx = 2;
         gbc.gridy = 0;
         panel3.add(recentChangesButton, gbc);
         vTextField = new JTextField();
@@ -635,7 +622,7 @@ public class UITabAdmin {
         vTextField.setHorizontalAlignment(0);
         vTextField.setText("v. ?");
         gbc = new GridBagConstraints();
-        gbc.gridx = 4;
+        gbc.gridx = 3;
         gbc.gridy = 0;
         panel3.add(vTextField, gbc);
         pnl_php = new JPanel();

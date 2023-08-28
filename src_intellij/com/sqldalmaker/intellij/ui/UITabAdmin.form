@@ -43,18 +43,9 @@
                           <text value="settings.xml"/>
                         </properties>
                       </component>
-                      <component id="91bc4" class="javax.swing.JButton" binding="referenceSettingsXmlButton1" default-binding="true">
-                        <constraints>
-                          <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
-                          <gridbag weightx="0.0" weighty="0.0"/>
-                        </constraints>
-                        <properties>
-                          <text value="Reference settings.xml"/>
-                        </properties>
-                      </component>
                       <component id="72e18" class="javax.swing.JButton" binding="btn_validate_all">
                         <constraints>
-                          <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
                           <gridbag weightx="0.0" weighty="0.0"/>
                         </constraints>
                         <properties>
@@ -63,7 +54,7 @@
                       </component>
                       <component id="a821f" class="javax.swing.JButton" binding="recentChangesButton" default-binding="true">
                         <constraints>
-                          <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
                           <gridbag weightx="0.0" weighty="0.0"/>
                         </constraints>
                         <properties>
@@ -73,7 +64,7 @@
                       </component>
                       <component id="6d08f" class="javax.swing.JTextField" binding="vTextField" default-binding="true">
                         <constraints>
-                          <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
                           <gridbag weightx="0.0" weighty="0.0"/>
                         </constraints>
                         <properties>
