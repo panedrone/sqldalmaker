@@ -142,7 +142,6 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         jPanel8 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         jButton5 = new javax.swing.JButton();
-        jButton25 = new javax.swing.JButton();
         jButton6 = new javax.swing.JButton();
         jButton13 = new javax.swing.JButton();
         jTextField1 = new javax.swing.JTextField();
@@ -234,15 +233,6 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         });
         jPanel3.add(jButton5);
 
-        jButton25.setText("Reference settings.xml");
-        jButton25.setFocusPainted(false);
-        jButton25.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton25ActionPerformed(evt);
-            }
-        });
-        jPanel3.add(jButton25);
-
         jButton6.setText("Validate Configuration");
         jButton6.setFocusPainted(false);
         jButton6.addActionListener(new java.awt.event.ActionListener() {
@@ -281,7 +271,7 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         });
         jPanel4.add(jButton1);
 
-        jButton2.setText("Create/Overwrite settings.xml");
+        jButton2.setText("Create settings.xml");
         jButton2.setFocusPainted(false);
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -290,8 +280,8 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         });
         jPanel4.add(jButton2);
 
-        jButton3.setText("Create/Overwrite dto.xml");
         jButton3.setFocusPainted(false);
+        jButton3.setLabel("Create dto.xml");
         jButton3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton3ActionPerformed(evt);
@@ -838,10 +828,6 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         validate_all();
     }//GEN-LAST:event_jButton6ActionPerformed
 
-    private void jButton25ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton25ActionPerformed
-        NbpIdeEditorHelpers.open_resource_file_in_editor_async("reference-settings.xml", "settings.xml");
-    }//GEN-LAST:event_jButton25ActionPerformed
-
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
         editSettingsXml();
     }//GEN-LAST:event_jButton5ActionPerformed
@@ -936,7 +922,6 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
     private javax.swing.JButton jButton22;
     private javax.swing.JButton jButton23;
     private javax.swing.JButton jButton24;
-    private javax.swing.JButton jButton25;
     private javax.swing.JButton jButton26;
     private javax.swing.JButton jButton27;
     private javax.swing.JButton jButton28;
