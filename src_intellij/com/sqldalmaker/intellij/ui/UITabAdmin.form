@@ -169,14 +169,14 @@
                           <gridbag weightx="0.0" weighty="0.0"/>
                         </constraints>
                         <properties>
-                          <borderPainted value="false"/>
-                          <contentAreaFilled value="false"/>
+                          <borderPainted value="true"/>
+                          <contentAreaFilled value="true"/>
                           <icon value="img/xmldoc_12x12.gif"/>
                           <margin top="0" left="0" bottom="0" right="0"/>
-                          <maximumSize width="16" height="16"/>
-                          <minimumSize width="16" height="16"/>
-                          <opaque value="false"/>
-                          <preferredSize width="16" height="16"/>
+                          <maximumSize width="22" height="24"/>
+                          <minimumSize width="22" height="24"/>
+                          <opaque value="true"/>
+                          <preferredSize width="22" height="24"/>
                           <text value=""/>
                           <toolTipText value="settings.xml"/>
                         </properties>
@@ -187,14 +187,14 @@
                           <gridbag weightx="0.0" weighty="0.0"/>
                         </constraints>
                         <properties>
-                          <borderPainted value="false"/>
-                          <contentAreaFilled value="false"/>
+                          <borderPainted value="true"/>
+                          <contentAreaFilled value="true"/>
                           <icon value="img/xmldoc_12x12.gif"/>
                           <margin top="0" left="0" bottom="0" right="0"/>
-                          <maximumSize width="16" height="16"/>
-                          <minimumSize width="16" height="16"/>
-                          <opaque value="false"/>
-                          <preferredSize width="16" height="16"/>
+                          <maximumSize width="22" height="24"/>
+                          <minimumSize width="22" height="24"/>
+                          <opaque value="true"/>
+                          <preferredSize width="22" height="24"/>
                           <text value=""/>
                           <toolTipText value="settings.xml"/>
                         </properties>
@@ -236,14 +236,14 @@
                           <gridbag weightx="0.0" weighty="0.0"/>
                         </constraints>
                         <properties>
-                          <borderPainted value="false"/>
-                          <contentAreaFilled value="false"/>
+                          <borderPainted value="true"/>
+                          <contentAreaFilled value="true"/>
                           <icon value="img/xmldoc_12x12.gif"/>
                           <margin top="0" left="0" bottom="0" right="0"/>
-                          <maximumSize width="16" height="16"/>
-                          <minimumSize width="16" height="16"/>
-                          <opaque value="false"/>
-                          <preferredSize width="16" height="16"/>
+                          <maximumSize width="22" height="24"/>
+                          <minimumSize width="22" height="24"/>
+                          <opaque value="true"/>
+                          <preferredSize width="22" height="24"/>
                           <text value=""/>
                           <toolTipText value="settings.xml"/>
                         </properties>
@@ -254,14 +254,14 @@
                           <gridbag weightx="0.0" weighty="0.0"/>
                         </constraints>
                         <properties>
-                          <borderPainted value="false"/>
-                          <contentAreaFilled value="false"/>
+                          <borderPainted value="true"/>
+                          <contentAreaFilled value="true"/>
                           <icon value="img/xmldoc_12x12.gif"/>
                           <margin top="0" left="0" bottom="0" right="0"/>
-                          <maximumSize width="16" height="16"/>
-                          <minimumSize width="16" height="16"/>
-                          <opaque value="false"/>
-                          <preferredSize width="16" height="16"/>
+                          <maximumSize width="22" height="24"/>
+                          <minimumSize width="22" height="24"/>
+                          <opaque value="true"/>
+                          <preferredSize width="22" height="24"/>
                           <text value=""/>
                           <toolTipText value="settings.xml"/>
                         </properties>
@@ -375,14 +375,14 @@
                           <gridbag weightx="0.0" weighty="0.0"/>
                         </constraints>
                         <properties>
-                          <borderPainted value="false"/>
-                          <contentAreaFilled value="false"/>
+                          <borderPainted value="true"/>
+                          <contentAreaFilled value="true"/>
                           <icon value="img/xmldoc_12x12.gif"/>
                           <margin top="0" left="0" bottom="0" right="0"/>
-                          <maximumSize width="16" height="16"/>
-                          <minimumSize width="16" height="16"/>
-                          <opaque value="false"/>
-                          <preferredSize width="16" height="16"/>
+                          <maximumSize width="22" height="24"/>
+                          <minimumSize width="22" height="24"/>
+                          <opaque value="true"/>
+                          <preferredSize width="22" height="24"/>
                           <text value=""/>
                           <toolTipText value="settings.xml"/>
                         </properties>
@@ -393,14 +393,14 @@
                           <gridbag weightx="0.0" weighty="0.0"/>
                         </constraints>
                         <properties>
-                          <borderPainted value="false"/>
-                          <contentAreaFilled value="false"/>
+                          <borderPainted value="true"/>
+                          <contentAreaFilled value="true"/>
                           <icon value="img/xmldoc_12x12.gif"/>
                           <margin top="0" left="0" bottom="0" right="0"/>
-                          <maximumSize width="16" height="16"/>
-                          <minimumSize width="16" height="16"/>
-                          <opaque value="false"/>
-                          <preferredSize width="16" height="16"/>
+                          <maximumSize width="22" height="24"/>
+                          <minimumSize width="22" height="24"/>
+                          <opaque value="true"/>
+                          <preferredSize width="22" height="24"/>
                           <text value=""/>
                           <toolTipText value="settings.xml"/>
                         </properties>
@@ -411,14 +411,14 @@
                           <gridbag weightx="0.0" weighty="0.0"/>
                         </constraints>
                         <properties>
-                          <borderPainted value="false"/>
-                          <contentAreaFilled value="false"/>
+                          <borderPainted value="true"/>
+                          <contentAreaFilled value="true"/>
                           <icon value="img/xmldoc_12x12.gif"/>
                           <margin top="0" left="0" bottom="0" right="0"/>
-                          <maximumSize width="16" height="16"/>
-                          <minimumSize width="16" height="16"/>
-                          <opaque value="false"/>
-                          <preferredSize width="16" height="16"/>
+                          <maximumSize width="22" height="24"/>
+                          <minimumSize width="22" height="24"/>
+                          <opaque value="true"/>
+                          <preferredSize width="22" height="24"/>
                           <text value=""/>
                           <toolTipText value="settings.xml"/>
                         </properties>
@@ -429,14 +429,14 @@
                           <gridbag weightx="0.0" weighty="0.0"/>
                         </constraints>
                         <properties>
-                          <borderPainted value="false"/>
-                          <contentAreaFilled value="false"/>
+                          <borderPainted value="true"/>
+                          <contentAreaFilled value="true"/>
                           <icon value="img/xmldoc_12x12.gif"/>
                           <margin top="0" left="0" bottom="0" right="0"/>
-                          <maximumSize width="16" height="16"/>
-                          <minimumSize width="16" height="16"/>
-                          <opaque value="false"/>
-                          <preferredSize width="16" height="16"/>
+                          <maximumSize width="22" height="24"/>
+                          <minimumSize width="22" height="24"/>
+                          <opaque value="true"/>
+                          <preferredSize width="22" height="24"/>
                           <text value=""/>
                           <toolTipText value="settings.xml"/>
                         </properties>
@@ -488,14 +488,14 @@
                           <gridbag weightx="0.0" weighty="0.0"/>
                         </constraints>
                         <properties>
-                          <borderPainted value="false"/>
-                          <contentAreaFilled value="false"/>
+                          <borderPainted value="true"/>
+                          <contentAreaFilled value="true"/>
                           <icon value="img/xmldoc_12x12.gif"/>
                           <margin top="0" left="0" bottom="0" right="0"/>
-                          <maximumSize width="16" height="16"/>
-                          <minimumSize width="16" height="16"/>
-                          <opaque value="false"/>
-                          <preferredSize width="16" height="16"/>
+                          <maximumSize width="22" height="24"/>
+                          <minimumSize width="22" height="24"/>
+                          <opaque value="true"/>
+                          <preferredSize width="22" height="24"/>
                           <text value=""/>
                           <toolTipText value="settings.xml"/>
                         </properties>
@@ -506,14 +506,14 @@
                           <gridbag weightx="0.0" weighty="0.0"/>
                         </constraints>
                         <properties>
-                          <borderPainted value="false"/>
-                          <contentAreaFilled value="false"/>
+                          <borderPainted value="true"/>
+                          <contentAreaFilled value="true"/>
                           <icon value="img/xmldoc_12x12.gif"/>
                           <margin top="0" left="0" bottom="0" right="0"/>
-                          <maximumSize width="16" height="16"/>
-                          <minimumSize width="16" height="16"/>
-                          <opaque value="false"/>
-                          <preferredSize width="16" height="16"/>
+                          <maximumSize width="22" height="24"/>
+                          <minimumSize width="22" height="24"/>
+                          <opaque value="true"/>
+                          <preferredSize width="22" height="24"/>
                           <text value=""/>
                           <toolTipText value="settings.xml"/>
                         </properties>
@@ -684,14 +684,14 @@
                           <gridbag weightx="0.0" weighty="0.0"/>
                         </constraints>
                         <properties>
-                          <borderPainted value="false"/>
-                          <contentAreaFilled value="false"/>
+                          <borderPainted value="true"/>
+                          <contentAreaFilled value="true"/>
                           <icon value="img/xmldoc_12x12.gif"/>
                           <margin top="0" left="0" bottom="0" right="0"/>
-                          <maximumSize width="16" height="16"/>
-                          <minimumSize width="16" height="16"/>
-                          <opaque value="false"/>
-                          <preferredSize width="16" height="16"/>
+                          <maximumSize width="22" height="24"/>
+                          <minimumSize width="22" height="24"/>
+                          <opaque value="true"/>
+                          <preferredSize width="22" height="24"/>
                           <text value=""/>
                           <toolTipText value="settings.xml"/>
                         </properties>
