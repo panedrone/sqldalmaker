@@ -3,13 +3,13 @@ Newer versions of the plug-in may require partial update/rework of existing XSD 
 Be familiar with "News". Use "Validate Configuration", then "Create/Overwrite XSD files"
 and make related fixes if needed.
 *******************
-SQL DAL Maker for Eclipse: https://marketplace.eclipse.org/content/sql-dal-maker
-SQL DAL Maker for IntelliJ-Platform: https://plugins.jetbrains.com/plugin/7092
-SQL DAL Maker for NetBeans: https://github.com/panedrone/sqldalmaker/releases/tag/latest
-
 SDM Website: https://sqldalmaker.sourceforge.net/
 SDM Pre-config: https://sqldalmaker.sourceforge.net/preconfig.html
 SDM on GitHub: https://github.com/panedrone/sqldalmaker
 Quick Start in mp4: https://github.com/panedrone/sqldalmaker/releases/tag/latest
+
+For Eclipse: https://marketplace.eclipse.org/content/sql-dal-maker
+For IntelliJ-Platform: https://plugins.jetbrains.com/plugin/7092
+For NetBeans: https://github.com/panedrone/sqldalmaker/releases/tag/latest
 
 Contact: sqldalmaker@gmail.com
