@@ -73,10 +73,6 @@
 
     <ide event-log="true"/>
 
-    <!-- prefix of generated C++ classes: -->
-
-    <cpp class-prefix=""/>
-
     <!-- jar: location of JDBC driver JAR file (relative to the project root); -->
 
     <!-- class: JDBC driver class name; -->

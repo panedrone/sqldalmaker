@@ -9,7 +9,6 @@
                 <xs:element ref="dto"/>
                 <xs:element ref="dao"/>
                 <xs:element ref="ide"/>
-                <xs:element ref="cpp"/>
                 <xs:element ref="jdbc"/>
                 <xs:element ref="type-map"/>
                 <xs:element ref="macros"/>
@@ -40,11 +39,6 @@
     <xs:element name="ide">
         <xs:complexType>
             <xs:attribute name="event-log" use="required" type="xs:boolean"/>
-        </xs:complexType>
-    </xs:element>
-    <xs:element name="cpp">
-        <xs:complexType>
-            <xs:attribute name="class-prefix" use="required" type="xs:string"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="jdbc">

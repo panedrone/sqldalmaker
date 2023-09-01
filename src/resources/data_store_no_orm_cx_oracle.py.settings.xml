@@ -14,8 +14,6 @@
 
     <ide event-log="true"/>
 
-    <cpp class-prefix=""/>
-
     <jdbc jar="ojdbc10.jar" class="oracle.jdbc.driver.OracleDriver"
           url="jdbc:oracle:thin:@localhost:1521/XE" user="todolist" pwd="sa"/>
 

@@ -26,7 +26,7 @@
                 <properties/>
                 <border type="none"/>
                 <children>
-                  <grid id="ea483" layout-manager="GridBagLayout">
+                  <grid id="ea483" binding="pnl_settings" layout-manager="GridBagLayout">
                     <constraints>
                       <grid row="0" column="0" row-span="1" col-span="2" vsize-policy="3" hsize-policy="3" anchor="9" fill="0" indent="0" use-parent-layout="false"/>
                       <gridbag weightx="1.0" weighty="1.0"/>
@@ -52,25 +52,43 @@
                           <text value="Validate Configuration"/>
                         </properties>
                       </component>
-                      <component id="a821f" class="javax.swing.JButton" binding="recentChangesButton" default-binding="true">
-                        <constraints>
-                          <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
-                          <gridbag weightx="0.0" weighty="0.0"/>
-                        </constraints>
-                        <properties>
-                          <preferredSize width="60" height="30"/>
-                          <text value="News"/>
-                        </properties>
-                      </component>
                       <component id="6d08f" class="javax.swing.JTextField" binding="vTextField" default-binding="true">
                         <constraints>
-                          <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
                           <gridbag weightx="0.0" weighty="0.0"/>
                         </constraints>
                         <properties>
                           <editable value="false"/>
                           <horizontalAlignment value="0"/>
                           <text value="v. ?"/>
+                        </properties>
+                      </component>
+                      <component id="9d6f0" class="javax.swing.JButton" binding="btn_about">
+                        <constraints>
+                          <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
+                        <properties>
+                          <borderPainted value="false"/>
+                          <contentAreaFilled value="false"/>
+                          <icon value="img/sqldalmaker.gif"/>
+                          <margin top="0" left="0" bottom="0" right="0"/>
+                          <maximumSize width="22" height="24"/>
+                          <minimumSize width="22" height="24"/>
+                          <opaque value="false"/>
+                          <preferredSize width="22" height="24"/>
+                          <text value=""/>
+                          <toolTipText value="settings.xml"/>
+                        </properties>
+                      </component>
+                      <component id="a821f" class="javax.swing.JButton" binding="recentChangesButton" default-binding="true">
+                        <constraints>
+                          <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
+                        <properties>
+                          <preferredSize width="60" height="30"/>
+                          <text value="News"/>
                         </properties>
                       </component>
                     </children>
@@ -520,7 +538,7 @@
                       </component>
                     </children>
                   </grid>
-                  <grid id="4187c" layout-manager="GridBagLayout">
+                  <grid id="4187c" binding="pnl_vm" layout-manager="GridBagLayout">
                     <constraints>
                       <grid row="7" column="0" row-span="1" col-span="4" vsize-policy="3" hsize-policy="3" anchor="9" fill="0" indent="0" use-parent-layout="false"/>
                       <gridbag weightx="1.0" weighty="1.0"/>
@@ -575,25 +593,7 @@
                       </component>
                     </children>
                   </grid>
-                  <grid id="22f6d" layout-manager="BorderLayout" hgap="0" vgap="0">
-                    <constraints>
-                      <grid row="8" column="0" row-span="1" col-span="2" vsize-policy="3" hsize-policy="3" anchor="1" fill="1" indent="0" use-parent-layout="false"/>
-                      <gridbag top="8" left="8" bottom="0" right="8" weightx="1.0" weighty="1.0"/>
-                    </constraints>
-                    <properties/>
-                    <border type="none"/>
-                    <children>
-                      <component id="c733b" class="javax.swing.JTextPane" binding="text1">
-                        <constraints border-constraint="Center"/>
-                        <properties>
-                          <editable value="false"/>
-                          <margin top="0" left="15" bottom="15" right="15"/>
-                          <text value=""/>
-                        </properties>
-                      </component>
-                    </children>
-                  </grid>
-                  <grid id="150db" layout-manager="GridBagLayout">
+                  <grid id="150db" binding="pnl_xsd" layout-manager="GridBagLayout">
                     <constraints>
                       <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
                       <gridbag weightx="0.0" weighty="0.0"/>

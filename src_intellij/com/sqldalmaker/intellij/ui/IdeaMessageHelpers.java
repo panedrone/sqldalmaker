@@ -132,13 +132,17 @@ public class IdeaMessageHelpers {
         });
     }
 
-    public static void show_info_in_ui_thread(String m) {
+    public static void show_info_in_ui_thread(String title, String m) {
         // Messages.show... ---- if there is "<" in messages, the text is now shown
         final String msg = m.replace("<", "");
         ApplicationManager.getApplication().invokeLater(new Runnable() {
             public void run() {
-                Messages.showInfoMessage(msg, "Info");
+                Messages.showInfoMessage(msg, title);
             }
         });
+    }
+
+    public static void show_info_in_ui_thread(String msg) {
+        show_info_in_ui_thread("Info", msg);
     }
 }

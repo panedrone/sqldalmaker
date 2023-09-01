@@ -72,6 +72,17 @@ public class SdmActionGroup extends ActionGroup implements AlwaysVisibleActionGr
         }
     }
 
+    private void add_about_actions(List<AnAction> drop_down_actions_list) {
+
+        SdmAction action = new SdmAction("About") {
+            @Override
+            public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
+                UIDialogAbout.showModal();
+            }
+        };
+        drop_down_actions_list.add(action);
+    }
+
     private void add_dto_actions(Project project, List<AnAction> drop_down_actions_list, VirtualFile xml_file) throws Exception {
 
         String xml_file_rel_path = IdeaHelpers.get_relative_path(project, xml_file);
@@ -225,6 +236,7 @@ public class SdmActionGroup extends ActionGroup implements AlwaysVisibleActionGr
                     add_common_actions(project, drop_down_actions_list, root_files);
                 }
             }
+            add_about_actions(drop_down_actions_list);
             AnAction[] arr = new AnAction[drop_down_actions_list.size()];
             return drop_down_actions_list.toArray(arr);
         } catch (/*Exception*/ Throwable e) {

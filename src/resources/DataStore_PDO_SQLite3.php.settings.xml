@@ -20,8 +20,6 @@
 
 	<ide event-log="true"/>
 
-	<cpp class-prefix=""/>
-
 	<jdbc jar="lib/sqlite-jdbc-3.42.0.0.jar" class="org.sqlite.JDBC"
 		  url="jdbc:sqlite:$PROJECT_DIR$/todolist.sqlite" user="" pwd=""/>
 

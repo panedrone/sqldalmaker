@@ -1,21 +1,10 @@
-2023-09 TODO
+2023-09-01
 
-    - Updates of settings.xsd  and settings.xml
+    - added form "About"
 
-        old:
-
-            <folders target="sdm_demo_todolist" sql="gorm/sdm/sql"/>
-
-            ...
-
-            <ide event-log="true"/>
+    - removed from "settings.xml":
 
             <cpp class-prefix=""/>
-
-
-        new:
-
-            <misc target="sdm_demo_todolist" sql="gorm/sdm/sql" ide-event-log="true" cpp-class-prefix=""/>
 
 2023-08-25
 

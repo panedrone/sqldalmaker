@@ -12,8 +12,6 @@ import com.sqldalmaker.common.Const;
 import com.sqldalmaker.jaxb.settings.Settings;
 
 import javax.swing.*;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
 import javax.swing.plaf.FontUIResource;
 import javax.swing.text.StyleContext;
 import java.awt.*;
@@ -46,7 +44,6 @@ public class UITabAdmin {
     private JButton cppVmButton;
     private JButton pythonVmButton;
     private JPanel rootPanel;
-    private JTextPane text1;
     private JButton php_vm;
     private JButton java_vm;
     private JButton recentChangesButton;
@@ -88,6 +85,10 @@ public class UITabAdmin {
     private JButton btn_doctrine;
     private JButton btn_jdbc;
     private JButton btn_android;
+    private JButton btn_about;
+    private JPanel pnl_settings;
+    private JPanel pnl_vm;
+    private JPanel pnl_xsd;
 
     private Project project;
     private VirtualFile root_file;
@@ -148,32 +149,9 @@ public class UITabAdmin {
         set_cursor(wc, pnl_php);
         set_cursor(wc, pnl_py);
 
-        try {
-            text1.setContentType("text/html");
-            text1.setEditable(false);
-
-            String text = IdeaHelpers.read_from_jar_file("", "ABOUT.html");
-            text1.setText(text);
-
-            text1.addHyperlinkListener(new HyperlinkListener() {
-                @Override
-                public void hyperlinkUpdate(HyperlinkEvent hle) {
-                    if (HyperlinkEvent.EventType.ACTIVATED.equals(hle.getEventType())) {
-                        // System.out.println(hle.getURL());
-                        if (Desktop.isDesktopSupported()) {
-                            try {
-                                Desktop desktop = Desktop.getDesktop();
-                                desktop.browse(hle.getURL().toURI());
-                            } catch (Exception ex) {
-                                ex.printStackTrace();
-                            }
-                        }
-                    }
-                }
-            });
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        set_cursor(wc, pnl_settings);
+        set_cursor(wc, pnl_xsd);
+        set_cursor(wc, pnl_vm);
 
         createOverwriteXSDFilesButton.addActionListener(new ActionListener() {
             @Override
@@ -467,6 +445,12 @@ public class UITabAdmin {
                 IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "DataStore.java.android.settings.xml", "settings.xml");
             }
         });
+        btn_about.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                UIDialogAbout.showModal();
+            }
+        });
     }
 
     public void openSettings() {
@@ -587,8 +571,8 @@ public class UITabAdmin {
         final JPanel panel2 = new JPanel();
         panel2.setLayout(new GridBagLayout());
         panel1.add(panel2);
-        final JPanel panel3 = new JPanel();
-        panel3.setLayout(new GridBagLayout());
+        pnl_settings = new JPanel();
+        pnl_settings.setLayout(new GridBagLayout());
         GridBagConstraints gbc;
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -597,34 +581,49 @@ public class UITabAdmin {
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
         gbc.anchor = GridBagConstraints.NORTHWEST;
-        panel2.add(panel3, gbc);
+        panel2.add(pnl_settings, gbc);
         buttonSettings = new JButton();
         buttonSettings.setText("settings.xml");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
-        panel3.add(buttonSettings, gbc);
+        pnl_settings.add(buttonSettings, gbc);
         btn_validate_all = new JButton();
         btn_validate_all.setText("Validate Configuration");
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
         gbc.gridy = 0;
-        panel3.add(btn_validate_all, gbc);
-        recentChangesButton = new JButton();
-        recentChangesButton.setPreferredSize(new Dimension(60, 30));
-        recentChangesButton.setText("News");
-        gbc = new GridBagConstraints();
-        gbc.gridx = 2;
-        gbc.gridy = 0;
-        panel3.add(recentChangesButton, gbc);
+        pnl_settings.add(btn_validate_all, gbc);
         vTextField = new JTextField();
         vTextField.setEditable(false);
         vTextField.setHorizontalAlignment(0);
         vTextField.setText("v. ?");
         gbc = new GridBagConstraints();
+        gbc.gridx = 2;
+        gbc.gridy = 0;
+        pnl_settings.add(vTextField, gbc);
+        btn_about = new JButton();
+        btn_about.setBorderPainted(false);
+        btn_about.setContentAreaFilled(false);
+        btn_about.setIcon(new ImageIcon(getClass().getResource("/img/sqldalmaker.gif")));
+        btn_about.setMargin(new Insets(0, 0, 0, 0));
+        btn_about.setMaximumSize(new Dimension(22, 24));
+        btn_about.setMinimumSize(new Dimension(22, 24));
+        btn_about.setOpaque(false);
+        btn_about.setPreferredSize(new Dimension(22, 24));
+        btn_about.setText("");
+        btn_about.setToolTipText("settings.xml");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 4;
+        gbc.gridy = 0;
+        pnl_settings.add(btn_about, gbc);
+        recentChangesButton = new JButton();
+        recentChangesButton.setPreferredSize(new Dimension(60, 30));
+        recentChangesButton.setText("News");
+        gbc = new GridBagConstraints();
         gbc.gridx = 3;
         gbc.gridy = 0;
-        panel3.add(vTextField, gbc);
+        pnl_settings.add(recentChangesButton, gbc);
         pnl_php = new JPanel();
         pnl_php.setLayout(new GridBagLayout());
         gbc = new GridBagConstraints();
@@ -970,8 +969,8 @@ public class UITabAdmin {
         gbc.gridx = 2;
         gbc.gridy = 0;
         pnl_go.add(btn_gorn, gbc);
-        final JPanel panel4 = new JPanel();
-        panel4.setLayout(new GridBagLayout());
+        pnl_vm = new JPanel();
+        pnl_vm.setLayout(new GridBagLayout());
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 7;
@@ -979,79 +978,62 @@ public class UITabAdmin {
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
         gbc.anchor = GridBagConstraints.NORTHWEST;
-        panel2.add(panel4, gbc);
+        panel2.add(pnl_vm, gbc);
         php_vm = new JButton();
         php_vm.setText("php.vm");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
-        panel4.add(php_vm, gbc);
+        pnl_vm.add(php_vm, gbc);
         java_vm = new JButton();
         java_vm.setText("java.vm");
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
         gbc.gridy = 0;
-        panel4.add(java_vm, gbc);
+        pnl_vm.add(java_vm, gbc);
         cppVmButton = new JButton();
         cppVmButton.setText("cpp.vm");
         gbc = new GridBagConstraints();
         gbc.gridx = 2;
         gbc.gridy = 0;
-        panel4.add(cppVmButton, gbc);
+        pnl_vm.add(cppVmButton, gbc);
         pythonVmButton = new JButton();
         pythonVmButton.setText("python.vm");
         gbc = new GridBagConstraints();
         gbc.gridx = 3;
         gbc.gridy = 0;
-        panel4.add(pythonVmButton, gbc);
+        pnl_vm.add(pythonVmButton, gbc);
         btn_golangVM = new JButton();
         btn_golangVM.setText("go.vm");
         gbc = new GridBagConstraints();
         gbc.gridx = 4;
         gbc.gridy = 0;
-        panel4.add(btn_golangVM, gbc);
-        final JPanel panel5 = new JPanel();
-        panel5.setLayout(new BorderLayout(0, 0));
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 8;
-        gbc.gridwidth = 2;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-        gbc.anchor = GridBagConstraints.NORTH;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(8, 8, 0, 8);
-        panel2.add(panel5, gbc);
-        text1 = new JTextPane();
-        text1.setEditable(false);
-        text1.setMargin(new Insets(0, 15, 15, 15));
-        text1.setText("");
-        panel5.add(text1, BorderLayout.CENTER);
-        final JPanel panel6 = new JPanel();
-        panel6.setLayout(new GridBagLayout());
+        pnl_vm.add(btn_golangVM, gbc);
+        pnl_xsd = new JPanel();
+        pnl_xsd.setLayout(new GridBagLayout());
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.fill = GridBagConstraints.BOTH;
-        panel2.add(panel6, gbc);
+        panel2.add(pnl_xsd, gbc);
         createOverwriteXSDFilesButton = new JButton();
         createOverwriteXSDFilesButton.setText("Create/Overwrite XSD files");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
-        panel6.add(createOverwriteXSDFilesButton, gbc);
+        pnl_xsd.add(createOverwriteXSDFilesButton, gbc);
         createOverwriteSettingsXmlButton = new JButton();
         createOverwriteSettingsXmlButton.setText("Create settings.xml");
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
         gbc.gridy = 0;
-        panel6.add(createOverwriteSettingsXmlButton, gbc);
+        pnl_xsd.add(createOverwriteSettingsXmlButton, gbc);
         createOverwriteDtoXmlButton = new JButton();
         createOverwriteDtoXmlButton.setText("Create dto.xml");
         gbc = new GridBagConstraints();
         gbc.gridx = 2;
         gbc.gridy = 0;
-        panel6.add(createOverwriteDtoXmlButton, gbc);
+        pnl_xsd.add(createOverwriteDtoXmlButton, gbc);
         pnl_cpp = new JPanel();
         pnl_cpp.setLayout(new GridBagLayout());
         gbc = new GridBagConstraints();

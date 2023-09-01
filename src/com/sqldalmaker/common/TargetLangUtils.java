@@ -181,7 +181,7 @@ public class TargetLangUtils {
                 String package_rel_path = settings.getFolders().getTarget();
                 output_dir_rel_path.append(package_rel_path);
             }
-            return new CppCG.DTO(dto_classes, settings, connection, sql_root_abs_path, settings.getCpp().getClassPrefix(), vm_template);
+            return new CppCG.DTO(dto_classes, settings, connection, sql_root_abs_path, "", vm_template);
         } else if (RootFileName.PYTHON.equals(root_fn)) {
             if (output_dir_rel_path != null) {
                 String package_rel_path = settings.getFolders().getTarget();
@@ -238,7 +238,7 @@ public class TargetLangUtils {
                 String package_rel_path = settings.getFolders().getTarget();
                 output_dir_rel_path.append(package_rel_path);
             }
-            String class_prefix = settings.getCpp().getClassPrefix();
+            String class_prefix = "";
             return new CppCG.DAO(dto_classes, settings, con, sql_root_abs_path, class_prefix, vm_template);
         } else if (RootFileName.PYTHON.equals(root_fn)) {
             String package_rel_path = settings.getFolders().getTarget();

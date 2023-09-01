@@ -20,8 +20,6 @@
 
     <ide event-log="true"/>
 
-    <cpp class-prefix=""/>
-
     <jdbc jar="sdm/sqlite-jdbc-3.41.2.1.jar" class="org.sqlite.JDBC"
           url="jdbc:sqlite:$PROJECT_DIR$/app/src/main/java/sqldalmaker/thesaurus.sqlite" user="" pwd=""/>
 
