@@ -85,10 +85,10 @@ public class UITabAdmin {
     private JButton btn_doctrine;
     private JButton btn_jdbc;
     private JButton btn_android;
-    private JButton btn_about;
     private JPanel pnl_settings;
     private JPanel pnl_vm;
     private JPanel pnl_xsd;
+    private JButton aboutButton;
 
     private Project project;
     private VirtualFile root_file;
@@ -445,7 +445,7 @@ public class UITabAdmin {
                 IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "DataStore.java.android.settings.xml", "settings.xml");
             }
         });
-        btn_about.addActionListener(new ActionListener() {
+        aboutButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 UIDialogAbout.showModal();
@@ -602,21 +602,6 @@ public class UITabAdmin {
         gbc.gridx = 2;
         gbc.gridy = 0;
         pnl_settings.add(vTextField, gbc);
-        btn_about = new JButton();
-        btn_about.setBorderPainted(false);
-        btn_about.setContentAreaFilled(false);
-        btn_about.setIcon(new ImageIcon(getClass().getResource("/img/sqldalmaker.gif")));
-        btn_about.setMargin(new Insets(0, 0, 0, 0));
-        btn_about.setMaximumSize(new Dimension(22, 24));
-        btn_about.setMinimumSize(new Dimension(22, 24));
-        btn_about.setOpaque(false);
-        btn_about.setPreferredSize(new Dimension(22, 24));
-        btn_about.setText("");
-        btn_about.setToolTipText("settings.xml");
-        gbc = new GridBagConstraints();
-        gbc.gridx = 4;
-        gbc.gridy = 0;
-        pnl_settings.add(btn_about, gbc);
         recentChangesButton = new JButton();
         recentChangesButton.setPreferredSize(new Dimension(60, 30));
         recentChangesButton.setText("News");
@@ -624,6 +609,14 @@ public class UITabAdmin {
         gbc.gridx = 3;
         gbc.gridy = 0;
         pnl_settings.add(recentChangesButton, gbc);
+        aboutButton = new JButton();
+        aboutButton.setPreferredSize(new Dimension(60, 30));
+        aboutButton.setText("About");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 4;
+        gbc.gridy = 0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        pnl_settings.add(aboutButton, gbc);
         pnl_php = new JPanel();
         pnl_php.setLayout(new GridBagLayout());
         gbc = new GridBagConstraints();

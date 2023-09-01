@@ -27,6 +27,7 @@ public class UIDialogAbout extends JDialog {
     private UIDialogAbout() {
         setContentPane(contentPane);
         setModal(true);
+        setTitle("About");
         getRootPane().setDefaultButton(buttonOK);
 
         buttonOK.addActionListener(new ActionListener() {

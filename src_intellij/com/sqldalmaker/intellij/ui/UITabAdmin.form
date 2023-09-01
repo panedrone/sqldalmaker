@@ -63,24 +63,6 @@
                           <text value="v. ?"/>
                         </properties>
                       </component>
-                      <component id="9d6f0" class="javax.swing.JButton" binding="btn_about">
-                        <constraints>
-                          <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
-                          <gridbag weightx="0.0" weighty="0.0"/>
-                        </constraints>
-                        <properties>
-                          <borderPainted value="false"/>
-                          <contentAreaFilled value="false"/>
-                          <icon value="img/sqldalmaker.gif"/>
-                          <margin top="0" left="0" bottom="0" right="0"/>
-                          <maximumSize width="22" height="24"/>
-                          <minimumSize width="22" height="24"/>
-                          <opaque value="false"/>
-                          <preferredSize width="22" height="24"/>
-                          <text value=""/>
-                          <toolTipText value="settings.xml"/>
-                        </properties>
-                      </component>
                       <component id="a821f" class="javax.swing.JButton" binding="recentChangesButton" default-binding="true">
                         <constraints>
                           <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
@@ -89,6 +71,16 @@
                         <properties>
                           <preferredSize width="60" height="30"/>
                           <text value="News"/>
+                        </properties>
+                      </component>
+                      <component id="723c" class="javax.swing.JButton" binding="aboutButton" default-binding="true">
+                        <constraints>
+                          <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
+                        <properties>
+                          <preferredSize width="60" height="30"/>
+                          <text value="About"/>
                         </properties>
                       </component>
                     </children>
