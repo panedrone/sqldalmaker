@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2021 sqldalmaker@gmail.com
+    Copyright 2011-2023 sqldalmaker@gmail.com
     SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -393,6 +393,11 @@ public final class UIDialogSelectDbSchema extends JDialog {
         jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
         org.openide.awt.Mnemonics.setLocalizedText(button_ok, org.openide.util.NbBundle.getMessage(UIDialogSelectDbSchema.class, "UIDialogSelectDbSchema.button_ok.text")); // NOI18N
+        button_ok.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                button_okActionPerformed(evt);
+            }
+        });
         jPanel5.add(button_ok);
 
         org.openide.awt.Mnemonics.setLocalizedText(jButton2, org.openide.util.NbBundle.getMessage(UIDialogSelectDbSchema.class, "UIDialogSelectDbSchema.jButton2.text")); // NOI18N
@@ -412,6 +417,10 @@ public final class UIDialogSelectDbSchema extends JDialog {
     private void radio_user_as_schemaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radio_user_as_schemaActionPerformed
         on_selection_changed();
     }//GEN-LAST:event_radio_user_as_schemaActionPerformed
+
+    private void button_okActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button_okActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_button_okActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;

@@ -52,31 +52,6 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         String jv = System.getProperty("java.version");
         jTextField1.setText(v + " on Java " + jv);
 //        jTextField1.setBorder(javax.swing.BorderFactory.createEmptyBorder());
-        ////////////////////////////////////////
-        jTextPane1.setEditable(false);
-        jTextPane1.setContentType("text/html");
-        try {
-            String text = NbpHelpers.read_from_jar_file("", "ABOUT.html");
-            jTextPane1.setText(text);
-        } catch (Exception ex) {
-            Exceptions.printStackTrace(ex);
-        }
-        jTextPane1.addHyperlinkListener(new HyperlinkListener() {
-            @Override
-            public void hyperlinkUpdate(HyperlinkEvent hle) {
-                if (HyperlinkEvent.EventType.ACTIVATED.equals(hle.getEventType())) {
-                    // System.out.println(hle.getURL());
-                    if (Desktop.isDesktopSupported()) {
-                        try {
-                            Desktop desktop = Desktop.getDesktop();
-                            desktop.browse(hle.getURL().toURI());
-                        } catch (Exception ex) {
-                            Exceptions.printStackTrace(ex);
-                        }
-                    }
-                }
-            }
-        });
     }
 
     private boolean is_opened = false;
@@ -143,8 +118,9 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         jPanel3 = new javax.swing.JPanel();
         jButton5 = new javax.swing.JButton();
         jButton6 = new javax.swing.JButton();
-        jButton13 = new javax.swing.JButton();
         jTextField1 = new javax.swing.JTextField();
+        jButton13 = new javax.swing.JButton();
+        jButton25 = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
@@ -196,7 +172,6 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         jButton21 = new javax.swing.JButton();
         jButton22 = new javax.swing.JButton();
         jButton31 = new javax.swing.JButton();
-        jTextPane1 = new javax.swing.JTextPane();
 
         setName(""); // NOI18N
         setOpaque(false);
@@ -218,7 +193,7 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         jPanel8.setMinimumSize(new java.awt.Dimension(700, 560));
         jPanel8.setName(""); // NOI18N
         jPanel8.setPreferredSize(new java.awt.Dimension(700, 560));
-        jPanel8.setLayout(new javax.swing.BoxLayout(jPanel8, javax.swing.BoxLayout.Y_AXIS));
+        jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
         jPanel3.setMinimumSize(new java.awt.Dimension(710, 32));
         jPanel3.setPreferredSize(new java.awt.Dimension(710, 32));
@@ -242,6 +217,13 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         });
         jPanel3.add(jButton6);
 
+        jTextField1.setEditable(false);
+        jTextField1.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        jTextField1.setText("v. ?");
+        jTextField1.setMinimumSize(new java.awt.Dimension(32, 22));
+        jTextField1.setName(""); // NOI18N
+        jPanel3.add(jTextField1);
+
         jButton13.setText("News");
         jButton13.setFocusPainted(false);
         jButton13.setPreferredSize(new java.awt.Dimension(64, 22));
@@ -252,11 +234,14 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         });
         jPanel3.add(jButton13);
 
-        jTextField1.setEditable(false);
-        jTextField1.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jTextField1.setText("v. ?");
-        jTextField1.setMargin(new java.awt.Insets(2, 10, 2, 2));
-        jPanel3.add(jTextField1);
+        jButton25.setText("About");
+        jButton25.setPreferredSize(new java.awt.Dimension(64, 22));
+        jButton25.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton25ActionPerformed(evt);
+            }
+        });
+        jPanel3.add(jButton25);
 
         jPanel8.add(jPanel3);
 
@@ -300,6 +285,7 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
 
         jButton11.setText("sqlite3");
         jButton11.setFocusPainted(false);
+        jButton11.setPreferredSize(new java.awt.Dimension(64, 22));
         jButton11.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton11ActionPerformed(evt);
@@ -672,13 +658,6 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
 
         jPanel8.add(jPanel7);
 
-        jTextPane1.setEditable(false);
-        jTextPane1.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
-        jTextPane1.setAutoscrolls(false);
-        jTextPane1.setMargin(new java.awt.Insets(0, 12, 12, 12));
-        jTextPane1.setName(""); // NOI18N
-        jPanel8.add(jTextPane1);
-
         jPanel6.add(jPanel8);
 
         jScrollPane1.setViewportView(jPanel6);
@@ -904,6 +883,10 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         NbpIdeEditorHelpers.open_resource_file_in_editor_async(Const.SETTINGS_XML, "DataStore.cpp.settings.xml");
     }//GEN-LAST:event_jButton37ActionPerformed
 
+    private void jButton25ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton25ActionPerformed
+        UIDialogAbout.show_modal();
+    }//GEN-LAST:event_jButton25ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton10;
@@ -922,6 +905,7 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
     private javax.swing.JButton jButton22;
     private javax.swing.JButton jButton23;
     private javax.swing.JButton jButton24;
+    private javax.swing.JButton jButton25;
     private javax.swing.JButton jButton26;
     private javax.swing.JButton jButton27;
     private javax.swing.JButton jButton28;
@@ -964,7 +948,6 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
     private javax.swing.JPanel jPanel9;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextPane jTextPane1;
     // End of variables declaration//GEN-END:variables
 
 //    private void testConnection() {

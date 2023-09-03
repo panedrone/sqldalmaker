@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2022 sqldalmaker@gmail.com
+    Copyright 2011-2023 sqldalmaker@gmail.com
     SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -293,6 +293,15 @@ public final class SdmAction extends AbstractAction implements Presenter.Toolbar
         try {
             add_xml_file_items(popup);
             add_root_file_items(popup);
+            
+            JMenuItem item = new JMenuItem(new AbstractAction("About") {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    UIDialogAbout.show_modal();
+                }
+            });
+            item.setText("About");
+            popup.add(item);
         } catch (Exception ex) {
             // Exceptions.printStackTrace(e); // // === panedrone: it shows banner!!!
         }

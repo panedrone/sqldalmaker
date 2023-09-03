@@ -1,19 +1,18 @@
 2023-09-01
 
-    - added form "About"
+    [+] added form "About"
 
-    - removed from "settings.xml":
-
-            <cpp class-prefix=""/>
+    [-] "<cpp..." removed from settings.xml
 
 2023-08-25
 
-    - separate examples of "settings.xml"
-    - minor fixes for PHP
+    [+] separate examples of "settings.xml"
+
+    [!] minor fixes for PHP
 
 2023-08-14
 
-    Improvements for Python
+    [!] improvements for Python
 
 2023-08-01
 
