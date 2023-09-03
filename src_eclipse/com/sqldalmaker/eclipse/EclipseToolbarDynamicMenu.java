@@ -212,6 +212,15 @@ public class EclipseToolbarDynamicMenu extends ContributionItem {
 				});
 			}
 		}
+		
+		MenuItem menuItem = new MenuItem(menu, SWT.PUSH, index++);
+		menuItem.setText("About");
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				Shell active_shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+				UIDialogAbout.show_modal(active_shell);
+			}
+		});		
 	}
 
 	@Override

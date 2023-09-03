@@ -43,7 +43,6 @@ import org.eclipse.wb.swt.SWTResourceManager;
 public class UIEditorPageAdmin extends Composite {
 
 	private final FormToolkit toolkit = new FormToolkit(Display.getCurrent());
-	private Text text_1;
 
 	private IEditor2 editor2;
 //	private Action action_settings_xml;
@@ -76,7 +75,7 @@ public class UIEditorPageAdmin extends Composite {
 		toolkit.paintBordersFor(composite_top);
 
 		Composite composite_0 = new Composite(composite_top, SWT.NONE);
-		composite_0.setLayout(new GridLayout(4, false));
+		composite_0.setLayout(new GridLayout(5, false));
 		toolkit.adapt(composite_0);
 		toolkit.paintBordersFor(composite_0);
 
@@ -107,6 +106,11 @@ public class UIEditorPageAdmin extends Composite {
 		toolkit.adapt(btnNewButton_1, true, true);
 		btnNewButton_1.setText("Validate Configuration");
 
+		txtV = new Text(composite_0, SWT.CENTER);
+		txtV.setEditable(false);
+		txtV.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, false, 1, 1));
+		toolkit.adapt(txtV, true, true);
+
 		Button btnRecentChanges = new Button(composite_0, SWT.NONE);
 		btnRecentChanges.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -117,10 +121,15 @@ public class UIEditorPageAdmin extends Composite {
 		toolkit.adapt(btnRecentChanges, true, true);
 		btnRecentChanges.setText("News");
 
-		txtV = new Text(composite_0, SWT.CENTER);
-		txtV.setEditable(false);
-		txtV.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, false, 1, 1));
-		toolkit.adapt(txtV, true, true);
+		Button btnAbout = new Button(composite_0, SWT.NONE);
+		btnAbout.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				UIDialogAbout.show_modal(getShell());
+			}
+		});
+		toolkit.adapt(btnAbout, true, true);
+		btnAbout.setText("About");
 
 		Composite composite_1 = new Composite(composite_top, SWT.NONE);
 		composite_1.setLayout(new GridLayout(3, false));
@@ -623,17 +632,6 @@ public class UIEditorPageAdmin extends Composite {
 		});
 		button_4_1.setText("go.vm");
 		toolkit.adapt(button_4_1, true, true);
-
-		Composite composite_text = new Composite(composite_top, SWT.NONE);
-		composite_text.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-		composite_text.setLayout(new GridLayout(1, false));
-		toolkit.adapt(composite_text);
-		toolkit.paintBordersFor(composite_text);
-
-		text_1 = new Text(composite_text, SWT.BORDER | SWT.MULTI);
-		text_1.setEditable(false);
-		text_1.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		toolkit.adapt(text_1, true, true);
 	}
 
 	private static String get_err_msg(Throwable ex) {
@@ -774,9 +772,7 @@ public class UIEditorPageAdmin extends Composite {
 					version.getQualifier());
 			String jv = System.getProperty("java.version");
 			txtV.setText(v + " on Java " + jv);
-			String text = Helpers.read_from_jar_file_2("ABOUT.txt");
-			// text += "\r\n" + v;
-			text_1.setText(text);
+
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
