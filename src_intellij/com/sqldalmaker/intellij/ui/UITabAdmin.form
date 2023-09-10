@@ -528,6 +528,34 @@
                           <toolTipText value="settings.xml"/>
                         </properties>
                       </component>
+                      <component id="b1262" class="javax.swing.JButton" binding="btn_sqlx">
+                        <constraints>
+                          <grid row="0" column="5" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
+                        <properties>
+                          <preferredSize width="60" height="30"/>
+                          <text value="sqlx"/>
+                        </properties>
+                      </component>
+                      <component id="76226" class="javax.swing.JButton" binding="btn_sqlx_xml">
+                        <constraints>
+                          <grid row="0" column="6" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
+                        <properties>
+                          <borderPainted value="true"/>
+                          <contentAreaFilled value="true"/>
+                          <icon value="img/xmldoc_12x12.gif"/>
+                          <margin top="0" left="0" bottom="0" right="0"/>
+                          <maximumSize width="22" height="24"/>
+                          <minimumSize width="22" height="24"/>
+                          <opaque value="true"/>
+                          <preferredSize width="22" height="24"/>
+                          <text value=""/>
+                          <toolTipText value="settings.xml"/>
+                        </properties>
+                      </component>
                     </children>
                   </grid>
                   <grid id="4187c" binding="pnl_vm" layout-manager="GridBagLayout">

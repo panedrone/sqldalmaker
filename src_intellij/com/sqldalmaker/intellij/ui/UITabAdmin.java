@@ -89,6 +89,8 @@ public class UITabAdmin {
     private JPanel pnl_vm;
     private JPanel pnl_xsd;
     private JButton aboutButton;
+    private JButton btn_sqlx_xml;
+    private JButton btn_sqlx;
 
     private Project project;
     private VirtualFile root_file;
@@ -449,6 +451,18 @@ public class UITabAdmin {
             @Override
             public void actionPerformed(ActionEvent e) {
                 UIDialogAbout.showModal();
+            }
+        });
+        btn_sqlx_xml.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "data_store_sqlx.go.settings.xml", "settings.xml");
+            }
+        });
+        btn_sqlx.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "data_store_sqlx.go", "data_store_sqlx.go");
             }
         });
     }
@@ -962,6 +976,28 @@ public class UITabAdmin {
         gbc.gridx = 2;
         gbc.gridy = 0;
         pnl_go.add(btn_gorn, gbc);
+        btn_sqlx = new JButton();
+        btn_sqlx.setPreferredSize(new Dimension(60, 30));
+        btn_sqlx.setText("sqlx");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 5;
+        gbc.gridy = 0;
+        pnl_go.add(btn_sqlx, gbc);
+        btn_sqlx_xml = new JButton();
+        btn_sqlx_xml.setBorderPainted(true);
+        btn_sqlx_xml.setContentAreaFilled(true);
+        btn_sqlx_xml.setIcon(new ImageIcon(getClass().getResource("/img/xmldoc_12x12.gif")));
+        btn_sqlx_xml.setMargin(new Insets(0, 0, 0, 0));
+        btn_sqlx_xml.setMaximumSize(new Dimension(22, 24));
+        btn_sqlx_xml.setMinimumSize(new Dimension(22, 24));
+        btn_sqlx_xml.setOpaque(true);
+        btn_sqlx_xml.setPreferredSize(new Dimension(22, 24));
+        btn_sqlx_xml.setText("");
+        btn_sqlx_xml.setToolTipText("settings.xml");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 6;
+        gbc.gridy = 0;
+        pnl_go.add(btn_sqlx_xml, gbc);
         pnl_vm = new JPanel();
         pnl_vm.setLayout(new GridBagLayout());
         gbc = new GridBagConstraints();

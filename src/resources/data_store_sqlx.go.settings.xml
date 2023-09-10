@@ -6,7 +6,7 @@
 
     <!-- sql: base folder of SQL files (relative to the project root) -->
 
-    <folders target="sdm_demo_todolist" sql="no_orm/sdm/sql"/>
+    <folders target="sdm_demo_todolist" sql="sqlx/sdm/sql"/>
 
     <!-- scope: base folder of generated DTO files (relative to the project root). -->
 
@@ -22,7 +22,7 @@
          Single VM template for both DTO and DAO is OK (like in VM examples from the tab "Admin").
          Separate VM templates for DTO and DAO are OK too. -->
 
-    <dto scope="no_orm/dbal/dto" inheritance="" field-names-mode="0" macro=""/>
+    <dto scope="sqlx/dbal/dto" inheritance="" field-names-mode="0" macro=""/>
 
     <!-- scope: base folder of generated DAO files (relative to the project root). -->
 
@@ -30,8 +30,8 @@
 
             0 - by column name
             1 - by position
-            2 - ptr to DTO (Gorm only and sqlx)
-            3 - direct ptr to resulting slice of DTO-s (Gorm and sqlx). -->
+            2 - ptr to DTO (Gorm, sqlx)
+            >>> 3 - direct ptr to resulting slice of DTO-s (Gorm only). -->
 
     <!-- macro: VM template to render DAO classes.
 
@@ -43,7 +43,7 @@
          Single VM template for both DTO and DAO is OK (like in VM examples from the tab "Admin").
          Separate VM templates for DTO and DAO are OK too. -->
 
-    <dao scope="no_orm/dbal" field-assign-mode="0" macro=""/>
+    <dao scope="sqlx/dbal" field-assign-mode="2" macro="sqlx/sdm/go.vm"/>
 
     <ide event-log="true"/>
 
@@ -63,21 +63,63 @@
 
         <!-- sqlite3 -->
 
+        <type detected="sqlx-java.lang.Integer" target="int64${json-sqlx} -> SetInt64"/>
+        <type detected="sqlx-java.lang.Float" target="float32${json-sqlx} -> SetFloat64"/>
+        <type detected="sqlx-java.lang.Double" target="float64${json-sqlx} -> SetFloat64"/>
+        <type detected="sqlx-java.lang.String" target="string${json-sqlx} -> SetString"/>
+        <type detected="sqlx-java.util.Date" target="time:time.Time${json-sqlx} -> SetTime"/>
+        <type detected="sqlx-byte[]" target="byte[]{$json-sqlx} -> SetBytes"/>
+        <type detected="sqlx-java.lang.Object" target="interface{}${json-sqlx}"/>
+
         <type detected="java.lang.Integer" target="int64${json} -> SetInt64"/>
+        <type detected="java.lang.Float" target="float32${json} -> SetFloat64"/>
         <type detected="java.lang.Double" target="float64${json} -> SetFloat64"/>
         <type detected="java.lang.String" target="string${json} -> SetString"/>
+        <type detected="java.util.Date" target="time:time.Time${json} -> SetTime"/>
         <type detected="byte[]" target="byte[]{$json} -> SetBytes"/>
         <type detected="java.lang.Object" target="interface{}${json}"/>
 
         <!-- oracle -->
 
+        <!--        <type detected="sqlx-java.math.BigDecimal" target="github.com/godror/godror:godror.Number${json-sqlx} -> SetNumber"/>-->
+        <!--        <type detected="sqlx-java.math.BigDecimal+auto" target="github.com/godror/godror:godror.Number${json-sqlx}|1:;autoIncrement -> SetNumber"/>-->
+
+        <!--        <type detected="sqlx-java.lang.String" target="string${json-sqlx} -> SetString"/>-->
+        <!--        <type detected="sqlx-java.util.Date" target="time:time.Time${json-sqlx} -> SetTime"/>-->
+        <!--        <type detected="sqlx-byte[]" target="string${json-sqlx}"/>-->
+        <!--        <type detected="sqlx-java.lang.Boolean" target="int64${json-sqlx} -> SetBool"/>-->
+
+        <!--        <type detected="sqlx-java.lang.Object" target="interface{}${json}-sqlx"/>-->
+
         <!--        <type detected="java.math.BigDecimal" target="github.com/godror/godror:godror.Number${json} -> SetNumber"/>-->
+
         <!--        <type detected="java.lang.String" target="string${json} -> SetString"/>-->
         <!--        <type detected="java.util.Date" target="time:time.Time${json} -> SetTime"/>-->
-        <!--        <type detected="byte[]" target="byte[]{$json} -> SetBytes"/>-->
-        <!--        <type detected="java.lang.Object" target="interface{}{$json}"/>-->
+        <!--        <type detected="byte[]" target="string${json}"/>-->
+        <!--        <type detected="java.lang.Boolean" target="int64${json} -> SetBool"/>-->
+
+        <!--        <type detected="java.lang.Object" target="interface{}${json}"/>-->
 
         <!-- mysql, postgres -->
+
+        <!--        <type detected="sqlx-java.util.UUID" target="github.com/google/uuid:uuid.UUID${json-sqlx}|1:;type:uuid"/>-->
+        <!--        <type detected="sqlx-java.util.UUID+auto"-->
+        <!--              target="github.com/google/uuid:uuid.UUID${json-sqlx}|1:;type:uuid;default:uuid_generate_v4()"/>-->
+
+        <!--        <type detected="sqlx-java.lang.Short" target="int16${json-sqlx} -> SetInt16"/>-->
+        <!--        <type detected="sqlx-java.lang.Integer" target="int32${json-sqlx} -> SetInt32"/>-->
+        <!--        <type detected="sqlx-java.lang.Long" target="int64${json-sqlx} -> SetInt64"/>-->
+
+        <!--        <type detected="sqlx-java.lang.Float" target="float32${json-sqlx} -> SetFloat32"/>-->
+        <!--        <type detected="sqlx-java.lang.Double" target="float64${json-sqlx} -> SetFloat64"/>-->
+        <!--        <type detected="sqlx-java.math.BigDecimal" target="float64${json-sqlx} -> SetFloat64"/>-->
+
+        <!--        <type detected="sqlx-java.lang.String" target="string${json-sqlx} -> SetString"/>-->
+        <!--        <type detected="sqlx-java.util.Date" target="time:time.Time${json-sqlx} -> SetTime"/>-->
+        <!--        <type detected="sqlx-byte[]" target="string${json-sqlx}"/>-->
+        <!--        <type detected="sqlx-java.lang.Boolean" target="bool${json-sqlx} -> SetBool"/>-->
+
+        <!--        <type detected="sqlx-java.lang.Object" target="interface{}${json-sqlx}"/>-->
 
         <!--        <type detected="java.util.UUID" target="github.com/google/uuid:uuid.UUID${json} -> SetUUID"/>-->
         <!--        <type detected="java.sql.Array" target="[]string${json}"/>-->
@@ -110,6 +152,9 @@
         <macro name="${col}" value="${lower_snake_case(column)}"/>
 
         <macro name="${json}" value=" `json:&quot;${col}${0}&quot;`"/>
+
+        <macro name="${json-sqlx}"
+               value=" `json:&quot;${col}${0}&quot; db:&quot;${column}&quot;`"/>
 
     </macros>
 

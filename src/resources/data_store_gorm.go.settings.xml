@@ -8,9 +8,40 @@
 
     <folders target="sdm_demo_todolist" sql="gorm/sdm/sql"/>
 
+    <!-- scope: base folder of generated DTO files (relative to the project root). -->
+
     <!-- field-names-mode: 0 - TitleCase -->
 
+    <!-- macro: VM template to render DAO classes.
+
+            1. Internal VM template is used if "macro" is empty (default).
+            2. VM template is located in "<macros>...<macro><vm>|<vm-xml>..." section below.
+            3. Ending ".vm" means using of VM file and specifies the path to this file relative to the project root:
+                    <dao ... macro="<path>/<name>.vm"/>
+
+         Single VM template for both DTO and DAO is OK (like in VM examples from the tab "Admin").
+         Separate VM templates for DTO and DAO are OK too. -->
+
     <dto scope="gorm/models" inheritance="" field-names-mode="0" macro=""/>
+
+    <!-- scope: base folder of generated DAO files (relative to the project root). -->
+
+    <!-- field-assign-mode (Go only)":
+
+            0 - by column name
+            1 - by position
+            2 - ptr to DTO (Gorm only and sqlx)
+            3 - direct ptr to resulting slice of DTO-s (Gorm and sqlx). -->
+
+    <!-- macro: VM template to render DAO classes.
+
+            1. Internal VM template is used if "macro" is empty (default).
+            2. VM template is located in "<macros>...<macro><vm>|<vm-xml>..." section below.
+            3. Ending ".vm" means using of VM file and specifies the path to this file relative to the project root:
+                    <dao ... macro="<path>/<name>.vm"/>
+
+         Single VM template for both DTO and DAO is OK (like in VM examples from the tab "Admin").
+         Separate VM templates for DTO and DAO are OK too. -->
 
     <dao scope="gorm/dbal" field-assign-mode="3" macro=""/>
 

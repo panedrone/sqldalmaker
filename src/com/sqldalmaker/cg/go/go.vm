@@ -70,7 +70,7 @@ type ${class_name} struct {
 // Generated/AI values are passed to DTO/model.
 
 func (dao *${class_name}) ${method_name}(ctx context.Context, p *${dto_param}) error {
-#if ($model != "")
+#if ($model == "gorm")
 	return dao.ds.Create(ctx, "${table_name}", p)
 }
 #else
@@ -121,7 +121,7 @@ func (dao *${class_name}) ${method_name}(ctx context.Context#param_decls_dto($is
 #else
 func (dao *${class_name}) ${method_name}(ctx context.Context#param_decls($is_external_sql $params)) (res []*${returned_type_name}, err error) {
 #end
-#if ($method_type == "READ" && $model != "")
+#if ($method_type == "READ" && $model == "gorm")
 	err = dao.ds.ReadAll(ctx, "${table_name}", &res)
 	return
 }
@@ -180,7 +180,7 @@ func (dao *${class_name}) ${method_name}(ctx context.Context#param_decls($is_ext
 #end## $assign_mode == 1 || 2
 	return
 }
-#end## $method_type == "READ" && $model != ""
+#end## $method_type == "READ" && $model == "gorm"
 ### ======================================================================================
 #elseif ($mode=="dao_query_one")
 
@@ -193,7 +193,7 @@ func (dao *${class_name}) ${method_name}(ctx context.Context#param_decls_dto($is
 #else
 func (dao *${class_name}) ${method_name}(ctx context.Context#param_decls($is_external_sql $params)) (#if($use_dto)*#end${returned_type_name}, error) {
 #end
-#if ($method_type == "READ" && $model != "")
+#if ($method_type == "READ" && $model == "gorm")
 	res := &${returned_type_name}{}
 	err := dao.ds.Read(ctx, "${table_name}", res#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
 	if err == nil {
@@ -270,7 +270,7 @@ func (dao *${class_name}) ${method_name}(ctx context.Context#param_decls($is_ext
 #end
 #if (${dto_param} != "")
 func (dao *${class_name}) ${method_name}(ctx context.Context#param_decls_dto($is_external_sql)p *${dto_param}) (rowsAffected int64, err error) {
-#if ($model != "")
+#if ($model == "gorm")
 #if ($method_type == "CREATE" || $method_type == "UPDATE")
 	rowsAffected, err = dao.ds.Update(ctx, "${table_name}", p)
 #elseif ( $method_type == "DELETE")
