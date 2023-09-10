@@ -1,3 +1,7 @@
+2023-09-10
+
+    [+] github.com/jmoiron/sqlx
+
 2023-09-01
 
     [+] added form "About"

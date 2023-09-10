@@ -28,7 +28,7 @@ Generated code is being synchronized with the current database schema using "liv
 [+] <a href="https://github.com/panedrone/sdm_demo_todolist_fastapi_sqlalchemy">SQLAlchemy</a>
 [+] <a href="https://github.com/panedrone/sdm_demo_todolist_flask_sqlalchemy">Flask-SQLAlchemy</a>
 <br/>
-[+] <a href="https://github.com/panedrone/sdm_demo_todolist_golang">Go + sqlx</a>
+[+] <a href="https://github.com/panedrone/sdm_demo_todolist_golang">Go + github.com/jmoiron/sqlx</a>
 ]]></change-notes>
 
     <application-components>

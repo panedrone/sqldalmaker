@@ -17,7 +17,7 @@ import (
 
 /*
 	This file is a part of SQL DAL Maker project: https://sqldalmaker.sourceforge.net
-	It demonstrates how to implement an interface DataStore in Go + "github.com/jmoiron/sqlx" (no-orm-scenario).
+	It demonstrates how to implement an interface DataStore in Go + sqlx.
 	More about DataStore: https://sqldalmaker.sourceforge.net/preconfiguring.html#ds
 	Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store_sqlx.go
 
@@ -28,6 +28,8 @@ import (
 */
 
 type DataStore interface {
+	Db() *sqlx.DB
+
 	Open() error
 	Close() error
 
@@ -78,6 +80,10 @@ type InOutParam struct {
 type _DS struct {
 	paramPrefix string
 	db          *sqlx.DB
+}
+
+func (ds *_DS) Db() *sqlx.DB {
+	return ds.db
 }
 
 func _close(obj io.Closer) {
