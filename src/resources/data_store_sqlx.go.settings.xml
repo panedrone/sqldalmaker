@@ -2,48 +2,44 @@
 <settings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:noNamespaceSchemaLocation="settings.xsd">
 
+    <!--    (*) below means "a path relative to the project root"   -->
+
     <!-- target: the same as "module" in "go.mod" -->
 
-    <!-- sql: base folder of SQL files (relative to the project root) -->
+    <!-- sql: base folder of SQL files (*) -->
 
     <folders target="sdm_demo_todolist" sql="sqlx/sdm/sql"/>
 
-    <!-- scope: base folder of generated DTO files (relative to the project root). -->
+    <!-- scope: base folder of generated DTO files (*) -->
 
     <!-- field-names-mode: 0 - TitleCase -->
 
-    <!-- macro: VM template to render DAO classes.
+    <!-- macro: VM template to render DAO classes
 
             1. Internal VM template is used if "macro" is empty (default).
             2. VM template is located in "<macros>...<macro><vm>|<vm-xml>..." section below.
             3. Ending ".vm" means using of VM file and specifies the path to this file relative to the project root:
-                    <dao ... macro="<path>/<name>.vm"/>
-
-         Single VM template for both DTO and DAO is OK (like in VM examples from the tab "Admin").
-         Separate VM templates for DTO and DAO are OK too. -->
+                    <dto ... macro="<path>/<name>.vm"/> -->
 
     <dto scope="sqlx/dbal/dto" inheritance="" field-names-mode="0" macro=""/>
 
-    <!-- scope: base folder of generated DAO files (relative to the project root). -->
+    <!-- scope: base folder of generated DAO files (*) -->
 
     <!-- field-assign-mode (Go only)":
 
             0 - by column name
-            1 - by position
-            2 - ptr to DTO (Gorm, sqlx)
-            >>> 3 - direct ptr to resulting slice of DTO-s (Gorm only). -->
+            1 - by field position
+            2 - ptr to DTO or ptr to slice of DTO-s (Gorm, sqlx)
+            3 - ptr to resulting slice of DTO-s (Gorm, sqlx) -->
 
-    <!-- macro: VM template to render DAO classes.
+    <!-- macro: VM template to render DAO classes
 
             1. Internal VM template is used if "macro" is empty (default).
             2. VM template is located in "<macros>...<macro><vm>|<vm-xml>..." section below.
             3. Ending ".vm" means using of VM file and specifies the path to this file relative to the project root:
-                    <dao ... macro="<path>/<name>.vm"/>
+                    <dao ... macro="<path>/<name>.vm"/> -->
 
-         Single VM template for both DTO and DAO is OK (like in VM examples from the tab "Admin").
-         Separate VM templates for DTO and DAO are OK too. -->
-
-    <dao scope="sqlx/dbal" field-assign-mode="2" macro="sqlx/sdm/go.vm"/>
+    <dao scope="sqlx/dbal" field-assign-mode="3" macro="sqlx/sdm/go.vm"/>
 
     <ide event-log="true"/>
 

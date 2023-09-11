@@ -46,7 +46,7 @@ type DataStore interface {
 	QueryRow(ctx context.Context, sqlText string, args ...interface{}) (row map[string]interface{}, err error)
 	QueryAllRows(ctx context.Context, sqlText string, onRow func(map[string]interface{}), args ...interface{}) error
 
-	QueryByFA(ctx context.Context, sqlText string, fa interface{}, args ...interface{}) error
+	QueryByFA(ctx context.Context, sqlText string, dest interface{}, args ...interface{}) error
 	QueryAllByFA(ctx context.Context, sqlText string, onRow func() (interface{}, func()), args ...interface{}) error
 
 	PGFetch(cursor string) string
@@ -772,8 +772,26 @@ func (ds *_DS) QueryAllRows(ctx context.Context, sqlText string, onRow func(map[
 	return
 }
 
-func (ds *_DS) QueryByFA(ctx context.Context, sqlText string, fa interface{}, args ...interface{}) (err error) {
+func isPtrSlice(i interface{}) bool {
+	// https://stackoverflow.com/questions/69675420/how-to-check-if-interface-is-a-a-pointer-to-a-slice
+	if i == nil {
+		return false
+	}
+	v := reflect.ValueOf(i)
+	if v.Kind() != reflect.Ptr {
+		return false
+	}
+	return v.Elem().Kind() == reflect.Slice
+}
+
+func (ds *_DS) QueryByFA(ctx context.Context, sqlText string, dest interface{}, args ...interface{}) (err error) {
 	sqlText = ds._formatSQL(sqlText)
+	faArr, isUntypedSlice := dest.([]interface{})
+	if !isUntypedSlice && isPtrSlice(dest) {
+		// pointer to slice of DTO-s
+		err = ds.db.SelectContext(ctx, dest, sqlText, args...)
+		return
+	}
 	rows, err := ds._queryX(ctx, sqlText, args...)
 	if err != nil {
 		return
@@ -783,11 +801,10 @@ func (ds *_DS) QueryByFA(ctx context.Context, sqlText string, fa interface{}, ar
 		err = sql.ErrNoRows
 		return
 	}
-	faArr, ok := fa.([]interface{})
-	if ok {
+	if isUntypedSlice {
 		err = rows.Scan(faArr...)
 	} else {
-		err = rows.StructScan(fa)
+		err = rows.StructScan(dest) // pointer to single DTO
 	}
 	if err != nil {
 		return
@@ -808,8 +825,8 @@ func (ds *_DS) QueryAllByFA(ctx context.Context, sqlText string, onRow func() (i
 	for {
 		for rows.Next() {
 			fa, onRowComplete := onRow()
-			faArr, ok := fa.([]interface{})
-			if ok {
+			faArr, isUntypedSlice := fa.([]interface{})
+			if isUntypedSlice {
 				err = rows.Scan(faArr...)
 			} else {
 				err = rows.StructScan(fa)
