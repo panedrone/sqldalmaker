@@ -39,7 +39,7 @@
             3. Ending ".vm" means using of VM file and specifies the path to this file relative to the project root:
                     <dao ... macro="<path>/<name>.vm"/> -->
 
-    <dao scope="sqlx/dbal" field-assign-mode="3" macro="sqlx/sdm/go.vm"/>
+    <dao scope="sqlx/dbal" field-assign-mode="3" macro=""/>
 
     <ide event-log="true"/>
 
