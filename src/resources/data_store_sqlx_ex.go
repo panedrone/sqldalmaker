@@ -22,6 +22,9 @@ func (ds *_DS) initDb() (err error) {
 	// ds.db, err = sqlx.Open("sqlite3", "./log.sqlite")
 	// ds.db, err = sqlx.Open("sqlite3", "./northwindEF.sqlite")
 	// === MySQL ===============================
+	// --- unsupported Scan, storing driver.Value type []uint8 into type *time.Time
+	// --- https://stackoverflow.com/questions/45040319/unsupported-scan-storing-driver-value-type-uint8-into-type-time-time
+	// ds.db, err = sqlx.Open("mysql", "root:root@/todolist?parseTime=true")
 	// ds.db, err = sqlx.Open("mysql", "root:root@/sakila")
 	// ds.db, err = sqlx.Open("mymysql", "sakila/root/root")
 	// === SQL Server ==========================
