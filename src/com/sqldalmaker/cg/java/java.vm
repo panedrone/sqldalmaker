@@ -96,7 +96,7 @@ public class ${class_name} {
      */
 #end
 #if($fetch_list)
-    public List<${returned_type_name}> ${method_name}(#if(${dto_param} != "")#param_decls_dto($is_external_sql)${dto_param} p#else#param_decls($is_external_sql $params)#end) throws Exception {
+    public List<${returned_type_name}> ${method_name}(#param_decls($is_external_sql $params)) throws Exception {
 #sql_var($is_external_sql $sql)
 #if($use_dto)
         final List<${returned_type_name}> res = new ArrayList<${returned_type_name}>();
@@ -110,35 +110,25 @@ public class ${class_name} {
 #end
                 res.add(obj);
             }
-        }#if(${dto_param} != "")#foreach($param in ${params}), p.${param.getterMethod()}()#end);#else#foreach($param in ${params}), ${param.getName()}#end);
+        }#foreach($param in ${params}), ${param.getName()}#end);
         return res;
-#end
-#else
-#if(${dto_param} != "")    
-        return ds.queryList(${returned_type_name}.class, sql#foreach($param in ${params}), p.${param.getterMethod()}()#end);
 #else
         return ds.queryList(${returned_type_name}.class, sql#foreach($param in ${params}), ${param.getName()}#end);
 #end
-#end
     }
 #else
-    public ${returned_type_name} ${method_name}(#if(${dto_param} != "")#param_decls_dto($is_external_sql)${dto_param} p#else#param_decls($is_external_sql $params)#end) throws Exception {
+    public ${returned_type_name} ${method_name}(#param_decls($is_external_sql $params)) throws Exception {
 #sql_var($is_external_sql $sql)
 #if($use_dto)
-        DataStore.RowData rd = ds.queryRow(sql#if(${dto_param} != "")#foreach($param in ${params}), p.${param.getterMethod()}()#end);#else#foreach($param in ${params}), ${param.getName()}#end);
+        DataStore.RowData rd = ds.queryRow(sql#foreach($param in ${params}), ${param.getName()}#end);
         ${returned_type_name} obj = new ${returned_type_name}();
 #foreach($f in ${fields})
 #set($i = ${velocityCount} - 1)
         obj.${f.setterMethod()}(rd.${f.getValueCall()});  // ${f.getComment()}
 #end
         return obj;
-#end
-#else
-#if(${dto_param} != "")    
-        return ds.query(${returned_type_name}.class, sql#foreach($param in ${params}), p.${param.getterMethod()}()#end);
 #else
         return ds.query(${returned_type_name}.class, sql#foreach($param in ${params}), ${param.getName()}#end);
-#end    
 #end
     }
 #end

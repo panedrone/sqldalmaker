@@ -90,11 +90,7 @@ public:
      */
 #if($fetch_list)
 #set($reader = "CListReader<"+${returned_type_name}+"> &reader")
-#if(${dto_param} != "")
-    int ${method_name}(#if($external_sql)DL_STR sql, #end${dto_param} &p, ${reader}) {
-#else
     int ${method_name}(#if($external_sql)DL_STR sql, #end#out_params($params)#if(${params.size()}>0), #end${reader}) {
-#end
 #sql_var(${external_sql} $sql)
         struct : public CRowProcessor {
             ${returned_type_name} buff;
@@ -102,14 +98,8 @@ public:
             void processRow() { pReader->read(buff); }
         } rp;
         rp.pReader = &reader;
-#if(${dto_param} != "")
-#if(${params.size()} > 0)
-        CValue *params[] = {#foreach ($param in ${params})#set($p="&p."+$param.getName())#list_item(${velocityCount} $p)#end};
-#end
-#else
 #if(${params.size()} > 0)
         CValue *params[] = {#foreach ($param in ${params})#set($p="&"+$param.getName())#list_item(${velocityCount} $p)#end};
-#end
 #end
 #if($return_type_is_dto)
         CValue *res_values[] = {#foreach ($field in ${fields})#set($v="&rp.buff."+$field.getName())#list_item(${velocityCount} $v)#end};
@@ -120,20 +110,10 @@ public:
         return m_ds.queryRowList(sql, ${params.size()},#if(${params.size()} > 0) params#else 0#end, ${fields.size()}, res_values, col_names, &rp);
     }
 #else
-#if(${dto_param} != "")
-    int ${method_name}(#if($external_sql)DL_STR sql, #end${dto_param} &p, ${returned_type_name} &res) {
-#else
     int ${method_name}(#if($external_sql)DL_STR sql, #end#out_params($params)#if(${params.size()}>0), #end${returned_type_name} &res) {
-#end
 #sql_var(${external_sql} $sql)
-#if(${dto_param} != "")
-#if(${params.size()} > 0)
-        CValue *params[] = {#foreach ($param in ${params})#set($p="&p."+$param.getName())#list_item(${velocityCount} $p)#end};
-#end
-#else
 #if(${params.size()} > 0)
         CValue *params[] = {#foreach ($param in ${params})#set($p="&"+$param.getName())#list_item(${velocityCount} $p)#end};
-#end
 #end
 #if($return_type_is_dto)
         CValue *res_values[] = {#foreach ($field in ${fields})#set($v="&res."+$field.getName())#list_item(${velocityCount} $v)#end};

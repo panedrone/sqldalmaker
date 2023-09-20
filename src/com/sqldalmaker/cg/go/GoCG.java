@@ -252,18 +252,18 @@ public class GoCG {
                 if (mi.return_type_is_dto) {
                     _process_dto_class_name(mi.jaxb_dto_or_return_type);
                 }
-                String[] parsed = _parse_method_declaration(mi.jaxb_method, dao_package);
+                String[] parsed = _parse_method_declaration2(mi.jaxb_method, dao_package);
                 String method_name = parsed[0];
-                String dto_param_type = parsed[1];
-                String param_descriptors = parsed[2];
+                String param_descriptors = parsed[1];
                 String[] method_param_descriptors = Helpers.get_listed_items(param_descriptors, false);
                 List<FieldInfo> fields = new ArrayList<FieldInfo>();
                 List<FieldInfo> params = new ArrayList<FieldInfo>();
-                String dao_query_jdbc_sql = db_utils.get_dao_query_info(sql_root_abs_path, mi.jaxb_ref, dto_param_type,
+                String dao_query_jdbc_sql = db_utils.get_dao_query_info(sql_root_abs_path, mi.jaxb_ref, "",
                         method_param_descriptors, mi.jaxb_dto_or_return_type, mi.return_type_is_dto, jaxb_dto_classes,
                         fields, params);
                 return _render_query(dao_query_jdbc_sql, mi.jaxb_is_external_sql, mi.jaxb_dto_or_return_type,
-                        mi.return_type_is_dto, mi.fetch_list, method_name, dto_param_type, null, fields, params);
+                        mi.return_type_is_dto, mi.fetch_list, method_name, // dto_param_type,
+                        null, fields, params);
             } catch (Throwable e) {
                 // e.printStackTrace();
                 String msg = "<" + xml_node_name + " method=\"" + mi.jaxb_method + "\" ref=\"" + mi.jaxb_ref
@@ -282,7 +282,7 @@ public class GoCG {
                                             boolean return_type_is_dto,
                                             boolean fetch_list,
                                             String method_name,
-                                            String dto_param_type,
+                                            // String dto_param_type,
                                             String crud_table,
                                             List<FieldInfo> fields,
                                             List<FieldInfo> params) throws Exception {
@@ -338,7 +338,7 @@ public class GoCG {
             context.put("is_external_sql", is_external_sql);
             context.put("use_dto", return_type_is_dto);
             context.put("returned_type_name", returned_type_name);
-            _assign_params_and_imports(params, dto_param_type, context);
+            _assign_params_and_imports(params, "", context);
             StringWriter sw = new StringWriter();
             te.merge(context, sw);
             String text = sw.toString();
@@ -392,14 +392,13 @@ public class GoCG {
             Helpers.check_required_attr(xml_node_name, method);
             try {
                 String dao_jdbc_sql = SqlUtils.jdbc_sql_by_exec_dml_ref(ref, sql_root_abs_path);
-                String[] parsed = _parse_method_declaration(method, dao_package);
+                String[] parsed = _parse_method_declaration2(method, dao_package);
                 String method_name = parsed[0]; // never is null
-                String dto_param_type = parsed[1]; // never is null
-                String param_descriptors = parsed[2]; // never is null
+                String param_descriptors = parsed[1]; // never is null
                 String[] method_param_descriptors = Helpers.get_listed_items(param_descriptors, true);
                 boolean is_external_sql = jaxb_exec_dml.isExternalSql();
                 StringBuilder buff = new StringBuilder();
-                _render_exec_dml(buff, dao_jdbc_sql, is_external_sql, method_name, dto_param_type,
+                _render_exec_dml(buff, dao_jdbc_sql, is_external_sql, method_name, // dto_param_type,
                         method_param_descriptors, xml_node_name, ref);
                 return buff;
 
@@ -410,18 +409,18 @@ public class GoCG {
             }
         }
 
+        // it is used only in render_jaxb_exec_dml
         private void _render_exec_dml(StringBuilder buffer,
                                       String jdbc_dao_sql,
                                       boolean is_external_sql,
                                       String method_name,
-                                      String dto_param_type,
                                       String[] param_descriptors,
                                       String xml_node_name,
                                       String sql_path) throws Exception {
 
             SqlUtils.throw_if_select_sql(jdbc_dao_sql);
             List<FieldInfo> _params = new ArrayList<FieldInfo>();
-            db_utils.get_dao_exec_dml_info(jdbc_dao_sql, dto_param_type, param_descriptors, _params);
+            db_utils.get_dao_exec_dml_info(jdbc_dao_sql, "", param_descriptors, _params);
             for (FieldInfo pi : _params) {
                 String imp = _get_type_import(pi);
                 if (imp != null) {
@@ -479,8 +478,6 @@ public class GoCG {
             Map<String, Object> context = new HashMap<String, Object>();
             context.put("params2", exec_dml_params);
             context.put("mappings", m_list);
-            boolean plain_params = dto_param_type.length() == 0;
-            context.put("plain_params", plain_params);
             context.put("class_name", dao_class_name);
             method_name = _refine_method_name(method_name);
             context.put("method_name", method_name);
@@ -492,7 +489,7 @@ public class GoCG {
             context.put("model", "");
             int fam = settings.getDao().getFieldAssignMode();
             context.put("assign_mode", fam);
-            _assign_params_and_imports(method_params, dto_param_type, context);
+            _assign_params_and_imports(method_params, "", context);
             StringWriter sw = new StringWriter();
             te.merge(context, sw);
             buffer.append(sw.getBuffer());
@@ -561,9 +558,8 @@ public class GoCG {
             context.put("imports", imports_set);
         }
 
-        private String[] _parse_method_declaration(String method_text,
+        private String[] _parse_method_declaration2(String method_text,
                                                    String dto_package) throws Exception {
-            String dto_param_type = "";
             String param_descriptors = "";
             String method_name;
             String[] parts = Helpers.parse_method_params(method_text);
@@ -571,16 +567,12 @@ public class GoCG {
             if (!("".equals(parts[1]))) {
                 parts = Helpers.parse_method_params(parts[1]);
                 if (!("".equals(parts[1]))) {
-                    dto_param_type = parts[0];
-                    param_descriptors = parts[1];
-                    if (dto_param_type.length() > 0) {
-                        _process_dto_class_name(dto_param_type);
-                    }
+                    throw new Exception("Invalid params: " + method_text);
                 } else {
                     param_descriptors = parts[0];
                 }
             }
-            return new String[]{method_name, dto_param_type, param_descriptors};
+            return new String[]{method_name, param_descriptors};
         }
 
         private static void _set_model(String dto_class_name,
@@ -649,7 +641,7 @@ public class GoCG {
             List<FieldInfo> fields_pk = new ArrayList<FieldInfo>();
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
             String dao_jdbc_sql = db_utils.get_dao_crud_read_info(dao_table_name, jaxb_dto_class, fetch_list, explicit_pk, fields_all, fields_pk);
-            return _render_query(dao_jdbc_sql, false, dto_class_name, true, fetch_list, method_name, "", dao_table_name,
+            return _render_query(dao_jdbc_sql, false, dto_class_name, true, fetch_list, method_name, dao_table_name, //dao_table_name,
                     fields_all, fields_pk);
         }
 

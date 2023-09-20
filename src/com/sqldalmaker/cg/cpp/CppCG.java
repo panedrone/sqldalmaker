@@ -123,19 +123,18 @@ public class CppCG {
                 if (mi.return_type_is_dto) {
                     _process_dto_class_name(mi.jaxb_dto_or_return_type);
                 }
-                String[] parsed = _parse_method_declaration(mi.jaxb_method);
+                String[] parsed = _parse_method_declaration2(mi.jaxb_method);
                 String method_name = parsed[0];
-                String dto_param_type = parsed[1];
                 String param_descriptors = parsed[2];
                 String[] method_param_descriptors = Helpers.get_listed_items(param_descriptors, false);
                 List<FieldInfo> fields = new ArrayList<FieldInfo>();
                 List<FieldInfo> params = new ArrayList<FieldInfo>();
                 String dao_query_jdbc_sql = db_utils.get_dao_query_info(
-                        sql_root_abs_path, mi.jaxb_ref, dto_param_type, method_param_descriptors,
+                        sql_root_abs_path, mi.jaxb_ref, "", method_param_descriptors,
                         mi.jaxb_dto_or_return_type, mi.return_type_is_dto, jaxb_dto_classes, fields, params);
                 return _render_query(dao_query_jdbc_sql, mi.jaxb_is_external_sql,
                         mi.jaxb_dto_or_return_type, mi.return_type_is_dto, mi.fetch_list,
-                        method_name, dto_param_type, null, fields, params);
+                        method_name, null, fields, params);
             } catch (Exception e) {
                 // e.printStackTrace();
                 String msg = "<" + xml_node_name + " method=\"" + mi.jaxb_method + "\" ref=\"" + mi.jaxb_ref
@@ -154,7 +153,6 @@ public class CppCG {
                                             boolean jaxb_return_type_is_dto,
                                             boolean fetch_list,
                                             String method_name,
-                                            String dto_param_type,
                                             String crud_table,
                                             List<FieldInfo> fields_all,
                                             List<FieldInfo> fields_pk) throws Exception {
@@ -183,7 +181,7 @@ public class CppCG {
             context.put("fetch_list", fetch_list);
             context.put("imports", imports);
             context.put("is_external_sql", is_external_sql);
-            _assign_params(fields_pk, dto_param_type, context);
+            _assign_params(fields_pk, context);
             StringWriter sw = new StringWriter();
             te.merge(context, sw);
             StringBuilder buff = new StringBuilder();
@@ -193,18 +191,12 @@ public class CppCG {
 
         private String _get_rendered_dto_class_name(String dto_class_name) throws Exception {
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
-            if (jaxb_dto_class != null) {
-                return class_prefix + jaxb_dto_class.getName();
-            } else {
-                throw new Exception("Element not found: " + dto_class_name);
-            }
+            return class_prefix + jaxb_dto_class.getName();
         }
 
         private void _process_dto_class_name(String dto_class_name) throws Exception {
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
-            if (jaxb_dto_class != null) {
-                imports.add(jaxb_dto_class.getName() + ".h");
-            }
+            imports.add(jaxb_dto_class.getName() + ".h");
         }
 
         @Override
@@ -215,15 +207,13 @@ public class CppCG {
             Helpers.check_required_attr(xml_node_name, method);
             try {
                 String dao_jdbc_sql = SqlUtils.jdbc_sql_by_exec_dml_ref(ref, sql_root_abs_path);
-                String[] parsed = _parse_method_declaration(method);
+                String[] parsed = _parse_method_declaration2(method);
                 String method_name = parsed[0]; // never is null
-                String dto_param_type = parsed[1]; // never is null
-                String param_descriptors = parsed[2]; // never is null
+                String param_descriptors = parsed[1]; // never is null
                 String[] method_param_descriptors = Helpers.get_listed_items(param_descriptors, true);
                 boolean is_external_sql = jaxb_exec_dml.isExternalSql();
                 StringBuilder buff = new StringBuilder();
-                _render_exec_dml(buff, dao_jdbc_sql, is_external_sql, method_name, dto_param_type,
-                        method_param_descriptors, xml_node_name, ref);
+                _render_exec_dml(buff, dao_jdbc_sql, is_external_sql, method_name, method_param_descriptors, xml_node_name, ref);
                 return buff;
             } catch (Exception e) {
                 // e.printStackTrace();
@@ -232,22 +222,21 @@ public class CppCG {
             }
         }
 
+        // it is used only in render_jaxb_exec_dml
         private void _render_exec_dml(StringBuilder buffer,
                                       String dao_jdbc_sql,
                                       boolean is_external_sql,
                                       String method_name,
-                                      String dto_param_type,
                                       String[] param_descriptors,
                                       String xml_node_name,
                                       String sql_path) throws Exception {
 
             SqlUtils.throw_if_select_sql(dao_jdbc_sql);
             List<FieldInfo> params = new ArrayList<FieldInfo>();
-            db_utils.get_dao_exec_dml_info(dao_jdbc_sql, dto_param_type, param_descriptors, params);
+            db_utils.get_dao_exec_dml_info(dao_jdbc_sql, "", param_descriptors, params);
             String sql_str = SqlUtils.jdbc_sql_to_cpp_str(dao_jdbc_sql);
             Map<String, Object> context = new HashMap<String, Object>();
-            _assign_params(params, dto_param_type, context);
-            context.put("dto_param", dto_param_type);
+            _assign_params(params, context);
             context.put("method_name", method_name);
             context.put("sql", sql_str);
             context.put("xml_node_name", xml_node_name);
@@ -259,24 +248,12 @@ public class CppCG {
             buffer.append(sw.getBuffer());
         }
 
-        private void _assign_params(List<FieldInfo> params,
-                                    String dto_param_type,
-                                    Map<String, Object> context) throws Exception {
-
-            int params_count = params.size();
-            if (dto_param_type.length() > 0) {
-                if (params_count == 0) {
-                    throw new Exception("DTO parameter specified but SQL-query does not contain any parameters");
-                }
-                _process_dto_class_name(dto_param_type);
-                context.put("dto_param", _get_rendered_dto_class_name(dto_param_type));
-            } else {
-                context.put("dto_param", "");
-            }
+        private void _assign_params(List<FieldInfo> params, Map<String, Object> context) {
+            context.put("dto_param", "");
             context.put("params", params);
         }
 
-        private String[] _parse_method_declaration(String method_text) throws Exception {
+        private String[] _parse_method_declaration2(String method_text) throws Exception {
             String dto_param_type = "";
             String param_descriptors = "";
             String method_name;
@@ -285,11 +262,7 @@ public class CppCG {
             if (!("".equals(parts[1]))) {
                 parts = Helpers.parse_method_params(parts[1]);
                 if (!("".equals(parts[1]))) {
-                    dto_param_type = parts[0];
-                    param_descriptors = parts[1];
-                    if (dto_param_type.length() > 0) {
-                        _process_dto_class_name(dto_param_type);
-                    }
+                    throw new Exception("Invalid params: " + method_text);
                 } else {
                     param_descriptors = parts[0];
                 }
@@ -344,7 +317,7 @@ public class CppCG {
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
             String dao_jdbc_sql = db_utils.get_dao_crud_read_info(dao_table_name, jaxb_dto_class, fetch_list, explicit_pk, fields_all, fields_pk);
             return _render_query(dao_jdbc_sql, false, dto_class_name, true, fetch_list,
-                    method_name, "", dao_table_name, fields_all, fields_pk);
+                    method_name, dao_table_name, fields_all, fields_pk);
         }
 
         @Override

@@ -160,12 +160,8 @@ class ${class_name}
 #if(${is_external_sql})
      * @param String ${d}sql external SQL statement
 #end
-#if(${dto_param} != "")
-     * @param ${dto_param} ${d}p
-#else
 #foreach($param in ${params})
      * @param ${param.getType()} ${d}${param.getName()}
-#end
 #end
 #if($fetch_list)
 #if($use_dto)
@@ -189,11 +185,7 @@ class ${class_name}
         return ${d}this->ds->readAll(${returned_type_name}::class);
     }
 #else
-#if(${dto_param} != "")
-    public function ${method_name}(#param_decls_dto($is_external_sql)${dto_param} ${d}p)
-#else
     public function ${method_name}(#param_decls($is_external_sql $params))
-#end
     {
 #sql_var(${is_external_sql} $sql)
 #if($use_dto)
@@ -219,11 +211,7 @@ class ${class_name}
         return ${d}this->ds->read(${returned_type_name}::class, #pk_array($params));
     }
 #else
-#if(${dto_param} != "")
-    public function ${method_name}(#param_decls_dto($is_external_sql)${dto_param} ${d}p)
-#else
     public function ${method_name}(#param_decls($is_external_sql $params))
-#end
     {
 #sql_var(${is_external_sql} $sql)
 #if($use_dto)

@@ -160,18 +160,17 @@ public class PhpCG {
             String xml_node_name = JaxbUtils.get_jaxb_node_name(jaxb_element);
             Helpers.check_required_attr(xml_node_name, mi.jaxb_method);
             try {
-                String[] parsed = _parse_method_declaration(mi.jaxb_method);
+                String[] parsed = _parse_method_declaration2(mi.jaxb_method);
                 String method_name = parsed[0];
-                String dto_param_type = parsed[1];
-                String param_descriptors = parsed[2];
+                String param_descriptors = parsed[1];
                 String[] method_param_descriptors = Helpers.get_listed_items(param_descriptors, false);
                 List<FieldInfo> fields = new ArrayList<FieldInfo>();
                 List<FieldInfo> params = new ArrayList<FieldInfo>();
-                String dao_query_jdbc_sql = db_utils.get_dao_query_info(sql_root_abs_path, mi.jaxb_ref, dto_param_type,
+                String dao_query_jdbc_sql = db_utils.get_dao_query_info(sql_root_abs_path, mi.jaxb_ref, "",
                         method_param_descriptors, mi.jaxb_dto_or_return_type, mi.return_type_is_dto, jaxb_dto_classes,
                         fields, params);
                 return _render_query(dao_query_jdbc_sql, mi.jaxb_is_external_sql, mi.jaxb_dto_or_return_type,
-                        mi.return_type_is_dto, mi.fetch_list, method_name, dto_param_type, null, fields, params);
+                        mi.return_type_is_dto, mi.fetch_list, method_name, null, fields, params);
             } catch (Throwable e) {
                 // e.printStackTrace();
                 String msg = "<" + xml_node_name + " method=\"" + mi.jaxb_method + "\" ref=\"" + mi.jaxb_ref
@@ -190,7 +189,6 @@ public class PhpCG {
                                             boolean jaxb_return_type_is_dto,
                                             boolean fetch_list,
                                             String method_name,
-                                            String dto_param_type,
                                             String crud_table,
                                             List<FieldInfo> fields,
                                             List<FieldInfo> params) throws Exception {
@@ -220,7 +218,7 @@ public class PhpCG {
             context.put("fetch_list", fetch_list);
             context.put("imports", imports);
             context.put("is_external_sql", is_external_sql);
-            _assign_params(params, dto_param_type, context);
+            _assign_params(params, context);
             StringWriter sw = new StringWriter();
             te.merge(context, sw);
             StringBuilder buff = new StringBuilder();
@@ -292,15 +290,13 @@ public class PhpCG {
             Helpers.check_required_attr(xml_node_name, method);
             try {
                 String dao_jdbc_sql = SqlUtils.jdbc_sql_by_exec_dml_ref(ref, sql_root_abs_path);
-                String[] parsed = _parse_method_declaration(method);
+                String[] parsed = _parse_method_declaration2(method);
                 String method_name = parsed[0]; // never is null
-                String dto_param_type = parsed[1]; // never is null
-                String param_descriptors = parsed[2]; // never is null
+                String param_descriptors = parsed[1]; // never is null
                 String[] method_param_descriptors = Helpers.get_listed_items(param_descriptors, true);
                 boolean is_external_sql = element.isExternalSql();
                 StringBuilder buff = new StringBuilder();
-                _render_exec_dml(buff, dao_jdbc_sql, is_external_sql, method_name, dto_param_type,
-                        method_param_descriptors, xml_node_name, ref);
+                _render_exec_dml(buff, dao_jdbc_sql, is_external_sql, method_name, method_param_descriptors, xml_node_name, ref);
                 return buff;
             } catch (Throwable e) {
                 // e.printStackTrace();
@@ -309,18 +305,18 @@ public class PhpCG {
             }
         }
 
+        // it is used only in render_jaxb_exec_dml
         private void _render_exec_dml(StringBuilder buffer,
                                       String jdbc_dao_sql,
                                       boolean is_external_sql,
                                       String method_name,
-                                      String dto_param_type,
                                       String[] param_descriptors,
                                       String xml_node_name,
                                       String sql_path) throws Exception {
 
             SqlUtils.throw_if_select_sql(jdbc_dao_sql);
             List<FieldInfo> _params = new ArrayList<FieldInfo>();
-            db_utils.get_dao_exec_dml_info(jdbc_dao_sql, dto_param_type, param_descriptors, _params);
+            db_utils.get_dao_exec_dml_info(jdbc_dao_sql, "", param_descriptors, _params);
             String sql_str = SqlUtils.jdbc_sql_to_php_str(jdbc_dao_sql);
             List<MappingInfo> m_list = new ArrayList<MappingInfo>();
             List<FieldInfo> method_params = new ArrayList<FieldInfo>();
@@ -367,10 +363,9 @@ public class PhpCG {
                 }
             }
             Map<String, Object> context = new HashMap<String, Object>();
-            _assign_params(method_params, dto_param_type, context);
+            _assign_params(method_params, context);
             context.put("params2", exec_dml_params);
             context.put("mappings", m_list);
-            context.put("dto_param", dto_param_type);
             context.put("method_name", method_name);
             context.put("sql", sql_str);
             context.put("xml_node_name", xml_node_name);
@@ -413,27 +408,13 @@ public class PhpCG {
             return m;
         }
 
-        private void _assign_params(List<FieldInfo> params,
-                                    String dto_param_type,
-                                    Map<String, Object> context) throws Exception {
-
-            int paramsCount = params.size();
-            if (dto_param_type.length() > 0) {
-                if (paramsCount == 0) {
-                    throw new Exception("DTO parameter specified but SQL-query does not contain any parameters");
-                }
-                StringBuilder rendered_class_name = new StringBuilder();
-                _process_rendered_dto_class_name(dto_param_type, rendered_class_name);
-                context.put("dto_param", rendered_class_name.toString());
-            } else {
-                context.put("dto_param", "");
-            }
+        private void _assign_params(List<FieldInfo> params, Map<String, Object> context) {
+            context.put("dto_param", "");
             context.put("params", params);
         }
 
-        private String[] _parse_method_declaration(String method_text) throws Exception {
+        private String[] _parse_method_declaration2(String method_text) throws Exception {
 
-            String dto_param_type = "";
             String param_descriptors = "";
             String method_name;
             String[] parts = Helpers.parse_method_params(method_text);
@@ -441,16 +422,12 @@ public class PhpCG {
             if (!("".equals(parts[1]))) {
                 parts = Helpers.parse_method_params(parts[1]);
                 if (!("".equals(parts[1]))) {
-                    dto_param_type = parts[0];
-                    param_descriptors = parts[1];
-                    if (dto_param_type.length() > 0) {
-                        _process_rendered_dto_class_name(dto_param_type, null);
-                    }
+                    throw new Exception("Invalid params: " + method_text);
                 } else {
                     param_descriptors = parts[0];
                 }
             }
-            return new String[]{method_name, dto_param_type, param_descriptors};
+            return new String[]{method_name, param_descriptors};
         }
 
         @Override
@@ -503,7 +480,7 @@ public class PhpCG {
             List<FieldInfo> fields_pk = new ArrayList<FieldInfo>();
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
             String dao_jdbc_sql = db_utils.get_dao_crud_read_info(dao_table_name, jaxb_dto_class, fetch_list, explicit_pk, fields_all, fields_pk);
-            return _render_query(dao_jdbc_sql, false, dto_class_name, true, fetch_list, method_name, "", dao_table_name,
+            return _render_query(dao_jdbc_sql, false, dto_class_name, true, fetch_list, method_name, dao_table_name,
                     fields_all, fields_pk);
         }
 
