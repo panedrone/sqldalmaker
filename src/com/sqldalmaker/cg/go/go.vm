@@ -142,18 +142,16 @@ func (dao *${class_name}) ${method_name}(ctx context.Context#param_decls($is_ext
 				res = append(res, _obj)
 			}
 	}
-#elseif ($assign_mode == 2)
+#else
 	_onRow := func() (interface{}, func()) {
 		_obj := &${returned_type_name}{}
 		return _obj, func() {
 			res = append(res, _obj)
 		}
 	}
-#else
-	// unknown: $assign_mode
 #end
 	err = dao.ds.QueryAllByFA(ctx, sql, _onRow#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
-#end## $assign_mode == 1 || 2
+#end
 	return
 }
 #end## $method_type == "READ" && $model == "gorm"
@@ -176,23 +174,7 @@ func (dao *${class_name}) ${method_name}(ctx context.Context#param_decls($is_ext
 #else
 #sql_var($is_external_sql $sql)
 #if($use_dto)## ------------------------------------------------------------ $use_dto
-#if ($assign_mode > 0)## ---------------- $assign_mode > 0 --> QueryByFA
-	res := &${returned_type_name}{}
-#if ($assign_mode == 1)
-	_fa := []interface{}{
-#foreach($f in ${fields})
-		&res.${f.getName()},
-#end
-	}
-#else
-	_fa := res
-#end
-	err := dao.ds.QueryByFA(ctx, sql, _fa#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
-	if err == nil {
-		return res, nil
-	}
-	return nil, err
-#else## ---------------------------------- $assign_mode == 0 --> QueryRow
+#if ($assign_mode == 0)
 	row, err := dao.ds.QueryRow(ctx, sql#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
 	if err != nil {
 		return nil, err
@@ -204,7 +186,26 @@ func (dao *${class_name}) ${method_name}(ctx context.Context#param_decls($is_ext
 #end
 	err = ErrMapToErr(errMap)
 	return &res, err
-#end## ----------------------------------- $assign_mode == 0
+#elseif ($assign_mode == 1)
+	res := &${returned_type_name}{}
+	_fa := []interface{}{
+#foreach($f in ${fields})
+		&res.${f.getName()},
+#end
+	}
+	err := dao.ds.QueryByFA(ctx, sql, _fa#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
+	if err == nil {
+		return res, nil
+	}
+	return nil, err
+#else
+	res := &${returned_type_name}{}
+	err := dao.ds.QueryByFA(ctx, sql, res#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
+	if err == nil {
+		return res, nil
+	}
+	return nil, err
+#end
 #else## ------------------------------------------------------------ NOT $use_dto
 	r, err := dao.ds.Query(ctx, sql#foreach($p in ${params}), ${p.getLowerCamelCaseName()}#end)
 	var res ${returned_type_name}
