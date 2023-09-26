@@ -6,7 +6,7 @@ import java.util.List;
 
 /*
  * This class is a part of SQL DAL Maker project (http://sqldalmaker.sourceforge.net).
- * More about DataStore: https://sqldalmaker.sourceforge.net/preconfiguring.html#ds
+ * More about DataStore: https://sqldalmaker.sourceforge.net/preconfig.html#ds
  * Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/DataStore_JDBC.java_
  * Improvements are welcome: sqldalmaker@gmail.com
  */

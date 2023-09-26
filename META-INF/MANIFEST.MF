@@ -3,7 +3,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: com.sqldalmaker.eclipse
 Bundle-SymbolicName: com.sqldalmaker.eclipse;singleton:=true
-Bundle-Version: 1.288.0.qualifier
+Bundle-Version: 1.289.0.qualifier
 Bundle-Activator: com.sqldalmaker.eclipse.Activator
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,

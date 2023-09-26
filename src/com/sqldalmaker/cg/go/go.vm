@@ -118,11 +118,11 @@ func (dao *${class_name}) ${method_name}(ctx context.Context#param_decls($is_ext
 #if ($assign_mode == 0)## --------------------------------------------------------
 	errMap := make(map[string]int)
 	_onRow := func(row map[string]interface{}) {
-		obj := ${returned_type_name}{}
+		item := ${returned_type_name}{}
 #foreach($f in ${fields})
-		${f.getAssignFunc()}(&obj.${f.getName()}, row, "${f.getColumnName()}", errMap)
+		${f.getAssignFunc()}(&item.${f.getName()}, row, "${f.getColumnName()}", errMap)
 #end
-		res = append(res, &obj)
+		res = append(res, &item)
 	}
 	err = dao.ds.QueryAllRows(ctx, sql, _onRow#foreach($p in ${params}), ${p.getLowerCamelCaseName()}#end)
 	if err == nil {
@@ -130,21 +130,21 @@ func (dao *${class_name}) ${method_name}(ctx context.Context#param_decls($is_ext
 	}
 #elseif ($assign_mode == 1)
 	_onRow := func() (interface{}, func()) {
-		_obj := &${returned_type_name}{}
+		item := &${returned_type_name}{}
 		return []interface{}{
 #foreach ($f in ${fields})
-				&_obj.${f.getName()},
+				&item.${f.getName()},
 #end
 			}, func() {
-				res = append(res, _obj)
+				res = append(res, item)
 			}
 	}
 	err = dao.ds.QueryAllByFA(ctx, sql, _onRow#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
 #elseif ($assign_mode == 2)
 	_onRow := func() (interface{}, func()) {
-		_obj := &${returned_type_name}{}
-		return _obj, func() {
-			res = append(res, _obj)
+		item := &${returned_type_name}{}
+		return item, func() {
+			res = append(res, item)
 		}
 	}
 	err = dao.ds.QueryAllByFA(ctx, sql, _onRow#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
@@ -256,29 +256,29 @@ func (dao *${class_name}) ${method_name}(ctx context.Context#param_decls($is_ext
 #end
 #foreach ($m in $mappings)
 	${m.get_exec_dml_param_name()} := func(rd map[string]interface{}) {
-		obj := ${m.get_dto_class_name()}{}
+		item := ${m.get_dto_class_name()}{}
 #foreach ($f in ${m.get_fields()})
-		${f.getAssignFunc()}(&obj.${f.getName()}, rd, "${f.getColumnName()}", errMap)
+		${f.getAssignFunc()}(&item.${f.getName()}, rd, "${f.getColumnName()}", errMap)
 #end
-		${m.get_method_param_name()}(&obj)
+		${m.get_method_param_name()}(&item)
 	}
 #end
 #else
 #foreach ($m in $mappings)
 	${m.get_exec_dml_param_name()} := func() (interface{}, func()) {
 #if ($assign_mode == 1)
-		_obj := ${m.get_dto_class_name()}{}
+		item := ${m.get_dto_class_name()}{}
 		return []interface{}{
 #foreach($f in ${m.get_fields()})
-				&_obj.${f.getName()},
+				&item.${f.getName()},
 #end
 			}, func() {
-				${m.get_method_param_name()}(&_obj)
+				${m.get_method_param_name()}(&item)
 			}
 #else
-		_obj := &${m.get_dto_class_name()}{}
-		return _obj, func() {
-			${m.get_method_param_name()}(_obj)
+		item := &${m.get_dto_class_name()}{}
+		return item, func() {
+			${m.get_method_param_name()}(item)
 		}
 #end
 	}
