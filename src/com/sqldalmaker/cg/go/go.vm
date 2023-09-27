@@ -20,6 +20,13 @@
 	sql := ${sql}
 #end
 #end
+#macro(set_field $f)
+#if (${f.getAssignFunc()} == "")
+SetAny(&item.${f.getName()}, row, "${f.getColumnName()}", errMap)
+#else
+${f.getAssignFunc()}(&item.${f.getName()}, row, "${f.getColumnName()}", errMap)
+#end
+#end
 ## ======================================================================================
 #if ($mode=="dto_class")
 package ${package}
@@ -120,7 +127,7 @@ func (dao *${class_name}) ${method_name}(ctx context.Context#param_decls($is_ext
 	_onRow := func(row map[string]interface{}) {
 		item := ${returned_type_name}{}
 #foreach($f in ${fields})
-		${f.getAssignFunc()}(&item.${f.getName()}, row, "${f.getColumnName()}", errMap)
+		#set_field($f)
 #end
 		res = append(res, &item)
 	}
@@ -178,13 +185,13 @@ func (dao *${class_name}) ${method_name}(ctx context.Context#param_decls($is_ext
 	if err != nil {
 		return nil, err
 	}
-	res := ${returned_type_name}{}
+	item := ${returned_type_name}{}
 	errMap := make(map[string]int)
 #foreach ($f in ${fields})
-	${f.getAssignFunc()}(&res.${f.getName()}, row, "${f.getColumnName()}", errMap)
+	#set_field($f)
 #end
 	err = ErrMapToErr(errMap)
-	return &res, err
+	return &item, err
 #elseif ($assign_mode == 1)
 	res := &${returned_type_name}{}
 	_fa := []interface{}{
@@ -258,7 +265,7 @@ func (dao *${class_name}) ${method_name}(ctx context.Context#param_decls($is_ext
 	${m.get_exec_dml_param_name()} := func(rd map[string]interface{}) {
 		item := ${m.get_dto_class_name()}{}
 #foreach ($f in ${m.get_fields()})
-		${f.getAssignFunc()}(&item.${f.getName()}, rd, "${f.getColumnName()}", errMap)
+		#set_field($f)
 #end
 		${m.get_method_param_name()}(&item)
 	}

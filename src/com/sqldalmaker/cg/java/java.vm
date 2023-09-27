@@ -22,6 +22,13 @@ String sql#if(${params.size()} > 0), #end
         String sql = ${sql};
 #end
 #end
+#macro(set_field $f)
+#if (${f.getAssignFunc()} == "")
+obj.${f.setterMethod()}(rd.getValue(${f.getType()}.class, "${f.getColumnName()}"));  // ${f.getComment()}
+#else
+obj.${f.setterMethod()}(rd.${f.getAssignFunc()}("${f.getColumnName()}"));  // ${f.getComment()}
+#end
+#end
 ## ====================================================================================================================
 #if ($mode=="dto_class")
 package ${package};
@@ -105,8 +112,7 @@ public class ${class_name} {
             public void handleRow(DataStore.RowData rd) throws Exception {
                 ${returned_type_name} obj = new ${returned_type_name}();
 #foreach($f in ${fields})
-#set($i = ${velocityCount} - 1)
-                obj.${f.setterMethod()}(rd.${f.getValueCall()});  // ${f.getComment()}
+                #set_field($f)
 #end
                 res.add(obj);
             }
@@ -123,8 +129,7 @@ public class ${class_name} {
         DataStore.RowData rd = ds.queryRow(sql#foreach($param in ${params}), ${param.getName()}#end);
         ${returned_type_name} obj = new ${returned_type_name}();
 #foreach($f in ${fields})
-#set($i = ${velocityCount} - 1)
-        obj.${f.setterMethod()}(rd.${f.getValueCall()});  // ${f.getComment()}
+        #set_field($f)
 #end
         return obj;
 #else
@@ -171,7 +176,7 @@ public class ${class_name} {
             public void handleRow(RowData rd) throws Exception {
                 ${m.get_dto_class_name()} obj = new ${m.get_dto_class_name()}();
 #foreach($f in ${m.get_fields()})
-                obj.${f.setterMethod()}(rd.${f.getValueCall()});  // ${f.getComment()}
+                #set_field($f)
 #end
                 ${m.get_method_param_name()}.handle(obj);
             }

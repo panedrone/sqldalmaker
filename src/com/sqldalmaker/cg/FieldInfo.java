@@ -38,7 +38,7 @@ public class FieldInfo {
 
     private String name_prefix = "";
 
-    private String assign_func;
+    private String assign_func = "";
 
     public FieldInfo(FieldNamesMode field_names_mode, String original_field_type, String jdbc_db_col_name, String comment) throws Exception {
         if (original_field_type == null) {
@@ -88,17 +88,7 @@ public class FieldInfo {
         this.comment = comment;
     }
 
-    public String getValueCall() { // this method is for use in "java.vm"
-        if (assign_func == null || assign_func.trim().length() == 0) {
-            return "getValue(" + getType() + ".class, \"" + getColumnName() + "\")";
-        }
-        return this.assign_func + "(\"" + getColumnName() + "\")";
-    }
-
-    public String getAssignFunc() { // this method is for use in "go.vm"
-        if (assign_func == null || assign_func.trim().length() == 0) {
-            assign_func = "SetAny";
-        }
+    public String getAssignFunc() { // this method is for use in "java.vm" and "go.vm"
         return this.assign_func;
     }
 
