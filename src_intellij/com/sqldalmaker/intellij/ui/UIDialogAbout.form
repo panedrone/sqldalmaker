@@ -12,20 +12,6 @@
         <properties/>
         <border type="none"/>
         <children>
-          <grid id="17b10" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="1">
-            <constraints border-constraint="North"/>
-            <properties/>
-            <border type="none"/>
-            <children>
-              <component id="e8c6b" class="javax.swing.JLabel">
-                <constraints/>
-                <properties>
-                  <font size="14" style="1"/>
-                  <text value="SQL DAL Maker"/>
-                </properties>
-              </component>
-            </children>
-          </grid>
           <grid id="d7b29" layout-manager="BorderLayout" hgap="0" vgap="0">
             <constraints border-constraint="Center"/>
             <properties/>

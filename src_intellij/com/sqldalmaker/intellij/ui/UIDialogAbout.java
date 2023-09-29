@@ -1,3 +1,8 @@
+/*
+    Copyright 2011-2023 sqldalmaker@gmail.com
+    SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
+    Read LICENSE.txt in the root of this project/archive for details.
+ */
 package com.sqldalmaker.intellij.ui;
 
 import com.intellij.uiDesigner.core.GridConstraints;
@@ -6,11 +11,8 @@ import com.intellij.uiDesigner.core.GridLayoutManager;
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
-import javax.swing.plaf.FontUIResource;
-import javax.swing.text.StyleContext;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.Locale;
 
 public class UIDialogAbout extends JDialog {
     private JPanel contentPane;
@@ -55,6 +57,8 @@ public class UIDialogAbout extends JDialog {
             text1.setEditable(false);
 
             String text = IdeaHelpers.read_from_jar_file("", "ABOUT.html");
+            String sdm_info = IdeaHelpers.get_sdm_info();
+            text = String.format(text, sdm_info);
             text1.setText(text);
 
             text1.addHyperlinkListener(new HyperlinkListener() {
@@ -104,52 +108,22 @@ public class UIDialogAbout extends JDialog {
         panel1.setLayout(new BorderLayout(0, 0));
         contentPane.add(panel1, BorderLayout.CENTER);
         final JPanel panel2 = new JPanel();
-        panel2.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
-        panel1.add(panel2, BorderLayout.NORTH);
-        final JLabel label1 = new JLabel();
-        Font label1Font = this.$$$getFont$$$(null, Font.BOLD, 14, label1.getFont());
-        if (label1Font != null) label1.setFont(label1Font);
-        label1.setText("SQL DAL Maker");
-        panel2.add(label1);
-        final JPanel panel3 = new JPanel();
-        panel3.setLayout(new BorderLayout(0, 0));
-        panel1.add(panel3, BorderLayout.CENTER);
+        panel2.setLayout(new BorderLayout(0, 0));
+        panel1.add(panel2, BorderLayout.CENTER);
         text1 = new JTextPane();
         text1.setEditable(false);
         text1.setMargin(new Insets(0, 15, 15, 15));
         text1.setText("");
-        panel3.add(text1, BorderLayout.CENTER);
+        panel2.add(text1, BorderLayout.CENTER);
+        final JPanel panel3 = new JPanel();
+        panel3.setLayout(new FlowLayout(FlowLayout.RIGHT, 5, 5));
+        contentPane.add(panel3, BorderLayout.SOUTH);
         final JPanel panel4 = new JPanel();
-        panel4.setLayout(new FlowLayout(FlowLayout.RIGHT, 5, 5));
-        contentPane.add(panel4, BorderLayout.SOUTH);
-        final JPanel panel5 = new JPanel();
-        panel5.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
-        panel4.add(panel5);
+        panel4.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
+        panel3.add(panel4);
         buttonOK = new JButton();
         buttonOK.setText("OK");
-        panel5.add(buttonOK, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-    }
-
-    /**
-     * @noinspection ALL
-     */
-    private Font $$$getFont$$$(String fontName, int style, int size, Font currentFont) {
-        if (currentFont == null) return null;
-        String resultName;
-        if (fontName == null) {
-            resultName = currentFont.getName();
-        } else {
-            Font testFont = new Font(fontName, Font.PLAIN, 10);
-            if (testFont.canDisplay('a') && testFont.canDisplay('1')) {
-                resultName = fontName;
-            } else {
-                resultName = currentFont.getName();
-            }
-        }
-        Font font = new Font(resultName, style >= 0 ? style : currentFont.getStyle(), size >= 0 ? size : currentFont.getSize());
-        boolean isMac = System.getProperty("os.name", "").toLowerCase(Locale.ENGLISH).startsWith("mac");
-        Font fontWithFallback = isMac ? new Font(font.getFamily(), font.getStyle(), font.getSize()) : new StyleContext().getFont(font.getFamily(), font.getStyle(), font.getSize());
-        return fontWithFallback instanceof FontUIResource ? fontWithFallback : new FontUIResource(fontWithFallback);
+        panel4.add(buttonOK, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
     }
 
     /**

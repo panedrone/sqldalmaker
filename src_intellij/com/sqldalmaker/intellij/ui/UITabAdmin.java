@@ -106,16 +106,8 @@ public class UITabAdmin {
                 // Programmatically get the version of an IntelliJ IDEA plugin
                 // https://stackoverflow.com/questions/28080707/programmatically-get-the-version-of-an-intellij-idea-plugin
 
-                String plugin_version = "1.160+";
-                try {
-                    String plugin_xml = IdeaHelpers.read_from_jar_file("", "plugin.xml");
-                    String[] parts = plugin_xml.split("<version>");
-                    plugin_version = parts[1].split("</version>")[0];
-                } catch (Throwable e) {
-                    //
-                }
-                String jv = System.getProperty("java.version");
-                vTextField.setText(plugin_version + " on Java " + jv);
+                String sdm_info = IdeaHelpers.get_sdm_info();
+                vTextField.setText(sdm_info);
                 vTextField.setBorder(BorderFactory.createEmptyBorder());
                 // https://stackoverflow.com/questions/291115/java-swing-using-jscrollpane-and-having-it-scroll-back-to-top
                 scroll_pane.getVerticalScrollBar().setValue(0);

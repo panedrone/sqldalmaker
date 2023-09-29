@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2022 sqldalmaker@gmail.com
+    Copyright 2011-2023 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -232,6 +232,20 @@ public class IdeaHelpers {
             throw new InternalException("Invalid URL");
         }
         return con;
+    }
+
+    public static String get_sdm_info() {
+        String plugin_version = "1.289+";
+        try {
+
+            String plugin_xml = IdeaHelpers.read_from_jar_file("", "plugin.xml");
+            String[] parts = plugin_xml.split("<version>");
+            plugin_version = parts[1].split("</version>")[0];
+        } catch (Throwable e) {
+            //
+        }
+        String jv = System.getProperty("java.version");
+        return plugin_version + " on Java " + jv;
     }
 
     public static class GeneratedFileData {
