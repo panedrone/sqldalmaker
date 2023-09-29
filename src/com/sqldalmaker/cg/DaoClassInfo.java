@@ -56,9 +56,9 @@ public class DaoClassInfo {
                                                   DtoClass jaxb_dto_class,
                                                   List<FieldInfo> dao_fields) throws Exception {
 
-        DtoClassInfo info = new DtoClassInfo(conn, type_map, markers, dto_field_names_mode);
-        final boolean ignore_model = true;
-        Map<String, FieldInfo> dto_fields_map = info.get_dto_field_info(ignore_model, jaxb_dto_class, sql_root_abs_path, new ArrayList<FieldInfo>());
+        DtoClassInfo dto_info = new DtoClassInfo(conn, type_map, markers, dto_field_names_mode);
+        boolean ignore_model = true;
+        Map<String, FieldInfo> dto_fields_map = dto_info.get_dto_field_info(ignore_model, jaxb_dto_class, sql_root_abs_path, new ArrayList<FieldInfo>());
         Set<FieldInfo> excluded_dao_fields = new HashSet<FieldInfo>();
         for (FieldInfo dao_fi : dao_fields) {
             String dao_col_name = dao_fi.getColumnName();

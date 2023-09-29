@@ -71,7 +71,8 @@ public class JavaCG {
             StringWriter sw = new StringWriter();
             te.merge(context, sw);
             String text = sw.toString();
-            text = text.replace("java.lang.", "");
+            // === panedrone: leave as is to see bad types in "", i.e. "java.lang.java.util.Date"
+//            text = text.replace("java.lang.", "");
             return new String[]{text};
         }
     }
