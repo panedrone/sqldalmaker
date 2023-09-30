@@ -185,7 +185,7 @@ class JdbcTableInfo {
                     if (!fields_map.containsKey(db_col_name)) {
                         continue;
                     }
-                } catch (Exception e) {
+                } catch (SQLException e) {
                     System.err.println("COLUMN_NAME: " + e.getMessage());
                     continue;
                 }
@@ -228,7 +228,7 @@ class JdbcTableInfo {
             } else {
                 fi.setNullable(false);
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.err.println("NULLABLE: " + e.getMessage());
         }
     }
@@ -242,7 +242,7 @@ class JdbcTableInfo {
                 if ("yes".equals(is_ai) || "YES".equals(is_ai)) {
                     fi.setAI(true);
                 }
-            } catch (Exception e) {
+            } catch (SQLException e) {
                 System.err.println("IS_AUTOINCREMENT: " + e.getMessage());
             }
         }
@@ -254,7 +254,7 @@ class JdbcTableInfo {
             // https://stackoverflow.com/questions/12931061/how-to-get-oracle-number-with-syncdb
             int decimal_digits = columns_rs.getInt("DECIMAL_DIGITS");
             fi.setDecimalDigits(decimal_digits);
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.err.println("DECIMAL_DIGITS: " + e.getMessage());
         }
     }
@@ -269,7 +269,7 @@ class JdbcTableInfo {
                     size = 0xffff;
                 }
                 fi.setColumnSize(size);
-            } catch (Exception e) {
+            } catch (SQLException e) {
                 System.err.println("COLUMN_SIZE: " + e.getMessage());
             }
         }
@@ -286,7 +286,7 @@ class JdbcTableInfo {
                 fi.refine_scalar_type(apache_java_type_name);
                 String rendered_type_name = _get_type_name(apache_java_type_name);
                 fi.refine_rendered_type(rendered_type_name);
-            } catch (Exception e) {
+            } catch (SQLException e) {
                 System.err.println("DATA_TYPE: " + e.getMessage());
             }
         }

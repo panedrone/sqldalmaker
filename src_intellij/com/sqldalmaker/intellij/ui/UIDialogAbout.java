@@ -5,30 +5,44 @@
  */
 package com.sqldalmaker.intellij.ui;
 
-import com.intellij.uiDesigner.core.GridConstraints;
-import com.intellij.uiDesigner.core.GridLayoutManager;
-
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import java.awt.*;
 import java.awt.event.*;
 
+/**
+ * @author panedrone
+ */
 public class UIDialogAbout extends JDialog {
     private JPanel contentPane;
     private JButton buttonOK;
     private JTextPane text1;
 
-    public static void showModal() {
-        final UIDialogAbout d = new UIDialogAbout();
-        d.pack();
-        d.setLocationRelativeTo(null);  // after pack!!!
-        d.setVisible(true);
+    public static void show_modal() {
+
+        EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                UIDialogAbout dialog = new UIDialogAbout(new JFrame(), true);
+
+                // dialog.setPreferredSize(new Dimension(720, 300)); // don't !!!
+
+                // How to completely remove an icon from JDialog?
+                // https://stackoverflow.com/questions/8504731/how-to-completely-remove-an-icon-from-jdialog
+                dialog.setResizable(false);
+
+                dialog.pack(); // after setPreferredSize
+                dialog.setLocationRelativeTo(null);  // after pack!!!
+                dialog.setVisible(true);
+            }
+        });
     }
 
-    private UIDialogAbout() {
+    private UIDialogAbout(Frame parent, boolean modal) {
+        super(parent, modal);
         setContentPane(contentPane);
-        setModal(true);
+        // setModal(true);
         setTitle("About");
         getRootPane().setDefaultButton(buttonOK);
 
@@ -119,11 +133,18 @@ public class UIDialogAbout extends JDialog {
         panel3.setLayout(new FlowLayout(FlowLayout.RIGHT, 5, 5));
         contentPane.add(panel3, BorderLayout.SOUTH);
         final JPanel panel4 = new JPanel();
-        panel4.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
+        panel4.setLayout(new GridBagLayout());
         panel3.add(panel4);
         buttonOK = new JButton();
         buttonOK.setText("OK");
-        panel4.add(buttonOK, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        GridBagConstraints gbc;
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        panel4.add(buttonOK, gbc);
     }
 
     /**

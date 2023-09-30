@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2022 sqldalmaker@gmail.com
+    Copyright 2011-2023 sqldalmaker@gmail.com
     SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -28,6 +28,8 @@ import java.util.Properties;
 import org.openide.filesystems.FileLock;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
+import org.openide.modules.ModuleInfo;
+import org.openide.modules.Modules;
 
 /**
  *
@@ -179,5 +181,12 @@ public class NbpHelpers {
         }
         file = folder.createData(file_name);
         write_file_content(file, file_content);
+    }
+
+    static String get_sdm_info(Class<?> clazz) {
+        ModuleInfo m = Modules.getDefault().ownerOf(clazz);
+        String v = m.getSpecificationVersion().toString();
+        String jv = System.getProperty("java.version");
+        return v + " on Java " + jv;
     }
 }

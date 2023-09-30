@@ -77,7 +77,7 @@ public class SdmActionGroup extends ActionGroup implements AlwaysVisibleActionGr
         SdmAction action = new SdmAction("About") {
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
-                UIDialogAbout.showModal();
+                UIDialogAbout.show_modal();
             }
         };
         drop_down_actions_list.add(action);

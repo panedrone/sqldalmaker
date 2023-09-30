@@ -442,7 +442,7 @@ public class UITabAdmin {
         aboutButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                UIDialogAbout.showModal();
+                UIDialogAbout.show_modal();
             }
         });
         btn_sqlx_xml.addActionListener(new ActionListener() {
