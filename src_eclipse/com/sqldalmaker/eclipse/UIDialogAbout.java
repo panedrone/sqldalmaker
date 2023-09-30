@@ -34,11 +34,12 @@ public class UIDialogAbout extends Dialog {
 
 		super.create();
 
-		getContents().getShell().setText("SQL DAL Maker");
+		getContents().getShell().setText("About");
 
 		try {
 			String txt = Helpers.read_from_jar_file_2("ABOUT.txt");
-			// text += "\r\n" + v;
+			String get_sdm_info = EclipseHelpers.get_sdm_info();
+			txt = String.format(txt, get_sdm_info);
 			text_1.setText(txt);
 		} catch (Exception e) {
 			e.printStackTrace();

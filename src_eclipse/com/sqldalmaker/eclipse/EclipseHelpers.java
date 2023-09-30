@@ -1,5 +1,5 @@
 /*
-	Copyright 2011-2022 sqldalmaker@gmail.com
+	Copyright 2011-2023 sqldalmaker@gmail.com
 	Read LICENSE.txt in the root of this project/archive.
 	Project web-site: https://sqldalmaker.sourceforge.net/
 */
@@ -21,8 +21,11 @@ import java.util.Properties;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.variables.IStringVariableManager;
 import org.eclipse.core.variables.VariablesPlugin;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.Version;
 
 import com.sqldalmaker.cg.Helpers;
 import com.sqldalmaker.common.InternalException;
@@ -172,5 +175,14 @@ public class EclipseHelpers {
 		Settings settings = load_settings(editor2);
 		String sql_root_abs_path = project_root + "/" + settings.getFolders().getSql();
 		SdmUtils.gen_field_wizard_jaxb(settings, connection, object_factory, dto_class, sql_root_abs_path);
+	}
+
+	public static String get_sdm_info() {
+		Bundle bundle = Platform.getBundle(Activator.PLUGIN_ID);
+		Version version = bundle.getVersion();
+		String v = String.format("%d.%d.%d.%s", version.getMajor(), version.getMinor(), version.getMicro(),
+				version.getQualifier());
+		String jv = System.getProperty("java.version");
+		return v + " on Java " + jv;
 	}
 }

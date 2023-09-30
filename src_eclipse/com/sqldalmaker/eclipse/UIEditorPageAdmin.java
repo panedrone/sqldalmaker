@@ -8,7 +8,6 @@ package com.sqldalmaker.eclipse;
 import java.sql.Connection;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.Action;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
@@ -27,13 +26,11 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.wb.swt.ResourceManager;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.Version;
+import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.sqldalmaker.cg.Helpers;
 import com.sqldalmaker.common.Const;
 import com.sqldalmaker.jaxb.settings.Settings;
-import org.eclipse.wb.swt.SWTResourceManager;
 
 /**
  *
@@ -797,18 +794,8 @@ public class UIEditorPageAdmin extends Composite {
 	}
 
 	public void init_runtime() {
-		try {
-
-			Bundle bundle = Platform.getBundle(Activator.PLUGIN_ID);
-			Version version = bundle.getVersion();
-			String v = String.format("%d.%d.%d.%s", version.getMajor(), version.getMinor(), version.getMicro(),
-					version.getQualifier());
-			String jv = System.getProperty("java.version");
-			txtV.setText(v + " on Java " + jv);
-
-		} catch (Exception e1) {
-			e1.printStackTrace();
-		}
+		String get_sdm_info = EclipseHelpers.get_sdm_info();
+		txtV.setText(get_sdm_info);
 	}
 
 	public void setEditor2(Editor2 ed) {
