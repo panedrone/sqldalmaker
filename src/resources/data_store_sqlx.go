@@ -6,9 +6,8 @@ import (
 	"database/sql/driver"
 	"errors"
 	"fmt"
-	"github.com/godror/godror"
+	//	"github.com/godror/godror"
 	"github.com/jmoiron/sqlx"
-	//"github.com/godror/godror"
 	"io"
 	"reflect"
 	"strconv"
@@ -498,7 +497,7 @@ func (ds *_DS) _fetchRows(rows *sqlx.Rows, onRow func() (interface{}, func())) (
 		case []interface{}:
 			err = rows.Scan(_fa...)
 		default:
-			err = errUnexpectedType(_fa)
+			err = rows.StructScan(_fa)
 		}
 		if err != nil {
 			return
@@ -1131,18 +1130,18 @@ func _setBytes(d *[]byte, value interface{}) error {
 	return nil
 }
 
-func SetNumber(d *godror.Number, row map[string]interface{}, colName string, errMap map[string]int) {
-	value, err := _getValue(row, colName, errMap)
-	if err == nil {
-		err = _setNumber(d, value)
-		_updateErrMap(err, colName, errMap)
-	}
-}
-
-func _setNumber(d *godror.Number, value interface{}) error {
-	err := d.Scan(value)
-	return err
-}
+//func SetNumber(d *godror.Number, row map[string]interface{}, colName string, errMap map[string]int) {
+//	value, err := _getValue(row, colName, errMap)
+//	if err == nil {
+//		err = _setNumber(d, value)
+//		_updateErrMap(err, colName, errMap)
+//	}
+//}
+//
+//func _setNumber(d *godror.Number, value interface{}) error {
+//	err := d.Scan(value)
+//	return err
+//}
 
 func assignErr(dstPtr interface{}, value interface{}, funcName string, errMsg string) error {
 	return errors.New(fmt.Sprintf("%s %T <- %T %s", funcName, dstPtr, value, errMsg))
@@ -1208,8 +1207,8 @@ func _setAny(dstPtr interface{}, value interface{}) error {
 		err = _setBool(d, value)
 	case *[]byte: // the same as uint8
 		err = _setBytes(d, value)
-	case *godror.Number:
-		err = _setNumber(d, value)
+	//case *godror.Number:
+	//	err = _setNumber(d, value)
 	//case *uuid.UUID:
 	//	switch bv := value.(type) {
 	//	case []byte:
