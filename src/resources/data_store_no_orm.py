@@ -18,13 +18,18 @@
 """
 
 
-# =========== Example of usage:
+# =========== Examples of usage:
 #
+# import sqlite3
 # import psycopg2
+# import mysql.connector # pip install mysql-connector-python
 #
 # from dbal.data_store import create_ds, DataStore
 #
-# conn = psycopg2.connect(host="127.0.0.1", database="my_tests", user="postgres", password="sa")
+# conn = sqlite3.connect('./todolist.sqlite', check_same_thread=False)
+# conn = mysql.connector.Connect(user='root', password='sa', host='127.0.0.1', database='todolist')
+# conn = psycopg2.connect(host="localhost", database="todolist", user="postgres", password="sa")
+#
 # # https://pynative.com/python-mysql-transaction-management-using-commit-rollback/
 # conn.autocommit = False
 #
@@ -127,9 +132,6 @@ class _DS(DataStore):
 
     def __init__(self, conn):
 
-        # conn = sqlite3.connect('./todolist.sqlite', check_same_thread=False)
-        # conn = mysql.connector.Connect(user='root', password='sa', host='127.0.0.1', database='todolist')
-        # conn = psycopg2.connect(host="localhost", database="todolist", user="postgres", password="sa")
 
         self.conn = conn
 
@@ -160,6 +162,7 @@ class _DS(DataStore):
             # self.conn.begin()  #  'sqlite3.Connection' object has no attribute 'begin'"
             return
         if self.engine_type == self.EngineType.mysql:
+            # it must be "self.conn.autocommit = True" or no prev. transaction
             self.conn.start_transaction()
             return
         if self.engine_type == self.EngineType.postgresql:

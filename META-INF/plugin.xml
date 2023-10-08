@@ -2,7 +2,7 @@
     <id>dal-mpe</id>
     <name>SQL DAL Maker</name>
     <category>Database</category>
-    <version>1.289.0929</version>
+    <version>1.290.1008</version>
     <vendor email="sqldalmaker@gmail.com" url="https://sqldalmaker.sourceforge.net">
         SQL DAL Maker
     </vendor>
@@ -21,13 +21,13 @@ Generated code is being synchronized with the current database schema using "liv
     ]]></description>
 
     <change-notes><![CDATA[
-[+] <a href="https://github.com/panedrone/sdm_demo_todolist_php_doctrine">PHP Doctrine</a>
-[+] <a href="https://github.com/panedrone/sdm_demo_todolist_golang">Go + Gorm</a>
-[+] <a href="https://github.com/panedrone/sdm_demo_todolist_django">Django</a>
-[+] <a href="https://github.com/panedrone/sdm_demo_todolist_fastapi_sqlalchemy">SQLAlchemy</a>
-[+] <a href="https://github.com/panedrone/sdm_demo_todolist_flask_sqlalchemy">Flask-SQLAlchemy</a>
-<br/>
-[+] <a href="https://github.com/panedrone/sdm_demo_todolist_golang">Go + github.com/jmoiron/sqlx</a>
+<ul>
+<li><a href="https://github.com/panedrone/sdm_demo_todolist_golang">sqlx</a></li>
+<li><a href="https://github.com/panedrone/sdm_demo_todolist_golang">gorm</a></li>
+<li><a href="https://github.com/panedrone/sdm_demo_todolist_django">Django</a></li>
+<li><a href="https://github.com/panedrone/sdm_demo_todolist_fastapi_sqlalchemy">SQLAlchemy</a>, <a href="https://github.com/panedrone/sdm_demo_todolist_flask_sqlalchemy">flask_sqlalchemy</a></li>
+<li><a href="https://github.com/panedrone/sdm_demo_todolist_php_doctrine">PHP Doctrine</a></li>
+</ul>
 ]]></change-notes>
 
     <application-components>

@@ -135,6 +135,8 @@
 
         <!--        <type detected="java.lang.Object" target="interface{}${json}"/>-->
 
+        <type detected="java.sql.ResultSet" target="string"/> <!-- PG cursor param -->
+
     </type-map>
 
     <macros>

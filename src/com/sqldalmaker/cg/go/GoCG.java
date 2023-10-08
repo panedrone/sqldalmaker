@@ -311,7 +311,11 @@ public class GoCG {
                     context.put("mode", "dao_query_all");
                 }
             } else {
-                context.put("mode", "dao_query_one");
+                if (return_type_is_dto) {
+                    context.put("mode", "dao_query_dto");
+                } else {
+                    context.put("mode", "dao_query");
+                }
             }
             context.put("class_name", dao_class_name);
             if (return_type_is_dto) {
@@ -336,7 +340,7 @@ public class GoCG {
             context.put("table_name", crud_table);
             context.put("sql", go_sql_str);
             context.put("is_external_sql", is_external_sql);
-            context.put("use_dto", return_type_is_dto);
+            // context.put("use_dto", return_type_is_dto);
             context.put("returned_type_name", returned_type_name);
             _assign_params_and_imports(params, "", context);
             StringWriter sw = new StringWriter();
