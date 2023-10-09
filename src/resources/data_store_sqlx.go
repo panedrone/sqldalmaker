@@ -225,6 +225,14 @@ func (ds *_DS) Rollback(txCtx *context.Context) (err error) {
 	return
 }
 
+func (ds *_DS) _select(ctx context.Context, dest interface{}, sqlString string, args ...interface{}) error {
+	tx := getTx(ctx)
+	if tx == nil {
+		return ds.db.SelectContext(ctx, dest, sqlString, args...)
+	}
+	return tx.SelectContext(ctx, dest, sqlString, args...)
+}
+
 func (ds *_DS) _queryX(ctx context.Context, sqlString string, args ...interface{}) (*sqlx.Rows, error) {
 	tx := getTx(ctx)
 	if tx == nil {
@@ -797,7 +805,7 @@ func (ds *_DS) QueryByFA(ctx context.Context, sqlString string, dest interface{}
 	faArr, isUntypedSlice := dest.([]interface{})
 	if !isUntypedSlice && isPtrSlice(dest) {
 		// pointer to DTO
-		err = ds.db.SelectContext(ctx, dest, sqlString, args...)
+		err = ds._select(ctx, dest, sqlString, args...)
 		return
 	}
 	rows, err := ds._queryX(ctx, sqlString, args...)
