@@ -7,6 +7,7 @@ package com.sqldalmaker.netbeans;
 
 import com.sqldalmaker.cg.Helpers;
 import com.sqldalmaker.common.Const;
+import com.sqldalmaker.common.XmlHelpers;
 import com.sqldalmaker.jaxb.settings.Settings;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
@@ -1024,21 +1025,21 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
             add_err_msg(ide_log, buff, "File not found: " + xsd_name);
             return false;
         } else {
-            String cur_text;
+            String cur_xsd;
             try {
-                cur_text = Helpers.load_text_from_file(xml_file.getPath());
+                cur_xsd = Helpers.load_text_from_file(xml_file.getPath());
             } catch (Exception ex) {
                 add_err_msg(ide_log, buff, get_err_msg(ex));
                 return false;
             }
-            String ref_text;
+            String ref_xsd;
             try {
-                ref_text = NbpHelpers.read_from_jar_file(xsd_name);
+                ref_xsd = NbpHelpers.read_from_jar_file(xsd_name);
             } catch (Exception ex) {
                 add_err_msg(ide_log, buff, get_err_msg(ex));
                 return false;
             }
-            if (ref_text.equals(cur_text)) {
+            if (XmlHelpers.compareXml(ref_xsd, cur_xsd) == 0) {
                 add_ok_msg(ide_log, buff, xsd_name);
             } else {
                 add_err_msg(ide_log, buff, xsd_name + " is out-of-date! Use 'Create/Overwrite XSD files'");

@@ -355,6 +355,8 @@ public class IdeaHelpers {
                         file = parent_dir.createChildData(null, file_name);
                     }
                     file.setBinaryContent(text.getBytes());
+
+                    parent_dir.refresh(/*asynchronous*/ false, /*recursive*/ true);
                 } catch (Throwable e) {
                     error.exception = e;
                 }

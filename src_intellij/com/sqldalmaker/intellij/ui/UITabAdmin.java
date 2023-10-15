@@ -9,6 +9,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.sqldalmaker.cg.Helpers;
 import com.sqldalmaker.common.Const;
+import com.sqldalmaker.common.XmlHelpers;
 import com.sqldalmaker.jaxb.settings.Settings;
 
 import javax.swing.*;
@@ -502,21 +503,21 @@ public class UITabAdmin {
             add_err_msg(buff, "File not found: " + xsd_name);
             return false;
         } else {
-            String cur_text;
+            String cur_xsd;
             try {
-                cur_text = Helpers.load_text_from_file(xsd_file.getPath());
+                cur_xsd = Helpers.load_text_from_file(xsd_file.getPath());
             } catch (Exception ex) {
                 add_err_msg(buff, get_err_msg(ex));
                 return false;
             }
-            String ref_text;
+            String ref_xsd;
             try {
-                ref_text = IdeaHelpers.read_from_jar_file(xsd_name);
+                ref_xsd = IdeaHelpers.read_from_jar_file(xsd_name);
             } catch (Exception ex) {
                 add_err_msg(buff, get_err_msg(ex));
                 return false;
             }
-            if (ref_text.equals(cur_text)) {
+            if (XmlHelpers.compareXml(ref_xsd, cur_xsd) == 0) {
                 add_ok_msg(buff, xsd_name);
             } else {
                 add_err_msg(buff, "File '" + xsd_name + "' is invalid or out-of-date! Use 'Create/Overwrite XSD files'");

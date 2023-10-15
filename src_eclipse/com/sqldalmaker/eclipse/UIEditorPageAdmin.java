@@ -30,6 +30,7 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.sqldalmaker.cg.Helpers;
 import com.sqldalmaker.common.Const;
+import com.sqldalmaker.common.XmlHelpers;
 import com.sqldalmaker.jaxb.settings.Settings;
 
 /**
@@ -704,22 +705,22 @@ public class UIEditorPageAdmin extends Composite {
 			add_err_msg(buff, "File not found: " + xsd_name);
 			return false;
 		} else {
-			String cur_text;
+			String cur_xsd;
 			try {
 				String xsd_abs_path = editor2.get_metaprogram_file_abs_path(xsd_name);
-				cur_text = Helpers.load_text_from_file(xsd_abs_path);
+				cur_xsd = Helpers.load_text_from_file(xsd_abs_path);
 			} catch (Exception ex) {
 				add_err_msg(buff, get_err_msg(ex));
 				return false;
 			}
-			String ref_text;
+			String ref_xsd;
 			try {
-				ref_text = EclipseHelpers.read_from_resource_folder(xsd_name);
+				ref_xsd = EclipseHelpers.read_from_resource_folder(xsd_name);
 			} catch (Exception ex) {
 				add_err_msg(buff, get_err_msg(ex));
 				return false;
 			}
-			if (ref_text.equals(cur_text)) {
+			if (XmlHelpers.compareXml(ref_xsd, cur_xsd) == 0) {
 				add_ok_msg(buff, xsd_name);
 			} else {
 				add_err_msg(buff, xsd_name + " is out-of-date! Use 'Create/Overwrite XSD files'");

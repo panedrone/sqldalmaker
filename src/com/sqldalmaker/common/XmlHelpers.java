@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2022 sqldalmaker@gmail.com
+    Copyright 2011-2023 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -11,6 +11,13 @@ import com.sqldalmaker.jaxb.dto.DtoClasses;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import java.io.ByteArrayOutputStream;
+
+import java.io.StringReader;
+import java.io.StringWriter;
+
+import javax.xml.transform.*;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 
 /**
  * @author sqldalmaker@gmail.com
@@ -62,5 +69,33 @@ public class XmlHelpers {
 
         String text = get_xml_text(object_factory.getClass().getPackage().getName(), root, Const.DAO_XSD);
         return text;
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+    // String	formatXML(String unformatted)
+    // http://www.java2s.com/example/java-utility-method/xml-format-index-0.html
+
+    private static String formatXML(String unformattedXml) {
+        String unformattedNoWhiteSpaces = unformattedXml.replaceAll(">\\s+<", "><");
+        Source xmlInput = new StreamSource(new StringReader(unformattedNoWhiteSpaces));
+        StreamResult xmlOutput = new StreamResult(new StringWriter());
+        try {
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            transformerFactory.setAttribute("indent-number", 2);
+            Transformer transformer = transformerFactory.newTransformer();
+            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.transform(xmlInput, xmlOutput);
+            return xmlOutput.getWriter().toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return unformattedXml;
+    }
+
+    public static int compareXml(String xmlStr1, String xmlStr2) {
+        xmlStr1 = formatXML(xmlStr1);
+        xmlStr2 = formatXML(xmlStr2);
+        return xmlStr1.compareTo(xmlStr2);
     }
 }
