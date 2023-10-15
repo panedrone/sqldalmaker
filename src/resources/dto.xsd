@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-	elementFormDefault="qualified">
+		   elementFormDefault="qualified">
 	<xs:element name="dto-classes">
 		<xs:complexType>
 			<xs:sequence>
@@ -22,15 +22,15 @@
 					<xs:element name="field">
 						<xs:complexType>
 							<xs:attribute name="column" use="required"
-								type="xs:string" />
+										  type="xs:string" />
 							<xs:attribute name="type" use="required"
-								type="xs:string" />
+										  type="xs:string" />
 						</xs:complexType>
 					</xs:element>
 				</xs:sequence>
 			</xs:sequence>
 			<xs:attribute name="name" use="required"
-				type="xs:string" />
+						  type="xs:string" />
 			<xs:attribute name="ref" use="required" type="xs:string" />
 			<xs:attribute name="pk" use="optional" type="xs:string" default="*" />
 			<xs:attribute name="auto" use="optional" type="xs:string" default="*" />

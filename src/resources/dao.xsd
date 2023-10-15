@@ -28,19 +28,19 @@
         <xs:attribute ref="method" use="optional"/>
     </xs:complexType>
 
-	<xs:element name="crud">
+    <xs:element name="crud">
         <xs:complexType>
-	 		<xs:sequence minOccurs="1">
-	            <xs:element name="create" type="type-method" minOccurs="0" maxOccurs="1"/>
-	            <xs:element name="read-all" type="type-method" minOccurs="0" maxOccurs="1"/>
-	            <xs:element name="read" type="type-method" minOccurs="0" maxOccurs="1"/>
-	            <xs:element name="update" type="type-method" minOccurs="0" maxOccurs="1"/>
-	            <xs:element name="delete" type="type-method" minOccurs="0" maxOccurs="1"/>
-	        </xs:sequence>
-	        <xs:attribute ref="dto" use="required"/>
-	        <xs:attribute name="table" type="xs:string" use="optional" default="*"/>
-        <xs:attribute name="fetch-generated" type="xs:boolean" default="true"/>        
-		</xs:complexType>
+            <xs:sequence minOccurs="1">
+                <xs:element name="create" type="type-method" minOccurs="0" maxOccurs="1"/>
+                <xs:element name="read-all" type="type-method" minOccurs="0" maxOccurs="1"/>
+                <xs:element name="read" type="type-method" minOccurs="0" maxOccurs="1"/>
+                <xs:element name="update" type="type-method" minOccurs="0" maxOccurs="1"/>
+                <xs:element name="delete" type="type-method" minOccurs="0" maxOccurs="1"/>
+            </xs:sequence>
+            <xs:attribute ref="dto" use="required"/>
+            <xs:attribute name="table" type="xs:string" use="optional" default="*"/>
+            <xs:attribute name="fetch-generated" type="xs:boolean" default="true"/>
+        </xs:complexType>
     </xs:element>
     <xs:element name="query">
         <xs:complexType>
