@@ -68,10 +68,10 @@ type DataStore interface {
 	PGFetch(cursor string) string
 }
 
-type OutParam struct {
+type Out struct {
 	/*
 		var outParam float64 // no need to init
-		cxDao.SpTestOutParams(47, OutParam{Dest: &outParam})
+		cxDao.SpTestOutParams(47, Out{Dest: &outParam})
 		// cxDao.SpTestOutParams(47, &outParam) // <- this one is also ok for OUT parameters
 		fmt.Println(outParam)
 
@@ -83,10 +83,10 @@ type OutParam struct {
 	Dest interface{}
 }
 
-type InOutParam struct {
+type InOut struct {
 	/*
 		inOutParam := 123.0 // must be initialized for INOUT
-		cxDao.SpTestInoutParams(InOutParam{Dest: &inOutParam})
+		cxDao.SpTestInoutParams(InOut{Dest: &inOutParam})
 		fmt.Println(inOutParam)
 
 		// not working in MySQL, see https://sqldalmaker.sourceforge.net/sp-udf.html#mysql_out_params
@@ -296,11 +296,11 @@ func _pointsToNil(p interface{}) bool {
 
 func _validateDest(dest interface{}) (err error) {
 	if dest == nil {
-		err = errors.New("OutParam/InOutParam -> Dest is nil")
+		err = errors.New("Out/InOut -> Dest is nil")
 	} else if !_isPtr(dest) {
-		err = errors.New("OutParam/InOutParam -> Dest must be a Ptr")
+		err = errors.New("Out/InOut -> Dest must be a Ptr")
 	} else if _pointsToNil(dest) {
-		err = errors.New("OutParam/InOutParam -> Dest points to nil")
+		err = errors.New("Out/InOut -> Dest points to nil")
 	}
 	return
 }
@@ -354,25 +354,25 @@ func (ds *_DS) _processExecParams(args []interface{}, onRowArr *[]interface{},
 			*onRowArr = append(*onRowArr, param) // add single func
 			var rows driver.Rows
 			*queryArgs = append(*queryArgs, sql.Out{Dest: &rows, In: false})
-		case *OutParam:
+		case *Out:
 			err = _validateDest(param.Dest)
 			if err != nil {
 				return
 			}
 			*queryArgs = append(*queryArgs, sql.Out{Dest: param.Dest, In: false})
-		case OutParam:
+		case Out:
 			err = _validateDest(param.Dest)
 			if err != nil {
 				return
 			}
 			*queryArgs = append(*queryArgs, sql.Out{Dest: param.Dest, In: false})
-		case *InOutParam:
+		case *InOut:
 			err = _validateDest(param.Dest)
 			if err != nil {
 				return
 			}
 			*queryArgs = append(*queryArgs, sql.Out{Dest: param.Dest, In: true})
-		case InOutParam:
+		case InOut:
 			err = _validateDest(param.Dest)
 			if err != nil {
 				return

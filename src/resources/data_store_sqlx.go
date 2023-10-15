@@ -6,8 +6,9 @@ import (
 	"database/sql/driver"
 	"errors"
 	"fmt"
-	//	"github.com/godror/godror"
+	"github.com/godror/godror"
 	"github.com/jmoiron/sqlx"
+	"github.com/jmoiron/sqlx/reflectx"
 	"io"
 	"reflect"
 	"strconv"
@@ -52,10 +53,10 @@ type DataStore interface {
 	PGFetch(cursor string) string
 }
 
-type OutParam struct {
+type Out struct {
 	/*
 		var outParam float64 // no need to init
-		cxDao.SpTestOutParams(47, OutParam{Dest: &outParam})
+		cxDao.SpTestOutParams(47, Out{Dest: &outParam})
 		// cxDao.SpTestOutParams(47, &outParam) // <- this one is also ok for OUT parameters
 		fmt.Println(outParam)
 
@@ -67,10 +68,10 @@ type OutParam struct {
 	Dest interface{}
 }
 
-type InOutParam struct {
+type InOut struct {
 	/*
 		inOutParam := 123.0 // must be initialized for INOUT
-		cxDao.SpTestInoutParams(InOutParam{Dest: &inOutParam})
+		cxDao.SpTestInoutParams(InOut{Dest: &inOutParam})
 		fmt.Println(inOutParam)
 
 		// not working in MySQL, see https://sqldalmaker.sourceforge.net/sp-udf.html#mysql_out_params
@@ -352,11 +353,11 @@ func _pointsToNil(p interface{}) bool {
 
 func _validateDest(dest interface{}) (err error) {
 	if dest == nil {
-		err = errors.New("OutParam/InOutParam -> Dest is nil")
+		err = errors.New("Out/InOut -> Dest is nil")
 	} else if !_isPtr(dest) {
-		err = errors.New("OutParam/InOutParam -> Dest must be a Ptr")
+		err = errors.New("Out/InOut -> Dest must be a Ptr")
 	} else if _pointsToNil(dest) {
-		err = errors.New("OutParam/InOutParam -> Dest points to nil")
+		err = errors.New("Out/InOut -> Dest points to nil")
 	}
 	return
 }
@@ -401,7 +402,7 @@ func (ds *_DS) _processExecParams(args []interface{}, onRowArr *[]interface{},
 				}
 				*onRowArr = append(*onRowArr, fn)
 			}
-		case func() ([]interface{}, func()):
+		case func() (interface{}, func()), func() ([]interface{}, func()):
 			if implicitCursors {
 				err = errors.New(fmt.Sprintf("Forbidden: %v", args))
 				return
@@ -410,25 +411,25 @@ func (ds *_DS) _processExecParams(args []interface{}, onRowArr *[]interface{},
 			*onRowArr = append(*onRowArr, param) // add single func
 			var rows driver.Rows
 			*queryArgs = append(*queryArgs, sql.Out{Dest: &rows, In: false})
-		case *OutParam:
+		case *Out:
 			err = _validateDest(param.Dest)
 			if err != nil {
 				return
 			}
 			*queryArgs = append(*queryArgs, sql.Out{Dest: param.Dest, In: false})
-		case OutParam:
+		case Out:
 			err = _validateDest(param.Dest)
 			if err != nil {
 				return
 			}
 			*queryArgs = append(*queryArgs, sql.Out{Dest: param.Dest, In: false})
-		case *InOutParam:
+		case *InOut:
 			err = _validateDest(param.Dest)
 			if err != nil {
 				return
 			}
 			*queryArgs = append(*queryArgs, sql.Out{Dest: param.Dest, In: true})
-		case InOutParam:
+		case InOut:
 			err = _validateDest(param.Dest)
 			if err != nil {
 				return
@@ -470,20 +471,13 @@ func (ds *_DS) _queryAllImplicitRcOracle(ctx context.Context, sqlString string, 
 		switch onRow := onRowArr[onRowIndex].(type) {
 		case func(map[string]interface{}):
 			// re-detect columns for each ResultSet
-			colNames, data, values, valuePointers, pfeErr := ds._prepareFetch(rows)
-			if pfeErr != nil {
-				err = pfeErr
-				return
-			}
+			row := make(map[string]interface{})
 			for rows.Next() {
-				err = rows.Scan(valuePointers...)
+				err = rows.MapScan(row)
 				if err != nil {
 					return
 				}
-				for i, colName := range colNames {
-					data[colName] = values[i]
-				}
-				onRow(data)
+				onRow(row)
 			}
 		case func() (interface{}, func()):
 			err = ds._fetchRows(rows, onRow)
@@ -530,20 +524,13 @@ func (ds *_DS) _queryAllImplicitRcMySQL(ctx context.Context, sqlString string, o
 		switch onRow := onRowArr[onRowIndex].(type) {
 		case func(map[string]interface{}):
 			// re-detect columns for each ResultSet
-			colNames, data, values, valuePointers, pfeErr := ds._prepareFetch(rows)
-			if pfeErr != nil {
-				err = pfeErr
-				return
-			}
+			row := make(map[string]interface{})
 			for rows.Next() {
-				err = rows.Scan(valuePointers...)
+				err = rows.MapScan(row)
 				if err != nil {
 					return
 				}
-				for i, colName := range colNames {
-					data[colName] = values[i]
-				}
-				onRow(data)
+				onRow(row)
 			}
 		case func() (interface{}, func()):
 			err = ds._fetchRows(rows, onRow)
@@ -576,7 +563,7 @@ func (ds *_DS) _exec2(ctx context.Context, sqlString string, onRowArr []interfac
 				case *driver.Rows:
 					rows := param.Dest.(*driver.Rows)
 					onRow := onRowArr[onRowIndex]
-					err = _fetchAllFromCursor(*rows, onRow)
+					err = ds.fetchAllFromCursor(*rows, onRow)
 					if err != nil {
 						return
 					}
@@ -589,47 +576,136 @@ func (ds *_DS) _exec2(ctx context.Context, sqlString string, onRowArr []interfac
 	return
 }
 
-func _fetchAllFromCursor(rows driver.Rows, onRowFunc interface{}) (err error) {
-	defer _close(rows)
-	colNames := rows.Columns()
-	values := make([]driver.Value, len(colNames))
+func (ds *_DS) fetchAllFromCursor(dr driver.Rows, onRowFunc interface{}) error {
+	defer _close(dr)
+	rx := newRows(dr)
 	switch onRow := onRowFunc.(type) {
 	case func(map[string]interface{}):
 		data := make(map[string]interface{})
 		for {
-			err = rows.Next(values)
-			if err != nil {
-				break
+			if !rx.Next() {
+				break // not an error
 			}
-			for i, colName := range colNames {
-				data[colName] = values[i]
-			}
+			rx.toMap(data)
 			onRow(data)
 		}
 	case func() (interface{}, func()):
-		for {
-			err = rows.Next(values)
-			if err != nil {
-				break
-			}
+		for rx.Next() {
 			fa, onRowCompleted := onRow()
+			var err error
 			switch _fa := fa.(type) {
 			case []interface{}:
-				for i, v := range values {
-					err = _setAny(_fa[i], v)
-					if err != nil {
-						return
-					}
-				}
+				err = rx.toSlice(_fa)
 			default:
-				return errUnexpectedType(_fa)
+				err = rx.toStruct(ds.db.Mapper, fa)
+			}
+			if err != nil {
+				return err
 			}
 			onRowCompleted()
 		}
 	default:
 		return errUnexpectedType(onRow)
 	}
-	return
+	return nil
+}
+
+type _Rows struct {
+	rows     driver.Rows
+	colNames []string
+	values   []driver.Value
+}
+
+func newRows(rows driver.Rows) *_Rows {
+	colNames := rows.Columns()
+	return &_Rows{
+		rows:     rows,
+		colNames: rows.Columns(),
+		values:   make([]driver.Value, len(colNames)),
+	}
+}
+
+func (rx *_Rows) Close() error {
+	// implement sqlx.rowsi
+	return rx.rows.Close()
+}
+
+func (rx *_Rows) Columns() ([]string, error) {
+	// implement sqlx.rowsi
+	return rx.colNames, nil
+}
+
+func (rx *_Rows) Err() error {
+	// implement sqlx.rowsi
+	return nil
+}
+
+func (rx *_Rows) Next() bool {
+	// implement sqlx.rowsi
+	err := rx.rows.Next(rx.values)
+	return err == nil
+}
+
+func (rx *_Rows) Scan(_fa ...interface{}) error {
+	// implement sqlx.rowsi --> to use in
+	for i, v := range rx.values {
+		err := _setAny(_fa[i], v)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (rx *_Rows) toMap(data map[string]interface{}) {
+	for i, colName := range rx.colNames {
+		data[colName] = rx.values[i]
+	}
+}
+
+func (rx *_Rows) toSlice(_fa []interface{}) error {
+	for i, v := range rx.values {
+		err := _setAny(_fa[i], v)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (rx *_Rows) toStruct(m *reflectx.Mapper, fa interface{}) error {
+	elemType := reflect.TypeOf(fa)
+	base := reflectx.Deref(elemType)
+	fields := m.TraversalsByName(base, rx.colNames)
+	values := make([]interface{}, len(rx.colNames))
+	vp := reflect.ValueOf(fa)
+	v := reflect.Indirect(vp)
+	err := fieldsByTraversal(v, fields, values, true)
+	if err != nil {
+		return err
+	}
+	return rx.Scan(values...)
+}
+
+func fieldsByTraversal(v reflect.Value, traversals [][]int, values []interface{}, ptrs bool) error {
+	v = reflect.Indirect(v)
+	if v.Kind() != reflect.Struct {
+		return errors.New("argument not a struct")
+	}
+
+	for i, traversal := range traversals {
+		if len(traversal) == 0 {
+			values[i] = new(interface{})
+			continue
+		}
+		f := reflectx.FieldByIndexes(v, traversal)
+		if ptrs {
+			values[i] = f.Addr().Interface()
+		} else {
+			values[i] = f.Interface()
+		}
+	}
+	return nil
 }
 
 func (ds *_DS) Exec(ctx context.Context, sqlString string, args ...interface{}) (rowsAffected int64, err error) {
@@ -658,7 +734,7 @@ func (ds *_DS) _queryScalar(ctx context.Context, sqlString string, dest interfac
 		return err
 	}
 	defer _close(rows)
-	_, _, values, valuePointers, err := ds._prepareFetch(rows)
+	_, values, valuePointers, err := ds._prepareFetch(rows)
 	if err != nil {
 		return err
 	}
@@ -683,12 +759,8 @@ func (ds *_DS) Query(ctx context.Context, sqlString string, dest interface{}, ar
 	sqlString = ds._formatSQL(sqlString)
 	var onRowArr []interface{}
 	var queryArgs []interface{}
-	implicitCursors, outCursors, err := ds._processExecParams(args, &onRowArr, &queryArgs)
+	_, _, err := ds._processExecParams(args, &onRowArr, &queryArgs)
 	if err != nil {
-		return err
-	}
-	if implicitCursors || outCursors {
-		err = errors.New("not supported in Query: implicitCursors || outCursors")
 		return err
 	}
 	err = ds._queryScalar(ctx, sqlString, dest, queryArgs...)
@@ -705,7 +777,7 @@ func (ds *_DS) QueryAll(ctx context.Context, sqlString string, onRow func(interf
 	for {
 		// re-detect columns for each ResultSet
 		// fetch all columns! if to fetch less, Scan returns nil-s
-		_, _, values, valuePointers, pfErr := ds._prepareFetch(rows)
+		_, values, valuePointers, pfErr := ds._prepareFetch(rows)
 		if pfErr != nil {
 			err = pfErr
 			return
@@ -732,21 +804,14 @@ func (ds *_DS) QueryRow(ctx context.Context, sqlString string, args ...interface
 		return
 	}
 	defer _close(rows)
-	colNames, row, values, valuePointers, pfErr := ds._prepareFetch(rows)
-	if pfErr != nil {
-		err = pfErr
-		return
-	}
 	if !rows.Next() {
 		err = errNoRows(sqlString)
 		return
 	}
-	err = rows.Scan(valuePointers...)
+	row = make(map[string]interface{})
+	err = rows.MapScan(row)
 	if err != nil {
 		return
-	}
-	for i, colName := range colNames {
-		row[colName] = values[i]
 	}
 	if rows.Next() {
 		err = errMultipleRows(sqlString)
@@ -756,8 +821,6 @@ func (ds *_DS) QueryRow(ctx context.Context, sqlString string, args ...interface
 }
 
 func (ds *_DS) QueryAllRows(ctx context.Context, sqlString string, onRow func(map[string]interface{}), args ...interface{}) (err error) {
-	// many thanks to:
-	// https://stackoverflow.com/questions/51731423/how-to-read-a-row-from-a-table-to-a-map-without-knowing-columns
 	sqlString = ds._formatSQL(sqlString)
 	rows, err := ds._queryX(ctx, sqlString, args...)
 	if err != nil {
@@ -766,20 +829,13 @@ func (ds *_DS) QueryAllRows(ctx context.Context, sqlString string, onRow func(ma
 	defer _close(rows)
 	for {
 		// re-detect columns for each ResultSet
-		colNames, data, values, valuePointers, pfErr := ds._prepareFetch(rows)
-		if pfErr != nil {
-			err = pfErr
-			return
-		}
+		row := make(map[string]interface{})
 		for rows.Next() {
-			err = rows.Scan(valuePointers...)
+			err = rows.MapScan(row)
 			if err != nil {
 				return
 			}
-			for i, colName := range colNames {
-				data[colName] = values[i]
-			}
-			onRow(data)
+			onRow(row)
 		}
 		if !rows.NextResultSet() {
 			break
@@ -875,12 +931,11 @@ func (ds *_DS) QueryAllByFA(ctx context.Context, sqlString string, onRow func() 
 		// ...
 		values := make([]string, len(colNames))
 */
-func (ds *_DS) _prepareFetch(rows *sqlx.Rows) (colNames []string, data map[string]interface{}, values []interface{}, valuePointers []interface{}, err error) {
+func (ds *_DS) _prepareFetch(rows *sqlx.Rows) (colNames []string, values []interface{}, valuePointers []interface{}, err error) {
 	colNames, err = rows.Columns()
 	if err != nil {
 		return
 	}
-	data = make(map[string]interface{})
 	// interface{} is ok for SQLite3, Oracle, and SQL Server.
 	// MySQL and PostgreSQL may require some convertors from []uint8
 	// https://github.com/ziutek/mymysql#type-mapping
@@ -896,18 +951,9 @@ func (ds *_DS) _formatSQL(sqlString string) string {
 	if len(ds.paramPrefix) == 0 {
 		return sqlString
 	}
-	i := 1
-	for {
-		pos := strings.Index(sqlString, "?")
-		if pos == -1 {
-			break
-		}
-		str1 := sqlString[0:pos]
-		str2 := sqlString[pos+1:]
-		sqlString = str1 + ds.paramPrefix + strconv.Itoa(i) + str2
-		i += 1
-	}
-	return sqlString
+	// https://jmoiron.github.io/sqlx/
+	// bindvars
+	return ds.db.Rebind(sqlString)
 }
 
 func SetString(d *string, row map[string]interface{}, colName string, errMap map[string]int) {
@@ -1138,18 +1184,18 @@ func _setBytes(d *[]byte, value interface{}) error {
 	return nil
 }
 
-//func SetNumber(d *godror.Number, row map[string]interface{}, colName string, errMap map[string]int) {
-//	value, err := _getValue(row, colName, errMap)
-//	if err == nil {
-//		err = _setNumber(d, value)
-//		_updateErrMap(err, colName, errMap)
-//	}
-//}
-//
-//func _setNumber(d *godror.Number, value interface{}) error {
-//	err := d.Scan(value)
-//	return err
-//}
+func SetNumber(d *godror.Number, row map[string]interface{}, colName string, errMap map[string]int) {
+	value, err := _getValue(row, colName, errMap)
+	if err == nil {
+		err = _setNumber(d, value)
+		_updateErrMap(err, colName, errMap)
+	}
+}
+
+func _setNumber(d *godror.Number, value interface{}) error {
+	err := d.Scan(value)
+	return err
+}
 
 func assignErr(dstPtr interface{}, value interface{}, funcName string, errMsg string) error {
 	return errors.New(fmt.Sprintf("%s %T <- %T %s", funcName, dstPtr, value, errMsg))
@@ -1215,8 +1261,8 @@ func _setAny(dstPtr interface{}, value interface{}) error {
 		err = _setBool(d, value)
 	case *[]byte: // the same as uint8
 		err = _setBytes(d, value)
-	//case *godror.Number:
-	//	err = _setNumber(d, value)
+	case *godror.Number:
+		err = _setNumber(d, value)
 	//case *uuid.UUID:
 	//	switch bv := value.(type) {
 	//	case []byte:

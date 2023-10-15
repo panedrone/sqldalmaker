@@ -6,7 +6,7 @@ import (
 	"database/sql/driver"
 	"errors"
 	"fmt"
-	//"github.com/godror/godror"
+	"github.com/godror/godror"
 	"io"
 	"reflect"
 	"strconv"
@@ -51,10 +51,10 @@ type DataStore interface {
 	PGFetch(cursor string) string
 }
 
-type OutParam struct {
+type Out struct {
 	/*
 		var outParam float64 // no need to init
-		cxDao.SpTestOutParams(47, OutParam{Dest: &outParam})
+		cxDao.SpTestOutParams(47, Out{Dest: &outParam})
 		// cxDao.SpTestOutParams(47, &outParam) // <- this one is also ok for OUT parameters
 		fmt.Println(outParam)
 
@@ -66,10 +66,10 @@ type OutParam struct {
 	Dest interface{}
 }
 
-type InOutParam struct {
+type InOut struct {
 	/*
 		inOutParam := 123.0 // must be initialized for INOUT
-		cxDao.SpTestInoutParams(InOutParam{Dest: &inOutParam})
+		cxDao.SpTestInoutParams(InOut{Dest: &inOutParam})
 		fmt.Println(inOutParam)
 
 		// not working in MySQL, see https://sqldalmaker.sourceforge.net/sp-udf.html#mysql_out_params
@@ -341,11 +341,11 @@ func _pointsToNil(p interface{}) bool {
 
 func _validateDest(dest interface{}) (err error) {
 	if dest == nil {
-		err = errors.New("OutParam/InOutParam -> Dest is nil")
+		err = errors.New("Out/InOut -> Dest is nil")
 	} else if !_isPtr(dest) {
-		err = errors.New("OutParam/InOutParam -> Dest must be a Ptr")
+		err = errors.New("Out/InOut -> Dest must be a Ptr")
 	} else if _pointsToNil(dest) {
-		err = errors.New("OutParam/InOutParam -> Dest points to nil")
+		err = errors.New("Out/InOut -> Dest points to nil")
 	}
 	return
 }
@@ -399,25 +399,25 @@ func (ds *_DS) _processExecParams(args []interface{}, onRowArr *[]interface{},
 			*onRowArr = append(*onRowArr, param) // add single func
 			var rows driver.Rows
 			*queryArgs = append(*queryArgs, sql.Out{Dest: &rows, In: false})
-		case *OutParam:
+		case *Out:
 			err = _validateDest(param.Dest)
 			if err != nil {
 				return
 			}
 			*queryArgs = append(*queryArgs, sql.Out{Dest: param.Dest, In: false})
-		case OutParam:
+		case Out:
 			err = _validateDest(param.Dest)
 			if err != nil {
 				return
 			}
 			*queryArgs = append(*queryArgs, sql.Out{Dest: param.Dest, In: false})
-		case *InOutParam:
+		case *InOut:
 			err = _validateDest(param.Dest)
 			if err != nil {
 				return
 			}
 			*queryArgs = append(*queryArgs, sql.Out{Dest: param.Dest, In: true})
-		case InOutParam:
+		case InOut:
 			err = _validateDest(param.Dest)
 			if err != nil {
 				return
@@ -1110,18 +1110,18 @@ func _setBytes(d *[]byte, value interface{}) error {
 	return nil
 }
 
-//func SetNumber(d *godror.Number, row map[string]interface{}, colName string, errMap map[string]int) {
-//	value, err := _getValue(row, colName, errMap)
-//	if err == nil {
-//		err = _setNumber(d, value)
-//		_updateErrMap(err, colName, errMap)
-//	}
-//}
-//
-//func _setNumber(d *godror.Number, value interface{}) error {
-//	err := d.Scan(value)
-//	return err
-//}
+func SetNumber(d *godror.Number, row map[string]interface{}, colName string, errMap map[string]int) {
+	value, err := _getValue(row, colName, errMap)
+	if err == nil {
+		err = _setNumber(d, value)
+		_updateErrMap(err, colName, errMap)
+	}
+}
+
+func _setNumber(d *godror.Number, value interface{}) error {
+	err := d.Scan(value)
+	return err
+}
 
 func assignErr(dstPtr interface{}, value interface{}, funcName string, errMsg string) error {
 	return errors.New(fmt.Sprintf("%s %T <- %T %s", funcName, dstPtr, value, errMsg))
@@ -1187,8 +1187,8 @@ func _setAny(dstPtr interface{}, value interface{}) error {
 		err = _setBool(d, value)
 	case *[]byte: // the same as uint8
 		err = _setBytes(d, value)
-	//case *godror.Number:
-	//	err = _setNumber(d, value)
+	case *godror.Number:
+		err = _setNumber(d, value)
 	//case *uuid.UUID:
 	//	switch bv := value.(type) {
 	//	case []byte:

@@ -70,8 +70,8 @@
         <!--        <type detected="java.math.BigDecimal" target="github.com/godror/godror:godror.Number${json} -> SetNumber"/>-->
         <!--        <type detected="java.lang.String" target="string${json} -> SetString"/>-->
         <!--        <type detected="java.util.Date" target="time:time.Time${json} -> SetTime"/>-->
-        <!--        <type detected="byte[]" target="byte[]{$json} -> SetBytes"/>-->
-        <!--        <type detected="java.lang.Object" target="interface{}{$json}"/>-->
+        <!--        <type detected="byte[]" target="byte[]${json} -> SetBytes"/>-->
+        <!--        <type detected="java.lang.Object" target="interface{}${json}"/>-->
 
         <!-- mysql, postgres -->
 

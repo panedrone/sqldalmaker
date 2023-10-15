@@ -72,7 +72,7 @@
         <type detected="java.lang.Double" target="float64${json} -> SetFloat64"/>
         <type detected="java.lang.String" target="string${json} -> SetString"/>
         <type detected="java.util.Date" target="time:time.Time${json} -> SetTime"/>
-        <type detected="byte[]" target="byte[]{$json} -> SetBytes"/>
+        <type detected="byte[]" target="byte[]${json} -> SetBytes"/>
         <type detected="java.lang.Object" target="interface{}${json}"/>
 
         <!-- oracle -->
