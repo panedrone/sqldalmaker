@@ -1,4 +1,4 @@
-package dbal
+package dao
 
 import (
 	"context"
@@ -6,7 +6,8 @@ import (
 	"database/sql/driver"
 	"errors"
 	"fmt"
-	"github.com/godror/godror"
+	"github.com/google/uuid"
+	// 	"github.com/godror/godror"
 	"io"
 	"reflect"
 	"strconv"
@@ -242,7 +243,7 @@ func (ds *_DS) PGFetch(cursor string) string {
 	return fmt.Sprintf(`fetch all from "%s"`, cursor)
 }
 
-func (ds *_DS) _pgInsert(ctx context.Context, sqlString string, aiNames string, args ...interface{}) (id interface{}, err error) {
+func (ds *_DS) insertPgSql(ctx context.Context, sqlString string, aiNames string, args ...interface{}) (id interface{}, err error) {
 	// fetching of multiple AI values is not implemented so far:
 	sqlString += " RETURNING " + aiNames
 	rows, err := ds._query(ctx, sqlString, args...)
@@ -251,15 +252,14 @@ func (ds *_DS) _pgInsert(ctx context.Context, sqlString string, aiNames string, 
 	}
 	defer _close(rows)
 	if rows.Next() {
-		var data interface{}
-		err = rows.Scan(&data)
+		err = rows.Scan(&id)
 		return
 	}
 	err = errors.New("rows.Next() FAILED:" + sqlString)
 	return
 }
 
-func (ds *_DS) _oracleInsert(ctx context.Context, sqlString string, aiNames string, args ...interface{}) (id interface{}, err error) {
+func (ds *_DS) insertOracle(ctx context.Context, sqlString string, aiNames string, args ...interface{}) (id interface{}, err error) {
 	// fetching of multiple AI values is not implemented so far:
 	sqlString = fmt.Sprintf("%s returning %s  into :%d", sqlString, aiNames, len(args)+1)
 	// https://ddcode.net/2019/05/11/how-does-go-call-oracles-stored-procedures-and-get-the-return-value-of-the-stored-procedures/
@@ -275,7 +275,7 @@ func (ds *_DS) _oracleInsert(ctx context.Context, sqlString string, aiNames stri
 	return id64, nil
 }
 
-func (ds *_DS) _mssqlInsert(ctx context.Context, sqlString string, args ...interface{}) (id interface{}, err error) {
+func (ds *_DS) insertMsSql(ctx context.Context, sqlString string, args ...interface{}) (id interface{}, err error) {
 	// SQL Server https://github.com/denisenkom/go-mssqldb
 	// LastInsertId should not be used with this driver (or SQL Server) due to
 	// how the TDS protocol works. Please use the OUTPUT Clause or add a select
@@ -313,13 +313,13 @@ func (ds *_DS) Insert(ctx context.Context, sqlString string, aiNames string, arg
 	// Builtin LastInsertId works only with MySQL and SQLite3
 	sqlString = ds._formatSQL(sqlString)
 	if ds.isPostgreSQL() {
-		return ds._pgInsert(ctx, sqlString, aiNames, args...)
+		return ds.insertPgSql(ctx, sqlString, aiNames, args...)
 	} else if ds.isSqlServer() {
-		return ds._mssqlInsert(ctx, sqlString, args...)
+		return ds.insertMsSql(ctx, sqlString, args...)
 	} else if ds.isOracle() {
 		// Oracle: specify AI values explicitly:
 		// <crud-auto model="ProjectInfo" table="PROJECTS" generated="P_ID"/>
-		return ds._oracleInsert(ctx, sqlString, aiNames, args...)
+		return ds.insertOracle(ctx, sqlString, aiNames, args...)
 	}
 	return ds._defaultInsert(ctx, sqlString, args...)
 }
@@ -1110,15 +1110,28 @@ func _setBytes(d *[]byte, value interface{}) error {
 	return nil
 }
 
-func SetNumber(d *godror.Number, row map[string]interface{}, colName string, errMap map[string]int) {
+//func SetNumber(d *godror.Number, row map[string]interface{}, colName string, errMap map[string]int) {
+//	value, err := _getValue(row, colName, errMap)
+//	if err == nil {
+//		err = _setNumber(d, value)
+//		_updateErrMap(err, colName, errMap)
+//	}
+//}
+//
+//func _setNumber(d *godror.Number, value interface{}) error {
+//	err := d.Scan(value)
+//	return err
+//}
+
+func SetUUID(d *uuid.UUID, row map[string]interface{}, colName string, errMap map[string]int) {
 	value, err := _getValue(row, colName, errMap)
 	if err == nil {
-		err = _setNumber(d, value)
+		err = _setUUID(d, value)
 		_updateErrMap(err, colName, errMap)
 	}
 }
 
-func _setNumber(d *godror.Number, value interface{}) error {
+func _setUUID(d *uuid.UUID, value interface{}) error {
 	err := d.Scan(value)
 	return err
 }
@@ -1187,19 +1200,10 @@ func _setAny(dstPtr interface{}, value interface{}) error {
 		err = _setBool(d, value)
 	case *[]byte: // the same as uint8
 		err = _setBytes(d, value)
-	case *godror.Number:
-		err = _setNumber(d, value)
-	//case *uuid.UUID:
-	//	switch bv := value.(type) {
-	//	case []byte:
-	//		err := d.Scan(bv)
-	//		if err != nil {
-	//			return assignErr(d, value, "_setAny", err.Error())
-	//		}
-	//		return nil
-	//  default:
-	//      return unknownTypeErr(d, value, "_setAny")
-	//	}
+	//case *godror.Number:
+	//	err = _setNumber(d, value)
+	case *uuid.UUID:
+		err = _setUUID(d, value)
 	//case *[]string:
 	//	switch bv := value.(type) {
 	//	case []byte:

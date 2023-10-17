@@ -326,7 +326,7 @@ public class DaoClassInfo {
 
     public void get_dao_fields_for_crud_create(DtoClass jaxb_dto_class,
                                                String table_name,
-                                               HashSet<String> dao_crud_generated_set,
+                                               HashSet<String> dao_crud_auto_columns,
                                                List<FieldInfo> res_dao_fields_not_generated,
                                                List<FieldInfo> res_dao_fields_generated) throws Exception {
 
@@ -339,10 +339,10 @@ public class DaoClassInfo {
         for (FieldInfo dao_field : dao_fields_all) {
             String dao_col_name = dao_field.getColumnName();
             String gen_dao_col_name = dao_col_name.toLowerCase();
-            if (dao_crud_generated_set.contains(gen_dao_col_name)) {
+            if (dao_crud_auto_columns.contains(gen_dao_col_name)) {
                 dao_field.setAI(true);
                 res_dao_fields_generated.add(dao_field);
-                dao_crud_generated_set.remove(gen_dao_col_name); // it must become empty in the end
+                dao_crud_auto_columns.remove(gen_dao_col_name); // it must become empty in the end
             } else {
                 if (dao_field.isAI()) {
                     res_dao_fields_generated.add(dao_field);
@@ -351,8 +351,8 @@ public class DaoClassInfo {
                 }
             }
         }
-        if (dao_crud_generated_set.size() > 0) { // not processed column names remain!
-            throw new Exception("Unknown columns are listed as 'generated': " + dao_crud_generated_set);
+        if (dao_crud_auto_columns.size() > 0) { // not processed column names remain!
+            throw new Exception("Unknown columns are listed as 'auto': " + dao_crud_auto_columns);
         }
     }
 

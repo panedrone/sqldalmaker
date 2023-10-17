@@ -1,4 +1,4 @@
-package dbal
+package dao
 
 import (
 	"context"
@@ -6,9 +6,8 @@ import (
 	"database/sql/driver"
 	"errors"
 	"fmt"
-	"github.com/godror/godror"
+	"github.com/google/uuid"
 	"gorm.io/gorm"
-
 	//"github.com/godror/godror"
 	"io"
 	"reflect"
@@ -1063,15 +1062,28 @@ func _setBytes(d *[]byte, value interface{}) error {
 	return nil
 }
 
-func SetNumber(d *godror.Number, row map[string]interface{}, colName string, errMap map[string]int) {
+//func SetNumber(d *godror.Number, row map[string]interface{}, colName string, errMap map[string]int) {
+//	value, err := _getValue(row, colName, errMap)
+//	if err == nil {
+//		err = _setNumber(d, value)
+//		_updateErrMap(err, colName, errMap)
+//	}
+//}
+//
+//func _setNumber(d *godror.Number, value interface{}) error {
+//	err := d.Scan(value)
+//	return err
+//}
+
+func SetUUID(d *uuid.UUID, row map[string]interface{}, colName string, errMap map[string]int) {
 	value, err := _getValue(row, colName, errMap)
 	if err == nil {
-		err = _setNumber(d, value)
+		err = _setUUID(d, value)
 		_updateErrMap(err, colName, errMap)
 	}
 }
 
-func _setNumber(d *godror.Number, value interface{}) error {
+func _setUUID(d *uuid.UUID, value interface{}) error {
 	err := d.Scan(value)
 	return err
 }
@@ -1140,19 +1152,10 @@ func _setAny(dstPtr interface{}, value interface{}) error {
 		err = _setBool(d, value)
 	case *[]byte: // the same as uint8
 		err = _setBytes(d, value)
-	case *godror.Number:
-		err = _setNumber(d, value)
-	//case *uuid.UUID:
-	//	switch bv := value.(type) {
-	//	case []byte:
-	//		err := d.Scan(bv)
-	//		if err != nil {
-	//			return assignErr(d, value, "_setAny", err.Error())
-	//		}
-	//		return nil
-	//  default:
-	//      return unknownTypeErr(d, value, "_setAny")
-	//	}
+	//case *godror.Number:
+	//	err = _setNumber(d, value)
+	case *uuid.UUID:
+		err = _setUUID(d, value)
 	//case *[]string:
 	//	switch bv := value.(type) {
 	//	case []byte:

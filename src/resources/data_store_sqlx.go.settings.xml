@@ -59,21 +59,21 @@
 
         <!-- sqlite3 -->
 
-        <type detected="sqlx-java.lang.Integer" target="int64${json-sqlx} -> SetInt64"/>
-        <type detected="sqlx-java.lang.Float" target="float32${json-sqlx} -> SetFloat64"/>
-        <type detected="sqlx-java.lang.Double" target="float64${json-sqlx} -> SetFloat64"/>
-        <type detected="sqlx-java.lang.String" target="string${json-sqlx} -> SetString"/>
-        <type detected="sqlx-java.util.Date" target="time:time.Time${json-sqlx} -> SetTime"/>
-        <type detected="sqlx-byte[]" target="byte[]${json-sqlx} -> SetBytes"/>
-        <type detected="sqlx-java.lang.Object" target="interface{}${json-sqlx}"/>
+        <!--        <type detected="sqlx-java.lang.Integer" target="int64${json-sqlx} -> SetInt64"/>-->
+        <!--        <type detected="sqlx-java.lang.Float" target="float32${json-sqlx} -> SetFloat64"/>-->
+        <!--        <type detected="sqlx-java.lang.Double" target="float64${json-sqlx} -> SetFloat64"/>-->
+        <!--        <type detected="sqlx-java.lang.String" target="string${json-sqlx} -> SetString"/>-->
+        <!--        <type detected="sqlx-java.util.Date" target="time:time.Time${json-sqlx} -> SetTime"/>-->
+        <!--        <type detected="sqlx-byte[]" target="byte[]${json-sqlx} -> SetBytes"/>-->
+        <!--        <type detected="sqlx-java.lang.Object" target="interface{}${json-sqlx}"/>-->
 
-        <type detected="java.lang.Integer" target="int64${json} -> SetInt64"/>
-        <type detected="java.lang.Float" target="float32${json} -> SetFloat64"/>
-        <type detected="java.lang.Double" target="float64${json} -> SetFloat64"/>
-        <type detected="java.lang.String" target="string${json} -> SetString"/>
-        <type detected="java.util.Date" target="time:time.Time${json} -> SetTime"/>
-        <type detected="byte[]" target="byte[]${json} -> SetBytes"/>
-        <type detected="java.lang.Object" target="interface{}${json}"/>
+        <!--        <type detected="java.lang.Integer" target="int64${json} -> SetInt64"/>-->
+        <!--        <type detected="java.lang.Float" target="float32${json} -> SetFloat64"/>-->
+        <!--        <type detected="java.lang.Double" target="float64${json} -> SetFloat64"/>-->
+        <!--        <type detected="java.lang.String" target="string${json} -> SetString"/>-->
+        <!--        <type detected="java.util.Date" target="time:time.Time${json} -> SetTime"/>-->
+        <!--        <type detected="byte[]" target="byte[]${json} -> SetBytes"/>-->
+        <!--        <type detected="java.lang.Object" target="interface{}${json}"/>-->
 
         <!-- oracle -->
 
@@ -98,42 +98,44 @@
 
         <!-- mysql, postgres -->
 
-        <!--        <type detected="sqlx-java.util.UUID" target="github.com/google/uuid:uuid.UUID${json-sqlx}|1:;type:uuid"/>-->
-        <!--        <type detected="sqlx-java.util.UUID+auto"-->
-        <!--              target="github.com/google/uuid:uuid.UUID${json-sqlx}|1:;type:uuid;default:uuid_generate_v4()"/>-->
+        <type detected="sqlx-java.util.UUID" target="github.com/google/uuid:uuid.UUID${json-sqlx}|1:;type:uuid"/>
+        <type detected="sqlx-java.util.UUID+auto"
+              target="github.com/google/uuid:uuid.UUID${json-sqlx}|1:;type:uuid;default:uuid_generate_v4()"/>
 
-        <!--        <type detected="sqlx-java.lang.Short" target="int16${json-sqlx} -> SetInt16"/>-->
-        <!--        <type detected="sqlx-java.lang.Integer" target="int32${json-sqlx} -> SetInt32"/>-->
-        <!--        <type detected="sqlx-java.lang.Long" target="int64${json-sqlx} -> SetInt64"/>-->
+        <type detected="sqlx-java.sql.Array" target="[]string${json-sqlx}"/>
 
-        <!--        <type detected="sqlx-java.lang.Float" target="float32${json-sqlx} -> SetFloat32"/>-->
-        <!--        <type detected="sqlx-java.lang.Double" target="float64${json-sqlx} -> SetFloat64"/>-->
-        <!--        <type detected="sqlx-java.math.BigDecimal" target="float64${json-sqlx} -> SetFloat64"/>-->
+        <type detected="sqlx-java.lang.Short" target="int16${json-sqlx} -> SetInt16"/>
+        <type detected="sqlx-java.lang.Integer" target="int32${json-sqlx} -> SetInt32"/>
+        <type detected="sqlx-java.lang.Long" target="int64${json-sqlx} -> SetInt64"/>
 
-        <!--        <type detected="sqlx-java.lang.String" target="string${json-sqlx} -> SetString"/>-->
-        <!--        <type detected="sqlx-java.util.Date" target="time:time.Time${json-sqlx} -> SetTime"/>-->
-        <!--        <type detected="sqlx-byte[]" target="string${json-sqlx}"/>-->
-        <!--        <type detected="sqlx-java.lang.Boolean" target="bool${json-sqlx} -> SetBool"/>-->
+        <type detected="sqlx-java.lang.Float" target="float32${json-sqlx} -> SetFloat32"/>
+        <type detected="sqlx-java.lang.Double" target="float64${json-sqlx} -> SetFloat64"/>
+        <type detected="sqlx-java.math.BigDecimal" target="float64${json-sqlx} -> SetFloat64"/>
 
-        <!--        <type detected="sqlx-java.lang.Object" target="interface{}${json-sqlx}"/>-->
+        <type detected="sqlx-java.lang.String" target="string${json-sqlx} -> SetString"/>
+        <type detected="sqlx-java.util.Date" target="time:time.Time${json-sqlx} -> SetTime"/>
+        <type detected="sqlx-byte[]" target="string${json-sqlx}"/>
+        <type detected="sqlx-java.lang.Boolean" target="bool${json-sqlx} -> SetBool"/>
 
-        <!--        <type detected="java.util.UUID" target="github.com/google/uuid:uuid.UUID${json} -> SetUUID"/>-->
-        <!--        <type detected="java.sql.Array" target="[]string${json}"/>-->
+        <type detected="sqlx-java.lang.Object" target="interface{}${json-sqlx}"/>
 
-        <!--        <type detected="java.lang.Short" target="int16${json} -> SetInt16"/>-->
-        <!--        <type detected="java.lang.Integer" target="int32${json} -> SetInt32"/>-->
-        <!--        <type detected="java.lang.Long" target="int64${json} -> SetInt64"/>-->
+        <type detected="java.util.UUID" target="github.com/google/uuid:uuid.UUID${json} -> SetUUID"/>
+        <type detected="java.sql.Array" target="[]string${json}"/>
 
-        <!--        <type detected="java.lang.Float" target="float32${json} -> SetFloat32"/>-->
-        <!--        <type detected="java.lang.Double" target="float64${json} -> SetFloat64"/>-->
-        <!--        <type detected="java.math.BigDecimal" target="float64${json} -> SetFloat64"/>-->
+        <type detected="java.lang.Short" target="int16${json} -> SetInt16"/>
+        <type detected="java.lang.Integer" target="int32${json} -> SetInt32"/>
+        <type detected="java.lang.Long" target="int64${json} -> SetInt64"/>
 
-        <!--        <type detected="java.lang.String" target="string${json} -> SetString"/>-->
-        <!--        <type detected="java.util.Date" target="time:time.Time${json} -> SetTime"/>-->
-        <!--        <type detected="byte[]" target="string${json} -> "/>-->
-        <!--        <type detected="java.lang.Boolean" target="bool${json} -> SetBool"/>-->
+        <type detected="java.lang.Float" target="float32${json} -> SetFloat32"/>
+        <type detected="java.lang.Double" target="float64${json} -> SetFloat64"/>
+        <type detected="java.math.BigDecimal" target="float64${json} -> SetFloat64"/>
 
-        <!--        <type detected="java.lang.Object" target="interface{}${json}"/>-->
+        <type detected="java.lang.String" target="string${json} -> SetString"/>
+        <type detected="java.util.Date" target="time:time.Time${json} -> SetTime"/>
+        <type detected="byte[]" target="string${json} -> "/>
+        <type detected="java.lang.Boolean" target="bool${json} -> SetBool"/>
+
+        <type detected="java.lang.Object" target="interface{}${json}"/>
 
         <type detected="java.sql.ResultSet" target="string"/> <!-- PG cursor param -->
 
