@@ -1084,8 +1084,16 @@ func SetUUID(d *uuid.UUID, row map[string]interface{}, colName string, errMap ma
 }
 
 func _setUUID(d *uuid.UUID, value interface{}) error {
-	err := d.Scan(value)
-	return err
+	switch bv := value.(type) {
+	case []byte:
+		err := d.Scan(bv)
+		if err != nil {
+			return assignErr(d, value, "_setAny", err.Error())
+		}
+		return nil
+	default:
+		return unknownTypeErr(d, value, "_setAny")
+	}
 }
 
 func assignErr(dstPtr interface{}, value interface{}, funcName string, errMsg string) error {
