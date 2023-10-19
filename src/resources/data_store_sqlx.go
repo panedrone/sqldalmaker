@@ -1,4 +1,4 @@
-package dao
+package dbal
 
 import (
 	"context"
@@ -626,28 +626,23 @@ func newRows(rows driver.Rows) *_Rows {
 }
 
 func (rx *_Rows) Close() error {
-	// implement sqlx.rowsi
 	return rx.rows.Close()
 }
 
 func (rx *_Rows) Columns() ([]string, error) {
-	// implement sqlx.rowsi
 	return rx.colNames, nil
 }
 
 func (rx *_Rows) Err() error {
-	// implement sqlx.rowsi
 	return nil
 }
 
 func (rx *_Rows) Next() bool {
-	// implement sqlx.rowsi
 	err := rx.rows.Next(rx.values)
 	return err == nil
 }
 
 func (rx *_Rows) Scan(_fa ...interface{}) error {
-	// implement sqlx.rowsi --> to use in
 	for i, v := range rx.values {
 		err := _setAny(_fa[i], v)
 		if err != nil {
@@ -728,7 +723,14 @@ func (ds *_DS) Exec(ctx context.Context, sqlString string, args ...interface{}) 
 	return ds._exec2(ctx, sqlString, onRowArr, queryArgs...)
 }
 
-func (ds *_DS) _queryScalar(ctx context.Context, sqlString string, dest interface{}, queryArgs ...interface{}) error {
+func (ds *_DS) Query(ctx context.Context, sqlString string, dest interface{}, args ...interface{}) error {
+	sqlString = ds._formatSQL(sqlString)
+	var onRowArr []interface{}
+	var queryArgs []interface{}
+	_, _, err := ds._processExecParams(args, &onRowArr, &queryArgs)
+	if err != nil {
+		return err
+	}
 	rows, err := ds._queryX(ctx, sqlString, queryArgs...)
 	if err != nil {
 		return err
@@ -753,18 +755,6 @@ func (ds *_DS) _queryScalar(ctx context.Context, sqlString string, dest interfac
 		return errMultipleRows(sqlString)
 	}
 	return nil
-}
-
-func (ds *_DS) Query(ctx context.Context, sqlString string, dest interface{}, args ...interface{}) error {
-	sqlString = ds._formatSQL(sqlString)
-	var onRowArr []interface{}
-	var queryArgs []interface{}
-	_, _, err := ds._processExecParams(args, &onRowArr, &queryArgs)
-	if err != nil {
-		return err
-	}
-	err = ds._queryScalar(ctx, sqlString, dest, queryArgs...)
-	return err
 }
 
 func (ds *_DS) QueryAll(ctx context.Context, sqlString string, onRow func(interface{}), args ...interface{}) (err error) {

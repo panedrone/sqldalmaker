@@ -1,4 +1,4 @@
-package dao
+package dbal
 
 import (
 	"context"
@@ -641,7 +641,18 @@ func (ds *_DS) Exec(ctx context.Context, sqlString string, args ...interface{}) 
 	return ds._exec2(ctx, sqlString, onRowArr, queryArgs...)
 }
 
-func (ds *_DS) _queryScalar(ctx context.Context, sqlString string, dest interface{}, queryArgs ...interface{}) error {
+func (ds *_DS) Query(ctx context.Context, sqlString string, dest interface{}, args ...interface{}) error {
+	sqlString = ds._formatSQL(sqlString)
+	var onRowArr []interface{}
+	var queryArgs []interface{}
+	implicitCursors, outCursors, err := ds._processExecParams(args, &onRowArr, &queryArgs)
+	if err != nil {
+		return err
+	}
+	if implicitCursors || outCursors {
+		err = errors.New("not supported in Query: implicitCursors || outCursors")
+		return err
+	}
 	rows, err := ds._query(ctx, sqlString, queryArgs...)
 	if err != nil {
 		return err
@@ -666,22 +677,6 @@ func (ds *_DS) _queryScalar(ctx context.Context, sqlString string, dest interfac
 		return errMultipleRows(sqlString)
 	}
 	return nil
-}
-
-func (ds *_DS) Query(ctx context.Context, sqlString string, dest interface{}, args ...interface{}) error {
-	sqlString = ds._formatSQL(sqlString)
-	var onRowArr []interface{}
-	var queryArgs []interface{}
-	implicitCursors, outCursors, err := ds._processExecParams(args, &onRowArr, &queryArgs)
-	if err != nil {
-		return err
-	}
-	if implicitCursors || outCursors {
-		err = errors.New("not supported in Query: implicitCursors || outCursors")
-		return err
-	}
-	err = ds._queryScalar(ctx, sqlString, dest, queryArgs...)
-	return err
 }
 
 func (ds *_DS) QueryAll(ctx context.Context, sqlString string, onRow func(interface{}), args ...interface{}) (err error) {
@@ -1189,6 +1184,10 @@ func _setAny(dstPtr interface{}, value interface{}) error {
 			*d = nil
 		}
 		return nil // leave as-is
+	}
+	sc, ok := dstPtr.(sql.Scanner)
+	if ok {
+		return sc.Scan(value)
 	}
 	var err error
 	switch d := dstPtr.(type) {

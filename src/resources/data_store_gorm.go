@@ -1,4 +1,4 @@
-package dao
+package dbal
 
 import (
 	"context"
@@ -6,9 +6,8 @@ import (
 	"database/sql/driver"
 	"errors"
 	"fmt"
-	"github.com/google/uuid"
+	"github.com/godror/godror"
 	"gorm.io/gorm"
-	//"github.com/godror/godror"
 	"io"
 	"reflect"
 	"strconv"
@@ -1062,39 +1061,39 @@ func _setBytes(d *[]byte, value interface{}) error {
 	return nil
 }
 
-//func SetNumber(d *godror.Number, row map[string]interface{}, colName string, errMap map[string]int) {
-//	value, err := _getValue(row, colName, errMap)
-//	if err == nil {
-//		err = _setNumber(d, value)
-//		_updateErrMap(err, colName, errMap)
-//	}
-//}
-//
-//func _setNumber(d *godror.Number, value interface{}) error {
-//	err := d.Scan(value)
-//	return err
-//}
-
-func SetUUID(d *uuid.UUID, row map[string]interface{}, colName string, errMap map[string]int) {
+func SetNumber(d *godror.Number, row map[string]interface{}, colName string, errMap map[string]int) {
 	value, err := _getValue(row, colName, errMap)
 	if err == nil {
-		err = _setUUID(d, value)
+		err = _setNumber(d, value)
 		_updateErrMap(err, colName, errMap)
 	}
 }
 
-func _setUUID(d *uuid.UUID, value interface{}) error {
-	switch bv := value.(type) {
-	case []byte:
-		err := d.Scan(bv)
-		if err != nil {
-			return assignErr(d, value, "_setAny", err.Error())
-		}
-		return nil
-	default:
-		return unknownTypeErr(d, value, "_setAny")
-	}
+func _setNumber(d *godror.Number, value interface{}) error {
+	err := d.Scan(value)
+	return err
 }
+
+//func SetUUID(d *uuid.UUID, row map[string]interface{}, colName string, errMap map[string]int) {
+//	value, err := _getValue(row, colName, errMap)
+//	if err == nil {
+//		err = _setUUID(d, value)
+//		_updateErrMap(err, colName, errMap)
+//	}
+//}
+//
+//func _setUUID(d *uuid.UUID, value interface{}) error {
+//	switch bv := value.(type) {
+//	case []byte:
+//		err := d.Scan(bv)
+//		if err != nil {
+//			return assignErr(d, value, "_setAny", err.Error())
+//		}
+//		return nil
+//	default:
+//		return unknownTypeErr(d, value, "_setAny")
+//	}
+//}
 
 func assignErr(dstPtr interface{}, value interface{}, funcName string, errMsg string) error {
 	return errors.New(fmt.Sprintf("%s %T <- %T %s", funcName, dstPtr, value, errMsg))
@@ -1142,6 +1141,10 @@ func _setAny(dstPtr interface{}, value interface{}) error {
 		}
 		return nil // leave as-is
 	}
+	sc, ok := dstPtr.(sql.Scanner)
+	if ok {
+		return sc.Scan(value)
+	}
 	var err error
 	switch d := dstPtr.(type) {
 	case *string:
@@ -1160,10 +1163,8 @@ func _setAny(dstPtr interface{}, value interface{}) error {
 		err = _setBool(d, value)
 	case *[]byte: // the same as uint8
 		err = _setBytes(d, value)
-	//case *godror.Number:
-	//	err = _setNumber(d, value)
-	case *uuid.UUID:
-		err = _setUUID(d, value)
+	//case *uuid.UUID:
+	//	err = _setUUID(d, value)
 	//case *[]string:
 	//	switch bv := value.(type) {
 	//	case []byte:
