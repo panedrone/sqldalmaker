@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2022 sqldalmaker@gmail.com
+    Copyright 2011-2023 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -124,7 +124,7 @@ class JdbcSqlFieldInfo {
             // sometime, it returns "[B": See comments for Class.getName() API
             String java_class_name = rsmd.getColumnClassName(col_num);
             return Helpers.refine_java_type_name(java_class_name);
-        } catch (Exception ex) {
+        } catch (ClassNotFoundException | SQLException ex) {
             return Object.class.getName();
         }
     }
