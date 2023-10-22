@@ -852,7 +852,6 @@ func (ds *_DS) QueryByFA(ctx context.Context, sqlString string, dest interface{}
 	faArr, isUntypedSlice := dest.([]interface{})
 	if !isUntypedSlice && isPtrSlice(dest) {
 		return ds.selectX(ctx, dest, sqlString, args...)
-
 	}
 	rows, err := ds.queryX(ctx, sqlString, args...)
 	if err != nil {

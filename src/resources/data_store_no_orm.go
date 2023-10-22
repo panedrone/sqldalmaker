@@ -6,7 +6,7 @@ import (
 	"database/sql/driver"
 	"errors"
 	"fmt"
-	// "github.com/google/uuid"
+	"github.com/google/uuid"
 	// "github.com/godror/godror"
 	"io"
 	"reflect"
@@ -866,7 +866,7 @@ func SetString(d *string, row map[string]interface{}, colName string, errMap map
 	value, err := _getValue(row, colName, errMap)
 	if err == nil {
 		err = _setString(d, value)
-		_updateErrMap(err, colName, errMap)
+		updateErrMap(err, colName, errMap)
 	}
 }
 
@@ -892,7 +892,7 @@ func SetInt64(d *int64, row map[string]interface{}, colName string, errMap map[s
 	value, err := _getValue(row, colName, errMap)
 	if err == nil {
 		err = _setInt64(d, value)
-		_updateErrMap(err, colName, errMap)
+		updateErrMap(err, colName, errMap)
 	}
 }
 
@@ -930,7 +930,7 @@ func SetInt32(d *int32, row map[string]interface{}, colName string, errMap map[s
 	value, err := _getValue(row, colName, errMap)
 	if err == nil {
 		err = _setInt32(d, value)
-		_updateErrMap(err, colName, errMap)
+		updateErrMap(err, colName, errMap)
 	}
 }
 
@@ -967,7 +967,7 @@ func SetFloat32(d *float32, row map[string]interface{}, colName string, errMap m
 	value, err := _getValue(row, colName, errMap)
 	if err == nil {
 		err = _setFloat32(d, value)
-		_updateErrMap(err, colName, errMap)
+		updateErrMap(err, colName, errMap)
 	}
 }
 
@@ -1000,7 +1000,7 @@ func SetFloat64(d *float64, row map[string]interface{}, colName string, errMap m
 	value, err := _getValue(row, colName, errMap)
 	if err == nil {
 		err = _setFloat64(d, value)
-		_updateErrMap(err, colName, errMap)
+		updateErrMap(err, colName, errMap)
 	}
 }
 
@@ -1033,7 +1033,7 @@ func SetTime(d *time.Time, row map[string]interface{}, colName string, errMap ma
 	value, err := _getValue(row, colName, errMap)
 	if err == nil {
 		err = _setTime(d, value)
-		_updateErrMap(err, colName, errMap)
+		updateErrMap(err, colName, errMap)
 	}
 }
 
@@ -1051,7 +1051,7 @@ func SetBool(d *bool, row map[string]interface{}, colName string, errMap map[str
 	value, err := _getValue(row, colName, errMap)
 	if err == nil {
 		err = _setBool(d, value)
-		_updateErrMap(err, colName, errMap)
+		updateErrMap(err, colName, errMap)
 	}
 }
 
@@ -1076,7 +1076,7 @@ func SetBytes(d *[]byte, row map[string]interface{}, colName string, errMap map[
 	value, err := _getValue(row, colName, errMap)
 	if err == nil {
 		err = _setBytes(d, value)
-		_updateErrMap(err, colName, errMap)
+		updateErrMap(err, colName, errMap)
 	}
 }
 
@@ -1094,7 +1094,7 @@ func _setBytes(d *[]byte, value interface{}) error {
 //	value, err := _getValue(row, colName, errMap)
 //	if err == nil {
 //		err = _setNumber(d, value)
-//		_updateErrMap(err, colName, errMap)
+//		updateErrMap(err, colName, errMap)
 //	}
 //}
 //
@@ -1103,26 +1103,26 @@ func _setBytes(d *[]byte, value interface{}) error {
 //	return err
 //}
 
-//func SetUUID(d *uuid.UUID, row map[string]interface{}, colName string, errMap map[string]int) {
-//	value, err := _getValue(row, colName, errMap)
-//	if err == nil {
-//		err = _setUUID(d, value)
-//		_updateErrMap(err, colName, errMap)
-//	}
-//}
-//
-//func _setUUID(d *uuid.UUID, value interface{}) error {
-//	switch bv := value.(type) {
-//	case []byte:
-//		err := d.Scan(bv)
-//		if err != nil {
-//			return assignErr(d, value, "_setAny", err.Error())
-//		}
-//		return nil
-//	default:
-//		return unknownTypeErr(d, value, "_setAny")
-//	}
-//}
+func SetUUID(d *uuid.UUID, row map[string]interface{}, colName string, errMap map[string]int) {
+	value, err := _getValue(row, colName, errMap)
+	if err == nil {
+		err = _setUUID(d, value)
+		updateErrMap(err, colName, errMap)
+	}
+}
+
+func _setUUID(d *uuid.UUID, value interface{}) error {
+	switch bv := value.(type) {
+	case []byte:
+		err := d.Scan(bv)
+		if err != nil {
+			return assignErr(d, value, "_setAny", err.Error())
+		}
+		return nil
+	default:
+		return unknownTypeErr(d, value, "_setAny")
+	}
+}
 
 func _getValue(row map[string]interface{}, colName string, errMap map[string]int) (value interface{}, err error) {
 	var ok bool
@@ -1139,19 +1139,6 @@ func _getValue(row map[string]interface{}, colName string, errMap map[string]int
 		return
 	}
 	return
-}
-
-func _updateErrMap(err error, colName string, errMap map[string]int) {
-	if err == nil {
-		return
-	}
-	key := fmt.Sprintf("[%s] %s", colName, err.Error())
-	count, ok := errMap[key]
-	if ok {
-		errMap[key] = count + 1
-	} else {
-		errMap[key] = 1
-	}
 }
 
 func _setAny(dstPtr interface{}, value interface{}) error {
@@ -1186,8 +1173,8 @@ func _setAny(dstPtr interface{}, value interface{}) error {
 		err = _setBytes(d, value)
 	//case *godror.Number:
 	//	err = _setNumber(d, value)
-	//case *uuid.UUID:
-	//	err = _setUUID(d, value)
+	case *uuid.UUID:
+		err = _setUUID(d, value)
 	//case *[]string:
 	//	switch bv := value.(type) {
 	//	case []byte:
