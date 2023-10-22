@@ -747,9 +747,8 @@ func (ds *_DS) QueryByFA(ctx context.Context, sqlString string, dest interface{}
 		}
 		if isPtrSlice(dest) {
 			return raw.Find(dest).Error
-		} else {
-			return raw.Take(dest).Error
 		}
+		return raw.Take(dest).Error
 	}
 	rows, err := ds.rawQuery(ctx, sqlString, args...)
 	if err != nil {
