@@ -738,38 +738,34 @@ func isPtrSlice(i interface{}) bool {
 
 func (ds *_DS) QueryByFA(ctx context.Context, sqlString string, dest interface{}, args ...interface{}) error {
 	sqlString = ds.formatSQL(sqlString)
-	faArr, isUntypedSlice := dest.([]interface{})
-	if !isUntypedSlice {
-		raw := ds.rawGet(ctx, sqlString, args...)
-		err := raw.Error
+	faArr, ok := dest.([]interface{})
+	if ok {
+		rows, err := ds.rawQuery(ctx, sqlString, args...)
 		if err != nil {
 			return err
 		}
-		if isPtrSlice(dest) {
-			return raw.Find(dest).Error
+		defer _close(rows)
+		if !rows.Next() {
+			return errNoRows(sqlString)
 		}
-		return raw.Take(dest).Error
-	}
-	rows, err := ds.rawQuery(ctx, sqlString, args...)
-	if err != nil {
-		return err
-	}
-	defer _close(rows)
-	if !rows.Next() {
-		return errNoRows(sqlString)
-	}
-	if isUntypedSlice {
 		err = rows.Scan(faArr...)
-	} else {
-		err = errUnexpectedType(dest)
+		if err != nil {
+			return err
+		}
+		if rows.Next() {
+			return errMultipleRows(sqlString)
+		}
+		return nil
 	}
+	raw := ds.rawGet(ctx, sqlString, args...)
+	err := raw.Error
 	if err != nil {
 		return err
 	}
-	if rows.Next() {
-		return errMultipleRows(sqlString)
+	if isPtrSlice(dest) {
+		return raw.Find(dest).Error
 	}
-	return nil
+	return raw.Take(dest).Error
 }
 
 func (ds *_DS) QueryAllByFA(ctx context.Context, sqlString string, onRow func() (interface{}, func()), args ...interface{}) (err error) {
