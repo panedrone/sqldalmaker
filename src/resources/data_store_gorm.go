@@ -263,9 +263,12 @@ func (ds *_DS) Delete(ctx context.Context, table string, dataObjRef interface{})
 
 // raw-SQL --------------------------------
 
+func (ds *_DS) rawGet(ctx context.Context, sqlString string, args ...interface{}) *gorm.DB {
+	return ds.Session(ctx).Raw(sqlString, args...)
+}
+
 func (ds *_DS) rawQuery(ctx context.Context, sqlString string, args ...interface{}) (*sql.Rows, error) {
-	raw := ds.Session(ctx).Raw(sqlString, args...)
-	return raw.Rows()
+	return ds.rawGet(ctx, sqlString, args...).Rows()
 }
 
 func (ds *_DS) rawExec(ctx context.Context, sqlString string, args ...interface{}) (rowsAffected int64, err error) {
@@ -721,43 +724,53 @@ func (ds *_DS) QueryAllRows(ctx context.Context, sqlString string, onRow func(ma
 	return
 }
 
-func (ds *_DS) QueryByFA(ctx context.Context, sqlString string, dest interface{}, args ...interface{}) (err error) {
+func isPtrSlice(i interface{}) bool {
+	// https://stackoverflow.com/questions/69675420/how-to-check-if-interface-is-a-a-pointer-to-a-slice
+	if i == nil {
+		return false
+	}
+	v := reflect.ValueOf(i)
+	if v.Kind() != reflect.Ptr {
+		return false
+	}
+	return v.Elem().Kind() == reflect.Slice
+}
+
+func (ds *_DS) QueryByFA(ctx context.Context, sqlString string, dest interface{}, args ...interface{}) error {
 	sqlString = ds.formatSQL(sqlString)
+	faArr, isUntypedSlice := dest.([]interface{})
+	if !isUntypedSlice {
+		raw := ds.rawGet(ctx, sqlString, args...)
+		err := raw.Error
+		if err != nil {
+			return err
+		}
+		if isPtrSlice(dest) {
+			return raw.Find(dest).Error
+		} else {
+			return raw.Take(dest).Error
+		}
+	}
 	rows, err := ds.rawQuery(ctx, sqlString, args...)
 	if err != nil {
-		return
+		return err
 	}
 	defer _close(rows)
 	if !rows.Next() {
-		err = errNoRows(sqlString)
-		return
+		return errNoRows(sqlString)
 	}
-	faArr, ok := dest.([]interface{})
-	if ok {
+	if isUntypedSlice {
 		err = rows.Scan(faArr...)
 	} else {
 		err = errUnexpectedType(dest)
 	}
 	if err != nil {
-		return
+		return err
 	}
 	if rows.Next() {
-		err = errMultipleRows(sqlString)
-		return
+		return errMultipleRows(sqlString)
 	}
-	return
-}
-
-func errUnexpectedType(val interface{}) error {
-	return errors.New(fmt.Sprintf("unexpected type: %v", reflect.TypeOf(val)))
-}
-
-func errNoRows(sqlString string) error {
-	return errors.New(fmt.Sprintf("no rows found for %s", sqlString))
-}
-
-func errMultipleRows(sqlString string) error {
-	return errors.New(fmt.Sprintf("more than 1 row found for %s", sqlString))
+	return nil
 }
 
 func (ds *_DS) QueryAllByFA(ctx context.Context, sqlString string, onRow func() (interface{}, func()), args ...interface{}) (err error) {
@@ -832,6 +845,8 @@ func (ds *_DS) formatSQL(sqlString string) string {
 	//}
 	return sqlString
 }
+
+/////////////////////////////////////////////////////////////
 
 func SetString(d *string, row map[string]interface{}, colName string, errMap map[string]int) {
 	value, err := _getValue(row, colName, errMap)
@@ -1087,21 +1102,13 @@ func _setBytes(d *[]byte, value interface{}) error {
 //	case []byte:
 //		err := d.Scan(bv)
 //		if err != nil {
-//			return assignErr(d, value, "_setAny", err.Error())
+//			return assignErr(d, value, "_setUUID", err.Error())
 //		}
 //		return nil
 //	default:
-//		return unknownTypeErr(d, value, "_setAny")
+//		return unknownTypeErr(d, value, "_setUUID")
 //	}
 //}
-
-func assignErr(dstPtr interface{}, value interface{}, funcName string, errMsg string) error {
-	return errors.New(fmt.Sprintf("%s %T <- %T %s", funcName, dstPtr, value, errMsg))
-}
-
-func unknownTypeErr(dstPtr interface{}, value interface{}, funcName string) error {
-	return assignErr(dstPtr, value, funcName, "unknown type")
-}
 
 func _getValue(row map[string]interface{}, colName string, errMap map[string]int) (value interface{}, err error) {
 	var ok bool
@@ -1233,9 +1240,44 @@ func SetAny(dstPtr interface{}, row map[string]interface{}, colName string, errM
 	SetScalarValue(dstPtr, value, errMap)
 }
 
+/////////////////////////////////////////////////////////////
+
 func ErrMapToErr(errMap map[string]int) (err error) {
 	if len(errMap) > 0 {
 		err = errors.New(fmt.Sprintf("%v", errMap))
 	}
 	return
+}
+
+func assignErr(dstPtr interface{}, value interface{}, funcName string, errMsg string) error {
+	return errors.New(fmt.Sprintf("%s %T <- %T %s", funcName, dstPtr, value, errMsg))
+}
+
+func unknownTypeErr(dstPtr interface{}, value interface{}, funcName string) error {
+	return assignErr(dstPtr, value, funcName, "unknown type")
+}
+
+func updateErrMap(err error, colName string, errMap map[string]int) {
+	if err == nil {
+		return
+	}
+	key := fmt.Sprintf("[%s] %s", colName, err.Error())
+	count, ok := errMap[key]
+	if ok {
+		errMap[key] = count + 1
+	} else {
+		errMap[key] = 1
+	}
+}
+
+func errUnexpectedType(val interface{}) error {
+	return errors.New(fmt.Sprintf("unexpected type: %v", reflect.TypeOf(val)))
+}
+
+func errNoRows(sqlString string) error {
+	return errors.New(fmt.Sprintf("no rows found for %s", sqlString))
+}
+
+func errMultipleRows(sqlString string) error {
+	return errors.New(fmt.Sprintf("more than 1 row found for %s", sqlString))
 }
