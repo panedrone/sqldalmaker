@@ -154,7 +154,7 @@ func (dao *${class_name}) ${method_name}(ctx context.Context#param_decls($is_ext
 				res = append(res, item)
 			}
 	}
-	err = dao.ds.QueryAllByFA(ctx, sql, _onRow#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
+	err = dao.ds.Select(ctx, sql, _onRow#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
 #elseif ($assign_mode == 2)
 	_onRow := func() (interface{}, func()) {
 		item := &${returned_type_name}{}
@@ -162,9 +162,9 @@ func (dao *${class_name}) ${method_name}(ctx context.Context#param_decls($is_ext
 			res = append(res, item)
 		}
 	}
-	err = dao.ds.QueryAllByFA(ctx, sql, _onRow#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
+	err = dao.ds.Select(ctx, sql, _onRow#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
 #elseif ($assign_mode == 3)
-	err = dao.ds.QueryByFA(ctx, sql, &res#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
+	err = dao.ds.Select(ctx, sql, &res#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
 #end
 	return
 }
@@ -207,14 +207,14 @@ func (dao *${class_name}) ${method_name}(ctx context.Context#param_decls($is_ext
 		&res.${f.getName()},
 #end
 	}
-	err := dao.ds.QueryByFA(ctx, sql, _fa#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
+	err := dao.ds.Select(ctx, sql, _fa#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
 	if err == nil {
 		return res, nil
 	}
 	return nil, err
 #else
 	res := &${returned_type_name}{}
-	err := dao.ds.QueryByFA(ctx, sql, res#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
+	err := dao.ds.Select(ctx, sql, res#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
 	if err == nil {
 		return res, nil
 	}

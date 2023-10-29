@@ -1,3 +1,17 @@
+2023-10-22
+
+    - sqlx field-assign-mode="0,1,2,3" (*)
+
+    - gorm field-assign-mode="0,1" (*)
+
+    - gorm field-assign-mode="2,3" - no implicit cursors, no ref-cursors (so far)
+
+    - database/sql field-assign-mode="0,1" - (*)
+
+    - database/sql field-assign-mode="2,3" - not supported
+
+        (*) - full-featured including implicit cursors and ref-cursors
+
 2023-09-10
 
     [+] github.com/jmoiron/sqlx

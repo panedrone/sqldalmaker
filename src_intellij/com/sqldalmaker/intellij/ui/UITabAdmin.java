@@ -936,7 +936,7 @@ public class UITabAdmin {
         btn_golang = new JButton();
         btn_golang.setText("database/sql");
         gbc = new GridBagConstraints();
-        gbc.gridx = 3;
+        gbc.gridx = 5;
         gbc.gridy = 0;
         pnl_go.add(btn_golang, gbc);
         btn_go_no_orm = new JButton();
@@ -951,7 +951,7 @@ public class UITabAdmin {
         btn_go_no_orm.setText("");
         btn_go_no_orm.setToolTipText("settings.xml");
         gbc = new GridBagConstraints();
-        gbc.gridx = 4;
+        gbc.gridx = 6;
         gbc.gridy = 0;
         pnl_go.add(btn_go_no_orm, gbc);
         btn_gorn = new JButton();
@@ -973,7 +973,7 @@ public class UITabAdmin {
         btn_sqlx.setPreferredSize(new Dimension(60, 30));
         btn_sqlx.setText("sqlx");
         gbc = new GridBagConstraints();
-        gbc.gridx = 5;
+        gbc.gridx = 3;
         gbc.gridy = 0;
         pnl_go.add(btn_sqlx, gbc);
         btn_sqlx_xml = new JButton();
@@ -988,7 +988,7 @@ public class UITabAdmin {
         btn_sqlx_xml.setText("");
         btn_sqlx_xml.setToolTipText("settings.xml");
         gbc = new GridBagConstraints();
-        gbc.gridx = 6;
+        gbc.gridx = 4;
         gbc.gridy = 0;
         pnl_go.add(btn_sqlx_xml, gbc);
         pnl_vm = new JPanel();

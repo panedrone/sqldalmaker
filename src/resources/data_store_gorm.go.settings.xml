@@ -99,14 +99,18 @@
         <!-- mysql, postgres -->
 
         <type detected="gorm-java.util.UUID" target="github.com/google/uuid:uuid.UUID${json-gorm}|1:;type:uuid"/>
+        <!--        <type detected="gorm-java.util.UUID+auto"-->
+        <!--              target="github.com/google/uuid:uuid.UUID${json-gorm}|1:;type:uuid;default:uuid_generate_v4()"/>-->
         <type detected="gorm-java.util.UUID+auto"
-              target="github.com/google/uuid:uuid.UUID${json-gorm}|1:;type:uuid;default:uuid_generate_v4()"/>
+              target="github.com/google/uuid:uuid.UUID${json-gorm}|1:;type:uuid;default:gen_random_uuid()"/>
 
         <type detected="gorm-java.sql.Array" target="[]string${json-gorm}"/>
 
         <type detected="gorm-java.lang.Short" target="int16${json-gorm} -> SetInt16"/>
         <type detected="gorm-java.lang.Integer" target="int32${json-gorm} -> SetInt32"/>
+
         <type detected="gorm-java.lang.Long" target="int64${json-gorm} -> SetInt64"/>
+        <type detected="gorm-java.lang.Long+auto" target="int64${json-gorm} -> SetInt64"/>
 
         <type detected="gorm-java.lang.Float" target="float32${json-gorm} -> SetFloat32"/>
         <type detected="gorm-java.lang.Double" target="float64${json-gorm} -> SetFloat64"/>
@@ -126,6 +130,7 @@
         <type detected="java.lang.Integer" target="int32${json} -> SetInt32"/>
         <type detected="java.lang.Long" target="int64${json} -> SetInt64"/>
 
+
         <type detected="java.lang.Float" target="float32${json} -> SetFloat32"/>
         <type detected="java.lang.Double" target="float64${json} -> SetFloat64"/>
         <type detected="java.math.BigDecimal" target="float64${json} -> SetFloat64"/>
@@ -141,6 +146,7 @@
 
     </type-map>
 
+
     <macros>
 
         <macro value="=built-in=" name="${column}"/>
@@ -154,7 +160,7 @@
         <macro name="${json}" value=" `json:&quot;${col}${0}&quot;`"/>
 
         <macro name="${json-gorm}"
-               value=" `json:&quot;${col}${0}&quot; gorm:&quot;column:${column}${gorm-params}&quot;`"/>
+               value=" `json:&quot;${col}${0}&quot; gorm:&quot;column:${column}${gorm-params}${1}&quot;`"/>
 
         <macro name="${gorm-params}">
             <vm-xml>

@@ -43,13 +43,13 @@ type DataStore interface {
 
 	Insert(ctx context.Context, sqlString string, aiNames string, args ...interface{}) (id interface{}, err error)
 	Exec(ctx context.Context, sqlString string, args ...interface{}) (rowsAffected int64, err error)
+
 	Query(ctx context.Context, sqlString string, res interface{}, args ...interface{}) error
 	QueryAll(ctx context.Context, sqlString string, onRow func(interface{}), args ...interface{}) error
 	QueryRow(ctx context.Context, sqlString string, args ...interface{}) (row map[string]interface{}, err error)
 	QueryAllRows(ctx context.Context, sqlString string, onRow func(map[string]interface{}), args ...interface{}) error
 
-	QueryByFA(ctx context.Context, sqlString string, dest interface{}, args ...interface{}) error
-	QueryAllByFA(ctx context.Context, sqlString string, onRow func() (interface{}, func()), args ...interface{}) error
+	Select(ctx context.Context, sqlString string, dest interface{}, args ...interface{}) error
 
 	PGFetch(cursor string) string
 }
@@ -174,7 +174,7 @@ func _close(obj io.Closer) {
 	_ = obj.Close()
 }
 
-func (ds *_DS) isPgSQL() bool {
+func (ds *_DS) isPgSql() bool {
 	return ds.paramPrefix == "$"
 }
 
@@ -325,7 +325,7 @@ func (ds *_DS) Insert(ctx context.Context, sqlString string, aiNames string, arg
 	}
 	// Builtin LastInsertId works only with MySQL and SQLite3
 	sqlString = ds.formatSQL(sqlString)
-	if ds.isPgSQL() {
+	if ds.isPgSql() {
 		return ds.insertPgSql(ctx, sqlString, aiNames, args...)
 	} else if ds.isMsSql() {
 		return ds.insertMsSql(ctx, sqlString, args...)
@@ -337,13 +337,13 @@ func (ds *_DS) Insert(ctx context.Context, sqlString string, aiNames string, arg
 	return ds.insertDefault(ctx, sqlString, args...)
 }
 
-func _isPtr(p interface{}) bool {
+func isPtr(p interface{}) bool {
 	val := reflect.ValueOf(p)
 	kindOfJ := val.Kind()
 	return kindOfJ == reflect.Ptr
 }
 
-func _pointsToNil(p interface{}) bool {
+func pointsToNil(p interface{}) bool {
 	switch d := p.(type) {
 	case *interface{}:
 		pointsTo := *d
@@ -352,47 +352,44 @@ func _pointsToNil(p interface{}) bool {
 	return false
 }
 
-func _validateDest(dest interface{}) (err error) {
+func validateDest(dest interface{}) (err error) {
 	if dest == nil {
 		err = errors.New("Out/InOut -> Dest is nil")
-	} else if !_isPtr(dest) {
+	} else if !isPtr(dest) {
 		err = errors.New("Out/InOut -> Dest must be a Ptr")
-	} else if _pointsToNil(dest) {
+	} else if pointsToNil(dest) {
 		err = errors.New("Out/InOut -> Dest points to nil")
 	}
 	return
 }
 
-func (ds *_DS) processExecParams(args []interface{}, onRowArr *[]interface{},
-	queryArgs *[]interface{}) (implicitCursors bool, outCursors bool, err error) {
-	implicitCursors = false
-	outCursors = false
+func (ds *_DS) processExecParams(args []interface{}, onRowArr *[]interface{}, queryArgs *[]interface{}) (hasParamsImplRc bool, hasParamsOutRc bool, err error) {
 	for _, arg := range args {
 		switch param := arg.(type) {
 		case []func(map[string]interface{}):
-			if outCursors {
-				err = errors.New(fmt.Sprintf("Forbidden: %v", args))
+			if hasParamsOutRc {
+				err = errUnexpectedType(args)
 				return
 			}
-			implicitCursors = true
+			hasParamsImplRc = true
 			for _, fn := range param {
 				*onRowArr = append(*onRowArr, fn)
 			}
 		case func(map[string]interface{}):
-			if implicitCursors {
-				err = errors.New(fmt.Sprintf("Forbidden: %v", args))
+			if hasParamsImplRc {
+				err = errUnexpectedType(args)
 				return
 			}
-			outCursors = true
+			hasParamsOutRc = true
 			*onRowArr = append(*onRowArr, param) // add single func
 			var rows driver.Rows
 			*queryArgs = append(*queryArgs, sql.Out{Dest: &rows, In: false})
 		case []interface{}:
-			if outCursors {
-				err = errors.New(fmt.Sprintf("Forbidden: %v", args))
+			if hasParamsOutRc {
+				err = errUnexpectedType(args)
 				return
 			}
-			implicitCursors = true
+			hasParamsImplRc = true
 			for _, fn := range param {
 				_, ok1 := fn.(func() (interface{}, func()))
 				_, ok2 := fn.(func(map[string]interface{}))
@@ -404,41 +401,41 @@ func (ds *_DS) processExecParams(args []interface{}, onRowArr *[]interface{},
 				*onRowArr = append(*onRowArr, fn)
 			}
 		case func() (interface{}, func()), func() ([]interface{}, func()):
-			if implicitCursors {
-				err = errors.New(fmt.Sprintf("Forbidden: %v", args))
+			if hasParamsImplRc {
+				err = errUnexpectedType(args)
 				return
 			}
-			outCursors = true
+			hasParamsOutRc = true
 			*onRowArr = append(*onRowArr, param) // add single func
 			var rows driver.Rows
 			*queryArgs = append(*queryArgs, sql.Out{Dest: &rows, In: false})
 		case *Out:
-			err = _validateDest(param.Dest)
+			err = validateDest(param.Dest)
 			if err != nil {
 				return
 			}
 			*queryArgs = append(*queryArgs, sql.Out{Dest: param.Dest, In: false})
 		case Out:
-			err = _validateDest(param.Dest)
+			err = validateDest(param.Dest)
 			if err != nil {
 				return
 			}
 			*queryArgs = append(*queryArgs, sql.Out{Dest: param.Dest, In: false})
 		case *InOut:
-			err = _validateDest(param.Dest)
+			err = validateDest(param.Dest)
 			if err != nil {
 				return
 			}
 			*queryArgs = append(*queryArgs, sql.Out{Dest: param.Dest, In: true})
 		case InOut:
-			err = _validateDest(param.Dest)
+			err = validateDest(param.Dest)
 			if err != nil {
 				return
 			}
 			*queryArgs = append(*queryArgs, sql.Out{Dest: param.Dest, In: true})
 		default:
-			if _isPtr(arg) {
-				if _pointsToNil(arg) {
+			if isPtr(arg) {
+				if pointsToNil(arg) {
 					err = errors.New("arg points to nil")
 					return
 				}
@@ -481,7 +478,7 @@ func (ds *_DS) queryAllImplicitRcOracle(ctx context.Context, sqlString string, o
 				onRow(row)
 			}
 		case func() (interface{}, func()):
-			err = ds.fetchRows(rows, onRow)
+			err = fetchRows(rows, onRow)
 			if err != nil {
 				return
 			}
@@ -493,7 +490,7 @@ func (ds *_DS) queryAllImplicitRcOracle(ctx context.Context, sqlString string, o
 	return
 }
 
-func (ds *_DS) fetchRows(rows *sqlx.Rows, onRow func() (interface{}, func())) (err error) {
+func fetchRows(rows *sqlx.Rows, onRow func() (interface{}, func())) (err error) {
 	for rows.Next() {
 		fa, onRowCompleted := onRow()
 		switch _fa := fa.(type) {
@@ -510,7 +507,7 @@ func (ds *_DS) fetchRows(rows *sqlx.Rows, onRow func() (interface{}, func())) (e
 	return
 }
 
-func (ds *_DS) queryAllImplicitRcMySQL(ctx context.Context, sqlString string, onRowArr []interface{}, queryArgs ...interface{}) (err error) {
+func (ds *_DS) queryAllImplicitRc(ctx context.Context, sqlString string, onRowArr []interface{}, queryArgs ...interface{}) (err error) {
 	rows, err := ds.queryX(ctx, sqlString, queryArgs...)
 	if err != nil {
 		return
@@ -530,7 +527,7 @@ func (ds *_DS) queryAllImplicitRcMySQL(ctx context.Context, sqlString string, on
 				onRow(row)
 			}
 		case func() (interface{}, func()):
-			err = ds.fetchRows(rows, onRow)
+			err = fetchRows(rows, onRow)
 			if err != nil {
 				return
 			}
@@ -688,7 +685,6 @@ func fieldsByTraversal(v reflect.Value, traversals [][]int, values []interface{}
 	if v.Kind() != reflect.Struct {
 		return errors.New("argument not a struct")
 	}
-
 	for i, traversal := range traversals {
 		if len(traversal) == 0 {
 			values[i] = new(interface{})
@@ -704,33 +700,50 @@ func fieldsByTraversal(v reflect.Value, traversals [][]int, values []interface{}
 	return nil
 }
 
+func assignPtrParams(values []interface{}, queryArgs []interface{}) error {
+	for i, arg := range queryArgs {
+		if isPtr(arg) {
+			err := SetRes(arg, values[i])
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
 func (ds *_DS) Exec(ctx context.Context, sqlString string, args ...interface{}) (rowsAffected int64, err error) {
 	sqlString = ds.formatSQL(sqlString)
 	var onRowArr []interface{}
 	var queryArgs []interface{}
 	// Syntax like [on_test1:Test, on_test2:Test] is used to call SP with IMPLICIT cursors
-	implicitCursors, _, err := ds.processExecParams(args, &onRowArr, &queryArgs)
+	hasImplRcParams, _, err := ds.processExecParams(args, &onRowArr, &queryArgs)
 	if err != nil {
 		return
 	}
-	if implicitCursors {
+	if hasImplRcParams {
 		if ds.isOracle() {
 			err = ds.queryAllImplicitRcOracle(ctx, sqlString, onRowArr, queryArgs...)
 		} else {
-			err = ds.queryAllImplicitRcMySQL(ctx, sqlString, onRowArr, queryArgs...) // it works with MySQL SP
+			// it works with MySQL SP and PgSQL
+			err = ds.queryAllImplicitRc(ctx, sqlString, onRowArr, queryArgs...)
 		}
-		return
+	} else {
+		rowsAffected, err = ds.exec2(ctx, sqlString, onRowArr, queryArgs...)
 	}
-	return ds.exec2(ctx, sqlString, onRowArr, queryArgs...)
+	return
 }
 
 func (ds *_DS) Query(ctx context.Context, sqlString string, dest interface{}, args ...interface{}) error {
 	sqlString = ds.formatSQL(sqlString)
 	var onRowArr []interface{}
 	var queryArgs []interface{}
-	_, _, err := ds.processExecParams(args, &onRowArr, &queryArgs)
+	hasParamsImplRc, hasParamsRefRc, err := ds.processExecParams(args, &onRowArr, &queryArgs)
 	if err != nil {
 		return err
+	}
+	if hasParamsImplRc || hasParamsRefRc {
+		return errUnexpectedInQuery()
 	}
 	rows, err := ds.queryX(ctx, sqlString, queryArgs...)
 	if err != nil {
@@ -754,6 +767,10 @@ func (ds *_DS) Query(ctx context.Context, sqlString string, dest interface{}, ar
 	}
 	if rows.Next() {
 		return errMultipleRows(sqlString)
+	}
+	err = assignPtrParams(values, queryArgs)
+	if err != nil {
+		return err
 	}
 	return nil
 }
@@ -847,7 +864,7 @@ func isPtrSlice(i interface{}) bool {
 	return v.Elem().Kind() == reflect.Slice
 }
 
-func (ds *_DS) QueryByFA(ctx context.Context, sqlString string, dest interface{}, args ...interface{}) error {
+func (ds *_DS) Select(ctx context.Context, sqlString string, dest interface{}, args ...interface{}) error {
 	sqlString = ds.formatSQL(sqlString)
 	faArr, isUntypedSlice := dest.([]interface{})
 	if !isUntypedSlice && isPtrSlice(dest) {
@@ -858,6 +875,10 @@ func (ds *_DS) QueryByFA(ctx context.Context, sqlString string, dest interface{}
 		return err
 	}
 	defer _close(rows)
+	onRow, ok := dest.(func() (interface{}, func()))
+	if ok {
+		return ds.fetchAll(rows, onRow)
+	}
 	if !rows.Next() {
 		return errNoRows(sqlString)
 	}
@@ -871,18 +892,11 @@ func (ds *_DS) QueryByFA(ctx context.Context, sqlString string, dest interface{}
 	}
 	if rows.Next() {
 		return errMultipleRows(sqlString)
-
 	}
 	return nil
 }
 
-func (ds *_DS) QueryAllByFA(ctx context.Context, sqlString string, onRow func() (interface{}, func()), args ...interface{}) (err error) {
-	sqlString = ds.formatSQL(sqlString)
-	rows, err := ds.queryX(ctx, sqlString, args...)
-	if err != nil {
-		return
-	}
-	defer _close(rows)
+func (ds *_DS) fetchAll(rows *sqlx.Rows, onRow func() (interface{}, func())) (err error) {
 	for {
 		for rows.Next() {
 			fa, onRowComplete := onRow()
@@ -898,10 +912,9 @@ func (ds *_DS) QueryAllByFA(ctx context.Context, sqlString string, onRow func() 
 			onRowComplete()
 		}
 		if !rows.NextResultSet() {
-			break
+			return
 		}
 	}
-	return
 }
 
 /*
@@ -1357,4 +1370,8 @@ func errNoRows(sqlString string) error {
 
 func errMultipleRows(sqlString string) error {
 	return errors.New(fmt.Sprintf("more than 1 row found for %s", sqlString))
+}
+
+func errUnexpectedInQuery() error {
+	return errors.New("not supported: 'query([onTest]) for implicit cursors', query(onTest) for out cursors")
 }
