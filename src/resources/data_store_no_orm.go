@@ -48,8 +48,10 @@ type DataStore interface {
 	QueryAllRows(ctx context.Context, sqlString string, onRow func(map[string]interface{}), args ...interface{}) error
 
 	Select(ctx context.Context, sqlString string, dest interface{}, args ...interface{}) error
+}
 
-	PGFetch(cursor string) string
+func FetchPg(cursor string) string {
+	return fmt.Sprintf(`fetch all from "%s"`, cursor)
 }
 
 type Out struct {
@@ -203,7 +205,7 @@ func (ds *_DS) Commit(txCtx *context.Context) (err error) {
 	}
 	tx := getTx(*txCtx)
 	if tx == nil {
-		return errors.New("ds.tx not started")
+		return errors.New("tx not started")
 	}
 	err = tx.Commit()
 	*txCtx = nil // to prevent ds.tx.Rollback() in defer
@@ -237,10 +239,6 @@ func (ds *_DS) exec(ctx context.Context, sqlString string, args ...interface{}) 
 		return ds.db.ExecContext(ctx, sqlString, args...)
 	}
 	return tx.ExecContext(ctx, sqlString, args...)
-}
-
-func (ds *_DS) PGFetch(cursor string) string {
-	return fmt.Sprintf(`fetch all from "%s"`, cursor)
 }
 
 func (ds *_DS) insertPgSql(ctx context.Context, sqlString string, aiNames string, args ...interface{}) (id interface{}, err error) {
@@ -435,7 +433,7 @@ func (ds *_DS) processExecParams(args []interface{}, onRowArr *[]interface{}, qu
 	return
 }
 
-func (ds *_DS) queryAllImplicitRcOracle(ctx context.Context, sqlString string, onRowArr []interface{}, queryArgs ...interface{}) (err error) {
+func (ds *_DS) queryImplRcOracle(ctx context.Context, sqlString string, onRowArr []interface{}, queryArgs ...interface{}) (err error) {
 	rows, err := ds.query(ctx, sqlString, queryArgs...)
 	if err != nil {
 		return
@@ -496,7 +494,7 @@ func (ds *_DS) fetchRows(rows *sql.Rows, onRow func() (interface{}, func())) (er
 	return
 }
 
-func (ds *_DS) queryAllImplicitRc(ctx context.Context, sqlString string, onRowArr []interface{}, queryArgs ...interface{}) (err error) {
+func (ds *_DS) queryImplRc(ctx context.Context, sqlString string, onRowArr []interface{}, queryArgs ...interface{}) (err error) {
 	rows, err := ds.query(ctx, sqlString, queryArgs...)
 	if err != nil {
 		return
@@ -634,10 +632,10 @@ func (ds *_DS) Exec(ctx context.Context, sqlString string, args ...interface{}) 
 	}
 	if hasImplRcParams {
 		if ds.isOracle() {
-			err = ds.queryAllImplicitRcOracle(ctx, sqlString, onRowArr, queryArgs...)
+			err = ds.queryImplRcOracle(ctx, sqlString, onRowArr, queryArgs...)
 		} else {
 			// it works with MySQL SP and PgSQL
-			err = ds.queryAllImplicitRc(ctx, sqlString, onRowArr, queryArgs...)
+			err = ds.queryImplRc(ctx, sqlString, onRowArr, queryArgs...)
 		}
 		return
 	}
@@ -830,13 +828,6 @@ func (ds *_DS) fetchAll(rows *sql.Rows, onRow func() (interface{}, func())) (err
 	}
 }
 
-/*
-// MySQL: if string is ok for all types (no conversions needed), use this:
-
-	func (ds *_DS) prepareFetch(rows *sql.Rows) ([]string, map[string]interface{}, []string, []interface{}) {
-		// ...
-		values := make([]string, len(colNames))
-*/
 func (ds *_DS) prepareFetch(rows *sql.Rows) (colNames []string, data map[string]interface{}, values []interface{}, valuePointers []interface{}, err error) {
 	colNames, err = rows.Columns()
 	if err != nil {

@@ -50,8 +50,10 @@ type DataStore interface {
 	QueryAllRows(ctx context.Context, sqlString string, onRow func(map[string]interface{}), args ...interface{}) error
 
 	Select(ctx context.Context, sqlString string, dest interface{}, args ...interface{}) error
+}
 
-	PGFetch(cursor string) string
+func FetchPg(cursor string) string {
+	return fmt.Sprintf(`fetch all from "%s"`, cursor)
 }
 
 type Out struct {
@@ -186,13 +188,13 @@ func (ds *_DS) isMsSql() bool {
 	return ds.paramPrefix == "@p"
 }
 
-func getTx(ctx context.Context) *sqlx.Tx {
+func getTxSqlx(ctx context.Context) *sqlx.Tx {
 	tx, _ := ctx.Value("tx").(*sqlx.Tx)
 	return tx
 }
 
 func (ds *_DS) Begin(ctx context.Context) (txCtx context.Context, err error) {
-	tx := getTx(ctx)
+	tx := getTxSqlx(ctx)
 	if tx != nil {
 		return nil, errors.New("tx already started")
 	}
@@ -205,7 +207,7 @@ func (ds *_DS) Commit(txCtx *context.Context) (err error) {
 	if txCtx == nil {
 		return errors.New("no tx to commit")
 	}
-	tx := getTx(*txCtx)
+	tx := getTxSqlx(*txCtx)
 	if tx == nil {
 		return errors.New("ds.tx not started")
 	}
@@ -218,7 +220,7 @@ func (ds *_DS) Rollback(txCtx *context.Context) (err error) {
 	if txCtx == nil {
 		return errors.New("no tx to rollback")
 	}
-	tx := getTx(*txCtx)
+	tx := getTxSqlx(*txCtx)
 	if tx == nil {
 		return nil // commit() was called, just do nothing:
 	}
@@ -227,38 +229,34 @@ func (ds *_DS) Rollback(txCtx *context.Context) (err error) {
 	return
 }
 
-func (ds *_DS) selectX(ctx context.Context, dest interface{}, sqlString string, args ...interface{}) error {
-	tx := getTx(ctx)
+func (ds *_DS) selectSqlx(ctx context.Context, dest interface{}, sqlString string, args ...interface{}) error {
+	tx := getTxSqlx(ctx)
 	if tx == nil {
 		return ds.db.SelectContext(ctx, dest, sqlString, args...)
 	}
 	return tx.SelectContext(ctx, dest, sqlString, args...)
 }
 
-func (ds *_DS) queryX(ctx context.Context, sqlString string, args ...interface{}) (*sqlx.Rows, error) {
-	tx := getTx(ctx)
+func (ds *_DS) querySqlx(ctx context.Context, sqlString string, args ...interface{}) (*sqlx.Rows, error) {
+	tx := getTxSqlx(ctx)
 	if tx == nil {
 		return ds.db.QueryxContext(ctx, sqlString, args...)
 	}
 	return tx.QueryxContext(ctx, sqlString, args...)
 }
 
-func (ds *_DS) exec(ctx context.Context, sqlString string, args ...interface{}) (sql.Result, error) {
-	tx := getTx(ctx)
+func (ds *_DS) execSqlx(ctx context.Context, sqlString string, args ...interface{}) (sql.Result, error) {
+	tx := getTxSqlx(ctx)
 	if tx == nil {
 		return ds.db.ExecContext(ctx, sqlString, args...)
 	}
 	return tx.ExecContext(ctx, sqlString, args...)
 }
 
-func (ds *_DS) PGFetch(cursor string) string {
-	return fmt.Sprintf(`fetch all from "%s"`, cursor)
-}
-
 func (ds *_DS) insertPgSql(ctx context.Context, sqlString string, aiNames string, args ...interface{}) (id interface{}, err error) {
 	// fetching of multiple AI values is not implemented so far:
 	sqlString += " RETURNING " + aiNames
-	rows, err := ds.queryX(ctx, sqlString, args...)
+	rows, err := ds.querySqlx(ctx, sqlString, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -281,7 +279,7 @@ func (ds *_DS) insertOracle(ctx context.Context, sqlString string, aiNames strin
 	// var id64 int64 --- it works, but...
 	args = append(args, sql.Out{Dest: &id64, In: false})
 	// ----------------
-	_, err = ds.exec(ctx, sqlString, args...)
+	_, err = ds.execSqlx(ctx, sqlString, args...)
 	if err != nil {
 		return
 	}
@@ -295,7 +293,7 @@ func (ds *_DS) insertMsSql(ctx context.Context, sqlString string, args ...interf
 	// ID = convert(bigint, SCOPE_IDENTITY()); to the end of your query (ref SCOPE_IDENTITY).
 	//  This will ensure you are getting the correct ID and will prevent a network round trip.
 	sqlString += ";SELECT @@IDENTITY;"
-	rows, err := ds.queryX(ctx, sqlString, args...)
+	rows, err := ds.querySqlx(ctx, sqlString, args...)
 	if err != nil {
 		return
 	}
@@ -310,7 +308,7 @@ func (ds *_DS) insertMsSql(ctx context.Context, sqlString string, args ...interf
 }
 
 func (ds *_DS) insertDefault(ctx context.Context, sqlString string, args ...interface{}) (id interface{}, err error) {
-	res, err := ds.exec(ctx, sqlString, args...)
+	res, err := ds.execSqlx(ctx, sqlString, args...)
 	if err != nil {
 		return
 	}
@@ -453,10 +451,10 @@ func (ds *_DS) processExecParams(args []interface{}, onRowArr *[]interface{}, qu
 	return
 }
 
-func (ds *_DS) queryAllImplicitRcOracle(ctx context.Context, sqlString string, onRowArr []interface{}, queryArgs ...interface{}) (err error) {
-	rows, err := ds.queryX(ctx, sqlString, queryArgs...)
+func (ds *_DS) queryImplRcOracle(ctx context.Context, sqlString string, onRowArr []interface{}, queryArgs ...interface{}) error {
+	rows, err := ds.querySqlx(ctx, sqlString, queryArgs...)
 	if err != nil {
-		return
+		return err
 	}
 	defer _close(rows)
 	onRowIndex := 0
@@ -473,42 +471,24 @@ func (ds *_DS) queryAllImplicitRcOracle(ctx context.Context, sqlString string, o
 			for rows.Next() {
 				err = rows.MapScan(row)
 				if err != nil {
-					return
+					return err
 				}
 				onRow(row)
 			}
 		case func() (interface{}, func()):
-			err = fetchRows(rows, onRow)
+			err = fetchSqlxRows(rows, onRow)
 			if err != nil {
-				return
+				return err
 			}
 		default:
 			return errUnexpectedType(onRow)
 		}
 		onRowIndex++
 	}
-	return
+	return nil
 }
-
-func fetchRows(rows *sqlx.Rows, onRow func() (interface{}, func())) (err error) {
-	for rows.Next() {
-		fa, onRowCompleted := onRow()
-		switch _fa := fa.(type) {
-		case []interface{}:
-			err = rows.Scan(_fa...)
-		default:
-			err = rows.StructScan(_fa)
-		}
-		if err != nil {
-			return
-		}
-		onRowCompleted()
-	}
-	return
-}
-
-func (ds *_DS) queryAllImplicitRc(ctx context.Context, sqlString string, onRowArr []interface{}, queryArgs ...interface{}) (err error) {
-	rows, err := ds.queryX(ctx, sqlString, queryArgs...)
+func (ds *_DS) queryImplRc(ctx context.Context, sqlString string, onRowArr []interface{}, queryArgs ...interface{}) (err error) {
+	rows, err := ds.querySqlx(ctx, sqlString, queryArgs...)
 	if err != nil {
 		return
 	}
@@ -527,7 +507,7 @@ func (ds *_DS) queryAllImplicitRc(ctx context.Context, sqlString string, onRowAr
 				onRow(row)
 			}
 		case func() (interface{}, func()):
-			err = fetchRows(rows, onRow)
+			err = fetchSqlxRows(rows, onRow)
 			if err != nil {
 				return
 			}
@@ -544,7 +524,7 @@ func (ds *_DS) queryAllImplicitRc(ctx context.Context, sqlString string, onRowAr
 
 func (ds *_DS) exec2(ctx context.Context, sqlString string, onRowArr []interface{}, args ...interface{}) (rowsAffected int64, err error) {
 	var res sql.Result
-	res, err = ds.exec(ctx, sqlString, args...)
+	res, err = ds.execSqlx(ctx, sqlString, args...)
 	if err != nil {
 		return
 	}
@@ -723,15 +703,12 @@ func (ds *_DS) Exec(ctx context.Context, sqlString string, args ...interface{}) 
 	}
 	if hasImplRcParams {
 		if ds.isOracle() {
-			err = ds.queryAllImplicitRcOracle(ctx, sqlString, onRowArr, queryArgs...)
-		} else {
-			// it works with MySQL SP and PgSQL
-			err = ds.queryAllImplicitRc(ctx, sqlString, onRowArr, queryArgs...)
+			return 0, ds.queryImplRcOracle(ctx, sqlString, onRowArr, queryArgs...)
 		}
-	} else {
-		rowsAffected, err = ds.exec2(ctx, sqlString, onRowArr, queryArgs...)
+		// it works with MySQL SP and PgSql
+		return 0, ds.queryImplRc(ctx, sqlString, onRowArr, queryArgs...)
 	}
-	return
+	return ds.exec2(ctx, sqlString, onRowArr, queryArgs...)
 }
 
 func (ds *_DS) Query(ctx context.Context, sqlString string, dest interface{}, args ...interface{}) error {
@@ -745,7 +722,7 @@ func (ds *_DS) Query(ctx context.Context, sqlString string, dest interface{}, ar
 	if hasParamsImplRc || hasParamsRefRc {
 		return errUnexpectedInQuery()
 	}
-	rows, err := ds.queryX(ctx, sqlString, queryArgs...)
+	rows, err := ds.querySqlx(ctx, sqlString, queryArgs...)
 	if err != nil {
 		return err
 	}
@@ -777,7 +754,7 @@ func (ds *_DS) Query(ctx context.Context, sqlString string, dest interface{}, ar
 
 func (ds *_DS) QueryAll(ctx context.Context, sqlString string, onRow func(interface{}), args ...interface{}) (err error) {
 	sqlString = ds.formatSQL(sqlString)
-	rows, err := ds.queryX(ctx, sqlString, args...)
+	rows, err := ds.querySqlx(ctx, sqlString, args...)
 	if err != nil {
 		return
 	}
@@ -807,7 +784,7 @@ func (ds *_DS) QueryAll(ctx context.Context, sqlString string, onRow func(interf
 
 func (ds *_DS) QueryRow(ctx context.Context, sqlString string, args ...interface{}) (row map[string]interface{}, err error) {
 	sqlString = ds.formatSQL(sqlString)
-	rows, err := ds.queryX(ctx, sqlString, args...)
+	rows, err := ds.querySqlx(ctx, sqlString, args...)
 	if err != nil {
 		return
 	}
@@ -830,7 +807,7 @@ func (ds *_DS) QueryRow(ctx context.Context, sqlString string, args ...interface
 
 func (ds *_DS) QueryAllRows(ctx context.Context, sqlString string, onRow func(map[string]interface{}), args ...interface{}) (err error) {
 	sqlString = ds.formatSQL(sqlString)
-	rows, err := ds.queryX(ctx, sqlString, args...)
+	rows, err := ds.querySqlx(ctx, sqlString, args...)
 	if err != nil {
 		return
 	}
@@ -868,16 +845,25 @@ func (ds *_DS) Select(ctx context.Context, sqlString string, dest interface{}, a
 	sqlString = ds.formatSQL(sqlString)
 	faArr, isUntypedSlice := dest.([]interface{})
 	if !isUntypedSlice && isPtrSlice(dest) {
-		return ds.selectX(ctx, dest, sqlString, args...)
+		return ds.selectSqlx(ctx, dest, sqlString, args...)
 	}
-	rows, err := ds.queryX(ctx, sqlString, args...)
+	rows, err := ds.querySqlx(ctx, sqlString, args...)
 	if err != nil {
 		return err
 	}
 	defer _close(rows)
 	onRow, ok := dest.(func() (interface{}, func()))
 	if ok {
-		return ds.fetchAll(rows, onRow)
+		for {
+			err := fetchSqlxRows(rows, onRow)
+			if err != nil {
+				return err
+			}
+			if !rows.NextResultSet() {
+				break
+			}
+		}
+		return nil
 	}
 	if !rows.Next() {
 		return errNoRows(sqlString)
@@ -896,34 +882,23 @@ func (ds *_DS) Select(ctx context.Context, sqlString string, dest interface{}, a
 	return nil
 }
 
-func (ds *_DS) fetchAll(rows *sqlx.Rows, onRow func() (interface{}, func())) (err error) {
-	for {
-		for rows.Next() {
-			fa, onRowComplete := onRow()
-			faArr, isUntypedSlice := fa.([]interface{})
-			if isUntypedSlice {
-				err = rows.Scan(faArr...)
-			} else {
-				err = rows.StructScan(fa)
-			}
-			if err != nil {
-				return
-			}
-			onRowComplete()
+func fetchSqlxRows(rows *sqlx.Rows, onRow func() (interface{}, func())) (err error) {
+	for rows.Next() {
+		fa, onRowCompleted := onRow()
+		switch _fa := fa.(type) {
+		case []interface{}:
+			err = rows.Scan(_fa...)
+		default:
+			err = rows.StructScan(_fa)
 		}
-		if !rows.NextResultSet() {
+		if err != nil {
 			return
 		}
+		onRowCompleted()
 	}
+	return
 }
 
-/*
-// MySQL: if string is ok for all types (no conversions needed), use this:
-
-	func (ds *_DS) prepareFetch(rows *sql.Rows) ([]string, map[string]interface{}, []string, []interface{}) {
-		// ...
-		values := make([]string, len(colNames))
-*/
 func (ds *_DS) prepareFetch(rows *sqlx.Rows) (colNames []string, values []interface{}, valuePointers []interface{}, err error) {
 	colNames, err = rows.Columns()
 	if err != nil {

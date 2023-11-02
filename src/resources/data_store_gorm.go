@@ -62,8 +62,10 @@ type DataStore interface {
 	QueryAllRows(ctx context.Context, sqlString string, onRow func(map[string]interface{}), args ...interface{}) error
 
 	Select(ctx context.Context, sqlString string, fa interface{}, args ...interface{}) error
+}
 
-	PGFetch(cursor string) string
+func FetchPg(cursor string) string {
+	return fmt.Sprintf(`fetch all from "%s"`, cursor)
 }
 
 type Out struct {
@@ -184,28 +186,28 @@ func (ds *_DS) Close() error {
 	return nil
 }
 
-func (ds *_DS) getTx(ctx context.Context) *gorm.DB {
+func (ds *_DS) getGormTx(ctx context.Context) *gorm.DB {
 	tx, _ := ctx.Value("getTx").(*gorm.DB)
 	return tx
 }
 
 func (ds *_DS) Begin(ctx context.Context) (txCtx context.Context, err error) {
-	tx := ds.getTx(ctx)
+	tx := ds.getGormTx(ctx)
 	if tx != nil {
-		return nil, errors.New("getTx already started")
+		return nil, errors.New("tx already started")
 	}
 	tx = ds.rootDb.WithContext(ctx).Begin()
-	txCtx = context.WithValue(ctx, "getTx", tx)
+	txCtx = context.WithValue(ctx, "tx", tx)
 	return
 }
 
 func (ds *_DS) Commit(txCtx *context.Context) (err error) {
 	if txCtx == nil {
-		return errors.New("no getTx to commit")
+		return errors.New("no tx to commit")
 	}
-	tx := ds.getTx(*txCtx)
+	tx := ds.getGormTx(*txCtx)
 	if tx == nil {
-		return errors.New("ds.getTx not started")
+		return errors.New("tx not started")
 	}
 	tx.Commit()
 	*txCtx = nil
@@ -216,9 +218,9 @@ func (ds *_DS) Rollback(txCtx *context.Context) (err error) {
 	if txCtx == nil {
 		return nil // commit() was called, just do nothing
 	}
-	tx := ds.getTx(*txCtx)
+	tx := ds.getGormTx(*txCtx)
 	if tx == nil {
-		return errors.New("ds.getTx not started")
+		return errors.New("tx not started")
 	}
 	tx.Rollback()
 	*txCtx = nil
@@ -228,7 +230,7 @@ func (ds *_DS) Rollback(txCtx *context.Context) (err error) {
 // ORM-based CRUD -----------------------------------
 
 func (ds *_DS) Session(ctx context.Context) *gorm.DB {
-	tx := ds.getTx(ctx)
+	tx := ds.getGormTx(ctx)
 	if tx == nil {
 		return ds.rootDb.WithContext(ctx)
 	}
@@ -274,10 +276,6 @@ func (ds *_DS) rawQuery(ctx context.Context, sqlString string, args ...interface
 func (ds *_DS) rawExec(ctx context.Context, sqlString string, args ...interface{}) (rowsAffected int64, err error) {
 	res := ds.Session(ctx).Exec(sqlString, args...)
 	return res.RowsAffected, res.Error
-}
-
-func (ds *_DS) PGFetch(cursor string) string {
-	return fmt.Sprintf(`fetch all from "%s"`, cursor)
 }
 
 func isPtr(p interface{}) bool {
@@ -396,10 +394,10 @@ func (ds *_DS) processExecParams(args []interface{}, onRowArr *[]interface{}, qu
 	return
 }
 
-func (ds *_DS) queryAllImplicitRcOracle(ctx context.Context, sqlString string, onRowArr []interface{}, queryArgs ...interface{}) (err error) {
+func (ds *_DS) queryImplRcOracle(ctx context.Context, sqlString string, onRowArr []interface{}, queryArgs ...interface{}) error {
 	rows, err := ds.rawQuery(ctx, sqlString, queryArgs...)
 	if err != nil {
-		return
+		return err
 	}
 	defer _close(rows)
 	onRowIndex := 0
@@ -412,15 +410,14 @@ func (ds *_DS) queryAllImplicitRcOracle(ctx context.Context, sqlString string, o
 		switch onRow := onRowArr[onRowIndex].(type) {
 		case func(map[string]interface{}):
 			// re-detect columns for each ResultSet
-			colNames, data, values, valuePointers, pfeErr := ds.prepareFetch(rows)
-			if pfeErr != nil {
-				err = pfeErr
-				return
+			colNames, data, values, valuePointers, err := ds.prepareFetch(rows)
+			if err != nil {
+				return err
 			}
 			for rows.Next() {
 				err = rows.Scan(valuePointers...)
 				if err != nil {
-					return
+					return err
 				}
 				for i, colName := range colNames {
 					data[colName] = values[i]
@@ -430,14 +427,14 @@ func (ds *_DS) queryAllImplicitRcOracle(ctx context.Context, sqlString string, o
 		case func() (interface{}, func()):
 			err = fetchRows(rows, onRow)
 			if err != nil {
-				return
+				return err
 			}
 		default:
 			return errUnexpectedType(onRow)
 		}
 		onRowIndex++
 	}
-	return
+	return nil
 }
 
 func fetchRows(rows *sql.Rows, onRow func() (interface{}, func())) (err error) {
@@ -457,10 +454,10 @@ func fetchRows(rows *sql.Rows, onRow func() (interface{}, func())) (err error) {
 	return
 }
 
-func (ds *_DS) queryAllImplicitRcMySQL(ctx context.Context, sqlString string, onRowArr []interface{}, queryArgs ...interface{}) (err error) {
+func (ds *_DS) queryImplRc(ctx context.Context, sqlString string, onRowArr []interface{}, queryArgs ...interface{}) error {
 	rows, err := ds.rawQuery(ctx, sqlString, queryArgs...)
 	if err != nil {
-		return
+		return err
 	}
 	defer _close(rows)
 	onRowIndex := 0
@@ -468,15 +465,14 @@ func (ds *_DS) queryAllImplicitRcMySQL(ctx context.Context, sqlString string, on
 		switch onRow := onRowArr[onRowIndex].(type) {
 		case func(map[string]interface{}):
 			// re-detect columns for each ResultSet
-			colNames, data, values, valuePointers, pfeErr := ds.prepareFetch(rows)
-			if pfeErr != nil {
-				err = pfeErr
-				return
+			colNames, data, values, valuePointers, err := ds.prepareFetch(rows)
+			if err != nil {
+				return err
 			}
 			for rows.Next() {
 				err = rows.Scan(valuePointers...)
 				if err != nil {
-					return
+					return err
 				}
 				for i, colName := range colNames {
 					data[colName] = values[i]
@@ -486,17 +482,17 @@ func (ds *_DS) queryAllImplicitRcMySQL(ctx context.Context, sqlString string, on
 		case func() (interface{}, func()):
 			err = fetchRows(rows, onRow)
 			if err != nil {
-				return
+				return err
 			}
 		default:
 			return errUnexpectedType(onRow)
 		}
 		if !rows.NextResultSet() {
-			break
+			break // no result sets in pg
 		}
 		onRowIndex++
 	}
-	return
+	return nil
 }
 
 func (ds *_DS) exec2(ctx context.Context, sqlString string, onRowArr []interface{}, args ...interface{}) (rowsAffected int64, err error) {
@@ -593,10 +589,10 @@ func (ds *_DS) Exec(ctx context.Context, sqlString string, args ...interface{}) 
 	}
 	if hasImplRcParams {
 		if ds.isOracle() {
-			err = ds.queryAllImplicitRcOracle(ctx, sqlString, onRowArr, queryArgs...)
+			err = ds.queryImplRcOracle(ctx, sqlString, onRowArr, queryArgs...)
 		} else {
 			// it works with MySQL SP and PgSQL
-			err = ds.queryAllImplicitRcMySQL(ctx, sqlString, onRowArr, queryArgs...)
+			err = ds.queryImplRc(ctx, sqlString, onRowArr, queryArgs...)
 		}
 		return
 	}
@@ -788,7 +784,7 @@ func (ds *_DS) Select(ctx context.Context, sqlString string, dest interface{}, a
 	if isPtrSlice(dest) {
 		return raw.Find(dest).Error
 	}
-	return raw.Find(dest).Error
+	return raw.Take(dest).Error
 }
 
 func fetchAll(rows *sql.Rows, onRow func() (interface{}, func())) (err error) {
@@ -812,13 +808,6 @@ func fetchAll(rows *sql.Rows, onRow func() (interface{}, func())) (err error) {
 	}
 }
 
-/*
-// MySQL: if string is ok for all types (no conversions needed), use this:
-
-	func (ds *_DS) prepareFetch(rows *sql.Rows) ([]string, map[string]interface{}, []string, []interface{}) {
-		// ...
-		values := make([]string, len(colNames))
-*/
 func (ds *_DS) prepareFetch(rows *sql.Rows) (colNames []string, data map[string]interface{}, values []interface{}, valuePointers []interface{}, err error) {
 	colNames, err = rows.Columns()
 	if err != nil {
