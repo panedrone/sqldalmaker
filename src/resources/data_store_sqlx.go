@@ -535,7 +535,7 @@ func (ds *_DS) fetchSqlxRows(rows *sqlx.Rows, onRow func() (interface{}, func())
 
 type scanner struct {
 	m      *reflectx.Mapper
-	values []interface{}
+	fields [][]int
 }
 
 func (s *scanner) Scan(rowsX *sqlx.Rows, fa interface{}) error {
@@ -544,23 +544,20 @@ func (s *scanner) Scan(rowsX *sqlx.Rows, fa interface{}) error {
 	case []interface{}:
 		return rowsX.Scan(_fa...)
 	}
-	if s.values == nil {
-		elemType := reflect.TypeOf(fa)
-		base := reflectx.Deref(elemType)
+	if s.fields == nil {
 		columns, err := rowsX.Columns()
 		if err != nil {
 			return err
 		}
-		fields := s.m.TraversalsByName(base, columns)
-		s.values = make([]interface{}, len(columns))
-		vp := reflect.ValueOf(fa)
-		v := reflect.Indirect(vp)
-		err = fieldsByTraversal(v, fields, s.values, true)
-		if err != nil {
-			return err
-		}
+		elemType := reflect.TypeOf(fa)
+		base := reflectx.Deref(elemType)
+		s.fields = s.m.TraversalsByName(base, columns)
 	}
-	return rowsX.Scan(s.values...)
+	values, err := toValues(s.fields, fa)
+	if err != nil {
+		return err
+	}
+	return rowsX.Scan(values...)
 }
 
 func (ds *_DS) exec2(ctx context.Context, sqlString string, onRowArr []interface{}, args ...interface{}) (rowsAffected int64, err error) {
@@ -628,6 +625,8 @@ type _Rows struct {
 	rows     driver.Rows
 	colNames []string
 	values   []driver.Value
+
+	fields [][]int
 }
 
 func newRows(rows driver.Rows) *_Rows {
@@ -688,17 +687,27 @@ func (rx *_Rows) toSlice(_fa []interface{}) error {
 }
 
 func (rx *_Rows) toStruct(m *reflectx.Mapper, fa interface{}) error {
-	elemType := reflect.TypeOf(fa)
-	base := reflectx.Deref(elemType)
-	fields := m.TraversalsByName(base, rx.colNames)
-	values := make([]interface{}, len(rx.colNames))
-	vp := reflect.ValueOf(fa)
-	v := reflect.Indirect(vp)
-	err := fieldsByTraversal(v, fields, values, true)
+	if rx.fields == nil {
+		elemType := reflect.TypeOf(fa)
+		base := reflectx.Deref(elemType)
+		rx.fields = m.TraversalsByName(base, rx.colNames)
+	}
+	values, err := toValues(rx.fields, fa)
 	if err != nil {
 		return err
 	}
 	return rx.Scan(values...)
+}
+
+func toValues(fields [][]int, fa interface{}) ([]interface{}, error) {
+	values := make([]interface{}, len(fields))
+	vp := reflect.ValueOf(fa)
+	v := reflect.Indirect(vp)
+	err := fieldsByTraversal(v, fields, values, true)
+	if err != nil {
+		return nil, err
+	}
+	return values, nil
 }
 
 func fieldsByTraversal(v reflect.Value, traversals [][]int, values []interface{}, ptrs bool) error {
@@ -1221,7 +1230,7 @@ func _setBytes(d *[]byte, value interface{}) error {
 //	value, err := _getValue(row, colName, errMap)
 //	if err == nil {
 //		err = _setNumber(d, value)
-//		_updateErrMap(err, colName, errMap)
+//		updateErrMap(err, colName, errMap)
 //	}
 //}
 //
