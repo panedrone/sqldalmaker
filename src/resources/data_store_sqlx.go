@@ -476,7 +476,7 @@ func (ds *_DS) queryImplRcOracle(ctx context.Context, sqlString string, onRowArr
 				onRow(row)
 			}
 		case func() (interface{}, func()):
-			err = fetchSqlxRows(rows, onRow)
+			err = ds.fetchSqlxRows(rows, onRow)
 			if err != nil {
 				return err
 			}
@@ -487,29 +487,28 @@ func (ds *_DS) queryImplRcOracle(ctx context.Context, sqlString string, onRowArr
 	}
 	return nil
 }
-func (ds *_DS) queryImplRc(ctx context.Context, sqlString string, onRowArr []interface{}, queryArgs ...interface{}) (err error) {
+func (ds *_DS) queryImplRc(ctx context.Context, sqlString string, onRowArr []interface{}, queryArgs ...interface{}) error {
 	rows, err := ds.querySqlx(ctx, sqlString, queryArgs...)
 	if err != nil {
-		return
+		return err
 	}
 	defer _close(rows)
-	onRowIndex := 0
-	for {
-		switch onRow := onRowArr[onRowIndex].(type) {
+	for _, fn := range onRowArr {
+		switch onRow := fn.(type) {
 		case func(map[string]interface{}):
 			// re-detect columns for each ResultSet
 			row := make(map[string]interface{})
 			for rows.Next() {
 				err = rows.MapScan(row)
 				if err != nil {
-					return
+					return err
 				}
 				onRow(row)
 			}
 		case func() (interface{}, func()):
-			err = fetchSqlxRows(rows, onRow)
+			err = ds.fetchSqlxRows(rows, onRow)
 			if err != nil {
-				return
+				return err
 			}
 		default:
 			return errUnexpectedType(onRow)
@@ -517,9 +516,51 @@ func (ds *_DS) queryImplRc(ctx context.Context, sqlString string, onRowArr []int
 		if !rows.NextResultSet() {
 			break
 		}
-		onRowIndex++
 	}
-	return
+	return nil
+}
+
+func (ds *_DS) fetchSqlxRows(rows *sqlx.Rows, onRow func() (interface{}, func())) error {
+	sc := scanner{m: ds.db.Mapper}
+	for rows.Next() {
+		fa, onRowCompleted := onRow()
+		err := sc.Scan(rows, fa)
+		if err != nil {
+			return err
+		}
+		onRowCompleted()
+	}
+	return nil
+}
+
+type scanner struct {
+	m      *reflectx.Mapper
+	values []interface{}
+}
+
+func (s *scanner) Scan(rowsX *sqlx.Rows, fa interface{}) error {
+	// sqlx.Rows.StructScan is not working with NextResultSet and multiple struct types
+	switch _fa := fa.(type) {
+	case []interface{}:
+		return rowsX.Scan(_fa...)
+	}
+	if s.values == nil {
+		elemType := reflect.TypeOf(fa)
+		base := reflectx.Deref(elemType)
+		columns, err := rowsX.Columns()
+		if err != nil {
+			return err
+		}
+		fields := s.m.TraversalsByName(base, columns)
+		s.values = make([]interface{}, len(columns))
+		vp := reflect.ValueOf(fa)
+		v := reflect.Indirect(vp)
+		err = fieldsByTraversal(v, fields, s.values, true)
+		if err != nil {
+			return err
+		}
+	}
+	return rowsX.Scan(s.values...)
 }
 
 func (ds *_DS) exec2(ctx context.Context, sqlString string, onRowArr []interface{}, args ...interface{}) (rowsAffected int64, err error) {
@@ -855,7 +896,7 @@ func (ds *_DS) Select(ctx context.Context, sqlString string, dest interface{}, a
 	onRow, ok := dest.(func() (interface{}, func()))
 	if ok {
 		for {
-			err := fetchSqlxRows(rows, onRow)
+			err := ds.fetchSqlxRows(rows, onRow)
 			if err != nil {
 				return err
 			}
@@ -880,23 +921,6 @@ func (ds *_DS) Select(ctx context.Context, sqlString string, dest interface{}, a
 		return errMultipleRows(sqlString)
 	}
 	return nil
-}
-
-func fetchSqlxRows(rows *sqlx.Rows, onRow func() (interface{}, func())) (err error) {
-	for rows.Next() {
-		fa, onRowCompleted := onRow()
-		switch _fa := fa.(type) {
-		case []interface{}:
-			err = rows.Scan(_fa...)
-		default:
-			err = rows.StructScan(_fa)
-		}
-		if err != nil {
-			return
-		}
-		onRowCompleted()
-	}
-	return
 }
 
 func (ds *_DS) prepareFetch(rows *sqlx.Rows) (colNames []string, values []interface{}, valuePointers []interface{}, err error) {
@@ -986,6 +1010,45 @@ func _setInt64(d *int64, value interface{}) error {
 		*d = i64
 	default:
 		return unknownTypeErr(d, value, "_setInt64")
+	}
+	return nil
+}
+
+func SetInt(d *int, row map[string]interface{}, colName string, errMap map[string]int) {
+	value, err := _getValue(row, colName, errMap)
+	if err == nil {
+		err = _setInt(d, value)
+		updateErrMap(err, colName, errMap)
+	}
+}
+
+func _setInt(d *int, value interface{}) error {
+	switch v := value.(type) {
+	case int:
+		*d = v
+	case int32:
+		*d = int(v)
+	case int64:
+		*d = int(v)
+	case float64:
+		*d = int(v)
+	case float32:
+		*d = int(v)
+	case []byte:
+		str := string(v)
+		d64, err := strconv.ParseInt(str, 10, 32)
+		if err != nil {
+			return assignErr(d, value, "_setInt", err.Error())
+		}
+		*d = int(d64)
+	case string:
+		d64, err := strconv.ParseInt(v, 10, 32)
+		if err != nil {
+			return assignErr(d, value, "_setInt", err.Error())
+		}
+		*d = int(d64)
+	default:
+		return unknownTypeErr(d, value, "_setInt")
 	}
 	return nil
 }
@@ -1217,6 +1280,8 @@ func _setAny(dstPtr interface{}, value interface{}) error {
 	switch d := dstPtr.(type) {
 	case *string:
 		err = _setString(d, value)
+	case *int:
+		err = _setInt(d, value)
 	case *int32:
 		err = _setInt32(d, value)
 	case *int64:
@@ -1262,6 +1327,8 @@ func _setAny(dstPtr interface{}, value interface{}) error {
 	case *interface{}:
 		*d = value
 		return nil
+	default:
+		return errUnexpectedType(dstPtr)
 	}
 	return err
 }

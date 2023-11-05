@@ -1,6 +1,13 @@
-to build eclipse plug-in, java files of folder 'scr/com/sqldalmaker/netbeans' must be hidden in zip.
+Regarding Java files from 'scr/com/sqldalmaker/netbeans':
 
-to build netbeans plug-in, these file must be unzipped back.
+    - to build Eclipse plugin, hide these files into a zip.
 
-1) never use layouts and components from intellij.uidesigner like GridLayoutManager and HSpacer
-2) remove folder intellij from sqldalmaker-intellij.jar included into sqldalmaker-intellij.zip distribution
+    - to build Netbeans plug-in, unzipped them back.
+
+To build IntelliJ plugin
+
+    - exclude a lib providing 'velocity-1.7-dep.jar' form Intellij SDK Classpath,
+      use 'velocity-1.7-dep.jar' from 'lib' folder instead
+
+    - never use layouts and components from intellij.uidesigner like GridLayoutManager and HSpacer,
+      remove 'intellij' folder from sqldalmaker-intellij.zip distribution

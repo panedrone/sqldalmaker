@@ -433,10 +433,10 @@ func (ds *_DS) processExecParams(args []interface{}, onRowArr *[]interface{}, qu
 	return
 }
 
-func (ds *_DS) queryImplRcOracle(ctx context.Context, sqlString string, onRowArr []interface{}, queryArgs ...interface{}) (err error) {
+func (ds *_DS) queryImplRcOracle(ctx context.Context, sqlString string, onRowArr []interface{}, queryArgs ...interface{}) error {
 	rows, err := ds.query(ctx, sqlString, queryArgs...)
 	if err != nil {
-		return
+		return err
 	}
 	defer _close(rows)
 	onRowIndex := 0
@@ -449,15 +449,15 @@ func (ds *_DS) queryImplRcOracle(ctx context.Context, sqlString string, onRowArr
 		switch onRow := onRowArr[onRowIndex].(type) {
 		case func(map[string]interface{}):
 			// re-detect columns for each ResultSet
-			colNames, data, values, valuePointers, pfeErr := ds.prepareFetch(rows)
-			if pfeErr != nil {
-				err = pfeErr
-				return
+			colNames, values, valuePointers, err := ds.prepareFetch(rows)
+			if err != nil {
+				return err
 			}
+			data := make(map[string]interface{})
 			for rows.Next() {
 				err = rows.Scan(valuePointers...)
 				if err != nil {
-					return
+					return err
 				}
 				for i, colName := range colNames {
 					data[colName] = values[i]
@@ -467,14 +467,14 @@ func (ds *_DS) queryImplRcOracle(ctx context.Context, sqlString string, onRowArr
 		case func() (interface{}, func()):
 			err = ds.fetchRows(rows, onRow)
 			if err != nil {
-				return
+				return err
 			}
 		default:
 			return errUnexpectedType(onRow)
 		}
 		onRowIndex++
 	}
-	return
+	return nil
 }
 
 func (ds *_DS) fetchRows(rows *sql.Rows, onRow func() (interface{}, func())) (err error) {
@@ -494,10 +494,10 @@ func (ds *_DS) fetchRows(rows *sql.Rows, onRow func() (interface{}, func())) (er
 	return
 }
 
-func (ds *_DS) queryImplRc(ctx context.Context, sqlString string, onRowArr []interface{}, queryArgs ...interface{}) (err error) {
+func (ds *_DS) queryImplRc(ctx context.Context, sqlString string, onRowArr []interface{}, queryArgs ...interface{}) error {
 	rows, err := ds.query(ctx, sqlString, queryArgs...)
 	if err != nil {
-		return
+		return err
 	}
 	defer _close(rows)
 	onRowIndex := 0
@@ -505,15 +505,15 @@ func (ds *_DS) queryImplRc(ctx context.Context, sqlString string, onRowArr []int
 		switch onRow := onRowArr[onRowIndex].(type) {
 		case func(map[string]interface{}):
 			// re-detect columns for each ResultSet
-			colNames, data, values, valuePointers, pfeErr := ds.prepareFetch(rows)
-			if pfeErr != nil {
-				err = pfeErr
-				return
+			colNames, values, valuePointers, err := ds.prepareFetch(rows)
+			if err != nil {
+				return err
 			}
+			data := make(map[string]interface{})
 			for rows.Next() {
 				err = rows.Scan(valuePointers...)
 				if err != nil {
-					return
+					return err
 				}
 				for i, colName := range colNames {
 					data[colName] = values[i]
@@ -523,7 +523,7 @@ func (ds *_DS) queryImplRc(ctx context.Context, sqlString string, onRowArr []int
 		case func() (interface{}, func()):
 			err = ds.fetchRows(rows, onRow)
 			if err != nil {
-				return
+				return err
 			}
 		default:
 			return errUnexpectedType(onRow)
@@ -533,7 +533,7 @@ func (ds *_DS) queryImplRc(ctx context.Context, sqlString string, onRowArr []int
 		}
 		onRowIndex++
 	}
-	return
+	return nil
 }
 
 func (ds *_DS) exec2(ctx context.Context, sqlString string, onRowArr []interface{}, args ...interface{}) (rowsAffected int64, err error) {
@@ -632,12 +632,10 @@ func (ds *_DS) Exec(ctx context.Context, sqlString string, args ...interface{}) 
 	}
 	if hasImplRcParams {
 		if ds.isOracle() {
-			err = ds.queryImplRcOracle(ctx, sqlString, onRowArr, queryArgs...)
-		} else {
-			// it works with MySQL SP and PgSQL
-			err = ds.queryImplRc(ctx, sqlString, onRowArr, queryArgs...)
+			return 0, ds.queryImplRcOracle(ctx, sqlString, onRowArr, queryArgs...)
 		}
-		return
+		// it works with MySQL SP and PgSQL
+		return 0, ds.queryImplRc(ctx, sqlString, onRowArr, queryArgs...)
 	}
 	return ds.exec2(ctx, sqlString, onRowArr, queryArgs...)
 }
@@ -658,7 +656,7 @@ func (ds *_DS) Query(ctx context.Context, sqlString string, dest interface{}, ar
 		return err
 	}
 	defer _close(rows)
-	_, _, values, valuePointers, err := ds.prepareFetch(rows)
+	_, values, valuePointers, err := ds.prepareFetch(rows)
 	if err != nil {
 		return err
 	}
@@ -693,7 +691,7 @@ func (ds *_DS) QueryAll(ctx context.Context, sqlString string, onRow func(interf
 	for {
 		// re-detect columns for each ResultSet
 		// fetch all columns! if to fetch less, Scan returns nil-s
-		_, _, values, valuePointers, pfErr := ds.prepareFetch(rows)
+		_, values, valuePointers, pfErr := ds.prepareFetch(rows)
 		if pfErr != nil {
 			err = pfErr
 			return
@@ -720,11 +718,11 @@ func (ds *_DS) QueryRow(ctx context.Context, sqlString string, args ...interface
 		return
 	}
 	defer _close(rows)
-	colNames, row, values, valuePointers, pfErr := ds.prepareFetch(rows)
-	if pfErr != nil {
-		err = pfErr
+	colNames, values, valuePointers, err := ds.prepareFetch(rows)
+	if err != nil {
 		return
 	}
+	row = make(map[string]interface{})
 	if !rows.Next() {
 		err = errNoRows(sqlString)
 		return
@@ -743,26 +741,26 @@ func (ds *_DS) QueryRow(ctx context.Context, sqlString string, args ...interface
 	return
 }
 
-func (ds *_DS) QueryAllRows(ctx context.Context, sqlString string, onRow func(map[string]interface{}), args ...interface{}) (err error) {
+func (ds *_DS) QueryAllRows(ctx context.Context, sqlString string, onRow func(map[string]interface{}), args ...interface{}) error {
 	// many thanks to:
 	// https://stackoverflow.com/questions/51731423/how-to-read-a-row-from-a-table-to-a-map-without-knowing-columns
 	sqlString = ds.formatSQL(sqlString)
 	rows, err := ds.query(ctx, sqlString, args...)
 	if err != nil {
-		return
+		return err
 	}
 	defer _close(rows)
 	for {
 		// re-detect columns for each ResultSet
-		colNames, data, values, valuePointers, pfErr := ds.prepareFetch(rows)
-		if pfErr != nil {
-			err = pfErr
-			return
+		colNames, values, valuePointers, err := ds.prepareFetch(rows)
+		if err != nil {
+			return err
 		}
+		data := make(map[string]interface{})
 		for rows.Next() {
 			err = rows.Scan(valuePointers...)
 			if err != nil {
-				return
+				return err
 			}
 			for i, colName := range colNames {
 				data[colName] = values[i]
@@ -773,7 +771,7 @@ func (ds *_DS) QueryAllRows(ctx context.Context, sqlString string, onRow func(ma
 			break
 		}
 	}
-	return
+	return nil
 }
 
 func (ds *_DS) Select(ctx context.Context, sqlString string, dest interface{}, args ...interface{}) (err error) {
@@ -828,12 +826,11 @@ func (ds *_DS) fetchAll(rows *sql.Rows, onRow func() (interface{}, func())) (err
 	}
 }
 
-func (ds *_DS) prepareFetch(rows *sql.Rows) (colNames []string, data map[string]interface{}, values []interface{}, valuePointers []interface{}, err error) {
+func (ds *_DS) prepareFetch(rows *sql.Rows) (colNames []string, values []interface{}, valuePointers []interface{}, err error) {
 	colNames, err = rows.Columns()
 	if err != nil {
 		return
 	}
-	data = make(map[string]interface{})
 	// interface{} is ok for SQLite3, Oracle, and SQL Server.
 	// MySQL and PostgreSQL may require some convertors from []uint8
 	// https://github.com/ziutek/mymysql#type-mapping
@@ -862,6 +859,8 @@ func (ds *_DS) formatSQL(sqlString string) string {
 	}
 	return sqlString
 }
+
+/////////////////////////////////////////////////////////////
 
 func SetString(d *string, row map[string]interface{}, colName string, errMap map[string]int) {
 	value, err := _getValue(row, colName, errMap)
@@ -923,6 +922,45 @@ func _setInt64(d *int64, value interface{}) error {
 		*d = i64
 	default:
 		return unknownTypeErr(d, value, "_setInt64")
+	}
+	return nil
+}
+
+func SetInt(d *int, row map[string]interface{}, colName string, errMap map[string]int) {
+	value, err := _getValue(row, colName, errMap)
+	if err == nil {
+		err = _setInt(d, value)
+		updateErrMap(err, colName, errMap)
+	}
+}
+
+func _setInt(d *int, value interface{}) error {
+	switch v := value.(type) {
+	case int:
+		*d = v
+	case int32:
+		*d = int(v)
+	case int64:
+		*d = int(v)
+	case float64:
+		*d = int(v)
+	case float32:
+		*d = int(v)
+	case []byte:
+		str := string(v)
+		d64, err := strconv.ParseInt(str, 10, 32)
+		if err != nil {
+			return assignErr(d, value, "_setInt", err.Error())
+		}
+		*d = int(d64)
+	case string:
+		d64, err := strconv.ParseInt(v, 10, 32)
+		if err != nil {
+			return assignErr(d, value, "_setInt", err.Error())
+		}
+		*d = int(d64)
+	default:
+		return unknownTypeErr(d, value, "_setInt")
 	}
 	return nil
 }
@@ -1095,7 +1133,7 @@ func _setBytes(d *[]byte, value interface{}) error {
 //	value, err := _getValue(row, colName, errMap)
 //	if err == nil {
 //		err = _setNumber(d, value)
-//		updateErrMap(err, colName, errMap)
+//		_updateErrMap(err, colName, errMap)
 //	}
 //}
 //
@@ -1108,7 +1146,7 @@ func _setBytes(d *[]byte, value interface{}) error {
 //	value, err := _getValue(row, colName, errMap)
 //	if err == nil {
 //		err = _setUUID(d, value)
-//		updateErrMap(err, colName, errMap)
+//		_updateErrMap(err, colName, errMap)
 //	}
 //}
 //
@@ -1117,11 +1155,11 @@ func _setBytes(d *[]byte, value interface{}) error {
 //	case []byte:
 //		err := d.Scan(bv)
 //		if err != nil {
-//			return assignErr(d, value, "_setUUID", err.Error())
+//			return assignErr(d, value, "_setAny", err.Error())
 //		}
 //		return nil
 //	default:
-//		return unknownTypeErr(d, value, "_setUUID")
+//		return unknownTypeErr(d, value, "_setAny")
 //	}
 //}
 
@@ -1150,14 +1188,12 @@ func _setAny(dstPtr interface{}, value interface{}) error {
 		}
 		return nil // leave as-is
 	}
-	sc, ok := dstPtr.(sql.Scanner)
-	if ok {
-		return sc.Scan(value)
-	}
 	var err error
 	switch d := dstPtr.(type) {
 	case *string:
 		err = _setString(d, value)
+	case *int:
+		err = _setInt(d, value)
 	case *int32:
 		err = _setInt32(d, value)
 	case *int64:
@@ -1203,6 +1239,8 @@ func _setAny(dstPtr interface{}, value interface{}) error {
 	case *interface{}:
 		*d = value
 		return nil
+	default:
+		return errUnexpectedType(dstPtr)
 	}
 	return err
 }

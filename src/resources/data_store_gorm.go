@@ -589,12 +589,10 @@ func (ds *_DS) Exec(ctx context.Context, sqlString string, args ...interface{}) 
 	}
 	if hasImplRcParams {
 		if ds.isOracle() {
-			err = ds.queryImplRcOracle(ctx, sqlString, onRowArr, queryArgs...)
-		} else {
-			// it works with MySQL SP and PgSQL
-			err = ds.queryImplRc(ctx, sqlString, onRowArr, queryArgs...)
+			return 0, ds.queryImplRcOracle(ctx, sqlString, onRowArr, queryArgs...)
 		}
-		return
+		// it works with MySQL SP and PgSQL
+		return 0, ds.queryImplRc(ctx, sqlString, onRowArr, queryArgs...)
 	}
 	return ds.exec2(ctx, sqlString, onRowArr, queryArgs...)
 }
@@ -852,7 +850,7 @@ func SetString(d *string, row map[string]interface{}, colName string, errMap map
 	value, err := _getValue(row, colName, errMap)
 	if err == nil {
 		err = _setString(d, value)
-		_updateErrMap(err, colName, errMap)
+		updateErrMap(err, colName, errMap)
 	}
 }
 
@@ -878,7 +876,7 @@ func SetInt64(d *int64, row map[string]interface{}, colName string, errMap map[s
 	value, err := _getValue(row, colName, errMap)
 	if err == nil {
 		err = _setInt64(d, value)
-		_updateErrMap(err, colName, errMap)
+		updateErrMap(err, colName, errMap)
 	}
 }
 
@@ -912,11 +910,50 @@ func _setInt64(d *int64, value interface{}) error {
 	return nil
 }
 
+func SetInt(d *int, row map[string]interface{}, colName string, errMap map[string]int) {
+	value, err := _getValue(row, colName, errMap)
+	if err == nil {
+		err = _setInt(d, value)
+		updateErrMap(err, colName, errMap)
+	}
+}
+
+func _setInt(d *int, value interface{}) error {
+	switch v := value.(type) {
+	case int:
+		*d = v
+	case int32:
+		*d = int(v)
+	case int64:
+		*d = int(v)
+	case float64:
+		*d = int(v)
+	case float32:
+		*d = int(v)
+	case []byte:
+		str := string(v)
+		d64, err := strconv.ParseInt(str, 10, 32)
+		if err != nil {
+			return assignErr(d, value, "_setInt", err.Error())
+		}
+		*d = int(d64)
+	case string:
+		d64, err := strconv.ParseInt(v, 10, 32)
+		if err != nil {
+			return assignErr(d, value, "_setInt", err.Error())
+		}
+		*d = int(d64)
+	default:
+		return unknownTypeErr(d, value, "_setInt")
+	}
+	return nil
+}
+
 func SetInt32(d *int32, row map[string]interface{}, colName string, errMap map[string]int) {
 	value, err := _getValue(row, colName, errMap)
 	if err == nil {
 		err = _setInt32(d, value)
-		_updateErrMap(err, colName, errMap)
+		updateErrMap(err, colName, errMap)
 	}
 }
 
@@ -953,7 +990,7 @@ func SetFloat32(d *float32, row map[string]interface{}, colName string, errMap m
 	value, err := _getValue(row, colName, errMap)
 	if err == nil {
 		err = _setFloat32(d, value)
-		_updateErrMap(err, colName, errMap)
+		updateErrMap(err, colName, errMap)
 	}
 }
 
@@ -986,7 +1023,7 @@ func SetFloat64(d *float64, row map[string]interface{}, colName string, errMap m
 	value, err := _getValue(row, colName, errMap)
 	if err == nil {
 		err = _setFloat64(d, value)
-		_updateErrMap(err, colName, errMap)
+		updateErrMap(err, colName, errMap)
 	}
 }
 
@@ -1019,7 +1056,7 @@ func SetTime(d *time.Time, row map[string]interface{}, colName string, errMap ma
 	value, err := _getValue(row, colName, errMap)
 	if err == nil {
 		err = _setTime(d, value)
-		_updateErrMap(err, colName, errMap)
+		updateErrMap(err, colName, errMap)
 	}
 }
 
@@ -1037,7 +1074,7 @@ func SetBool(d *bool, row map[string]interface{}, colName string, errMap map[str
 	value, err := _getValue(row, colName, errMap)
 	if err == nil {
 		err = _setBool(d, value)
-		_updateErrMap(err, colName, errMap)
+		updateErrMap(err, colName, errMap)
 	}
 }
 
@@ -1062,7 +1099,7 @@ func SetBytes(d *[]byte, row map[string]interface{}, colName string, errMap map[
 	value, err := _getValue(row, colName, errMap)
 	if err == nil {
 		err = _setBytes(d, value)
-		_updateErrMap(err, colName, errMap)
+		updateErrMap(err, colName, errMap)
 	}
 }
 
@@ -1102,11 +1139,11 @@ func _setBytes(d *[]byte, value interface{}) error {
 //	case []byte:
 //		err := d.Scan(bv)
 //		if err != nil {
-//			return assignErr(d, value, "_setUUID", err.Error())
+//			return assignErr(d, value, "_setAny", err.Error())
 //		}
 //		return nil
 //	default:
-//		return unknownTypeErr(d, value, "_setUUID")
+//		return unknownTypeErr(d, value, "_setAny")
 //	}
 //}
 
@@ -1127,19 +1164,6 @@ func _getValue(row map[string]interface{}, colName string, errMap map[string]int
 	return
 }
 
-func _updateErrMap(err error, colName string, errMap map[string]int) {
-	if err == nil {
-		return
-	}
-	key := fmt.Sprintf("[%s] %s", colName, err.Error())
-	count, ok := errMap[key]
-	if ok {
-		errMap[key] = count + 1
-	} else {
-		errMap[key] = 1
-	}
-}
-
 func _setAny(dstPtr interface{}, value interface{}) error {
 	if value == nil {
 		switch d := dstPtr.(type) {
@@ -1152,6 +1176,8 @@ func _setAny(dstPtr interface{}, value interface{}) error {
 	switch d := dstPtr.(type) {
 	case *string:
 		err = _setString(d, value)
+	case *int:
+		err = _setInt(d, value)
 	case *int32:
 		err = _setInt32(d, value)
 	case *int64:
@@ -1197,6 +1223,8 @@ func _setAny(dstPtr interface{}, value interface{}) error {
 	case *interface{}:
 		*d = value
 		return nil
+	default:
+		return errUnexpectedType(dstPtr)
 	}
 	return err
 }
