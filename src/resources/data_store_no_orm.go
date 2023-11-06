@@ -184,41 +184,43 @@ func (ds *_DS) isMsSql() bool {
 	return ds.paramPrefix == "@p"
 }
 
+const txKey = "tx"
+
 func getTx(ctx context.Context) *sql.Tx {
-	tx, _ := ctx.Value("tx").(*sql.Tx)
+	tx, _ := ctx.Value(txKey).(*sql.Tx)
 	return tx
 }
 
 func (ds *_DS) Begin(ctx context.Context) (txCtx context.Context, err error) {
 	tx := getTx(ctx)
 	if tx != nil {
-		return nil, errors.New("tx already started")
+		return nil, errors.New("already in " + txKey)
 	}
 	tx, err = ds.db.Begin()
-	txCtx = context.WithValue(ctx, "tx", tx)
+	txCtx = context.WithValue(ctx, txKey, tx)
 	return
 }
 
 func (ds *_DS) Commit(txCtx *context.Context) (err error) {
 	if txCtx == nil {
-		return errors.New("no tx to commit")
+		return errNilParam()
 	}
 	tx := getTx(*txCtx)
 	if tx == nil {
-		return errors.New("tx not started")
+		return errNotInTx()
 	}
 	err = tx.Commit()
-	*txCtx = nil // to prevent ds.tx.Rollback() in defer
+	*txCtx = nil
 	return
 }
 
 func (ds *_DS) Rollback(txCtx *context.Context) (err error) {
 	if txCtx == nil {
-		return errors.New("no tx to rollback")
+		return errNilParam()
 	}
 	tx := getTx(*txCtx)
 	if tx == nil {
-		return nil // commit() was called, just do nothing:
+		return errNotInTx()
 	}
 	err = tx.Rollback()
 	*txCtx = nil
@@ -1328,4 +1330,12 @@ func errMultipleRows(sqlString string) error {
 
 func errUnexpectedInQuery() error {
 	return errors.New("not supported: 'query([onTest]) for implicit cursors', query(onTest) for out cursors")
+}
+
+func errNotInTx() error {
+	return errors.New(txKey + " not started")
+}
+
+func errNilParam() error {
+	return errors.New("nil parameter")
 }

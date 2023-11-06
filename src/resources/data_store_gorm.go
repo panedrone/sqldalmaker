@@ -64,7 +64,7 @@ type DataStore interface {
 	Select(ctx context.Context, sqlString string, fa interface{}, args ...interface{}) error
 }
 
-func FetchPg(cursor string) string {
+func FetchSql(cursor string) string {
 	return fmt.Sprintf(`fetch all from "%s"`, cursor)
 }
 
@@ -186,28 +186,30 @@ func (ds *_DS) Close() error {
 	return nil
 }
 
-func (ds *_DS) getGormTx(ctx context.Context) *gorm.DB {
-	tx, _ := ctx.Value("getTx").(*gorm.DB)
+const txKey = "tx"
+
+func (ds *_DS) gormTx(ctx context.Context) *gorm.DB {
+	tx, _ := ctx.Value(txKey).(*gorm.DB)
 	return tx
 }
 
 func (ds *_DS) Begin(ctx context.Context) (txCtx context.Context, err error) {
-	tx := ds.getGormTx(ctx)
+	tx := ds.gormTx(ctx)
 	if tx != nil {
-		return nil, errors.New("tx already started")
+		return nil, errors.New("already in " + txKey)
 	}
-	tx = ds.rootDb.WithContext(ctx).Begin()
-	txCtx = context.WithValue(ctx, "tx", tx)
+	tx = ds.rootDb.Begin()
+	txCtx = context.WithValue(ctx, txKey, tx)
 	return
 }
 
 func (ds *_DS) Commit(txCtx *context.Context) (err error) {
 	if txCtx == nil {
-		return errors.New("no tx to commit")
+		return errNilParam()
 	}
-	tx := ds.getGormTx(*txCtx)
+	tx := ds.gormTx(*txCtx)
 	if tx == nil {
-		return errors.New("tx not started")
+		return errNotInTx()
 	}
 	tx.Commit()
 	*txCtx = nil
@@ -216,11 +218,11 @@ func (ds *_DS) Commit(txCtx *context.Context) (err error) {
 
 func (ds *_DS) Rollback(txCtx *context.Context) (err error) {
 	if txCtx == nil {
-		return nil // commit() was called, just do nothing
+		return errNilParam()
 	}
-	tx := ds.getGormTx(*txCtx)
+	tx := ds.gormTx(*txCtx)
 	if tx == nil {
-		return errors.New("tx not started")
+		return errNotInTx()
 	}
 	tx.Rollback()
 	*txCtx = nil
@@ -230,11 +232,11 @@ func (ds *_DS) Rollback(txCtx *context.Context) (err error) {
 // ORM-based CRUD -----------------------------------
 
 func (ds *_DS) Session(ctx context.Context) *gorm.DB {
-	tx := ds.getGormTx(ctx)
+	tx := ds.gormTx(ctx)
 	if tx == nil {
 		return ds.rootDb.WithContext(ctx)
 	}
-	return tx
+	return tx.WithContext(ctx)
 }
 
 func (ds *_DS) Create(ctx context.Context, table string, dataObjRef interface{}) error {
@@ -1312,4 +1314,12 @@ func errMultipleRows(sqlString string) error {
 
 func errUnexpectedInQuery() error {
 	return errors.New("not supported: 'query([onTest]) for implicit cursors', query(onTest) for out cursors")
+}
+
+func errNotInTx() error {
+	return errors.New(txKey + " not started")
+}
+
+func errNilParam() error {
+	return errors.New("nil parameter")
 }
