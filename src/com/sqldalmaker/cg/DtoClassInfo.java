@@ -5,7 +5,7 @@
  */
 package com.sqldalmaker.cg;
 
-import com.sqldalmaker.jaxb.dto.DtoClass;
+import com.sqldalmaker.jaxb.sdm.DtoClass;
 import com.sqldalmaker.jaxb.settings.Macros;
 
 import java.io.StringWriter;

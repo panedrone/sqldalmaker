@@ -183,7 +183,7 @@ public class Helpers {
         File dir = new File(file.getParent());
         String file_name = file.getName();
         if (!exists(dir, file_name)) {
-            throw new IOException("File not found (case-sensitive): " + file_name);
+            throw new IOException("File not found (case-sensitive): " + file_path);
         }
         FileReader reader = new FileReader(file);
         try {

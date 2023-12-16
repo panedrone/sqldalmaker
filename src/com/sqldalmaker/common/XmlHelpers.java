@@ -5,8 +5,8 @@
  */
 package com.sqldalmaker.common;
 
-import com.sqldalmaker.jaxb.dao.DaoClass;
-import com.sqldalmaker.jaxb.dto.DtoClasses;
+import com.sqldalmaker.jaxb.sdm.DaoClass;
+import com.sqldalmaker.jaxb.sdm.Sdm;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
@@ -56,15 +56,15 @@ public class XmlHelpers {
     }
 
     public static String get_dto_xml_text(
-            com.sqldalmaker.jaxb.dto.ObjectFactory object_factory,
-            DtoClasses root) throws Exception {
+            com.sqldalmaker.jaxb.sdm.ObjectFactory object_factory,
+            Sdm root) throws Exception {
 
-        String text = get_xml_text(object_factory.getClass().getPackage().getName(), root, Const.DTO_XSD);
+        String text = get_xml_text(object_factory.getClass().getPackage().getName(), root, Const.SDM_XSD);
         return text;
     }
 
     public static String get_dao_xml_text(
-            com.sqldalmaker.jaxb.dao.ObjectFactory object_factory,
+            com.sqldalmaker.jaxb.sdm.ObjectFactory object_factory,
             DaoClass root) throws Exception {
 
         String text = get_xml_text(object_factory.getClass().getPackage().getName(), root, Const.DAO_XSD);

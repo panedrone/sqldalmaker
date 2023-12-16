@@ -11,13 +11,14 @@ import com.sqldalmaker.cg.go.GoCG;
 import com.sqldalmaker.cg.java.JavaCG;
 import com.sqldalmaker.cg.php.PhpCG;
 import com.sqldalmaker.cg.python.PythonCG;
-import com.sqldalmaker.jaxb.dto.DtoClasses;
+import com.sqldalmaker.jaxb.sdm.*;
 import com.sqldalmaker.jaxb.settings.Macros;
 import com.sqldalmaker.jaxb.settings.Settings;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.Connection;
+import java.util.List;
 
 public class TargetLangUtils {
 
@@ -152,11 +153,11 @@ public class TargetLangUtils {
 
         String sql_root_abs_path = Helpers.concat_path(project_abs_path, settings.getFolders().getSql());
         String vm_template = TargetLangUtils.get_dto_vm_template(settings, project_abs_path);
-        String dto_xml_abs_path = Helpers.concat_path(xml_configs_folder_full_path, Const.DTO_XML);
-        String dto_xsd_abs_path = Helpers.concat_path(xml_configs_folder_full_path, Const.DTO_XSD);
-        String context_path = DtoClasses.class.getPackage().getName();
+        String dto_xml_abs_path = Helpers.concat_path(xml_configs_folder_full_path, Const.SDM_XML);
+        String dto_xsd_abs_path = Helpers.concat_path(xml_configs_folder_full_path, Const.SDM_XSD);
+        String context_path = Sdm.class.getPackage().getName();
         XmlParser xml_parser = new XmlParser(context_path, dto_xsd_abs_path);
-        DtoClasses dto_classes = xml_parser.unmarshal(dto_xml_abs_path);
+        Sdm sdm = xml_parser.unmarshal(dto_xml_abs_path);
         ////////////////////////////////////////////////////
         if (RootFileName.PHP.equals(root_fn)) {
             if (output_dir_rel_path != null) {
@@ -165,7 +166,7 @@ public class TargetLangUtils {
                 output_dir_rel_path.append(package_rel_path);
             }
             FieldNamesMode field_names_mode = Helpers.get_field_names_mode(settings);
-            return new PhpCG.DTO(dto_classes, settings, connection, sql_root_abs_path, vm_template, field_names_mode);
+            return new PhpCG.DTO(sdm, settings, connection, sql_root_abs_path, vm_template, field_names_mode);
         } else if (RootFileName.JAVA.equals(root_fn)) {
             FieldNamesMode field_names_mode = Helpers.get_field_names_mode(settings);
             String dto_inheritance = settings.getDto().getInheritance();
@@ -174,27 +175,27 @@ public class TargetLangUtils {
                 String package_rel_path = SdmUtils.get_package_relative_path(settings, dto_package);
                 output_dir_rel_path.append(package_rel_path);
             }
-            return new JavaCG.DTO(dto_classes, settings, connection, dto_package,
+            return new JavaCG.DTO(sdm, settings, connection, dto_package,
                     sql_root_abs_path, dto_inheritance, field_names_mode, vm_template);
         } else if (RootFileName.CPP.equals(root_fn)) {
             if (output_dir_rel_path != null) {
                 String package_rel_path = settings.getFolders().getTarget();
                 output_dir_rel_path.append(package_rel_path);
             }
-            return new CppCG.DTO(dto_classes, settings, connection, sql_root_abs_path, "", vm_template);
+            return new CppCG.DTO(sdm, settings, connection, sql_root_abs_path, "", vm_template);
         } else if (RootFileName.PYTHON.equals(root_fn)) {
             if (output_dir_rel_path != null) {
                 String package_rel_path = settings.getFolders().getTarget();
                 output_dir_rel_path.append(package_rel_path);
             }
-            return new PythonCG.DTO(dto_classes, settings, connection, sql_root_abs_path, vm_template);
+            return new PythonCG.DTO(sdm, settings, connection, sql_root_abs_path, vm_template);
         } else if (RootFileName.GO.equals(root_fn)) {
             if (output_dir_rel_path != null) {
                 String package_rel_path = TargetLangUtils.get_golang_dto_folder_rel_path(settings);
                 output_dir_rel_path.append(package_rel_path);
             }
             FieldNamesMode field_names_mode = Helpers.get_field_names_mode(settings);
-            return new GoCG.DTO(dto_classes, settings, connection, sql_root_abs_path, field_names_mode, vm_template);
+            return new GoCG.DTO(sdm, settings, connection, sql_root_abs_path, field_names_mode, vm_template);
         } else {
             throw new Exception(TargetLangUtils.get_unknown_root_file_msg(root_fn));
         }
@@ -208,12 +209,13 @@ public class TargetLangUtils {
                                        StringBuilder output_dir_rel_path) throws Exception {
 
         String sql_root_abs_path = Helpers.concat_path(project_abs_path, settings.getFolders().getSql());
-        String dto_xml_abs_path = Helpers.concat_path(xml_configs_folder_full_path, Const.DTO_XML);
-        String dto_xsd_abs_path = Helpers.concat_path(xml_configs_folder_full_path, Const.DTO_XSD);
+        String dto_xml_abs_path = Helpers.concat_path(xml_configs_folder_full_path, Const.SDM_XML);
+        String dto_xsd_abs_path = Helpers.concat_path(xml_configs_folder_full_path, Const.SDM_XSD);
         String vm_template = TargetLangUtils.get_dao_vm_template(settings, project_abs_path);
-        String context_path = DtoClasses.class.getPackage().getName();
+        String context_path = Sdm.class.getPackage().getName();
         XmlParser xml_parser = new XmlParser(context_path, dto_xsd_abs_path);
-        DtoClasses dto_classes = xml_parser.unmarshal(dto_xml_abs_path);
+        Sdm sdm = xml_parser.unmarshal(dto_xml_abs_path);
+        List<DtoClass> dto_classes = sdm.getDtoClass();
         ////////////////////////////////////////////////////
         if (RootFileName.PHP.equals(root_fn)) {
             if (output_dir_rel_path != null) {

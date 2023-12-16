@@ -272,7 +272,7 @@ public class UIDialogSelectDbSchema extends JDialog {
         panel5.add(radio_user_as_schema);
         chk_omit = new JCheckBox();
         chk_omit.setSelected(true);
-        chk_omit.setText("Omit DTO that are already declared in 'dto.xml'");
+        chk_omit.setText("Omit DTO that are already declared");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 1;

@@ -12,16 +12,15 @@ import java.util.Set;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.sqldalmaker.jaxb.dao.Crud;
-import com.sqldalmaker.jaxb.dao.DaoClass;
-import com.sqldalmaker.jaxb.dao.ExecDml;
-import com.sqldalmaker.jaxb.dao.Query;
-import com.sqldalmaker.jaxb.dao.QueryDto;
-import com.sqldalmaker.jaxb.dao.QueryDtoList;
-import com.sqldalmaker.jaxb.dao.QueryList;
-import com.sqldalmaker.jaxb.dao.TypeMethod;
-import com.sqldalmaker.jaxb.dto.DtoClass;
-import com.sqldalmaker.jaxb.dto.DtoClasses;
+import com.sqldalmaker.jaxb.sdm.Crud;
+import com.sqldalmaker.jaxb.sdm.DaoClass;
+import com.sqldalmaker.jaxb.sdm.ExecDml;
+import com.sqldalmaker.jaxb.sdm.Query;
+import com.sqldalmaker.jaxb.sdm.QueryDto;
+import com.sqldalmaker.jaxb.sdm.QueryDtoList;
+import com.sqldalmaker.jaxb.sdm.QueryList;
+import com.sqldalmaker.jaxb.sdm.TypeMethod;
+import com.sqldalmaker.jaxb.sdm.DtoClass;
 
 /**
  * @author sqldalmaker@gmail.com
@@ -35,18 +34,33 @@ public class JaxbUtils {
     }
 
     public static DtoClass find_jaxb_dto_class(String dto_class_name,
-                                               DtoClasses jaxb_dto_classes) throws Exception {
+                                               List<DtoClass> jaxb_dto_classes) throws Exception {
 
         if (dto_class_name == null || dto_class_name.length() == 0) {
             throw new Exception("Invalid DTO class name: " + dto_class_name);
         }
-        for (DtoClass cls : jaxb_dto_classes.getDtoClass()) {
+        for (DtoClass cls : jaxb_dto_classes) {
             String name = cls.getName();
             if (name != null && name.equals(dto_class_name)) {
                 return cls;
             }
         }
         throw new Exception("DTO XML element not found: '" + dto_class_name + "'");
+    }
+
+    public static DaoClass find_jaxb_dao_class(String dao_class_name,
+                                               List<DaoClass> jaxb_dao_classes) throws Exception {
+
+        if (dao_class_name == null || dao_class_name.length() == 0) {
+            throw new Exception("Invalid DAO class name: " + dao_class_name);
+        }
+        for (DaoClass cls : jaxb_dao_classes) {
+            String name = cls.getName();
+            if (name != null && name.equals(dao_class_name)) {
+                return cls;
+            }
+        }
+        throw new Exception("DTO XML element not found: '" + dao_class_name + "'");
     }
 
     public static void process_jaxb_dao_class(IDaoCG dao_cg,

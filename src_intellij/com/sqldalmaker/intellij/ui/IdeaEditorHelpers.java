@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2022 sqldalmaker@gmail.com
+ * Copyright 2011-2023 sqldalmaker@gmail.com
  * SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
  * Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -16,14 +16,15 @@ import com.sqldalmaker.common.Const;
 import com.sqldalmaker.common.InternalException;
 import com.sqldalmaker.common.SdmUtils;
 import com.sqldalmaker.common.XmlHelpers;
-import com.sqldalmaker.jaxb.dao.DaoClass;
-import com.sqldalmaker.jaxb.dto.DtoClass;
-import com.sqldalmaker.jaxb.dto.DtoClasses;
-import com.sqldalmaker.jaxb.dto.ObjectFactory;
+import com.sqldalmaker.jaxb.sdm.DaoClass;
+import com.sqldalmaker.jaxb.sdm.DtoClass;
+import com.sqldalmaker.jaxb.sdm.ObjectFactory;
+import com.sqldalmaker.jaxb.sdm.Sdm;
 import com.sqldalmaker.jaxb.settings.Settings;
 
 import java.io.File;
 import java.sql.Connection;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -164,9 +165,9 @@ public class IdeaEditorHelpers {
     public static void open_dto_xml_sync(Project project,
                                          VirtualFile root_file) {
         try {
-            VirtualFile dto_xml = root_file.getParent().findFileByRelativePath(Const.DTO_XML);
+            VirtualFile dto_xml = root_file.getParent().findFileByRelativePath(Const.SDM_XML);
             if (dto_xml == null) {
-                throw new InternalException("File '" + Const.DTO_XML + "' not found");
+                throw new InternalException("File '" + Const.SDM_XML + "' not found");
             }
             open_in_editor_sync(project, dto_xml);
         } catch (Exception e) {
@@ -198,16 +199,16 @@ public class IdeaEditorHelpers {
         Connection con = IdeaHelpers.get_connection(project, settings);
         try {
             ObjectFactory object_factory = new ObjectFactory();
-            DtoClasses dto_classes = object_factory.createDtoClasses();
+            Sdm sdm = object_factory.createSdm();
             DtoClass cls = object_factory.createDtoClass();
             cls.setName(class_name);
             cls.setRef(ref);
-            dto_classes.getDtoClass().add(cls);
+            sdm.getDtoClass().add(cls);
             VirtualFile project_dir = IdeaHelpers.get_project_base_dir(project);
             final String module_root = project_dir.getPath();
             String sql_root_folder_full_path = Helpers.concat_path(module_root, settings.getFolders().getSql());
             SdmUtils.gen_field_wizard_jaxb(settings, con, object_factory, cls, sql_root_folder_full_path);
-            open_dto_xml_in_editor(object_factory, project, dto_classes);
+            open_dto_xml_in_editor(object_factory, project, sdm);
         } finally {
             con.close();
         }
@@ -215,16 +216,16 @@ public class IdeaEditorHelpers {
 
     public static void open_dto_xml_in_editor(ObjectFactory object_factory,
                                               Project project,
-                                              DtoClasses dto_classes) throws Exception {
+                                              Sdm sdm) throws Exception {
 
-        String text = XmlHelpers.get_dto_xml_text(object_factory, dto_classes);
+        String text = XmlHelpers.get_dto_xml_text(object_factory, sdm);
         String[] parts = text.split("\\?>");
         text = parts[0] + Const.COMMENT_GENERATED_DTO_XML + parts[1];
         open_text_in_new_editor(project, "dto.xml", text);
     }
 
     public static void open_dao_xml_in_editor(Project project,
-                                              com.sqldalmaker.jaxb.dao.ObjectFactory object_factory,
+                                              com.sqldalmaker.jaxb.sdm.ObjectFactory object_factory,
                                               String file_name,
                                               DaoClass root) throws Exception {
 

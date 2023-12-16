@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2021 sqldalmaker@gmail.com
+ * Copyright 2011-2023 sqldalmaker@gmail.com
  * Read LICENSE.txt in the root of this project/archive.
  * Project web-site: https://sqldalmaker.sourceforge.net/
  */
@@ -37,8 +37,9 @@ import org.eclipse.ui.part.FileEditorInput;
 import com.sqldalmaker.common.Const;
 import com.sqldalmaker.common.InternalException;
 import com.sqldalmaker.common.XmlHelpers;
-import com.sqldalmaker.jaxb.dto.DtoClass;
-import com.sqldalmaker.jaxb.dto.DtoClasses;
+import com.sqldalmaker.jaxb.sdm.DtoClass;
+import com.sqldalmaker.jaxb.sdm.ObjectFactory;
+import com.sqldalmaker.jaxb.sdm.Sdm;
 
 /**
  * @author sqldalmaker@gmail.com
@@ -134,10 +135,11 @@ public class EclipseEditorHelpers {
 		return editor_part;
 	}
 
-	public static void open_dto_xml_in_editor_sync(com.sqldalmaker.jaxb.dto.ObjectFactory object_factory,
-			DtoClasses root) throws Exception {
+	public static void open_dto_xml_in_editor_sync(com.sqldalmaker.jaxb.sdm.ObjectFactory object_factory, Sdm root)
+			throws Exception {
+
 		Marshaller marshaller = XmlHelpers.create_marshaller(object_factory.getClass().getPackage().getName(),
-				Const.DTO_XSD);
+				Const.SDM_XSD);
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		try {
 			marshaller.marshal(root, out);
@@ -186,14 +188,14 @@ public class EclipseEditorHelpers {
 		String project_root = EclipseHelpers.get_absolute_dir_path_str(project);
 		Connection con = EclipseHelpers.get_connection(editor2);
 		try {
-			com.sqldalmaker.jaxb.dto.ObjectFactory object_factory = new com.sqldalmaker.jaxb.dto.ObjectFactory();
-			DtoClasses root = object_factory.createDtoClasses();
+			ObjectFactory object_factory = new ObjectFactory();
+			Sdm sdm = object_factory.createSdm();
 			DtoClass cls = object_factory.createDtoClass();
 			cls.setName(class_name);
 			cls.setRef(ref);
-			root.getDtoClass().add(cls);
+			sdm.getDtoClass().add(cls);
 			EclipseHelpers.gen_tmp_field_tags(con, object_factory, cls, project_root, editor2);
-			open_dto_xml_in_editor_sync(object_factory, root);
+			open_dto_xml_in_editor_sync(object_factory, sdm);
 		} finally {
 			con.close();
 		}

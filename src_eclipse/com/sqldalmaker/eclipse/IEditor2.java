@@ -1,8 +1,8 @@
 /*
- * Copyright 2011-2022 sqldalmaker@gmail.com
- * SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
- * Read LICENSE.txt in the root of this project/archive for details.
- */
+	Copyright 2011-2023 sqldalmaker@gmail.com
+	Read LICENSE.txt in the root of this project/archive.
+	Project web-site: https://sqldalmaker.sourceforge.net/
+*/
 package com.sqldalmaker.eclipse;
 
 import org.eclipse.core.resources.IContainer;
@@ -30,7 +30,7 @@ public interface IEditor2 {
 	/**
 	 * @return null if not found
 	 */
-	IFile find_dto_xml();
+	IFile find_sdm_xml();
 
 	String get_dto_xml_abs_path() throws Exception;
 
@@ -47,9 +47,9 @@ public interface IEditor2 {
 	 * @return 1) IProject if meta-program is located directly in project root 2)
 	 *         IFolder for project sub-folder
 	 */
-	IContainer get_metaprogram_folder();
+	IContainer get_sdm_folder();
 
-	String get_metaprogram_folder_path_relative_to_project() throws Exception;
+	String get_sdm_folder_path_relative_to_project() throws Exception;
 
-	String get_metaprogram_folder_abs_path() throws Exception;
+	String get_sdm_folder_abs_path() throws Exception;
 }

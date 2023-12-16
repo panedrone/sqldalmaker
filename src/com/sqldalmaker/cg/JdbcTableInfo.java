@@ -18,7 +18,7 @@ import java.util.Set;
 
 import org.apache.cayenne.dba.TypesMapping;
 
-import com.sqldalmaker.jaxb.dto.DtoClass;
+import com.sqldalmaker.jaxb.sdm.DtoClass;
 
 /**
  * @author sqldalmaker@gmail.com

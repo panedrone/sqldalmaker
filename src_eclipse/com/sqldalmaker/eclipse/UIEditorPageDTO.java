@@ -1,5 +1,5 @@
 /*
-	Copyright 2011-2022 sqldalmaker@gmail.com
+	Copyright 2011-2023 sqldalmaker@gmail.com
 	Read LICENSE.txt in the root of this project/archive.
 	Project web-site: https://sqldalmaker.sourceforge.net/
 */
@@ -58,7 +58,7 @@ import com.sqldalmaker.cg.SqlUtils;
 import com.sqldalmaker.common.Const;
 import com.sqldalmaker.common.InternalException;
 import com.sqldalmaker.common.SdmUtils;
-import com.sqldalmaker.jaxb.dto.DtoClass;
+import com.sqldalmaker.jaxb.sdm.DtoClass;
 import com.sqldalmaker.jaxb.settings.Settings;
 
 /**
@@ -232,7 +232,7 @@ public class UIEditorPageDTO extends Composite {
 			action_generate = new Action("") {
 				@Override
 				public void run() {
-					generate();
+					generate_with_progress();
 				}
 			};
 			action_generate.setToolTipText("Generate selected");
@@ -243,12 +243,7 @@ public class UIEditorPageDTO extends Composite {
 			action_validate = new Action("") {
 				@Override
 				public void run() {
-					try {
-						validate();
-					} catch (Throwable e) {
-						e.printStackTrace();
-						EclipseMessageHelpers.show_error(e);
-					}
+					validate_with_progress();
 				}
 			};
 			action_validate.setToolTipText("Validate all");
@@ -325,6 +320,15 @@ public class UIEditorPageDTO extends Composite {
 		}
 	}
 
+	protected void validate_with_progress() {
+		try {
+			validate();
+		} catch (Throwable e) {
+			e.printStackTrace();
+			EclipseMessageHelpers.show_error(e);
+		}
+	}
+
 	protected void validate() throws Exception {
 		final List<Item> items = reload_table();
 		EclipseSyncAction action = new EclipseSyncAction() {
@@ -348,7 +352,9 @@ public class UIEditorPageDTO extends Composite {
 					Settings settings = EclipseHelpers.load_settings(editor2);
 					StringBuilder output_dir_abs_path = new StringBuilder();
 					// !!!! after 'try'
-					IDtoCG gen = EclipseTargetLanguageHelpers.create_dto_cg(con, editor2, settings, output_dir_abs_path);
+					IDtoCG gen = EclipseTargetLanguageHelpers.create_dto_cg(con, editor2, settings,
+							output_dir_abs_path);
+					monitor.beginTask(get_name(), get_total_work());
 					for (int i = 0; i < items.size(); i++) {
 						if (monitor.isCanceled()) {
 							return;
@@ -357,8 +363,8 @@ public class UIEditorPageDTO extends Composite {
 						monitor.subTask(dto_class_name);
 						try {
 							String file_content[] = gen.translate(dto_class_name);
-							String file_abs_path = EclipseTargetLanguageHelpers.get_rel_path(editor2, output_dir_abs_path.toString(),
-									dto_class_name);
+							String file_abs_path = EclipseTargetLanguageHelpers.get_rel_path(editor2,
+									output_dir_abs_path.toString(), dto_class_name);
 							String old_text = Helpers.load_text_from_file(file_abs_path);
 							StringBuilder validation_buff = new StringBuilder();
 							if (old_text == null) {
@@ -434,8 +440,8 @@ public class UIEditorPageDTO extends Composite {
 		}
 		return items;
 	}
-	
-	private void generate() {
+
+	private void generate_with_progress() {
 		final List<Item> items = get_items();
 		if (items == null) {
 			return;
@@ -465,6 +471,7 @@ public class UIEditorPageDTO extends Composite {
 					StringBuilder output_dir = new StringBuilder();
 					// !!!! after 'try'
 					IDtoCG gen = EclipseTargetLanguageHelpers.create_dto_cg(con, editor2, settings, output_dir);
+					monitor.beginTask(get_name(), get_total_work());
 					for (Item item : items) {
 						if (monitor.isCanceled()) {
 							return;
@@ -541,16 +548,16 @@ public class UIEditorPageDTO extends Composite {
 
 	protected void open_xml() {
 		try {
-			IFile file = editor2.find_dto_xml();
+			IFile file = editor2.find_sdm_xml();
 			if (file == null) {
-				throw new InternalException("File not found: " + Const.DTO_XML);
+				throw new InternalException("File not found: " + Const.SDM_XML);
 			}
 			final List<Item> items = prepare_selected_items();
 			if (items == null || items.size() == 0) {
 				EclipseEditorHelpers.open_editor_sync(getShell(), file);
 				return;
 			}
-			EclipseXmlAttrHelpers.goto_dto_class_declaration(getShell(), file, items.get(0).get_name());
+			EclipseXmlAttrHelpers.goto_sdm_class_declaration(getShell(), file, items.get(0).get_name());
 		} catch (Throwable e) {
 			e.printStackTrace();
 			EclipseMessageHelpers.show_error(e);

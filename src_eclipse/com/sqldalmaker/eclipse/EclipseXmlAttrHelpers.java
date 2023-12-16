@@ -1,5 +1,5 @@
 /*
-	Copyright 2011-2022 sqldalmaker@gmail.com
+	Copyright 2011-2023 sqldalmaker@gmail.com
 	Read LICENSE.txt in the root of this project/archive.
 	Project web-site: https://sqldalmaker.sourceforge.net/
 */
@@ -122,7 +122,7 @@ public class EclipseXmlAttrHelpers {
 		return new Region(reg_offset + 1, reg_length);
 	}
 
-	public static void goto_dto_class_declaration(Shell shell, IFile file, String dto_class_name) throws Exception {
+	public static void goto_sdm_class_declaration(Shell shell, IFile file, String class_name) throws Exception {
 		IEditorPart part = EclipseEditorHelpers.open_editor_sync(shell, file);
 		// google: eclipse plugin api editor set caret position
 		// https://stackoverflow.com/questions/35591397/eclipseget-and-set-caret-position-of-the-editor
@@ -131,7 +131,7 @@ public class EclipseXmlAttrHelpers {
 		if (control instanceof StyledText) {
 			StyledText styledText = (StyledText) control;
 			String xml_text = styledText.getText();
-			Location location = get_offset(xml_text, dto_class_name);
+			Location location = get_offset(xml_text, class_name);
 			if (location == null) {
 				styledText.setCaretOffset(0);
 				styledText.setTopIndex(0);
@@ -154,17 +154,17 @@ public class EclipseXmlAttrHelpers {
 				styledText.setTopIndex(line);
 			}
 		} else {
-			throw new Exception("Cannot read " + Const.DTO_XML);
+			throw new Exception("Cannot read " + Const.SDM_XML);
 		}
 	}
 
-	private static boolean is_dto_class_element(XMLStreamReader streamReader, String dto_class_name) {
+	private static boolean is_sdm_class_element(XMLStreamReader streamReader, String sdm_class_name) {
 		int attr_count = streamReader.getAttributeCount(); // it works only with event == START_ELEMENT
 		for (int i = 0; i < attr_count; i++) {
 			String attr_name = streamReader.getAttributeLocalName(i); // getAttributeName(i).getLocalPart();
 			if (attr_name.equals("name")) {
 				String attr_value = streamReader.getAttributeValue(i);
-				if (attr_value.equals(dto_class_name)) {
+				if (attr_value.equals(sdm_class_name)) {
 					return true;
 				}
 				return false;
@@ -173,7 +173,7 @@ public class EclipseXmlAttrHelpers {
 		return false;
 	}
 
-	private static Location get_offset(String xml_text, String dto_class_name) throws Exception {
+	private static Location get_offset(String xml_text, String sdm_class_name) throws Exception {
 		XMLInputFactory factory = XMLInputFactory.newInstance();
 		XMLStreamReader streamReader = factory.createXMLStreamReader(new StringReader(xml_text));
 		while (streamReader.hasNext()) {
@@ -187,8 +187,8 @@ public class EclipseXmlAttrHelpers {
 
 			if (streamReader.getEventType() == XMLStreamReader.START_ELEMENT) {
 				String tag = streamReader.getLocalName();
-				if (tag.compareTo("dto-class") == 0) {
-					if (is_dto_class_element(streamReader, dto_class_name)) {
+				if (tag.compareTo("dto-class") == 0 || tag.compareTo("dao-class") == 0) {
+					if (is_sdm_class_element(streamReader, sdm_class_name)) {
 //						while (streamReader.hasNext()) {
 //							streamReader.next();
 //							if (streamReader.getEventType() == XMLStreamReader.END_ELEMENT) {

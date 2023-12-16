@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2020 sqldalmaker@gmail.com
+ * Copyright 2011-2023 sqldalmaker@gmail.com
  * SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
  * Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -56,7 +56,7 @@ public class CompletionProviderDtoClass extends CompletionProvider<CompletionPar
         }
         // the same folder as root-file
         //
-        VirtualFile dto_xml_file = xml_file_dir.findFileByRelativePath(Const.DTO_XML);
+        VirtualFile dto_xml_file = xml_file_dir.findFileByRelativePath(Const.SDM_XML);
         if (dto_xml_file == null) {
             return;
         }

@@ -1,13 +1,13 @@
 /*
-    Copyright 2011-2022 sqldalmaker@gmail.com
+    Copyright 2011-2023 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
 package com.sqldalmaker.cg;
 
-import com.sqldalmaker.jaxb.dao.DaoClass;
-import com.sqldalmaker.jaxb.dao.ExecDml;
-import com.sqldalmaker.jaxb.dao.Crud;
+import com.sqldalmaker.jaxb.sdm.DaoClass;
+import com.sqldalmaker.jaxb.sdm.ExecDml;
+import com.sqldalmaker.jaxb.sdm.Crud;
 
 /**
  * @author sqldalmaker@gmail.com

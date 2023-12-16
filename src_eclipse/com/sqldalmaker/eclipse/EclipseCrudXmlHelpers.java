@@ -1,9 +1,8 @@
 /*
- * Copyright 2011-2020 sqldalmaker@gmail.com
- * SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
- * Read LICENSE.txt in the root of this project/archive for details.
- * 
- */
+	Copyright 2011-2023 sqldalmaker@gmail.com
+	Read LICENSE.txt in the root of this project/archive.
+	Project web-site: https://sqldalmaker.sourceforge.net/
+*/
 package com.sqldalmaker.eclipse;
 
 import java.sql.Connection;
@@ -20,9 +19,7 @@ import com.sqldalmaker.common.FileSearchHelpers;
 import com.sqldalmaker.common.FileSearchHelpers.IFile_List;
 import com.sqldalmaker.common.ISelectDbSchemaCallback;
 import com.sqldalmaker.common.SdmUtils;
-import com.sqldalmaker.jaxb.dao.DaoClass;
-import com.sqldalmaker.jaxb.dao.ObjectFactory;
-import com.sqldalmaker.jaxb.dto.DtoClasses;
+import com.sqldalmaker.jaxb.sdm.*;
 import com.sqldalmaker.jaxb.settings.Settings;
 
 /**
@@ -40,8 +37,8 @@ public class EclipseCrudXmlHelpers {
 			public void process_ok(boolean schema_in_xml, String selected_schema, boolean skip_used,
 					boolean include_views, boolean plural_to_singular, boolean crud_auto, boolean add_fk_access) {
 				try {
-					com.sqldalmaker.jaxb.dto.ObjectFactory object_factory = new com.sqldalmaker.jaxb.dto.ObjectFactory();
-					DtoClasses root;
+					com.sqldalmaker.jaxb.sdm.ObjectFactory object_factory = new com.sqldalmaker.jaxb.sdm.ObjectFactory();
+					Sdm root;
 					Connection connection = EclipseHelpers.get_connection(editor2);
 					try {
 						Set<String> in_use; // !!!! after 'try'
@@ -91,9 +88,9 @@ public class EclipseCrudXmlHelpers {
 	public static Set<String> find_dto_used_in_dao_xml_crud(IEditor2 editor2, String project_abs_path)
 			throws Exception {
 
-		String metaprogram_folder_abs_path = editor2.get_metaprogram_folder_abs_path();
+		String metaprogram_folder_abs_path = editor2.get_sdm_folder_abs_path();
 		List<String> dao_xml_file_name_list = get_dao_xml_file_name_list(editor2.get_project(),
-				editor2.get_metaprogram_folder_abs_path());
+				editor2.get_sdm_folder_abs_path());
 		Set<String> res = SdmUtils.find_dto_used_in_dao_xml_crud(metaprogram_folder_abs_path, dao_xml_file_name_list);
 		return res;
 	}

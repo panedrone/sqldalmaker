@@ -6,9 +6,8 @@
 package com.sqldalmaker.cg.java;
 
 import com.sqldalmaker.cg.*;
-import com.sqldalmaker.jaxb.dao.*;
-import com.sqldalmaker.jaxb.dto.DtoClass;
-import com.sqldalmaker.jaxb.dto.DtoClasses;
+import com.sqldalmaker.jaxb.sdm.*;
+import com.sqldalmaker.jaxb.sdm.DtoClass;
 import com.sqldalmaker.jaxb.settings.Settings;
 
 import java.io.StringWriter;
@@ -29,11 +28,11 @@ public class JavaCG {
         private final String dto_package;
         private final String sql_root_abs_path;
         private final String dto_inheritance;
-        private final DtoClasses jaxb_dto_classes;
+        private final List<DtoClass> jaxb_dto_classes;
         private final TemplateEngine te;
         private final JdbcUtils db_utils;
 
-        public DTO(DtoClasses jaxb_dto_classes,
+        public DTO(Sdm sdm,
                    Settings jaxb_settings,
                    Connection connection,
                    String dto_package,
@@ -42,7 +41,7 @@ public class JavaCG {
                    FieldNamesMode field_names_mode,
                    String vm_template) throws Exception {
 
-            this.jaxb_dto_classes = jaxb_dto_classes;
+            this.jaxb_dto_classes = sdm.getDtoClass();
             this.dto_package = dto_package;
             this.sql_root_abs_path = sql_root_abs_path;
             this.dto_inheritance = dto_inheritance;
@@ -82,12 +81,12 @@ public class JavaCG {
         private final String dto_package;
         private final String dao_package;
         private final String sql_root_abs_path;
-        private final DtoClasses jaxb_dto_classes;
+        private final List<DtoClass> jaxb_dto_classes;
         private final Set<String> imports = new HashSet<String>();
         private final TemplateEngine te;
         private final JdbcUtils db_utils;
 
-        public DAO(DtoClasses jaxb_dto_classes,
+        public DAO(List<DtoClass> jaxb_dto_classes,
                    Settings jaxb_settings,
                    Connection connection,
                    String dto_package,

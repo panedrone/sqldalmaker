@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2022 sqldalmaker@gmail.com
+    Copyright 2011-2023 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -9,9 +9,7 @@ import com.sqldalmaker.cg.JdbcUtils;
 import com.sqldalmaker.cg.FieldInfo;
 import com.sqldalmaker.cg.FieldNamesMode;
 import com.sqldalmaker.cg.Helpers;
-import com.sqldalmaker.jaxb.dao.*;
-import com.sqldalmaker.jaxb.dto.DtoClass;
-import com.sqldalmaker.jaxb.dto.DtoClasses;
+import com.sqldalmaker.jaxb.sdm.*;
 import com.sqldalmaker.jaxb.settings.Settings;
 
 import java.sql.Connection;
@@ -163,7 +161,7 @@ public class SdmUtils {
         return word;
     }
 
-    public static DaoClass create_crud_xml_jaxb_dao_class(com.sqldalmaker.jaxb.dao.ObjectFactory object_factory,
+    public static DaoClass create_crud_xml_jaxb_dao_class(com.sqldalmaker.jaxb.sdm.ObjectFactory object_factory,
                                                           Connection conn,
                                                           Set<String> in_use,
                                                           boolean schema_in_xml,
@@ -277,7 +275,7 @@ public class SdmUtils {
         return root;
     }
 
-    public static DtoClasses get_crud_dto_xml(com.sqldalmaker.jaxb.dto.ObjectFactory object_factory,
+    public static Sdm get_crud_dto_xml(com.sqldalmaker.jaxb.sdm.ObjectFactory object_factory,
                                               Connection conn,
                                               Set<String> in_use,
                                               boolean schema_in_xml,
@@ -285,7 +283,7 @@ public class SdmUtils {
                                               boolean include_views,
                                               boolean plural_to_singular) throws SQLException {
 
-        DtoClasses root = object_factory.createDtoClasses();
+        Sdm root = object_factory.createSdm();
         List<DtoClass> items = root.getDtoClass();
         ResultSet rs = JdbcUtils.get_tables_rs(conn, selected_schema, include_views);
         try {
@@ -321,7 +319,7 @@ public class SdmUtils {
 
     public static void gen_field_wizard_jaxb(Settings settings,
                                              Connection connection,
-                                             com.sqldalmaker.jaxb.dto.ObjectFactory object_factory,
+                                             com.sqldalmaker.jaxb.sdm.ObjectFactory object_factory,
                                              DtoClass dto_class,
                                              String sql_root_abs_path) throws Exception {
 
@@ -335,13 +333,23 @@ public class SdmUtils {
         }
     }
 
-    public static List<DtoClass> get_dto_classes(String dto_xml_abs_file_path,
-                                                 String dto_xsd_abs_file_path) throws Exception {
+    public static List<DtoClass> get_dto_classes(String sdm_xml_abs_file_path,
+                                                 String sdm_xsd_abs_file_path) throws Exception {
 
-        String context_path = DtoClasses.class.getPackage().getName();
-        XmlParser xml_parser = new XmlParser(context_path, dto_xsd_abs_file_path);
-        DtoClasses elements = xml_parser.unmarshal(dto_xml_abs_file_path);
+        String context_path = Sdm.class.getPackage().getName();
+        XmlParser xml_parser = new XmlParser(context_path, sdm_xsd_abs_file_path);
+        Sdm elements = xml_parser.unmarshal(sdm_xml_abs_file_path);
         List<DtoClass> res = new ArrayList<DtoClass>(elements.getDtoClass());
+        return res;
+    }
+
+    public static List<DaoClass> get_dao_classes(String sdm_xml_abs_file_path,
+                                                 String sdm_xsd_abs_file_path) throws Exception {
+
+        String context_path = Sdm.class.getPackage().getName();
+        XmlParser xml_parser = new XmlParser(context_path, sdm_xsd_abs_file_path);
+        Sdm elements = xml_parser.unmarshal(sdm_xml_abs_file_path);
+        List<DaoClass> res = new ArrayList<DaoClass>(elements.getDaoClass());
         return res;
     }
 

@@ -5,8 +5,7 @@
  */
 package com.sqldalmaker.cg;
 
-import com.sqldalmaker.jaxb.dto.DtoClass;
-import com.sqldalmaker.jaxb.dto.DtoClasses;
+import com.sqldalmaker.jaxb.sdm.DtoClass;
 import com.sqldalmaker.jaxb.settings.Settings;
 
 import java.sql.*;
@@ -113,7 +112,7 @@ public class JdbcUtils {
                                      String[] method_param_descriptors,
                                      String jaxb_dto_or_return_type,
                                      boolean jaxb_return_type_is_dto,
-                                     DtoClasses jaxb_dto_classes,
+                                     List<DtoClass> jaxb_dto_classes,
                                      List<FieldInfo> res_fields,
                                      List<FieldInfo> res_params) throws Exception {
 

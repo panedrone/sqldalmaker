@@ -1,0 +1,93 @@
+
+package com.sqldalmaker.jaxb.sdm;
+
+import java.util.ArrayList;
+import java.util.List;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElements;
+import javax.xml.bind.annotation.XmlSeeAlso;
+import javax.xml.bind.annotation.XmlType;
+
+
+/**
+ * &lt;p&gt;Java class for dao-node complex type.
+ * 
+ * &lt;p&gt;The following schema fragment specifies the expected content contained within this class.
+ * 
+ * &lt;pre&gt;
+ * &amp;lt;complexType name="dao-node"&amp;gt;
+ *   &amp;lt;complexContent&amp;gt;
+ *     &amp;lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&amp;gt;
+ *       &amp;lt;sequence&amp;gt;
+ *         &amp;lt;choice maxOccurs="unbounded" minOccurs="0"&amp;gt;
+ *           &amp;lt;element ref="{}crud"/&amp;gt;
+ *           &amp;lt;element ref="{}query"/&amp;gt;
+ *           &amp;lt;element ref="{}query-list"/&amp;gt;
+ *           &amp;lt;element ref="{}query-dto"/&amp;gt;
+ *           &amp;lt;element ref="{}query-dto-list"/&amp;gt;
+ *           &amp;lt;element ref="{}exec-dml"/&amp;gt;
+ *         &amp;lt;/choice&amp;gt;
+ *       &amp;lt;/sequence&amp;gt;
+ *     &amp;lt;/restriction&amp;gt;
+ *   &amp;lt;/complexContent&amp;gt;
+ * &amp;lt;/complexType&amp;gt;
+ * &lt;/pre&gt;
+ * 
+ * 
+ */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "dao-node", propOrder = {
+    "crudOrQueryOrQueryList"
+})
+@XmlSeeAlso({
+    DaoClass.class
+})
+public class DaoNode {
+
+    @XmlElements({
+        @XmlElement(name = "crud", type = Crud.class),
+        @XmlElement(name = "query", type = Query.class),
+        @XmlElement(name = "query-list", type = QueryList.class),
+        @XmlElement(name = "query-dto", type = QueryDto.class),
+        @XmlElement(name = "query-dto-list", type = QueryDtoList.class),
+        @XmlElement(name = "exec-dml", type = ExecDml.class)
+    })
+    protected List<Object> crudOrQueryOrQueryList;
+
+    /**
+     * Gets the value of the crudOrQueryOrQueryList property.
+     * 
+     * &lt;p&gt;
+     * This accessor method returns a reference to the live list,
+     * not a snapshot. Therefore any modification you make to the
+     * returned list will be present inside the JAXB object.
+     * This is why there is not a &lt;CODE&gt;set&lt;/CODE&gt; method for the crudOrQueryOrQueryList property.
+     * 
+     * &lt;p&gt;
+     * For example, to add a new item, do as follows:
+     * &lt;pre&gt;
+     *    getCrudOrQueryOrQueryList().add(newItem);
+     * &lt;/pre&gt;
+     * 
+     * 
+     * &lt;p&gt;
+     * Objects of the following type(s) are allowed in the list
+     * {@link Crud }
+     * {@link Query }
+     * {@link QueryList }
+     * {@link QueryDto }
+     * {@link QueryDtoList }
+     * {@link ExecDml }
+     * 
+     * 
+     */
+    public List<Object> getCrudOrQueryOrQueryList() {
+        if (crudOrQueryOrQueryList == null) {
+            crudOrQueryOrQueryList = new ArrayList<Object>();
+        }
+        return this.crudOrQueryOrQueryList;
+    }
+
+}

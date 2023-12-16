@@ -103,7 +103,7 @@ public class EclipseTargetLanguageHelpers {
 
 		IProject project = editor2.get_project();
 		String root_fn = editor2.get_root_file_name();
-		String xml_configs_folder_full_path = editor2.get_metaprogram_folder_abs_path();
+		String xml_configs_folder_full_path = editor2.get_sdm_folder_abs_path();
 		return create_dto_cg(conn, project, settings, root_fn, xml_configs_folder_full_path, output_dir_rel_path);
 	}
 
@@ -123,7 +123,7 @@ public class EclipseTargetLanguageHelpers {
 			StringBuilder output_dir_abs_path) throws Exception {
 
 		String root_fn = editor2.get_root_file_name();
-		String xml_configs_folder_full_path = editor2.get_metaprogram_folder_abs_path();
+		String xml_configs_folder_full_path = editor2.get_sdm_folder_abs_path();
 		return create_dao_cg(conn, project, root_fn, settings, xml_configs_folder_full_path, output_dir_abs_path);
 	}
 

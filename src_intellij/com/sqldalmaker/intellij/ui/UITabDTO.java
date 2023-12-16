@@ -14,7 +14,7 @@ import com.sqldalmaker.cg.SqlUtils;
 import com.sqldalmaker.common.Const;
 import com.sqldalmaker.common.InternalException;
 import com.sqldalmaker.common.SdmUtils;
-import com.sqldalmaker.jaxb.dto.DtoClass;
+import com.sqldalmaker.jaxb.sdm.DtoClass;
 import com.sqldalmaker.jaxb.settings.Settings;
 
 import javax.swing.*;
@@ -609,8 +609,8 @@ public class UITabDTO {
             final ArrayList<String[]> list = my_table_model.getList();
             list.clear();
             String xml_configs_folder_full_path = root_file.getParent().getPath();
-            String dto_xml_abs_path = xml_configs_folder_full_path + "/" + Const.DTO_XML;
-            String dto_xsd_abs_path = xml_configs_folder_full_path + "/" + Const.DTO_XSD;
+            String dto_xml_abs_path = xml_configs_folder_full_path + "/" + Const.SDM_XML;
+            String dto_xsd_abs_path = xml_configs_folder_full_path + "/" + Const.SDM_XSD;
             List<DtoClass> res = SdmUtils.get_dto_classes(dto_xml_abs_path, dto_xsd_abs_path);
             for (DtoClass cls : res) {
                 String[] item = new String[3];

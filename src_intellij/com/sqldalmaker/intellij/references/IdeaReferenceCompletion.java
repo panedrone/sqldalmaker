@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2022 sqldalmaker@gmail.com
+    Copyright 2011-2023 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -60,10 +60,10 @@ public class IdeaReferenceCompletion {
 
     public static @Nullable
     PsiElement find_dto_class_xml_tag(@NotNull Project project,
-                                      @NotNull VirtualFile dto_xml_file,
+                                      @NotNull VirtualFile sdm_xml_file,
                                       @NotNull String dto_class_name) {
 
-        PsiElement res = PsiManager.getInstance(project).findFile(dto_xml_file);// @Nullable
+        PsiElement res = PsiManager.getInstance(project).findFile(sdm_xml_file);// @Nullable
         if (!(res instanceof XmlFile)) {
             return null;
         }
@@ -97,11 +97,49 @@ public class IdeaReferenceCompletion {
     }
 
     public static @Nullable
+    PsiElement find_dao_class_xml_tag(@NotNull Project project,
+                                      @NotNull VirtualFile sdm_xml_file,
+                                      @NotNull String dao_class_name) {
+
+        PsiElement res = PsiManager.getInstance(project).findFile(sdm_xml_file);// @Nullable
+        if (!(res instanceof XmlFile)) {
+            return null;
+        }
+        XmlFile xml_file = (XmlFile) res;
+        XmlTag root = xml_file.getRootTag(); // nullable
+        if (root == null) {
+            return null;
+        }
+        PsiElement[] tags = root.getChildren(); // notnull;
+        for (PsiElement el : tags) {
+            if (!(el instanceof XmlTag)) {
+                continue;
+            }
+            XmlTag t = (XmlTag) el;
+            if (!t.getName().equals(ELEMENT.DAO_CLASS)) {
+                continue;
+            }
+            XmlAttribute a = t.getAttribute(ATTRIBUTE.NAME);
+            if (a == null) {
+                continue;
+            }
+            String v = a.getValue();
+            if (v == null || v.isEmpty()) {
+                continue;
+            }
+            if (dao_class_name.equals(v)) {
+                return el;
+            }
+        }
+        return null;
+    }
+
+    public static @Nullable
     PsiElement find_dto_class_target_file(@NotNull Project project,
-                                          @NotNull VirtualFile dto_xml_file,
+                                          @NotNull VirtualFile sdm_xml_file,
                                           @NotNull String dto_class_name) {
 
-        VirtualFile xml_file_dir = dto_xml_file.getParent();
+        VirtualFile xml_file_dir = sdm_xml_file.getParent();
         if (xml_file_dir == null) {
             return null;
         }
@@ -119,6 +157,49 @@ public class IdeaReferenceCompletion {
         String target_file_rel_path;
         try {
             String target_file_abs_path = IdeaTargetLanguageHelpers.get_dto_file_abs_path(project, root_file, settings, dto_class_name);
+            target_file_rel_path = IdeaHelpers.get_relative_path(project, target_file_abs_path);
+        } catch (Exception e) {
+            return null;
+        }
+        VirtualFile project_dir;
+        try {
+            project_dir = IdeaHelpers.get_project_base_dir(project);
+        } catch (Exception e) {
+            return null;
+        }
+        VirtualFile target_file;
+        try {
+            target_file = IdeaEditorHelpers.find_case_sensitive(project_dir, target_file_rel_path);
+        } catch (Exception e) {
+            return null;
+        }
+        PsiElement res = PsiManager.getInstance(project).findFile(target_file); // @Nullable
+        return res;
+    }
+
+    public static @Nullable
+    PsiElement find_dao_class_target_file(@NotNull Project project,
+                                          @NotNull VirtualFile sdm_xml_file,
+                                          @NotNull String dao_class_name) {
+
+        VirtualFile xml_file_dir = sdm_xml_file.getParent();
+        if (xml_file_dir == null) {
+            return null;
+        }
+        List<VirtualFile> root_files = IdeaTargetLanguageHelpers.find_root_files(xml_file_dir);
+        if (root_files.size() != 1) {
+            return null;
+        }
+        VirtualFile root_file = root_files.get(0);
+        Settings settings;
+        try {
+            settings = IdeaHelpers.load_settings(root_file);
+        } catch (Exception e) {
+            return null;
+        }
+        String target_file_rel_path;
+        try {
+            String target_file_abs_path = IdeaTargetLanguageHelpers.get_dao_file_abs_path(project, root_file, settings, dao_class_name);
             target_file_rel_path = IdeaHelpers.get_relative_path(project, target_file_abs_path);
         } catch (Exception e) {
             return null;

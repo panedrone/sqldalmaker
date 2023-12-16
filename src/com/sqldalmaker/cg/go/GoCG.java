@@ -7,11 +7,7 @@ package com.sqldalmaker.cg.go;
 
 import com.sqldalmaker.cg.*;
 import com.sqldalmaker.common.Const;
-import com.sqldalmaker.jaxb.dao.Crud;
-import com.sqldalmaker.jaxb.dao.DaoClass;
-import com.sqldalmaker.jaxb.dao.ExecDml;
-import com.sqldalmaker.jaxb.dto.DtoClass;
-import com.sqldalmaker.jaxb.dto.DtoClasses;
+import com.sqldalmaker.jaxb.sdm.*;
 import com.sqldalmaker.jaxb.settings.Settings;
 
 import java.io.StringWriter;
@@ -86,11 +82,11 @@ public class GoCG {
         private final String dto_package;
 
         private final String sql_root_abs_path;
-        private final DtoClasses jaxb_dto_classes;
+        private final List<DtoClass> jaxb_dto_classes;
         private final TemplateEngine te;
         private final JdbcUtils db_utils;
 
-        public DTO(DtoClasses jaxb_dto_classes,
+        public DTO(Sdm sdm,
                    Settings jaxb_settings,
                    Connection connection,
                    String sql_root_abs_path,
@@ -99,7 +95,7 @@ public class GoCG {
 
             String dto_scope = jaxb_settings.getDto().getScope().replace('\\', '/').trim();
             this.dto_package = _get_package_name(dto_scope);
-            this.jaxb_dto_classes = jaxb_dto_classes;
+            this.jaxb_dto_classes = sdm.getDtoClass();
             this.sql_root_abs_path = sql_root_abs_path;
             if (vm_template == null) {
                 te = new TemplateEngine(get_template_path(), false);
@@ -186,7 +182,7 @@ public class GoCG {
         private final String dao_package;
 
         private final String sql_root_abs_path;
-        private final DtoClasses jaxb_dto_classes;
+        private final List<DtoClass> jaxb_dto_classes;
         private final Set<String> imports_set = new HashSet<String>();
         private final TemplateEngine te;
         private final JdbcUtils db_utils;
@@ -194,7 +190,7 @@ public class GoCG {
 
         private String dao_class_name;
 
-        public DAO(DtoClasses jaxb_dto_classes,
+        public DAO(List<DtoClass> jaxb_dto_classes,
                    Settings jaxb_settings,
                    Connection connection,
                    String sql_root_abs_path,
@@ -563,7 +559,7 @@ public class GoCG {
         }
 
         private String[] _parse_method_declaration2(String method_text,
-                                                   String dto_package) throws Exception {
+                                                    String dto_package) throws Exception {
             String param_descriptors = "";
             String method_name;
             String[] parts = Helpers.parse_method_params(method_text);

@@ -157,10 +157,10 @@ public class IdeaTargetLanguageHelpers {
         return target_file_abs_path;
     }
 
-    private static String get_dao_file_abs_path(Project project,
-                                                VirtualFile root_file,
-                                                Settings settings,
-                                                String dao_class_name) throws Exception {
+    public static String get_dao_file_abs_path(Project project,
+                                               VirtualFile root_file,
+                                               Settings settings,
+                                               String dao_class_name) throws Exception {
 
         String root_file_fn = root_file.getName();
         String target_folder_abs_path;

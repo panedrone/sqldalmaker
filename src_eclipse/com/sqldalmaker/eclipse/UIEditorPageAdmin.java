@@ -1,8 +1,8 @@
 /*
- * Copyright 2011-2023 sqldalmaker@gmail.com
- * Read LICENSE.txt in the root of this project/archive.
- * Project web-site: https://sqldalmaker.sourceforge.net/
- */
+	Copyright 2011-2023 sqldalmaker@gmail.com
+	Read LICENSE.txt in the root of this project/archive.
+	Project web-site: https://sqldalmaker.sourceforge.net/
+*/
 package com.sqldalmaker.eclipse;
 
 import java.sql.Connection;
@@ -47,6 +47,9 @@ public class UIEditorPageAdmin extends Composite {
 	private Action action_test_conn;
 	private Action action_validate_all;
 	private Text txtV;
+	private Text txtStartingFromV;
+
+	private Composite composite_8;
 
 	/**
 	 * Create the composite.
@@ -144,16 +147,6 @@ public class UIEditorPageAdmin extends Composite {
 		btnCreateoverwriteXsdFiles.setText("Create/Overwrite XSD files");
 		toolkit.adapt(btnCreateoverwriteXsdFiles, true, true);
 
-		Button btnCreateoverwriteSettingsxml = new Button(composite_1, SWT.NONE);
-		btnCreateoverwriteSettingsxml.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				EclipseMetaProgramHelpers.create_overwrite_settings_xml(editor2);
-			}
-		});
-		btnCreateoverwriteSettingsxml.setText("Create/Overwrite settings.xml");
-		toolkit.adapt(btnCreateoverwriteSettingsxml, true, true);
-
 		Button btnNewButton_2 = new Button(composite_1, SWT.NONE);
 		btnNewButton_2.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -162,7 +155,17 @@ public class UIEditorPageAdmin extends Composite {
 			}
 		});
 		toolkit.adapt(btnNewButton_2, true, true);
-		btnNewButton_2.setText("Create/Overwrite dto.xml");
+		btnNewButton_2.setText("Create sdm.xml");
+
+		Button btnCreateoverwriteSettingsxml = new Button(composite_1, SWT.NONE);
+		btnCreateoverwriteSettingsxml.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				EclipseMetaProgramHelpers.create_overwrite_settings_xml(editor2);
+			}
+		});
+		btnCreateoverwriteSettingsxml.setText("Create settings.xml");
+		toolkit.adapt(btnCreateoverwriteSettingsxml, true, true);
 
 		Composite composite_2 = new Composite(composite_top, SWT.NONE);
 		GridLayout gl_composite_2 = new GridLayout(1, false);
@@ -663,6 +666,18 @@ public class UIEditorPageAdmin extends Composite {
 		});
 		button_4_1.setText("go.vm");
 		toolkit.adapt(button_4_1, true, true);
+
+		composite_8 = new Composite(composite_top, SWT.NONE);
+		toolkit.adapt(composite_8);
+		toolkit.paintBordersFor(composite_8);
+		composite_8.setLayout(new GridLayout(1, false));
+
+		txtStartingFromV = new Text(composite_8, SWT.BORDER | SWT.MULTI);
+		txtStartingFromV.setText(
+				"Starting from v1.292, use \"sdm.xml\" instead of \"dto.xml\".\r\n\r\nHow to migrate:\r\n\r\n1. Click \"Create/Overwrite XSD files\"\r\n2. Click \"Create sdm.xml\"\r\n3. Copy-paste internal text from \"dto.xml\",<dto-classes>... to \"sdm.xml\",<sdm>...\r\n4. Delete \"dto.xml\" and \"dto.xsd\".\r\n5. Click \"Validate Configuration\". Done.\r\n\r\nWhere to declare DAO classes with v1.292+:\r\n\r\n- \"option 1\": separate XML files like in prev. versions of the plugin\r\n- \"option 2\": tags \"<dao-class...\" in \"sdm.xml\"\r\n\r\nOnce you start using \"option 2\" then \"option 1\" becomes ignored.");
+		txtStartingFromV.setEditable(false);
+		txtStartingFromV.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		toolkit.adapt(txtStartingFromV, true, true);
 	}
 
 	private static String get_err_msg(Throwable ex) {
@@ -670,6 +685,16 @@ public class UIEditorPageAdmin extends Composite {
 	}
 
 	private void validate_all() {
+		boolean need_migrate = false;
+		IFile sdm_xml = editor2.find_metaprogram_file(Const.SDM_XML);
+		if (sdm_xml == null) {
+//        	IFile dto_xml = editor2.find_metaprogram_file("dto.xml");
+//            if (dto_xml != null) {
+			need_migrate = true;
+//            }
+		}
+		set_need_migrate_warning(need_migrate);
+
 		EclipseConsoleHelpers.init_console();
 		StringBuilder buff = new StringBuilder();
 		Settings sett = null;
@@ -683,7 +708,7 @@ public class UIEditorPageAdmin extends Composite {
 		} else {
 			add_err_msg(buff, "Cannot load " + Const.SETTINGS_XML + " because of invalid " + Const.SETTINGS_XSD);
 		}
-		check_xsd(buff, Const.DTO_XSD);
+		check_xsd(buff, Const.SDM_XSD);
 		check_xsd(buff, Const.DAO_XSD);
 		if (sett == null) {
 			add_err_msg(buff, "Test connection -> failed because of invalid settings");
@@ -801,5 +826,9 @@ public class UIEditorPageAdmin extends Composite {
 
 	public void setEditor2(Editor2 ed) {
 		editor2 = ed;
+	}
+
+	public void set_need_migrate_warning(boolean need_migrate) {
+		composite_8.setVisible(need_migrate);
 	}
 }

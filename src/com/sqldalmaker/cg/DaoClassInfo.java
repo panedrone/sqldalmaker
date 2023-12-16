@@ -5,8 +5,7 @@
  */
 package com.sqldalmaker.cg;
 
-import com.sqldalmaker.jaxb.dto.DtoClass;
-import com.sqldalmaker.jaxb.dto.DtoClasses;
+import com.sqldalmaker.jaxb.sdm.DtoClass;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -94,7 +93,7 @@ public class DaoClassInfo {
                                         FieldNamesMode param_names_mode,
                                         String jaxb_dto_or_return_type,
                                         boolean jaxb_return_type_is_dto,
-                                        DtoClasses jaxb_dto_classes,
+                                        List<DtoClass> jaxb_dto_classes,
                                         List<FieldInfo> res_fields,
                                         List<FieldInfo> res_params) throws Exception {
         res_fields.clear();
@@ -212,7 +211,7 @@ public class DaoClassInfo {
 
     private void _get_custom_sql_ret_field_info(String sql_root_abs_path,
                                                 String jaxb_dto_or_return_type,
-                                                DtoClasses jaxb_dto_classes,
+                                                List<DtoClass> jaxb_dto_classes,
                                                 List<FieldInfo> dao_fields_jdbc,
                                                 List<FieldInfo> dao_fields_res,
                                                 StringBuilder error) throws Exception {
@@ -237,7 +236,7 @@ public class DaoClassInfo {
                                              String dao_query_jdbc_sql,
                                              String jaxb_dto_or_return_type,
                                              boolean jaxb_return_type_is_dto,
-                                             DtoClasses jaxb_dto_classes,
+                                             List<DtoClass> jaxb_dto_classes,
                                              List<FieldInfo> dao_fields_res) throws Exception {
 
         List<FieldInfo> dao_fields_jdbc = new ArrayList<FieldInfo>();
@@ -286,7 +285,7 @@ public class DaoClassInfo {
                                      String[] method_param_descriptors,
                                      String jaxb_dto_or_return_type,
                                      boolean jaxb_return_type_is_dto,
-                                     DtoClasses jaxb_dto_classes,
+                                     List<DtoClass> jaxb_dto_classes,
                                      List<FieldInfo> res_fields,
                                      List<FieldInfo> res_params) throws Exception {
         res_fields.clear();

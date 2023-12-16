@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2020 sqldalmaker@gmail.com
+ * Copyright 2011-2023 sqldalmaker@gmail.com
  * SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
  * Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -32,7 +32,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public class PsiReferenceContributorCommon extends PsiReferenceContributor {
 
-    private static class DtoXmlDocElementFilter implements ElementFilter {
+    private static class SdmXmlDocElementFilter implements ElementFilter {
 
         @Override
         public boolean isAcceptable(Object element, @Nullable PsiElement context) {
@@ -49,7 +49,7 @@ public class PsiReferenceContributorCommon extends PsiReferenceContributor {
                 return false;
             }
             String name = vf.getName();
-            return FileSearchHelpers.is_dto_xml(name);
+            return FileSearchHelpers.is_sdm_xml(name);
         }
 
         @Override
@@ -74,7 +74,8 @@ public class PsiReferenceContributorCommon extends PsiReferenceContributor {
                 return false;
             }
             String name = vf.getName();
-            return FileSearchHelpers.is_dao_xml(name);
+            boolean res = FileSearchHelpers.is_sdm_xml(name) || FileSearchHelpers.is_dao_xml(name);
+            return res;
         }
 
         @Override
@@ -88,8 +89,14 @@ public class PsiReferenceContributorCommon extends PsiReferenceContributor {
         PsiReferenceDtoClassProvider ref_provider_dto_class = new PsiReferenceDtoClassProvider();
         XmlUtil.registerXmlAttributeValueReferenceProvider(registrar, new String[]{"name"}, new ScopeFilter(
                 new AndFilter(
-                        new DtoXmlDocElementFilter(),
+                        new SdmXmlDocElementFilter(),
                         new ParentElementFilter(new TagNameFilter(IdeaReferenceCompletion.ELEMENT.DTO_CLASS), 2)
+                )
+        ), true, ref_provider_dto_class);
+        XmlUtil.registerXmlAttributeValueReferenceProvider(registrar, new String[]{"name"}, new ScopeFilter(
+                new AndFilter(
+                        new SdmXmlDocElementFilter(),
+                        new ParentElementFilter(new TagNameFilter(IdeaReferenceCompletion.ELEMENT.DAO_CLASS), 2)
                 )
         ), true, ref_provider_dto_class);
         XmlUtil.registerXmlAttributeValueReferenceProvider(registrar, new String[]{"dto"}, new ScopeFilter(
@@ -102,7 +109,7 @@ public class PsiReferenceContributorCommon extends PsiReferenceContributor {
         PsiReferenceSqlProvider ref_provider_sql_file = new PsiReferenceSqlProvider();
         XmlUtil.registerXmlAttributeValueReferenceProvider(registrar, new String[]{"ref"}, new ScopeFilter(
                 new AndFilter(
-                        new DtoXmlDocElementFilter(),
+                        new SdmXmlDocElementFilter(),
                         new ParentElementFilter(new TagNameFilter(IdeaReferenceCompletion.ELEMENT.DTO_CLASS), 2)
                 )
         ), true, ref_provider_sql_file);

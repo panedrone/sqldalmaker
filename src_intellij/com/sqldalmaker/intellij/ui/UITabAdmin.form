@@ -615,7 +615,7 @@
                   </grid>
                   <grid id="150db" binding="pnl_xsd" layout-manager="GridBagLayout">
                     <constraints>
-                      <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                      <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="8" fill="2" indent="0" use-parent-layout="false"/>
                       <gridbag weightx="0.0" weighty="0.0"/>
                     </constraints>
                     <properties/>
@@ -632,7 +632,7 @@
                       </component>
                       <component id="53c87" class="javax.swing.JButton" binding="createOverwriteSettingsXmlButton" default-binding="true">
                         <constraints>
-                          <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
                           <gridbag weightx="0.0" weighty="0.0"/>
                         </constraints>
                         <properties>
@@ -641,11 +641,11 @@
                       </component>
                       <component id="22204" class="javax.swing.JButton" binding="createOverwriteDtoXmlButton" default-binding="true">
                         <constraints>
-                          <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
                           <gridbag weightx="0.0" weighty="0.0"/>
                         </constraints>
                         <properties>
-                          <text value="Create dto.xml"/>
+                          <text value="Create sdm.xml"/>
                         </properties>
                       </component>
                     </children>
@@ -714,6 +714,25 @@
                           <preferredSize width="22" height="24"/>
                           <text value=""/>
                           <toolTipText value="settings.xml"/>
+                        </properties>
+                      </component>
+                    </children>
+                  </grid>
+                  <grid id="a2639" binding="pnl_migrate" layout-manager="BorderLayout" hgap="0" vgap="0">
+                    <constraints>
+                      <grid row="8" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                      <gridbag weightx="0.0" weighty="0.0"/>
+                    </constraints>
+                    <properties/>
+                    <border type="none"/>
+                    <children>
+                      <component id="6566f" class="javax.swing.JTextPane" binding="text1">
+                        <constraints border-constraint="Center"/>
+                        <properties>
+                          <editable value="false"/>
+                          <margin top="0" left="15" bottom="15" right="15"/>
+                          <text value="&#10;Starting from v1.292, use &quot;sdm.xml&quot; instead of &quot;dto.xml&quot;.&#10;&#10;How to migrate:&#10;&#10;1. Click &quot;Create/Overwrite XSD files&quot;&#10;2. Click &quot;Create sdm.xml&quot;&#10;3. Copy-paste internal text from &quot;dto.xml&quot;,&lt;dto-classes&gt;... to &quot;sdm.xml&quot;,&lt;sdm&gt;...&#10;4. Delete &quot;dto.xml&quot; and &quot;dto.xsd&quot;.&#10;5. Click &quot;Validate Configuration&quot;. Done.&#10;&#10;Where to declare DAO classes with v1.292+:&#10;&#10;- &quot;option 1&quot;: separate XML files like in prev. versions of the plugin&#10;- &quot;option 2&quot;: tags &quot;&lt;dao-class...&quot; in &quot;sdm.xml&quot;&#10;&#10;Once you start using &quot;option 2&quot; then &quot;option 1&quot; becomes ignored.&#10;"/>
+                          <visible value="true"/>
                         </properties>
                       </component>
                     </children>

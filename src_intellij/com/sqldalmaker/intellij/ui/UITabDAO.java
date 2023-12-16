@@ -11,11 +11,9 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.JBColor;
 import com.sqldalmaker.cg.Helpers;
 import com.sqldalmaker.cg.IDaoCG;
-import com.sqldalmaker.common.Const;
-import com.sqldalmaker.common.FileSearchHelpers;
-import com.sqldalmaker.common.InternalException;
-import com.sqldalmaker.common.XmlParser;
-import com.sqldalmaker.jaxb.dao.DaoClass;
+import com.sqldalmaker.cg.JaxbUtils;
+import com.sqldalmaker.common.*;
+import com.sqldalmaker.jaxb.sdm.DaoClass;
 import com.sqldalmaker.jaxb.settings.Settings;
 
 import javax.swing.*;
@@ -24,6 +22,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -174,21 +173,24 @@ public class UITabDAO {
 
     protected void open_xml() {
         try {
-            int[] selectedRows = get_selection();
-            String relDirPath = (String) table.getValueAt(selectedRows[0], 0);
-            IdeaEditorHelpers.open_local_file_in_editor_sync(project, root_file, relDirPath);
+            int[] selected_rows = get_selection();
+            String dao_class_name = (String) table.getValueAt(selected_rows[0], 0);
+            if (!IdeaHelpers.navigate_to_dao_class_declaration(project, root_file, dao_class_name)) {
+                String relDirPath = (String) table.getValueAt(selected_rows[0], 0) + ".xml";
+                IdeaEditorHelpers.open_local_file_in_editor_sync(project, root_file, relDirPath);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             IdeaMessageHelpers.show_error_in_ui_thread(e);
         }
     }
 
-    protected void open_generated_source_file() {
+    private void open_generated_source_file() {
         try {
             int[] selectedRows = get_selection();
             final Settings settings = IdeaHelpers.load_settings(root_file);
-            String v = (String) table.getValueAt(selectedRows[0], 0);
-            String dao_class_name = Helpers.get_dao_class_name(v);
+            String dao_class_name = (String) table.getValueAt(selectedRows[0], 0);
+            // String dao_class_name = Helpers.get_dao_class_name(v);
             IdeaTargetLanguageHelpers.open_dao_sync(project, root_file, settings, dao_class_name);
         } catch (Exception e) {
             e.printStackTrace();
@@ -196,8 +198,73 @@ public class UITabDAO {
         }
     }
 
-    protected void generate_sync() {
-        final java.util.List<IdeaHelpers.GeneratedFileData> list = new ArrayList<IdeaHelpers.GeneratedFileData>();
+    private void generate_for_sdm_xml(final IDaoCG gen, final List<IdeaHelpers.GeneratedFileData> list, final Settings settings, final int[] selectedRows, List<DaoClass> jaxb_dao_classes) throws Exception {
+        for (int row : selectedRows) {
+            String dao_class_name = (String) table.getValueAt(row, 0);
+            try {
+                ProgressManager.progress(dao_class_name);
+                DaoClass dao_class = JaxbUtils.find_jaxb_dao_class(dao_class_name, jaxb_dao_classes);
+                String[] file_content = gen.translate(dao_class_name, dao_class);
+                IdeaTargetLanguageHelpers.prepare_generated_file_data(root_file, dao_class_name, file_content, list);
+                table.setValueAt(Const.STATUS_GENERATED, row, 1);
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                // to prevent:
+                // WARN - intellij.ide.HackyRepaintManager
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        table.updateUI();
+                    }
+                });
+            } catch (Throwable e) {
+                String msg = e.getMessage();
+                table.setValueAt(msg, row, 1);
+                IdeaMessageHelpers.add_dao_error_message(settings, root_file, dao_class_name, msg);
+                // break; // exit the loop
+            }
+        }
+    }
+
+    private void generate_for_dao_xml(final IDaoCG gen, final List<IdeaHelpers.GeneratedFileData> list, final Settings settings, final int[] selectedRows) throws Exception {
+        String local_abs_path = root_file.getParent().getPath();
+        String contextPath = DaoClass.class.getPackage().getName();
+        XmlParser xml_parser = new XmlParser(contextPath, Helpers.concat_path(local_abs_path, Const.DAO_XSD));
+        for (int row : selectedRows) {
+            String dao_xml_rel_path = (String) table.getValueAt(row, 0) + ".xml";
+            try {
+                ProgressManager.progress(dao_xml_rel_path);
+                String dao_class_name = Helpers.get_dao_class_name(dao_xml_rel_path);
+                String dao_xml_abs_path = Helpers.concat_path(local_abs_path, dao_xml_rel_path);
+                DaoClass dao_class = xml_parser.unmarshal(dao_xml_abs_path);
+                String[] file_content = gen.translate(dao_class_name, dao_class);
+                IdeaTargetLanguageHelpers.prepare_generated_file_data(root_file, dao_class_name, file_content, list);
+                table.setValueAt(Const.STATUS_GENERATED, row, 1);
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                // to prevent:
+                // WARN - intellij.ide.HackyRepaintManager
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        table.updateUI();
+                    }
+                });
+            } catch (Throwable e) {
+                String msg = e.getMessage();
+                table.setValueAt(msg, row, 1);
+                IdeaMessageHelpers.add_dao_error_message(settings, root_file, dao_xml_rel_path, msg);
+                // break; // exit the loop
+            }
+        }
+    }
+
+    private void generate_sync() {
+        final List<IdeaHelpers.GeneratedFileData> list = new ArrayList<IdeaHelpers.GeneratedFileData>();
         final StringBuilder output_dir = new StringBuilder();
         class Error {
             public Throwable error = null;
@@ -224,37 +291,11 @@ public class UITabDAO {
                     try {
                         // !!!! after 'try'
                         IDaoCG gen = IdeaTargetLanguageHelpers.create_dao_cg(con, project, root_file, settings, output_dir);
-                        String local_abs_path = root_file.getParent().getPath();
-                        String contextPath = DaoClass.class.getPackage().getName();
-                        XmlParser xml_parser = new XmlParser(contextPath, Helpers.concat_path(local_abs_path, Const.DAO_XSD));
-                        for (int row : selectedRows) {
-                            String dao_xml_rel_path = (String) table.getValueAt(row, 0);
-                            try {
-                                ProgressManager.progress(dao_xml_rel_path);
-                                String dao_class_name = Helpers.get_dao_class_name(dao_xml_rel_path);
-                                String dao_xml_abs_path = Helpers.concat_path(local_abs_path, dao_xml_rel_path);
-                                DaoClass dao_class = xml_parser.unmarshal(dao_xml_abs_path);
-                                String[] file_content = gen.translate(dao_class_name, dao_class);
-                                IdeaTargetLanguageHelpers.prepare_generated_file_data(root_file, dao_class_name, file_content, list);
-                                table.setValueAt(Const.STATUS_GENERATED, row, 1);
-                                try {
-                                    Thread.sleep(50);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-                                // to prevent:
-                                // WARN - intellij.ide.HackyRepaintManager
-                                SwingUtilities.invokeLater(new Runnable() {
-                                    public void run() {
-                                        table.updateUI();
-                                    }
-                                });
-                            } catch (Throwable e) {
-                                String msg = e.getMessage();
-                                table.setValueAt(msg, row, 1);
-                                IdeaMessageHelpers.add_dao_error_message(settings, root_file, dao_xml_rel_path, msg);
-                                // break; // exit the loop
-                            }
+                        List<DaoClass> jaxb_dao_classes = load_sdm_dao();
+                        if (jaxb_dao_classes.size() > 0) {
+                            generate_for_sdm_xml(gen, list, settings, selectedRows, jaxb_dao_classes);
+                        } else {
+                            generate_for_dao_xml(gen, list, settings, selectedRows);
                         }
                     } finally {
                         con.close();
@@ -321,45 +362,93 @@ public class UITabDAO {
         }
     }
 
+    private void validate_by_sdm(final IDaoCG gen, final TableModel model, final Settings settings, final List<DaoClass> jaxb_dao_classes) {
+        int rc = model.getRowCount();
+        for (int i = 0; i < rc; i++) {
+            String dao_class_name = (String) model.getValueAt(i, 0);
+            try {
+                ProgressManager.progress(dao_class_name);
+                DaoClass dao_class = JaxbUtils.find_jaxb_dao_class(dao_class_name, jaxb_dao_classes);
+                String[] file_content = gen.translate(dao_class_name, dao_class);
+                StringBuilder validation_buff = new StringBuilder();
+                IdeaTargetLanguageHelpers.validate_dao(project, root_file, settings, dao_class_name, file_content, validation_buff);
+                String status = validation_buff.toString();
+                if (status.length() == 0) {
+                    model.setValueAt(Const.STATUS_OK, i, 1);
+                } else {
+                    model.setValueAt(status, i, 1);
+                    IdeaMessageHelpers.add_dao_error_message(settings, root_file, dao_class_name, status);
+                }
+            } catch (Throwable ex) {
+                // ex.printStackTrace();
+                String msg = ex.getMessage();
+                model.setValueAt(msg, i, 1);
+                IdeaMessageHelpers.add_dao_error_message(settings, root_file, dao_class_name, msg);
+            }
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    table.updateUI();
+                }
+            });
+        }
+    }
+
+    private void validate_by_xml_files(final IDaoCG gen, final TableModel model, final Settings settings) throws Exception {
+        String local_abs_path = root_file.getParent().getPath();
+        String contextPath = DaoClass.class.getPackage().getName();
+        XmlParser xml_parser = new XmlParser(contextPath, Helpers.concat_path(local_abs_path, Const.DAO_XSD));
+        // === panedrone: don't ask it in loop because of
+        // "Cannot read the array length because "<local3>" is null"
+        int rc = model.getRowCount();
+        for (int i = 0; i < rc; i++) {
+            String dao_xml_rel_path = (String) model.getValueAt(i, 0) + ".xml";
+            try {
+                ProgressManager.progress(dao_xml_rel_path);
+                String dao_class_name = Helpers.get_dao_class_name(dao_xml_rel_path);
+                String dao_xml_abs_path = Helpers.concat_path(local_abs_path, dao_xml_rel_path);
+                DaoClass dao_class = xml_parser.unmarshal(dao_xml_abs_path);
+                String[] file_content = gen.translate(dao_class_name, dao_class);
+                StringBuilder validation_buff = new StringBuilder();
+                IdeaTargetLanguageHelpers.validate_dao(project, root_file, settings, dao_class_name, file_content, validation_buff);
+                String status = validation_buff.toString();
+                if (status.length() == 0) {
+                    model.setValueAt(Const.STATUS_OK, i, 1);
+                } else {
+                    model.setValueAt(status, i, 1);
+                    IdeaMessageHelpers.add_dao_error_message(settings, root_file, dao_xml_rel_path, status);
+                }
+            } catch (Throwable ex) {
+                // ex.printStackTrace();
+                String msg = ex.getMessage();
+                model.setValueAt(msg, i, 1);
+                IdeaMessageHelpers.add_dao_error_message(settings, root_file, dao_xml_rel_path, msg);
+            }
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    table.updateUI();
+                }
+            });
+        }
+    }
+
+    private List<DaoClass> load_sdm_dao() throws Exception {
+        String sdm_folder_abs_path = root_file.getParent().getPath();
+        String sdm_xml_abs_path = Helpers.concat_path(sdm_folder_abs_path, Const.SDM_XML);
+        String sdm_xsd_abs_path = Helpers.concat_path(sdm_folder_abs_path, Const.SDM_XSD);
+        List<DaoClass> jaxb_dao_classes = SdmUtils.get_dao_classes(sdm_xml_abs_path, sdm_xsd_abs_path);
+        return jaxb_dao_classes;
+    }
+
     private void validate_sync(final IDaoCG gen, final TableModel model, final Settings settings) {
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
                 try {
-                    String local_abs_path = root_file.getParent().getPath();
-                    String contextPath = DaoClass.class.getPackage().getName();
-                    XmlParser xml_parser = new XmlParser(contextPath, Helpers.concat_path(local_abs_path, Const.DAO_XSD));
-                    // === panedrone: don't ask it in loop because of
-                    // "Cannot read the array length because "<local3>" is null"
-                    int rc = model.getRowCount();
-                    for (int i = 0; i < rc; i++) {
-                        String dao_xml_rel_path = (String) model.getValueAt(i, 0);
-                        try {
-                            ProgressManager.progress(dao_xml_rel_path);
-                            String dao_class_name = Helpers.get_dao_class_name(dao_xml_rel_path);
-                            String dao_xml_abs_path = Helpers.concat_path(local_abs_path, dao_xml_rel_path);
-                            DaoClass dao_class = xml_parser.unmarshal(dao_xml_abs_path);
-                            String[] file_content = gen.translate(dao_class_name, dao_class);
-                            StringBuilder validation_buff = new StringBuilder();
-                            IdeaTargetLanguageHelpers.validate_dao(project, root_file, settings, dao_class_name, file_content, validation_buff);
-                            String status = validation_buff.toString();
-                            if (status.length() == 0) {
-                                model.setValueAt(Const.STATUS_OK, i, 1);
-                            } else {
-                                model.setValueAt(status, i, 1);
-                                IdeaMessageHelpers.add_dao_error_message(settings, root_file, dao_xml_rel_path, status);
-                            }
-                        } catch (Throwable ex) {
-                            // ex.printStackTrace();
-                            String msg = ex.getMessage();
-                            model.setValueAt(msg, i, 1);
-                            IdeaMessageHelpers.add_dao_error_message(settings, root_file, dao_xml_rel_path, msg);
-                        }
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                table.updateUI();
-                            }
-                        });
+                    List<DaoClass> jaxb_dao_classes = load_sdm_dao();
+                    if (jaxb_dao_classes.size() > 0) {
+                        validate_by_sdm(gen, model, settings, jaxb_dao_classes);
+                    } else {
+                        validate_by_xml_files(gen, model, settings);
                     }
                 } catch (Throwable e) {
                     e.printStackTrace();
@@ -544,7 +633,7 @@ public class UITabDAO {
         }
 
         public String getColumnName(int col) {
-            return col == 0 ? "File" : "State";
+            return col == 0 ? "Class" : "State";
         }
 
         @Override
@@ -568,25 +657,35 @@ public class UITabDAO {
         }
     }
 
-    private void reload_table() {
+    private void reload_table() throws Exception {
         try {
             final ArrayList<String[]> list = my_table_model.getList();
             list.clear();
-            FileSearchHelpers.IFile_List fileList = new FileSearchHelpers.IFile_List() {
-                @Override
-                public void add(String fileName) {
+
+            List<DaoClass> jaxb_dao_classes = load_sdm_dao();
+            if (jaxb_dao_classes.size() > 0) {
+                for (DaoClass cls : jaxb_dao_classes) {
                     String[] item = new String[2];
-                    try {
-                        item[0] = fileName;
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        item[0] = e.getMessage();
-                    }
+                    item[0] = cls.getName();
+                    item[1] = "";
                     list.add(item);
                 }
-            };
-            String xml_configs_folder_full_path = root_file.getParent().getPath();
-            FileSearchHelpers.enum_dao_xml_file_names(xml_configs_folder_full_path, fileList);
+            } else {
+                FileSearchHelpers.IFile_List fileList = new FileSearchHelpers.IFile_List() {
+                    @Override
+                    public void add(String fileName) {
+                        String[] item = new String[2];
+                        try {
+                            item[0] = fileName.replace(".xml", "");
+                        } catch (Exception e) {
+                            item[0] = e.getMessage();
+                        }
+                        list.add(item);
+                    }
+                };
+                String xml_configs_folder_full_path = root_file.getParent().getPath();
+                FileSearchHelpers.enum_dao_xml_file_names(xml_configs_folder_full_path, fileList);
+            }
         } finally {
             my_table_model.refresh(); // // table.updateUI();
         }

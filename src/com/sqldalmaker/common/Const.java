@@ -12,13 +12,13 @@ package com.sqldalmaker.common;
 public class Const {
 
     public static final String DAO_XSD = "dao.xsd";
-    public static final String DTO_XSD = "dto.xsd";
+    public static final String SDM_XSD = "sdm.xsd";
 
     public static final String SETTINGS_XML = "settings.xml";
     public static final String SETTINGS_XSD = "settings.xsd";
 
     public static final String EMPTY_DAO_XML = "dao.xml";
-    public static final String DTO_XML = "dto.xml";
+    public static final String SDM_XML = "sdm.xml";
 
     public static final String STATUS_OK = "OK";
     public static final String STATUS_GENERATED = "Generated successfully";

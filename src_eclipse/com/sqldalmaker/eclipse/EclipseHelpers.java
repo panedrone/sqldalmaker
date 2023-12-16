@@ -30,7 +30,8 @@ import org.osgi.framework.Version;
 import com.sqldalmaker.cg.Helpers;
 import com.sqldalmaker.common.InternalException;
 import com.sqldalmaker.common.SdmUtils;
-import com.sqldalmaker.jaxb.dto.DtoClass;
+import com.sqldalmaker.jaxb.sdm.DtoClass;
+import com.sqldalmaker.jaxb.sdm.ObjectFactory;
 import com.sqldalmaker.jaxb.settings.Settings;
 
 /**
@@ -41,7 +42,7 @@ import com.sqldalmaker.jaxb.settings.Settings;
 public class EclipseHelpers {
 
 	public static Settings load_settings(IEditor2 ed) throws Exception {
-		String xml_mp_folder_abs_path = ed.get_metaprogram_folder_abs_path();
+		String xml_mp_folder_abs_path = ed.get_sdm_folder_abs_path();
 		return SdmUtils.load_settings(xml_mp_folder_abs_path);
 	}
 
@@ -65,7 +66,7 @@ public class EclipseHelpers {
 	}
 
 	public static void refresh_metaprogram_folder(IEditor2 editor2) throws Exception {
-		String rel_dir_path = editor2.get_metaprogram_folder_path_relative_to_project();
+		String rel_dir_path = editor2.get_sdm_folder_path_relative_to_project();
 		EclipseHelpers.refresh_project_folder(editor2.get_project(), rel_dir_path);
 	}
 
@@ -170,7 +171,7 @@ public class EclipseHelpers {
 		}
 	}
 
-	public static void gen_tmp_field_tags(Connection connection, com.sqldalmaker.jaxb.dto.ObjectFactory object_factory,
+	public static void gen_tmp_field_tags(Connection connection, ObjectFactory object_factory,
 			DtoClass dto_class, String project_root, IEditor2 editor2) throws Exception {
 		Settings settings = load_settings(editor2);
 		String sql_root_abs_path = project_root + "/" + settings.getFolders().getSql();

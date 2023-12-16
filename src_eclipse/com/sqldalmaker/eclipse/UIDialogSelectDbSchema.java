@@ -1,8 +1,8 @@
 /*
- * Copyright 2011-2018 sqldalmaker@gmail.com
- * SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
- * Read LICENSE.txt in the root of this project/archive for details.
- */
+	Copyright 2011-2023 sqldalmaker@gmail.com
+	Read LICENSE.txt in the root of this project/archive.
+	Project web-site: https://sqldalmaker.sourceforge.net/
+*/
 package com.sqldalmaker.eclipse;
 
 import java.sql.Connection;
@@ -121,7 +121,7 @@ public class UIDialogSelectDbSchema extends TitleAreaDialog {
 				open_mode);
 
 		dlg.schema_names = schema_names;
-		dlg.sdm_folder_abs_path = editor2.get_metaprogram_folder_abs_path();
+		dlg.sdm_folder_abs_path = editor2.get_sdm_folder_abs_path();
 
 		if (dlg.open() == IDialogConstants.OK_ID) {
 

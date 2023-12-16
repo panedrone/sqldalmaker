@@ -84,7 +84,7 @@
                     </constraints>
                     <properties>
                       <selected value="true"/>
-                      <text value="Omit DTO that are already declared in 'dto.xml'" noi18n="true"/>
+                      <text value="Omit DTO that are already declared" noi18n="true"/>
                     </properties>
                   </component>
                   <component id="efa9a" class="javax.swing.JCheckBox" binding="chk_singular">

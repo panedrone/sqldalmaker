@@ -22,8 +22,8 @@ public class IdeaMetaProgramInitHelpers {
                 IdeaHelpers.run_write_action_to_save_text_file(root_file, Const.DAO_XSD, text);
             }
             {
-                String text = IdeaHelpers.read_from_jar_file(Const.DTO_XSD);
-                IdeaHelpers.run_write_action_to_save_text_file(root_file, Const.DTO_XSD, text);
+                String text = IdeaHelpers.read_from_jar_file(Const.SDM_XSD);
+                IdeaHelpers.run_write_action_to_save_text_file(root_file, Const.SDM_XSD, text);
             }
             {
                 String text = IdeaHelpers.read_from_jar_file(Const.SETTINGS_XSD);
@@ -47,8 +47,8 @@ public class IdeaMetaProgramInitHelpers {
 
     public static void create_dto_xml(VirtualFile root_file) {
         try {
-            String text = IdeaHelpers.read_from_jar_file(Const.DTO_XML);
-            IdeaHelpers.run_write_action_to_save_text_file(root_file, Const.DTO_XML, text);
+            String text = IdeaHelpers.read_from_jar_file(Const.SDM_XML);
+            IdeaHelpers.run_write_action_to_save_text_file(root_file, Const.SDM_XML, text);
         } catch (Throwable e) {
             e.printStackTrace();
             IdeaMessageHelpers.show_error_in_ui_thread(e);

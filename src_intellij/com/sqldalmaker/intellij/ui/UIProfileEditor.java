@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2021 sqldalmaker@gmail.com
+    Copyright 2011-2023 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -7,6 +7,7 @@ package com.sqldalmaker.intellij.ui;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.sqldalmaker.common.Const;
 
 import javax.swing.*;
 import java.awt.*;
@@ -130,6 +131,18 @@ public class UIProfileEditor {
             tabAdmin.setProject(project);
             tabAdmin.setFile(root_file);
             tabAdmin.init_runtime();
+
+            boolean need_migrate = false;
+            VirtualFile sdm_xml = root_file.getParent().findChild(Const.SDM_XML);
+            if (sdm_xml == null) {
+                VirtualFile dto_xml = root_file.getParent().findChild("dto.xml");
+                if (dto_xml != null) {
+                    need_migrate = true;
+                    openAdmin();
+                }
+            }
+            tabAdmin.set_need_migrate_warning(need_migrate);
+
         } catch (Exception e) {
             e.printStackTrace();
             IdeaMessageHelpers.show_error_in_ui_thread(e);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2020 sqldalmaker@gmail.com
+ * Copyright 2011-2023 sqldalmaker@gmail.com
  * SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
  * Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -41,7 +41,7 @@ public class PsiReferenceSql extends PsiReferenceBase<PsiElement> {
             return null;
         }
         String file_name = containing_file.getName();
-        if (!FileSearchHelpers.is_dto_xml(file_name) && ! FileSearchHelpers.is_dao_xml(file_name)) {
+        if (!FileSearchHelpers.is_sdm_xml(file_name) && ! FileSearchHelpers.is_dao_xml(file_name)) {
             return null;
         }
         String canonical_text = getCanonicalText(); // @NotNull
@@ -104,7 +104,7 @@ public class PsiReferenceSql extends PsiReferenceBase<PsiElement> {
         if (canonical_text.trim().length() == 0) {
             return true; // ref is empty
         }
-        if (FileSearchHelpers.is_dto_xml(file_name)) {
+        if (FileSearchHelpers.is_sdm_xml(file_name)) {
             if (SqlUtils.is_sql_file_ref_base(canonical_text)) {
                 return false;
             }

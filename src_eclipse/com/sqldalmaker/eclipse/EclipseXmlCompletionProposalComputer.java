@@ -1,5 +1,5 @@
 /*
-	Copyright 2011-2022 sqldalmaker@gmail.com
+	Copyright 2011-2023 sqldalmaker@gmail.com
 	Read LICENSE.txt in the root of this project/archive.
 	Project web-site: https://sqldalmaker.sourceforge.net/
 */
@@ -68,7 +68,7 @@ public class EclipseXmlCompletionProposalComputer implements ICompletionProposal
 			if (this_xml_file == null) {
 				return NONE;
 			}
-			boolean dto_xml = FileSearchHelpers.is_dto_xml(this_xml_file.getName());
+			boolean dto_xml = FileSearchHelpers.is_sdm_xml(this_xml_file.getName());
 			boolean dao_xml = FileSearchHelpers.is_dao_xml(this_xml_file.getName());
 			if (!dto_xml && !dao_xml) {
 				return NONE;
@@ -126,7 +126,7 @@ public class EclipseXmlCompletionProposalComputer implements ICompletionProposal
 			} else if (dao_xml) {
 				if (EclipseXmlAttrHelpers.is_value_of("dto", attr_offset, text)) {
 					IContainer metaprogram_folder = this_xml_file.getParent();
-					IResource res = metaprogram_folder.findMember(Const.DTO_XML);
+					IResource res = metaprogram_folder.findMember(Const.SDM_XML);
 					if (!(res instanceof IFile)) {
 						return NONE;
 					}
@@ -144,7 +144,7 @@ public class EclipseXmlCompletionProposalComputer implements ICompletionProposal
 					return prop_list;
 				} else if (EclipseXmlAttrHelpers.is_value_of("table", attr_offset, text)) {
 					IContainer metaprogram_folder = this_xml_file.getParent();
-					IResource res = metaprogram_folder.findMember(Const.DTO_XML);
+					IResource res = metaprogram_folder.findMember(Const.SDM_XML);
 					if (!(res instanceof IFile)) {
 						return NONE;
 					}

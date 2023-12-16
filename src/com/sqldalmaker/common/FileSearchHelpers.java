@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2022 sqldalmaker@gmail.com
+    Copyright 2011-2023 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -16,15 +16,15 @@ public class FileSearchHelpers {
         void add(String fileName);
     }
 
-    public static boolean is_dto_xml(String name) {
-        return name != null && name.equals(Const.DTO_XML);
+    public static boolean is_sdm_xml(String name) {
+        return name != null && name.equals(Const.SDM_XML);
     }
 
     public static boolean is_dao_xml(String name) {
         if (name == null) {
             return false;
         }
-        if (is_dto_xml(name)) {
+        if (is_sdm_xml(name)) {
             return false;
         }
         if (is_setting_xml(name)) {

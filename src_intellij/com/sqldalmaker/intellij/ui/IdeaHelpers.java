@@ -395,14 +395,33 @@ public class IdeaHelpers {
         if (xml_file_dir == null) {
             throw new Exception("Cannot get parent folder for " + root_file.getName());
         }
-        VirtualFile dto_xml_file = xml_file_dir.findFileByRelativePath(Const.DTO_XML);
-        if (dto_xml_file == null) {
-            throw new Exception(Const.DTO_XML + " not found");
+        VirtualFile sdm_xml_file = xml_file_dir.findFileByRelativePath(Const.SDM_XML);
+        if (sdm_xml_file == null) {
+            throw new Exception(Const.SDM_XML + " not found");
         }
-        PsiElement psi_element = IdeaReferenceCompletion.find_dto_class_xml_tag(project, dto_xml_file, dto_class_name);
+        PsiElement psi_element = IdeaReferenceCompletion.find_dto_class_xml_tag(project, sdm_xml_file, dto_class_name);
         if (psi_element == null) {
             throw new Exception(dto_class_name + ": declaration not found");
         }
         navigate_to_source(project, psi_element);
+    }
+
+    public static boolean navigate_to_dao_class_declaration(@NotNull Project project,
+                                                            @NotNull VirtualFile root_file,
+                                                            @NotNull String dao_class_name) {
+        VirtualFile xml_file_dir = root_file.getParent();
+        if (xml_file_dir == null) {
+            return false;
+        }
+        VirtualFile sdm_xml_file = xml_file_dir.findFileByRelativePath(Const.SDM_XML);
+        if (sdm_xml_file == null) {
+            return false;
+        }
+        PsiElement psi_element = IdeaReferenceCompletion.find_dao_class_xml_tag(project, sdm_xml_file, dao_class_name);
+        if (psi_element == null) {
+            return false;
+        }
+        navigate_to_source(project, psi_element);
+        return true;
     }
 }

@@ -92,6 +92,8 @@ public class UITabAdmin {
     private JButton aboutButton;
     private JButton btn_sqlx_xml;
     private JButton btn_sqlx;
+    private JTextPane text1;
+    private JPanel pnl_migrate;
 
     private Project project;
     private VirtualFile root_file;
@@ -188,7 +190,7 @@ public class UITabAdmin {
         btn_validate_all.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                validate_all();
+                validate_config();
             }
         });
         php_vm.addActionListener(new ActionListener() {
@@ -468,7 +470,18 @@ public class UITabAdmin {
         return ex.getClass().getName() + " -> " + ex.getMessage(); // printStackTrace();
     }
 
-    private void validate_all() {
+    private void validate_config() {
+
+        boolean need_migrate = false;
+        VirtualFile sdm_xml = root_file.getParent().findChild(Const.SDM_XML);
+        if (sdm_xml == null) {
+            VirtualFile dto_xml = root_file.getParent().findChild("dto.xml");
+            if (dto_xml != null) {
+                need_migrate = true;
+            }
+        }
+        set_need_migrate_warning(need_migrate);
+
         StringBuilder buff = new StringBuilder();
         Settings sett = null;
         if (check_xsd(buff, Const.SETTINGS_XSD)) {
@@ -481,7 +494,7 @@ public class UITabAdmin {
         } else {
             add_err_msg(buff, "Cannot load " + Const.SETTINGS_XML + " because of invalid " + Const.SETTINGS_XSD);
         }
-        check_xsd(buff, Const.DTO_XSD);
+        check_xsd(buff, Const.SDM_XSD);
         check_xsd(buff, Const.DAO_XSD);
         if (sett == null) {
             add_err_msg(buff, "Test connection -> failed because of invalid settings");
@@ -1036,7 +1049,8 @@ public class UITabAdmin {
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 1;
-        gbc.fill = GridBagConstraints.BOTH;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.VERTICAL;
         panel2.add(pnl_xsd, gbc);
         createOverwriteXSDFilesButton = new JButton();
         createOverwriteXSDFilesButton.setText("Create/Overwrite XSD files");
@@ -1047,13 +1061,13 @@ public class UITabAdmin {
         createOverwriteSettingsXmlButton = new JButton();
         createOverwriteSettingsXmlButton.setText("Create settings.xml");
         gbc = new GridBagConstraints();
-        gbc.gridx = 1;
+        gbc.gridx = 2;
         gbc.gridy = 0;
         pnl_xsd.add(createOverwriteSettingsXmlButton, gbc);
         createOverwriteDtoXmlButton = new JButton();
-        createOverwriteDtoXmlButton.setText("Create dto.xml");
+        createOverwriteDtoXmlButton.setText("Create sdm.xml");
         gbc = new GridBagConstraints();
-        gbc.gridx = 2;
+        gbc.gridx = 1;
         gbc.gridy = 0;
         pnl_xsd.add(createOverwriteDtoXmlButton, gbc);
         pnl_cpp = new JPanel();
@@ -1111,6 +1125,19 @@ public class UITabAdmin {
         gbc.gridx = 4;
         gbc.gridy = 0;
         pnl_cpp.add(btn_cpp, gbc);
+        pnl_migrate = new JPanel();
+        pnl_migrate.setLayout(new BorderLayout(0, 0));
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 8;
+        gbc.fill = GridBagConstraints.BOTH;
+        panel2.add(pnl_migrate, gbc);
+        text1 = new JTextPane();
+        text1.setEditable(false);
+        text1.setMargin(new Insets(0, 15, 15, 15));
+        text1.setText("\nStarting from v1.292, use \"sdm.xml\" instead of \"dto.xml\".\n\nHow to migrate:\n\n1. Click \"Create/Overwrite XSD files\"\n2. Click \"Create sdm.xml\"\n3. Copy-paste internal text from \"dto.xml\",<dto-classes>... to \"sdm.xml\",<sdm>...\n4. Delete \"dto.xml\" and \"dto.xsd\".\n5. Click \"Validate Configuration\". Done.\n\nWhere to declare DAO classes with v1.292+:\n\n- \"option 1\": separate XML files like in prev. versions of the plugin\n- \"option 2\": tags \"<dao-class...\" in \"sdm.xml\"\n\nOnce you start using \"option 2\" then \"option 1\" becomes ignored.\n");
+        text1.setVisible(true);
+        pnl_migrate.add(text1, BorderLayout.CENTER);
     }
 
     /**
@@ -1142,4 +1169,7 @@ public class UITabAdmin {
         return rootPanel;
     }
 
+    public void set_need_migrate_warning(boolean needMigrate) {
+        pnl_migrate.setVisible(needMigrate);
+    }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2021 sqldalmaker@gmail.com
+ * Copyright 2011-2023 sqldalmaker@gmail.com
  * Read LICENSE.txt in the root of this project/archive.
  * Project web-site: https://sqldalmaker.sourceforge.net/
  */
@@ -11,8 +11,8 @@ import com.sqldalmaker.cg.FieldNamesMode;
 import com.sqldalmaker.cg.Helpers;
 import com.sqldalmaker.common.*;
 import com.sqldalmaker.common.FileSearchHelpers.IFile_List;
-import com.sqldalmaker.jaxb.dao.DaoClass;
-import com.sqldalmaker.jaxb.dto.DtoClasses;
+import com.sqldalmaker.jaxb.sdm.DaoClass;
+import com.sqldalmaker.jaxb.sdm.Sdm;
 import com.sqldalmaker.jaxb.settings.Settings;
 
 import java.sql.Connection;
@@ -41,8 +41,8 @@ public class IdeaCrudXmlHelpers {
                                    boolean plural_to_singular, boolean crud_auto, boolean add_fk_access) {
                 try {
                     Settings settings = IdeaHelpers.load_settings(root_file);
-                    com.sqldalmaker.jaxb.dto.ObjectFactory object_factory = new com.sqldalmaker.jaxb.dto.ObjectFactory();
-                    DtoClasses root;
+                    com.sqldalmaker.jaxb.sdm.ObjectFactory object_factory = new com.sqldalmaker.jaxb.sdm.ObjectFactory();
+                    Sdm root;
                     Connection connection = IdeaHelpers.get_connection(project, settings);
                     try {
                         Set<String> in_use; // !!!! after 'try'
@@ -74,8 +74,8 @@ public class IdeaCrudXmlHelpers {
     private static Set<String> find_dto_declared_in_dto_xml(VirtualFile root_file) throws Exception {
 
         String xml_configs_folder_full_path = root_file.getParent().getPath();
-        String dto_xml_abs_file_path = Helpers.concat_path(xml_configs_folder_full_path, Const.DTO_XML);
-        String dto_xsd_abs_file_path = Helpers.concat_path(xml_configs_folder_full_path, Const.DTO_XSD);
+        String dto_xml_abs_file_path = Helpers.concat_path(xml_configs_folder_full_path, Const.SDM_XML);
+        String dto_xsd_abs_file_path = Helpers.concat_path(xml_configs_folder_full_path, Const.SDM_XSD);
         Set<String> res = SdmUtils.get_dto_class_names_used_in_dto_xml(dto_xml_abs_file_path, dto_xsd_abs_file_path);
         return res;
     }
@@ -133,7 +133,7 @@ public class IdeaCrudXmlHelpers {
                     Settings settings = IdeaHelpers.load_settings(root_file);
                     FieldNamesMode field_names_mode = get_field_names_mode(root_file, settings);
                     Connection connection = IdeaHelpers.get_connection(project, settings);
-                    com.sqldalmaker.jaxb.dao.ObjectFactory object_factory = new com.sqldalmaker.jaxb.dao.ObjectFactory();
+                    com.sqldalmaker.jaxb.sdm.ObjectFactory object_factory = new com.sqldalmaker.jaxb.sdm.ObjectFactory();
                     DaoClass root;
                     try {
                         Set<String> in_use; // !!!! after 'try'
@@ -171,7 +171,7 @@ public class IdeaCrudXmlHelpers {
             public void process_ok(boolean schema_in_xml, String selected_schema, boolean skip_used, boolean include_views,
                                    boolean plural_to_singular, boolean crud_auto, boolean add_fk_access) {
                 try {
-                    com.sqldalmaker.jaxb.dao.ObjectFactory object_factory = new com.sqldalmaker.jaxb.dao.ObjectFactory();
+                    com.sqldalmaker.jaxb.sdm.ObjectFactory object_factory = new com.sqldalmaker.jaxb.sdm.ObjectFactory();
                     DaoClass root;
                     Settings settings = IdeaHelpers.load_settings(root_file);
                     FieldNamesMode field_names_mode = get_field_names_mode(root_file, settings);

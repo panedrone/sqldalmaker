@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2022 sqldalmaker@gmail.com
+    Copyright 2011-2023 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -58,8 +58,14 @@ public class PsiReferenceDtoClassProvider extends PsiReferenceProvider {
                 return new PsiReference[]{new PsiReferenceDtoClass(element/*, element.getTextRange()*/)};
 //                    }
             }
-        } else if (FileSearchHelpers.is_dto_xml(file_name)) {
-            if (IdeaReferenceCompletion.ATTRIBUTE.NAME.equals(attr_name)) {
+        } else if (FileSearchHelpers.is_sdm_xml(file_name)) {
+            if (IdeaReferenceCompletion.ATTRIBUTE.DTO.equals(attr_name)) {
+//                    final String parent_tag_name = ((XmlTag) parent_tag).getName();
+//                    if (dao_tag_names.contains(parent_tag_name)) {
+                return new PsiReference[]{new PsiReferenceDtoClass(element/*, element.getTextRange()*/)};
+//                    }
+            }
+            else if (IdeaReferenceCompletion.ATTRIBUTE.NAME.equals(attr_name)) {
 //                    final String parent_tag_name = ((XmlTag) parent_tag).getName();
 //                    if (dao_tag_names.contains(parent_tag_name)) {
                 return new PsiReference[]{new PsiReferenceDtoClass(element/*, element.getTextRange()*/)};

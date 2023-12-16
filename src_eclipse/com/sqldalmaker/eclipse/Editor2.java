@@ -1,8 +1,8 @@
 /*
- * Copyright 2011-2022 sqldalmaker@gmail.com
- * SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
- * Read LICENSE.txt in the root of this project/archive for details.
- */
+	Copyright 2011-2023 sqldalmaker@gmail.com
+	Read LICENSE.txt in the root of this project/archive.
+	Project web-site: https://sqldalmaker.sourceforge.net/
+*/
 package com.sqldalmaker.eclipse;
 
 import org.eclipse.core.resources.IContainer;
@@ -134,18 +134,18 @@ public class Editor2 extends EditorPart implements IEditor2 {
 	}
 
 	@Override
-	public IFile find_dto_xml() {
-		return find_metaprogram_file(Const.DTO_XML);
+	public IFile find_sdm_xml() {
+		return find_metaprogram_file(Const.SDM_XML);
 	}
 
 	@Override
 	public String get_dto_xml_abs_path() throws Exception {
-		return get_metaprogram_file_abs_path(Const.DTO_XML);
+		return get_metaprogram_file_abs_path(Const.SDM_XML);
 	}
 
 	@Override
 	public String get_dto_xsd_abs_path() throws Exception {
-		return get_metaprogram_file_abs_path(Const.DTO_XSD);
+		return get_metaprogram_file_abs_path(Const.SDM_XSD);
 	}
 
 	@Override
@@ -155,7 +155,7 @@ public class Editor2 extends EditorPart implements IEditor2 {
 
 	@Override
 	public IFile find_metaprogram_file(String name) {
-		Object member = get_metaprogram_folder().findMember(name);
+		Object member = get_sdm_folder().findMember(name);
 		IFile res = (IFile) member;
 		return res;
 	}
@@ -163,7 +163,7 @@ public class Editor2 extends EditorPart implements IEditor2 {
 	@Override
 	public String get_metaprogram_file_abs_path(String name) throws Exception {
 
-		IContainer res = get_metaprogram_folder();
+		IContainer res = get_sdm_folder();
 
 		return get_abs_path(res) + "/" + name;
 	}
@@ -184,9 +184,9 @@ public class Editor2 extends EditorPart implements IEditor2 {
 	}
 
 	@Override
-	public String get_metaprogram_folder_path_relative_to_project() throws Exception {
+	public String get_sdm_folder_path_relative_to_project() throws Exception {
 
-		IContainer res = get_metaprogram_folder();
+		IContainer res = get_sdm_folder();
 
 		if (res == null) {
 
@@ -204,7 +204,7 @@ public class Editor2 extends EditorPart implements IEditor2 {
 	}
 
 	@Override
-	public IContainer get_metaprogram_folder() {
+	public IContainer get_sdm_folder() {
 
 		IContainer parent = config_file.getParent();
 
@@ -212,9 +212,9 @@ public class Editor2 extends EditorPart implements IEditor2 {
 	}
 
 	@Override
-	public String get_metaprogram_folder_abs_path() throws Exception {
+	public String get_sdm_folder_abs_path() throws Exception {
 
-		IContainer res = get_metaprogram_folder();
+		IContainer res = get_sdm_folder();
 
 		if (res == null) {
 
@@ -229,9 +229,20 @@ public class Editor2 extends EditorPart implements IEditor2 {
 	private Composite container;
 
 	private final FormToolkit formToolkit = new FormToolkit(Display.getDefault());
+	private Hyperlink hprlnkDto;
 	private Hyperlink hprlnkDao;
 	private Hyperlink hprlnkAdmin;
 	private Composite composite_toolbar;
+
+	private void openAdmin() {
+		StackLayout layout = (StackLayout) composite_tabs.getLayout();
+		layout.topControl = editor_page_admin;
+		composite_tabs.layout(true);
+
+		hprlnkDto.setUnderlined(false);
+		hprlnkDao.setUnderlined(false);
+		hprlnkAdmin.setUnderlined(true);
+	}
 
 	@Override
 	public void createPartControl(Composite parent) {
@@ -243,7 +254,7 @@ public class Editor2 extends EditorPart implements IEditor2 {
 		buttons = new Composite(container, SWT.NONE);
 		buttons.setLayout(new GridLayout(4, false));
 
-		final Hyperlink hprlnkDto = formToolkit.createHyperlink(buttons, "DTO", SWT.NONE);
+		hprlnkDto = formToolkit.createHyperlink(buttons, "DTO", SWT.NONE);
 		hprlnkDto.setForeground(SWTResourceManager.getColor(51, 102, 153));
 		hprlnkDto.addHyperlinkListener(new IHyperlinkListener() {
 			public void linkActivated(HyperlinkEvent e) {
@@ -286,18 +297,12 @@ public class Editor2 extends EditorPart implements IEditor2 {
 		});
 		hprlnkDao.setUnderlined(false);
 		formToolkit.paintBordersFor(hprlnkDao);
-		
+
 		hprlnkAdmin = formToolkit.createHyperlink(buttons, "Admin", SWT.NONE);
 		hprlnkAdmin.setForeground(SWTResourceManager.getColor(51, 102, 153));
 		hprlnkAdmin.addHyperlinkListener(new IHyperlinkListener() {
 			public void linkActivated(HyperlinkEvent e) {
-				StackLayout layout = (StackLayout) composite_tabs.getLayout();
-				layout.topControl = editor_page_admin;
-				composite_tabs.layout(true);
-
-				hprlnkDto.setUnderlined(false);
-				hprlnkDao.setUnderlined(false);
-				hprlnkAdmin.setUnderlined(true);
+				openAdmin();
 			}
 
 			public void linkEntered(HyperlinkEvent e) {
@@ -332,6 +337,16 @@ public class Editor2 extends EditorPart implements IEditor2 {
 				editor_page_dao.reload_table(false);
 				// editorPageQueries.reloadTable(false);
 				// editorPageConfiguration.loadDataInUIThreadSync();
+				boolean need_migrate = false;
+				IFile sdm_xml = find_metaprogram_file(Const.SDM_XML);
+				if (sdm_xml == null) {
+					IFile dto_xml = find_metaprogram_file("dto.xml");
+					if (dto_xml != null) {
+						need_migrate = true;
+					}
+					openAdmin();
+				}
+				editor_page_admin.set_need_migrate_warning(need_migrate);
 			}
 		});
 

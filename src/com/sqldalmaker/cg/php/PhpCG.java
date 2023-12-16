@@ -1,14 +1,13 @@
 /*
-    Copyright 2011-2022 sqldalmaker@gmail.com
+    Copyright 2011-2023 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
 package com.sqldalmaker.cg.php;
 
 import com.sqldalmaker.cg.*;
-import com.sqldalmaker.jaxb.dao.*;
-import com.sqldalmaker.jaxb.dto.DtoClass;
-import com.sqldalmaker.jaxb.dto.DtoClasses;
+import com.sqldalmaker.jaxb.sdm.*;
+import com.sqldalmaker.jaxb.sdm.DtoClass;
 import com.sqldalmaker.jaxb.settings.Settings;
 
 import java.io.StringWriter;
@@ -29,19 +28,19 @@ public class PhpCG {
     public static class DTO implements IDtoCG {
 
         private final String sql_root_abs_path;
-        private final DtoClasses jaxb_dto_classes;
+        private final List<DtoClass> jaxb_dto_classes;
         private final TemplateEngine te;
         private final JdbcUtils db_utils;
         private final Settings jaxb_settings;
 
-        public DTO(DtoClasses jaxb_dto_classes,
+        public DTO(Sdm sdm,
                    Settings jaxb_settings,
                    Connection connection,
                    String sql_root_abs_path,
                    String vm_template,
                    FieldNamesMode field_names_mode) throws Exception {
 
-            this.jaxb_dto_classes = jaxb_dto_classes;
+            this.jaxb_dto_classes = sdm.getDtoClass();
             this.jaxb_settings = jaxb_settings;
             this.sql_root_abs_path = sql_root_abs_path;
             if (vm_template == null) {
@@ -94,7 +93,7 @@ public class PhpCG {
     public static class DAO implements IDaoCG {
 
         private final String sql_root_abs_path;
-        private final DtoClasses jaxb_dto_classes;
+        private final List<DtoClass> jaxb_dto_classes;
         private final Set<String> imports = new HashSet<String>();
         private final Set<String> uses = new HashSet<String>();
         private final TemplateEngine te;
@@ -102,7 +101,7 @@ public class PhpCG {
         private final Settings jaxb_settings;
         private String model = "";
 
-        public DAO(DtoClasses jaxb_dto_classes,
+        public DAO(List<DtoClass> jaxb_dto_classes,
                    Settings jaxb_settings,
                    Connection connection,
                    String sql_root_abs_path,

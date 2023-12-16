@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sdm xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:noNamespaceSchemaLocation="sdm.xsd">
+
+<!--    <dto-class name="Task" ref="tasks"/>-->
+
+<!--    <dao-class name="TaskDao">-->
+<!--        <crud dto="Task"/>-->
+<!--    </dao-class>-->
+
+</sdm>

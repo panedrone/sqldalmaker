@@ -90,6 +90,7 @@ public class SdmActionGroup extends ActionGroup implements AlwaysVisibleActionGr
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
                 IdeaCG.generate_all_dto(project, xml_file);
+                IdeaCG.generate_all_sdm_dao(project, xml_file);
             }
         };
         drop_down_actions_list.add(action_generate);
@@ -97,6 +98,7 @@ public class SdmActionGroup extends ActionGroup implements AlwaysVisibleActionGr
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
                 IdeaCG.validate_all_dto(project, xml_file);
+                IdeaCG.validate_all_sdm_dao(project, xml_file);
             }
         };
         drop_down_actions_list.add(action_validate);
@@ -173,12 +175,12 @@ public class SdmActionGroup extends ActionGroup implements AlwaysVisibleActionGr
         }
         VirtualFile root_file = root_files.get(0);
         String name = xml_file.getName();
-        if (FileSearchHelpers.is_dto_xml(name)) {
+        if (FileSearchHelpers.is_sdm_xml(name)) {
             add_dto_actions(project, drop_down_actions_list, xml_file);
         } else if (FileSearchHelpers.is_dao_xml(name)) {
             add_dao_actions(project, drop_down_actions_list, xml_file);
         }
-        if (FileSearchHelpers.is_dto_xml(name) || FileSearchHelpers.is_dao_xml(name)) {
+        if (FileSearchHelpers.is_sdm_xml(name) || FileSearchHelpers.is_dao_xml(name)) {
             String root_file_rel_path = IdeaHelpers.get_relative_path(project, root_file);
             SdmAction action = new SdmAction(root_file_rel_path) {
                 @Override
