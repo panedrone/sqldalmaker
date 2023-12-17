@@ -45,7 +45,7 @@ public class PsiReferenceSqlProvider extends PsiReferenceProvider {
                 final String attr_name = ((XmlAttribute) attr_element).getName();
                 if (IdeaReferenceCompletion.ATTRIBUTE.REF.equals(attr_name)) {
                     PsiElement parent_tag = attr_element.getParent();
-                    if (parent_tag instanceof XmlTag) {
+                    if (parent_tag != null) {
                         final String tag_name = ((XmlTag) parent_tag).getName();
                         if (dao_tag_names.contains(tag_name)) {
                             return new PsiReference[]{new PsiReferenceSql(element/*, element.getTextRange()*/)};
