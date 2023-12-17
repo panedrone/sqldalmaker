@@ -9,12 +9,16 @@ import java.io.IOException;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionReferences;
+import org.openide.cookies.OpenCookie;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.MIMEResolver;
 import org.openide.loaders.DataObject;
 import org.openide.loaders.DataObjectExistsException;
 import org.openide.loaders.MultiDataObject;
 import org.openide.loaders.MultiFileLoader;
+import org.openide.nodes.CookieSet;
+import org.openide.nodes.Node;
+import org.openide.util.Lookup;
 import org.openide.util.NbBundle.Messages;
 
 /**
@@ -88,20 +92,61 @@ import org.openide.util.NbBundle.Messages;
             position = 1400
     )
 })
-public class SdmDataObject extends MultiDataObject {
+public class SdmDataObject extends MultiDataObject { // implements OpenCookie {
 
     public SdmDataObject(FileObject pf, MultiFileLoader loader) throws DataObjectExistsException, IOException {
         super(pf, loader);
         registerEditor("text/sqldalmaker+dal", true);
+        // === panedrone: seems that SdmDataObject is a singleton, so constructor is called only once.
+        // to process separate "open", use this 
+        // https://netbeans.apache.org/wiki/main/wiki/DevFaqEditorTopComponent/
+        // super.getCookieSet().add(new MySdmOpenCookie());
+        // BUT it is much simpler to "implements OpenCookie"
+        // because it works for both:
+        // - double-click/enter on *.dal" file in file tree
+        // - opening like in NbpIdeEditorHelpers.open_in_editor_async:
+        //        DataObjectataObject obj = DataObject.find(file);
+        //        obj.getLookup().lookup(OpenCookie.class).open()
     }
 
-    @Override
-    protected int associateLookup() {
-        return 1;
-    }
+//    @Override
+//    public <T extends Node.Cookie> T getCookie(Class<T> type) {
+//        // just to check who calls
+//        T res = super.getCookie(type);
+//        if (type == OpenCookie.class) { //  repeats unpredictable amount of times
+//            NbpIdeMessageHelpers.show_info_in_ui_thread("want OpenCookie.class");
+//        }
+//        return res;
+//    }
+//    @Override
+//    public void open() {
+//        NbpIdeMessageHelpers.show_info_in_ui_thread("SdmDataObject.OpenCookie.open");
+//        
+//        super.getLookup().lookup(OpenCookie.class).open();
+//    }
 
+    // === panedrone: copy-pasted from here:
+    // https://netbeans.apache.org/wiki/main/wiki/DevFaqEditorTopComponent/
+//    private class MySdmOpenCookie implements OpenCookie {
+//
+//        @Override
+//        public void open() {
+//            NbpIdeMessageHelpers.show_info_in_ui_thread("Opener.open");
+//        }
+//    }
+
+//    @Override
+//    public Lookup getLookup() {
+//        // === panedrone: copy-pasted from here:
+//        // https://netbeans.apache.org/wiki/main/wiki/DevFaqEditorTopComponent/
+//        return getCookieSet().getLookup();
+//    }
+//    @Override
+//    protected int associateLookup() {
+//        int baseRes = super.associateLookup();
+//        return 1;
+//    }
     // === panedrone: no need to edit this file :)
-    
 //    @MultiViewElement.Registration(
 //            displayName = "#LBL_Sdm_EDITOR",
 //            iconBase = "com/sqldalmaker/netbeans/sqldalmaker.gif",
@@ -114,5 +159,4 @@ public class SdmDataObject extends MultiDataObject {
 //    public static MultiViewEditorElement createEditor(Lookup lkp) {
 //        return new MultiViewEditorElement(lkp);
 //    }
-
 }

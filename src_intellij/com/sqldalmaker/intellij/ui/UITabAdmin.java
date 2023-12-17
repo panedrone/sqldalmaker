@@ -146,9 +146,7 @@ public class UITabAdmin {
         createOverwriteXSDFilesButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int dialogResult = JOptionPane.showConfirmDialog(null,
-                        "This action creates/overwrites XSD files in the folder of XML meta-program. Continue?",
-                        "Warning", JOptionPane.YES_NO_OPTION);
+                int dialogResult = JOptionPane.showConfirmDialog(null, "Create/overwrite xsd files?", "Warning", JOptionPane.YES_NO_OPTION);
                 if (dialogResult == JOptionPane.YES_OPTION) {
                     IdeaMetaProgramInitHelpers.create_xsd(root_file);
                 }
@@ -157,8 +155,7 @@ public class UITabAdmin {
         createOverwriteSettingsXmlButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int dialogResult = JOptionPane.showConfirmDialog(null, "This action creates/overwrites settings.xml in the folder of XML meta-program. Continue?",
-                        "Warning", JOptionPane.YES_NO_OPTION);
+                int dialogResult = JOptionPane.showConfirmDialog(null, "Create/overwrite 'settings.xml'?", "Warning", JOptionPane.YES_NO_OPTION);
                 if (dialogResult == JOptionPane.YES_OPTION) {
                     IdeaMetaProgramInitHelpers.create_settings_xml(root_file);
                 }
@@ -167,19 +164,12 @@ public class UITabAdmin {
         createOverwriteDtoXmlButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int dialogResult = JOptionPane.showConfirmDialog(null, "This action creates/overwrites dto.xml in the folder of XML meta-program. Continue?",
-                        "Warning", JOptionPane.YES_NO_OPTION);
+                int dialogResult = JOptionPane.showConfirmDialog(null, "Create/overwrite 'sdm.xml'?", "Warning", JOptionPane.YES_NO_OPTION);
                 if (dialogResult == JOptionPane.YES_OPTION) {
                     IdeaMetaProgramInitHelpers.create_sdm_xml(root_file);
                 }
             }
         });
-//        editSettingsXmlButton.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                IdeaEditorHelpers.open_settings_xml_sync(project, root_file);
-//            }
-//        });
         btn_validate_all.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -267,18 +257,6 @@ public class UITabAdmin {
                 IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "DataStore_Qt5.h", "DataStore.h");
             }
         });
-//        datastore_pyodbc.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "data_store_pyodbc.py", "data_store_pyodbc.py");
-//            }
-//        });
-//        dataStorePsycopg2Button.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "data_store_psycopg2.py", "data_store_no_orm.py");
-//            }
-//        });
         btn_php_pg.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

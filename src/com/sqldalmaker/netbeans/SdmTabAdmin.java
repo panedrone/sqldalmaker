@@ -42,9 +42,52 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
     public SdmTabAdmin(Lookup lookup) {
         super(lookup);
         initComponents();
-        String sdm_info = NbpHelpers.get_sdm_info(this.getClass()); 
+        String sdm_info = NbpHelpers.get_sdm_info(this.getClass());
         jTextField1.setText(sdm_info);
 //        jTextField1.setBorder(javax.swing.BorderFactory.createEmptyBorder());
+
+        jPanelMigrate.setVisible(false);
+
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                check_need_sdm_migrate();
+            }
+        });
+    }
+
+    @Override
+    public void componentActivated() {
+        super.componentActivated();
+    }
+
+    private void check_need_sdm_migrate() {
+        boolean need_migrate = false;
+        FileObject root_file = obj.getPrimaryFile();
+        FileObject mp_folder = root_file.getParent();
+        FileObject xml_file = mp_folder.getFileObject(Const.SDM_XML);
+        if (xml_file == null) {
+            FileObject old_file = mp_folder.getFileObject("dto.xml");
+            if (old_file != null) {
+                need_migrate = true;
+            }
+            // ensureVisible(); === creates extra tab
+        }
+        set_need_migrate_warning(need_migrate);
+    }
+
+    private void ckeck_need_sdm() {
+        FileObject root_file = obj.getPrimaryFile();
+        FileObject mp_folder = root_file.getParent();
+        boolean onlyExisting = true;
+        FileObject xml_file = mp_folder.getFileObject(Const.SDM_XML, onlyExisting);
+        if (xml_file != null) {
+            set_need_migrate_warning(false);
+        }
+    }
+
+    private void set_need_migrate_warning(boolean need_migrate) {
+        jPanelMigrate.setVisible(need_migrate);
     }
 
     private boolean is_opened = false;
@@ -116,8 +159,8 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         jButton25 = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         jButton11 = new javax.swing.JButton();
@@ -167,6 +210,8 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         jButton21 = new javax.swing.JButton();
         jButton22 = new javax.swing.JButton();
         jButton31 = new javax.swing.JButton();
+        jPanelMigrate = new javax.swing.JPanel();
+        jTextPane1 = new javax.swing.JTextPane();
 
         setName(""); // NOI18N
         setOpaque(false);
@@ -251,6 +296,16 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         });
         jPanel4.add(jButton1);
 
+        jButton3.setText("Create 'sdm.xml'");
+        jButton3.setActionCommand("Create sdm.xml");
+        jButton3.setFocusPainted(false);
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
+        jPanel4.add(jButton3);
+
         jButton2.setText("Create settings.xml");
         jButton2.setFocusPainted(false);
         jButton2.addActionListener(new java.awt.event.ActionListener() {
@@ -259,15 +314,6 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
             }
         });
         jPanel4.add(jButton2);
-
-        jButton3.setText("Create dto.xml");
-        jButton3.setFocusPainted(false);
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
-            }
-        });
-        jPanel4.add(jButton3);
 
         jPanel8.add(jPanel4);
 
@@ -671,6 +717,14 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
 
         jPanel8.add(jPanel7);
 
+        jPanelMigrate.setLayout(new java.awt.BorderLayout());
+
+        jTextPane1.setText("\nStarting from v1.292, use \"sdm.xml\" instead of \"dto.xml\".\n\nHow to migrate:\n\n1. Click \"Create/Overwrite XSD files\"\n2. Click \"Create sdm.xml\"\n3. Copy-paste internal text from \"dto.xml\",<dto-classes>... to \"sdm.xml\",<sdm>...\n4. Delete \"dto.xml\" and \"dto.xsd\".\n5. Click \"Validate Configuration\". Done.\n\nWhere to declare DAO classes with v1.292+:\n\n- \"option 1\": separate XML files like in prev. versions of the plugin\n- \"option 2\": tags \"<dao-class...\" in \"sdm.xml\"\n\nOnce you start using \"option 2\" then \"option 1\" becomes ignored.\n");
+        jTextPane1.setMargin(new java.awt.Insets(0, 20, 0, 20));
+        jPanelMigrate.add(jTextPane1, java.awt.BorderLayout.CENTER);
+
+        jPanel8.add(jPanelMigrate);
+
         jPanel6.add(jPanel8);
 
         jScrollPane1.setViewportView(jPanel6);
@@ -780,30 +834,27 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
 
-        int dialogResult = JOptionPane.showConfirmDialog(null,
-                "This action creates/overwrites 'dto.xml' in the folder of XML meta-program. Continue?",
+        int dialogResult = JOptionPane.showConfirmDialog(null, "Create/overwrite 'sdm.xml'?",
                 "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 
         if (dialogResult == JOptionPane.YES_OPTION) {
-
             NbpMetaProgramInitHelpers.copy_dto_xml(obj);
         }
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
 
-        int dialogResult = JOptionPane.showConfirmDialog(null, "This action creates/overwrites 'settings.xml' in the folder of XML meta-program. Continue?",
+        int dialogResult = JOptionPane.showConfirmDialog(null, "Create/overwrite 'settings.xml'?",
                 "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 
         if (dialogResult == JOptionPane.YES_OPTION) {
-
             NbpMetaProgramInitHelpers.copy_settings_xml(obj);
         }
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
 
-        int dialogResult = JOptionPane.showConfirmDialog(null, "This action creates/overwrites XSD files in the folder of XML meta-program. Continue?",
+        int dialogResult = JOptionPane.showConfirmDialog(null, "Create/overwrite xsd files?",
                 "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 
         if (dialogResult == JOptionPane.YES_OPTION) {
@@ -969,8 +1020,10 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
+    private javax.swing.JPanel jPanelMigrate;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextField jTextField1;
+    private javax.swing.JTextPane jTextPane1;
     // End of variables declaration//GEN-END:variables
 
 //    private void testConnection() {
@@ -988,6 +1041,10 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
     }
 
     private void validate_all() {
+        FileObject root_file = obj.getPrimaryFile();
+
+        ckeck_need_sdm();
+
         NbpIdeConsoleUtil ide_log = new NbpIdeConsoleUtil(obj);
         StringBuilder buff = new StringBuilder();
         Settings sett = null;

@@ -90,6 +90,25 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
         my_table_model = new MyTableModel();
         createUIComponents();
         reload_table(false); // dto.xml is missing at beginning
+
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                check_need_sdm_migrate();
+            }
+        });
+    }
+
+    private void check_need_sdm_migrate() {
+        FileObject root_file = obj.getPrimaryFile();
+        FileObject mp_folder = root_file.getParent();
+        FileObject xml_file = mp_folder.getFileObject(Const.SDM_XML);
+        if (xml_file == null) {
+            FileObject old_file = mp_folder.getFileObject("dto.xml");
+            if (old_file != null) {
+                NbpIdeMessageHelpers.show_info_in_ui_thread("Click 'Admin' for migration...");
+            }
+        }
     }
 
     @Override
@@ -141,7 +160,6 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
 //    private void deselect_all() {
 //        table.clearSelection();
 //    }
-
     private void generate() throws Exception {
         final Settings settings = NbpHelpers.load_settings(obj);
         final int[] selected_rows = get_selection();

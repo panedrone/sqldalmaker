@@ -16,6 +16,7 @@ import com.sqldalmaker.jaxb.settings.Settings;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import org.netbeans.api.actions.Openable;
 import org.openide.cookies.OpenCookie;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileSystem;
@@ -38,8 +39,13 @@ public class NbpIdeEditorHelpers {
             public void run() {
                 try {
                     // https://blogs.oracle.com/geertjan/entry/open_file_action
-                    DataObject.find(file).getLookup().lookup(OpenCookie.class).open();
-                } catch (DataObjectNotFoundException ex) {
+                    DataObject obj = DataObject.find(file); // throws DataObjectNotFoundException
+                    Openable openable = obj.getLookup().lookup(OpenCookie.class);
+                    if (openable == null) {
+                        throw new Exception( "Not an openable: " + file.getNameExt());
+                    }
+                    openable.open();
+                } catch (Exception ex) {
                     // ex.printStackTrace();
                     NbpIdeMessageHelpers.show_error_in_ui_thread(ex);
                 }

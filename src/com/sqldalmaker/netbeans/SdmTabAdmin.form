@@ -156,6 +156,16 @@
                         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton1ActionPerformed"/>
                       </Events>
                     </Component>
+                    <Component class="javax.swing.JButton" name="jButton3">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Create &apos;sdm.xml&apos;"/>
+                        <Property name="actionCommand" type="java.lang.String" value="Create sdm.xml"/>
+                        <Property name="focusPainted" type="boolean" value="false"/>
+                      </Properties>
+                      <Events>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton3ActionPerformed"/>
+                      </Events>
+                    </Component>
                     <Component class="javax.swing.JButton" name="jButton2">
                       <Properties>
                         <Property name="text" type="java.lang.String" value="Create settings.xml"/>
@@ -163,15 +173,6 @@
                       </Properties>
                       <Events>
                         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton2ActionPerformed"/>
-                      </Events>
-                    </Component>
-                    <Component class="javax.swing.JButton" name="jButton3">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="Create dto.xml"/>
-                        <Property name="focusPainted" type="boolean" value="false"/>
-                      </Properties>
-                      <Events>
-                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton3ActionPerformed"/>
                       </Events>
                     </Component>
                   </SubComponents>
@@ -671,6 +672,25 @@
                       <Events>
                         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton31ActionPerformed"/>
                       </Events>
+                    </Component>
+                  </SubComponents>
+                </Container>
+                <Container class="javax.swing.JPanel" name="jPanelMigrate">
+
+                  <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
+                  <SubComponents>
+                    <Component class="javax.swing.JTextPane" name="jTextPane1">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="&#xa;Starting from v1.292, use &quot;sdm.xml&quot; instead of &quot;dto.xml&quot;.&#xa;&#xa;How to migrate:&#xa;&#xa;1. Click &quot;Create/Overwrite XSD files&quot;&#xa;2. Click &quot;Create sdm.xml&quot;&#xa;3. Copy-paste internal text from &quot;dto.xml&quot;,&lt;dto-classes&gt;... to &quot;sdm.xml&quot;,&lt;sdm&gt;...&#xa;4. Delete &quot;dto.xml&quot; and &quot;dto.xsd&quot;.&#xa;5. Click &quot;Validate Configuration&quot;. Done.&#xa;&#xa;Where to declare DAO classes with v1.292+:&#xa;&#xa;- &quot;option 1&quot;: separate XML files like in prev. versions of the plugin&#xa;- &quot;option 2&quot;: tags &quot;&lt;dao-class...&quot; in &quot;sdm.xml&quot;&#xa;&#xa;Once you start using &quot;option 2&quot; then &quot;option 1&quot; becomes ignored.&#xa;"/>
+                        <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
+                          <Insets value="[0, 20, 0, 20]"/>
+                        </Property>
+                      </Properties>
+                      <Constraints>
+                        <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
+                          <BorderConstraints direction="Center"/>
+                        </Constraint>
+                      </Constraints>
                     </Component>
                   </SubComponents>
                 </Container>
