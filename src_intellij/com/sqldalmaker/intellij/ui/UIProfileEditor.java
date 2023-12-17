@@ -144,7 +144,7 @@ public class UIProfileEditor {
             tabAdmin.set_need_migrate_warning(need_migrate);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            // e.printStackTrace();
             IdeaMessageHelpers.show_error_in_ui_thread(e);
         }
     }

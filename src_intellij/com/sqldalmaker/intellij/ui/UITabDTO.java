@@ -509,7 +509,7 @@ public class UITabDTO {
         // 4. update the files from the list
         final List<IdeaHelpers.GeneratedFileData> list = new ArrayList<IdeaHelpers.GeneratedFileData>();
         class Error {
-            public Throwable error = null;
+            public Exception error = null;
         }
         Error error = new Error();
         final Runnable runnable = new Runnable() {
@@ -565,7 +565,7 @@ public class UITabDTO {
                             table.updateUI();
                         }
                     });
-                } catch (Throwable e) {
+                } catch (Exception e) {
                     error.error = e;
                 }
             }
@@ -580,7 +580,6 @@ public class UITabDTO {
             IdeaMessageHelpers.show_error_in_ui_thread(e);
         }
         if (error.error != null) {
-            error.error.getMessage();
             IdeaMessageHelpers.show_error_in_ui_thread(error.error);
         }
         table.updateUI();
