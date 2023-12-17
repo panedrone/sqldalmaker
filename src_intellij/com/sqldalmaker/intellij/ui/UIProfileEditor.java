@@ -109,13 +109,8 @@ public class UIProfileEditor {
         return root;
     }
 
-    private Project project;
-    private VirtualFile root_file;
-
     public void init(Project project, VirtualFile root_file) {
         try {
-            this.project = project;
-            this.root_file = root_file;
             UITabDTO tabDTO1 = new UITabDTO();
             cards1.add(tabDTO1.get_root_panel(), DTO);
             tabDTO1.set_project(project);
