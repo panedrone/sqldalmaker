@@ -1,7 +1,7 @@
 /*
- * Copyright 2011-2013 sqldalmaker@gmail.com
- * SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
- * Read LICENSE.txt in the root of this project/archive for details.
+    Copyright 2011-2023 sqldalmaker@gmail.com
+    SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
+    Read LICENSE.txt in the root of this project/archive for details.
  */
 package com.sqldalmaker.intellij.references;
 
@@ -12,7 +12,7 @@ import com.intellij.patterns.PlatformPatterns;
 import com.intellij.patterns.XmlPatterns;
 import com.sqldalmaker.common.Const;
 
-/**
+/*
  * implementation is based on com.intellij.codeInsight.completion.XmlCompletionContributor
  * and https://confluence.jetbrains.com/display/IntelliJIDEA/Completion+Contributor
  * <p>

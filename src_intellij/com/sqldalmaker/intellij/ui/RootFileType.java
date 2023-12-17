@@ -1,7 +1,7 @@
 /*
- * Copyright 2011-2022 sqldalmaker@gmail.com
- * SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
- * Read LICENSE.txt in the root of this project/archive for details.
+    Copyright 2011-2023 sqldalmaker@gmail.com
+    SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
+    Read LICENSE.txt in the root of this project/archive for details.
  */
 package com.sqldalmaker.intellij.ui;
 
@@ -62,7 +62,7 @@ public class RootFileType implements FileType {
     @NonNls
     @Nullable
     @Override
-    public String getCharset(@NotNull VirtualFile file, @NotNull byte[] content) {
+    public String getCharset(@NotNull VirtualFile file, byte @NotNull [] content) {
         return null;
     }
 }

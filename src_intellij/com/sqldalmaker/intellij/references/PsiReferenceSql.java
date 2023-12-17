@@ -1,7 +1,7 @@
 /*
- * Copyright 2011-2023 sqldalmaker@gmail.com
- * SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
- * Read LICENSE.txt in the root of this project/archive for details.
+    Copyright 2011-2023 sqldalmaker@gmail.com
+    SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
+    Read LICENSE.txt in the root of this project/archive for details.
  */
 package com.sqldalmaker.intellij.references;
 
@@ -20,7 +20,7 @@ import com.sqldalmaker.jaxb.settings.Settings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/**
+/*
  * usage of PsiReferenceBase<PsiElement> is based on
  * https://confluence.jetbrains.com/display/IntelliJIDEA/Reference+Contributor
  * <p>
@@ -61,7 +61,7 @@ public class PsiReferenceSql extends PsiReferenceBase<PsiElement> {
         try {
             project_dir = IdeaHelpers.get_project_base_dir(project);
         } catch (Exception e) {
-            e.printStackTrace();
+            // e.printStackTrace();
             return null;
         }
         String sql_root_rel_path;
@@ -69,7 +69,7 @@ public class PsiReferenceSql extends PsiReferenceBase<PsiElement> {
             final Settings settings = SdmUtils.load_settings(xml_file_dir.getPath());
             sql_root_rel_path = settings.getFolders().getSql();
         } catch (Exception e) {
-            e.printStackTrace();
+            // e.printStackTrace();
             return null;
         }
         String rel_path = sql_root_rel_path + "/" + canonical_text;
@@ -85,9 +85,8 @@ public class PsiReferenceSql extends PsiReferenceBase<PsiElement> {
         return res;
     }
 
-    @NotNull
     @Override
-    public Object[] getVariants() {
+    public Object @NotNull [] getVariants() {
         // code completion is implemented with CompletionProvider API
         return ArrayUtil.EMPTY_OBJECT_ARRAY;
     }
@@ -101,7 +100,7 @@ public class PsiReferenceSql extends PsiReferenceBase<PsiElement> {
         }
         String canonical_text = getCanonicalText(); // @NotNull
         String file_name = containing_file.getName();
-        if (canonical_text.trim().length() == 0) {
+        if (canonical_text.trim().isEmpty()) {
             return true; // ref is empty
         }
         if (FileSearchHelpers.is_sdm_xml(file_name)) {

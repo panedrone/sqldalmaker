@@ -58,13 +58,13 @@ public class UITabDAO {
         btn_Validate.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                validate();
+                validate_with_progress_sync();
             }
         });
         btn_Generate.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                generate_sync();
+                generate_with_progress_sync();
             }
         });
         btn_OpenXML.addActionListener(new ActionListener() {
@@ -176,11 +176,11 @@ public class UITabDAO {
             int[] selected_rows = get_selection();
             String dao_class_name = (String) table.getValueAt(selected_rows[0], 0);
             if (!IdeaHelpers.navigate_to_dao_class_declaration(project, root_file, dao_class_name)) {
-                String relDirPath = (String) table.getValueAt(selected_rows[0], 0) + ".xml";
+                String relDirPath = table.getValueAt(selected_rows[0], 0) + ".xml";
                 IdeaEditorHelpers.open_local_file_in_editor_sync(project, root_file, relDirPath);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            // e.printStackTrace();
             IdeaMessageHelpers.show_error_in_ui_thread(e);
         }
     }
@@ -193,12 +193,12 @@ public class UITabDAO {
             // String dao_class_name = Helpers.get_dao_class_name(v);
             IdeaTargetLanguageHelpers.open_dao_sync(project, root_file, settings, dao_class_name);
         } catch (Exception e) {
-            e.printStackTrace();
+            // e.printStackTrace();
             IdeaMessageHelpers.show_error_in_ui_thread(e);
         }
     }
 
-    private void generate_for_sdm_xml(final IDaoCG gen, final List<IdeaHelpers.GeneratedFileData> list, final Settings settings, final int[] selectedRows, List<DaoClass> jaxb_dao_classes) throws Exception {
+    private void generate_for_sdm_xml(final IDaoCG gen, final List<IdeaHelpers.GeneratedFileData> list, final Settings settings, final int[] selectedRows, List<DaoClass> jaxb_dao_classes) {
         for (int row : selectedRows) {
             String dao_class_name = (String) table.getValueAt(row, 0);
             try {
@@ -210,7 +210,7 @@ public class UITabDAO {
                 try {
                     Thread.sleep(50);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    // e.printStackTrace();
                 }
                 // to prevent:
                 // WARN - intellij.ide.HackyRepaintManager
@@ -233,7 +233,7 @@ public class UITabDAO {
         String contextPath = DaoClass.class.getPackage().getName();
         XmlParser xml_parser = new XmlParser(contextPath, Helpers.concat_path(local_abs_path, Const.DAO_XSD));
         for (int row : selectedRows) {
-            String dao_xml_rel_path = (String) table.getValueAt(row, 0) + ".xml";
+            String dao_xml_rel_path = table.getValueAt(row, 0) + ".xml";
             try {
                 ProgressManager.progress(dao_xml_rel_path);
                 String dao_class_name = Helpers.get_dao_class_name(dao_xml_rel_path);
@@ -245,7 +245,7 @@ public class UITabDAO {
                 try {
                     Thread.sleep(50);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    // e.printStackTrace();
                 }
                 // to prevent:
                 // WARN - intellij.ide.HackyRepaintManager
@@ -263,7 +263,7 @@ public class UITabDAO {
         }
     }
 
-    private void generate_sync() {
+    private void generate_with_progress_sync() {
         final List<IdeaHelpers.GeneratedFileData> list = new ArrayList<IdeaHelpers.GeneratedFileData>();
         final StringBuilder output_dir = new StringBuilder();
         class Error {
@@ -292,7 +292,7 @@ public class UITabDAO {
                         // !!!! after 'try'
                         IDaoCG gen = IdeaTargetLanguageHelpers.create_dao_cg(con, project, root_file, settings, output_dir);
                         List<DaoClass> jaxb_dao_classes = load_sdm_dao();
-                        if (jaxb_dao_classes.size() > 0) {
+                        if (!jaxb_dao_classes.isEmpty()) {
                             generate_for_sdm_xml(gen, list, settings, selectedRows, jaxb_dao_classes);
                         } else {
                             generate_for_dao_xml(gen, list, settings, selectedRows);
@@ -310,17 +310,17 @@ public class UITabDAO {
                 }
             }
         };
-        ProgressManager.getInstance().runProcessWithProgressSynchronously(runnable, "Code generation", false, project);
+        ProgressManager.getInstance().runProcessWithProgressSynchronously(runnable, "Generating", false, project);
         // write only the generated files
         // writeActions can show their own dialogs
         try {
             IdeaHelpers.run_write_action_to_generate_source_file(output_dir.toString(), list, project);
         } catch (Exception e) {
-            e.printStackTrace();
+            // e.printStackTrace();
             IdeaMessageHelpers.show_error_in_ui_thread(e);
         }
         if (error.error != null) {
-            error.error.printStackTrace();
+            // error.error.printStackTrace();
             IdeaMessageHelpers.show_error_in_ui_thread(error.error);
         }
         table.updateUI();
@@ -344,24 +344,6 @@ public class UITabDAO {
         return selected_rows;
     }
 
-    private void validate() {
-        try {
-            reload_table();
-            Settings profile = IdeaHelpers.load_settings(root_file);
-            Connection con = IdeaHelpers.get_connection(project, profile);
-            try {
-                // !!!! after 'try'
-                IDaoCG gen = IdeaTargetLanguageHelpers.create_dao_cg(con, project, root_file, profile, null);
-                validate_sync(gen, my_table_model, profile);
-            } finally {
-                con.close();
-            }
-        } catch (Throwable e) {
-            e.printStackTrace();
-            IdeaMessageHelpers.show_error_in_ui_thread(e);
-        }
-    }
-
     private void validate_by_sdm(final IDaoCG gen, final TableModel model, final Settings settings, final List<DaoClass> jaxb_dao_classes) {
         int rc = model.getRowCount();
         for (int i = 0; i < rc; i++) {
@@ -373,7 +355,7 @@ public class UITabDAO {
                 StringBuilder validation_buff = new StringBuilder();
                 IdeaTargetLanguageHelpers.validate_dao(project, root_file, settings, dao_class_name, file_content, validation_buff);
                 String status = validation_buff.toString();
-                if (status.length() == 0) {
+                if (status.isEmpty()) {
                     model.setValueAt(Const.STATUS_OK, i, 1);
                 } else {
                     model.setValueAt(status, i, 1);
@@ -401,7 +383,7 @@ public class UITabDAO {
         // "Cannot read the array length because "<local3>" is null"
         int rc = model.getRowCount();
         for (int i = 0; i < rc; i++) {
-            String dao_xml_rel_path = (String) model.getValueAt(i, 0) + ".xml";
+            String dao_xml_rel_path = model.getValueAt(i, 0) + ".xml";
             try {
                 ProgressManager.progress(dao_xml_rel_path);
                 String dao_class_name = Helpers.get_dao_class_name(dao_xml_rel_path);
@@ -411,7 +393,7 @@ public class UITabDAO {
                 StringBuilder validation_buff = new StringBuilder();
                 IdeaTargetLanguageHelpers.validate_dao(project, root_file, settings, dao_class_name, file_content, validation_buff);
                 String status = validation_buff.toString();
-                if (status.length() == 0) {
+                if (status.isEmpty()) {
                     model.setValueAt(Const.STATUS_OK, i, 1);
                 } else {
                     model.setValueAt(status, i, 1);
@@ -439,25 +421,42 @@ public class UITabDAO {
         return jaxb_dao_classes;
     }
 
-    private void validate_sync(final IDaoCG gen, final TableModel model, final Settings settings) {
+    private void validate_with_progress_sync(final IDaoCG gen, final TableModel model, final Settings settings) {
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
                 try {
                     List<DaoClass> jaxb_dao_classes = load_sdm_dao();
-                    if (jaxb_dao_classes.size() > 0) {
+                    if (!jaxb_dao_classes.isEmpty()) {
                         validate_by_sdm(gen, model, settings, jaxb_dao_classes);
                     } else {
                         validate_by_xml_files(gen, model, settings);
                     }
                 } catch (Throwable e) {
-                    e.printStackTrace();
+                    // e.printStackTrace();
                     IdeaMessageHelpers.show_info_in_ui_thread(e.getMessage());
                 }
             }
         };
-        ProgressManager.getInstance().runProcessWithProgressSynchronously(runnable,
-                "Validation", false, project);
+        ProgressManager.getInstance().runProcessWithProgressSynchronously(runnable, "Validating", false, project);
+    }
+
+    private void validate_with_progress_sync() {
+        try {
+            reload_table();
+            Settings profile = IdeaHelpers.load_settings(root_file);
+            Connection con = IdeaHelpers.get_connection(project, profile);
+            try {
+                // !!!! after 'try'
+                IDaoCG gen = IdeaTargetLanguageHelpers.create_dao_cg(con, project, root_file, profile, null);
+                validate_with_progress_sync(gen, my_table_model, profile);
+            } finally {
+                con.close();
+            }
+        } catch (Throwable e) {
+            // e.printStackTrace();
+            IdeaMessageHelpers.show_error_in_ui_thread(e);
+        }
     }
 
     public void set_project(Project project) {
@@ -663,7 +662,7 @@ public class UITabDAO {
             list.clear();
 
             List<DaoClass> jaxb_dao_classes = load_sdm_dao();
-            if (jaxb_dao_classes.size() > 0) {
+            if (!jaxb_dao_classes.isEmpty()) {
                 for (DaoClass cls : jaxb_dao_classes) {
                     String[] item = new String[2];
                     item[0] = cls.getName();
@@ -696,7 +695,7 @@ public class UITabDAO {
             reload_table();
         } catch (Throwable e) {
             if (show_error_msg) {
-                e.printStackTrace();
+                // e.printStackTrace();
                 IdeaMessageHelpers.show_error_in_ui_thread(e);
             }
         }

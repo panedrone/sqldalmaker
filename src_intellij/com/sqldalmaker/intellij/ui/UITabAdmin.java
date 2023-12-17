@@ -27,7 +27,6 @@ import java.util.Locale;
  * Date: 21.06.12
  */
 public class UITabAdmin {
-    //private JButton editSettingsXmlButton;
     private JButton btn_validate_all;
     private JButton createOverwriteXSDFilesButton;
     private JButton createOverwriteSettingsXmlButton;
@@ -35,10 +34,8 @@ public class UITabAdmin {
     private JButton dataStoreJavaButton;
     private JButton dataStorePySQLite3Button;
     private JButton dataStoreJavaDbUtilsButton;
-    // private JButton dataStoreGroovyButton;
     private JButton dataStoreJavaAndroidButton;
     private JButton dataStorePhpButton;
-    //private JButton dataStorePyMySQLButton;
     private JButton PDODataStorePhpButton;
     private JButton dataStoreCSTLButton;
     private JButton dataStoreCATLButton;
@@ -51,17 +48,13 @@ public class UITabAdmin {
     private JButton dataStoreQt5CButton;
     private JTextField vTextField;
     private JScrollPane scroll_pane;
-    //    private JButton datastore_pyodbc;
-    //private JButton dataStorePsycopg2Button;
     private JButton btn_php_pg;
     private JButton btn_mysql;
     private JButton dataStorePhpPDOSQLButton;
     private JButton btn_php_oracle;
-    //    private JButton btn_cx_Oracle;
     private JButton dataStorePhpOCI8Button;
     private JButton btn_golang;
     private JButton btn_golangVM;
-    // private JButton djangoDbButton;
     private JButton sqlite3MysqlConnectorPsycopg2Button;
     private JButton SQLAlchemyButton;
     private JButton gormButton;

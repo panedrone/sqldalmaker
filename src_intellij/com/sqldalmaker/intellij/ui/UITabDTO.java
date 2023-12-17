@@ -71,7 +71,7 @@ public class UITabDTO {
         btn_Generate.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                generate();
+                generate_with_progress_sync();
             }
         });
         btn_OpenSQL.addActionListener(new ActionListener() {
@@ -460,9 +460,6 @@ public class UITabDTO {
                 // "Cannot read the array length because "<local3>" is null"
                 int rc = model.getRowCount();
                 for (int i = 0; i < rc; i++) {
-//                    if (indicator.isCanceled()) {
-//                        break;
-//                    }
                     String dto_class_name = (String) model.getValueAt(i, 0);
                     ProgressManager.progress(dto_class_name);
                     progressManager.getProgressIndicator().setText(dto_class_name);
@@ -492,16 +489,10 @@ public class UITabDTO {
                 }
             }
         };
-        /*
-        public abstract boolean runProcessWithProgressSynchronously(@NotNull Runnable process,
-                                                              @NotNull @ProgressTitle String progressTitle,
-                                                              boolean canBeCanceled,
-                                                              @Nullable Project project);
-         */
-        progressManager.runProcessWithProgressSynchronously(runnable, "Validation", false, project);
+        progressManager.runProcessWithProgressSynchronously(runnable, "Validating", false, project);
     }
 
-    protected void generate() {
+    protected void generate_with_progress_sync() {
         final StringBuilder output_dir = new StringBuilder();
         // 1. open connection
         // 2. create the list of generated text
@@ -511,7 +502,7 @@ public class UITabDTO {
         class Error {
             public Exception error = null;
         }
-        Error error = new Error();
+        final Error error = new Error();
         final Runnable runnable = new Runnable() {
             @Override
             public void run() {
@@ -521,7 +512,7 @@ public class UITabDTO {
                     for (int row : selected_rows) {
                         table.setValueAt("", row, 2);
                     }
-                    // to prevent: WARN - tellij.ide.HackyRepaintManager
+                    // to prevent: WARN - intellij.ide.HackyRepaintManager
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                             table.updateUI();
@@ -570,7 +561,7 @@ public class UITabDTO {
                 }
             }
         };
-        ProgressManager.getInstance().runProcessWithProgressSynchronously(runnable, "Code Generation", false, project);
+        ProgressManager.getInstance().runProcessWithProgressSynchronously(runnable, "Generating", false, project);
         // write only the generated files
         // writeActions can show their own dialogs
         try {
