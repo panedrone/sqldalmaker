@@ -30,7 +30,7 @@ public class IdeaMetaProgramInitHelpers {
                 IdeaHelpers.run_write_action_to_save_text_file(root_file, Const.SETTINGS_XSD, text);
             }
         } catch (Throwable e) {
-            e.printStackTrace();
+            // e.printStackTrace();
             IdeaMessageHelpers.show_error_in_ui_thread(e);
         }
     }
@@ -40,7 +40,7 @@ public class IdeaMetaProgramInitHelpers {
             String text = IdeaHelpers.read_from_jar_file(Const.SETTINGS_XML);
             IdeaHelpers.run_write_action_to_save_text_file(root_file, Const.SETTINGS_XML, text);
         } catch (Throwable e) {
-            e.printStackTrace();
+            // e.printStackTrace();
             IdeaMessageHelpers.show_error_in_ui_thread(e);
         }
     }
@@ -50,7 +50,7 @@ public class IdeaMetaProgramInitHelpers {
             String text = IdeaHelpers.read_from_jar_file(Const.SDM_XML);
             IdeaHelpers.run_write_action_to_save_text_file(root_file, Const.SDM_XML, text);
         } catch (Throwable e) {
-            e.printStackTrace();
+            // e.printStackTrace();
             IdeaMessageHelpers.show_error_in_ui_thread(e);
         }
     }

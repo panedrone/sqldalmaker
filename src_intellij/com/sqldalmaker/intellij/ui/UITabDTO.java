@@ -147,7 +147,7 @@ public class UITabDTO {
             IdeaHelpers.navigate_to_dto_class_declaration(project, root_file, dto_class_name);
         } catch (Exception e) {
             IdeaMessageHelpers.show_error_in_ui_thread(e);
-            e.printStackTrace();
+            // e.printStackTrace();
         }
     }
 
@@ -393,7 +393,7 @@ public class UITabDTO {
             IdeaEditorHelpers.open_project_file_in_editor_sync(project, relPath);
         } catch (Exception e) {
             IdeaMessageHelpers.show_error_in_ui_thread(e);
-            e.printStackTrace();
+            // e.printStackTrace();
         }
     }
 
@@ -404,7 +404,7 @@ public class UITabDTO {
             String dto_class_name = (String) table.getValueAt(selected_rows[0], 0);
             IdeaTargetLanguageHelpers.open_dto_sync(project, root_file, settings, dto_class_name);
         } catch (Exception e) {
-            e.printStackTrace();
+            // e.printStackTrace();
             IdeaMessageHelpers.show_error_in_ui_thread(e);
         }
     }
@@ -416,7 +416,7 @@ public class UITabDTO {
             String ref = (String) table.getValueAt(selected_rows[0], 1);
             IdeaEditorHelpers.gen_field_wizard_jaxb(class_name, ref, project, root_file);
         } catch (Exception e) {
-            e.printStackTrace();
+            // e.printStackTrace();
             IdeaMessageHelpers.show_error_in_ui_thread(e);
         }
     }
@@ -442,7 +442,7 @@ public class UITabDTO {
                 con.close();
             }
         } catch (Throwable e) {
-            e.printStackTrace();
+            // e.printStackTrace();
             IdeaMessageHelpers.show_error_in_ui_thread(e);
         }
     }
@@ -472,14 +472,14 @@ public class UITabDTO {
                         StringBuilder validationBuff = new StringBuilder();
                         IdeaTargetLanguageHelpers.validate_dto(project, root_file, settings, dto_class_name, fileContent, validationBuff);
                         String status = validationBuff.toString();
-                        if (status.length() == 0) {
+                        if (status.isEmpty()) {
                             model.setValueAt(Const.STATUS_OK, i, 2);
                         } else {
                             model.setValueAt(status, i, 2);
                             IdeaMessageHelpers.add_dto_error_message(settings, root_file, dto_class_name, status);
                         }
                     } catch (Throwable e) {
-                        // e.printStackTrace();
+                        // // e.printStackTrace();
                         String msg = e.getMessage();
                         model.setValueAt(msg, i, 2);
                         IdeaMessageHelpers.add_dto_error_message(settings, root_file, dto_class_name, msg);
@@ -542,7 +542,7 @@ public class UITabDTO {
                                 try {
                                     Thread.sleep(50);
                                 } catch (InterruptedException e) {
-                                    e.printStackTrace();
+                                    // e.printStackTrace();
                                 }
                                 // to prevent:
                                 // WARN - Intellij.ide.HackyRepaintManager
@@ -570,17 +570,17 @@ public class UITabDTO {
                 }
             }
         };
-        ProgressManager.getInstance().runProcessWithProgressSynchronously(runnable, "Code generation", false, project);
+        ProgressManager.getInstance().runProcessWithProgressSynchronously(runnable, "Code Generation", false, project);
         // write only the generated files
         // writeActions can show their own dialogs
         try {
             IdeaHelpers.run_write_action_to_generate_source_file(output_dir.toString(), list, project);
         } catch (Exception e) {
-            e.printStackTrace();
+            // e.printStackTrace();
             IdeaMessageHelpers.show_error_in_ui_thread(e);
         }
         if (error.error != null) {
-            error.error.printStackTrace();
+            error.error.getMessage();
             IdeaMessageHelpers.show_error_in_ui_thread(error.error);
         }
         table.updateUI();
@@ -628,7 +628,7 @@ public class UITabDTO {
             reload_table();
         } catch (Throwable e) {
             if (showErrorMsg) {
-                e.printStackTrace();
+                // e.printStackTrace();
                 IdeaMessageHelpers.show_error_in_ui_thread(e);
             }
         }

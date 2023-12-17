@@ -94,7 +94,7 @@ public class IdeaEditorHelpers {
         try {
             open_text_in_new_editor(fem, virtual_file_name, text);
         } catch (Throwable e1) {
-            e1.printStackTrace();
+            // e1.printStackTrace();
             IdeaMessageHelpers.show_error_in_ui_thread(e1);
         }
     }
@@ -167,7 +167,7 @@ public class IdeaEditorHelpers {
                 open_text_in_new_editor(fem, virtual_file_name, text_from_jar);
             }
         } catch (Throwable e1) {
-            e1.printStackTrace();
+            // e1.printStackTrace();
             IdeaMessageHelpers.show_error_in_ui_thread(e1);
         }
     }
@@ -184,7 +184,7 @@ public class IdeaEditorHelpers {
             open_in_editor_sync(project, sdm_xml);
         } catch (Exception e) {
             IdeaMessageHelpers.show_error_in_ui_thread(e);
-            // e.printStackTrace();
+            // // e.printStackTrace();
         }
     }
 
@@ -199,7 +199,7 @@ public class IdeaEditorHelpers {
             open_in_editor_sync(project, settings_xml);
         } catch (Exception e) {
             IdeaMessageHelpers.show_error_in_ui_thread(e);
-            // e.printStackTrace();
+            // // e.printStackTrace();
         }
     }
 
