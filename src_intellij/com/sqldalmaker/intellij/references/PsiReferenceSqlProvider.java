@@ -36,9 +36,8 @@ public class PsiReferenceSqlProvider extends PsiReferenceProvider {
         dao_tag_names.add(IdeaReferenceCompletion.ELEMENT.DTO_CLASS);
     }
 
-    @NotNull
     @Override
-    public PsiReference[] getReferencesByElement(@NotNull PsiElement element, @NotNull ProcessingContext context) {
+    public PsiReference @NotNull [] getReferencesByElement(@NotNull PsiElement element, @NotNull ProcessingContext context) {
 
         if (element instanceof XmlAttributeValue) {
             PsiElement attr_element = element.getParent();

@@ -70,7 +70,7 @@ public class IdeaMessageHelpers {
     }
 
     public static void add_to_ide_log(String title, String msg, NotificationType nt) {
-        if (msg == null || msg.trim().length() == 0) {
+        if (msg == null || msg.trim().isEmpty()) {
             return;
         }
         if (GROUP_DISPLAY_ID == null) {

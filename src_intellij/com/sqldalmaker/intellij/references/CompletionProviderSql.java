@@ -63,7 +63,7 @@ public class CompletionProviderSql extends CompletionProvider<CompletionParamete
         try {
             project_dir = IdeaHelpers.get_project_base_dir(project);
         } catch (Exception e) {
-            e.printStackTrace();
+            // e.printStackTrace();
             IdeaMessageHelpers.add_error_to_ide_log(this.getClass().getName(), e.getMessage());
             return;
         }
@@ -73,7 +73,7 @@ public class CompletionProviderSql extends CompletionProvider<CompletionParamete
             settings = SdmUtils.load_settings(xml_file_dir.getPath());
             sql_root_rel_path = settings.getFolders().getSql();
         } catch (Exception e) {
-            e.printStackTrace();
+            // e.printStackTrace();
             IdeaMessageHelpers.add_error_to_ide_log(this.getClass().getName(), e.getMessage());
             return;
         }

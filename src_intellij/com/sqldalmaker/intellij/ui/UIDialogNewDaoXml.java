@@ -116,7 +116,7 @@ public class UIDialogNewDaoXml extends JDialog {
                     success = true;
                     dispose();
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    // e.printStackTrace();
                     IdeaMessageHelpers.show_error_in_ui_thread(e);
                 }
             }

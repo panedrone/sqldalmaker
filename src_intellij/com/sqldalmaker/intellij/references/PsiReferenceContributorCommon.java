@@ -22,7 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 
-/**
+/*
  * Created with IntelliJ IDEA.
  * User: sqldalmaker@gmail.com
  * Date: 26.06.12

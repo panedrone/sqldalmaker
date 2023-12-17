@@ -198,7 +198,7 @@ public class UIDialogSelectDbSchema extends JDialog {
                         return items.size();
                     }
                 });
-                if (items.size() == 0) {
+                if (items.isEmpty()) {
                     radio_selected_schema.setText("Without schema");
                 } else {
                     radio_selected_schema.setText("Use selected schema");
@@ -209,7 +209,7 @@ public class UIDialogSelectDbSchema extends JDialog {
             }
             on_selection_changed();
         } catch (Exception e) {
-            e.printStackTrace();
+            // e.printStackTrace();
             IdeaMessageHelpers.show_error_in_ui_thread(e);
         }
     }
