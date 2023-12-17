@@ -151,7 +151,7 @@ public class UIEditorPageAdmin extends Composite {
 		btnNewButton_2.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				EclipseMetaProgramHelpers.create_dto_xml(editor2);
+				EclipseMetaProgramHelpers.create_sdm_xml(editor2);
 			}
 		});
 		toolkit.adapt(btnNewButton_2, true, true);
@@ -688,10 +688,7 @@ public class UIEditorPageAdmin extends Composite {
 		boolean need_migrate = false;
 		IFile sdm_xml = editor2.find_metaprogram_file(Const.SDM_XML);
 		if (sdm_xml == null) {
-//        	IFile dto_xml = editor2.find_metaprogram_file("dto.xml");
-//            if (dto_xml != null) {
 			need_migrate = true;
-//            }
 		}
 		set_need_migrate_warning(need_migrate);
 

@@ -32,9 +32,9 @@ public interface IEditor2 {
 	 */
 	IFile find_sdm_xml();
 
-	String get_dto_xml_abs_path() throws Exception;
+	String get_sdm_xml_abs_path() throws Exception;
 
-	String get_dto_xsd_abs_path() throws Exception;
+	String get_sdm_xsd_abs_path() throws Exception;
 
 	String get_dao_xsd_abs_path() throws Exception;
 

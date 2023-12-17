@@ -24,7 +24,6 @@ import com.sqldalmaker.jaxb.settings.Settings;
 
 import java.io.File;
 import java.sql.Connection;
-import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -33,15 +32,17 @@ import java.util.List;
  */
 public class IdeaEditorHelpers {
 
-    public static void open_in_editor_sync(Project project,
-                                           VirtualFile file) {
+    public static void open_in_editor_sync(
+            Project project,
+            VirtualFile file) {
 
         FileEditorManager fem = FileEditorManager.getInstance(project);
         fem.openFile(file, true, true);
     }
 
-    public static VirtualFile find_case_sensitive(VirtualFile dir,
-                                                  String rel_path) throws Exception {
+    public static VirtualFile find_case_sensitive(
+            VirtualFile dir,
+            String rel_path) throws Exception {
 
         VirtualFile file = dir.findFileByRelativePath(rel_path);
         if (file == null) {
@@ -55,30 +56,36 @@ public class IdeaEditorHelpers {
         return file;
     }
 
-    public static void open_local_file_in_editor_sync(Project project,
-                                                      VirtualFile root_file,
-                                                      String rel_path) throws Exception {
+    public static void open_local_file_in_editor_sync(
+            Project project,
+            VirtualFile root_file,
+            String rel_path) throws Exception {
+
         VirtualFile dir = root_file.getParent();
         VirtualFile file = find_case_sensitive(dir, rel_path);
         open_in_editor_sync(project, file);
     }
 
-    public static void open_local_file_in_editor_sync(Project project,
-                                                      VirtualFile file) {
+    public static void open_local_file_in_editor_sync(
+            Project project,
+            VirtualFile file) {
+
         open_in_editor_sync(project, file);
     }
 
-    public static void open_project_file_in_editor_sync(Project project,
-                                                        String rel_path) throws Exception {
+    public static void open_project_file_in_editor_sync(
+            Project project,
+            String rel_path) throws Exception {
 
         VirtualFile project_dir = IdeaHelpers.get_project_base_dir(project);
         VirtualFile file = find_case_sensitive(project_dir, rel_path);
         open_in_editor_sync(project, file);
     }
 
-    public static void open_text_in_new_editor(Project project,
-                                               String file_name,
-                                               String text) {
+    public static void open_text_in_new_editor(
+            Project project,
+            String file_name,
+            String text) {
 
         FileEditorManager fem = FileEditorManager.getInstance(project);
         String virtual_file_name = "_" + file_name; // '%' throws URI exception in NB
@@ -92,9 +99,10 @@ public class IdeaEditorHelpers {
         }
     }
 
-    private static void open_text_in_new_editor(FileEditorManager fem,
-                                                String virtual_file_name,
-                                                String text) throws Exception {
+    private static void open_text_in_new_editor(
+            FileEditorManager fem,
+            String virtual_file_name,
+            String text) throws Exception {
 
         // http://grepcode.com/file/repository.grepcode.com/java/ext/com.jetbrains/intellij-idea/9.0.4/com/intellij/openapi/vfs/VirtualFile.java
         // If an in-memory implementation of VirtualFile is required, LightVirtualFile from the com.intellij.testFramework package (Extended API) can be used.
@@ -127,17 +135,19 @@ public class IdeaEditorHelpers {
         }
     }
 
-    public static void open_or_activate_jar_resource_in_editor(Project project,
-                                                               String res_name,
-                                                               String title) {
+    public static void open_or_activate_jar_resource_in_editor(
+            Project project,
+            String res_name,
+            String title) {
 
         open_or_activate_jar_file_in_editor(project, "resources", res_name, title);
     }
 
-    public static void open_or_activate_jar_file_in_editor(Project project,
-                                                           String res_path,
-                                                           String res_name,
-                                                           String title) {
+    public static void open_or_activate_jar_file_in_editor(
+            Project project,
+            String res_path,
+            String res_name,
+            String title) {
 
         FileEditorManager fem = FileEditorManager.getInstance(project);
         String virtual_file_name = "%" + title; // to make unique
@@ -162,38 +172,42 @@ public class IdeaEditorHelpers {
         }
     }
 
-    public static void open_dto_xml_sync(Project project,
-                                         VirtualFile root_file) {
+    public static void open_sdm_xml_sync(
+            Project project,
+            VirtualFile root_file) {
+
         try {
-            VirtualFile dto_xml = root_file.getParent().findFileByRelativePath(Const.SDM_XML);
-            if (dto_xml == null) {
+            VirtualFile sdm_xml = root_file.getParent().findFileByRelativePath(Const.SDM_XML);
+            if (sdm_xml == null) {
                 throw new InternalException("File '" + Const.SDM_XML + "' not found");
             }
-            open_in_editor_sync(project, dto_xml);
+            open_in_editor_sync(project, sdm_xml);
         } catch (Exception e) {
             IdeaMessageHelpers.show_error_in_ui_thread(e);
-            e.printStackTrace();
+            // e.printStackTrace();
         }
     }
 
-    public static void open_settings_xml_sync(Project project,
-                                              VirtualFile root_file) {
+    public static void open_settings_xml_sync(
+            Project project,
+            VirtualFile root_file) {
         try {
-            VirtualFile dto_xml = root_file.getParent().findFileByRelativePath(Const.SETTINGS_XML);
-            if (dto_xml == null) {
+            VirtualFile settings_xml = root_file.getParent().findFileByRelativePath(Const.SETTINGS_XML);
+            if (settings_xml == null) {
                 throw new InternalException("File '" + Const.SETTINGS_XML + "' not found");
             }
-            open_in_editor_sync(project, dto_xml);
+            open_in_editor_sync(project, settings_xml);
         } catch (Exception e) {
             IdeaMessageHelpers.show_error_in_ui_thread(e);
-            e.printStackTrace();
+            // e.printStackTrace();
         }
     }
 
-    public static void gen_field_wizard_jaxb(String class_name,
-                                             String ref,
-                                             Project project,
-                                             VirtualFile root_file) throws Exception {
+    public static void gen_field_wizard_jaxb(
+            String class_name,
+            String ref,
+            Project project,
+            VirtualFile root_file) throws Exception {
 
         Settings settings = IdeaHelpers.load_settings(root_file);
         Connection con = IdeaHelpers.get_connection(project, settings);
@@ -208,26 +222,28 @@ public class IdeaEditorHelpers {
             final String module_root = project_dir.getPath();
             String sql_root_folder_full_path = Helpers.concat_path(module_root, settings.getFolders().getSql());
             SdmUtils.gen_field_wizard_jaxb(settings, con, object_factory, cls, sql_root_folder_full_path);
-            open_dto_xml_in_editor(object_factory, project, sdm);
+            open_sdm_xml_in_editor(object_factory, project, sdm);
         } finally {
             con.close();
         }
     }
 
-    public static void open_dto_xml_in_editor(ObjectFactory object_factory,
-                                              Project project,
-                                              Sdm sdm) throws Exception {
+    public static void open_sdm_xml_in_editor(
+            ObjectFactory object_factory,
+            Project project,
+            Sdm sdm) throws Exception {
 
-        String text = XmlHelpers.get_dto_xml_text(object_factory, sdm);
+        String text = XmlHelpers.get_sdm_xml_text(object_factory, sdm);
         String[] parts = text.split("\\?>");
-        text = parts[0] + Const.COMMENT_GENERATED_DTO_XML + parts[1];
+        text = parts[0] + Const.COMMENT_GENERATED_SDM_XML + parts[1];
         open_text_in_new_editor(project, "dto.xml", text);
     }
 
-    public static void open_dao_xml_in_editor(Project project,
-                                              com.sqldalmaker.jaxb.sdm.ObjectFactory object_factory,
-                                              String file_name,
-                                              DaoClass root) throws Exception {
+    public static void open_dao_xml_in_editor(
+            Project project,
+            com.sqldalmaker.jaxb.sdm.ObjectFactory object_factory,
+            String file_name,
+            DaoClass root) throws Exception {
 
         String text = XmlHelpers.get_dao_xml_text(object_factory, root);
         String[] parts = text.split("\\?>");

@@ -83,7 +83,7 @@ public class UITabDTO {
         btn_OpenXML.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                open_dto_xml();
+                open_sdm_xml();
             }
         });
         btn_OpenJava.addActionListener(new ActionListener() {
@@ -136,8 +136,8 @@ public class UITabDTO {
         table.doLayout();
     }
 
-    private void open_dto_xml() {
-        IdeaEditorHelpers.open_dto_xml_sync(project, root_file);
+    private void open_sdm_xml() {
+        IdeaEditorHelpers.open_sdm_xml_sync(project, root_file);
     }
 
     private void navigate_to_dto_class_declaration() {
@@ -370,7 +370,7 @@ public class UITabDTO {
                             open_generated_source_file();
                         }
                     } else {
-                        open_dto_xml();
+                        open_sdm_xml();
                     }
                 }
             }
@@ -378,7 +378,7 @@ public class UITabDTO {
     }
 
     private void create_crud_xml() {
-        IdeaCrudXmlHelpers.get_crud_dto_xml(project, root_file);
+        IdeaCrudXmlHelpers.get_crud_sdm_xml(project, root_file);
     }
 
     private void open_sql() {
@@ -609,9 +609,9 @@ public class UITabDTO {
             final ArrayList<String[]> list = my_table_model.getList();
             list.clear();
             String xml_configs_folder_full_path = root_file.getParent().getPath();
-            String dto_xml_abs_path = xml_configs_folder_full_path + "/" + Const.SDM_XML;
-            String dto_xsd_abs_path = xml_configs_folder_full_path + "/" + Const.SDM_XSD;
-            List<DtoClass> res = SdmUtils.get_dto_classes(dto_xml_abs_path, dto_xsd_abs_path);
+            String sdm_xml_abs_path = xml_configs_folder_full_path + "/" + Const.SDM_XML;
+            String sdm_xsd_abs_path = xml_configs_folder_full_path + "/" + Const.SDM_XSD;
+            List<DtoClass> res = SdmUtils.get_dto_classes(sdm_xml_abs_path, sdm_xsd_abs_path);
             for (DtoClass cls : res) {
                 String[] item = new String[3];
                 item[0] = cls.getName();

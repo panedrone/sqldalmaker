@@ -65,7 +65,7 @@ public class EclipseMetaProgramHelpers {
 		}
 	}
 
-	public static void create_dto_xml(IEditor2 editor2) {
+	public static void create_sdm_xml(IEditor2 editor2) {
 
 		if (!EclipseMessageHelpers.show_confirmation(
 				"This action creates/overwrites sdm.xml file in XML meta-program folder. Continue?")) {

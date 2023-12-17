@@ -83,14 +83,14 @@ public class EclipseToolbarDynamicMenu extends ContributionItem {
 			return index;
 		}
 		IFile root_file = root_files.get(0);
-		boolean is_dto_xml = FileSearchHelpers.is_sdm_xml(input_file.getName());
+		boolean is_sdm_xml = FileSearchHelpers.is_sdm_xml(input_file.getName());
 		boolean is_dao_xml = FileSearchHelpers.is_dao_xml(input_file.getName());
 		String path = input_file.getFullPath().toPortableString();
 		if (path.startsWith("/")) {
 			path = path.substring(1);
 		}
 		String current_xml_file_rel_path = path;
-		if (is_dto_xml) {
+		if (is_sdm_xml) {
 			{
 				MenuItem menuItem = new MenuItem(menu, SWT.PUSH, index++);
 				menuItem.setText(current_xml_file_rel_path + " -> Generate All");
@@ -135,7 +135,7 @@ public class EclipseToolbarDynamicMenu extends ContributionItem {
 				});
 			}
 		}
-		if (is_dto_xml || is_dao_xml) {
+		if (is_sdm_xml || is_dao_xml) {
 			path = root_file.getFullPath().toPortableString();
 			if (path.startsWith("/")) {
 				path = path.substring(1);

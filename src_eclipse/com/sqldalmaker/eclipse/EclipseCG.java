@@ -45,9 +45,9 @@ public class EclipseCG {
 			try {
 				IDtoCG gen = EclipseTargetLanguageHelpers.create_dto_cg(con, project, settings, root_file.getName(),
 						xml_mp_abs_path, output_dir);
-				String dto_xml_abs_path = xml_file.getLocation().toPortableString();
-				String dto_xsd_abs_path = Helpers.concat_path(xml_mp_abs_path, Const.SDM_XSD);
-				List<DtoClass> dto_classes = SdmUtils.get_dto_classes(dto_xml_abs_path, dto_xsd_abs_path);
+				String sdm_xml_abs_path = xml_file.getLocation().toPortableString();
+				String sdm_xsd_abs_path = Helpers.concat_path(xml_mp_abs_path, Const.SDM_XSD);
+				List<DtoClass> dto_classes = SdmUtils.get_dto_classes(sdm_xml_abs_path, sdm_xsd_abs_path);
 				for (DtoClass cls : dto_classes) {
 					try {
 						String[] file_content = gen.translate(cls.getName());
@@ -89,9 +89,9 @@ public class EclipseCG {
 			try {
 				IDaoCG gen = EclipseTargetLanguageHelpers.create_dao_cg(con, project, root_file.getName(), settings,
 						xml_mp_abs_path, output_dir);
-				String dto_xml_abs_path = xml_file.getLocation().toPortableString();
-				String dto_xsd_abs_path = Helpers.concat_path(xml_mp_abs_path, Const.SDM_XSD);
-				List<DaoClass> dao_classes = SdmUtils.get_dao_classes(dto_xml_abs_path, dto_xsd_abs_path);
+				String sdm_xml_abs_path = xml_file.getLocation().toPortableString();
+				String sdm_xsd_abs_path = Helpers.concat_path(xml_mp_abs_path, Const.SDM_XSD);
+				List<DaoClass> dao_classes = SdmUtils.get_dao_classes(sdm_xml_abs_path, sdm_xsd_abs_path);
 				for (DaoClass cls : dao_classes) {
 					try {
 						String[] file_content = gen.translate(cls.getName(), cls);
@@ -120,7 +120,7 @@ public class EclipseCG {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public static void validate_all_dto(IFile root_file, IFile xml_file) {
 
 		StringBuilder output_dir = new StringBuilder();
@@ -133,9 +133,9 @@ public class EclipseCG {
 			try {
 				IDtoCG gen = EclipseTargetLanguageHelpers.create_dto_cg(con, project, settings, root_file.getName(),
 						xml_mp_abs_path, output_dir);
-				String dto_xml_abs_path = xml_file.getLocation().toPortableString();
-				String dto_xsd_abs_path = Helpers.concat_path(xml_mp_abs_path, Const.SDM_XSD);
-				List<DtoClass> dto_classes = SdmUtils.get_dto_classes(dto_xml_abs_path, dto_xsd_abs_path);
+				String sdm_xml_abs_path = xml_file.getLocation().toPortableString();
+				String sdm_xsd_abs_path = Helpers.concat_path(xml_mp_abs_path, Const.SDM_XSD);
+				List<DtoClass> dto_classes = SdmUtils.get_dto_classes(sdm_xml_abs_path, sdm_xsd_abs_path);
 				for (DtoClass cls : dto_classes) {
 					try {
 						String[] file_content = gen.translate(cls.getName());
@@ -191,9 +191,9 @@ public class EclipseCG {
 			try {
 				IDaoCG gen = EclipseTargetLanguageHelpers.create_dao_cg(con, project, root_file.getName(), settings,
 						xml_mp_abs_path, output_dir);
-				String dto_xml_abs_path = xml_file.getLocation().toPortableString();
-				String dto_xsd_abs_path = Helpers.concat_path(xml_mp_abs_path, Const.SDM_XSD);
-				List<DaoClass> dao_classes = SdmUtils.get_dao_classes(dto_xml_abs_path, dto_xsd_abs_path);
+				String sdm_xml_abs_path = xml_file.getLocation().toPortableString();
+				String sdm_xsd_abs_path = Helpers.concat_path(xml_mp_abs_path, Const.SDM_XSD);
+				List<DaoClass> dao_classes = SdmUtils.get_dao_classes(sdm_xml_abs_path, sdm_xsd_abs_path);
 				for (DaoClass cls : dao_classes) {
 					try {
 						String[] file_content = gen.translate(cls.getName(), cls);

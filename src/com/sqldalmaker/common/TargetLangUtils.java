@@ -83,7 +83,7 @@ public class TargetLangUtils {
 
     public static String get_golang_dto_folder_rel_path(Settings settings) throws Exception {
         String dto_scope = settings.getDto().getScope().replace("\\", "/").trim();
-        if (dto_scope.length() == 0) {
+        if (dto_scope.isEmpty()) {
             throw new Exception(Const.GOLANG_SCOPES_ERR);
         }
         return dto_scope;
@@ -91,7 +91,7 @@ public class TargetLangUtils {
 
     public static String get_golang_dao_folder_rel_path(Settings settings) throws Exception {
         String dao_scope = settings.getDao().getScope().replace("\\", "/").trim();
-        if (dao_scope.length() == 0) {
+        if (dao_scope.isEmpty()) {
             throw new Exception(Const.GOLANG_SCOPES_ERR);
         }
         return dao_scope;
@@ -115,7 +115,7 @@ public class TargetLangUtils {
                                            Settings settings,
                                            String project_abs_path) throws Exception {
         // read the file or find the macro
-        if (macro_name == null || macro_name.trim().length() == 0) {
+        if (macro_name == null || macro_name.trim().isEmpty()) {
             return null;
         }
         String vm_template;
@@ -153,11 +153,11 @@ public class TargetLangUtils {
 
         String sql_root_abs_path = Helpers.concat_path(project_abs_path, settings.getFolders().getSql());
         String vm_template = TargetLangUtils.get_dto_vm_template(settings, project_abs_path);
-        String dto_xml_abs_path = Helpers.concat_path(xml_configs_folder_full_path, Const.SDM_XML);
-        String dto_xsd_abs_path = Helpers.concat_path(xml_configs_folder_full_path, Const.SDM_XSD);
+        String sdm_xml_abs_path = Helpers.concat_path(xml_configs_folder_full_path, Const.SDM_XML);
+        String sdm_xsd_abs_path = Helpers.concat_path(xml_configs_folder_full_path, Const.SDM_XSD);
         String context_path = Sdm.class.getPackage().getName();
-        XmlParser xml_parser = new XmlParser(context_path, dto_xsd_abs_path);
-        Sdm sdm = xml_parser.unmarshal(dto_xml_abs_path);
+        XmlParser xml_parser = new XmlParser(context_path, sdm_xsd_abs_path);
+        Sdm sdm = xml_parser.unmarshal(sdm_xml_abs_path);
         ////////////////////////////////////////////////////
         if (RootFileName.PHP.equals(root_fn)) {
             if (output_dir_rel_path != null) {
@@ -209,12 +209,12 @@ public class TargetLangUtils {
                                        StringBuilder output_dir_rel_path) throws Exception {
 
         String sql_root_abs_path = Helpers.concat_path(project_abs_path, settings.getFolders().getSql());
-        String dto_xml_abs_path = Helpers.concat_path(xml_configs_folder_full_path, Const.SDM_XML);
-        String dto_xsd_abs_path = Helpers.concat_path(xml_configs_folder_full_path, Const.SDM_XSD);
+        String sdm_xml_abs_path = Helpers.concat_path(xml_configs_folder_full_path, Const.SDM_XML);
+        String sdm_xsd_abs_path = Helpers.concat_path(xml_configs_folder_full_path, Const.SDM_XSD);
         String vm_template = TargetLangUtils.get_dao_vm_template(settings, project_abs_path);
         String context_path = Sdm.class.getPackage().getName();
-        XmlParser xml_parser = new XmlParser(context_path, dto_xsd_abs_path);
-        Sdm sdm = xml_parser.unmarshal(dto_xml_abs_path);
+        XmlParser xml_parser = new XmlParser(context_path, sdm_xsd_abs_path);
+        Sdm sdm = xml_parser.unmarshal(sdm_xml_abs_path);
         List<DtoClass> dto_classes = sdm.getDtoClass();
         ////////////////////////////////////////////////////
         if (RootFileName.PHP.equals(root_fn)) {
@@ -240,8 +240,7 @@ public class TargetLangUtils {
                 String package_rel_path = settings.getFolders().getTarget();
                 output_dir_rel_path.append(package_rel_path);
             }
-            String class_prefix = "";
-            return new CppCG.DAO(dto_classes, settings, con, sql_root_abs_path, class_prefix, vm_template);
+            return new CppCG.DAO(dto_classes, settings, con, sql_root_abs_path, "", vm_template);
         } else if (RootFileName.PYTHON.equals(root_fn)) {
             String package_rel_path = settings.getFolders().getTarget();
             if (output_dir_rel_path != null) {

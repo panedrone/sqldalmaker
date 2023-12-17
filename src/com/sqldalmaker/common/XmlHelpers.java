@@ -55,7 +55,7 @@ public class XmlHelpers {
         return text;
     }
 
-    public static String get_dto_xml_text(
+    public static String get_sdm_xml_text(
             com.sqldalmaker.jaxb.sdm.ObjectFactory object_factory,
             Sdm root) throws Exception {
 
@@ -88,7 +88,7 @@ public class XmlHelpers {
             transformer.transform(xmlInput, xmlOutput);
             return xmlOutput.getWriter().toString();
         } catch (Exception e) {
-            e.printStackTrace();
+            // e.printStackTrace();
         }
         return unformattedXml;
     }

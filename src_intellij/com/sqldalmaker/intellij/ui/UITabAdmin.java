@@ -177,7 +177,7 @@ public class UITabAdmin {
                 int dialogResult = JOptionPane.showConfirmDialog(null, "This action creates/overwrites dto.xml in the folder of XML meta-program. Continue?",
                         "Warning", JOptionPane.YES_NO_OPTION);
                 if (dialogResult == JOptionPane.YES_OPTION) {
-                    IdeaMetaProgramInitHelpers.create_dto_xml(root_file);
+                    IdeaMetaProgramInitHelpers.create_sdm_xml(root_file);
                 }
             }
         });
@@ -475,10 +475,10 @@ public class UITabAdmin {
         boolean need_migrate = false;
         VirtualFile sdm_xml = root_file.getParent().findChild(Const.SDM_XML);
         if (sdm_xml == null) {
-            VirtualFile dto_xml = root_file.getParent().findChild("dto.xml");
-            if (dto_xml != null) {
-                need_migrate = true;
-            }
+//            VirtualFile old_xml = root_file.getParent().findChild("dto.xml");
+//            if (old_xml != null) {
+            need_migrate = true;
+//            }
         }
         set_need_migrate_warning(need_migrate);
 

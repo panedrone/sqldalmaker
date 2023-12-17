@@ -135,7 +135,7 @@ public class EclipseEditorHelpers {
 		return editor_part;
 	}
 
-	public static void open_dto_xml_in_editor_sync(com.sqldalmaker.jaxb.sdm.ObjectFactory object_factory, Sdm root)
+	public static void open_sdm_xml_in_editor_sync(com.sqldalmaker.jaxb.sdm.ObjectFactory object_factory, Sdm root)
 			throws Exception {
 
 		Marshaller marshaller = XmlHelpers.create_marshaller(object_factory.getClass().getPackage().getName(),
@@ -146,7 +146,7 @@ public class EclipseEditorHelpers {
 			out.flush();
 			String text = new String(out.toByteArray());
 			String[] parts = text.split("\\?>");
-			text = parts[0] + Const.COMMENT_GENERATED_DTO_XML + parts[1];
+			text = parts[0] + Const.COMMENT_GENERATED_SDM_XML + parts[1];
 			ByteArrayOutputStream out2 = new ByteArrayOutputStream();
 			for (int i = 0; i < text.length(); ++i)
 				out2.write(text.charAt(i));
@@ -195,7 +195,7 @@ public class EclipseEditorHelpers {
 			cls.setRef(ref);
 			sdm.getDtoClass().add(cls);
 			EclipseHelpers.gen_tmp_field_tags(con, object_factory, cls, project_root, editor2);
-			open_dto_xml_in_editor_sync(object_factory, sdm);
+			open_sdm_xml_in_editor_sync(object_factory, sdm);
 		} finally {
 			con.close();
 		}

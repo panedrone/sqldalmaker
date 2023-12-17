@@ -68,9 +68,9 @@ public class EclipseXmlCompletionProposalComputer implements ICompletionProposal
 			if (this_xml_file == null) {
 				return NONE;
 			}
-			boolean dto_xml = FileSearchHelpers.is_sdm_xml(this_xml_file.getName());
-			boolean dao_xml = FileSearchHelpers.is_dao_xml(this_xml_file.getName());
-			if (!dto_xml && !dao_xml) {
+			boolean is_sdm_xml = FileSearchHelpers.is_sdm_xml(this_xml_file.getName());
+			boolean is_dao_xml = FileSearchHelpers.is_dao_xml(this_xml_file.getName());
+			if (!is_sdm_xml && !is_dao_xml) {
 				return NONE;
 			}
 			IDocument doc = text_viewer.getDocument();
@@ -99,40 +99,37 @@ public class EclipseXmlCompletionProposalComputer implements ICompletionProposal
 			}
 			int attr_offset = region.getOffset() - 2;
 			if (EclipseXmlAttrHelpers.is_value_of("ref", attr_offset, text)) {
-				if (dto_xml || dao_xml) {
-					// === panedrone: this is incorrect condition because
-					// "dict/" is correct qualifier
-					// for dict/get_categories.sql
-					// if (value.toLowerCase().endsWith(".sql") == false) {
-					// return NONE;
-					// }
-					IContainer this_folder = this_xml_file.getParent();
-					IResource root = EclipseTargetLanguageHelpers.find_root_file(this_folder);
-					String xml_metaprogram_folder_path = root.getParent().getLocation().toPortableString();
-					Settings settings = SdmUtils.load_settings(xml_metaprogram_folder_path);
-					String sql_root_rel_path = settings.getFolders().getSql();
-					IProject project = this_xml_file.getProject();
-					IFolder sql_root = project.getFolder(sql_root_rel_path);
-					if (sql_root == null) {
-						return NONE;
-					}
-					List<String> list = new ArrayList<String>();
-					enum_sql_files(sql_root, list, sql_root.getFullPath().toPortableString());
-					List<ICompletionProposal> prop_list = new ArrayList<ICompletionProposal>();
-					compute_structure_proposals(qualifier, cursor_offset, prop_list, list);
-					return prop_list;
+				// === panedrone: this is incorrect condition because
+				// "dict/" is correct qualifier
+				// for dict/get_categories.sql
+				// if (value.toLowerCase().endsWith(".sql") == false) {
+				// return NONE;
+				// }
+				IContainer this_folder = this_xml_file.getParent();
+				IResource root = EclipseTargetLanguageHelpers.find_root_file(this_folder);
+				String xml_metaprogram_folder_path = root.getParent().getLocation().toPortableString();
+				Settings settings = SdmUtils.load_settings(xml_metaprogram_folder_path);
+				String sql_root_rel_path = settings.getFolders().getSql();
+				IProject project = this_xml_file.getProject();
+				IFolder sql_root = project.getFolder(sql_root_rel_path);
+				if (sql_root == null) {
+					return NONE;
 				}
-
-			} else if (dao_xml) {
+				List<String> list = new ArrayList<String>();
+				enum_sql_files(sql_root, list, sql_root.getFullPath().toPortableString());
+				List<ICompletionProposal> prop_list = new ArrayList<ICompletionProposal>();
+				compute_structure_proposals(qualifier, cursor_offset, prop_list, list);
+				return prop_list;
+			} else if (is_dao_xml) {
 				if (EclipseXmlAttrHelpers.is_value_of("dto", attr_offset, text)) {
 					IContainer metaprogram_folder = this_xml_file.getParent();
 					IResource res = metaprogram_folder.findMember(Const.SDM_XML);
 					if (!(res instanceof IFile)) {
 						return NONE;
 					}
-					IFile dto_xml_file = (IFile) res;
+					IFile sdm_xml_file = (IFile) res;
 					String xml;
-					InputStream stream = dto_xml_file.getContents();
+					InputStream stream = sdm_xml_file.getContents();
 					try {
 						xml = input_stream_to_string(stream);
 					} finally {
@@ -148,9 +145,9 @@ public class EclipseXmlCompletionProposalComputer implements ICompletionProposal
 					if (!(res instanceof IFile)) {
 						return NONE;
 					}
-					IFile dto_xml_file = (IFile) res;
+					IFile sdm_xml_file = (IFile) res;
 					String xml;
-					InputStream stream = dto_xml_file.getContents();
+					InputStream stream = sdm_xml_file.getContents();
 					try {
 						xml = input_stream_to_string(stream);
 					} finally {

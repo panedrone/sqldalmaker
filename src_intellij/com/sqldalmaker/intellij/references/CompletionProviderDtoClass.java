@@ -56,15 +56,15 @@ public class CompletionProviderDtoClass extends CompletionProvider<CompletionPar
         }
         // the same folder as root-file
         //
-        VirtualFile dto_xml_file = xml_file_dir.findFileByRelativePath(Const.SDM_XML);
-        if (dto_xml_file == null) {
+        VirtualFile sdm_xml_file = xml_file_dir.findFileByRelativePath(Const.SDM_XML);
+        if (sdm_xml_file == null) {
             return;
         }
         Project project = containing_file.getProject();
 //        if (project == null) {
 //            return null; // ---- it is @NotNull
 //        }
-        PsiElement res = PsiManager.getInstance(project).findFile(dto_xml_file);// @Nullable
+        PsiElement res = PsiManager.getInstance(project).findFile(sdm_xml_file);// @Nullable
         if (!(res instanceof XmlFile)) {
             return;
         }

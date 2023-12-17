@@ -45,7 +45,7 @@ public class IdeaMetaProgramInitHelpers {
         }
     }
 
-    public static void create_dto_xml(VirtualFile root_file) {
+    public static void create_sdm_xml(VirtualFile root_file) {
         try {
             String text = IdeaHelpers.read_from_jar_file(Const.SDM_XML);
             IdeaHelpers.run_write_action_to_save_text_file(root_file, Const.SDM_XML, text);

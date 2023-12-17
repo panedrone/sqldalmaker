@@ -31,11 +31,13 @@ import com.sqldalmaker.jaxb.settings.Settings;
  */
 public class EclipseCrudXmlHelpers {
 
-	public static void get_crud_dto_xml(final Shell parent_shell, final IEditor2 editor2) throws Exception {
+	public static void get_crud_sdm_xml(final Shell parent_shell, final IEditor2 editor2) throws Exception {
 
 		ISelectDbSchemaCallback callback = new ISelectDbSchemaCallback() {
+
 			public void process_ok(boolean schema_in_xml, String selected_schema, boolean skip_used,
 					boolean include_views, boolean plural_to_singular, boolean crud_auto, boolean add_fk_access) {
+
 				try {
 					com.sqldalmaker.jaxb.sdm.ObjectFactory object_factory = new com.sqldalmaker.jaxb.sdm.ObjectFactory();
 					Sdm root;
@@ -44,16 +46,16 @@ public class EclipseCrudXmlHelpers {
 						Set<String> in_use; // !!!! after 'try'
 						if (skip_used) {
 							String project_abs_path = EclipseHelpers.get_absolute_dir_path_str(editor2.get_project());
-							in_use = find_dto_declared_in_dto_xml(editor2, project_abs_path);
+							in_use = find_dto_declared_in_sdm_xml(editor2, project_abs_path);
 						} else {
 							in_use = new HashSet<String>();
 						}
-						root = SdmUtils.get_crud_dto_xml(object_factory, connection, in_use, schema_in_xml,
+						root = SdmUtils.get_crud_sdm_xml(object_factory, connection, in_use, schema_in_xml,
 								selected_schema, include_views, plural_to_singular);
 					} finally {
 						connection.close();
 					}
-					EclipseEditorHelpers.open_dto_xml_in_editor_sync(object_factory, root);
+					EclipseEditorHelpers.open_sdm_xml_in_editor_sync(object_factory, root);
 				} catch (Throwable e) {
 					e.printStackTrace();
 					EclipseMessageHelpers.show_error(e);
@@ -63,12 +65,12 @@ public class EclipseCrudXmlHelpers {
 		UIDialogSelectDbSchema.open(parent_shell, editor2, callback, UIDialogSelectDbSchema.Open_Mode.DTO);
 	}
 
-	private static Set<String> find_dto_declared_in_dto_xml(IEditor2 editor2, String project_abs_path)
+	private static Set<String> find_dto_declared_in_sdm_xml(IEditor2 editor2, String project_abs_path)
 			throws Exception {
 
-		String dto_xml_abs_file_path = editor2.get_dto_xml_abs_path();
-		String dto_xsd_abs_file_path = editor2.get_dto_xsd_abs_path();
-		Set<String> res = SdmUtils.get_dto_class_names_used_in_dto_xml(dto_xml_abs_file_path, dto_xsd_abs_file_path);
+		String sdm_xml_abs_path = editor2.get_sdm_xml_abs_path();
+		String sdm_xsd_abs_path = editor2.get_sdm_xsd_abs_path();
+		Set<String> res = SdmUtils.get_dto_class_names_used_in_sdm_xml(sdm_xml_abs_path, sdm_xsd_abs_path);
 		return res;
 	}
 
@@ -96,6 +98,7 @@ public class EclipseCrudXmlHelpers {
 	}
 
 	private static FieldNamesMode get_field_names_mode(IEditor2 editor2, Settings settings) {
+
 		boolean force_snake_case = EclipseTargetLanguageHelpers.snake_case_needed(editor2);
 		FieldNamesMode field_names_mode;
 		if (force_snake_case) {
@@ -122,6 +125,7 @@ public class EclipseCrudXmlHelpers {
 			@Override
 			public void process_ok(boolean schema_in_xml, String selected_schema, boolean skip_used,
 					boolean include_views, boolean plural_to_singular, boolean use_crud_auto, boolean add_fk_access) {
+				
 				try {
 					ObjectFactory object_factory = new ObjectFactory();
 					DaoClass root;

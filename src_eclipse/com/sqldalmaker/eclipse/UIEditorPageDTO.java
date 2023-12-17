@@ -222,7 +222,7 @@ public class UIEditorPageDTO extends Composite {
 			action_import = new Action("") {
 				@Override
 				public void run() {
-					generate_crud_dto_xml();
+					generate_crud_sdm_xml();
 				}
 			};
 			action_import.setToolTipText("DTO CRUD XML Assistant");
@@ -311,9 +311,9 @@ public class UIEditorPageDTO extends Composite {
 		}
 	}
 
-	protected void generate_crud_dto_xml() {
+	protected void generate_crud_sdm_xml() {
 		try {
-			EclipseCrudXmlHelpers.get_crud_dto_xml(getShell(), editor2);
+			EclipseCrudXmlHelpers.get_crud_sdm_xml(getShell(), editor2);
 		} catch (Throwable e) {
 			e.printStackTrace();
 			EclipseMessageHelpers.show_error(e);
@@ -696,12 +696,12 @@ public class UIEditorPageDTO extends Composite {
 	private ArrayList<Item> reload_table() throws Exception {
 		ArrayList<Item> items = new ArrayList<Item>();
 		try {
-			String fileName = editor2.get_dto_xml_abs_path();
+			String fileName = editor2.get_sdm_xml_abs_path();
 			InputStream fs = new FileInputStream(fileName);
 			try {
-				String dto_xml_abs_path = editor2.get_dto_xml_abs_path();
-				String dto_xsd_abs_path = editor2.get_dto_xsd_abs_path();
-				List<DtoClass> list = SdmUtils.get_dto_classes(dto_xml_abs_path, dto_xsd_abs_path);
+				String sdm_xml_abs_path = editor2.get_sdm_xml_abs_path();
+				String sdm_xsd_abs_path = editor2.get_sdm_xsd_abs_path();
+				List<DtoClass> list = SdmUtils.get_dto_classes(sdm_xml_abs_path, sdm_xsd_abs_path);
 				for (DtoClass cls : list) {
 					Item item = new Item();
 					item.setName(cls.getName());

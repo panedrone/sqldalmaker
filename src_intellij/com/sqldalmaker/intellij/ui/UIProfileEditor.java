@@ -135,8 +135,8 @@ public class UIProfileEditor {
             boolean need_migrate = false;
             VirtualFile sdm_xml = root_file.getParent().findChild(Const.SDM_XML);
             if (sdm_xml == null) {
-                VirtualFile dto_xml = root_file.getParent().findChild("dto.xml");
-                if (dto_xml != null) {
+                VirtualFile olx_xml = root_file.getParent().findChild("dto.xml");
+                if (olx_xml != null) {
                     need_migrate = true;
                     openAdmin();
                 }

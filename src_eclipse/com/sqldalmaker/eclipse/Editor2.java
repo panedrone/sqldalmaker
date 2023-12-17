@@ -139,12 +139,12 @@ public class Editor2 extends EditorPart implements IEditor2 {
 	}
 
 	@Override
-	public String get_dto_xml_abs_path() throws Exception {
+	public String get_sdm_xml_abs_path() throws Exception {
 		return get_metaprogram_file_abs_path(Const.SDM_XML);
 	}
 
 	@Override
-	public String get_dto_xsd_abs_path() throws Exception {
+	public String get_sdm_xsd_abs_path() throws Exception {
 		return get_metaprogram_file_abs_path(Const.SDM_XSD);
 	}
 
@@ -340,8 +340,8 @@ public class Editor2 extends EditorPart implements IEditor2 {
 				boolean need_migrate = false;
 				IFile sdm_xml = find_metaprogram_file(Const.SDM_XML);
 				if (sdm_xml == null) {
-					IFile dto_xml = find_metaprogram_file("dto.xml");
-					if (dto_xml != null) {
+					IFile old_xml = find_metaprogram_file("dto.xml");
+					if (old_xml != null) {
 						need_migrate = true;
 					}
 					openAdmin();

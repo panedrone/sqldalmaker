@@ -33,7 +33,7 @@ import java.util.Set;
  */
 public class IdeaCrudXmlHelpers {
 
-    public static void get_crud_dto_xml(final Project project, final VirtualFile root_file) {
+    public static void get_crud_sdm_xml(final Project project, final VirtualFile root_file) {
 
         ISelectDbSchemaCallback callback = new ISelectDbSchemaCallback() {
             @Override
@@ -47,18 +47,18 @@ public class IdeaCrudXmlHelpers {
                     try {
                         Set<String> in_use; // !!!! after 'try'
                         if (skip_used) {
-                            in_use = find_dto_declared_in_dto_xml(root_file);
+                            in_use = find_dto_declared_in_sdm_xml(root_file);
                         } else {
                             in_use = new HashSet<String>();
                         }
-                        root = SdmUtils.get_crud_dto_xml(object_factory, connection, in_use, schema_in_xml, selected_schema, include_views,
+                        root = SdmUtils.get_crud_sdm_xml(object_factory, connection, in_use, schema_in_xml, selected_schema, include_views,
                                 plural_to_singular);
                     } finally {
                         connection.close();
                     }
-                    IdeaEditorHelpers.open_dto_xml_in_editor(object_factory, project, root);
+                    IdeaEditorHelpers.open_sdm_xml_in_editor(object_factory, project, root);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    // e.printStackTrace();
                     IdeaMessageHelpers.show_error_in_ui_thread(e);
                 }
             }
@@ -66,17 +66,17 @@ public class IdeaCrudXmlHelpers {
         try {
             UIDialogSelectDbSchema.open(project, root_file, callback, true, false);
         } catch (Exception e) {
-            e.printStackTrace();
+            // e.printStackTrace();
             IdeaMessageHelpers.show_error_in_ui_thread(e);
         }
     }
 
-    private static Set<String> find_dto_declared_in_dto_xml(VirtualFile root_file) throws Exception {
+    private static Set<String> find_dto_declared_in_sdm_xml(VirtualFile root_file) throws Exception {
 
         String xml_configs_folder_full_path = root_file.getParent().getPath();
-        String dto_xml_abs_file_path = Helpers.concat_path(xml_configs_folder_full_path, Const.SDM_XML);
-        String dto_xsd_abs_file_path = Helpers.concat_path(xml_configs_folder_full_path, Const.SDM_XSD);
-        Set<String> res = SdmUtils.get_dto_class_names_used_in_dto_xml(dto_xml_abs_file_path, dto_xsd_abs_file_path);
+        String sdm_xml_abs_file_path = Helpers.concat_path(xml_configs_folder_full_path, Const.SDM_XML);
+        String sdm_xsd_abs_file_path = Helpers.concat_path(xml_configs_folder_full_path, Const.SDM_XSD);
+        Set<String> res = SdmUtils.get_dto_class_names_used_in_sdm_xml(sdm_xml_abs_file_path, sdm_xsd_abs_file_path);
         return res;
     }
 
@@ -151,7 +151,7 @@ public class IdeaCrudXmlHelpers {
                     }
                     IdeaEditorHelpers.open_dao_xml_in_editor(project, object_factory, "crud-dao.xml", root);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    // e.printStackTrace();
                     IdeaMessageHelpers.show_error_in_ui_thread(e);
                 }
             }
@@ -159,7 +159,7 @@ public class IdeaCrudXmlHelpers {
         try {
             UIDialogSelectDbSchema.open(project, root_file, callback, false, false);
         } catch (Exception e) {
-            e.printStackTrace();
+            // e.printStackTrace();
             IdeaMessageHelpers.show_error_in_ui_thread(e);
         }
     }
@@ -184,7 +184,7 @@ public class IdeaCrudXmlHelpers {
                     }
                     IdeaEditorHelpers.open_dao_xml_in_editor(project, object_factory, "fk-dao.xml", root);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    // e.printStackTrace();
                     IdeaMessageHelpers.show_error_in_ui_thread(e);
                 }
             }
@@ -192,7 +192,7 @@ public class IdeaCrudXmlHelpers {
         try {
             UIDialogSelectDbSchema.open(project, root_file, callback, false, true);
         } catch (Exception e) {
-            e.printStackTrace();
+            // e.printStackTrace();
             IdeaMessageHelpers.show_error_in_ui_thread(e);
         }
     }

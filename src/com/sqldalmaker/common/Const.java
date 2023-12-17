@@ -26,8 +26,8 @@ public class Const {
     public static final String OUTPUT_FILE_IS_OUT_OF_DATE = "Generated file is out of date";
     public static final String OUTPUT_FILE_IS_MISSING = "Generated file is missing";
 
-    public static final String COMMENT_GENERATED_DTO_XML = "?>\n\n<!-- This is just an output of utility. Copy/Cut 'dto-class' nodes from here and Paste them into 'dto.xml'. -->\n";
-    public static final String COMMENT_GENERATED_DAO_XML = "?>\n\n<!-- This is just an output of utility. Copy/Cut 'crud...' and 'query...' nodes from here and Paste them into DAO XML. -->\n";
+    public static final String COMMENT_GENERATED_SDM_XML = "?>\n\n<!-- This is just an output of utility. Copy-paste 'dto-class' nodes from here to 'sdm.xml'. -->\n";
+    public static final String COMMENT_GENERATED_DAO_XML = "?>\n\n<!-- This is just an output of utility. Copy-paste 'crud...' and 'query...' nodes from here to DAO XML. -->\n";
 
     public static final String GOLANG_SCOPES_ERR = "Error in 'settings.xml': \n" +
             "empty values for '<dto scope' and '<dao scope' are not allowed";
