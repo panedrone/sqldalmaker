@@ -13,9 +13,11 @@ import com.sqldalmaker.jaxb.sdm.DtoClass;
 import com.sqldalmaker.jaxb.sdm.ObjectFactory;
 import com.sqldalmaker.jaxb.sdm.Sdm;
 import com.sqldalmaker.jaxb.settings.Settings;
+
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+
 import org.netbeans.api.actions.Openable;
 import org.openide.cookies.OpenCookie;
 import org.openide.filesystems.FileObject;
@@ -25,9 +27,35 @@ import org.openide.loaders.DataObject;
 import org.openide.loaders.DataObjectNotFoundException;
 import org.openide.util.RequestProcessor;
 
-/**
+/*
  *
  * @author sqldalmaker@gmail.com
+ *
+ * 16.12.2023 09:01 1.292 sdm.xml
+ *
+ * 16.08.2023 03:03 1.285
+ *
+ * 10.08.2023 09:31 1.285
+ *
+ * 23.02.2023 15:42 1.279
+ *
+ * 16.02.2023 11:38 1.278
+ *
+ * 30.10.2022 08:03 1.266
+ *
+ * 06.08.2022 09:15 1.261
+ *
+ * 24.04.2022 08:20 1.229
+ *
+ * 08.04.2022 20:33 + hyperlinks for nb
+ *
+ * 18.05.2021 10:49 1.202
+ *
+ * 14.05.2021 06:22 1.201
+ *
+ * 08.05.2021 22:29 1.200
+ *
+ * 07.02.2019 19:50 initial commit
  *
  */
 public class NbpIdeEditorHelpers {
@@ -42,7 +70,7 @@ public class NbpIdeEditorHelpers {
                     DataObject obj = DataObject.find(file); // throws DataObjectNotFoundException
                     Openable openable = obj.getLookup().lookup(OpenCookie.class);
                     if (openable == null) {
-                        throw new Exception( "Not an openable: " + file.getNameExt());
+                        throw new Exception("Not an openable: " + file.getNameExt());
                     }
                     openable.open();
                 } catch (Exception ex) {
@@ -53,12 +81,12 @@ public class NbpIdeEditorHelpers {
         });
     }
 
-    public static void open_metaprogram_file_async(SdmDataObject obj, String file_name) {
+    public static void open_sdm_folder_file_async(SdmDataObject obj, String file_name) {
         FileObject folder = obj.getPrimaryFile().getParent();
-        open_metaprogram_file_in_editor_async(folder, file_name);
+        open_sdm_folder_file_in_editor_async(folder, file_name);
     }
 
-    public static void open_metaprogram_file_in_editor_async(FileObject folder, String file_name) {
+    public static void open_sdm_folder_file_in_editor_async(FileObject folder, String file_name) {
         FileObject file = folder.getFileObject(file_name);
         if (file == null) {
             NbpIdeMessageHelpers.show_error_in_ui_thread("File not found: " + file_name);
@@ -79,6 +107,21 @@ public class NbpIdeEditorHelpers {
     public static void open_project_file_in_editor_async(SdmDataObject obj, String rel_path) throws Exception {
         FileObject file = obj.getPrimaryFile();
         open_project_file_in_editor_async(file, rel_path);
+    }
+
+    public static boolean try_open_sdm_folder_file_in_editor_async(FileObject root_file, String rel_path) throws Exception {
+        FileObject sdm_folder = NbpPathHelpers.get_root_folder(root_file);
+        FileObject res = sdm_folder.getFileObject(rel_path);
+        if (res == null || res.isFolder()) {
+            return false;
+        }
+        open_in_editor_async(res);
+        return true;
+    }
+
+    public static boolean try_open_sdm_folder_file_in_editor_async(SdmDataObject obj, String rel_path) throws Exception {
+        FileObject file = obj.getPrimaryFile();
+        return try_open_sdm_folder_file_in_editor_async(file, rel_path);
     }
 
     public static void open_resource_file_in_editor_async(String res_title, String res_name) {
@@ -108,7 +151,7 @@ public class NbpIdeEditorHelpers {
             String output_dir_rel_path = NbpPathHelpers.get_folder_relative_path(obj);
             String file_content = NbpHelpers.read_from_jar_file(Const.EMPTY_DAO_XML);
             NbpHelpers.save_text_to_file(obj, output_dir_rel_path, name, file_content);
-            open_metaprogram_file_async(obj, name);
+            open_sdm_folder_file_async(obj, name);
         } catch (Throwable ex) {
             // ex.printStackTrace();
             NbpIdeMessageHelpers.show_error_in_ui_thread(ex);

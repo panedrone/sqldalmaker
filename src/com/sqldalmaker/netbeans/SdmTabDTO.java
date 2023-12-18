@@ -11,6 +11,7 @@ import com.sqldalmaker.common.Const;
 import com.sqldalmaker.common.InternalException;
 import com.sqldalmaker.jaxb.sdm.DtoClass;
 import com.sqldalmaker.jaxb.settings.Settings;
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
@@ -33,6 +34,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
+
 import org.netbeans.core.spi.multiview.MultiViewElement;
 import org.openide.filesystems.FileObject;
 import org.openide.util.Exceptions;
@@ -41,8 +43,7 @@ import org.openide.util.NbBundle.Messages;
 import org.openide.util.RequestProcessor;
 import org.openide.windows.TopComponent;
 
-/**
- *
+/*
  * @author sqldalmaker@gmail.com
  *
  * 18.12.2023 03:01 1.292
@@ -174,9 +175,12 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
         });
     }
 
-    private void generate() throws Exception {
+    private void schedule_generate() throws Exception {
         final Settings settings = NbpHelpers.load_settings(obj);
         final int[] selected_rows = get_selection();
+        if (selected_rows.length == 0) {
+            return;
+        }
         for (int row : selected_rows) {
             table.setValueAt("", row, 2);
         }
@@ -243,30 +247,28 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
             }
         });
         //////////////////////////////////////////////////////
-        if (selected_rows.length > 0) {
-            task.schedule(0);
-        }
+        task.schedule(0);
     }
 
-    private void generate2() {
+    private void generate_async() {
         try {
-            generate();
+            schedule_generate();
         } catch (Exception e) {
             // e.printStackTrace();
             NbpIdeMessageHelpers.show_error_in_ui_thread(e);
         }
     }
 
-    private void validate_all2() {
+    private void validate_all_async() {
         try {
-            validate_all();
+            schedule_validate_all();
         } catch (Exception e) {
             // e.printStackTrace();
             NbpIdeMessageHelpers.show_error_in_ui_thread(e);
         }
     }
 
-    private void validate_all() throws Exception {
+    private void schedule_validate_all() throws Exception {
         final Settings settings = NbpHelpers.load_settings(obj);
         reload_table();
         // 1. open connection
@@ -274,7 +276,7 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
         // 3. close connection
         // 4. update the files from the list
         // http://stackoverflow.com/questions/22326822/netbeans-platform-progress-bar
-        RequestProcessor RP = new RequestProcessor("Validate DTO classes RP");
+        RequestProcessor RP = new RequestProcessor("Validate all DTO classes RP");
         // final ProgressHandle ph = ProgressHandle.createHandle("Validate DTO classes");
         RequestProcessor.Task task = RP.create(new Runnable() {
             @Override
@@ -408,7 +410,7 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-                boolean hasFocus, int row, int column) {
+                                                       boolean hasFocus, int row, int column) {
             Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             String s_value = (String) value;
             setText(s_value);
@@ -536,7 +538,7 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
     }
 
     private void open_dto_xml() {
-        NbpIdeEditorHelpers.open_metaprogram_file_async(obj, Const.SDM_XML);
+        NbpIdeEditorHelpers.open_sdm_folder_file_async(obj, Const.SDM_XML);
     }
 
     protected void open_generated_source_file() {
@@ -706,11 +708,11 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton9ActionPerformed
-        generate2();
+        generate_async();
     }//GEN-LAST:event_jButton9ActionPerformed
 
     private void jButton10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton10ActionPerformed
-        validate_all2();
+        validate_all_async();
     }//GEN-LAST:event_jButton10ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed

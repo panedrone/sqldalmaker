@@ -15,6 +15,7 @@ import com.sqldalmaker.common.SdmUtils;
 import com.sqldalmaker.common.XmlParser;
 import com.sqldalmaker.jaxb.sdm.DaoClass;
 import com.sqldalmaker.jaxb.settings.Settings;
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
@@ -38,6 +39,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
+
 import org.netbeans.core.spi.multiview.MultiViewElement;
 import org.openide.filesystems.FileObject;
 import org.openide.util.Lookup;
@@ -45,8 +47,7 @@ import org.openide.util.NbBundle.Messages;
 import org.openide.util.RequestProcessor;
 import org.openide.windows.TopComponent;
 
-/**
- *
+/*
  * @author sqldalmaker@gmail.com
  *
  * 18.12.2023 03:01 1.292
@@ -203,7 +204,7 @@ public final class SdmTabDAO extends SdmMultiViewCloneableEditor {
                 XmlEditorUtil.goto_sdm_class_declaration_async(folder, dto_class_name);
             } else {
                 String ref = (String) table.getValueAt(sel_row, 0) + ".xml";
-                NbpIdeEditorHelpers.open_metaprogram_file_async(obj, ref);
+                NbpIdeEditorHelpers.open_sdm_folder_file_async(obj, ref);
             }
         } catch (Exception ex) {
             // ex.printStackTrace();
@@ -227,7 +228,7 @@ public final class SdmTabDAO extends SdmMultiViewCloneableEditor {
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-                boolean hasFocus, int row, int column) {
+                                                       boolean hasFocus, int row, int column) {
             Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             String sValue = (String) value;
             setText(sValue);
@@ -404,7 +405,12 @@ public final class SdmTabDAO extends SdmMultiViewCloneableEditor {
                 }
             }
 
-            private void generate_for_dao_xml(NbpIdeConsoleUtil ide_log, final IDaoCG gen, final StringBuilder output_dir, int[] selected_rows) throws Exception {
+            private void generate_for_dao_xml(
+                    NbpIdeConsoleUtil ide_log,
+                    IDaoCG gen,
+                    StringBuilder output_dir,
+                    int[] selected_rows) throws Exception {
+
                 String sdm_folder_abs_path = NbpPathHelpers.get_metaprogram_abs_path(obj);
                 String output_dir_rel_path = output_dir.toString();
                 String context_path = DaoClass.class.getPackage().getName();
@@ -433,7 +439,13 @@ public final class SdmTabDAO extends SdmMultiViewCloneableEditor {
                 }
             }
 
-            private void generate_for_sdm_xml(NbpIdeConsoleUtil ide_log, IDaoCG gen, StringBuilder output_dir, List<DaoClass> jaxb_dao_classes, int[] selected_rows) {
+            private void generate_for_sdm_xml(
+                    NbpIdeConsoleUtil ide_log,
+                    IDaoCG gen,
+                    StringBuilder output_dir,
+                    List<DaoClass> jaxb_dao_classes,
+                    int[] selected_rows) {
+
                 String output_dir_rel_path = output_dir.toString();
                 for (int row : selected_rows) {
                     String dao_class_name = (String) table.getValueAt(row, 0);
@@ -514,7 +526,10 @@ public final class SdmTabDAO extends SdmMultiViewCloneableEditor {
                 }
             }
 
-            private void validate_for_dao_xml(NbpIdeConsoleUtil ide_log, IDaoCG gen) throws Exception {
+            private void validate_for_dao_xml(
+                    NbpIdeConsoleUtil ide_log,
+                    IDaoCG gen) throws Exception {
+
                 String sdm_folder_abs_path = NbpPathHelpers.get_metaprogram_abs_path(obj);
                 String context_path = DaoClass.class.getPackage().getName();
                 XmlParser xml_Parser = new XmlParser(context_path, Helpers.concat_path(sdm_folder_abs_path, Const.DAO_XSD));
@@ -551,7 +566,11 @@ public final class SdmTabDAO extends SdmMultiViewCloneableEditor {
                 }
             }
 
-            private void validate_for_sdm_xml(NbpIdeConsoleUtil ide_log, IDaoCG gen, List<DaoClass> jaxb_dao_classes) {
+            private void validate_for_sdm_xml(
+                    NbpIdeConsoleUtil ide_log,
+                    IDaoCG gen,
+                    List<DaoClass> jaxb_dao_classes) {
+
                 int rc = my_table_model.getRowCount();
                 for (int i = 0; i < rc; i++) {
                     String dao_class_name = (String) table.getValueAt(i, 0);

@@ -13,14 +13,50 @@ import com.sqldalmaker.common.RootFileName;
 import com.sqldalmaker.common.SdmUtils;
 import com.sqldalmaker.common.TargetLangUtils;
 import com.sqldalmaker.jaxb.settings.Settings;
+
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.openide.filesystems.FileObject;
 
-/**
+/*
  *
  * @author sqldalmaker@gmail.com
+ *
+ * 16.12.2023 09:01 1.292 sdm.xml
+ *
+ * 10.08.2023 09:31 1.285
+ *
+ * 12.05.2023 23:01 1.283
+ *
+ * 27.03.2023 10:44 1.280
+ *
+ * 16.02.2023 11:38 1.278
+ *
+ * 30.10.2022 08:03 1.266
+ *
+ * 06.08.2022 09:15 1.261
+ *
+ * 24.07.2022 18:11 1.256
+ *
+ * 10.07.2022 00:45 1.248
+ *
+ * 21.05.2022 11:59 1.243
+ *
+ * 17.04.2022 22:07 1.219
+ *
+ * 18.05.2021 10:49 1.202
+ *
+ * 08.05.2021 22:29 1.200
+ *
+ * 22.03.2021 21:19 Go
+ *
+ * 16.03.2021 07:05 type-map for rubi
+ *
+ * 06.09.2020 19:46 improved RefCursors logic for php + oci8
+ *
+ * 07.02.2019 19:50 initial commit
  *
  */
 public class NbpTargetLanguageHelpers {
@@ -31,7 +67,7 @@ public class NbpTargetLanguageHelpers {
             return root_files;
         }
         String[] rfn = {RootFileName.PHP, RootFileName.JAVA, RootFileName.CPP,
-            RootFileName.PYTHON, RootFileName.GO};
+                RootFileName.PYTHON, RootFileName.GO};
         for (String fn : rfn) {
             FileObject root_file = xml_mp_dir.getFileObject(fn);
             if (root_file != null) {
@@ -52,10 +88,10 @@ public class NbpTargetLanguageHelpers {
     }
 
     public static void validate_dto(SdmDataObject obj,
-            Settings settings,
-            String dto_class_name,
-            String[] file_content,
-            StringBuilder res_buf) throws Exception {
+                                    Settings settings,
+                                    String dto_class_name,
+                                    String[] file_content,
+                                    StringBuilder res_buf) throws Exception {
 
         String root_fn = obj.getPrimaryFile().getNameExt();
         String source_folder_rel_path = settings.getFolders().getTarget();
@@ -75,18 +111,18 @@ public class NbpTargetLanguageHelpers {
     }
 
     public static String get_target_folder_abs_path(String root_fn,
-            String project_root_abs_path,
-            String target_folder_rel_path,
-            String class_scope) {
+                                                    String project_root_abs_path,
+                                                    String target_folder_rel_path,
+                                                    String class_scope) {
 
         return TargetLangUtils.get_target_folder_abs_path(class_scope, root_fn, target_folder_rel_path, project_root_abs_path);
     }
 
     public static void validate_dao(SdmDataObject obj,
-            Settings settings,
-            String dao_class_name,
-            String[] file_content,
-            StringBuilder res_buf) throws Exception {
+                                    Settings settings,
+                                    String dao_class_name,
+                                    String[] file_content,
+                                    StringBuilder res_buf) throws Exception {
 
         String root_fn = obj.getPrimaryFile().getNameExt();
         String source_folder_rel_path = settings.getFolders().getTarget();
@@ -106,16 +142,16 @@ public class NbpTargetLanguageHelpers {
     }
 
     public static String get_target_file_name(SdmDataObject obj,
-            String class_name) throws Exception {
+                                              String class_name) throws Exception {
 
         String root_fn = obj.getPrimaryFile().getNameExt();
         return TargetLangUtils.file_name_from_class_name(root_fn, class_name);
     }
 
     public static String get_rel_path(Settings settings,
-            String root_fn,
-            String file_name,
-            String scope) {
+                                      String root_fn,
+                                      String file_name,
+                                      String scope) {
 
         if (RootFileName.JAVA.equals(root_fn) || RootFileName.PHP.equals(root_fn)) {
             return Helpers.concat_path(SdmUtils.get_package_relative_path(settings, scope), file_name);
@@ -125,9 +161,9 @@ public class NbpTargetLanguageHelpers {
     }
 
     public static String get_rel_path(SdmDataObject obj,
-            Settings settings,
-            String class_name,
-            String scope) throws Exception {
+                                      Settings settings,
+                                      String class_name,
+                                      String scope) throws Exception {
 
         String root_fn = obj.getPrimaryFile().getNameExt();
         String target_file_name = TargetLangUtils.file_name_from_class_name(root_fn, class_name);
@@ -136,12 +172,21 @@ public class NbpTargetLanguageHelpers {
     }
 
     public static void open_in_editor_async(SdmDataObject obj,
-            Settings settings,
-            String class_name,
-            String scope) throws Exception {
+                                            Settings settings,
+                                            String class_name,
+                                            String scope) throws Exception {
 
         String rel_path = get_rel_path(obj, settings, class_name, scope);
         NbpIdeEditorHelpers.open_project_file_in_editor_async(obj, rel_path);
+    }
+
+    public static boolean try_open_in_editor_async(SdmDataObject obj,
+                                                   Settings settings,
+                                                   String class_name,
+                                                   String scope) throws Exception {
+
+        String rel_path = get_rel_path(obj, settings, class_name, scope);
+        return NbpIdeEditorHelpers.try_open_sdm_folder_file_in_editor_async(obj, rel_path);
     }
 
     public static IDtoCG create_dto_cg(
@@ -153,7 +198,7 @@ public class NbpTargetLanguageHelpers {
         String root_fn = obj.getPrimaryFile().getNameExt();
         String xml_configs_folder_full_path = obj.getPrimaryFile().getParent().getPath();
         String project_abs_path = NbpPathHelpers.get_root_folder(obj.getPrimaryFile()).getPath();
-        return TargetLangUtils.create_dto_cg(root_fn, project_abs_path, xml_configs_folder_full_path, 
+        return TargetLangUtils.create_dto_cg(root_fn, project_abs_path, xml_configs_folder_full_path,
                 conn, settings, output_dir_rel_path);
     }
 
@@ -166,12 +211,12 @@ public class NbpTargetLanguageHelpers {
         String root_fn = obj.getPrimaryFile().getNameExt();
         String xml_configs_folder_full_path = obj.getPrimaryFile().getParent().getPath();
         String project_abs_path = NbpPathHelpers.get_root_folder(obj.getPrimaryFile()).getPath();
-        return TargetLangUtils.create_dao_cg(root_fn, project_abs_path, xml_configs_folder_full_path, 
+        return TargetLangUtils.create_dao_cg(root_fn, project_abs_path, xml_configs_folder_full_path,
                 conn, settings, output_dir_rel_path);
     }
 
     public static String get_root_file_relative_path(FileObject root_folder,
-            FileObject file) {
+                                                     FileObject file) {
 
         String fn = file.getNameExt();
         if (RootFileName.JAVA.equals(fn)

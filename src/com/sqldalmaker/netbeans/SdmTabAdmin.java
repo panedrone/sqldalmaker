@@ -9,27 +9,34 @@ import com.sqldalmaker.cg.Helpers;
 import com.sqldalmaker.common.Const;
 import com.sqldalmaker.common.XmlHelpers;
 import com.sqldalmaker.jaxb.settings.Settings;
+
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.sql.Connection;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JToolBar;
+
 import org.netbeans.core.spi.multiview.MultiViewElement;
 import org.openide.filesystems.FileObject;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
 
-/**
+/*
  *
  * @author sqldalmaker@gmail.com
  *
  * 18.12.2023 03:01 1.292
+ *
  * 12.05.2023 23:01 1.283
+ *
  * 23.02.2023 15:42 1.279
+ *
  * 30.10.2022 08:03 1.266
+ *
  * 08.05.2021 22:29 1.200
+ *
  * 29.06.2020 06:54
  *
  */
@@ -144,7 +151,7 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
     }
 
     private void editSettingsXml() {
-        NbpIdeEditorHelpers.open_metaprogram_file_async(obj, Const.SETTINGS_XML);
+        NbpIdeEditorHelpers.open_sdm_folder_file_async(obj, Const.SETTINGS_XML);
     }
 
     /**
@@ -1033,7 +1040,7 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
     private javax.swing.JTextPane jTextPane1;
     // End of variables declaration//GEN-END:variables
 
-//    private void testConnection() {
+    //    private void testConnection() {
 //        try {
 //            Connection conn = NbpHelpers.get_connection(obj);
 //            conn.close();

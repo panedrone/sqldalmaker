@@ -89,7 +89,9 @@ public class XmlEditorHyperlinkProvider implements HyperlinkProviderExt {
             return false;
         }
         String doc_name = this_file_object.getNameExt();
-        if (!FileSearchHelpers.is_sdm_xml(doc_name) && !FileSearchHelpers.is_dao_xml(doc_name)) {
+        boolean is_sdm_xml = FileSearchHelpers.is_sdm_xml(doc_name);
+        boolean is_dao_xml = FileSearchHelpers.is_dao_xml(doc_name);
+        if (!is_sdm_xml && !is_dao_xml) {
             return false;
         }
         XmlEditorUtil checker = new XmlEditorUtil();
@@ -103,14 +105,12 @@ public class XmlEditorHyperlinkProvider implements HyperlinkProviderExt {
                 return true;
             }
         } else if (XmlEditorUtil.ATTRIBUTE.DTO.equals(attribute_name)) {
-            if (FileSearchHelpers.is_dao_xml(doc_name)) {
-                start_offset = checker.get_start_offset() + 1;
-                end_offset = checker.get_end_offset() + 1;
-                attribute_value = checker.get_attribute_value();
-                return true;
-            }
+            start_offset = checker.get_start_offset() + 1;
+            end_offset = checker.get_end_offset() + 1;
+            attribute_value = checker.get_attribute_value();
+            return true;
         } else if (XmlEditorUtil.ATTRIBUTE.NAME.equals(attribute_name)) {
-            if (FileSearchHelpers.is_sdm_xml(doc_name)) {
+            if (is_sdm_xml) {
                 start_offset = checker.get_start_offset() + 1;
                 end_offset = checker.get_end_offset() + 1;
                 attribute_value = checker.get_attribute_value();
@@ -165,7 +165,7 @@ public class XmlEditorHyperlinkProvider implements HyperlinkProviderExt {
         if (XmlEditorUtil.ATTRIBUTE.NAME.equals(attribute_name)) {
             try {
                 Settings settings = NbpHelpers.load_settings(this_doc_file);
-                String dto_class_name = attribute_value;
+                String class_name = attribute_value;
                 final FileObject this_file_object = data_object.getPrimaryFile();
                 if (this_file_object == null) {
                     return;
@@ -185,7 +185,15 @@ public class XmlEditorHyperlinkProvider implements HyperlinkProviderExt {
                     return;
                 }
                 SdmDataObject root_data_object = (SdmDataObject) root_file_data_object;
-                NbpTargetLanguageHelpers.open_in_editor_async(root_data_object, settings, dto_class_name, settings.getDto().getScope());
+                boolean is_dao = false;
+                if (class_name.toLowerCase().endsWith("dao")) {
+                    String scope = settings.getDao().getScope();
+                    is_dao = NbpTargetLanguageHelpers.try_open_in_editor_async(root_data_object, settings, class_name, scope);
+                }
+                if (!is_dao) {
+                    String scope = settings.getDto().getScope();
+                    NbpTargetLanguageHelpers.open_in_editor_async(root_data_object, settings, class_name, scope);
+                }
             } catch (Exception ex) {
                 // ex.printStackTrace();
                 NbpIdeMessageHelpers.show_error_in_ui_thread(ex);

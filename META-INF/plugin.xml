@@ -39,7 +39,7 @@ Generated code is being synchronized with the current database schema using "liv
     </module-components>
 
     <actions>
-        <group class="com.sqldalmaker.intellij.SdmActionGroup" id="SdmActionGroup" text="SDM"
+        <group class="com.sqldalmaker.intellij.ui.IdeaActionGroup" id="IdeaActionGroup" text="SDM"
                description="SDM" icon="/img/sqldalmaker.png" popup="true">
             <add-to-group group-id="FileMainSettingsGroup" anchor="last"/>
             <add-to-group group-id="MainToolBarSettings" anchor="last"/>
