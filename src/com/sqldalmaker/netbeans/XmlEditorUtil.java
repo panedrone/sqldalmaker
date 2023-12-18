@@ -28,6 +28,24 @@ import org.openide.util.RequestProcessor;
  * Implementation of XmlEditorUtil is based on
  * https://platform.netbeans.org/tutorials/nbm-hyperlink.html
  *
+ * 18.12.2023 03:01 1.292
+ *
+ * 10.08.2023 09:31 1.285
+ *
+ * 23.02.2023 15:42 1.279
+ *
+ * 16.02.2023 11:38 1.278
+ *
+ * 30.10.2022 08:03 1.266
+ *
+ * 06.08.2022 09:15 1.261
+ *
+ * 08.04.2022 20:33 + hyperlinks for nb
+ *
+ * 14.05.2021 06:22 1.201
+ *
+ * 08.05.2021 22:29 1.200
+ *
  */
 public class XmlEditorUtil {
 
@@ -111,7 +129,7 @@ public class XmlEditorUtil {
         return attribute_value == null ? "" : attribute_value;
     }
 
-    private static int get_gto_class_declaration_offset(Document dto_xml_doc, String search_pattern) throws Exception {
+    private static int get_sdm_class_declaration_offset(Document dto_xml_doc, String search_pattern) throws Exception {
         TokenHierarchy<Document> hi = TokenHierarchy.get(dto_xml_doc);
         TokenSequence<XMLTokenId> ts = hi.tokenSequence(XMLTokenId.language());
         ts.moveStart();
@@ -130,7 +148,7 @@ public class XmlEditorUtil {
 
     private static int process_tag(TokenSequence<XMLTokenId> ts, Token<XMLTokenId> tag_token, String search_pattern) {
         String tag_text = tag_token.text().toString();
-        if (!(tag_token.id() == XMLTokenId.TAG && tag_text.equals("<dto-class"))) {
+        if (!(tag_token.id() == XMLTokenId.TAG && ("<dto-class".equals(tag_text) || "<dao-class".equals(tag_text)))) {
             return 0;
         }
         while (ts.moveNext()) { // search for argument 'name'
@@ -180,11 +198,10 @@ public class XmlEditorUtil {
         return 0;
     }
 
-    public static void goto_dto_class_declaration_async(final FileObject folder, final String dto_class_name) {
-        String dto_xml_file_name = Const.SDM_XML;
-        final FileObject dto_xml_file = folder.getFileObject(dto_xml_file_name);
-        if (dto_xml_file == null) {
-            NbpIdeMessageHelpers.show_error_in_ui_thread("File not found: " + dto_xml_file_name);
+    public static void goto_sdm_class_declaration_async(final FileObject folder, final String class_name) {
+        final FileObject sdm_xml_file = folder.getFileObject(Const.SDM_XML);
+        if (sdm_xml_file == null) {
+            NbpIdeMessageHelpers.show_error_in_ui_thread("File not found: " + Const.SDM_XML);
             return;
         }
         // https://platform.netbeans.org/tutorials/60/nbm-hyperlink.html
@@ -192,9 +209,9 @@ public class XmlEditorUtil {
             @Override
             public void run() {
                 try {
-                    final DataObject dto_xml_data_object = DataObject.find(dto_xml_file);
+                    final DataObject sdm_xml_data_object = DataObject.find(sdm_xml_file);
                     // https://blogs.oracle.com/geertjan/entry/open_file_action
-                    dto_xml_data_object.getLookup().lookup(OpenCookie.class).open();
+                    sdm_xml_data_object.getLookup().lookup(OpenCookie.class).open();
                     // https://platform.netbeans.org/tutorials/60/nbm-hyperlink.html
                     org.netbeans.editor.Utilities.runInEventDispatchThread(new Runnable() {
                         // SwingUtilities.invokeAndWait(new Runnable() { // === panedrone: it does not work:
@@ -205,7 +222,7 @@ public class XmlEditorUtil {
                                 // copy-paste from // https://platform.netbeans.org/tutorials/60/nbm-hyperlink.html
                                 // warning: [cast] redundant cast to Observable
                                 // final EditorCookie.Observable ec = (EditorCookie.Observable) dObject.getCookie(EditorCookie.Observable.class);
-                                final EditorCookie.Observable ec = dto_xml_data_object.getCookie(EditorCookie.Observable.class);
+                                final EditorCookie.Observable ec = sdm_xml_data_object.getCookie(EditorCookie.Observable.class);
                                 if (ec != null) {
                                     final JEditorPane[] panes = ec.getOpenedPanes(); // UI thread needed
                                     if ((panes != null) && (panes.length > 0)) {
@@ -213,10 +230,10 @@ public class XmlEditorUtil {
                                         if (dto_xml_doc == null) {
                                             return;
                                         }
-                                        int tok_offset = get_gto_class_declaration_offset(dto_xml_doc, dto_class_name);
+                                        int tok_offset = get_sdm_class_declaration_offset(dto_xml_doc, class_name);
                                         // panes[0].setCaretPosition(tok_offset);
                                         panes[0].setSelectionStart(tok_offset + 1);
-                                        panes[0].setSelectionEnd(tok_offset + 1 + dto_class_name.length());
+                                        panes[0].setSelectionEnd(tok_offset + 1 + class_name.length());
                                     }
                                 }
                                 // === panedrone: it does not work:

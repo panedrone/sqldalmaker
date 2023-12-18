@@ -198,7 +198,24 @@ public class UITabDAO {
         }
     }
 
-    private void generate_for_sdm_xml(final IDaoCG gen, final List<IdeaHelpers.GeneratedFileData> list, final Settings settings, final int[] selectedRows, List<DaoClass> jaxb_dao_classes) {
+
+    private void update_table_async() {
+        // to prevent:
+        // WARN - intellij.ide.HackyRepaintManager
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                table.updateUI();
+            }
+        });
+    }
+
+    private void generate_for_sdm_xml(
+            IDaoCG gen,
+            List<IdeaHelpers.GeneratedFileData> list,
+            Settings settings,
+            int[] selectedRows,
+            List<DaoClass> jaxb_dao_classes) {
+
         for (int row : selectedRows) {
             String dao_class_name = (String) table.getValueAt(row, 0);
             try {
@@ -207,28 +224,22 @@ public class UITabDAO {
                 String[] file_content = gen.translate(dao_class_name, dao_class);
                 IdeaTargetLanguageHelpers.prepare_generated_file_data(root_file, dao_class_name, file_content, list);
                 table.setValueAt(Const.STATUS_GENERATED, row, 1);
-                try {
-                    Thread.sleep(50);
-                } catch (InterruptedException e) {
-                    // e.printStackTrace();
-                }
-                // to prevent:
-                // WARN - intellij.ide.HackyRepaintManager
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        table.updateUI();
-                    }
-                });
             } catch (Throwable e) {
                 String msg = e.getMessage();
                 table.setValueAt(msg, row, 1);
                 IdeaMessageHelpers.add_dao_error_message(settings, root_file, dao_class_name, msg);
                 // break; // exit the loop
             }
+            update_table_async();
         }
     }
 
-    private void generate_for_dao_xml(final IDaoCG gen, final List<IdeaHelpers.GeneratedFileData> list, final Settings settings, final int[] selectedRows) throws Exception {
+    private void generate_for_dao_xml(
+            IDaoCG gen,
+            List<IdeaHelpers.GeneratedFileData> list,
+            Settings settings,
+            int[] selectedRows) throws Exception {
+
         String local_abs_path = root_file.getParent().getPath();
         String contextPath = DaoClass.class.getPackage().getName();
         XmlParser xml_parser = new XmlParser(contextPath, Helpers.concat_path(local_abs_path, Const.DAO_XSD));
@@ -242,24 +253,13 @@ public class UITabDAO {
                 String[] file_content = gen.translate(dao_class_name, dao_class);
                 IdeaTargetLanguageHelpers.prepare_generated_file_data(root_file, dao_class_name, file_content, list);
                 table.setValueAt(Const.STATUS_GENERATED, row, 1);
-                try {
-                    Thread.sleep(50);
-                } catch (InterruptedException e) {
-                    // e.printStackTrace();
-                }
-                // to prevent:
-                // WARN - intellij.ide.HackyRepaintManager
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        table.updateUI();
-                    }
-                });
             } catch (Throwable e) {
                 String msg = e.getMessage();
                 table.setValueAt(msg, row, 1);
                 IdeaMessageHelpers.add_dao_error_message(settings, root_file, dao_xml_rel_path, msg);
                 // break; // exit the loop
             }
+            update_table_async();
         }
     }
 
@@ -279,14 +279,7 @@ public class UITabDAO {
                     for (int row : selectedRows) {
                         table.setValueAt("", row, 1);
                     }
-                    // to prevent:
-                    // WARN - Intellij.ide.HackyRepaintManager
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            table.updateUI();
-                        }
-                    });
-                    // tableViewer.refresh();
+                    update_table_async();
                     Connection con = IdeaHelpers.get_connection(project, settings);
                     try {
                         // !!!! after 'try'
@@ -300,11 +293,7 @@ public class UITabDAO {
                     } finally {
                         con.close();
                     }
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            table.updateUI();
-                        }
-                    });
+                    update_table_async();
                 } catch (Throwable e) {
                     error.error = e;
                 }
@@ -319,11 +308,10 @@ public class UITabDAO {
             // e.printStackTrace();
             IdeaMessageHelpers.show_error_in_ui_thread(e);
         }
+        update_table_async();
         if (error.error != null) {
-            // error.error.printStackTrace();
             IdeaMessageHelpers.show_error_in_ui_thread(error.error);
         }
-        table.updateUI();
     }
 
     private int[] get_selection() throws Exception {
@@ -367,11 +355,7 @@ public class UITabDAO {
                 model.setValueAt(msg, i, 1);
                 IdeaMessageHelpers.add_dao_error_message(settings, root_file, dao_class_name, msg);
             }
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    table.updateUI();
-                }
-            });
+            update_table_async();
         }
     }
 
@@ -405,11 +389,7 @@ public class UITabDAO {
                 model.setValueAt(msg, i, 1);
                 IdeaMessageHelpers.add_dao_error_message(settings, root_file, dao_xml_rel_path, msg);
             }
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    table.updateUI();
-                }
-            });
+            update_table_async();
         }
     }
 

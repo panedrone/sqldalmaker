@@ -464,7 +464,6 @@ public class UITabDTO {
                     ProgressManager.progress(dto_class_name);
                     progressManager.getProgressIndicator().setText(dto_class_name);
                     try {
-                        Thread.sleep(50);
                         String[] fileContent = gen.translate(dto_class_name);
                         StringBuilder validationBuff = new StringBuilder();
                         IdeaTargetLanguageHelpers.validate_dto(project, root_file, settings, dto_class_name, fileContent, validationBuff);
@@ -481,11 +480,7 @@ public class UITabDTO {
                         model.setValueAt(msg, i, 2);
                         IdeaMessageHelpers.add_dto_error_message(settings, root_file, dto_class_name, msg);
                     }
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            table.updateUI();
-                        }
-                    });
+                    update_table_async();
                 }
             }
         };
@@ -512,12 +507,7 @@ public class UITabDTO {
                     for (int row : selected_rows) {
                         table.setValueAt("", row, 2);
                     }
-                    // to prevent: WARN - intellij.ide.HackyRepaintManager
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            table.updateUI();
-                        }
-                    });
+                    update_table_async();
                     // tableViewer.refresh();
                     Connection con = IdeaHelpers.get_connection(project, settings);
                     try {
@@ -530,18 +520,7 @@ public class UITabDTO {
                                 String[] fileContent = gen.translate(dto_class_name);
                                 IdeaTargetLanguageHelpers.prepare_generated_file_data(root_file, dto_class_name, fileContent, list);
                                 table.setValueAt(Const.STATUS_GENERATED, row, 2);
-                                try {
-                                    Thread.sleep(50);
-                                } catch (InterruptedException e) {
-                                    // e.printStackTrace();
-                                }
-                                // to prevent:
-                                // WARN - Intellij.ide.HackyRepaintManager
-                                SwingUtilities.invokeLater(new Runnable() {
-                                    public void run() {
-                                        table.updateUI();
-                                    }
-                                });
+                                update_table_async();
                             } catch (Throwable e) {
                                 String msg = e.getMessage();
                                 table.setValueAt(msg, row, 2);
@@ -551,11 +530,7 @@ public class UITabDTO {
                     } finally {
                         con.close();
                     }
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            table.updateUI();
-                        }
-                    });
+                    update_table_async();
                 } catch (Exception e) {
                     error.error = e;
                 }
@@ -573,7 +548,17 @@ public class UITabDTO {
         if (error.error != null) {
             IdeaMessageHelpers.show_error_in_ui_thread(error.error);
         }
-        table.updateUI();
+        update_table_async();
+    }
+
+    private void update_table_async() {
+        // to prevent:
+        // WARN - intellij.ide.HackyRepaintManager
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                table.updateUI();
+            }
+        });
     }
 
     private int[] get_selection() throws InternalException {

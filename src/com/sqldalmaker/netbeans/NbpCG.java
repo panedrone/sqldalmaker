@@ -25,6 +25,16 @@ import org.openide.util.RequestProcessor;
  *
  * @author sqldalmaker@gmail.com
  *
+ * 18.12.2023 02:47 1.292
+ * 
+ * 16.08.2023 03:03 1.285
+ * 
+ * 23.02.2023 15:42 1.279
+ * 
+ * 30.10.2022 08:03 1.266
+ * 
+ * 08.05.2021 22:29 1.200
+ * 
  */
 public class NbpCG {
 
@@ -46,7 +56,7 @@ public class NbpCG {
             return;
         }
         final NbpIdeConsoleUtil ide_log = new NbpIdeConsoleUtil(settings, root_data_object);
-        RequestProcessor RP = new RequestProcessor("Generate DTO classes RP");
+        RequestProcessor RP = new RequestProcessor("Generate all DTO classes RP");
         // final ProgressHandle ph = ProgressHandle.createHandle("Generate DTO class(es)");
         RequestProcessor.Task task = RP.create(new Runnable() {
             @Override
@@ -57,17 +67,71 @@ public class NbpCG {
                     try {
                         IDtoCG gen = NbpTargetLanguageHelpers.create_dto_cg(conn, root_data_object, settings, output_dir);
                         String output_dir_rel_path = output_dir.toString();
-                        String dto_xml_abs_path = xml_file.getPath();
-                        String dto_xsd_abs_path = Helpers.concat_path(xml_metaprogram_abs_path, Const.SDM_XSD);
-                        List<DtoClass> dto_classes = SdmUtils.get_dto_classes(dto_xml_abs_path, dto_xsd_abs_path);
-//                        ide_log.add_debug_message("STARTED...");
-//                        try {
-//                            Thread.sleep(200);
-//                        } catch (InterruptedException e) {
-//                            Exceptions.printStackTrace(e);
-//                        }
+                        String sdm_xml_abs_path = xml_file.getPath();
+                        String sdm_xsd_abs_path = Helpers.concat_path(xml_metaprogram_abs_path, Const.SDM_XSD);
+                        List<DtoClass> dto_classes = SdmUtils.get_dto_classes(sdm_xml_abs_path, sdm_xsd_abs_path);
                         boolean error = false;
                         for (DtoClass cls : dto_classes) {
+                            try {
+                                String[] file_content = gen.translate(cls.getName());
+                                String file_name = NbpTargetLanguageHelpers.get_target_file_name(root_data_object, cls.getName());
+                                NbpHelpers.save_text_to_file(root_data_object, output_dir_rel_path, file_name, file_content[0]);
+                            } catch (Exception e) {
+                                // Exceptions.printStackTrace(e); // === panedrone: it shows banner!!!
+                                error = true;
+                                ide_log.add_error_message(e);
+                            }
+                        }
+                        if (!error) {
+                            ide_log.add_success_message(xml_file_title + " -> Generated successfully");
+                        }
+                        //ide_log.add_debug_message("DONE");
+                    } finally {
+                        conn.close();
+                    }
+                } catch (Exception e) {
+                    NbpIdeMessageHelpers.show_error_in_ui_thread(e);
+                    // Exceptions.printStackTrace(e); // // === panedrone: it shows banner!!!
+                }
+            }
+        });
+        task.schedule(0);
+    }
+
+    public static void generate_all_dao(final SdmDataObject root_data_object, final FileObject xml_file, final String xml_file_title) {
+        String name_ext = xml_file.getNameExt();
+        if (!FileSearchHelpers.is_sdm_xml(name_ext)) {
+            return;
+        }
+        final FileObject xml_mp_dir = xml_file.getParent();
+        if (xml_mp_dir == null) {
+            return;
+        }
+        final String sdm_folder_abs_path = xml_mp_dir.getPath();
+        final Settings settings;
+        try {
+            settings = SdmUtils.load_settings(xml_mp_dir.getPath());
+        } catch (Exception ex) {
+            Exceptions.printStackTrace(ex);
+            return;
+        }
+        final NbpIdeConsoleUtil ide_log = new NbpIdeConsoleUtil(settings, root_data_object);
+        RequestProcessor RP = new RequestProcessor("Generate all DAO classes RP");
+        // final ProgressHandle ph = ProgressHandle.createHandle("Generate DTO class(es)");
+        RequestProcessor.Task task = RP.create(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    StringBuilder output_dir = new StringBuilder();
+                    Connection conn = NbpHelpers.get_connection(root_data_object);
+                    try {
+                        IDtoCG gen = NbpTargetLanguageHelpers.create_dto_cg(conn, root_data_object, settings, output_dir);
+                        String output_dir_rel_path = output_dir.toString();
+                        String sdm_xml_abs_path = xml_file.getPath();
+                        String sdm_xsd_abs_path = Helpers.concat_path(sdm_folder_abs_path, Const.SDM_XSD);
+                        List<DaoClass> dao_classes = SdmUtils.get_dao_classes(sdm_xml_abs_path, sdm_xsd_abs_path);
+                        boolean error = false;
+                        for (DaoClass cls : dao_classes) {
                             try {
                                 String[] file_content = gen.translate(cls.getName());
                                 String file_name = NbpTargetLanguageHelpers.get_target_file_name(root_data_object, cls.getName());
@@ -103,7 +167,67 @@ public class NbpCG {
         if (xml_mp_dir == null) {
             return;
         }
-        RequestProcessor RP = new RequestProcessor("Validate DTO classes RP");
+        RequestProcessor RP = new RequestProcessor("Validate all DTO classes RP");
+        // final ProgressHandle ph = ProgressHandle.createHandle("Generate DTO class(es)");
+        RequestProcessor.Task task = RP.create(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Settings settings = SdmUtils.load_settings(xml_mp_dir.getPath());
+                    NbpIdeConsoleUtil ide_log = new NbpIdeConsoleUtil(settings, root_data_object);
+//                    ide_log.add_debug_message("STARTED...");
+                    StringBuilder output_dir = new StringBuilder();
+                    String xml_metaprogram_abs_path = xml_mp_dir.getPath();
+                    Connection conn = NbpHelpers.get_connection(root_data_object);
+                    try {
+                        IDtoCG gen = NbpTargetLanguageHelpers.create_dto_cg(conn, root_data_object, settings, output_dir);
+                        String sdm_xml_abs_path = xml_file.getPath();
+                        String sdm_xsd_abs_path = Helpers.concat_path(xml_metaprogram_abs_path, Const.SDM_XSD);
+                        List<DtoClass> dto_classes = SdmUtils.get_dto_classes(sdm_xml_abs_path, sdm_xsd_abs_path);
+                        boolean error = false;
+                        for (DtoClass cls : dto_classes) {
+                            try {
+                                //ProgressManager.progress(cls.getName());
+                                String[] file_content = gen.translate(cls.getName());
+                                StringBuilder validation_buff = new StringBuilder();
+                                NbpTargetLanguageHelpers.validate_dto(root_data_object, settings, cls.getName(), file_content, validation_buff);
+                                String status = validation_buff.toString();
+                                if (status.length() > 0) {
+                                    error = true;
+                                    ide_log.add_error_message(xml_file_title + " -> DTO class '" + cls.getName() + "'. " + status);
+                                }
+                            } catch (Exception e) {
+                                // Exceptions.printStackTrace(e); // === panedrone: it shows banner!!!
+                                error = true;
+                                ide_log.add_error_message(e);
+                            }
+                        }
+                        if (!error) {
+                            ide_log.add_success_message(xml_file_title + " -> OK");
+                        }
+                    } finally {
+                        conn.close();
+//                        ide_log.add_debug_message("COMPLETED.");
+                    }
+                } catch (Exception e) {
+                    NbpIdeMessageHelpers.show_error_in_ui_thread(e);
+                    // Exceptions.printStackTrace(e); // // === panedrone: it shows banner!!!
+                }
+            }
+        });
+        task.schedule(0);
+    }
+
+    public static void validate_all_dao(final SdmDataObject root_data_object, final FileObject xml_file, final String xml_file_title) {
+        String name_ext = xml_file.getNameExt();
+        if (!FileSearchHelpers.is_sdm_xml(name_ext)) {
+            return;
+        }
+        final FileObject xml_mp_dir = xml_file.getParent();
+        if (xml_mp_dir == null) {
+            return;
+        }
+        RequestProcessor RP = new RequestProcessor("Validate all DAO classes RP");
         // final ProgressHandle ph = ProgressHandle.createHandle("Generate DTO class(es)");
         RequestProcessor.Task task = RP.create(new Runnable() {
             @Override
@@ -119,14 +243,9 @@ public class NbpCG {
                         IDtoCG gen = NbpTargetLanguageHelpers.create_dto_cg(conn, root_data_object, settings, output_dir);
                         String dto_xml_abs_path = xml_file.getPath();
                         String dto_xsd_abs_path = Helpers.concat_path(xml_metaprogram_abs_path, Const.SDM_XSD);
-                        List<DtoClass> dto_classes = SdmUtils.get_dto_classes(dto_xml_abs_path, dto_xsd_abs_path);
-                        try {
-                            Thread.sleep(200);
-                        } catch (InterruptedException e) {
-                            Exceptions.printStackTrace(e);
-                        }
+                        List<DaoClass> dao_classes = SdmUtils.get_dao_classes(dto_xml_abs_path, dto_xsd_abs_path);
                         boolean error = false;
-                        for (DtoClass cls : dto_classes) {
+                        for (DaoClass cls : dao_classes) {
                             try {
                                 //ProgressManager.progress(cls.getName());
                                 String[] file_content = gen.translate(cls.getName());
@@ -135,7 +254,7 @@ public class NbpCG {
                                 String status = validation_buff.toString();
                                 if (status.length() > 0) {
                                     error = true;
-                                    ide_log.add_error_message(xml_file_title + " -> DTO class '" + cls.getName() + "'. " + status);
+                                    ide_log.add_error_message(xml_file_title + " -> DAO class '" + cls.getName() + "'. " + status);
                                 }
                             } catch (Exception e) {
                                 // Exceptions.printStackTrace(e); // === panedrone: it shows banner!!!
@@ -183,11 +302,6 @@ public class NbpCG {
                     try {
                         IDaoCG gen = NbpTargetLanguageHelpers.create_dao_cg(conn, root_data_object, settings, output_dir);
                         String output_dir_rel_path = output_dir.toString();
-                        try {
-                            Thread.sleep(200);
-                        } catch (InterruptedException e) {
-                            Exceptions.printStackTrace(e);
-                        }
                         boolean error = false;
                         try {
                             String context_path = DaoClass.class.getPackage().getName();
@@ -235,17 +349,11 @@ public class NbpCG {
                 try {
                     Settings settings = SdmUtils.load_settings(xml_mp_dir.getPath());
                     NbpIdeConsoleUtil ide_log = new NbpIdeConsoleUtil(settings, root_data_object);
-//                    ide_log.add_debug_message("STARTED...");
                     StringBuilder output_dir = new StringBuilder();
                     String xml_mp_abs_path = xml_mp_dir.getPath();
                     Connection conn = NbpHelpers.get_connection(root_data_object);
                     try {
                         IDaoCG gen = NbpTargetLanguageHelpers.create_dao_cg(conn, root_data_object, settings, output_dir);
-                        try {
-                            Thread.sleep(200);
-                        } catch (InterruptedException e) {
-                            Exceptions.printStackTrace(e);
-                        }
                         boolean error = false;
                         try {
                             String context_path = DaoClass.class.getPackage().getName();

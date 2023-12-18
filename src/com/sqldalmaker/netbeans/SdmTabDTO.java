@@ -45,6 +45,18 @@ import org.openide.windows.TopComponent;
  *
  * @author sqldalmaker@gmail.com
  *
+ * 18.12.2023 03:01 1.292
+ *
+ * 12.05.2023 23:01 1.283
+ *
+ * 23.02.2023 15:42 1.279
+ *
+ * 30.10.2022 08:03 1.266
+ *
+ * 08.05.2021 22:29 1.200
+ *
+ * 08.04.2021 22:08
+ *
  */
 @MultiViewElement.Registration(
         displayName = "#LBL_Sdm_DTO",
@@ -152,14 +164,16 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
         }
     }
 
-//    private void select_all() {
-//        ListSelectionModel selectionModel = table.getSelectionModel();
-//        selectionModel.setSelectionInterval(0, table.getRowCount() - 1);
-//    }
-//
-//    private void deselect_all() {
-//        table.clearSelection();
-//    }
+    private void update_table_async() {
+        // table.updateUI();       throws NullPointerException without SwingUtilities.invokeLater 
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                table.updateUI();
+            }
+        });
+    }
+
     private void generate() throws Exception {
         final Settings settings = NbpHelpers.load_settings(obj);
         final int[] selected_rows = get_selection();
@@ -202,19 +216,7 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
                                 NbpHelpers.save_text_to_file(obj, output_dir_rel_path, file_name, fileContent[0]);
                                 ide_log.add_success_message(dto_class_name + " -> " + Const.STATUS_GENERATED);
                                 table.setValueAt(Const.STATUS_GENERATED, row, 2);
-                                try {
-                                    Thread.sleep(50);
-                                } catch (InterruptedException e) {
-                                    // e.printStackTrace();
-                                }
-                                // myTableModel.refresh(); cleares selection
-                                // table.updateUI();       throws NullPointerException without SwingUtilities.invokeLater 
-                                SwingUtilities.invokeLater(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        table.updateUI();
-                                    }
-                                });
+                                update_table_async();
                             } catch (Exception ex) {
                                 String msg = ex.getMessage();
                                 if (msg == null) {
@@ -227,15 +229,7 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
                         }
                     } finally {
                         con.close();
-                        // Exception can occur at 3rd line (for example):
-                        // refresh first 3 lines
-                        // error lines are not generated but update them too
-                        SwingUtilities.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                table.updateUI();
-                            }
-                        });
+                        update_table_async();
                     }
                 } catch (Exception ex) {
                     ide_log.add_error_message(ex);
@@ -314,20 +308,7 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
                                     table.setValueAt(status, i, 2);
                                     ide_log.add_error_message(dto_class_name + " -> " + status);
                                 }
-                                try {
-                                    Thread.sleep(50);
-                                } catch (InterruptedException e) {
-                                    // e.printStackTrace();
-                                }
-                                // myTableModel.refresh(); cleares selection
-                                // table.updateUI();       throws NullPointerException without SwingUtilities.invokeLater 
-                                SwingUtilities.invokeLater(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        table.updateUI();
-                                    }
-                                });
-
+                                update_table_async();
                             } catch (Exception ex) {
                                 String msg = ex.getMessage();
                                 if (msg == null) {
@@ -512,7 +493,7 @@ public final class SdmTabDTO extends SdmMultiViewCloneableEditor {
             if (selected_rows.length == 1) {
                 FileObject folder = this_doc_file.getParent();
                 String dto_class_name = (String) table.getValueAt(selected_rows[0], 0);
-                XmlEditorUtil.goto_dto_class_declaration_async(folder, dto_class_name);
+                XmlEditorUtil.goto_sdm_class_declaration_async(folder, dto_class_name);
             }
         } catch (Exception ex) {
             // ex.printStackTrace();

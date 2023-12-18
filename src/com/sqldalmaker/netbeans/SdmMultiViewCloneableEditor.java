@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2021 sqldalmaker@gmail.com
+    Copyright 2011-2023 sqldalmaker@gmail.com
     SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -21,11 +21,24 @@ import org.openide.windows.TopComponent;
  *
  * @author sqldalmaker@gmail.com
  *
+ * 18.12.2023 03:01 1.292
+ * 
+ * 10.08.2023 09:31 1.285
+ * 
+ * 12.05.2023 23:01 1.283
+ * 
+ * 23.02.2023 15:42 1.279
+ * 
+ * 30.10.2022 08:03 1.266
+ * 
+ * 08.05.2021 22:29 1.200
+ * 
+ * 08.04.2021 22:08
+ *
  */
 public class SdmMultiViewCloneableEditor extends CloneableEditor implements MultiViewElement {
 
     protected final SdmDataObject obj;
-    // private final JToolBar toolbar = new JToolBar();
     protected transient MultiViewElementCallback callback;
 
     public SdmMultiViewCloneableEditor(Lookup lookup) {
@@ -129,7 +142,6 @@ public class SdmMultiViewCloneableEditor extends CloneableEditor implements Mult
     @Override
     public void setMultiViewCallback(MultiViewElementCallback callback) {
         this.callback = callback;
-
         // updateName(); // calling it here leads to empty titles
     }
 

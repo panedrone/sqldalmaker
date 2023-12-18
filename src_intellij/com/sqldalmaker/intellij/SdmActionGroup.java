@@ -20,7 +20,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
+/*
  * Created with IntelliJ IDEA.
  * User: sqldalmaker@gmail.com
  * Date: 21.06.12
@@ -37,7 +37,10 @@ public class SdmActionGroup extends ActionGroup implements AlwaysVisibleActionGr
         }
     }
 
-    private static void enum_root_files(Project project, VirtualFile current_folder, List<VirtualFile> root_files) {
+    private static void enum_root_files(
+            Project project,
+            VirtualFile current_folder,
+            List<VirtualFile> root_files) {
 
         @SuppressWarnings("UnsafeVfsRecursion") VirtualFile[] children = current_folder.getChildren();
         for (VirtualFile c : children) {
@@ -54,7 +57,10 @@ public class SdmActionGroup extends ActionGroup implements AlwaysVisibleActionGr
         }
     }
 
-    private void add_common_actions(Project project, List<AnAction> drop_down_actions_list, List<VirtualFile> root_files) throws Exception {
+    private void add_common_actions(
+            Project project,
+            List<AnAction> drop_down_actions_list,
+            List<VirtualFile> root_files) throws Exception {
 
         for (VirtualFile root_file : root_files) {
             String root_file_rel_path = IdeaHelpers.get_relative_path(project, root_file);
@@ -73,7 +79,6 @@ public class SdmActionGroup extends ActionGroup implements AlwaysVisibleActionGr
     }
 
     private void add_about_actions(List<AnAction> drop_down_actions_list) {
-
         SdmAction action = new SdmAction("About") {
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
@@ -83,7 +88,10 @@ public class SdmActionGroup extends ActionGroup implements AlwaysVisibleActionGr
         drop_down_actions_list.add(action);
     }
 
-    private void add_dto_actions(Project project, List<AnAction> drop_down_actions_list, VirtualFile xml_file) throws Exception {
+    private void add_sdm_actions(
+            Project project,
+            List<AnAction> drop_down_actions_list,
+            VirtualFile xml_file) throws Exception {
 
         String xml_file_rel_path = IdeaHelpers.get_relative_path(project, xml_file);
         SdmAction action_generate = new SdmAction(xml_file_rel_path + " -> Generate All") {
@@ -104,7 +112,10 @@ public class SdmActionGroup extends ActionGroup implements AlwaysVisibleActionGr
         drop_down_actions_list.add(action_validate);
     }
 
-    private void add_dao_actions(Project project, List<AnAction> drop_down_actions_list, VirtualFile xml_file) throws Exception {
+    private void add_dao_actions(
+            Project project,
+            List<AnAction> drop_down_actions_list,
+            VirtualFile xml_file) throws Exception {
 
         String xml_file_rel_path = IdeaHelpers.get_relative_path(project, xml_file);
         SdmAction action_generate = new SdmAction(xml_file_rel_path + " -> Generate") {
@@ -123,7 +134,11 @@ public class SdmActionGroup extends ActionGroup implements AlwaysVisibleActionGr
         drop_down_actions_list.add(action_validate);
     }
 
-    private void add_open_dao_target_action(Project project, VirtualFile root_file, VirtualFile xml_file, List<AnAction> drop_down_actions_list) throws Exception {
+    private void add_open_dao_target_action(
+            Project project,
+            VirtualFile root_file,
+            VirtualFile xml_file,
+            List<AnAction> drop_down_actions_list) throws Exception {
 
         Settings settings = IdeaHelpers.load_settings(root_file);
         String xml_file_path = xml_file.getPath();
@@ -135,7 +150,7 @@ public class SdmActionGroup extends ActionGroup implements AlwaysVisibleActionGr
                 try {
                     IdeaTargetLanguageHelpers.open_dao_sync(project, root_file, settings, dao_class_name);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    // e.printStackTrace();
                     IdeaMessageHelpers.show_error_in_ui_thread(e);
                 }
             }
@@ -143,7 +158,9 @@ public class SdmActionGroup extends ActionGroup implements AlwaysVisibleActionGr
         drop_down_actions_list.add(action_goto_target);
     }
 
-    private boolean add_xml_file_actions(Project project, List<AnAction> drop_down_actions_list) throws Exception {
+    private boolean add_xml_file_actions(
+            Project project,
+            List<AnAction> drop_down_actions_list) throws Exception {
 
         FileEditorManager fm = FileEditorManager.getInstance(project);
         // FileEditor editor = fm.getSelectedEditor(); // since 182.711
@@ -170,13 +187,13 @@ public class SdmActionGroup extends ActionGroup implements AlwaysVisibleActionGr
             return false;
         }
         List<VirtualFile> root_files = IdeaTargetLanguageHelpers.find_root_files(xml_file_dir);
-        if (root_files.size() < 1) {
+        if (root_files.isEmpty()) {
             return false;
         }
         VirtualFile root_file = root_files.get(0);
         String name = xml_file.getName();
         if (FileSearchHelpers.is_sdm_xml(name)) {
-            add_dto_actions(project, drop_down_actions_list, xml_file);
+            add_sdm_actions(project, drop_down_actions_list, xml_file);
         } else if (FileSearchHelpers.is_dao_xml(name)) {
             add_dao_actions(project, drop_down_actions_list, xml_file);
         }
@@ -200,9 +217,8 @@ public class SdmActionGroup extends ActionGroup implements AlwaysVisibleActionGr
         return true;
     }
 
-    @NotNull
     @Override
-    public AnAction[] getChildren(@Nullable AnActionEvent anActionEvent) {
+    public AnAction @NotNull [] getChildren(@Nullable AnActionEvent anActionEvent) {
         try {
             if (anActionEvent == null) {
                 return AnAction.EMPTY_ARRAY;
@@ -230,7 +246,7 @@ public class SdmActionGroup extends ActionGroup implements AlwaysVisibleActionGr
             VirtualFile project_base_dir = IdeaHelpers.get_project_base_dir(project);
             List<VirtualFile> root_files = new ArrayList<VirtualFile>();
             enum_root_files(project, project_base_dir, root_files);
-            if (drop_down_actions_list.size() == 0) {
+            if (drop_down_actions_list.isEmpty()) {
                 add_common_actions(project, drop_down_actions_list, root_files);
             } else {
                 if (root_files.size() > 1) {

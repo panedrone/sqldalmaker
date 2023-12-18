@@ -23,6 +23,24 @@ import org.openide.loaders.DataObject;
  *
  * @author sqldalmaker@gmail.com
  *
+ * 18.12.2023 03:01 1.292
+ *
+ * 10.08.2023 09:31 1.285
+ *
+ * 23.02.2023 15:42 1.279
+ *
+ * 11.11.2022 01:35
+ *
+ * 30.10.2022 08:03 1.266
+ *
+ * 06.08.2022 09:15 1.261
+ *
+ * 08.04.2022 20:33 + hyperlinks for nb
+ *
+ * 14.05.2021 06:22 v1.201
+ *
+ * 08.05.2021 22:29 v1.200
+ *
  */
 @MimeRegistration(mimeType = "text/xml", service = HyperlinkProviderExt.class)
 public class XmlEditorHyperlinkProvider implements HyperlinkProviderExt {
@@ -186,7 +204,7 @@ public class XmlEditorHyperlinkProvider implements HyperlinkProviderExt {
             }
         } else if (XmlEditorUtil.ATTRIBUTE.DTO.equals(attribute_name)) {
             FileObject folder = this_doc_file.getParent();
-            XmlEditorUtil.goto_dto_class_declaration_async(folder, attribute_value);
+            XmlEditorUtil.goto_sdm_class_declaration_async(folder, attribute_value);
         }
     }
 

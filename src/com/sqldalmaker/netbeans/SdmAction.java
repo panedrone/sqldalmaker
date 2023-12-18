@@ -45,7 +45,17 @@ import org.openide.util.actions.Presenter;
 /**
  *
  * @author sqldalmaker@gmail.com
- *
+ * 
+ * 18.12.2023 03:03 1.292
+ * 
+ * 23.02.2023 15:42 1.279
+ * 
+ * 08.04.2022 20:33
+ * 
+ * 08.05.2021 22:29 1.200
+ * 
+ * 02.04.2021 03:20
+ * 
  */
 @ActionID(
         category = "Tools",
@@ -167,12 +177,13 @@ public final class SdmAction extends AbstractAction implements Presenter.Toolbar
         return res;
     }
 
-    private void build_popup_dto(final JPopupMenu popup, final SdmDataObject root_data_object, final FileObject xml_file, final String xml_file_title) {
+    private void build_popup_sdm(final JPopupMenu popup, final SdmDataObject root_data_object, final FileObject xml_file, final String xml_file_title) {
         final String name_gen = xml_file_title + " -> Generate All";
         JMenuItem item_gen = new JMenuItem(new AbstractAction(name_gen) {
             @Override
             public void actionPerformed(ActionEvent e) {
                 NbpCG.generate_all_dto(root_data_object, xml_file, xml_file_title);
+                NbpCG.generate_all_dao(root_data_object, xml_file, xml_file_title);
             }
         });
         item_gen.setText(name_gen);
@@ -182,6 +193,7 @@ public final class SdmAction extends AbstractAction implements Presenter.Toolbar
             @Override
             public void actionPerformed(ActionEvent e) {
                 NbpCG.validate_all_dto(root_data_object, xml_file, xml_file_title);
+                NbpCG.validate_all_dao(root_data_object, xml_file, xml_file_title);
             }
         });
         item_val.setText(name_val);
@@ -243,7 +255,7 @@ public final class SdmAction extends AbstractAction implements Presenter.Toolbar
         String this_file_title = get_title(this_project, this_file_rel_path);
         String doc_name = this_file_object.getNameExt();
         if (FileSearchHelpers.is_sdm_xml(doc_name)) {
-            build_popup_dto(popup, root_data_object, this_file_object, this_file_title);
+            build_popup_sdm(popup, root_data_object, this_file_object, this_file_title);
         } else if (FileSearchHelpers.is_dao_xml(doc_name)) {
             build_popup_dao(popup, root_data_object, this_file_object, this_file_title);
         }
