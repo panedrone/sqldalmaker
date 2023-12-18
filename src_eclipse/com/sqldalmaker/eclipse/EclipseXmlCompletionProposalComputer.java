@@ -120,26 +120,27 @@ public class EclipseXmlCompletionProposalComputer implements ICompletionProposal
 				List<ICompletionProposal> prop_list = new ArrayList<ICompletionProposal>();
 				compute_structure_proposals(qualifier, cursor_offset, prop_list, list);
 				return prop_list;
+			}
+			if (EclipseXmlAttrHelpers.is_value_of("dto", attr_offset, text)) {
+				IContainer metaprogram_folder = this_xml_file.getParent();
+				IResource res = metaprogram_folder.findMember(Const.SDM_XML);
+				if (!(res instanceof IFile)) {
+					return NONE;
+				}
+				IFile sdm_xml_file = (IFile) res;
+				String xml;
+				InputStream stream = sdm_xml_file.getContents();
+				try {
+					xml = input_stream_to_string(stream);
+				} finally {
+					stream.close();
+				}
+				List<String> list = get_attribute_value("name", xml);
+				List<ICompletionProposal> prop_list = new ArrayList<ICompletionProposal>();
+				compute_structure_proposals(qualifier, cursor_offset, prop_list, list);
+				return prop_list;
 			} else if (is_dao_xml) {
-				if (EclipseXmlAttrHelpers.is_value_of("dto", attr_offset, text)) {
-					IContainer metaprogram_folder = this_xml_file.getParent();
-					IResource res = metaprogram_folder.findMember(Const.SDM_XML);
-					if (!(res instanceof IFile)) {
-						return NONE;
-					}
-					IFile sdm_xml_file = (IFile) res;
-					String xml;
-					InputStream stream = sdm_xml_file.getContents();
-					try {
-						xml = input_stream_to_string(stream);
-					} finally {
-						stream.close();
-					}
-					List<String> list = get_attribute_value("name", xml);
-					List<ICompletionProposal> prop_list = new ArrayList<ICompletionProposal>();
-					compute_structure_proposals(qualifier, cursor_offset, prop_list, list);
-					return prop_list;
-				} else if (EclipseXmlAttrHelpers.is_value_of("table", attr_offset, text)) {
+				if (EclipseXmlAttrHelpers.is_value_of("table", attr_offset, text)) {
 					IContainer metaprogram_folder = this_xml_file.getParent();
 					IResource res = metaprogram_folder.findMember(Const.SDM_XML);
 					if (!(res instanceof IFile)) {
