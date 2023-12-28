@@ -77,20 +77,13 @@ public class Editor2 extends EditorPart implements IEditor2 {
 
 	@Override
 	public void init(IEditorSite site, IEditorInput editorInput) throws PartInitException {
-
 		if (!(editorInput instanceof IFileEditorInput)) {
-
 			throw new PartInitException("Invalid input: must be IFileEditorInput");
 		}
-
 		// IFileEditorInput fileEditorInput = (IFileEditorInput) editorInput;
-
 		config_file = ResourceUtil.getFile(editorInput);
-
 		IPath p = config_file.getFullPath();
-
 		String file_name = p.lastSegment();
-
 		config_file_name = file_name;
 
 		// calls setSite and setInput:
@@ -104,19 +97,12 @@ public class Editor2 extends EditorPart implements IEditor2 {
 		// setTitle(p.toPortableString());
 
 		IContainer parent = config_file.getParent();
-
 		if (parent != null) {
-
 			IPath parent_path = parent.getFullPath();
-
 			p = p.makeRelativeTo(parent_path);
-
 			String s = parent_path.lastSegment() + "/" + file_name;
-
 			setPartName(s);
-
 		} else {
-
 			setPartName(file_name);
 		}
 	}
@@ -162,19 +148,14 @@ public class Editor2 extends EditorPart implements IEditor2 {
 
 	@Override
 	public String get_metaprogram_file_abs_path(String name) throws Exception {
-
 		IContainer res = get_sdm_folder();
-
 		return get_abs_path(res) + "/" + name;
 	}
 
 	private static String get_abs_path(IResource res) throws Exception {
-
 		if (res == null || res.getLocation() == null) {
-
 			throw new Exception("Resource not found. Try to reopen SQL DAL Maker GUI.");
 		}
-
 		return res.getLocation().toPortableString();
 	}
 
@@ -185,11 +166,8 @@ public class Editor2 extends EditorPart implements IEditor2 {
 
 	@Override
 	public String get_sdm_folder_path_relative_to_project() throws Exception {
-
 		IContainer res = get_sdm_folder();
-
 		if (res == null) {
-
 			throw new Exception("Internal error. Metaprogram folder not found for " + config_file.getFullPath());
 		}
 
@@ -199,28 +177,21 @@ public class Editor2 extends EditorPart implements IEditor2 {
 		// workspace.
 
 		String s = res.getFullPath().makeRelativeTo(get_project().getFullPath()).toPortableString();
-
 		return s;
 	}
 
 	@Override
 	public IContainer get_sdm_folder() {
-
 		IContainer parent = config_file.getParent();
-
 		return parent;
 	}
 
 	@Override
 	public String get_sdm_folder_abs_path() throws Exception {
-
 		IContainer res = get_sdm_folder();
-
 		if (res == null) {
-
 			throw new Exception("Internal error. Metaprogram folder not found for " + config_file.getFullPath());
 		}
-
 		return get_abs_path(res);
 	}
 

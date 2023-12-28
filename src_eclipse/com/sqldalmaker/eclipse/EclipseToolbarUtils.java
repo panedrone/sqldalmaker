@@ -64,6 +64,7 @@ public class EclipseToolbarUtils {
 
 	public static void open_root_file(String dal_title, IProject[] projects)
 			throws Exception {
+		
 		String dal_file_path = dal_title.replace("\\", "/");
 		String[] segments = dal_file_path.split("/");
 		if (segments.length < 1) {

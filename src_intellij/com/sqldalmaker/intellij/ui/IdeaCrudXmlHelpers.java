@@ -33,7 +33,6 @@ import java.util.Set;
 public class IdeaCrudXmlHelpers {
 
     public static void get_crud_sdm_xml(final Project project, final VirtualFile root_file) {
-
         ISelectDbSchemaCallback callback = new ISelectDbSchemaCallback() {
             @Override
             public void process_ok(boolean schema_in_xml, String selected_schema, boolean skip_used, boolean include_views,
@@ -71,7 +70,6 @@ public class IdeaCrudXmlHelpers {
     }
 
     private static Set<String> find_dto_declared_in_sdm_xml(VirtualFile root_file) throws Exception {
-
         String xml_configs_folder_full_path = root_file.getParent().getPath();
         String sdm_xml_abs_file_path = Helpers.concat_path(xml_configs_folder_full_path, Const.SDM_XML);
         String sdm_xsd_abs_file_path = Helpers.concat_path(xml_configs_folder_full_path, Const.SDM_XSD);
@@ -80,7 +78,6 @@ public class IdeaCrudXmlHelpers {
     }
 
     private static ArrayList<String> fill_dao_file_path_list(VirtualFile root_file) {
-
         final ArrayList<String> res = new ArrayList<String>();
         FileSearchHelpers.IFileList file_list = new FileSearchHelpers.IFileList() {
             @Override
@@ -94,7 +91,6 @@ public class IdeaCrudXmlHelpers {
     }
 
     private static Set<String> find_dto_used_in_dao_xml_crud(VirtualFile root_file) throws Exception {
-
         ArrayList<String> dao_xml_file_name_list = fill_dao_file_path_list(root_file);
         String meta_program_folder_abs_path = root_file.getParent().getPath();
         Set<String> res = SdmUtils.find_dto_used_in_dao_xml_crud(meta_program_folder_abs_path, dao_xml_file_name_list);
@@ -123,7 +119,6 @@ public class IdeaCrudXmlHelpers {
     }
 
     public static void get_crud_dao_xml(final Project project, final VirtualFile root_file) {
-
         ISelectDbSchemaCallback callback = new ISelectDbSchemaCallback() {
             @Override
             public void process_ok(boolean schema_in_xml, String selected_schema, boolean skip_used, boolean include_views,
@@ -164,7 +159,6 @@ public class IdeaCrudXmlHelpers {
     }
 
     public static void get_fk_access_xml(final Project project, final VirtualFile root_file) {
-
         ISelectDbSchemaCallback callback = new ISelectDbSchemaCallback() {
             @Override
             public void process_ok(boolean schema_in_xml, String selected_schema, boolean skip_used, boolean include_views,

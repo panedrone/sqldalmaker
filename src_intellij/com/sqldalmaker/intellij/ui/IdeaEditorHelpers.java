@@ -32,18 +32,12 @@ import java.sql.Connection;
  */
 public class IdeaEditorHelpers {
 
-    public static void open_in_editor_sync(
-            Project project,
-            VirtualFile file) {
-
+    public static void open_in_editor_sync(Project project, VirtualFile file) {
         FileEditorManager fem = FileEditorManager.getInstance(project);
         fem.openFile(file, true, true);
     }
 
-    public static VirtualFile find_case_sensitive(
-            VirtualFile dir,
-            String rel_path) throws Exception {
-
+    public static VirtualFile find_case_sensitive(VirtualFile dir, String rel_path) throws Exception {
         VirtualFile file = dir.findFileByRelativePath(rel_path);
         if (file == null) {
             throw new Exception("File not found: " + rel_path);
@@ -56,37 +50,23 @@ public class IdeaEditorHelpers {
         return file;
     }
 
-    public static void open_local_file_in_editor_sync(
-            Project project,
-            VirtualFile root_file,
-            String rel_path) throws Exception {
-
+    public static void open_local_file_in_editor_sync(Project project, VirtualFile root_file, String rel_path) throws Exception {
         VirtualFile dir = root_file.getParent();
         VirtualFile file = find_case_sensitive(dir, rel_path);
         open_in_editor_sync(project, file);
     }
 
-    public static void open_local_file_in_editor_sync(
-            Project project,
-            VirtualFile file) {
-
+    public static void open_local_file_in_editor_sync(Project project, VirtualFile file) {
         open_in_editor_sync(project, file);
     }
 
-    public static void open_project_file_in_editor_sync(
-            Project project,
-            String rel_path) throws Exception {
-
+    public static void open_project_file_in_editor_sync(Project project, String rel_path) throws Exception {
         VirtualFile project_dir = IdeaHelpers.get_project_base_dir(project);
         VirtualFile file = find_case_sensitive(project_dir, rel_path);
         open_in_editor_sync(project, file);
     }
 
-    public static void open_text_in_new_editor(
-            Project project,
-            String file_name,
-            String text) {
-
+    public static void open_text_in_new_editor(Project project, String file_name, String text) {
         FileEditorManager fem = FileEditorManager.getInstance(project);
         String virtual_file_name = "_" + file_name; // '%' throws URI exception in NB
         // http://grepcode.com/file/repository.grepcode.com/java/ext/com.jetbrains/intellij-idea/9.0.4/com/intellij/openapi/vfs/VirtualFile.java
@@ -99,11 +79,7 @@ public class IdeaEditorHelpers {
         }
     }
 
-    private static void open_text_in_new_editor(
-            FileEditorManager fem,
-            String virtual_file_name,
-            String text) throws Exception {
-
+    private static void open_text_in_new_editor(FileEditorManager fem, String virtual_file_name, String text) throws Exception {
         // http://grepcode.com/file/repository.grepcode.com/java/ext/com.jetbrains/intellij-idea/9.0.4/com/intellij/openapi/vfs/VirtualFile.java
         // If an in-memory implementation of VirtualFile is required, LightVirtualFile from the com.intellij.testFramework package (Extended API) can be used.
         VirtualFile file;
@@ -135,11 +111,7 @@ public class IdeaEditorHelpers {
         }
     }
 
-    public static void open_or_activate_jar_resource_in_editor(
-            Project project,
-            String res_name,
-            String title) {
-
+    public static void open_or_activate_jar_resource_in_editor(Project project, String res_name, String title) {
         open_or_activate_jar_file_in_editor(project, "resources", res_name, title);
     }
 
@@ -172,10 +144,7 @@ public class IdeaEditorHelpers {
         }
     }
 
-    public static void open_sdm_xml_sync(
-            Project project,
-            VirtualFile root_file) {
-
+    public static void open_sdm_xml_sync(Project project, VirtualFile root_file) {
         try {
             VirtualFile sdm_xml = root_file.getParent().findFileByRelativePath(Const.SDM_XML);
             if (sdm_xml == null) {
@@ -188,9 +157,7 @@ public class IdeaEditorHelpers {
         }
     }
 
-    public static void open_settings_xml_sync(
-            Project project,
-            VirtualFile root_file) {
+    public static void open_settings_xml_sync(Project project, VirtualFile root_file) {
         try {
             VirtualFile settings_xml = root_file.getParent().findFileByRelativePath(Const.SETTINGS_XML);
             if (settings_xml == null) {
@@ -228,11 +195,7 @@ public class IdeaEditorHelpers {
         }
     }
 
-    public static void open_sdm_xml_in_editor(
-            ObjectFactory object_factory,
-            Project project,
-            Sdm sdm) throws Exception {
-
+    public static void open_sdm_xml_in_editor(ObjectFactory object_factory, Project project, Sdm sdm) throws Exception {
         String text = XmlHelpers.get_sdm_xml_text(object_factory, sdm);
         String[] parts = text.split("\\?>");
         text = parts[0] + Const.COMMENT_GENERATED_SDM_XML + parts[1];

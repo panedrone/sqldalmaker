@@ -34,7 +34,6 @@ public class EclipseCG {
 	}
 
 	public static void generate_all_dto(IFile root_file, IFile xml_file) {
-
 		StringBuilder output_dir = new StringBuilder();
 		Error error = new Error();
 		try {
@@ -78,7 +77,6 @@ public class EclipseCG {
 	}
 
 	public static void generate_all_dao(IFile root_file, IFile xml_file) {
-
 		StringBuilder output_dir = new StringBuilder();
 		Error error = new Error();
 		try {
@@ -122,7 +120,6 @@ public class EclipseCG {
 	}
 
 	public static void validate_all_dto(IFile root_file, IFile xml_file) {
-
 		StringBuilder output_dir = new StringBuilder();
 		Error error = new Error();
 		try {
@@ -180,7 +177,6 @@ public class EclipseCG {
 	}
 
 	public static void validate_all_dao(IFile root_file, IFile xml_file) {
-
 		StringBuilder output_dir = new StringBuilder();
 		Error error = new Error();
 		try {
@@ -238,7 +234,6 @@ public class EclipseCG {
 	}
 
 	public static void generate_dao(IFile root_file, IFile xml_file) {
-
 		Error error = new Error();
 		try {
 			String xml_mp_abs_path = root_file.getParent().getLocation().toPortableString();
@@ -283,7 +278,6 @@ public class EclipseCG {
 	}
 
 	public static void validate_dao(IFile root_file, IFile xml_file) {
-
 		String current_xml_file_path = xml_file.getFullPath().toPortableString();
 		if (current_xml_file_path.startsWith("/")) {
 			current_xml_file_path = current_xml_file_path.substring(1);

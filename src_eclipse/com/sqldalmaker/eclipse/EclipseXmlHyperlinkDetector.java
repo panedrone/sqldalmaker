@@ -131,9 +131,7 @@ public class EclipseXmlHyperlinkDetector extends AbstractHyperlinkDetector {
 			}
 			EclipseXmlHyperlink link = new EclipseXmlHyperlink(hyperlink_region, file, sdm_class_name);
 			return new IHyperlink[] { link };
-		} catch (
-
-		Throwable e) {
+		} catch (Throwable e) {
 			e.printStackTrace();
 			return NONE;
 		}

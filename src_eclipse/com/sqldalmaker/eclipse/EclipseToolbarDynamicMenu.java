@@ -168,6 +168,7 @@ public class EclipseToolbarDynamicMenu extends ContributionItem {
 
 	private static void add_goto_target_menu(Menu menu, int index, String current_xml_file_rel_path, IFile root_file)
 			throws Exception {
+		
 		String dao_class_name = Helpers.get_dao_class_name(current_xml_file_rel_path);
 		String xml_mp_abs_path = root_file.getParent().getLocation().toPortableString();
 		Settings settings = SdmUtils.load_settings(xml_mp_abs_path);

@@ -337,7 +337,8 @@ public class Helpers {
         return class_name;
     }
 
-    private static InputStream _res_as_stream(String res_path) throws Exception {
+    // public for eclipse
+    public static InputStream res_as_stream(String res_path) throws Exception {
         // swing app wants 'resources/' but plug-in wants '/resources/' WHY?
         ClassLoader cl = Helpers.class.getClassLoader();
         InputStream is = cl.getResourceAsStream(res_path);
@@ -352,7 +353,7 @@ public class Helpers {
 
     public static String res_from_jar(String res_name) throws Exception {
         // http://www.devdaily.com/blog/post/java/read-text-file-from-jar-file
-        InputStream is = _res_as_stream(res_name);
+        InputStream is = res_as_stream(res_name);
         try {
             InputStreamReader reader = new InputStreamReader(is);
             try {

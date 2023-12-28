@@ -95,9 +95,7 @@ public class UIDialogNewDaoXml extends JDialog {
     private boolean success = false;
 
     private void onOK() {
-
         ApplicationManager.getApplication().runWriteAction(new Runnable() {
-
             @Override
             public void run() {
 
@@ -121,7 +119,6 @@ public class UIDialogNewDaoXml extends JDialog {
                 }
             }
         });
-
     }
 
     private void onCancel() {

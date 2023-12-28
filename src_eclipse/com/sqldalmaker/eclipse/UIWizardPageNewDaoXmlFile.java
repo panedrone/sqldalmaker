@@ -21,16 +21,11 @@ public class UIWizardPageNewDaoXmlFile extends UIWizardPageNewFile {
 	}
 
 	public void init(final IEditor2 editor2) throws InternalException {
-
 		final IContainer res = editor2.get_sdm_folder();
-
 		if (res == null) {
-			throw new InternalException(
-					"Invalid meta-program folder");
+			throw new InternalException("Invalid SDM folder");
 		}
-
 		setInput(res);
-
 		bindControls(null);
 	}
 }

@@ -58,6 +58,7 @@ public class EclipseXmlCompletionProposalComputer implements ICompletionProposal
 	@Override
 	public List<ICompletionProposal> computeCompletionProposals(CompletionProposalInvocationContext context,
 			IProgressMonitor monitor) {
+
 		try {
 			ITextViewer text_viewer = context.getViewer();
 			if (text_viewer == null) {
@@ -179,7 +180,6 @@ public class EclipseXmlCompletionProposalComputer implements ICompletionProposal
 	// http://stackoverflow.com/questions/17586789/how-to-extract-attribute-values-with-xpath
 	//
 	private static List<String> get_attribute_value(String attribute, String xml_response_body) {
-
 		List<String> results = new ArrayList<String>();
 		try {
 			DocumentBuilderFactory doc_builder_factory = DocumentBuilderFactory.newInstance();
@@ -243,6 +243,7 @@ public class EclipseXmlCompletionProposalComputer implements ICompletionProposal
 	//
 	private static void compute_structure_proposals(String qualifier, int doc_offset,
 			List<ICompletionProposal> prop_list, List<String> complete_List) {
+
 		int qlen = qualifier.length();
 		// Loop through all proposals
 		for (int i = 0; i < complete_List.size(); i++) {

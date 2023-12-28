@@ -24,10 +24,7 @@ import java.util.List;
 
 public class IdeaCG {
 
-    public static void validate_all_dto(
-            Project project,
-            VirtualFile xml_file) {
-
+    public static void validate_all_dto(Project project, VirtualFile xml_file) {
         String name = xml_file.getName();
         if (!FileSearchHelpers.is_sdm_xml(name)) {
             return;
@@ -92,10 +89,7 @@ public class IdeaCG {
         ProgressManager.getInstance().runProcessWithProgressSynchronously(runnable, "Code Validation", false, project);
     }
 
-    public static void validate_all_sdm_dao(
-            Project project,
-            VirtualFile xml_file) {
-
+    public static void validate_all_sdm_dao(Project project, VirtualFile xml_file) {
         String name = xml_file.getName();
         if (!FileSearchHelpers.is_sdm_xml(name)) {
             return;
@@ -160,10 +154,7 @@ public class IdeaCG {
         ProgressManager.getInstance().runProcessWithProgressSynchronously(runnable, "Code Validation", false, project);
     }
 
-    public static void generate_all_dto(
-            Project project,
-            VirtualFile xml_file) {
-
+    public static void generate_all_dto(Project project, VirtualFile xml_file) {
         String name = xml_file.getName();
         if (!FileSearchHelpers.is_sdm_xml(name)) {
             return;
@@ -234,10 +225,7 @@ public class IdeaCG {
         }
     }
 
-    public static void generate_all_sdm_dao(
-            Project project,
-            VirtualFile xml_file) {
-
+    public static void generate_all_sdm_dao(Project project, VirtualFile xml_file) {
         String name = xml_file.getName();
         if (!FileSearchHelpers.is_sdm_xml(name)) {
             return;
@@ -308,10 +296,7 @@ public class IdeaCG {
         }
     }
 
-    public static void validate_dao(
-            Project project,
-            VirtualFile xml_file) {
-
+    public static void validate_dao(Project project, VirtualFile xml_file) {
         String name = xml_file.getName();
         if (!FileSearchHelpers.is_dao_xml(name)) {
             return;
@@ -366,10 +351,7 @@ public class IdeaCG {
         }
     }
 
-    public static void generate_dao(
-            Project project,
-            VirtualFile xml_file) {
-
+    public static void generate_dao(Project project, VirtualFile xml_file) {
         String name = xml_file.getName();
         if (!FileSearchHelpers.is_dao_xml(name)) {
             return;

@@ -158,7 +158,6 @@ public class UIWizardPageNewFile extends WizardPage implements Listener {
 	}
 
 	public void setResource(String value) {
-
 		if (resourceNameField == null) {
 			initialFileName = value;
 		} else {
@@ -170,9 +169,7 @@ public class UIWizardPageNewFile extends WizardPage implements Listener {
 
 	@Override
 	public void handleEvent(Event event) {
-
 		boolean res = validatePage();
-
 		setPageComplete(res);
 	}
 
@@ -182,15 +179,12 @@ public class UIWizardPageNewFile extends WizardPage implements Listener {
 
 
 	private boolean validatePage() {
-
 		problemType = PROBLEM_NONE;
 		problemMessage = "";//$NON-NLS-1$
-
 		if (!validateResourceName()) {
 			setErrorMessage(problemMessage);
 			return false;
 		}
-
 		IPath p = this.fInput.getFullPath().append(resourceNameField.getText());
 		String s =  p.toPortableString();
 		IPath path = Path.fromPortableString(s);
@@ -213,7 +207,6 @@ public class UIWizardPageNewFile extends WizardPage implements Listener {
 
 	protected boolean validateFullResourcePath(IPath resourcePath) {
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-
 		IStatus result = workspace.validatePath(resourcePath.toString(),
 				IResource.FOLDER);
 		if (!result.isOK()) {
@@ -221,9 +214,7 @@ public class UIWizardPageNewFile extends WizardPage implements Listener {
 			problemMessage = result.getMessage();
 			return false;
 		}
-
 		boolean allowExistingResources = false;
-
 		if (!allowExistingResources
 				&& (workspace.getRoot().getFolder(resourcePath).exists() || workspace
 						.getRoot().getFile(resourcePath).exists())) {
@@ -236,13 +227,11 @@ public class UIWizardPageNewFile extends WizardPage implements Listener {
 
 	protected boolean validateResourceName() {
 		String resourceName = getResource();
-
 		if (resourceName.length() == 0) {
 			problemType = PROBLEM_RESOURCE_EMPTY;
 			problemMessage = "Name cannot be empty";
 			return false;
 		}
-
 		if (!Path.ROOT.isValidPath(resourceName)) {
 			problemType = PROBLEM_NAME_INVALID;
 			problemMessage = "Invalid file name";
@@ -262,10 +251,8 @@ public class UIWizardPageNewFile extends WizardPage implements Listener {
 	}
 
 	public IFile create_new_file() {
-
 		final IFile newFileHandle = createFileHandle(new Path(getResource()));
 		final InputStream initialContents = getInitialContents();
-
 		IRunnableWithProgress op = new IRunnableWithProgress() {
 			public void run(IProgressMonitor monitor) {
 				CreateFileOperation op = new CreateFileOperation(newFileHandle,
@@ -291,16 +278,12 @@ public class UIWizardPageNewFile extends WizardPage implements Listener {
 				}
 			}
 		};
-
 		try {
-
 			getContainer().run(true, true, op);
 
 		} catch (Throwable e) {
-
 			EclipseMessageHelpers.show_error(e);
 		}
-
 		return newFileHandle;
 	}
 

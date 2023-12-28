@@ -96,6 +96,7 @@ public class EclipseHelpers {
 
 	public static Connection get_connection(String project_abs_path, String driver_jar, String driver_class_name,
 			String url, String user_name, String password) throws Exception {
+		
 		url = url.replace("$PROJECT_DIR$", "${project_loc}");
 		VariablesPlugin p = VariablesPlugin.getDefault();
 		IStringVariableManager m = p.getStringVariableManager();
@@ -128,7 +129,7 @@ public class EclipseHelpers {
 	}
 
 	public static InputStream get_resource_as_stream_from_resource_folder(String res_name) throws Exception {
-		return Helpers.get_resource_as_stream_2("resources/" + res_name);
+		return Helpers.res_as_stream("resources/" + res_name);
 	}
 
 	//
@@ -173,6 +174,7 @@ public class EclipseHelpers {
 
 	public static void gen_tmp_field_tags(Connection connection, ObjectFactory object_factory,
 			DtoClass dto_class, String project_root, IEditor2 editor2) throws Exception {
+		
 		Settings settings = load_settings(editor2);
 		String sql_root_abs_path = project_root + "/" + settings.getFolders().getSql();
 		SdmUtils.gen_field_wizard_jaxb(settings, connection, object_factory, dto_class, sql_root_abs_path);

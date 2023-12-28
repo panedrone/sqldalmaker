@@ -447,10 +447,7 @@ public class UITabDTO {
         }
     }
 
-    private void validate_with_progress_sync(IDtoCG gen,
-                                             AbstractTableModel model,
-                                             Settings settings) {
-
+    private void validate_with_progress_sync(IDtoCG gen, AbstractTableModel model, Settings settings) {
         ProgressManager progressManager = ProgressManager.getInstance();
         // ProgressIndicator indicator = progressManager.getProgressIndicator();
         Runnable runnable = new Runnable() {

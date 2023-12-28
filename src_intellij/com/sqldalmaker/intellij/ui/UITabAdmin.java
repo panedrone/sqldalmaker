@@ -92,16 +92,14 @@ public class UITabAdmin {
     private VirtualFile root_file;
 
     public void init_runtime() {
-
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-
                 ///////////////////////////////////////////////////////////////////
                 //
                 // google: intellij platform plugin sdk detect plugin version programmatically
-                // Programmatically get the version of an IntelliJ IDEA plugin
+                //  get the version of an IntelliJ IDEA plugin
                 // https://stackoverflow.com/questions/28080707/programmatically-get-the-version-of-an-intellij-idea-plugin
-
+                //
                 String sdm_info = IdeaHelpers.get_sdm_info();
                 vTextField.setText(sdm_info);
                 vTextField.setBorder(BorderFactory.createEmptyBorder());
@@ -119,13 +117,6 @@ public class UITabAdmin {
             if (c instanceof JButton) {
                 JButton b = (JButton) c;
                 b.setCursor(wc);
-//                b.setFocusPainted(false);
-//                // https://stackoverflow.com/questions/4585867/transparent-jbutton
-//                b.setOpaque(false);
-//                b.setContentAreaFilled(false);
-//                b.setBorderPainted(false);
-//                // https://coderanch.com/t/336633/java/transparent-jbuttons
-//                b.setBorder(null);
             }
         }
     }

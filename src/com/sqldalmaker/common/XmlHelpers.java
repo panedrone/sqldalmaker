@@ -64,9 +64,9 @@ public class XmlHelpers {
     // String	formatXML(String unformatted)
     // http://www.java2s.com/example/java-utility-method/xml-format-index-0.html
 
-    private static String formatXML(String unformattedXml) {
-        String unformattedNoWhiteSpaces = unformattedXml.replaceAll(">\\s+<", "><");
-        Source xmlInput = new StreamSource(new StringReader(unformattedNoWhiteSpaces));
+    private static String formatXML(String unFormattedXml) {
+        String unFormattedNoWhiteSpaces = unFormattedXml.replaceAll(">\\s+<", "><");
+        Source xmlInput = new StreamSource(new StringReader(unFormattedNoWhiteSpaces));
         StreamResult xmlOutput = new StreamResult(new StringWriter());
         try {
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
@@ -79,7 +79,7 @@ public class XmlHelpers {
         } catch (Exception e) {
             // e.printStackTrace();
         }
-        return unformattedXml;
+        return unFormattedXml;
     }
 
     public static int compareXml(String xmlStr1, String xmlStr2) {

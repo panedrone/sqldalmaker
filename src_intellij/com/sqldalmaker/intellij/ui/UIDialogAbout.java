@@ -13,6 +13,9 @@ import java.awt.event.*;
 
 /**
  * @author panedrone
+ *
+ * 01.09.2023 12:21 1.287
+ *
  */
 public class UIDialogAbout extends JDialog {
     private JPanel contentPane;
@@ -20,18 +23,14 @@ public class UIDialogAbout extends JDialog {
     private JTextPane text1;
 
     public static void show_modal() {
-
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
                 UIDialogAbout dialog = new UIDialogAbout(new JFrame(), true);
-
                 // dialog.setPreferredSize(new Dimension(720, 300)); // don't !!!
-
                 // How to completely remove an icon from JDialog?
                 // https://stackoverflow.com/questions/8504731/how-to-completely-remove-an-icon-from-jdialog
                 dialog.setResizable(false);
-
                 dialog.pack(); // after setPreferredSize
                 dialog.setLocationRelativeTo(null);  // after pack!!!
                 dialog.setVisible(true);
@@ -74,7 +73,6 @@ public class UIDialogAbout extends JDialog {
             String sdm_info = IdeaHelpers.get_sdm_info();
             text = String.format(text, sdm_info);
             text1.setText(text);
-
             text1.addHyperlinkListener(new HyperlinkListener() {
                 @Override
                 public void hyperlinkUpdate(HyperlinkEvent hle) {
@@ -85,14 +83,14 @@ public class UIDialogAbout extends JDialog {
                                 Desktop desktop = Desktop.getDesktop();
                                 desktop.browse(hle.getURL().toURI());
                             } catch (Exception ex) {
-                                ex.printStackTrace();
+                                // ex.printStackTrace();
                             }
                         }
                     }
                 }
             });
         } catch (Exception e) {
-            e.printStackTrace();
+            // e.printStackTrace();
         }
     }
 

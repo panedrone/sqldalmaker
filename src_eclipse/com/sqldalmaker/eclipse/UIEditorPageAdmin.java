@@ -808,7 +808,7 @@ public class UIEditorPageAdmin extends Composite {
 	public void set_need_migrate_warning(boolean need_to_migrate) {
 		if (need_to_migrate) {
 			try {
-				String txt = Helpers.read_from_jar_file_2("sdm.xml_how_to_migrate.txt");
+				String txt = Helpers.res_from_jar("sdm.xml_how_to_migrate.txt");
 				txt_migrate.setText(txt);
 			} catch (Exception e) {
 				txt_migrate.setText(e.getMessage());

@@ -49,6 +49,7 @@ public class EclipseEditorHelpers {
 
 	public static void open_editor_sync(ByteArrayOutputStream output_stream, String full_path, String title)
 			throws Exception {
+		
 		IEditorInput ei = new MyStorageEditorInput(output_stream, full_path, title);
 		open_editor_sync(ei, full_path);
 	}
@@ -112,6 +113,7 @@ public class EclipseEditorHelpers {
 
 	public static IEditorPart open_editor_sync(IEditorInput editor_input, String file_name)
 			throws PartInitException, InternalException {
+		
 		IEditorRegistry r = PlatformUI.getWorkbench().getEditorRegistry();
 		IEditorDescriptor desc = r.getDefaultEditor(file_name);
 		// Eclipse for RCP and RAP Developers' does not have SQL editor
@@ -162,6 +164,7 @@ public class EclipseEditorHelpers {
 
 	public static void open_dao_xml_in_editor_sync(String instance_name, String file_name, Object root)
 			throws Exception {
+		
 		Marshaller marshaller = XmlHelpers.create_marshaller(instance_name, Const.DAO_XSD);
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		try {
@@ -185,6 +188,7 @@ public class EclipseEditorHelpers {
 
 	public static void open_tmp_field_tags_sync(String class_name, String ref, IProject project, final IEditor2 editor2)
 			throws Exception {
+		
 		String project_root = EclipseHelpers.get_absolute_dir_path_str(project);
 		Connection con = EclipseHelpers.get_connection(editor2);
 		try {

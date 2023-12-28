@@ -157,10 +157,7 @@ public class IdeaActionGroup extends ActionGroup implements AlwaysVisibleActionG
         drop_down_actions_list.add(action_goto_target);
     }
 
-    private boolean add_xml_file_actions(
-            Project project,
-            List<AnAction> drop_down_actions_list) throws Exception {
-
+    private boolean add_xml_file_actions(Project project, List<AnAction> drop_down_actions_list) throws Exception {
         FileEditorManager fm = FileEditorManager.getInstance(project);
         // FileEditor editor = fm.getSelectedEditor(); // since 182.711
         VirtualFile[] files = fm.getSelectedFiles();

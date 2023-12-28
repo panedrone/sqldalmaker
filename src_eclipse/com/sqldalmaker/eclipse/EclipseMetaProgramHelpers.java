@@ -16,7 +16,6 @@ import com.sqldalmaker.common.Const;
 public class EclipseMetaProgramHelpers {
 
 	public static void create_overwrite_xsd(IEditor2 editor2) {
-
 		if (!EclipseMessageHelpers.show_confirmation(
 				"This action creates/overwrites XSD files in XML meta-program folder. Continue?")) {
 			return;
@@ -48,7 +47,6 @@ public class EclipseMetaProgramHelpers {
 	}
 
 	public static void create_overwrite_settings_xml(IEditor2 editor2) {
-
 		if (!EclipseMessageHelpers.show_confirmation(
 				"This action creates/overwrites settings.xml file in XML meta-program folder. Continue?")) {
 			return;
@@ -66,7 +64,6 @@ public class EclipseMetaProgramHelpers {
 	}
 
 	public static void create_sdm_xml(IEditor2 editor2) {
-
 		if (!EclipseMessageHelpers.show_confirmation(
 				"This action creates/overwrites sdm.xml file in XML meta-program folder. Continue?")) {
 			return;

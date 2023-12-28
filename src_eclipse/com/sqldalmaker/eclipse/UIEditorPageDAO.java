@@ -806,7 +806,7 @@ public class UIEditorPageDAO extends Composite {
 				}
 
 			} else {
-				FileSearchHelpers.IFile_List fileList = new FileSearchHelpers.IFile_List() {
+				FileSearchHelpers.IFileList fileList = new FileSearchHelpers.IFileList() {
 					@Override
 					public void add(String fileName) {
 						String dao_class_name = fileName.replace(".xml", "");

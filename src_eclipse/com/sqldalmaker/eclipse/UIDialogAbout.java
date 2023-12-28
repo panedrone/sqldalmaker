@@ -37,7 +37,7 @@ public class UIDialogAbout extends Dialog {
 		getContents().getShell().setText("About");
 
 		try {
-			String txt = Helpers.read_from_jar_file_2("ABOUT.txt");
+			String txt = Helpers.res_from_jar("ABOUT.txt");
 			String get_sdm_info = EclipseHelpers.get_sdm_info();
 			txt = String.format(txt, get_sdm_info);
 			text_1.setText(txt);

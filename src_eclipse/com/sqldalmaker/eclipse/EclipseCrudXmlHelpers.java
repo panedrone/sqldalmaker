@@ -16,7 +16,7 @@ import org.eclipse.swt.widgets.Shell;
 
 import com.sqldalmaker.cg.FieldNamesMode;
 import com.sqldalmaker.common.FileSearchHelpers;
-import com.sqldalmaker.common.FileSearchHelpers.IFile_List;
+import com.sqldalmaker.common.FileSearchHelpers.IFileList;
 import com.sqldalmaker.common.ISelectDbSchemaCallback;
 import com.sqldalmaker.common.SdmUtils;
 import com.sqldalmaker.jaxb.sdm.*;
@@ -77,7 +77,7 @@ public class EclipseCrudXmlHelpers {
 	private static List<String> get_dao_xml_file_name_list(IProject project, String xml_configs_folder_full_path) {
 
 		final List<String> res = new ArrayList<String>();
-		IFile_List file_list = new IFile_List() {
+		IFileList file_list = new IFileList() {
 			@Override
 			public void add(String abs_file_path) {
 				res.add(abs_file_path);

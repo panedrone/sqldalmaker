@@ -80,7 +80,7 @@ public class EclipseResourceEditorHelpers {
 					// For example,
 					// org.eclipse.debug.core.sourcelookup.containers.LocalFileStorage.getContents()
 					// creates it each time;
-					return Helpers.get_resource_as_stream_2(full_path);
+					return Helpers.res_as_stream(full_path);
 				} catch (Throwable e) {
 					return null;
 				}

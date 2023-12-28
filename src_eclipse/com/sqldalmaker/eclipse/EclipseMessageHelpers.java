@@ -20,7 +20,6 @@ import com.sqldalmaker.common.InternalException;
 public class EclipseMessageHelpers {
 
 	public static void show_error(Throwable e) {
-
 		Shell active_shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
 		MessageBox box = new MessageBox(active_shell, SWT.ICON_ERROR);
 		box.setText("Error");
@@ -34,7 +33,6 @@ public class EclipseMessageHelpers {
 	}
 
 	public static void show_info(String msg) {
-
 		Shell active_shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
 		MessageBox box = new MessageBox(active_shell, SWT.ICON_INFORMATION);
 		box.setText("Info");
@@ -43,7 +41,6 @@ public class EclipseMessageHelpers {
 	}
 
 	public static boolean show_confirmation(String msg) {
-
 		Shell active_shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
 		MessageBox box = new MessageBox(active_shell, SWT.ICON_QUESTION | SWT.YES | SWT.NO);
 		box.setText("");
