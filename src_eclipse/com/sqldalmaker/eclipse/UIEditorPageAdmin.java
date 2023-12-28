@@ -43,11 +43,10 @@ public class UIEditorPageAdmin extends Composite {
 	private final FormToolkit toolkit = new FormToolkit(Display.getCurrent());
 
 	private IEditor2 editor2;
-//	private Action action_settings_xml;
 	private Action action_test_conn;
 	private Action action_validate_all;
 	private Text txtV;
-	private Text txtStartingFromV;
+	private Text txt_migrate;
 
 	private Composite composite_8;
 
@@ -672,12 +671,12 @@ public class UIEditorPageAdmin extends Composite {
 		toolkit.paintBordersFor(composite_8);
 		composite_8.setLayout(new GridLayout(1, false));
 
-		txtStartingFromV = new Text(composite_8, SWT.BORDER | SWT.MULTI);
-		txtStartingFromV.setText(
-				"Starting from v1.292, use \"sdm.xml\" instead of \"dto.xml\".\r\n\r\nHow to migrate:\r\n\r\n1. Click \"Create/Overwrite XSD files\"\r\n2. Click \"Create sdm.xml\"\r\n3. Copy-paste internal text from \"dto.xml\",<dto-classes>... to \"sdm.xml\",<sdm>...\r\n4. Delete \"dto.xml\" and \"dto.xsd\".\r\n5. Click \"Validate Configuration\". Done.\r\n\r\nWhere to declare DAO classes with v1.292+:\r\n\r\n- \"option 1\": separate XML files like in prev. versions of the plugin\r\n- \"option 2\": tags \"<dao-class...\" in \"sdm.xml\"\r\n\r\nOnce you start using \"option 2\" then \"option 1\" becomes ignored.");
-		txtStartingFromV.setEditable(false);
-		txtStartingFromV.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		toolkit.adapt(txtStartingFromV, true, true);
+		txt_migrate = new Text(composite_8, SWT.BORDER | SWT.MULTI);
+		txt_migrate.setText(
+				"=== sdm.xml migrate ===");
+		txt_migrate.setEditable(false);
+		txt_migrate.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		toolkit.adapt(txt_migrate, true, true);
 	}
 
 	private static String get_err_msg(Throwable ex) {
@@ -776,26 +775,7 @@ public class UIEditorPageAdmin extends Composite {
 		}
 	}
 
-//	protected void editSettings() {
-//		try {
-//			IFile file = editor2.find_settings_xml();
-//			EclipseEditorHelpers.open_editor_sync(getShell(), file);
-//		} catch (Throwable ex) {
-//			ex.printStackTrace();
-//			EclipseMessageHelpers.show_error(ex);
-//		}
-//	}
-
 	private void createActions() {
-//		action_settings_xml = new Action("") {
-//			@Override
-//			public void run() {
-//				editSettings();
-//			}
-//		};
-//		action_settings_xml.setToolTipText("Edit settings.xml");
-//		action_settings_xml
-//				.setImageDescriptor(ResourceManager.getImageDescriptor(UIEditorPageAdmin.class, "/img/XMLFile.gif"));
 		action_test_conn = new Action("") {
 			@Override
 			public void run() {
@@ -825,7 +805,17 @@ public class UIEditorPageAdmin extends Composite {
 		editor2 = ed;
 	}
 
-	public void set_need_migrate_warning(boolean need_migrate) {
-		composite_8.setVisible(need_migrate);
+	public void set_need_migrate_warning(boolean need_to_migrate) {
+		if (need_to_migrate) {
+			try {
+				String txt = Helpers.read_from_jar_file_2("sdm.xml_how_to_migrate.txt");
+				txt_migrate.setText(txt);
+			} catch (Exception e) {
+				txt_migrate.setText(e.getMessage());
+			}	
+		} else {
+			txt_migrate.setText("");			
+		}
+		composite_8.setVisible(need_to_migrate);
 	}
 }

@@ -18,15 +18,15 @@ public class IdeaMetaProgramInitHelpers {
     public static void create_xsd(VirtualFile root_file) {
         try {
             {
-                String text = IdeaHelpers.read_from_jar_file(Const.DAO_XSD);
+                String text = IdeaHelpers.read_from_jar_resources(Const.DAO_XSD);
                 IdeaHelpers.run_write_action_to_save_text_file(root_file, Const.DAO_XSD, text);
             }
             {
-                String text = IdeaHelpers.read_from_jar_file(Const.SDM_XSD);
+                String text = IdeaHelpers.read_from_jar_resources(Const.SDM_XSD);
                 IdeaHelpers.run_write_action_to_save_text_file(root_file, Const.SDM_XSD, text);
             }
             {
-                String text = IdeaHelpers.read_from_jar_file(Const.SETTINGS_XSD);
+                String text = IdeaHelpers.read_from_jar_resources(Const.SETTINGS_XSD);
                 IdeaHelpers.run_write_action_to_save_text_file(root_file, Const.SETTINGS_XSD, text);
             }
         } catch (Throwable e) {
@@ -37,7 +37,7 @@ public class IdeaMetaProgramInitHelpers {
 
     public static void create_settings_xml(VirtualFile root_file) {
         try {
-            String text = IdeaHelpers.read_from_jar_file(Const.SETTINGS_XML);
+            String text = IdeaHelpers.read_from_jar_resources(Const.SETTINGS_XML);
             IdeaHelpers.run_write_action_to_save_text_file(root_file, Const.SETTINGS_XML, text);
         } catch (Throwable e) {
             // e.printStackTrace();
@@ -47,7 +47,7 @@ public class IdeaMetaProgramInitHelpers {
 
     public static void create_sdm_xml(VirtualFile root_file) {
         try {
-            String text = IdeaHelpers.read_from_jar_file(Const.SDM_XML);
+            String text = IdeaHelpers.read_from_jar_resources(Const.SDM_XML);
             IdeaHelpers.run_write_action_to_save_text_file(root_file, Const.SDM_XML, text);
         } catch (Throwable e) {
             // e.printStackTrace();

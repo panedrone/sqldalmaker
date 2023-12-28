@@ -7,15 +7,32 @@ package com.sqldalmaker.cg.java;
 
 import com.sqldalmaker.cg.*;
 import com.sqldalmaker.jaxb.sdm.*;
-import com.sqldalmaker.jaxb.sdm.DtoClass;
 import com.sqldalmaker.jaxb.settings.Settings;
 
 import java.io.StringWriter;
 import java.sql.Connection;
 import java.util.*;
 
-/**
- * @author sqldalmaker@gmail.com
+/*
+ * 16.12.2023 09:01 1.292 sdm.xml
+ * 29.09.2023 09:58 1.289
+ * 27.03.2023 10:03 optional "<crud table"
+ * 19.01.2023 20:57 1.276
+ * 16.11.2022 08:02 1.269
+ * 25.10.2022 09:26 crud pk --> dto-class pk
+ * 25.10.2022 03:46 - crud generated; + dao-class auto
+ * 06.08.2022 08:37 1.261 no 'crud-auto' anymore, just empty 'crud' instead
+ * 09.07.2022 23:10  + dto macro + dao macro
+ * 27.05.2022 01:17 1.246
+ * 21.04.2022 17:15 1.225 fixes for python and go
+ * 10.05.2021 21:46 new xml attr "field-comment"
+ * 01.05.2021 22:33 JSON and XML comments for Go
+ * 22.03.2021 21:19 TitleCase for method names
+ * 16.09.2020 02:23 reduced amount of warnings in java
+ * 07.01.2020 22:19 Now you can declare in XML calculated DTO fields.
+ * 03.09.2019 15:55 minor code refactoring
+ * 07.02.2019 19:50 initial commit
+ *
  */
 public class JavaCG {
 
@@ -32,14 +49,15 @@ public class JavaCG {
         private final TemplateEngine te;
         private final JdbcUtils db_utils;
 
-        public DTO(Sdm sdm,
-                   Settings jaxb_settings,
-                   Connection connection,
-                   String dto_package,
-                   String sql_root_abs_path,
-                   String dto_inheritance,
-                   FieldNamesMode field_names_mode,
-                   String vm_template) throws Exception {
+        public DTO(
+                Sdm sdm,
+                Settings jaxb_settings,
+                Connection connection,
+                String dto_package,
+                String sql_root_abs_path,
+                String dto_inheritance,
+                FieldNamesMode field_names_mode,
+                String vm_template) throws Exception {
 
             this.jaxb_dto_classes = sdm.getDtoClass();
             this.dto_package = dto_package;
@@ -70,8 +88,6 @@ public class JavaCG {
             StringWriter sw = new StringWriter();
             te.merge(context, sw);
             String text = sw.toString();
-            // === panedrone: leave as is to see bad types in "", i.e. "java.lang.java.util.Date"
-//            text = text.replace("java.lang.", "");
             return new String[]{text};
         }
     }
@@ -86,14 +102,15 @@ public class JavaCG {
         private final TemplateEngine te;
         private final JdbcUtils db_utils;
 
-        public DAO(List<DtoClass> jaxb_dto_classes,
-                   Settings jaxb_settings,
-                   Connection connection,
-                   String dto_package,
-                   String dao_package,
-                   String sql_root_abs_path,
-                   FieldNamesMode field_names_mode,
-                   String vm_template) throws Exception {
+        public DAO(
+                List<DtoClass> jaxb_dto_classes,
+                Settings jaxb_settings,
+                Connection connection,
+                String dto_package,
+                String dao_package,
+                String sql_root_abs_path,
+                FieldNamesMode field_names_mode,
+                String vm_template) throws Exception {
 
             this.jaxb_dto_classes = jaxb_dto_classes;
             this.dto_package = dto_package;
@@ -108,8 +125,7 @@ public class JavaCG {
         }
 
         @Override
-        public String[] translate(String dao_class_name,
-                                  DaoClass dao_class) throws Exception {
+        public String[] translate(String dao_class_name, DaoClass dao_class) throws Exception {
             imports.clear();
             List<String> methods = new ArrayList<String>();
             JaxbUtils.process_jaxb_dao_class(this, dao_class_name, dao_class, methods);
@@ -162,15 +178,16 @@ public class JavaCG {
         //
         // this method is called from both 'render_jaxb_query' and 'render_crud_read'
         //
-        private StringBuilder _render_query(String dao_query_jdbc_sql,
-                                            boolean is_external_sql,
-                                            String jaxb_dto_or_return_type,
-                                            boolean jaxb_return_type_is_dto,
-                                            boolean fetch_list,
-                                            String method_name,
-                                            String crud_table,
-                                            List<FieldInfo> fields,
-                                            List<FieldInfo> params) throws Exception {
+        private StringBuilder _render_query(
+                String dao_query_jdbc_sql,
+                boolean is_external_sql,
+                String jaxb_dto_or_return_type,
+                boolean jaxb_return_type_is_dto,
+                boolean fetch_list,
+                String method_name,
+                String crud_table,
+                List<FieldInfo> fields,
+                List<FieldInfo> params) throws Exception {
 
             if (dao_query_jdbc_sql == null) {
                 return Helpers.get_no_pk_warning(method_name);
@@ -185,7 +202,7 @@ public class JavaCG {
                 }
                 returned_type_name = _get_rendered_dto_class_name(jaxb_dto_or_return_type);
             } else {
-                if (fields.size() == 0) {
+                if (fields.isEmpty()) {
                     returned_type_name = "?";
                 } else {
                     FieldInfo fi = fields.get(0);
@@ -220,7 +237,7 @@ public class JavaCG {
         }
 
         private void _process_dto_class_name(String dto_class_name) {
-            if (dto_package != null && dto_package.length() > 0) {
+            if (dto_package != null && !dto_package.isEmpty()) {
                 imports.add(dto_package + "." + dto_class_name);
             } else {
                 imports.add(dto_class_name);
@@ -252,15 +269,15 @@ public class JavaCG {
         }
 
         // it is used only in render_jaxb_exec_dml
-        private void _render_exec_dml(StringBuilder buffer,
-                                      String jdbc_dao_sql,
-                                      boolean is_external_sql,
-                                      String method_name,
-                                      String[] param_descriptors,
-                                      String xml_node_name,
-                                      String sql_path) throws Exception {
+        private void _render_exec_dml(
+                StringBuilder buffer,
+                String jdbc_dao_sql,
+                boolean is_external_sql,
+                String method_name,
+                String[] param_descriptors,
+                String xml_node_name,
+                String sql_path) throws Exception {
 
-            SqlUtils.throw_if_select_sql(jdbc_dao_sql);
             List<FieldInfo> _params = new ArrayList<FieldInfo>();
             db_utils.get_dao_exec_dml_info(jdbc_dao_sql, "", param_descriptors, _params);
             String java_sql = SqlUtils.format_jdbc_sql_for_java(jdbc_dao_sql);
@@ -349,7 +366,7 @@ public class JavaCG {
             imports.add("com.sqldalmaker.DataStore.RecordHandler");
             _process_dto_class_name(jaxb_dto_class.getName()); // extends imports
             db_utils.get_dto_field_info(jaxb_dto_class, sql_root_abs_path, fields);
-            if (fields.size() > 0) {
+            if (!fields.isEmpty()) {
                 fields.get(0).setComment(fields.get(0).getComment() + " [INFO] REF CURSOR");
             }
             m.fields.addAll(fields);
@@ -361,8 +378,7 @@ public class JavaCG {
             context.put("params", params);
         }
 
-        private String[] _parse_method_declaration2(String method_text,
-                                                    String dto_package) throws Exception {
+        private String[] _parse_method_declaration2(String method_text, String dto_package) throws Exception {
             String param_descriptors = "";
             String method_name;
             String[] parts = Helpers.parse_method_params(method_text);
@@ -379,12 +395,13 @@ public class JavaCG {
         }
 
         @Override
-        public StringBuilder render_crud_create(String class_name,
-                                                String method_name,
-                                                String table_name,
-                                                String dto_class_name,
-                                                boolean fetch_generated,
-                                                String generated) throws Exception {
+        public StringBuilder render_crud_create(
+                String class_name,
+                String method_name,
+                String table_name,
+                String dto_class_name,
+                boolean fetch_generated,
+                String generated) throws Exception {
 
             List<FieldInfo> fields_not_ai = new ArrayList<FieldInfo>();
             List<FieldInfo> fields_ai = new ArrayList<FieldInfo>();
@@ -399,7 +416,7 @@ public class JavaCG {
             context.put("method_name", method_name);
             context.put("params", fields_not_ai);
             context.put("dto_param", _get_rendered_dto_class_name(dto_class_name));
-            if (fetch_generated && fields_ai.size() > 0) {
+            if (fetch_generated && !fields_ai.isEmpty()) {
                 context.put("keys", fields_ai);
                 context.put("mode", "dao_create");
             } else {
@@ -415,11 +432,12 @@ public class JavaCG {
         }
 
         @Override
-        public StringBuilder render_crud_read(String method_name,
-                                              String dao_table_name,
-                                              String dto_class_name,
-                                              String explicit_pk,
-                                              boolean fetch_list) throws Exception {
+        public StringBuilder render_crud_read(
+                String method_name,
+                String dao_table_name,
+                String dto_class_name,
+                String explicit_pk,
+                boolean fetch_list) throws Exception {
 
             List<FieldInfo> fields_all = new ArrayList<FieldInfo>();
             List<FieldInfo> fields_pk = new ArrayList<FieldInfo>();
@@ -430,12 +448,13 @@ public class JavaCG {
         }
 
         @Override
-        public StringBuilder render_crud_update(String dao_class_name,
-                                                String method_name,
-                                                String table_name,
-                                                String explicit_pk,
-                                                String dto_class_name,
-                                                boolean scalar_params) throws Exception {
+        public StringBuilder render_crud_update(
+                String dao_class_name,
+                String method_name,
+                String table_name,
+                String explicit_pk,
+                String dto_class_name,
+                boolean scalar_params) throws Exception {
 
             List<FieldInfo> fields_not_pk = new ArrayList<FieldInfo>();
             List<FieldInfo> fields_pk = new ArrayList<FieldInfo>();
@@ -468,11 +487,12 @@ public class JavaCG {
         }
 
         @Override
-        public StringBuilder render_crud_delete(String dao_class_name,
-                                                String dto_class_name,
-                                                String method_name,
-                                                String table_name,
-                                                String explicit_pk) throws Exception {
+        public StringBuilder render_crud_delete(
+                String dao_class_name,
+                String dto_class_name,
+                String method_name,
+                String table_name,
+                String explicit_pk) throws Exception {
 
             List<FieldInfo> fields_pk = new ArrayList<FieldInfo>();
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
@@ -500,12 +520,10 @@ public class JavaCG {
         }
 
         @Override
-        public StringBuilder render_jaxb_crud(String dao_class_name,
-                                              Crud jaxb_type_crud) throws Exception {
-
+        public StringBuilder render_jaxb_crud(                String dao_class_name,                Crud jaxb_type_crud) throws Exception {
             String node_name = JaxbUtils.get_jaxb_node_name(jaxb_type_crud);
             String dto_class_name = jaxb_type_crud.getDto();
-            if (dto_class_name.length() == 0) {
+            if (dto_class_name.isEmpty()) {
                 throw new Exception("<" + node_name + "...\nDTO class is not set");
             }
             try {

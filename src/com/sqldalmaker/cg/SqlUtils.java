@@ -7,10 +7,27 @@ package com.sqldalmaker.cg;
 
 import java.util.List;
 
-/**
- * @author sqldalmaker@gmail.com
+/*
+ * 27.03.2023 10:03
+ * 19.01.2023 20:57 1.276
+ * 16.11.2022 08:02 1.269
+ * 21.05.2022 10:42
+ * 26.04.2022 15:44 1.230
+ * 16.04.2022 17:35 1.219
+ * 30.03.2022 12:18
+ * 10.06.2021 13:03
+ * 08.05.2021 22:29 1.200
+ * 14.03.2021 22:09
+ *
  */
+@SuppressWarnings("removal")
 public class SqlUtils {
+
+    static class SqlShortcut {
+        public String table_name;
+        public String params;
+        public String col_names;
+    }
 
     private static String[] get_sql_lines(String sql) {
         sql = sql.replace('\r', '\n');
@@ -21,7 +38,7 @@ public class SqlUtils {
 
     public static String jdbc_sql_to_cpp_str(String jdbc_sql) {
         String[] parts = get_sql_lines(jdbc_sql);
-        String new_line = System.getProperty("line.separator");
+        String new_line = System.lineSeparator();
         String new_line_j = org.apache.commons.lang.StringEscapeUtils.escapeJava("\n");
         StringBuilder res = new StringBuilder();
         res.append("\"");
@@ -198,22 +215,6 @@ public class SqlUtils {
         return res.toString();
     }
 
-    public static void throw_if_select_sql(String jdbc_dao_sql) /*throws Exception*/ {
-// allow to execute SELECT in exec-dml
-//
-//        String trimmed = jdbc_dao_sql.toLowerCase().trim();
-//
-//        String[] parts = trimmed.split("\\s+");
-//
-//        if (parts.length > 0) {
-//
-//            if ("select".equals(parts[0])) {
-//
-//                throw new Exception("SELECT is not allowed here");
-//            }
-//        }
-    }
-
     public static String jdbc_sql_by_dto_class_ref(String ref, String sql_root_abs_path) throws Exception {
         String[] parts = ref.split(":");
         String table_name = null;
@@ -242,48 +243,28 @@ public class SqlUtils {
     }
 
     static String jdbc_sql_by_query_ref(String ref, String sql_root_abs_path) throws Exception {
-        /*if (is_jdbc_stored_proc_call(ref)) {
-            return ref;
-        } else if (is_stored_proc_call_shortcut(ref)) {
-            return ref;
-        } else if (is_stored_func_call_shortcut(ref)) {
-            return ref;
-        } else */
         if (is_sql_file_ref(ref)) {
             String sql_file_path = Helpers.concat_path(sql_root_abs_path, ref);
             return Helpers.load_text_from_file(sql_file_path);
         } else if (is_sql_shortcut_ref(ref)) {
             String res = _sql_shortcut_to_jdbc_sql(ref);
             return res;
-        } /*else if (is_table_ref(ref)) { // is_table_ref returns true for 'select * from my_table'
-            throw new Exception("Table names are not allowed here: ref=\"" + ref + "\"");
-        } */ else {
-            return ref;
         }
+        return ref;
     }
 
     public static String jdbc_sql_by_exec_dml_ref(String ref, String sql_root_abs_path) throws Exception {
-        /*if (is_jdbc_stored_proc_call(ref)) {
-            return ref;
-        } else if (is_stored_proc_call_shortcut(ref)) {
-            return ref;
-        } else if (is_stored_func_call_shortcut(ref)) {
-            return ref;
-        } else */
         if (is_sql_file_ref(ref)) {
             String sql_file_path = Helpers.concat_path(sql_root_abs_path, ref);
             return Helpers.load_text_from_file(sql_file_path);
         } else if (is_sql_shortcut_ref(ref)) {
             throw new Exception("SQL-shortcuts are not allowed here: ref=\"" + ref + "\"");
-        } /* else if (is_table_ref(ref)) {  // is_table_ref returns true for 'delete from my_table'
-            throw new Exception("Table names are not allowed here: ref=\"" + ref + "\"");
-        } */ else {
-            return ref;
         }
+        return ref;
     }
 
     public static boolean is_sql_shortcut_ref(String ref) {
-        if (ref == null || ref.length() == 0) {
+        if (ref == null || ref.isEmpty()) {
             return false;
         }
         if (is_sql_file_ref_base(ref)) {
@@ -331,11 +312,11 @@ public class SqlUtils {
     }
 
     public static boolean is_empty_ref(String ref) {
-        return ref == null || ref.trim().length() == 0;
+        return ref == null || ref.trim().isEmpty();
     }
 
     public static boolean is_table_ref(String ref) {
-        if (ref == null || ref.length() == 0) {
+        if (ref == null || ref.isEmpty()) {
             return false;
         }
         if (is_sql_shortcut_ref(ref)) {
@@ -364,7 +345,7 @@ public class SqlUtils {
         // no empty strings separated by dots
         String[] parts = ref.split("\\.", -1); // -1 to leave empty strings
         for (String s : parts) {
-            if (s.length() == 0) {
+            if (s.isEmpty()) {
                 return false;
             }
         }
@@ -411,7 +392,7 @@ public class SqlUtils {
 
     static SqlShortcut parse_sql_shortcut_ref(String ref) throws Exception {
         ref = ref.trim();
-        String []mm = ref.split("->");
+        String[] mm = ref.split("->");
         if (mm.length != 2) {
             mm = ref.split("/");
         }
@@ -432,7 +413,7 @@ public class SqlUtils {
             }
             res.table_name = ref.substring(0, pos).trim();
             res.params = ref.substring(pos + 1, ref.length() - 1).trim();
-            if (res.params.length() == 0) {
+            if (res.params.isEmpty()) {
                 res.params = null;
             }
         } else {
@@ -446,7 +427,7 @@ public class SqlUtils {
         SqlShortcut shc = parse_sql_shortcut_ref(ref);
         String params = null;
         String param_descriptors = shc.params;
-        if (param_descriptors != null && param_descriptors.trim().length() > 0) {
+        if (param_descriptors != null && !param_descriptors.trim().isEmpty()) {
             String[] param_arr = Helpers.get_listed_items(param_descriptors, false);
             if (param_arr.length < 1) {
                 throw new Exception("Not empty list of parameters expected in SQL shortcut");
@@ -460,7 +441,7 @@ public class SqlUtils {
         if (shc.col_names == null) {
             sql = "select * from " + shc.table_name;
         } else {
-            sql ="select " + shc.col_names + " from " + shc.table_name;
+            sql = "select " + shc.col_names + " from " + shc.table_name;
         }
         if (params == null) {
             return sql;

@@ -42,7 +42,6 @@ public class TargetLangUtils {
     }
 
     public static boolean accept(String root_fn) {
-
         return RootFileName.JAVA.equals(root_fn) ||
                 RootFileName.CPP.equals(root_fn) ||
                 RootFileName.PHP.equals(root_fn) ||
@@ -67,10 +66,12 @@ public class TargetLangUtils {
         return RootFileName.GO.equals(fn);
     }
 
-    public static String get_target_folder_abs_path(String class_scope,
-                                                    String root_file_fn,
-                                                    String target_folder_rel_path,
-                                                    String module_root) {
+    public static String get_target_folder_abs_path(
+            String class_scope,
+            String root_file_fn,
+            String target_folder_rel_path,
+            String module_root) {
+
         String res;
         if (RootFileName.JAVA.equals(root_file_fn) || RootFileName.PHP.equals(root_file_fn)) {
             class_scope = class_scope.replace('.', '/').replace('\\', '/');
@@ -97,23 +98,17 @@ public class TargetLangUtils {
         return dao_scope;
     }
 
-    public static String get_dto_vm_template(Settings settings,
-                                             String project_abs_path) throws Exception {
-
+    public static String get_dto_vm_template(Settings settings, String project_abs_path) throws Exception {
         String macro_name = settings.getDto().getMacro();
         return _get_vm_template(macro_name, settings, project_abs_path);
     }
 
-    public static String get_dao_vm_template(Settings settings,
-                                             String project_abs_path) throws Exception {
-
+    public static String get_dao_vm_template(Settings settings, String project_abs_path) throws Exception {
         String macro_name = settings.getDao().getMacro();
         return _get_vm_template(macro_name, settings, project_abs_path);
     }
 
-    private static String _get_vm_template(String macro_name,
-                                           Settings settings,
-                                           String project_abs_path) throws Exception {
+    private static String _get_vm_template(String macro_name, Settings settings, String project_abs_path) throws Exception {
         // read the file or find the macro
         if (macro_name == null || macro_name.trim().isEmpty()) {
             return null;
@@ -144,12 +139,13 @@ public class TargetLangUtils {
         return vm_template;
     }
 
-    public static IDtoCG create_dto_cg(String root_fn,
-                                       String project_abs_path,
-                                       String xml_configs_folder_full_path,
-                                       Connection connection,
-                                       Settings settings,
-                                       StringBuilder output_dir_rel_path) throws Exception {
+    public static IDtoCG create_dto_cg(
+            String root_fn,
+            String project_abs_path,
+            String xml_configs_folder_full_path,
+            Connection connection,
+            Settings settings,
+            StringBuilder output_dir_rel_path) throws Exception {
 
         String sql_root_abs_path = Helpers.concat_path(project_abs_path, settings.getFolders().getSql());
         String vm_template = TargetLangUtils.get_dto_vm_template(settings, project_abs_path);
@@ -201,12 +197,13 @@ public class TargetLangUtils {
         }
     }
 
-    public static IDaoCG create_dao_cg(String root_fn,
-                                       String project_abs_path,
-                                       String xml_configs_folder_full_path,
-                                       Connection con,
-                                       Settings settings,
-                                       StringBuilder output_dir_rel_path) throws Exception {
+    public static IDaoCG create_dao_cg(
+            String root_fn,
+            String project_abs_path,
+            String xml_configs_folder_full_path,
+            Connection con,
+            Settings settings,
+            StringBuilder output_dir_rel_path) throws Exception {
 
         String sql_root_abs_path = Helpers.concat_path(project_abs_path, settings.getFolders().getSql());
         String sdm_xml_abs_path = Helpers.concat_path(xml_configs_folder_full_path, Const.SDM_XML);

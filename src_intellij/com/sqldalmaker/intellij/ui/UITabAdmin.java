@@ -481,6 +481,20 @@ public class UITabAdmin {
         IdeaMessageHelpers.show_info_in_ui_thread(buff.toString());
     }
 
+    public void set_need_migrate_warning(boolean need_to_migrate) {
+        if (need_to_migrate) {
+            try {
+                String text = IdeaHelpers.read_from_jar("", "sdm.xml_how_to_migrate.txt");
+                text1.setText(text);
+            } catch (Exception e) {
+                text1.setText(e.getMessage());
+            }
+        } else {
+            text1.setText("");
+        }
+        pnl_migrate.setVisible(need_to_migrate);
+    }
+
     private boolean check_xsd(StringBuilder buff, String xsd_name) {
         VirtualFile xsd_file = root_file.getParent().findChild(xsd_name);
         if (xsd_file == null) {
@@ -496,7 +510,7 @@ public class UITabAdmin {
             }
             String ref_xsd;
             try {
-                ref_xsd = IdeaHelpers.read_from_jar_file(xsd_name);
+                ref_xsd = IdeaHelpers.read_from_jar_resources(xsd_name);
             } catch (Exception ex) {
                 add_err_msg(buff, get_err_msg(ex));
                 return false;
@@ -1106,7 +1120,7 @@ public class UITabAdmin {
         text1 = new JTextPane();
         text1.setEditable(false);
         text1.setMargin(new Insets(0, 15, 15, 15));
-        text1.setText("\nStarting from v1.292, use \"sdm.xml\" instead of \"dto.xml\".\n\nHow to migrate:\n\n1. Click \"Create/Overwrite XSD files\"\n2. Click \"Create sdm.xml\"\n3. Copy-paste internal text from \"dto.xml\",<dto-classes>... to \"sdm.xml\",<sdm>...\n4. Delete \"dto.xml\" and \"dto.xsd\".\n5. Click \"Validate Configuration\". Done.\n\nWhere to declare DAO classes with v1.292+:\n\n- \"option 1\": separate XML files like in prev. versions of the plugin\n- \"option 2\": tags \"<dao-class...\" in \"sdm.xml\"\n\nOnce you start using \"option 2\" then \"option 1\" becomes ignored.\n");
+        text1.setText(" === 1.292 migration ===");
         text1.setVisible(true);
         pnl_migrate.add(text1, BorderLayout.CENTER);
     }
@@ -1140,7 +1154,4 @@ public class UITabAdmin {
         return rootPanel;
     }
 
-    public void set_need_migrate_warning(boolean needMigrate) {
-        pnl_migrate.setVisible(needMigrate);
-    }
 }

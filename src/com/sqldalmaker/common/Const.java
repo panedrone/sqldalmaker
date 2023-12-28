@@ -5,9 +5,11 @@
  */
 package com.sqldalmaker.common;
 
-/**
- * @author sqldalmaker@gmail.com
- * 
+/*
+ * 17.12.2023 02:16 1.292 sdm.xml
+ * 16.11.2022 08:02 1.269
+ * 07.02.2019 19:50 initial commit
+ *
  */
 public class Const {
 
@@ -31,4 +33,12 @@ public class Const {
 
     public static final String GOLANG_SCOPES_ERR = "Error in 'settings.xml': \n" +
             "empty values for '<dto scope' and '<dao scope' are not allowed";
+
+    public static class Root {
+        public static final String JAVA = "java.dal";
+        public static final String CPP = "cpp.dal";
+        public static final String PHP = "php.dal";
+        public static final String PYTHON = "python.dal";
+        public static final String GO = "go.dal";
+    }
 }

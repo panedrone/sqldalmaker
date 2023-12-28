@@ -20,8 +20,20 @@ import org.apache.cayenne.dba.TypesMapping;
 
 import com.sqldalmaker.jaxb.sdm.DtoClass;
 
-/**
- * @author sqldalmaker@gmail.com
+/*
+ * 30.09.2023 11:29 1.289
+ * 07.05.2023 15:37
+ * 06.04.2023 02:56 1.281
+ * 27.03.2023 12:15 1.280
+ * 16.11.2022 08:02 1.269
+ * 02.11.2022 06:51 1.267
+ * 25.10.2022 09:26
+ * 19.07.2022 13:04
+ * 28.05.2022 22:33 1.247
+ * 10.05.2022 19:27 1.239
+ * 24.04.2022 08:20 1.229
+ * 17.04.2022 11:25 1.219
+ * 
  */
 class JdbcTableInfo {
 
@@ -40,37 +52,40 @@ class JdbcTableInfo {
     private final String explicit_auto_column_name;
     private final String explicit_auto_column_generation_type;
 
-    public static JdbcTableInfo forDao(String model,
-                                       Connection conn,
-                                       JaxbTypeMap type_map,
-                                       FieldNamesMode dto_field_names_mode,
-                                       String table_name,
-                                       String jaxb_explicit_pk,
-                                       DtoClass jaxb_dto_class) throws Exception {
+    public static JdbcTableInfo forDao(
+            String model,
+            Connection conn,
+            JaxbTypeMap type_map,
+            FieldNamesMode dto_field_names_mode,
+            String table_name,
+            String jaxb_explicit_pk,
+            DtoClass jaxb_dto_class) throws Exception {
 
         return new JdbcTableInfo(model, conn, type_map, dto_field_names_mode, table_name,
                 jaxb_explicit_pk, jaxb_dto_class.getAuto());
     }
 
-    public static JdbcTableInfo forDto(String model,
-                                       Connection conn,
-                                       JaxbTypeMap type_map,
-                                       FieldNamesMode dto_field_names_mode,
-                                       String table_name,
-                                       String jaxb_explicit_pk,
-                                       String jaxb_explicit_auto_column) throws Exception {
+    public static JdbcTableInfo forDto(
+            String model,
+            Connection conn,
+            JaxbTypeMap type_map,
+            FieldNamesMode dto_field_names_mode,
+            String table_name,
+            String jaxb_explicit_pk,
+            String jaxb_explicit_auto_column) throws Exception {
 
         return new JdbcTableInfo(model, conn, type_map, dto_field_names_mode, table_name,
                 jaxb_explicit_pk, jaxb_explicit_auto_column);
     }
 
-    private JdbcTableInfo(String model,
-                          Connection conn,
-                          JaxbTypeMap type_map,
-                          FieldNamesMode dto_field_names_mode,
-                          String table_name,
-                          String jaxb_explicit_pk,
-                          String jaxb_explicit_auto_column) throws Exception {
+    private JdbcTableInfo(
+            String model,
+            Connection conn,
+            JaxbTypeMap type_map,
+            FieldNamesMode dto_field_names_mode,
+            String table_name,
+            String jaxb_explicit_pk,
+            String jaxb_explicit_auto_column) throws Exception {
 
         this.conn = conn;
         this.type_map = type_map;
@@ -90,7 +105,7 @@ class JdbcTableInfo {
         } else {
             jaxb_explicit_auto_column = jaxb_explicit_auto_column.trim();
         }
-        if (jaxb_explicit_auto_column.length() == 0) {
+        if (jaxb_explicit_auto_column.isEmpty()) {
             explicit_auto_column_name = "";
             explicit_auto_column_generation_type = "";
         } else {
@@ -136,9 +151,11 @@ class JdbcTableInfo {
         throw new Exception("Not found: '" + table_name_pattern + "'. The search is case-sensitive.");
     }
 
-    public static ResultSet get_tables_rs(Connection conn,
-                                          String table_name_pattern, // it may include schema like "public.%"
-                                          boolean include_views) throws SQLException {
+    public static ResultSet get_tables_rs(
+            Connection conn,
+            String table_name_pattern, // it may include schema like "public.%"
+            boolean include_views) throws SQLException {
+
         String schema_name = null;
         if (table_name_pattern.contains(".")) {
             String[] parts = table_name_pattern.split("\\.");
@@ -292,10 +309,12 @@ class JdbcTableInfo {
         }
     }
 
-    private Map<String, String> _index_names_by_lo_case_col_names(Connection conn,
-                                                                  String schema,
-                                                                  String table_name,
-                                                                  boolean unique) throws SQLException {
+    private Map<String, String> _index_names_by_lo_case_col_names(
+            Connection conn,
+            String schema,
+            String table_name,
+            boolean unique) throws SQLException {
+
         Map<String, String> res = new HashMap<String, String>();
         DatabaseMetaData dm = conn.getMetaData();
         ResultSet rs = dm.getIndexInfo(null, schema, table_name, unique, true);
@@ -309,9 +328,11 @@ class JdbcTableInfo {
         return res;
     }
 
-    private static Map<String, String[]> _get_lower_case_FK_col_names(Connection conn,
-                                                                      String schema,
-                                                                      String table_name) throws SQLException {
+    private static Map<String, String[]> _get_lower_case_FK_col_names(
+            Connection conn,
+            String schema,
+            String table_name) throws SQLException {
+
         DatabaseMetaData db_md = conn.getMetaData();
         ResultSet rs = db_md.getImportedKeys(conn.getCatalog(), schema, table_name);
         Map<String, String[]> map = new HashMap<String, String[]>();
@@ -340,7 +361,7 @@ class JdbcTableInfo {
         for (FieldInfo fi : fields_map.values()) {
             String detected_type_name;
             String db_col_name = fi.getColumnName();
-            if (db_col_name.equalsIgnoreCase(explicit_auto_column_name) && model.length() > 0) {
+            if (db_col_name.equalsIgnoreCase(explicit_auto_column_name) && !model.isEmpty()) {
                 detected_type_name = fi.getType() + "+" + explicit_auto_column_generation_type;
             } else {
                 detected_type_name = fi.getType();
@@ -350,17 +371,14 @@ class JdbcTableInfo {
         }
     }
 
-    private Set<String> _get_lower_case_pk_col_names(String table_name,
-                                                     String explicit_pk) throws Exception {
+    private Set<String> _get_lower_case_pk_col_names(String table_name, String explicit_pk) throws Exception {
         if ("*".equals(explicit_pk)) {
             return _get_pk_col_name_aliases_from_table(table_name);
         }
-        return JaxbUtils.get_pk_col_name_aliaces_from_jaxb(explicit_pk);
+        return JaxbUtils.get_pk_col_name_aliases_from_jaxb(explicit_pk);
     }
 
-    private ResultSet _get_pk_rs(DatabaseMetaData md,
-                                 String table_name) throws Exception {
-
+    private ResultSet _get_pk_rs(DatabaseMetaData md, String table_name) throws Exception {
         if (table_name.contains(".")) {
             String[] parts = table_name.split("\\.");
             if (parts.length != 2) {

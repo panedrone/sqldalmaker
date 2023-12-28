@@ -650,7 +650,7 @@ public class UITabDAO {
                     list.add(item);
                 }
             } else {
-                FileSearchHelpers.IFile_List fileList = new FileSearchHelpers.IFile_List() {
+                FileSearchHelpers.IFileList fileList = new FileSearchHelpers.IFileList() {
                     @Override
                     public void add(String fileName) {
                         String[] item = new String[2];

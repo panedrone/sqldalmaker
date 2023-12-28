@@ -10,18 +10,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * @author sqldalmaker@gmail.com
+/*
+ * 21.10.2023 09:42
+ * 07.05.2023 15:37
+ * 16.11.2022 08:02 1.269
+ * 02.11.2022 06:51 1.267
+ * 25.10.2022 09:26
+ *
  */
 class JdbcSqlFieldInfo {
 
-    public static void get_field_info_by_jdbc_sql(String model,
-                                                  Connection conn,
-                                                  FieldNamesMode dto_field_names_mode,
-                                                  String jdbc_sql,
-                                                  String jaxb_explicit_pk,
-                                                  Map<String, FieldInfo> fields_map,
-                                                  List<FieldInfo> fields_all) throws Exception {
+    public static void get_field_info_by_jdbc_sql(
+            String model,
+            Connection conn,
+            FieldNamesMode dto_field_names_mode,
+            String jdbc_sql,
+            String jaxb_explicit_pk,
+            Map<String, FieldInfo> fields_map,
+            List<FieldInfo> fields_all) throws Exception {
+
         fields_map.clear();
         fields_all.clear();
         PreparedStatement ps = JdbcUtils.prepare_jdbc_sql(conn, jdbc_sql);
@@ -53,8 +60,8 @@ class JdbcSqlFieldInfo {
         } finally {
             ps.close();
         }
-        if (jaxb_explicit_pk != null && jaxb_explicit_pk.trim().length() > 0 && !"*".equals(jaxb_explicit_pk)) {
-            Set<String> lower_case_pk_col_names = JaxbUtils.get_pk_col_name_aliaces_from_jaxb(jaxb_explicit_pk);
+        if (jaxb_explicit_pk != null && !jaxb_explicit_pk.trim().isEmpty() && !"*".equals(jaxb_explicit_pk)) {
+            Set<String> lower_case_pk_col_names = JaxbUtils.get_pk_col_name_aliases_from_jaxb(jaxb_explicit_pk);
             for (FieldInfo fi : fields_all) {
                 String col_name = fi.getColumnName();
                 String lower_case_col_name = Helpers.get_pk_col_name_alias(col_name);
@@ -97,29 +104,27 @@ class JdbcSqlFieldInfo {
         return column_count;
     }
 
-    private static String _get_jdbc_col_name(ResultSetMetaData rsmd,
-                                             int col_num) throws Exception {
+    private static String _get_jdbc_col_name(ResultSetMetaData rsmd, int col_num) throws Exception {
         String column_name;
         try {
             column_name = rsmd.getColumnLabel(col_num);
         } catch (SQLException e) {
             column_name = null;
         }
-        if (column_name == null || column_name.length() == 0) {
+        if (column_name == null || column_name.isEmpty()) {
             column_name = rsmd.getColumnName(col_num);
         }
         if (column_name == null) {
             throw new Exception(
                     "Cannot detect column name. Try to specify column label like 'select count(*) as res from ...'");
         }
-        if (column_name.length() == 0) {
+        if (column_name.isEmpty()) {
             column_name = "col_" + col_num; // MS SQL Server: column_name == "" for 'select dbo.ufnLeadingZeros(?)'
         }
         return column_name;
     }
 
-    private static String _get_jdbc_col_type_name(ResultSetMetaData rsmd,
-                                                  int col_num) {
+    private static String _get_jdbc_col_type_name(ResultSetMetaData rsmd, int col_num) {
         try {
             // sometime, it returns "[B": See comments for Class.getName() API
             String java_class_name = rsmd.getColumnClassName(col_num);

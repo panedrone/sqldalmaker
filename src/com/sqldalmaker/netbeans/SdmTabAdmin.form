@@ -681,7 +681,7 @@
                   <SubComponents>
                     <Component class="javax.swing.JTextPane" name="jTextPane1">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="&#xa;Starting from v1.292, use &quot;sdm.xml&quot; instead of &quot;dto.xml&quot;.&#xa;&#xa;How to migrate:&#xa;&#xa;1. Click &quot;Create/Overwrite XSD files&quot;&#xa;2. Click &quot;Create sdm.xml&quot;&#xa;3. Copy-paste internal text from &quot;dto.xml&quot;,&lt;dto-classes&gt;... to &quot;sdm.xml&quot;,&lt;sdm&gt;...&#xa;4. Delete &quot;dto.xml&quot; and &quot;dto.xsd&quot;.&#xa;5. Click &quot;Validate Configuration&quot;. Done.&#xa;&#xa;Where to declare DAO classes with v1.292+:&#xa;&#xa;- &quot;option 1&quot;: separate XML files like in prev. versions of the plugin&#xa;- &quot;option 2&quot;: tags &quot;&lt;dao-class...&quot; in &quot;sdm.xml&quot;&#xa;&#xa;Once you start using &quot;option 2&quot; then &quot;option 1&quot; becomes ignored.&#xa;"/>
+                        <Property name="text" type="java.lang.String" value="=== migrate ==="/>
                         <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
                           <Insets value="[0, 20, 0, 20]"/>
                         </Property>

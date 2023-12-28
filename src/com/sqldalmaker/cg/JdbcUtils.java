@@ -11,8 +11,11 @@ import com.sqldalmaker.jaxb.settings.Settings;
 import java.sql.*;
 import java.util.*;
 
-/**
- * @author sqldalmaker@gmail.com
+/*
+ * 16.11.2022 08:02 1.269
+ * 16.04.2022 17:35 1.219
+ * 08.05.2021 22:29 1.200
+ *
  */
 public class JdbcUtils {
 
@@ -20,23 +23,24 @@ public class JdbcUtils {
     private final FieldNamesMode dto_field_names_mode;
     private final FieldNamesMode method_params_names_mode;
 
-    private final JaxbMacros global_markers;
-    private final JaxbTypeMap type_map;
+    private final JaxbMacros jaxb_macros;
+    private final JaxbTypeMap jaxb_type_map;
 
     private final String sql_root_abs_path;
 
-    public JdbcUtils(Connection conn,
-                     FieldNamesMode dto_field_names_mode,
-                     FieldNamesMode method_params_names_mode,
-                     Settings jaxb_settings,
-                     String sql_root_abs_path) throws Exception {
+    public JdbcUtils(
+            Connection conn,
+            FieldNamesMode dto_field_names_mode,
+            FieldNamesMode method_params_names_mode,
+            Settings jaxb_settings,
+            String sql_root_abs_path) throws Exception {
 
         this.conn = conn;
         this.dto_field_names_mode = dto_field_names_mode;
         this.method_params_names_mode = method_params_names_mode;
 
-        this.global_markers = new JaxbMacros(jaxb_settings.getMacros());
-        this.type_map = new JaxbTypeMap(jaxb_settings.getTypeMap());
+        this.jaxb_macros = new JaxbMacros(jaxb_settings.getMacros());
+        this.jaxb_type_map = new JaxbTypeMap(jaxb_settings.getTypeMap());
 
         this.sql_root_abs_path = sql_root_abs_path;
     }
@@ -50,14 +54,12 @@ public class JdbcUtils {
     }
 
     public String get_target_type_by_type_map(String detected) {
-        String target_type_name = type_map.get_target_type_name(detected);
+        String target_type_name = jaxb_type_map.get_target_type_name(detected);
         String[] parts = target_type_name.split("->");
         return parts[0].trim();
     }
 
-    public static ResultSet get_tables_rs(Connection conn,
-                                          String schema_name,
-                                          boolean include_views) throws SQLException {
+    public static ResultSet get_tables_rs(Connection conn, String schema_name, boolean include_views) throws SQLException {
         String table_name_pattern;
         if (schema_name == null) {
             table_name_pattern = "%";
@@ -86,18 +88,17 @@ public class JdbcUtils {
     //
     // ---------------------------------------------------------
 
-    public Map<String, FieldInfo> get_dto_field_info(DtoClass jaxb_dto_class,
-                                                     String sql_root_abs_path,
-                                                     List<FieldInfo> res_dto_fields) throws Exception {
+    public Map<String, FieldInfo> get_dto_field_info(
+            DtoClass jaxb_dto_class,
+            String sql_root_abs_path,
+            List<FieldInfo> res_dto_fields) throws Exception {
 
-        DtoClassInfo info = new DtoClassInfo(conn, type_map, global_markers, dto_field_names_mode);
+        DtoClassInfo info = new DtoClassInfo(conn, jaxb_type_map, jaxb_macros, dto_field_names_mode);
         return info.get_dto_field_info(false, jaxb_dto_class, sql_root_abs_path, res_dto_fields);
     }
 
-    public List<FieldInfo> get_field_info_for_wizard(DtoClass jaxb_dto_class,
-                                                     String sql_root_abs_path) throws Exception {
-
-        DtoClassInfo info = new DtoClassInfo(conn, type_map, global_markers, dto_field_names_mode);
+    public List<FieldInfo> get_field_info_for_wizard(DtoClass jaxb_dto_class, String sql_root_abs_path) throws Exception {
+        DtoClassInfo info = new DtoClassInfo(conn, jaxb_type_map, jaxb_macros, dto_field_names_mode);
         List<FieldInfo> res_dto_fields = info.get_field_info_for_wizard(jaxb_dto_class, sql_root_abs_path);
         return res_dto_fields;
     }
@@ -106,46 +107,49 @@ public class JdbcUtils {
     //
     // ---------------------------------------------------------
 
-    public String get_dao_query_info(String sql_root_abs_path,
-                                     String dao_jaxb_ref,
-                                     String dto_param_type,
-                                     String[] method_param_descriptors,
-                                     String jaxb_dto_or_return_type,
-                                     boolean jaxb_return_type_is_dto,
-                                     List<DtoClass> jaxb_dto_classes,
-                                     List<FieldInfo> res_fields,
-                                     List<FieldInfo> res_params) throws Exception {
+    public String get_dao_query_info(
+            String sql_root_abs_path,
+            String dao_jaxb_ref,
+            String dto_param_type,
+            String[] method_param_descriptors,
+            String jaxb_dto_or_return_type,
+            boolean jaxb_return_type_is_dto,
+            List<DtoClass> jaxb_dto_classes,
+            List<FieldInfo> res_fields,
+            List<FieldInfo> res_params) throws Exception {
 
-        DaoClassInfo info = new DaoClassInfo(conn, dto_field_names_mode, method_params_names_mode, global_markers, type_map);
+        DaoClassInfo info = new DaoClassInfo(conn, dto_field_names_mode, method_params_names_mode, jaxb_macros, jaxb_type_map);
         String dao_query_jdbc_sql = info.get_dao_query_info(sql_root_abs_path, dao_jaxb_ref, dto_param_type,
                 method_param_descriptors, jaxb_dto_or_return_type,
                 jaxb_return_type_is_dto, jaxb_dto_classes, res_fields, res_params);
         return dao_query_jdbc_sql;
     }
 
-    public void get_dao_exec_dml_info(String dao_jdbc_sql,
-                                      String dto_param_type,
-                                      String[] method_param_descriptors,
-                                      List<FieldInfo> res_params) throws Exception {
+    public void get_dao_exec_dml_info(
+            String dao_jdbc_sql,
+            String dto_param_type,
+            String[] method_param_descriptors,
+            List<FieldInfo> res_params) throws Exception {
 
         FieldNamesMode param_names_mode;
-        if (dto_param_type == null || dto_param_type.length() == 0) {
+        if (dto_param_type == null || dto_param_type.isEmpty()) {
             param_names_mode = method_params_names_mode;
         } else {
             param_names_mode = dto_field_names_mode;
         }
-        JdbcSqlParamInfo.get_jdbc_sql_params_info(conn, type_map, dao_jdbc_sql, param_names_mode, method_param_descriptors, res_params);
+        JdbcSqlParamInfo.get_jdbc_sql_params_info(conn, jaxb_type_map, dao_jdbc_sql, param_names_mode, method_param_descriptors, res_params);
     }
 
     // DAO. CRUD -----------------------------------------------
     //
     // ---------------------------------------------------------
 
-    public String get_dao_crud_create_info(String dao_table_name,
-                                           DtoClass jaxb_dto_class,
-                                           String generated_col_names,
-                                           List<FieldInfo> res_dao_fields_not_generated,
-                                           List<FieldInfo> res_dao_fields_generated) throws Exception {
+    public String get_dao_crud_create_info(
+            String dao_table_name,
+            DtoClass jaxb_dto_class,
+            String generated_col_names,
+            List<FieldInfo> res_dao_fields_not_generated,
+            List<FieldInfo> res_dao_fields_generated) throws Exception {
 
         res_dao_fields_not_generated.clear();
         res_dao_fields_generated.clear();
@@ -157,27 +161,30 @@ public class JdbcUtils {
                 dao_crud_generated_set.add(k.toLowerCase());
             }
         }
-        DaoClassInfo info = new DaoClassInfo(conn, dto_field_names_mode, method_params_names_mode, global_markers, type_map);
+        DaoClassInfo info = new DaoClassInfo(conn, dto_field_names_mode, method_params_names_mode, jaxb_macros, jaxb_type_map);
         info.get_dao_fields_for_crud_create(jaxb_dto_class, dao_table_name,
                 dao_crud_generated_set, res_dao_fields_not_generated, res_dao_fields_generated);
         return SqlUtils.create_crud_create_sql(dao_table_name, res_dao_fields_not_generated);
     }
 
-    private JdbcTableInfo _get_table_info_for_crud(DtoClass jaxb_dto_class,
-                                                   String table_name,
-                                                   String explicit_pk) throws Exception {
+    private JdbcTableInfo _get_table_info_for_crud(
+            DtoClass jaxb_dto_class,
+            String table_name,
+            String explicit_pk) throws Exception {
 
-        DaoClassInfo info = new DaoClassInfo(conn, dto_field_names_mode, method_params_names_mode, global_markers, type_map);
+        DaoClassInfo info = new DaoClassInfo(conn, dto_field_names_mode, method_params_names_mode, jaxb_macros, jaxb_type_map);
         JdbcTableInfo t_info = info.get_dao_fields_for_crud(jaxb_dto_class, table_name, explicit_pk, sql_root_abs_path);
         return t_info;
     }
 
-    public String get_dao_crud_read_info(String dao_table_name,
-                                         DtoClass jaxb_dto_class,
-                                         boolean fetch_list,
-                                         String explicit_pk,
-                                         List<FieldInfo> res_dao_fields_all,
-                                         List<FieldInfo> res_dao_fields_pk) throws Exception {
+    public String get_dao_crud_read_info(
+            String dao_table_name,
+            DtoClass jaxb_dto_class,
+            boolean fetch_list,
+            String explicit_pk,
+            List<FieldInfo> res_dao_fields_all,
+            List<FieldInfo> res_dao_fields_pk) throws Exception {
+
         res_dao_fields_all.clear();
         res_dao_fields_pk.clear();
         JdbcTableInfo tfi = _get_table_info_for_crud(jaxb_dto_class, dao_table_name, explicit_pk);
@@ -186,11 +193,13 @@ public class JdbcUtils {
         return SqlUtils.create_crud_read_sql(dao_table_name, res_dao_fields_pk, fetch_list);
     }
 
-    public String get_dao_crud_update_info(String dao_table_name,
-                                           DtoClass jaxb_dto_class,
-                                           String explicit_pk,
-                                           List<FieldInfo> res_fields_not_pk,
-                                           List<FieldInfo> res_fields_pk) throws Exception {
+    public String get_dao_crud_update_info(
+            String dao_table_name,
+            DtoClass jaxb_dto_class,
+            String explicit_pk,
+            List<FieldInfo> res_fields_not_pk,
+            List<FieldInfo> res_fields_pk) throws Exception {
+
         res_fields_not_pk.clear();
         res_fields_pk.clear();
         JdbcTableInfo tfi = _get_table_info_for_crud(jaxb_dto_class, dao_table_name, explicit_pk);
@@ -205,10 +214,11 @@ public class JdbcUtils {
         return SqlUtils.create_crud_update_sql(dao_table_name, res_fields_not_pk, res_fields_pk);
     }
 
-    public String get_dao_crud_delete_info(String dao_table_name,
-                                           DtoClass jaxb_dto_class,
-                                           String explicit_pk,
-                                           List<FieldInfo> res_fields_pk) throws Exception {
+    public String get_dao_crud_delete_info(
+            String dao_table_name,
+            DtoClass jaxb_dto_class,
+            String explicit_pk,
+            List<FieldInfo> res_fields_pk) throws Exception {
 
         JdbcTableInfo tfi = _get_table_info_for_crud(jaxb_dto_class, dao_table_name, explicit_pk);
         res_fields_pk.clear();
@@ -219,9 +229,7 @@ public class JdbcUtils {
         return SqlUtils.create_crud_delete_sql(dao_table_name, res_fields_pk);
     }
 
-    public static PreparedStatement prepare_jdbc_sql(Connection conn,
-                                                     String jdbc_sql) throws SQLException {
-
+    public static PreparedStatement prepare_jdbc_sql(Connection conn, String jdbc_sql) throws SQLException {
         boolean is_sp = SqlUtils.is_jdbc_stored_proc_call(jdbc_sql);
         if (is_sp) {
             return conn.prepareCall(jdbc_sql);

@@ -10,7 +10,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.sqldalmaker.cg.FieldNamesMode;
 import com.sqldalmaker.cg.Helpers;
 import com.sqldalmaker.common.*;
-import com.sqldalmaker.common.FileSearchHelpers.IFile_List;
 import com.sqldalmaker.jaxb.sdm.DaoClass;
 import com.sqldalmaker.jaxb.sdm.Sdm;
 import com.sqldalmaker.jaxb.settings.Settings;
@@ -83,7 +82,7 @@ public class IdeaCrudXmlHelpers {
     private static ArrayList<String> fill_dao_file_path_list(VirtualFile root_file) {
 
         final ArrayList<String> res = new ArrayList<String>();
-        FileSearchHelpers.IFile_List file_list = new IFile_List() {
+        FileSearchHelpers.IFileList file_list = new FileSearchHelpers.IFileList() {
             @Override
             public void add(String file_path) {
                 res.add(file_path);

@@ -731,7 +731,7 @@
                         <properties>
                           <editable value="false"/>
                           <margin top="0" left="15" bottom="15" right="15"/>
-                          <text value="&#10;Starting from v1.292, use &quot;sdm.xml&quot; instead of &quot;dto.xml&quot;.&#10;&#10;How to migrate:&#10;&#10;1. Click &quot;Create/Overwrite XSD files&quot;&#10;2. Click &quot;Create sdm.xml&quot;&#10;3. Copy-paste internal text from &quot;dto.xml&quot;,&lt;dto-classes&gt;... to &quot;sdm.xml&quot;,&lt;sdm&gt;...&#10;4. Delete &quot;dto.xml&quot; and &quot;dto.xsd&quot;.&#10;5. Click &quot;Validate Configuration&quot;. Done.&#10;&#10;Where to declare DAO classes with v1.292+:&#10;&#10;- &quot;option 1&quot;: separate XML files like in prev. versions of the plugin&#10;- &quot;option 2&quot;: tags &quot;&lt;dao-class...&quot; in &quot;sdm.xml&quot;&#10;&#10;Once you start using &quot;option 2&quot; then &quot;option 1&quot; becomes ignored.&#10;"/>
+                          <text value=" === 1.292 migration ==="/>
                           <visible value="true"/>
                         </properties>
                       </component>

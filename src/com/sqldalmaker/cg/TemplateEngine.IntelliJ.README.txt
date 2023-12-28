@@ -1,0 +1,1 @@
+Remove "lib-client.jar" from Project Structure --> Platform SDK --> IntelliJ IDEA Community Edition IC-233.13135.103

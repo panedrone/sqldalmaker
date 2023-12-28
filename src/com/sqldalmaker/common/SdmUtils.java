@@ -26,10 +26,7 @@ public class SdmUtils {
     /*
         Used in XML assistants
      */
-    public static Set<String> find_dto_used_in_dao_xml_crud(
-            String sdm_folder_abs_path,
-            List<String> dao_xml_file_name_list) throws Exception {
-
+    public static Set<String> find_dto_used_in_dao_xml_crud(String sdm_folder_abs_path, List<String> dao_xml_file_name_list) throws Exception {
         String context_path = DaoClass.class.getPackage().getName();
         XmlParser xml_parser = new XmlParser(context_path, Helpers.concat_path(sdm_folder_abs_path, Const.DAO_XSD));
         Set<String> res = new HashSet<String>();
@@ -41,10 +38,7 @@ public class SdmUtils {
         return res;
     }
 
-    private static Set<String> find_dto_used_in_dao_xml_crud(
-            XmlParser xml_parser,
-            String xml_file_abs_path) throws Exception {
-
+    private static Set<String> find_dto_used_in_dao_xml_crud(XmlParser xml_parser, String xml_file_abs_path) throws Exception {
         Set<String> res = new HashSet<String>();
         DaoClass dao_class = xml_parser.unmarshal(xml_file_abs_path);
         List<Object> tags = dao_class.getCrudOrQueryOrQueryList();
@@ -133,10 +127,7 @@ public class SdmUtils {
     /*
         just table name without schema needed
      */
-    public static String table_name_to_dto_class_name(
-            String table_name,
-            boolean plural_to_singular) {
-
+    public static String table_name_to_dto_class_name(String table_name, boolean plural_to_singular) {
         String word = Helpers.to_lower_camel_or_title_case(table_name, true);
         if (plural_to_singular) {
             int last_word_index = -1;
@@ -314,10 +305,7 @@ public class SdmUtils {
     }
 
     // for Java and PHP
-    public static String get_package_relative_path(
-            Settings settings,
-            String package_name) {
-
+    public static String get_package_relative_path(Settings settings, String package_name) {
         String source_folder = settings.getFolders().getTarget();
         if (package_name.isEmpty()) {
             return source_folder;
@@ -342,34 +330,25 @@ public class SdmUtils {
         }
     }
 
-    public static List<DtoClass> get_dto_classes(
-            String sdm_xml_abs_file_path,
-            String sdm_xsd_abs_file_path) throws Exception {
-
+    public static List<DtoClass> get_dto_classes(String sdm_xml_abs_path, String sdm_xsd_abs_path) throws Exception {
         String context_path = Sdm.class.getPackage().getName();
-        XmlParser xml_parser = new XmlParser(context_path, sdm_xsd_abs_file_path);
-        Sdm elements = xml_parser.unmarshal(sdm_xml_abs_file_path);
+        XmlParser xml_parser = new XmlParser(context_path, sdm_xsd_abs_path);
+        Sdm elements = xml_parser.unmarshal(sdm_xml_abs_path);
         List<DtoClass> res = new ArrayList<DtoClass>(elements.getDtoClass());
         return res;
     }
 
-    public static List<DaoClass> get_dao_classes(
-            String sdm_xml_abs_file_path,
-            String sdm_xsd_abs_file_path) throws Exception {
-
+    public static List<DaoClass> get_dao_classes(String sdm_xml_abs_path, String sdm_xsd_abs_path) throws Exception {
         String context_path = Sdm.class.getPackage().getName();
-        XmlParser xml_parser = new XmlParser(context_path, sdm_xsd_abs_file_path);
-        Sdm elements = xml_parser.unmarshal(sdm_xml_abs_file_path);
+        XmlParser xml_parser = new XmlParser(context_path, sdm_xsd_abs_path);
+        Sdm elements = xml_parser.unmarshal(sdm_xml_abs_path);
         List<DaoClass> res = new ArrayList<DaoClass>(elements.getDaoClass());
         return res;
     }
 
-    public static Set<String> get_dto_class_names_used_in_sdm_xml(
-            String sdm_xml_abs_file_path,
-            String sdm_xsd_abs_file_path) throws Exception {
-
+    public static Set<String> get_dto_class_names_used_in_sdm_xml(String sdm_xml_abs_path, String sdm_xsd_abs_path) throws Exception {
         Set<String> res = new HashSet<String>();
-        List<DtoClass> list = SdmUtils.get_dto_classes(sdm_xml_abs_file_path, sdm_xsd_abs_file_path);
+        List<DtoClass> list = get_dto_classes(sdm_xml_abs_path, sdm_xsd_abs_path);
         for (DtoClass cls : list) {
             String class_name = cls.getName();
             if (res.contains(class_name)) {
@@ -380,9 +359,9 @@ public class SdmUtils {
         return res;
     }
 
-    public static Settings load_settings(String settings_folder_abs_path) throws Exception {
-        String settings_xml_abs_path = Helpers.concat_path(settings_folder_abs_path, Const.SETTINGS_XML);
-        String settings_xsd_abs_path = Helpers.concat_path(settings_folder_abs_path, Const.SETTINGS_XSD);
+    public static Settings load_settings(String sdm_folder_abs_path) throws Exception {
+        String settings_xml_abs_path = Helpers.concat_path(sdm_folder_abs_path, Const.SETTINGS_XML);
+        String settings_xsd_abs_path = Helpers.concat_path(sdm_folder_abs_path, Const.SETTINGS_XSD);
         String context_path = Settings.class.getPackage().getName();
         XmlParser xml_parser = new XmlParser(context_path, settings_xsd_abs_path);
         Settings res = xml_parser.unmarshal(settings_xml_abs_path);

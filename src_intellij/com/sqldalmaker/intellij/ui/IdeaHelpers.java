@@ -107,8 +107,8 @@ public class IdeaHelpers {
     }
 
     public static Settings load_settings(VirtualFile root_file) throws Exception {
-        String xml_meraprogram_folder_full_path = root_file.getParent().getPath();
-        return SdmUtils.load_settings(xml_meraprogram_folder_full_path);
+        String sdm_folder_full_path = root_file.getParent().getPath();
+        return SdmUtils.load_settings(sdm_folder_full_path);
     }
 
     /**
@@ -131,7 +131,7 @@ public class IdeaHelpers {
                 try {
                     folder.refresh(/*asynchronous*/ false, /*recursive*/ true);
                 } catch (Throwable e) {
-                    e.printStackTrace();
+                    // e.printStackTrace();
                     throw new RuntimeException(e);
                 }
             }
@@ -139,11 +139,11 @@ public class IdeaHelpers {
     }
 
     // http://www.devdaily.com/blog/post/java/read-text-file-from-jar-file
-    public static String read_from_jar_file(String res_name) throws Exception {
-        return read_from_jar_file("resources", res_name);
+    public static String read_from_jar_resources(String res_name) throws Exception {
+        return read_from_jar("resources", res_name);
     }
 
-    public static String read_from_jar_file(String path, String res_name) throws Exception {
+    public static String read_from_jar(String path, String res_name) throws Exception {
         InputStream is = get_resource_as_stream(path, res_name);
         try {
             InputStreamReader reader = new InputStreamReader(is);
@@ -157,12 +157,11 @@ public class IdeaHelpers {
         }
     }
 
-    private static InputStream get_resource_as_stream(String path, String res_name)
-            throws InternalException {
+    private static InputStream get_resource_as_stream(String path, String res_name) throws InternalException {
         // swing app wants 'resources/' but plug-in wants '/resources/' WHY?
         ClassLoader cl = IdeaHelpers.class.getClassLoader();
         InputStream is;
-        if (path == null || path.trim().length() == 0) {
+        if (path == null || path.trim().isEmpty()) {
             // to avoid Warning
             // Do not request resource from classloader using path with leading slash
             is = cl.getResourceAsStream(res_name);
@@ -178,21 +177,20 @@ public class IdeaHelpers {
         return is;
     }
 
-    public static Connection get_connection(Project project,
-                                            Settings settings) throws Exception {
+    public static Connection get_connection(Project project, Settings settings) throws Exception {
         String driver_jar = settings.getJdbc().getJar();
         String driver_class_name = settings.getJdbc().getClazz();
         String url = settings.getJdbc().getUrl();
         String user_name = settings.getJdbc().getUser();
         String password = settings.getJdbc().getPwd();
-        return get_connection(project, driver_jar, driver_class_name,
-                url, user_name, password);
+        return get_connection(project, driver_jar, driver_class_name, url, user_name, password);
     }
 
-    public static Connection get_connection(Project project,
-                                            String driver_jar,
-                                            String driver_class_name, String url,
-                                            String user_name, String password) throws Exception {
+    public static Connection get_connection(
+            Project project,
+            String driver_jar,
+            String driver_class_name, String url,
+            String user_name, String password) throws Exception {
 
         VirtualFile project_dir = get_project_base_dir(project);
         String project_abs_path = project_dir.getPath();
@@ -209,7 +207,7 @@ public class IdeaHelpers {
         }
         driver_jar = driver_file.getPath();
         Class<?> cl;
-        if (!"".equals(driver_jar)) {
+        if (!driver_jar.isEmpty()) {
             ClassLoader loader = new URLClassLoader(new URL[]{new File(
                     driver_jar).toURI().toURL()});
             cl = Class.forName(driver_class_name, true, loader);
@@ -237,8 +235,7 @@ public class IdeaHelpers {
     public static String get_sdm_info() {
         String plugin_version = "1.289+";
         try {
-
-            String plugin_xml = IdeaHelpers.read_from_jar_file("", "plugin.xml");
+            String plugin_xml = IdeaHelpers.read_from_jar("", "plugin.xml");
             String[] parts = plugin_xml.split("<version>");
             plugin_version = parts[1].split("</version>")[0];
         } catch (Throwable e) {
@@ -249,7 +246,6 @@ public class IdeaHelpers {
     }
 
     public static class GeneratedFileData {
-
         String file_name;
         String file_content;
     }
@@ -299,8 +295,10 @@ public class IdeaHelpers {
         }
     }
 
-    public static void run_write_action_to_generate_source_file(final String output_dir_module_relative_path, List<GeneratedFileData> generated_file_data_list,
-                                                                final Project project) throws Exception {
+    public static void run_write_action_to_generate_source_file(
+            String output_dir_module_relative_path,
+            List<GeneratedFileData> generated_file_data_list,
+            Project project) throws Exception {
 
         GenerateSourceFileWriteAction write_action = new GenerateSourceFileWriteAction();
         write_action.generated_file_data_list = generated_file_data_list;
@@ -314,7 +312,6 @@ public class IdeaHelpers {
     }
 
     private static VirtualFile ensure_dir(VirtualFile root_dir, String rel_path) throws IOException {
-
         rel_path = rel_path.replace('\\', '/');
         VirtualFile virtual_dir = root_dir.findFileByRelativePath(rel_path);
         if (virtual_dir == null) {
@@ -323,7 +320,7 @@ public class IdeaHelpers {
             for (String p : parts) {
                 // createChildDirectory may show dialog and throw
                 // java.lang.IllegalStateException: The DialogWrapper can be used only on event dispatch thread.
-                // if it is called outside of WriteAction
+                // if it is called outside WriteAction
                 VirtualFile dir = tmp.findFileByRelativePath(p);
                 if (dir == null) {
                     tmp = tmp.createChildDirectory(null, p);
@@ -336,8 +333,7 @@ public class IdeaHelpers {
         return virtual_dir;
     }
 
-    public static void run_write_action_to_save_text_file(final VirtualFile root_file,
-                                                          final String file_name, final String text) throws IOException {
+    public static void run_write_action_to_save_text_file(VirtualFile root_file, String file_name, String text) throws IOException {
         class Error {
             public Throwable exception = null;
         }
@@ -351,11 +347,10 @@ public class IdeaHelpers {
                     if (file == null) {
                         // createChildData may show dialog and throw
                         // java.lang.IllegalStateException: The DialogWrapper can be used only on event dispatch thread.
-                        // if it is called outside of WriteAction
+                        // if it is called outside WriteAction
                         file = parent_dir.createChildData(null, file_name);
                     }
                     file.setBinaryContent(text.getBytes());
-
                     parent_dir.refresh(/*asynchronous*/ false, /*recursive*/ true);
                 } catch (Throwable e) {
                     error.exception = e;
@@ -369,8 +364,7 @@ public class IdeaHelpers {
     }
 
     // thanks to https://plugins.jetbrains.com/plugin/3202?pr=
-    private static void navigate_to_source(@NotNull Project project, @NotNull PsiElement psi_element) {
-
+    private static void navigate_to_source(Project project, PsiElement psi_element) {
         PsiFile containing_file = psi_element.getContainingFile();
         // VirtualFile virtual_file = containingFile.find_virtual_file();
         VirtualFile virtual_file = IdeaReferenceCompletion.find_virtual_file(containing_file);
@@ -388,9 +382,7 @@ public class IdeaHelpers {
         }
     }
 
-    public static void navigate_to_dto_class_declaration(@NotNull Project project,
-                                                         @NotNull VirtualFile root_file,
-                                                         @NotNull String dto_class_name) throws Exception {
+    public static void navigate_to_dto_class_declaration(Project project, VirtualFile root_file, String dto_class_name) throws Exception {
         VirtualFile xml_file_dir = root_file.getParent();
         if (xml_file_dir == null) {
             throw new Exception("Cannot get parent folder for " + root_file.getName());
@@ -406,9 +398,7 @@ public class IdeaHelpers {
         navigate_to_source(project, psi_element);
     }
 
-    public static boolean navigate_to_dao_class_declaration(@NotNull Project project,
-                                                            @NotNull VirtualFile root_file,
-                                                            @NotNull String dao_class_name) {
+    public static boolean navigate_to_dao_class_declaration(Project project, VirtualFile root_file, String dao_class_name) {
         VirtualFile xml_file_dir = root_file.getParent();
         if (xml_file_dir == null) {
             return false;

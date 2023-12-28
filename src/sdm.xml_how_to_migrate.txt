@@ -1,0 +1,17 @@
+
+Starting from v1.292, use "sdm.xml" instead of "dto.xml".
+
+How to migrate:
+
+1. click "Create/Overwrite XSD files"
+2. click "Create sdm.xml"
+3. copy-paste internal text from "dto.xml":<dto-classes>... to "sdm.xml":<sdm>...
+4. delete "dto.xml" and "dto.xsd"
+5. click "Validate Configuration" -> done.
+
+Where to declare DAO classes with v1.292+:
+
+- "option 1": separate XML files like in prev. versions
+- "option 2": tags "<dao-class..." in "sdm.xml"
+
+Once you start using "option 2", "option 1" is ignored.

@@ -67,7 +67,10 @@ class DaoClassInfo {
         return new FieldInfo(dto_field_names_mode, ret_type_name, ret_col_name, "ret-value");
     }
 
-    private void _refine_dao_fields_by_dto_fields(String sql_root_abs_path, DtoClass jaxb_dto_class, List<FieldInfo> dao_fields) throws Exception {
+    private void _refine_dao_fields_by_dto_fields(
+            String sql_root_abs_path,
+            DtoClass jaxb_dto_class,
+            List<FieldInfo> dao_fields) throws Exception {
 
         DtoClassInfo dto_info = new DtoClassInfo(conn, jaxb_type_map, jaxb_macros, dto_field_names_mode);
         boolean ignore_model = true;
@@ -347,10 +350,7 @@ class DaoClassInfo {
             List<FieldInfo> res_dao_fields_not_generated,
             List<FieldInfo> res_dao_fields_generated) throws Exception {
 
-        // The instance of JdbcTableInfo for "crud-create"
-        // should not be cached/shared, because of modifying of FieldInfo
-
-        String no_model = ""; // TODO - info about PK and FK is not needed for crud_create
+        String no_model = "";
         JdbcTableInfo t_info = JdbcTableInfo.forDao(no_model, conn, jaxb_type_map, dto_field_names_mode, table_name, "*", jaxb_dto_class);
         List<FieldInfo> dao_fields_all = t_info.fields_all;
         for (FieldInfo dao_field : dao_fields_all) {

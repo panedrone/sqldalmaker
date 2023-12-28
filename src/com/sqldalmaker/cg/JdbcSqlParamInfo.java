@@ -10,17 +10,25 @@ import java.sql.ParameterMetaData;
 import java.sql.PreparedStatement;
 import java.util.List;
 
-/**
- * @author sqldalmaker@gmail.com
+/*
+ * 07.05.2023 15:37
+ * 09.04.2023 14:52 1.282
+ * 16.11.2022 08:02 1.269
+ * 25.10.2022 09:26
+ * 10.05.2022 19:27 1.239
+ * 26.04.2022 15:44 1.230
+ * 17.04.2022 11:25 1.219
+ *
  */
-public class JdbcSqlParamInfo {
+class JdbcSqlParamInfo {
 
-    public static void get_jdbc_sql_params_info(Connection conn,
-                                                JaxbTypeMap type_map,
-                                                String dao_jdbc_sql,
-                                                FieldNamesMode param_names_mode,
-                                                String[] method_param_descriptors,
-                                                List<FieldInfo> res_params) throws Exception {
+    public static void get_jdbc_sql_params_info(
+            Connection conn,
+            JaxbTypeMap type_map,
+            String dao_jdbc_sql,
+            FieldNamesMode param_names_mode,
+            String[] method_param_descriptors,
+            List<FieldInfo> res_params) throws Exception {
 
         Helpers.check_duplicates(method_param_descriptors);
         PreparedStatement ps = JdbcUtils.prepare_jdbc_sql(conn, dao_jdbc_sql);
@@ -31,11 +39,12 @@ public class JdbcSqlParamInfo {
         }
     }
 
-    public static void get_params_info(PreparedStatement ps,
-                                       JaxbTypeMap type_map,
-                                       FieldNamesMode param_names_mode,
-                                       String[] method_param_descriptors,
-                                       List<FieldInfo> _params) throws Exception {
+    public static void get_params_info(
+            PreparedStatement ps,
+            JaxbTypeMap type_map,
+            FieldNamesMode param_names_mode,
+            String[] method_param_descriptors,
+            List<FieldInfo> _params) throws Exception {
         //
         // get_params_info should not be used for CRUD
         //
@@ -94,10 +103,12 @@ public class JdbcSqlParamInfo {
         }
     }
 
-    private static void _get_param_info_by_descriptors(JaxbTypeMap type_map,
-                                                       FieldNamesMode param_names_mode,
-                                                       String[] method_param_descriptors,
-                                                       List<FieldInfo> res_params) throws Exception {
+    private static void _get_param_info_by_descriptors(
+            JaxbTypeMap type_map,
+            FieldNamesMode param_names_mode,
+            String[] method_param_descriptors,
+            List<FieldInfo> res_params) throws Exception {
+
         res_params.clear();
         for (String param_descriptor : method_param_descriptors) {
             FieldInfo pi = create_param_info(type_map, param_names_mode, param_descriptor, Object.class.getName());
@@ -105,8 +116,7 @@ public class JdbcSqlParamInfo {
         }
     }
 
-    private static String _get_jdbc_param_type_name(ParameterMetaData pm,
-                                                    int i_0_n) {
+    private static String _get_jdbc_param_type_name(ParameterMetaData pm, int i_0_n) {
         if (pm == null) {
             return Object.class.getName();
         }
@@ -123,10 +133,12 @@ public class JdbcSqlParamInfo {
         return java_class_name;
     }
 
-    public static FieldInfo create_param_info(JaxbTypeMap type_map,
-                                              FieldNamesMode param_names_mode,
-                                              String param_descriptor,
-                                              String default_param_type_name) throws Exception {
+    public static FieldInfo create_param_info(
+            JaxbTypeMap type_map,
+            FieldNamesMode param_names_mode,
+            String param_descriptor,
+            String default_param_type_name) throws Exception {
+
         String param_type_name;
         String param_name;
         String[] parts = Helpers.parse_param_descriptor(param_descriptor);

@@ -31,12 +31,13 @@ public class CppCG {
         private final JdbcUtils db_utils;
         private final String dto_class_prefix;
 
-        public DTO(Sdm sdm,
-                   Settings jaxb_settings,
-                   Connection connection,
-                   String sql_root_abs_path,
-                   String dto_class_prefix,
-                   String vm_template) throws Exception {
+        public DTO(
+                Sdm sdm,
+                Settings jaxb_settings,
+                Connection connection,
+                String sql_root_abs_path,
+                String dto_class_prefix,
+                String vm_template) throws Exception {
 
             this.jaxb_dto_classes = sdm.getDtoClass();
             this.dto_class_prefix = dto_class_prefix;
@@ -74,12 +75,13 @@ public class CppCG {
         private final TemplateEngine te;
         private final JdbcUtils db_utils;
 
-        public DAO(List<DtoClass> jaxb_dto_classes,
-                   Settings jaxb_settings,
-                   Connection connection,
-                   String sql_root_abs_path,
-                   String class_prefix,
-                   String vm_template) throws Exception {
+        public DAO(
+                List<DtoClass> jaxb_dto_classes,
+                Settings jaxb_settings,
+                Connection connection,
+                String sql_root_abs_path,
+                String class_prefix,
+                String vm_template) throws Exception {
 
             this.jaxb_dto_classes = jaxb_dto_classes;
             this.sql_root_abs_path = sql_root_abs_path;
@@ -93,8 +95,7 @@ public class CppCG {
         }
 
         @Override
-        public String[] translate(String dao_class_name,
-                                  DaoClass dao_class) throws Exception {
+        public String[] translate(String dao_class_name, DaoClass dao_class) throws Exception {
             imports.clear();
             imports.add("DataStore.h");
             List<String> methods = new ArrayList<String>();
@@ -146,15 +147,16 @@ public class CppCG {
         //
         // this method is called from both 'render_jaxb_query' and 'render_crud_read'
         //
-        private StringBuilder _render_query(String dao_query_jdbc_sql,
-                                            boolean is_external_sql,
-                                            String jaxb_dto_or_return_type,
-                                            boolean jaxb_return_type_is_dto,
-                                            boolean fetch_list,
-                                            String method_name,
-                                            String crud_table,
-                                            List<FieldInfo> fields_all,
-                                            List<FieldInfo> fields_pk) throws Exception {
+        private StringBuilder _render_query(
+                String dao_query_jdbc_sql,
+                boolean is_external_sql,
+                String jaxb_dto_or_return_type,
+                boolean jaxb_return_type_is_dto,
+                boolean fetch_list,
+                String method_name,
+                String crud_table,
+                List<FieldInfo> fields_all,
+                List<FieldInfo> fields_pk) throws Exception {
 
             if (dao_query_jdbc_sql == null) {
                 return Helpers.get_no_pk_warning(method_name);
@@ -222,15 +224,15 @@ public class CppCG {
         }
 
         // it is used only in render_jaxb_exec_dml
-        private void _render_exec_dml(StringBuilder buffer,
-                                      String dao_jdbc_sql,
-                                      boolean is_external_sql,
-                                      String method_name,
-                                      String[] param_descriptors,
-                                      String xml_node_name,
-                                      String sql_path) throws Exception {
+        private void _render_exec_dml(
+                StringBuilder buffer,
+                String dao_jdbc_sql,
+                boolean is_external_sql,
+                String method_name,
+                String[] param_descriptors,
+                String xml_node_name,
+                String sql_path) throws Exception {
 
-            SqlUtils.throw_if_select_sql(dao_jdbc_sql);
             List<FieldInfo> params = new ArrayList<FieldInfo>();
             db_utils.get_dao_exec_dml_info(dao_jdbc_sql, "", param_descriptors, params);
             String sql_str = SqlUtils.jdbc_sql_to_cpp_str(dao_jdbc_sql);
@@ -270,12 +272,13 @@ public class CppCG {
         }
 
         @Override
-        public StringBuilder render_crud_create(String class_name,
-                                                String method_name,
-                                                String table_name,
-                                                String dto_class_name,
-                                                boolean fetch_generated,
-                                                String generated) throws Exception {
+        public StringBuilder render_crud_create(
+                String class_name,
+                String method_name,
+                String table_name,
+                String dto_class_name,
+                boolean fetch_generated,
+                String generated) throws Exception {
 
             List<FieldInfo> fields_not_ai = new ArrayList<FieldInfo>();
             List<FieldInfo> fields_ai = new ArrayList<FieldInfo>();
@@ -290,7 +293,7 @@ public class CppCG {
             context.put("method_name", method_name);
             context.put("params", fields_not_ai);
             context.put("dto_param", _get_rendered_dto_class_name(dto_class_name));
-            if (fetch_generated && fields_ai.size() > 0) {
+            if (fetch_generated && !fields_ai.isEmpty()) {
                 context.put("keys", fields_ai);
                 context.put("mode", "dao_create");
             } else {
@@ -305,11 +308,12 @@ public class CppCG {
         }
 
         @Override
-        public StringBuilder render_crud_read(String method_name,
-                                              String dao_table_name,
-                                              String dto_class_name,
-                                              String explicit_pk,
-                                              boolean fetch_list) throws Exception {
+        public StringBuilder render_crud_read(
+                String method_name,
+                String dao_table_name,
+                String dto_class_name,
+                String explicit_pk,
+                boolean fetch_list) throws Exception {
 
             List<FieldInfo> fields_all = new ArrayList<FieldInfo>();
             List<FieldInfo> fields_pk = new ArrayList<FieldInfo>();
@@ -320,12 +324,13 @@ public class CppCG {
         }
 
         @Override
-        public StringBuilder render_crud_update(String dao_class_name,
-                                                String method_name,
-                                                String table_name,
-                                                String explicit_pk,
-                                                String dto_class_name,
-                                                boolean scalar_params) throws Exception {
+        public StringBuilder render_crud_update(
+                String dao_class_name,
+                String method_name,
+                String table_name,
+                String explicit_pk,
+                String dto_class_name,
+                boolean scalar_params) throws Exception {
 
             List<FieldInfo> updated_fields = new ArrayList<FieldInfo>();
             List<FieldInfo> fields_pk = new ArrayList<FieldInfo>();
@@ -358,11 +363,12 @@ public class CppCG {
         }
 
         @Override
-        public StringBuilder render_crud_delete(String dao_class_name,
-                                                String dto_class_name,
-                                                String method_name,
-                                                String table_name,
-                                                String explicit_pk) throws Exception {
+        public StringBuilder render_crud_delete(
+                String dao_class_name,
+                String dto_class_name,
+                String method_name,
+                String table_name,
+                String explicit_pk) throws Exception {
 
             List<FieldInfo> fields_pk = new ArrayList<FieldInfo>();
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
@@ -390,12 +396,10 @@ public class CppCG {
         }
 
         @Override
-        public StringBuilder render_jaxb_crud(String dao_class_name,
-                                              Crud jaxb_type_crud) throws Exception {
-
+        public StringBuilder render_jaxb_crud(String dao_class_name, Crud jaxb_type_crud) throws Exception {
             String node_name = JaxbUtils.get_jaxb_node_name(jaxb_type_crud);
             String dto_class_name = jaxb_type_crud.getDto();
-            if (dto_class_name.length() == 0) {
+            if (dto_class_name.isEmpty()) {
                 throw new Exception("<" + node_name + "...\nAttribute 'dto' is empty");
             }
             try {

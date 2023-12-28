@@ -163,7 +163,7 @@ public class IdeaEditorHelpers {
             if (file != null) {
                 fem.openFile(file, true, true);
             } else {
-                String text_from_jar = IdeaHelpers.read_from_jar_file(res_path, res_name);
+                String text_from_jar = IdeaHelpers.read_from_jar(res_path, res_name);
                 open_text_in_new_editor(fem, virtual_file_name, text_from_jar);
             }
         } catch (Throwable e1) {

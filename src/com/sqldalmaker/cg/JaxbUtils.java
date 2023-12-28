@@ -22,21 +22,29 @@ import com.sqldalmaker.jaxb.sdm.QueryList;
 import com.sqldalmaker.jaxb.sdm.TypeMethod;
 import com.sqldalmaker.jaxb.sdm.DtoClass;
 
-/**
- * @author sqldalmaker@gmail.com
+/*
+ * 27.03.2023 10:23
+ * 21.11.2022 22:07
+ * 16.11.2022 08:02 1.269
+ * 25.10.2022 09:26
+ * 06.08.2022 08:37 1.261
+ * 05.05.2022 10:44
+ * 21.04.2022 20:21
+ * 13.09.2021 10:15
+ * 11.05.2021 05:21 1.201
+ * 22.03.2021 21:19
+ * 15.05.2020 19:11
+ * 
  */
 public class JaxbUtils {
 
     public static String get_jaxb_node_name(Object jaxb_node) {
-
         XmlRootElement attr = jaxb_node.getClass().getAnnotation(XmlRootElement.class);
         return attr.name();
     }
 
-    public static DtoClass find_jaxb_dto_class(String dto_class_name,
-                                               List<DtoClass> jaxb_dto_classes) throws Exception {
-
-        if (dto_class_name == null || dto_class_name.length() == 0) {
+    public static DtoClass find_jaxb_dto_class(String dto_class_name, List<DtoClass> jaxb_dto_classes) throws Exception {
+        if (dto_class_name == null || dto_class_name.isEmpty()) {
             throw new Exception("Invalid DTO class name: " + dto_class_name);
         }
         for (DtoClass cls : jaxb_dto_classes) {
@@ -48,10 +56,8 @@ public class JaxbUtils {
         throw new Exception("DTO XML element not found: '" + dto_class_name + "'");
     }
 
-    public static DaoClass find_jaxb_dao_class(String dao_class_name,
-                                               List<DaoClass> jaxb_dao_classes) throws Exception {
-
-        if (dao_class_name == null || dao_class_name.length() == 0) {
+    public static DaoClass find_jaxb_dao_class(String dao_class_name, List<DaoClass> jaxb_dao_classes) throws Exception {
+        if (dao_class_name == null || dao_class_name.isEmpty()) {
             throw new Exception("Invalid DAO class name: " + dao_class_name);
         }
         for (DaoClass cls : jaxb_dao_classes) {
@@ -63,10 +69,11 @@ public class JaxbUtils {
         throw new Exception("DTO XML element not found: '" + dao_class_name + "'");
     }
 
-    public static void process_jaxb_dao_class(IDaoCG dao_cg,
-                                              String dao_class_name,
-                                              DaoClass jaxb_dao_class,
-                                              List<String> methods) throws Exception {
+    public static void process_jaxb_dao_class(
+            IDaoCG dao_cg,
+            String dao_class_name,
+            DaoClass jaxb_dao_class,
+            List<String> methods) throws Exception {
 
         if (jaxb_dao_class.getCrudOrQueryOrQueryList() != null) {
             for (int i = 0; i < jaxb_dao_class.getCrudOrQueryOrQueryList().size(); i++) {
@@ -88,18 +95,20 @@ public class JaxbUtils {
         }
     }
 
-    private static boolean _process_jaxb_crud_create(IDaoCG dao_cg,
-                                                     Crud jaxb_type_crud,
-                                                     String dto_class_name,
-                                                     String table_name,
-                                                     String auto_column,
-                                                     FieldNamesMode field_names_mode,
-                                                     StringBuilder code_buff) throws Exception {
+    private static boolean _process_jaxb_crud_create(
+            IDaoCG dao_cg,
+            Crud jaxb_type_crud,
+            String dto_class_name,
+            String table_name,
+            String auto_column,
+            FieldNamesMode field_names_mode,
+            StringBuilder code_buff) throws Exception {
+
         if (jaxb_type_crud.getCreate() == null) {
             return false;
         }
         String method_name = jaxb_type_crud.getCreate().getMethod();
-        if (method_name == null || "".equals(method_name)) {
+        if (method_name == null || method_name.isEmpty()) {
             method_name = build_method_name("create", dto_class_name);
         }
         method_name = Helpers.get_method_name(method_name, field_names_mode);
@@ -109,17 +118,19 @@ public class JaxbUtils {
         return true;
     }
 
-    private static boolean _process_jaxb_crud_read_all(IDaoCG dao_cg,
-                                                       Crud jaxb_type_crud,
-                                                       String dto_class_name,
-                                                       String table_name,
-                                                       FieldNamesMode field_names_mode,
-                                                       StringBuilder code_buff) throws Exception {
+    private static boolean _process_jaxb_crud_read_all(
+            IDaoCG dao_cg,
+            Crud jaxb_type_crud,
+            String dto_class_name,
+            String table_name,
+            FieldNamesMode field_names_mode,
+            StringBuilder code_buff) throws Exception {
+
         if (jaxb_type_crud.getReadAll() == null) {
             return false;
         }
         String method_name = jaxb_type_crud.getReadAll().getMethod();
-        if (method_name == null || "".equals(method_name)) {
+        if (method_name == null || method_name.isEmpty()) {
             method_name = build_method_name("read", dto_class_name + "List");
         }
         method_name = Helpers.get_method_name(method_name, field_names_mode);
@@ -128,18 +139,20 @@ public class JaxbUtils {
         return true;
     }
 
-    private static boolean _process_jaxb_crud_read(IDaoCG dao_cg,
-                                                   Crud jaxb_type_crud,
-                                                   String dto_class_name,
-                                                   String table_name,
-                                                   String explicit_pk,
-                                                   FieldNamesMode field_names_mode,
-                                                   StringBuilder code_buff) throws Exception {
+    private static boolean _process_jaxb_crud_read(
+            IDaoCG dao_cg,
+            Crud jaxb_type_crud,
+            String dto_class_name,
+            String table_name,
+            String explicit_pk,
+            FieldNamesMode field_names_mode,
+            StringBuilder code_buff) throws Exception {
+
         if (jaxb_type_crud.getRead() == null) {
             return false;
         }
         String method_name = jaxb_type_crud.getRead().getMethod();
-        if (method_name == null || "".equals(method_name)) {
+        if (method_name == null || method_name.isEmpty()) {
             method_name = build_method_name("read", dto_class_name);
         }
         method_name = Helpers.get_method_name(method_name, field_names_mode);
@@ -148,19 +161,21 @@ public class JaxbUtils {
         return true;
     }
 
-    private static boolean _process_jaxb_crud_update(IDaoCG dao_cg,
-                                                     Crud jaxb_type_crud,
-                                                     String dao_class_name,
-                                                     String dto_class_name,
-                                                     String table_name,
-                                                     String explicit_primary_keys,
-                                                     FieldNamesMode field_names_mode,
-                                                     StringBuilder code_buff) throws Exception {
+    private static boolean _process_jaxb_crud_update(
+            IDaoCG dao_cg,
+            Crud jaxb_type_crud,
+            String dao_class_name,
+            String dto_class_name,
+            String table_name,
+            String explicit_primary_keys,
+            FieldNamesMode field_names_mode,
+            StringBuilder code_buff) throws Exception {
+
         if (jaxb_type_crud.getUpdate() == null) {
             return false;
         }
         String method_name = jaxb_type_crud.getUpdate().getMethod();
-        if (method_name == null || "".equals(method_name)) {
+        if (method_name == null || method_name.isEmpty()) {
             method_name = build_method_name("update", dto_class_name);
         }
         method_name = Helpers.get_method_name(method_name, field_names_mode);
@@ -170,19 +185,21 @@ public class JaxbUtils {
         return true;
     }
 
-    private static boolean _process_jaxb_crud_delete(IDaoCG dao_cg,
-                                                     Crud jaxb_type_crud,
-                                                     String dao_class_name,
-                                                     String dto_class_name,
-                                                     String table_name,
-                                                     String explicit_pk,
-                                                     FieldNamesMode field_names_mode,
-                                                     StringBuilder code_buff) throws Exception {
+    private static boolean _process_jaxb_crud_delete(
+            IDaoCG dao_cg,
+            Crud jaxb_type_crud,
+            String dao_class_name,
+            String dto_class_name,
+            String table_name,
+            String explicit_pk,
+            FieldNamesMode field_names_mode,
+            StringBuilder code_buff) throws Exception {
+
         if (jaxb_type_crud.getDelete() == null) {
             return false;
         }
         String method_name = jaxb_type_crud.getDelete().getMethod();
-        if (method_name == null || "".equals(method_name)) {
+        if (method_name == null || method_name.isEmpty()) {
             method_name = build_method_name("delete", dto_class_name);
         }
         method_name = Helpers.get_method_name(method_name, field_names_mode);
@@ -191,9 +208,7 @@ public class JaxbUtils {
         return true;
     }
 
-    private static String build_method_name(String base,
-                                            String dto_class_name) {
-
+    private static String build_method_name(String base, String dto_class_name) {
         int model_name_end_index = dto_class_name.indexOf('-');
         if (model_name_end_index == -1) {
             return base + dto_class_name;
@@ -202,11 +217,12 @@ public class JaxbUtils {
         return base + dto_class_name;
     }
 
-    public static StringBuilder process_jaxb_crud(IDaoCG dao_cg,
-                                                  FieldNamesMode field_names_mode,
-                                                  Crud jaxb_type_crud,
-                                                  String dao_class_name,
-                                                  DtoClass jaxb_dto_class) throws Exception {
+    public static StringBuilder process_jaxb_crud(
+            IDaoCG dao_cg,
+            FieldNamesMode field_names_mode,
+            Crud jaxb_type_crud,
+            String dao_class_name,
+            DtoClass jaxb_dto_class) throws Exception {
 
         String dto_class_name = jaxb_type_crud.getDto();
         String explicit_primary_keys = jaxb_dto_class.getPk();
@@ -246,8 +262,8 @@ public class JaxbUtils {
         return code_buff;
     }
 
-    public static Set<String> get_pk_col_name_aliaces_from_jaxb(String explicit_pk) throws Exception {
-        // if PK are specified explicitely, don't use getPrimaryKeys at all
+    public static Set<String> get_pk_col_name_aliases_from_jaxb(String explicit_pk) throws Exception {
+        // if PK are specified explicitly, don't use getPrimaryKeys at all
         String[] gen_keys_arr = Helpers.get_listed_items(explicit_pk, false);
         Helpers.check_duplicates(gen_keys_arr);
         for (int i = 0; i < gen_keys_arr.length; i++) {
@@ -257,6 +273,9 @@ public class JaxbUtils {
     }
 
     private static String refine_table_name(DtoClass jaxb_dto_class, String dao_table_name) throws Exception {
+        if (dao_table_name == null || dao_table_name.isEmpty()) {
+            throw new Exception("'table' is empty");
+        }
         if ("*".equals(dao_table_name)) {
             String dto_class_ref = jaxb_dto_class.getRef();
             if (!SqlUtils.is_table_ref(dto_class_ref)) {
@@ -266,9 +285,6 @@ public class JaxbUtils {
                         "\" ref=\"" + dto_class_ref + "\"..");
             }
             return dto_class_ref;
-        }
-        if (dao_table_name == null || dao_table_name.length() == 0) {
-            throw new Exception("'table' is empty");
         }
         return dao_table_name;
     }

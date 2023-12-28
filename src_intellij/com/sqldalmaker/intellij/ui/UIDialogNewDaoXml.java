@@ -109,7 +109,7 @@ public class UIDialogNewDaoXml extends JDialog {
                         throw new InternalException("The file already exists: " + name);
                     }
                     f = dir.createChildData(null, name);
-                    String xml = IdeaHelpers.read_from_jar_file(Const.EMPTY_DAO_XML);
+                    String xml = IdeaHelpers.read_from_jar_resources(Const.EMPTY_DAO_XML);
                     f.setBinaryContent(xml.getBytes());
                     IdeaHelpers.start_write_action_from_ui_thread_and_refresh_folder_sync(dir);
                     IdeaEditorHelpers.open_local_file_in_editor_sync(project, f);

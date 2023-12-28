@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2022 sqldalmaker@gmail.com
+    Copyright 2011-2023 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -17,35 +17,34 @@ import org.apache.velocity.runtime.RuntimeServices;
 import org.apache.velocity.runtime.parser.ParseException;
 import org.apache.velocity.runtime.parser.node.SimpleNode;
 
-/**
- * @author sqldalmaker@gmail.com
+/*
+ * 16.11.2022 08:02 1.269
+ * 29.04.2022 18:39 1.231
+ * 16.04.2022 17:35 1.219
+ * 08.05.2021 22:29 1.200
+ * 07.02.2019 19:50 initial commit
+ *
  */
 public class TemplateEngine {
 
     private final Template template;
 
-    public TemplateEngine(String vm_template,
-                          String template_name) throws Exception {
-
+    public TemplateEngine(String vm_template, String template_name) throws Exception {
         template = create_template(vm_template, template_name);
     }
 
-    public TemplateEngine(String vm_path,
-                          boolean is_file_system) throws Exception {
-
+    public TemplateEngine(String vm_path, boolean is_file_system) throws Exception {
         String vm_template;
         if (is_file_system) {
             vm_template = Helpers.load_text_from_file(vm_path);
         } else {
-            vm_template = Helpers.read_from_jar_file_2(vm_path);
+            vm_template = Helpers.res_from_jar(vm_path);
         }
         String template_name = vm_path;
         template = create_template(vm_template, template_name);
     }
 
-    private Template create_template(String template_text,
-                                     String template_name) throws ParseException {
-
+    private Template create_template(String template_text, String template_name) throws ParseException {
         // Velocity loads ResourceManager in this way:
         // ClassLoader loader = Thread.currentThread().getContextClassLoader();
         // return Class.forName(clazz, true, loader);
@@ -118,7 +117,6 @@ public class TemplateEngine {
     }
 
     public void merge(Map<String, Object> values, StringWriter sw) {
-
         VelocityContext context = new VelocityContext();
         for (String key : values.keySet()) {
             context.put(key, values.get(key));

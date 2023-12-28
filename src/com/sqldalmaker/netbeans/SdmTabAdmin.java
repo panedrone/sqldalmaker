@@ -100,8 +100,18 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
         }
     }
 
-    private void set_need_migrate_warning(boolean need_migrate) {
-        jPanelMigrate.setVisible(need_migrate);
+    private void set_need_migrate_warning(boolean need_to_migrate) {
+        if (need_to_migrate) {
+            try {
+                String text = NbpHelpers.read_from_jar_file("", "sdm.xml_how_to_migrate.txt");
+                jTextPane1.setText(text);
+            } catch (Exception ex) {
+                jTextPane1.setText(ex.getMessage());
+            }
+        } else {
+            jTextPane1.setText("");
+        }
+        jPanelMigrate.setVisible(need_to_migrate);
     }
 
     private boolean is_opened = false;
@@ -733,7 +743,7 @@ public final class SdmTabAdmin extends SdmMultiViewCloneableEditor {
 
         jPanelMigrate.setLayout(new java.awt.BorderLayout());
 
-        jTextPane1.setText("\nStarting from v1.292, use \"sdm.xml\" instead of \"dto.xml\".\n\nHow to migrate:\n\n1. Click \"Create/Overwrite XSD files\"\n2. Click \"Create sdm.xml\"\n3. Copy-paste internal text from \"dto.xml\",<dto-classes>... to \"sdm.xml\",<sdm>...\n4. Delete \"dto.xml\" and \"dto.xsd\".\n5. Click \"Validate Configuration\". Done.\n\nWhere to declare DAO classes with v1.292+:\n\n- \"option 1\": separate XML files like in prev. versions of the plugin\n- \"option 2\": tags \"<dao-class...\" in \"sdm.xml\"\n\nOnce you start using \"option 2\" then \"option 1\" becomes ignored.\n");
+        jTextPane1.setText("=== migrate ===");
         jTextPane1.setMargin(new java.awt.Insets(0, 20, 0, 20));
         jPanelMigrate.add(jTextPane1, java.awt.BorderLayout.CENTER);
 

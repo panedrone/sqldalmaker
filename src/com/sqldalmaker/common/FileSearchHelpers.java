@@ -12,7 +12,7 @@ import java.io.File;
  */
 public class FileSearchHelpers {
 
-    public interface IFile_List {
+    public interface IFileList {
         void add(String fileName);
     }
 
@@ -37,9 +37,7 @@ public class FileSearchHelpers {
         return /*name != null &&*/ Const.SETTINGS_XML.equals(name);
     }
 
-    public static void enum_dao_xml_file_names(String xml_configs_folder_full_path,
-                                               IFile_List file_list) {
-
+    public static void enum_dao_xml_file_names(String xml_configs_folder_full_path, IFileList file_list) {
         File dir = new File(xml_configs_folder_full_path);
         String[] children = dir.list();
         if (children != null) {

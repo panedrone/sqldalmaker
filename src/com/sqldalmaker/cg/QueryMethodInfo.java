@@ -7,8 +7,11 @@ package com.sqldalmaker.cg;
 
 import com.sqldalmaker.jaxb.sdm.*;
 
-/**
- * @author sqldalmaker@gmail.com
+/*
+ * 16.11.2022 08:02 1.269
+ * 16.04.2022 17:35 1.219
+ * 08.05.2021 22:29 1.200
+ *
  */
 public class QueryMethodInfo {
 
@@ -20,7 +23,6 @@ public class QueryMethodInfo {
     public final boolean fetch_list;
 
     public QueryMethodInfo(Object jaxb_query) throws Exception {
-
         fetch_list = (jaxb_query instanceof QueryDtoList) || (jaxb_query instanceof QueryList);
         return_type_is_dto = (jaxb_query instanceof QueryDto) || (jaxb_query instanceof QueryDtoList);
         if (jaxb_query instanceof Query) {

@@ -70,7 +70,7 @@ public class UIDialogAbout extends JDialog {
             text1.setContentType("text/html");
             text1.setEditable(false);
 
-            String text = IdeaHelpers.read_from_jar_file("", "ABOUT.html");
+            String text = IdeaHelpers.read_from_jar("", "ABOUT.html");
             String sdm_info = IdeaHelpers.get_sdm_info();
             text = String.format(text, sdm_info);
             text1.setText(text);

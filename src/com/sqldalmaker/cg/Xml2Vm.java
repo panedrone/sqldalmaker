@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2022 sqldalmaker@gmail.com
+    Copyright 2011-2023 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -10,6 +10,12 @@ import com.sqldalmaker.jaxb.settings.*;
 import java.io.StringWriter;
 import java.util.List;
 
+/*
+ * 16.11.2022 08:02 1.269
+ * 05.05.2022 16:33
+ * 02.05.2022 22:53
+ *
+ */
 public class Xml2Vm {
 
 	public static String parse(VmXml vm_xml) {

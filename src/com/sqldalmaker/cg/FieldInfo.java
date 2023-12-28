@@ -5,8 +5,23 @@
  */
 package com.sqldalmaker.cg;
 
-/**
- * @author sqldalmaker@gmail.com
+/*
+ * 27.09.2023 17:56
+ * 09.04.2023 20:31 1.282
+ * 09.04.2023 14:52 1.282
+ * 06.04.2023 02:56 1.281
+ * 30.12.2022 23:48 1.273
+ * 16.11.2022 08:02 1.269
+ * 02.11.2022 06:51 1.267
+ * 25.07.2022 14:53
+ * 19.05.2022 09:45 1.241
+ * 21.04.2022 11:34 1.225
+ * 10.05.2021 21:46
+ * 07.03.2021 22:16
+ * 06.03.2021 19:52
+ * 02.01.2020 07:21
+ * 07.02.2019 19:50 initial commit
+ *
  */
 public class FieldInfo {
 
@@ -40,7 +55,12 @@ public class FieldInfo {
 
     private String assign_func = "";
 
-    public FieldInfo(FieldNamesMode field_names_mode, String original_field_type, String jdbc_db_col_name, String comment) throws Exception {
+    public FieldInfo(
+            FieldNamesMode field_names_mode,
+            String original_field_type,
+            String jdbc_db_col_name,
+            String comment) throws Exception {
+
         if (original_field_type == null) {
             throw new Exception("<field type=null. Ensure that XSD and XML files of meta-program are valid.");
         }
@@ -114,6 +134,7 @@ public class FieldInfo {
     }
 
     public void refine_rendered_type(String type) {
+
         String[] assign_parts = type.split("->");
         if (assign_parts.length > 1) {
             this.rendered_type = assign_parts[0].trim();

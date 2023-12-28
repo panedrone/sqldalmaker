@@ -1,3 +1,8 @@
+/*
+    Copyright 2011-2023 sqldalmaker@gmail.com
+    SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
+    Read LICENSE.txt in the root of this project/archive for details.
+ */
 package com.sqldalmaker.cg;
 
 import com.sqldalmaker.jaxb.settings.Macros;
@@ -7,14 +12,18 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class JaxbMacros {
+/*
+ * 06.04.2023 02:56 1.281
+ * 25.10.2022 09:26
+ *
+ */
+ class JaxbMacros {
 
     private final Map<String, String> built_in = new HashMap<String, String>();
     private final Map<String, String> custom = new HashMap<String, String>();
     private final Map<String, Macros.Macro> custom_vm = new HashMap<String, Macros.Macro>();
 
     public JaxbMacros(Macros jaxb_macros) {
-
         if (jaxb_macros == null) {
             return;
         }
@@ -56,7 +65,6 @@ public class JaxbMacros {
     }
 
     public void substitute_type_params(FieldInfo fi) throws Exception {
-
         String type_name = fi.getType();
         int local_field_type_params_start = type_name.indexOf('|');
         Map<String, String> params = new HashMap<String, String>();
@@ -88,7 +96,6 @@ public class JaxbMacros {
     }
 
     private static Set<String> _find_macro_calls(String input) {
-
         // https://stackoverflow.com/questions/53904144/regex-matching-even-amount-of-brackets
         Set<String> res = new HashSet<String>();
         boolean inside_of_macro = false;

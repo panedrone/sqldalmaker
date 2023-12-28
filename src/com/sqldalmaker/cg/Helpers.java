@@ -16,8 +16,24 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * @author sqldalmaker@gmail.com
+/*
+ * 12.05.2023 12:04
+ * 12.05.2023 11:50
+ * 07.05.2023 15:37
+ * 16.11.2022 08:02 1.269
+ * 25.10.2022 09:26
+ * 21.04.2022 17:15 1.225
+ * 16.04.2022 17:35
+ * 17.05.2021 11:28
+ * 08.05.2021 22:29 1.200
+ * 17.04.2021 20:16
+ * 22.03.2021 21:19
+ * 05.03.2021 00:35
+ * 15.05.2020 19:11
+ * 02.01.2020 07:21
+ * 03.09.2019 15:55
+ * 07.02.2019 19:50 initial commit
+ * 
  */
 public class Helpers {
 
@@ -40,6 +56,7 @@ public class Helpers {
     }
 
     public static String[] parse_method_params(String src) throws Exception {
+
         String before_brackets;
         String inside_brackets;
         src = src.trim();
@@ -121,7 +138,7 @@ public class Helpers {
                 return false;
             }
         }
-        return str.length() > 0;
+        return !str.isEmpty();
     }
 
     public static String concat_path(String seg0, String seg1) {
@@ -204,7 +221,7 @@ public class Helpers {
     }
 
     public static String[] get_listed_items(String list, boolean allow_semicolon) throws Exception {
-        if (list == null || list.trim().length() == 0) {
+        if (list == null || list.trim().isEmpty()) {
             return new String[]{};
         }
         list = list.trim();
@@ -252,7 +269,7 @@ public class Helpers {
     }
 
     private static void check_item(String name, boolean allow_semicolon) throws Exception {
-        if (name == null || name.length() == 0) {
+        if (name == null || name.isEmpty()) {
             throw new Exception("Item name is null or empty");
         }
         char ch_0 = name.charAt(0);
@@ -311,7 +328,7 @@ public class Helpers {
             default:
                 throw new Exception(IFN + dao_xml_path);
         }
-        if (class_name.length() == 0) {
+        if (class_name.isEmpty()) {
             throw new Exception(IFN + dao_xml_path);
         }
         if (Character.isLowerCase(class_name.charAt(0))) {
@@ -320,7 +337,7 @@ public class Helpers {
         return class_name;
     }
 
-    public static InputStream get_resource_as_stream_2(String res_path) throws Exception {
+    private static InputStream _res_as_stream(String res_path) throws Exception {
         // swing app wants 'resources/' but plug-in wants '/resources/' WHY?
         ClassLoader cl = Helpers.class.getClassLoader();
         InputStream is = cl.getResourceAsStream(res_path);
@@ -333,11 +350,9 @@ public class Helpers {
         return is;
     }
 
-    //
-    // http://www.devdaily.com/blog/post/java/read-text-file-from-jar-file
-    //
-    public static String read_from_jar_file_2(String res_name) throws Exception {
-        InputStream is = get_resource_as_stream_2(res_name);
+    public static String res_from_jar(String res_name) throws Exception {
+        // http://www.devdaily.com/blog/post/java/read-text-file-from-jar-file
+        InputStream is = _res_as_stream(res_name);
         try {
             InputStreamReader reader = new InputStreamReader(is);
             try {
@@ -369,7 +384,7 @@ public class Helpers {
     }
 
     private static void _build_warning_comment(StringBuilder buffer, String msg) {
-        String ls = System.getProperty("line.separator");
+        String ls = System.lineSeparator();
         buffer.append(ls);
         buffer.append(msg);
         buffer.append(ls);
@@ -417,19 +432,20 @@ public class Helpers {
     }
 
     static void check_duplicates(String[] param_names) throws Exception {
-        if (param_names != null) {
-            Set<String> set = new HashSet<String>();
-            for (String param_name : param_names) {
-                if (set.contains(param_name)) {
-                    throw new SQLException("Duplicated parameter names");
-                }
-                set.add(param_name);
+        if (param_names == null) {
+            return;
+        }
+        Set<String> set = new HashSet<String>();
+        for (String param_name : param_names) {
+            if (set.contains(param_name)) {
+                throw new SQLException("Duplicated parameter names");
             }
+            set.add(param_name);
         }
     }
 
     public static void check_required_attr(String node_name, String method_name_attr) throws Exception {
-        if (method_name_attr == null || method_name_attr.trim().length() == 0) {
+        if (method_name_attr == null || method_name_attr.trim().isEmpty()) {
             throw new Exception("<" + node_name + "...\n'method' is not set.");
         }
     }
@@ -455,7 +471,7 @@ public class Helpers {
         String[] arr = str.split("_");
         for (int i = 0; i < arr.length; i++) {
             String s = arr[i];
-            if (s.length() == 0) {
+            if (s.isEmpty()) {
                 continue; // E.g. _ALL_FILE_GROUPS
             }
             char ch0 = s.charAt(0);

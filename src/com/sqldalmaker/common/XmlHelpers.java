@@ -6,6 +6,7 @@
 package com.sqldalmaker.common;
 
 import com.sqldalmaker.jaxb.sdm.DaoClass;
+import com.sqldalmaker.jaxb.sdm.ObjectFactory;
 import com.sqldalmaker.jaxb.sdm.Sdm;
 
 import javax.xml.bind.JAXBContext;
@@ -24,10 +25,7 @@ import javax.xml.transform.stream.StreamSource;
  */
 public class XmlHelpers {
 
-    public static Marshaller create_marshaller(
-            String instance_name,
-            String xsd) throws Exception {
-
+    public static Marshaller create_marshaller(String instance_name, String xsd) throws Exception {
         ClassLoader cl = XmlHelpers.class.getClassLoader();
         JAXBContext jc = JAXBContext.newInstance(instance_name, cl);
         // http://docs.oracle.com/javase/6/docs/api/javax/xml/bind/Marshaller.html
@@ -38,10 +36,7 @@ public class XmlHelpers {
         return marshaller;
     }
 
-    private static String get_xml_text(
-            String instance_name,
-            Object root, String xsd) throws Exception {
-
+    private static String get_xml_text(String instance_name, Object root, String xsd) throws Exception {
         Marshaller marshaller = create_marshaller(instance_name, xsd);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         String text;
@@ -55,18 +50,12 @@ public class XmlHelpers {
         return text;
     }
 
-    public static String get_sdm_xml_text(
-            com.sqldalmaker.jaxb.sdm.ObjectFactory object_factory,
-            Sdm root) throws Exception {
-
+    public static String get_sdm_xml_text(ObjectFactory object_factory, Sdm root) throws Exception {
         String text = get_xml_text(object_factory.getClass().getPackage().getName(), root, Const.SDM_XSD);
         return text;
     }
 
-    public static String get_dao_xml_text(
-            com.sqldalmaker.jaxb.sdm.ObjectFactory object_factory,
-            DaoClass root) throws Exception {
-
+    public static String get_dao_xml_text(com.sqldalmaker.jaxb.sdm.ObjectFactory object_factory, DaoClass root) throws Exception {
         String text = get_xml_text(object_factory.getClass().getPackage().getName(), root, Const.DAO_XSD);
         return text;
     }
