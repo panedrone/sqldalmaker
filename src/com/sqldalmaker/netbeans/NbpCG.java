@@ -21,18 +21,11 @@ import org.openide.filesystems.FileObject;
 import org.openide.util.Exceptions;
 import org.openide.util.RequestProcessor;
 
-/**
- *
- * @author sqldalmaker@gmail.com
- *
+/*
  * 18.12.2023 02:47 1.292
- * 
  * 16.08.2023 03:03 1.285
- * 
  * 23.02.2023 15:42 1.279
- * 
  * 30.10.2022 08:03 1.266
- * 
  * 08.05.2021 22:29 1.200
  * 
  */

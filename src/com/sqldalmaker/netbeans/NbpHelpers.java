@@ -31,11 +31,6 @@ import org.openide.filesystems.FileUtil;
 import org.openide.modules.ModuleInfo;
 import org.openide.modules.Modules;
 
-/**
- *
- * @author sqldalmaker@gmail.com
- *
- */
 public class NbpHelpers {
 
     public static Settings load_settings(SdmDataObject obj) throws Exception {
@@ -132,8 +127,7 @@ public class NbpHelpers {
         }
     }
 
-    private static InputStream get_resource_as_stream(String path, String res_name)
-            throws InternalException {
+    private static InputStream get_resource_as_stream(String path, String res_name) throws InternalException {
         ClassLoader cl = NbpHelpers.class.getClassLoader();
         // no need in starting '/' for NetBeans:
         InputStream is = cl.getResourceAsStream(path + "/" + res_name);

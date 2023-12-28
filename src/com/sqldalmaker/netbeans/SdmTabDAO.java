@@ -48,18 +48,11 @@ import org.openide.util.RequestProcessor;
 import org.openide.windows.TopComponent;
 
 /*
- * @author sqldalmaker@gmail.com
- *
  * 18.12.2023 03:01 1.292
- *
  * 12.05.2023 23:01 1.283
- *
  * 23.02.2023 15:42 1.279
- *
  * 30.10.2022 08:03 1.266
- *
  * 08.05.2021 22:29 1.200
- *
  * 08.04.2021 22:08
  *
  */
@@ -296,7 +289,7 @@ public final class SdmTabDAO extends SdmMultiViewCloneableEditor {
                     list.add(item);
                 }
             } else {
-                FileSearchHelpers.IFile_List file_list = new FileSearchHelpers.IFile_List() {
+                FileSearchHelpers.IFileList file_list = new FileSearchHelpers.IFileList() {
                     @Override
                     public void add(String file_name) {
                         String[] item = new String[2];

@@ -9,11 +9,6 @@ import com.sqldalmaker.common.InternalException;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
-/**
- *
- * @author sqldalmaker@gmail.com
- *
- */
 public class NbpIdeMessageHelpers {
 
     public static void show_error_in_ui_thread(final Throwable e) {

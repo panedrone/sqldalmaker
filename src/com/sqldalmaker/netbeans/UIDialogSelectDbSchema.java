@@ -25,11 +25,6 @@ import java.util.List;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-/**
- *
- * @author sqldalmaker@gmail.com
- *
- */
 public final class UIDialogSelectDbSchema extends JDialog {
 
     private static final long serialVersionUID = 1L;
@@ -43,12 +38,6 @@ public final class UIDialogSelectDbSchema extends JDialog {
     private final Settings settings;
 
     private final List<String> schemas = new ArrayList<String>();
-
-    private UIDialogSelectDbSchema() {
-        obj = null;
-        callback = null;
-        settings = null;
-    }
 
     private UIDialogSelectDbSchema(SdmDataObject obj, ISelectDbSchemaCallback callback, boolean dto, boolean fk) throws Exception {
 

@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2021 sqldalmaker@gmail.com
+    Copyright 2011-2023 sqldalmaker@gmail.com
     SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -15,11 +15,6 @@ import org.netbeans.api.project.ProjectInformation;
 import org.netbeans.api.project.ProjectUtils;
 import org.openide.util.Exceptions;
 
-/**
- *
- * @author sqldalmaker@gmail.com
- *
- */
 public class NbpIdeConsoleUtil {
 
     private InputOutput io = null;

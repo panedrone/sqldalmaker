@@ -21,29 +21,18 @@ import org.openide.loaders.DataObject;
 import org.openide.loaders.DataObjectNotFoundException;
 import org.openide.util.RequestProcessor;
 
-/**
- *
- * @author sqldalmaker@gmail.com
- *
+/*
  * Implementation of XmlEditorUtil is based on
  * https://platform.netbeans.org/tutorials/nbm-hyperlink.html
  *
  * 18.12.2023 03:01 1.292
- *
  * 10.08.2023 09:31 1.285
- *
  * 23.02.2023 15:42 1.279
- *
  * 16.02.2023 11:38 1.278
- *
  * 30.10.2022 08:03 1.266
- *
  * 06.08.2022 09:15 1.261
- *
  * 08.04.2022 20:33 + hyperlinks for nb
- *
  * 14.05.2021 06:22 1.201
- *
  * 08.05.2021 22:29 1.200
  *
  */

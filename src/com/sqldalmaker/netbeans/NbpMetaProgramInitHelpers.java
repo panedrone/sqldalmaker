@@ -7,11 +7,6 @@ package com.sqldalmaker.netbeans;
 
 import com.sqldalmaker.common.Const;
 
-/**
- *
- * @author sqldalmaker@gmail.com
- *
- */
 public class NbpMetaProgramInitHelpers {
 
     public static void copy_xsd(SdmDataObject obj) {

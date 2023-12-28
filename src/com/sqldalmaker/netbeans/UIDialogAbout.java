@@ -19,13 +19,9 @@ import static javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
-/**
- * @author panedrone
- */
 public class UIDialogAbout extends javax.swing.JDialog {
 
     public static void show_modal() {
-
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {

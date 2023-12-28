@@ -17,22 +17,13 @@ import org.openide.util.Lookup;
 import org.openide.util.Mutex;
 import org.openide.windows.TopComponent;
 
-/**
- *
- * @author sqldalmaker@gmail.com
- *
+/*
  * 18.12.2023 03:01 1.292
- * 
  * 10.08.2023 09:31 1.285
- * 
  * 12.05.2023 23:01 1.283
- * 
  * 23.02.2023 15:42 1.279
- * 
  * 30.10.2022 08:03 1.266
- * 
  * 08.05.2021 22:29 1.200
- * 
  * 08.04.2021 22:08
  *
  */
@@ -130,7 +121,7 @@ public class SdmMultiViewCloneableEditor extends CloneableEditor implements Mult
         // super.componentShowing(); === panedrone: it shows default text editor
 
         updateName(); // instead of call from base constructor
-        
+
         // updateDisplayText(); // copy-paste from MultiViewCloneableEditor: does not work
     }
 
@@ -160,34 +151,35 @@ public class SdmMultiViewCloneableEditor extends CloneableEditor implements Mult
         // custom values are assigned instead of defaults:
         Mutex.EVENT.writeAccess(
                 new Runnable() {
-                    @Override
-                    public void run() {
+            @Override
+            public void run() {
 
-                        String display_name;
-                        try {
-                            display_name = NbpPathHelpers.get_path_relative_to_root_folder(obj);
-                        } catch (Exception ex) {
-                            // ex.printStackTrace();
-                            display_name = obj.getPrimaryFile().getNameExt();
-                        }
-
-                        // === panedrone: callback.updateTitle causes StackOverflow while drag-drop throuh project tree:
-                        // Mutex.EVENT.writeAccess does not solve problem
-                        // callback.updateTitle(n);
-                        setHtmlDisplayName("<HTML>" + display_name); // TODO
-                        setDisplayName(display_name); // causes stack error if called it super.updateName() 2 and more times
-                        String name = obj.getPrimaryFile().getNameExt();
-                        setName(name); // XXX compatibility
-
-                        setToolTipText(display_name);
-                    }
+                String display_name;
+                try {
+                    display_name = NbpPathHelpers.get_path_relative_to_root_folder(obj);
+                } catch (Exception ex) {
+                    // ex.printStackTrace();
+                    display_name = obj.getPrimaryFile().getNameExt();
                 }
+
+                // === panedrone: callback.updateTitle causes StackOverflow while drag-drop throuh project tree:
+                // Mutex.EVENT.writeAccess does not solve problem
+                // callback.updateTitle(n);
+                setHtmlDisplayName("<HTML>" + display_name); // TODO
+                setDisplayName(display_name); // causes stack error if called it super.updateName() 2 and more times
+                String name = obj.getPrimaryFile().getNameExt();
+                setName(name); // XXX compatibility
+
+                setToolTipText(display_name);
+            }
+        }
         );
         updateDisplayText();
     }
 
     /**
-     * this copy-paste from MultiViewCloneableEditor solves problem related to unexpected empty title
+     * this copy-paste from MultiViewCloneableEditor solves problem related to
+     * unexpected empty title
      */
     private void updateDisplayText() {
         if (this.callback != null) {

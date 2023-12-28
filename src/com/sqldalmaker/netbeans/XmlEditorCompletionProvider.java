@@ -21,11 +21,6 @@ import org.netbeans.spi.editor.completion.support.AsyncCompletionTask;
 import org.openide.filesystems.FileObject;
 import org.openide.loaders.DataObject;
 
-/**
- *
- * @author sqldalmaker@gmail.com
- *
- */
 @MimeRegistration(mimeType = "text/xml", service = CompletionProvider.class)
 public class XmlEditorCompletionProvider implements CompletionProvider {
     /*

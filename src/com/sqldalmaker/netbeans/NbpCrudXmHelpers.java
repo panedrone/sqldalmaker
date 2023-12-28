@@ -100,7 +100,7 @@ public class NbpCrudXmHelpers {
 
     private static ArrayList<String> fill_dao_file_path_list(SdmDataObject obj) {
         final ArrayList<String> res = new ArrayList<String>();
-        FileSearchHelpers.IFile_List file_list = new FileSearchHelpers.IFile_List() {
+        FileSearchHelpers.IFileList file_list = new FileSearchHelpers.IFileList() {
             @Override
             public void add(String file_name) {
                 res.add(file_name);

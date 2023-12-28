@@ -24,37 +24,21 @@ import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileSystem;
 import org.openide.filesystems.FileUtil;
 import org.openide.loaders.DataObject;
-import org.openide.loaders.DataObjectNotFoundException;
 import org.openide.util.RequestProcessor;
 
 /*
- *
- * @author sqldalmaker@gmail.com
- *
  * 16.12.2023 09:01 1.292 sdm.xml
- *
  * 16.08.2023 03:03 1.285
- *
  * 10.08.2023 09:31 1.285
- *
  * 23.02.2023 15:42 1.279
- *
  * 16.02.2023 11:38 1.278
- *
  * 30.10.2022 08:03 1.266
- *
  * 06.08.2022 09:15 1.261
- *
  * 24.04.2022 08:20 1.229
- *
  * 08.04.2022 20:33 + hyperlinks for nb
- *
  * 18.05.2021 10:49 1.202
- *
  * 14.05.2021 06:22 1.201
- *
  * 08.05.2021 22:29 1.200
- *
  * 07.02.2019 19:50 initial commit
  *
  */
