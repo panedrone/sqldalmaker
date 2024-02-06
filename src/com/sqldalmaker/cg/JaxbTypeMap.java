@@ -20,7 +20,7 @@ class JaxbTypeMap {
     private final Map<String, String> detected = new HashMap<String, String>();
     private final String default_type;
 
-    public JaxbTypeMap(TypeMap jaxb_type_map) {
+    JaxbTypeMap(TypeMap jaxb_type_map) {
         if (jaxb_type_map == null) {
             default_type = null;
             return;
@@ -35,7 +35,7 @@ class JaxbTypeMap {
     //      1) detected using JDBC or
     //      2) detected from explicit declarations in XML meta-program
 
-    public String get_target_type_name(String detected_type_name) {
+    String get_target_type_name(String detected_type_name) {
         if (detected.isEmpty()) {
             // if no re-definitions, pass any type as-is (independently of 'default')
             return detected_type_name;

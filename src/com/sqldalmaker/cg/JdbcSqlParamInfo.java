@@ -22,7 +22,7 @@ import java.util.List;
  */
 class JdbcSqlParamInfo {
 
-    public static void get_jdbc_sql_params_info(
+    static void get_jdbc_sql_params_info(
             Connection conn,
             JaxbTypeMap type_map,
             String dao_jdbc_sql,
@@ -39,7 +39,7 @@ class JdbcSqlParamInfo {
         }
     }
 
-    public static void get_params_info(
+    static void get_params_info(
             PreparedStatement ps,
             JaxbTypeMap type_map,
             FieldNamesMode param_names_mode,
@@ -133,7 +133,7 @@ class JdbcSqlParamInfo {
         return java_class_name;
     }
 
-    public static FieldInfo create_param_info(
+    static FieldInfo create_param_info(
             JaxbTypeMap type_map,
             FieldNamesMode param_names_mode,
             String param_descriptor,

@@ -23,7 +23,7 @@ import java.util.Set;
     private final Map<String, String> custom = new HashMap<String, String>();
     private final Map<String, Macros.Macro> custom_vm = new HashMap<String, Macros.Macro>();
 
-    public JaxbMacros(Macros jaxb_macros) {
+    JaxbMacros(Macros jaxb_macros) {
         if (jaxb_macros == null) {
             return;
         }
@@ -44,27 +44,27 @@ import java.util.Set;
         }
     }
 
-    public Set<String> get_built_in_names() {
+    Set<String> get_built_in_names() {
         return built_in.keySet();
     }
 
-    public Set<String> get_custom_names() {
+    Set<String> get_custom_names() {
         return custom.keySet();
     }
 
-    public Set<String> get_vm_macro_names() {
+    Set<String> get_vm_macro_names() {
         return custom_vm.keySet();
     }
 
-    public String get_custom(String name) {
+    String get_custom(String name) {
         return custom.get(name);
     }
 
-    public Macros.Macro get_vm_macro(String name) {
+    Macros.Macro get_vm_macro(String name) {
         return custom_vm.get(name);
     }
 
-    public void substitute_type_params(FieldInfo fi) throws Exception {
+    void substitute_type_params(FieldInfo fi) throws Exception {
         String type_name = fi.getType();
         int local_field_type_params_start = type_name.indexOf('|');
         Map<String, String> params = new HashMap<String, String>();

@@ -21,7 +21,7 @@
             3. Ending ".vm" means using of VM file and specifies the path to this file relative to the project root:
                     <dto ... macro="<path>/<name>.vm"/> -->
 
-    <dto scope="sqlx/dbal/dto" inheritance="" field-names-mode="0" macro=""/>
+    <dto scope="no_orm/dbal/dto" inheritance="" field-names-mode="0" macro=""/>
 
     <!-- scope: base folder of generated DAO files (*) -->
 
@@ -39,7 +39,7 @@
             3. Ending ".vm" means using of VM file and specifies the path to this file relative to the project root:
                     <dao ... macro="<path>/<name>.vm"/> -->
 
-    <dao scope="sqlx/dbal" field-assign-mode="3" macro=""/>
+    <dao scope="no_orm/dbal" field-assign-mode="3" macro=""/>
 
     <ide event-log="true"/>
 
@@ -62,7 +62,7 @@
         <!--        <type detected="java.lang.Integer" target="int64${json} -> SetInt64"/>-->
         <!--        <type detected="java.lang.Double" target="float64${json} -> SetFloat64"/>-->
         <!--        <type detected="java.lang.String" target="string${json} -> SetString"/>-->
-        <!--        <type detected="byte[]" target="byte[]{$json} -> SetBytes"/>-->
+        <!--        <type detected="byte[]" target="[]byte${json} -> SetBytes"/>-->
         <!--        <type detected="java.lang.Object" target="interface{}${json}"/>-->
 
         <!-- oracle -->
@@ -70,7 +70,7 @@
         <!--        <type detected="java.math.BigDecimal" target="github.com/godror/godror:godror.Number${json} -> SetNumber"/>-->
         <!--        <type detected="java.lang.String" target="string${json} -> SetString"/>-->
         <!--        <type detected="java.util.Date" target="time:time.Time${json} -> SetTime"/>-->
-        <!--        <type detected="byte[]" target="byte[]${json} -> SetBytes"/>-->
+        <!--        <type detected="byte[]" target="string${json} -> SetBytes"/>-->
         <!--        <type detected="java.lang.Object" target="interface{}${json}"/>-->
 
         <!-- mysql, postgres -->
@@ -88,7 +88,7 @@
 
         <type detected="java.lang.String" target="string${json} -> SetString"/>
         <type detected="java.util.Date" target="time:time.Time${json} -> SetTime"/>
-        <type detected="byte[]" target="string${json} -> "/>
+        <type detected="byte[]" target="[]byte${json} -> "/>
         <type detected="java.lang.Boolean" target="bool${json} -> SetBool"/>
 
         <type detected="java.lang.Object" target="interface{}${json}"/>

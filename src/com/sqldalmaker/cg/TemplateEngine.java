@@ -34,17 +34,17 @@ public class TemplateEngine {
     }
 
     public TemplateEngine(String vm_path, boolean is_file_system) throws Exception {
-        String vm_template;
+        String vm_text;
         if (is_file_system) {
-            vm_template = Helpers.load_text_from_file(vm_path);
+            vm_text = Helpers.load_text_from_file(vm_path);
         } else {
-            vm_template = Helpers.res_from_jar(vm_path);
+            vm_text = Helpers.res_from_jar(vm_path);
         }
         String template_name = vm_path;
-        template = create_template(vm_template, template_name);
+        template = create_template(vm_text, template_name);
     }
 
-    private Template create_template(String template_text, String template_name) throws ParseException {
+    private Template create_template(String vm_text, String template_name) throws ParseException {
         // Velocity loads ResourceManager in this way:
         // ClassLoader loader = Thread.currentThread().getContextClassLoader();
         // return Class.forName(clazz, true, loader);
@@ -102,11 +102,16 @@ public class TemplateEngine {
             // runtimeServices.setProperty("string.resource.loader.cache",
             // Boolean.FALSE.toString());
             // }
-            StringReader reader = new StringReader(template_text);
+            StringReader reader = new StringReader(vm_text);
             // parse(String string, String templateName)
             // https://velocity.apache.org/engine/1.7/apidocs/org/apache/velocity/runtime/RuntimeServices.html
             SimpleNode node = runtime_services.parse(reader, template_name);
             Template template = new Template();
+            // 2023-12-30 https://stackoverflow.com/questions/5151572/velocity-templates-seem-to-fail-with-utf-8
+            template.setEncoding("UTF-8");
+            runtime_services.setProperty("input.encoding", "UTF-8");
+            runtime_services.setProperty("output.encoding", "UTF-8");
+            runtime_services.setProperty("response.encoding", "UTF-8");
             template.setRuntimeServices(runtime_services);
             template.setData(node);
             template.initDocument();

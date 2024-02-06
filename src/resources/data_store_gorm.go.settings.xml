@@ -21,7 +21,7 @@
             3. Ending ".vm" means using of VM file and specifies the path to this file relative to the project root:
                     <dto ... macro="<path>/<name>.vm"/> -->
 
-    <dto scope="sqlx/dbal/dto" inheritance="" field-names-mode="0" macro=""/>
+    <dto scope="gorm/dbal/dto" inheritance="" field-names-mode="0" macro=""/>
 
     <!-- scope: base folder of generated DAO files (*) -->
 
@@ -39,7 +39,7 @@
             3. Ending ".vm" means using of VM file and specifies the path to this file relative to the project root:
                     <dao ... macro="<path>/<name>.vm"/> -->
 
-    <dao scope="sqlx/dbal" field-assign-mode="3" macro=""/>
+    <dao scope="gorm/dbal" field-assign-mode="3" macro=""/>
 
     <ide event-log="true"/>
 
@@ -64,7 +64,7 @@
         <!--        <type detected="gorm-java.lang.Double" target="float64${json-gorm} -> SetFloat64"/>-->
         <!--        <type detected="gorm-java.lang.String" target="string${json-gorm} -> SetString"/>-->
         <!--        <type detected="gorm-java.util.Date" target="time:time.Time${json-gorm} -> SetTime"/>-->
-        <!--        <type detected="gorm-byte[]" target="byte[]{$json-gorm} -> SetBytes"/>-->
+        <!--        <type detected="gorm-byte[]" target="[]byte${json-gorm} -> SetBytes"/>-->
         <!--        <type detected="gorm-java.lang.Object" target="interface{}${json-gorm}"/>-->
 
         <!--        <type detected="java.lang.Integer" target="int64${json} -> SetInt64"/>-->
@@ -72,7 +72,7 @@
         <!--        <type detected="java.lang.Double" target="float64${json} -> SetFloat64"/>-->
         <!--        <type detected="java.lang.String" target="string${json} -> SetString"/>-->
         <!--        <type detected="java.util.Date" target="time:time.Time${json} -> SetTime"/>-->
-        <!--        <type detected="byte[]" target="byte[]${json} -> SetBytes"/>-->
+        <!--        <type detected="byte[]" target="[]byte${json} -> SetBytes"/>-->
         <!--        <type detected="java.lang.Object" target="interface{}${json}"/>-->
 
         <!-- oracle -->
@@ -137,7 +137,7 @@
 
         <type detected="java.lang.String" target="string${json} -> SetString"/>
         <type detected="java.util.Date" target="time:time.Time${json} -> SetTime"/>
-        <type detected="byte[]" target="string${json} -> "/>
+        <type detected="byte[]" target="[]byte${json} -> "/>
         <type detected="java.lang.Boolean" target="bool${json} -> SetBool"/>
 
         <type detected="java.lang.Object" target="interface{}${json}"/>

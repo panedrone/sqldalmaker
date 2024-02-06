@@ -37,11 +37,11 @@ import com.sqldalmaker.jaxb.sdm.DtoClass;
  */
 class JdbcTableInfo {
 
-    public final List<FieldInfo> fields_all = new ArrayList<FieldInfo>();
-    public final List<FieldInfo> fields_not_pk = new ArrayList<FieldInfo>();
-    public final List<FieldInfo> fields_pk = new ArrayList<FieldInfo>();
+    final List<FieldInfo> fields_all = new ArrayList<FieldInfo>();
+    final List<FieldInfo> fields_not_pk = new ArrayList<FieldInfo>();
+    final List<FieldInfo> fields_pk = new ArrayList<FieldInfo>();
 
-    public final Map<String, FieldInfo> fields_map = new HashMap<String, FieldInfo>();
+    final Map<String, FieldInfo> fields_map = new HashMap<String, FieldInfo>();
 
     private final Connection conn;
     private final JaxbTypeMap type_map;
@@ -52,7 +52,7 @@ class JdbcTableInfo {
     private final String explicit_auto_column_name;
     private final String explicit_auto_column_generation_type;
 
-    public static JdbcTableInfo forDao(
+    static JdbcTableInfo forDao(
             String model,
             Connection conn,
             JaxbTypeMap type_map,
@@ -65,7 +65,7 @@ class JdbcTableInfo {
                 jaxb_explicit_pk, jaxb_dto_class.getAuto());
     }
 
-    public static JdbcTableInfo forDto(
+    static JdbcTableInfo forDto(
             String model,
             Connection conn,
             JaxbTypeMap type_map,
@@ -151,7 +151,7 @@ class JdbcTableInfo {
         throw new Exception("Not found: '" + table_name_pattern + "'. The search is case-sensitive.");
     }
 
-    public static ResultSet get_tables_rs(
+    static ResultSet get_tables_rs(
             Connection conn,
             String table_name_pattern, // it may include schema like "public.%"
             boolean include_views) throws SQLException {

@@ -20,7 +20,7 @@ import java.util.Set;
  */
 class JdbcSqlFieldInfo {
 
-    public static void get_field_info_by_jdbc_sql(
+    static void get_field_info_by_jdbc_sql(
             String model,
             Connection conn,
             FieldNamesMode dto_field_names_mode,

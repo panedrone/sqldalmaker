@@ -18,12 +18,10 @@ import com.sqldalmaker.jaxb.sdm.Sdm;
 import com.sqldalmaker.jaxb.settings.Settings;
 import java.util.List;
 
-/**
+/*
  * The class to control
  *
  * - DTO XML assistant - DAO XML assistant - FK access XML assistant
- *
- * @author sqldalmaker@gmail.com
  *
  */
 public class NbpCrudXmHelpers {

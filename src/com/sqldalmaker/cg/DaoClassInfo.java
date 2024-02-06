@@ -37,7 +37,7 @@ class DaoClassInfo {
     private final JaxbMacros jaxb_macros;
     private final JaxbTypeMap jaxb_type_map;
 
-    public DaoClassInfo(
+    DaoClassInfo(
             Connection conn,
             FieldNamesMode dto_field_names_mode,
             FieldNamesMode method_params_names_mode,
@@ -154,7 +154,7 @@ class DaoClassInfo {
         }
     }
 
-    public void _get_shortcut_params(
+    void _get_shortcut_params(
             FieldNamesMode param_names_mode,
             String[] method_param_descriptors,
             List<FieldInfo> _table_fields,
@@ -297,7 +297,7 @@ class DaoClassInfo {
         return mode;
     }
 
-    public String get_dao_query_info(
+    String get_dao_query_info(
             String sql_root_abs_path,
             String dao_jaxb_ref,
             String dto_param_type,
@@ -343,7 +343,7 @@ class DaoClassInfo {
         return dao_query_jdbc_sql;
     }
 
-    public void get_dao_fields_for_crud_create(
+    void get_dao_fields_for_crud_create(
             DtoClass jaxb_dto_class,
             String table_name,
             HashSet<String> dao_crud_auto_columns,
