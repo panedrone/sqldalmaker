@@ -75,7 +75,7 @@ public class IdeaCG {
                         }
                         if (!error) {
                             String xml_file_rel_path = IdeaHelpers.get_relative_path(project, xml_file);
-                            IdeaMessageHelpers.add_info_to_ide_log(xml_file_rel_path, "OK");
+                            IdeaMessageHelpers.add_info_to_ide_log(xml_file_rel_path, "Validate DTO classes...OK");
                         }
                     } finally {
                         con.close();
@@ -86,7 +86,7 @@ public class IdeaCG {
                 }
             }
         };
-        ProgressManager.getInstance().runProcessWithProgressSynchronously(runnable, "Code Validation", false, project);
+        ProgressManager.getInstance().runProcessWithProgressSynchronously(runnable, "DTO Validation", false, project);
     }
 
     public static void validate_all_sdm_dao(Project project, VirtualFile xml_file) {
@@ -138,9 +138,9 @@ public class IdeaCG {
                                 IdeaMessageHelpers.add_error_to_ide_log("ERROR", msg);
                             }
                         }
-                        if (!error) {
+                        if (!error && !dao_classes.isEmpty()) {
                             String xml_file_rel_path = IdeaHelpers.get_relative_path(project, xml_file);
-                            IdeaMessageHelpers.add_info_to_ide_log(xml_file_rel_path, "OK");
+                            IdeaMessageHelpers.add_info_to_ide_log(xml_file_rel_path, "Validate DAO classes...OK");
                         }
                     } finally {
                         con.close();
@@ -151,7 +151,7 @@ public class IdeaCG {
                 }
             }
         };
-        ProgressManager.getInstance().runProcessWithProgressSynchronously(runnable, "Code Validation", false, project);
+        ProgressManager.getInstance().runProcessWithProgressSynchronously(runnable, "DAO Validation", false, project);
     }
 
     public static void generate_all_dto(Project project, VirtualFile xml_file) {
@@ -216,7 +216,7 @@ public class IdeaCG {
                 String xml_file_rel_path = IdeaHelpers.get_relative_path(project, xml_file);
                 IdeaHelpers.run_write_action_to_generate_source_file(output_dir.toString(), list, project);
                 if (!err.occurred) {
-                    IdeaMessageHelpers.add_info_to_ide_log(xml_file_rel_path, "Generated successfully");
+                    IdeaMessageHelpers.add_info_to_ide_log(xml_file_rel_path, "Generate DTO classes...OK");
                 }
             }
         } catch (Exception e) {
@@ -287,7 +287,7 @@ public class IdeaCG {
                 String xml_file_rel_path = IdeaHelpers.get_relative_path(project, xml_file);
                 IdeaHelpers.run_write_action_to_generate_source_file(output_dir.toString(), list, project);
                 if (!err.occurred) {
-                    IdeaMessageHelpers.add_info_to_ide_log(xml_file_rel_path, "Generated successfully");
+                    IdeaMessageHelpers.add_info_to_ide_log(xml_file_rel_path, "Generate DAO classes...OK");
                 }
             }
         } catch (Exception e) {
@@ -351,12 +351,12 @@ public class IdeaCG {
         }
     }
 
-    public static void generate_dao(Project project, VirtualFile xml_file) {
-        String name = xml_file.getName();
+    public static void generate_dao(Project project, VirtualFile dao_xml_file) {
+        String name = dao_xml_file.getName();
         if (!FileSearchHelpers.is_dao_xml(name)) {
             return;
         }
-        VirtualFile xml_file_dir = xml_file.getParent();
+        VirtualFile xml_file_dir = dao_xml_file.getParent();
         if (xml_file_dir == null) {
             return;
         }
@@ -377,7 +377,7 @@ public class IdeaCG {
             String contextPath = DaoClass.class.getPackage().getName();
             XmlParser xml_parser = new XmlParser(contextPath, Helpers.concat_path(xml_metaprogram_abs_path, Const.DAO_XSD));
             boolean error = false;
-            String dao_xml_abs_path = xml_file.getPath();
+            String dao_xml_abs_path = dao_xml_file.getPath();
             Path path = Paths.get(dao_xml_abs_path);
             String dao_xml_file_name = path.getFileName().toString();
             String dao_class_name = Helpers.get_dao_class_name(dao_xml_file_name);
@@ -400,7 +400,7 @@ public class IdeaCG {
                 if (!list.isEmpty()) {
                     IdeaHelpers.run_write_action_to_generate_source_file(output_dir.toString(), list, project);
                     if (!error) {
-                        IdeaMessageHelpers.add_info_to_ide_log(dao_xml_file_name, "Generated successfully");
+                        IdeaMessageHelpers.add_info_to_ide_log(dao_xml_file_name, "Generate DAO class...OK");
                     }
                 }
             } catch (Exception e) {
