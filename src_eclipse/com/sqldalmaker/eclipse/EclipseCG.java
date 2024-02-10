@@ -59,16 +59,16 @@ public class EclipseCG {
 						error.happend = true;
 					}
 				}
+				if (!error.happend && !dto_classes.isEmpty()) {
+					EclipseHelpers.refresh_project(xml_file.getProject());
+					String current_xml_file_path = xml_file.getFullPath().toPortableString();
+					if (current_xml_file_path.startsWith("/")) {
+						current_xml_file_path = current_xml_file_path.substring(1);
+					}
+					EclipseConsoleHelpers.add_info_msg(current_xml_file_path + " -> Generate DTO classes...OK");
+				}
 			} finally {
 				con.close();
-			}
-			if (!error.happend) {
-				EclipseHelpers.refresh_project(xml_file.getProject());
-				String current_xml_file_path = xml_file.getFullPath().toPortableString();
-				if (current_xml_file_path.startsWith("/")) {
-					current_xml_file_path = current_xml_file_path.substring(1);
-				}
-				EclipseConsoleHelpers.add_info_msg(current_xml_file_path + " -> Generated successfully");
 			}
 		} catch (Exception e) {
 			EclipseConsoleHelpers.add_error_msg(e.getMessage());
@@ -102,16 +102,16 @@ public class EclipseCG {
 						error.happend = true;
 					}
 				}
+				if (!error.happend && !dao_classes.isEmpty()) {
+					EclipseHelpers.refresh_project(xml_file.getProject());
+					String current_xml_file_path = xml_file.getFullPath().toPortableString();
+					if (current_xml_file_path.startsWith("/")) {
+						current_xml_file_path = current_xml_file_path.substring(1);
+					}
+					EclipseConsoleHelpers.add_info_msg(current_xml_file_path + " -> Generate DAO classes...OK");
+				}
 			} finally {
 				con.close();
-			}
-			if (!error.happend) {
-				EclipseHelpers.refresh_project(xml_file.getProject());
-				String current_xml_file_path = xml_file.getFullPath().toPortableString();
-				if (current_xml_file_path.startsWith("/")) {
-					current_xml_file_path = current_xml_file_path.substring(1);
-				}
-				EclipseConsoleHelpers.add_info_msg(current_xml_file_path + " -> Generated successfully");
 			}
 		} catch (Exception e) {
 			EclipseConsoleHelpers.add_error_msg(e.getMessage());
@@ -127,12 +127,12 @@ public class EclipseCG {
 			Settings settings = SdmUtils.load_settings(xml_mp_abs_path);
 			IProject project = root_file.getProject();
 			Connection con = EclipseHelpers.get_connection(project, settings);
+			String sdm_xml_abs_path = xml_file.getLocation().toPortableString();
+			String sdm_xsd_abs_path = Helpers.concat_path(xml_mp_abs_path, Const.SDM_XSD);
+			List<DtoClass> dto_classes = SdmUtils.get_dto_classes(sdm_xml_abs_path, sdm_xsd_abs_path);
 			try {
 				IDtoCG gen = EclipseTargetLanguageHelpers.create_dto_cg(con, project, settings, root_file.getName(),
 						xml_mp_abs_path, output_dir);
-				String sdm_xml_abs_path = xml_file.getLocation().toPortableString();
-				String sdm_xsd_abs_path = Helpers.concat_path(xml_mp_abs_path, Const.SDM_XSD);
-				List<DtoClass> dto_classes = SdmUtils.get_dto_classes(sdm_xml_abs_path, sdm_xsd_abs_path);
 				for (DtoClass cls : dto_classes) {
 					try {
 						String[] file_content = gen.translate(cls.getName());
@@ -162,13 +162,13 @@ public class EclipseCG {
 			} finally {
 				con.close();
 			}
-			if (!error.happend) {
+			if (!error.happend && !dto_classes.isEmpty()) {
 				EclipseHelpers.refresh_project(xml_file.getProject());
 				String current_xml_file_path = xml_file.getFullPath().toPortableString();
 				if (current_xml_file_path.startsWith("/")) {
 					current_xml_file_path = current_xml_file_path.substring(1);
 				}
-				EclipseConsoleHelpers.add_info_msg(current_xml_file_path + " -> OK");
+				EclipseConsoleHelpers.add_info_msg(current_xml_file_path + " -> Validate DTO classes...OK");
 			}
 		} catch (Exception e) {
 			EclipseConsoleHelpers.add_error_msg(e.getMessage());
@@ -184,12 +184,12 @@ public class EclipseCG {
 			Settings settings = SdmUtils.load_settings(xml_mp_abs_path);
 			IProject project = root_file.getProject();
 			Connection con = EclipseHelpers.get_connection(project, settings);
+			String sdm_xml_abs_path = xml_file.getLocation().toPortableString();
+			String sdm_xsd_abs_path = Helpers.concat_path(xml_mp_abs_path, Const.SDM_XSD);
+			List<DaoClass> dao_classes = SdmUtils.get_dao_classes(sdm_xml_abs_path, sdm_xsd_abs_path);
 			try {
 				IDaoCG gen = EclipseTargetLanguageHelpers.create_dao_cg(con, project, root_file.getName(), settings,
 						xml_mp_abs_path, output_dir);
-				String sdm_xml_abs_path = xml_file.getLocation().toPortableString();
-				String sdm_xsd_abs_path = Helpers.concat_path(xml_mp_abs_path, Const.SDM_XSD);
-				List<DaoClass> dao_classes = SdmUtils.get_dao_classes(sdm_xml_abs_path, sdm_xsd_abs_path);
 				for (DaoClass cls : dao_classes) {
 					try {
 						String[] file_content = gen.translate(cls.getName(), cls);
@@ -219,13 +219,13 @@ public class EclipseCG {
 			} finally {
 				con.close();
 			}
-			if (!error.happend) {
+			if (!error.happend && !dao_classes.isEmpty()) {
 				EclipseHelpers.refresh_project(xml_file.getProject());
 				String current_xml_file_path = xml_file.getFullPath().toPortableString();
 				if (current_xml_file_path.startsWith("/")) {
 					current_xml_file_path = current_xml_file_path.substring(1);
 				}
-				EclipseConsoleHelpers.add_info_msg(current_xml_file_path + " -> OK");
+				EclipseConsoleHelpers.add_info_msg(current_xml_file_path + " -> Validate DAO classes...OK");
 			}
 		} catch (Exception e) {
 			EclipseConsoleHelpers.add_error_msg(e.getMessage());
@@ -269,7 +269,7 @@ public class EclipseCG {
 				if (current_xml_file_path.startsWith("/")) {
 					current_xml_file_path = current_xml_file_path.substring(1);
 				}
-				EclipseConsoleHelpers.add_info_msg(current_xml_file_path + " -> Generated successfully");
+				EclipseConsoleHelpers.add_info_msg(current_xml_file_path + " -> Generate DAO class...OK");
 			}
 		} catch (Exception e) {
 			EclipseConsoleHelpers.add_error_msg(e.getMessage());
@@ -327,7 +327,7 @@ public class EclipseCG {
 			}
 			if (!error.happend) {
 				EclipseHelpers.refresh_project(xml_file.getProject());
-				EclipseConsoleHelpers.add_info_msg(current_xml_file_path + " -> OK");
+				EclipseConsoleHelpers.add_info_msg(current_xml_file_path + " -> Validate DAO class...OK");
 			}
 		} catch (Exception e) {
 			EclipseConsoleHelpers.add_error_msg(e.getMessage());

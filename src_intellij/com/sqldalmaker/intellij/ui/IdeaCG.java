@@ -211,7 +211,7 @@ public class IdeaCG {
             }
         };
         ProgressManager.getInstance().runProcessWithProgressSynchronously(runnable, "Code Generation", false, project);
-        try { // outside of Runnable
+        try { // outside Runnable
             if (!list.isEmpty()) {
                 String xml_file_rel_path = IdeaHelpers.get_relative_path(project, xml_file);
                 IdeaHelpers.run_write_action_to_generate_source_file(output_dir.toString(), list, project);
@@ -282,7 +282,7 @@ public class IdeaCG {
             }
         };
         ProgressManager.getInstance().runProcessWithProgressSynchronously(runnable, "Code Generation", false, project);
-        try { // outside of Runnable
+        try { // outside Runnable
             if (!list.isEmpty()) {
                 String xml_file_rel_path = IdeaHelpers.get_relative_path(project, xml_file);
                 IdeaHelpers.run_write_action_to_generate_source_file(output_dir.toString(), list, project);
