@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2023 sqldalmaker@gmail.com
+    Copyright 2011-2024 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -65,7 +65,7 @@ public class IdeaCG {
                                 String status = validationBuff.toString();
                                 if (!status.isEmpty()) {
                                     error = true;
-                                    IdeaMessageHelpers.add_error_to_ide_log("ERROR", " DTO class '" + cls.getName() + "'. " + status);
+                                    IdeaMessageHelpers.add_error_to_ide_log("ERROR", " DTO/Model '" + cls.getName() + "'. " + status);
                                 }
                             } catch (Throwable e) {
                                 error = true;
@@ -75,7 +75,7 @@ public class IdeaCG {
                         }
                         if (!error) {
                             String xml_file_rel_path = IdeaHelpers.get_relative_path(project, xml_file);
-                            IdeaMessageHelpers.add_info_to_ide_log(xml_file_rel_path, "Validate DTO classes...OK");
+                            IdeaMessageHelpers.add_info_to_ide_log(xml_file_rel_path, "DTO/Model Validation...OK");
                         }
                     } finally {
                         con.close();
@@ -86,7 +86,7 @@ public class IdeaCG {
                 }
             }
         };
-        ProgressManager.getInstance().runProcessWithProgressSynchronously(runnable, "DTO Validation", false, project);
+        ProgressManager.getInstance().runProcessWithProgressSynchronously(runnable, "DTO/Model Validation", false, project);
     }
 
     public static void validate_all_sdm_dao(Project project, VirtualFile xml_file) {
@@ -130,7 +130,7 @@ public class IdeaCG {
                                 String status = validationBuff.toString();
                                 if (!status.isEmpty()) {
                                     error = true;
-                                    IdeaMessageHelpers.add_error_to_ide_log("ERROR", " class '" + cls.getName() + "'. " + status);
+                                    IdeaMessageHelpers.add_error_to_ide_log("ERROR", " DAO class '" + cls.getName() + "'. " + status);
                                 }
                             } catch (Throwable e) {
                                 error = true;
@@ -140,7 +140,7 @@ public class IdeaCG {
                         }
                         if (!error && !dao_classes.isEmpty()) {
                             String xml_file_rel_path = IdeaHelpers.get_relative_path(project, xml_file);
-                            IdeaMessageHelpers.add_info_to_ide_log(xml_file_rel_path, "Validate DAO classes...OK");
+                            IdeaMessageHelpers.add_info_to_ide_log(xml_file_rel_path, "DAO Validation...OK");
                         }
                     } finally {
                         con.close();
@@ -210,13 +210,13 @@ public class IdeaCG {
                 }
             }
         };
-        ProgressManager.getInstance().runProcessWithProgressSynchronously(runnable, "Code Generation", false, project);
+        ProgressManager.getInstance().runProcessWithProgressSynchronously(runnable, "DTO/Model Code Generation", false, project);
         try { // outside Runnable
             if (!list.isEmpty()) {
                 String xml_file_rel_path = IdeaHelpers.get_relative_path(project, xml_file);
                 IdeaHelpers.run_write_action_to_generate_source_file(output_dir.toString(), list, project);
                 if (!err.occurred) {
-                    IdeaMessageHelpers.add_info_to_ide_log(xml_file_rel_path, "Generate DTO classes...OK");
+                    IdeaMessageHelpers.add_info_to_ide_log(xml_file_rel_path, "Generate DTO/Model classes...OK");
                 }
             }
         } catch (Exception e) {
@@ -281,7 +281,7 @@ public class IdeaCG {
                 }
             }
         };
-        ProgressManager.getInstance().runProcessWithProgressSynchronously(runnable, "Code Generation", false, project);
+        ProgressManager.getInstance().runProcessWithProgressSynchronously(runnable, "DAO Code Generation", false, project);
         try { // outside Runnable
             if (!list.isEmpty()) {
                 String xml_file_rel_path = IdeaHelpers.get_relative_path(project, xml_file);
