@@ -48,12 +48,12 @@ public class IdeaCG {
                 try {
                     Settings settings = SdmUtils.load_settings(xml_file_dir.getPath());
                     StringBuilder output_dir = new StringBuilder();
-                    String xml_metaprogram_abs_path = root_file.getParent().getPath();
                     Connection con = IdeaHelpers.get_connection(project, settings);
                     try {
                         IDtoCG gen = IdeaTargetLanguageHelpers.create_dto_cg(con, project, root_file, settings, output_dir);
                         String sdm_xml_abs_path = xml_file.getPath();
-                        String sdm_xsd_abs_path = xml_metaprogram_abs_path + "/" + Const.SDM_XSD;
+                        String sdm_folder_abs_path = root_file.getParent().getPath();
+                        String sdm_xsd_abs_path = sdm_folder_abs_path + "/" + Const.SDM_XSD;
                         List<DtoClass> dto_classes = SdmUtils.get_dto_classes(sdm_xml_abs_path, sdm_xsd_abs_path);
                         boolean error = false;
                         for (DtoClass cls : dto_classes) {

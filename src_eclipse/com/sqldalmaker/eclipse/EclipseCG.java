@@ -65,7 +65,7 @@ public class EclipseCG {
 					if (current_xml_file_path.startsWith("/")) {
 						current_xml_file_path = current_xml_file_path.substring(1);
 					}
-					EclipseConsoleHelpers.add_info_msg(current_xml_file_path + " -> Generate DTO classes...OK");
+					EclipseConsoleHelpers.add_info_msg(current_xml_file_path + " -> Generate DTO/Model classes...OK");
 				}
 			} finally {
 				con.close();
@@ -168,7 +168,7 @@ public class EclipseCG {
 				if (current_xml_file_path.startsWith("/")) {
 					current_xml_file_path = current_xml_file_path.substring(1);
 				}
-				EclipseConsoleHelpers.add_info_msg(current_xml_file_path + " -> Validate DTO classes...OK");
+				EclipseConsoleHelpers.add_info_msg(current_xml_file_path + " -> Validate DTO/Model classes...OK");
 			}
 		} catch (Exception e) {
 			EclipseConsoleHelpers.add_error_msg(e.getMessage());

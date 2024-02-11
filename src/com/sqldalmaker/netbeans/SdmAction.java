@@ -186,7 +186,7 @@ public final class SdmAction extends AbstractAction implements Presenter.Toolbar
             @Override
             public void actionPerformed(ActionEvent e) {
                 NbpCG.validate_all_dto(root_data_object, xml_file, xml_file_title);
-                NbpCG.validate_all_dao(root_data_object, xml_file, xml_file_title);
+                NbpCG.validate_all_sdm_dao(root_data_object, xml_file, xml_file_title);
             }
         });
         item_val.setText(name_val);

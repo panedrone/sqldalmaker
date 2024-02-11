@@ -49,7 +49,7 @@ public class NbpCG {
             return;
         }
         final NbpIdeConsoleUtil ide_log = new NbpIdeConsoleUtil(settings, root_data_object);
-        RequestProcessor RP = new RequestProcessor("Generate all DTO classes RP");
+        RequestProcessor RP = new RequestProcessor("Generate DTO classes RP");
         // final ProgressHandle ph = ProgressHandle.createHandle("Generate DTO class(es)");
         RequestProcessor.Task task = RP.create(new Runnable() {
             @Override
@@ -76,7 +76,7 @@ public class NbpCG {
                             }
                         }
                         if (!error) {
-                            ide_log.add_success_message(xml_file_title + " -> Generated successfully");
+                            ide_log.add_success_message(xml_file_title + " -> Generate DTO/Model classes...OK");
                         }
                         //ide_log.add_debug_message("DONE");
                     } finally {
@@ -109,7 +109,7 @@ public class NbpCG {
             return;
         }
         final NbpIdeConsoleUtil ide_log = new NbpIdeConsoleUtil(settings, root_data_object);
-        RequestProcessor RP = new RequestProcessor("Generate all DAO classes RP");
+        RequestProcessor RP = new RequestProcessor("Generate DAO classes RP");
         // final ProgressHandle ph = ProgressHandle.createHandle("Generate DTO class(es)");
         RequestProcessor.Task task = RP.create(new Runnable() {
             @Override
@@ -118,7 +118,7 @@ public class NbpCG {
                     StringBuilder output_dir = new StringBuilder();
                     Connection conn = NbpHelpers.get_connection(root_data_object);
                     try {
-                        IDtoCG gen = NbpTargetLanguageHelpers.create_dto_cg(conn, root_data_object, settings, output_dir);
+                        IDaoCG gen = NbpTargetLanguageHelpers.create_dao_cg(conn, root_data_object, settings, output_dir);
                         String output_dir_rel_path = output_dir.toString();
                         String sdm_xml_abs_path = xml_file.getPath();
                         String sdm_xsd_abs_path = Helpers.concat_path(sdm_folder_abs_path, Const.SDM_XSD);
@@ -126,7 +126,7 @@ public class NbpCG {
                         boolean error = false;
                         for (DaoClass cls : dao_classes) {
                             try {
-                                String[] file_content = gen.translate(cls.getName());
+                                String[] file_content = gen.translate(cls.getName(), cls);
                                 String file_name = NbpTargetLanguageHelpers.get_target_file_name(root_data_object, cls.getName());
                                 NbpHelpers.save_text_to_file(root_data_object, output_dir_rel_path, file_name, file_content[0]);
                             } catch (Exception e) {
@@ -136,7 +136,7 @@ public class NbpCG {
                             }
                         }
                         if (!error) {
-                            ide_log.add_success_message(xml_file_title + " -> Generated successfully");
+                            ide_log.add_success_message(xml_file_title + " -> Generate DAO classes...OK");
                         }
                         //ide_log.add_debug_message("DONE");
                     } finally {
@@ -160,7 +160,7 @@ public class NbpCG {
         if (xml_mp_dir == null) {
             return;
         }
-        RequestProcessor RP = new RequestProcessor("Validate all DTO classes RP");
+        RequestProcessor RP = new RequestProcessor("Validate DTO classes RP");
         // final ProgressHandle ph = ProgressHandle.createHandle("Generate DTO class(es)");
         RequestProcessor.Task task = RP.create(new Runnable() {
             @Override
@@ -196,7 +196,7 @@ public class NbpCG {
                             }
                         }
                         if (!error) {
-                            ide_log.add_success_message(xml_file_title + " -> OK");
+                            ide_log.add_success_message(xml_file_title + " -> Validate DTO/Model classes...OK");
                         }
                     } finally {
                         conn.close();
@@ -211,7 +211,7 @@ public class NbpCG {
         task.schedule(0);
     }
 
-    public static void validate_all_dao(final SdmDataObject root_data_object, final FileObject xml_file, final String xml_file_title) {
+    public static void validate_all_sdm_dao(final SdmDataObject root_data_object, final FileObject xml_file, final String xml_file_title) {
         String name_ext = xml_file.getNameExt();
         if (!FileSearchHelpers.is_sdm_xml(name_ext)) {
             return;
@@ -220,7 +220,7 @@ public class NbpCG {
         if (xml_mp_dir == null) {
             return;
         }
-        RequestProcessor RP = new RequestProcessor("Validate all DAO classes RP");
+        RequestProcessor RP = new RequestProcessor("Validate DAO classes RP");
         // final ProgressHandle ph = ProgressHandle.createHandle("Generate DTO class(es)");
         RequestProcessor.Task task = RP.create(new Runnable() {
             @Override
@@ -233,7 +233,7 @@ public class NbpCG {
                     String xml_metaprogram_abs_path = xml_mp_dir.getPath();
                     Connection conn = NbpHelpers.get_connection(root_data_object);
                     try {
-                        IDtoCG gen = NbpTargetLanguageHelpers.create_dto_cg(conn, root_data_object, settings, output_dir);
+                        IDaoCG gen = NbpTargetLanguageHelpers.create_dao_cg(conn, root_data_object, settings, output_dir);
                         String dto_xml_abs_path = xml_file.getPath();
                         String dto_xsd_abs_path = Helpers.concat_path(xml_metaprogram_abs_path, Const.SDM_XSD);
                         List<DaoClass> dao_classes = SdmUtils.get_dao_classes(dto_xml_abs_path, dto_xsd_abs_path);
@@ -241,9 +241,9 @@ public class NbpCG {
                         for (DaoClass cls : dao_classes) {
                             try {
                                 //ProgressManager.progress(cls.getName());
-                                String[] file_content = gen.translate(cls.getName());
+                                String[] file_content = gen.translate(cls.getName(), cls);
                                 StringBuilder validation_buff = new StringBuilder();
-                                NbpTargetLanguageHelpers.validate_dto(root_data_object, settings, cls.getName(), file_content, validation_buff);
+                                NbpTargetLanguageHelpers.validate_dao(root_data_object, settings, cls.getName(), file_content, validation_buff);
                                 String status = validation_buff.toString();
                                 if (status.length() > 0) {
                                     error = true;
@@ -256,7 +256,7 @@ public class NbpCG {
                             }
                         }
                         if (!error) {
-                            ide_log.add_success_message(xml_file_title + " -> OK");
+                            ide_log.add_success_message(xml_file_title + " -> Validate DAO classes...OK");
                         }
                     } finally {
                         conn.close();
@@ -311,7 +311,7 @@ public class NbpCG {
                             ide_log.add_error_message(e);
                         }
                         if (!error) {
-                            ide_log.add_success_message(xml_file_title + " -> Generated successfully");
+                            ide_log.add_success_message(xml_file_title + " -> Generate DAO class...OK");
                         }
                     } finally {
                         conn.close();
@@ -335,7 +335,7 @@ public class NbpCG {
         if (xml_mp_dir == null) {
             return;
         }
-        RequestProcessor RP = new RequestProcessor("Generate DAO class RP");
+        RequestProcessor RP = new RequestProcessor("Validate DAO class RP");
         RequestProcessor.Task task = RP.create(new Runnable() {
             @Override
             public void run() {
@@ -368,7 +368,7 @@ public class NbpCG {
                             ide_log.add_error_message(e);
                         }
                         if (!error) {
-                            ide_log.add_success_message(xml_file_title + " -> OK");
+                            ide_log.add_success_message(xml_file_title + " -> Validate DAO class...OK");
                         }
                     } finally {
                         conn.close();

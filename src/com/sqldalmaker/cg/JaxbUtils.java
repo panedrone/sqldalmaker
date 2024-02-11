@@ -23,6 +23,7 @@ import com.sqldalmaker.jaxb.sdm.TypeMethod;
 import com.sqldalmaker.jaxb.sdm.DtoClass;
 
 /*
+ * 11.02.2024 06.-- 1.293
  * 27.03.2023 10:23
  * 21.11.2022 22:07
  * 16.11.2022 08:02 1.269
@@ -44,7 +45,7 @@ public class JaxbUtils {
     }
 
     public static DtoClass find_jaxb_dto_class(String dto_class_name, List<DtoClass> jaxb_dto_classes) throws Exception {
-        if (dto_class_name == null || dto_class_name.isEmpty()) {
+        if (dto_class_name == null || dto_class_name.trim().isEmpty()) {
             throw new Exception("Invalid DTO class name: " + dto_class_name);
         }
         for (DtoClass cls : jaxb_dto_classes) {
@@ -53,11 +54,11 @@ public class JaxbUtils {
                 return cls;
             }
         }
-        throw new Exception("DTO XML element not found: '" + dto_class_name + "'");
+        throw new Exception("XML element not found <dto-class name=\"" + dto_class_name + "\"");
     }
 
     public static DaoClass find_jaxb_dao_class(String dao_class_name, List<DaoClass> jaxb_dao_classes) throws Exception {
-        if (dao_class_name == null || dao_class_name.isEmpty()) {
+        if (dao_class_name == null || dao_class_name.trim().isEmpty()) {
             throw new Exception("Invalid DAO class name: " + dao_class_name);
         }
         for (DaoClass cls : jaxb_dao_classes) {
@@ -66,7 +67,7 @@ public class JaxbUtils {
                 return cls;
             }
         }
-        throw new Exception("DTO XML element not found: '" + dao_class_name + "'");
+        throw new Exception("XML element not found <dao-class name=\"" + dao_class_name + "\"");
     }
 
     public static void process_jaxb_dao_class(
