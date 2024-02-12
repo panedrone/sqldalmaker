@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2023 sqldalmaker@gmail.com
+    Copyright 2011-2024 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -41,4 +41,13 @@ public class Const {
         public static final String PYTHON = "python.dal";
         public static final String GO = "go.dal";
     }
+
+    public static final String VALIDATE_SDM_DTO_MODELS = "validating DTO/models....OK";
+    public static final String VALIDATE_SDM_DAO = "validating DAO....OK";
+
+    public static final String GENERATE_SDM_DTO_MODELS = "generating DTO/model classes....OK";
+    public static final String GENERATE_SDM_DAO = "generating DAO classes....OK";
+
+    public static final String VALIDATE_DAO_XML = "validating....OK";
+    public static final String GENERATE_DAO_XML = "generating DAO class....OK";
 }

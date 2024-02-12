@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2023 sqldalmaker@gmail.com
+    Copyright 2011-2024 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -96,7 +96,7 @@ public class IdeaActionGroup extends ActionGroup implements AlwaysVisibleActionG
         SdmAction action_generate = new SdmAction(xml_file_rel_path + " -> Generate All") {
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
-                IdeaCG.generate_all_dto(project, xml_file);
+                IdeaCG.generate_all_sdm_dto(project, xml_file);
                 IdeaCG.generate_all_sdm_dao(project, xml_file);
             }
         };
@@ -104,7 +104,7 @@ public class IdeaActionGroup extends ActionGroup implements AlwaysVisibleActionG
         SdmAction action_validate = new SdmAction(xml_file_rel_path + " -> Validate All") {
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
-                IdeaCG.validate_all_dto(project, xml_file);
+                IdeaCG.validate_all_sdm_dto(project, xml_file);
                 IdeaCG.validate_all_sdm_dao(project, xml_file);
             }
         };

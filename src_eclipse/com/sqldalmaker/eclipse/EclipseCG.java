@@ -1,5 +1,5 @@
 /*
-	Copyright 2011-2023 sqldalmaker@gmail.com
+	Copyright 2011-2024 sqldalmaker@gmail.com
 	Read LICENSE.txt in the root of this project/archive.
 	Project web-site: https://sqldalmaker.sourceforge.net/
 */
@@ -33,7 +33,7 @@ public class EclipseCG {
 		public boolean happend = false;
 	}
 
-	public static void generate_all_dto(IFile root_file, IFile xml_file) {
+	public static void generate_all_sdm_dto(IFile root_file, IFile xml_file) {
 		StringBuilder output_dir = new StringBuilder();
 		Error error = new Error();
 		try {
@@ -65,7 +65,7 @@ public class EclipseCG {
 					if (current_xml_file_path.startsWith("/")) {
 						current_xml_file_path = current_xml_file_path.substring(1);
 					}
-					EclipseConsoleHelpers.add_info_msg(current_xml_file_path + " -> Generate DTO/Model classes...OK");
+					EclipseConsoleHelpers.add_info_msg(current_xml_file_path + " -> " + Const.GENERATE_SDM_DTO_MODELS);
 				}
 			} finally {
 				con.close();
@@ -76,7 +76,7 @@ public class EclipseCG {
 		}
 	}
 
-	public static void generate_all_dao(IFile root_file, IFile xml_file) {
+	public static void generate_all_sdm_dao(IFile root_file, IFile xml_file) {
 		StringBuilder output_dir = new StringBuilder();
 		Error error = new Error();
 		try {
@@ -108,7 +108,7 @@ public class EclipseCG {
 					if (current_xml_file_path.startsWith("/")) {
 						current_xml_file_path = current_xml_file_path.substring(1);
 					}
-					EclipseConsoleHelpers.add_info_msg(current_xml_file_path + " -> Generate DAO classes...OK");
+					EclipseConsoleHelpers.add_info_msg(current_xml_file_path + " -> " + Const.GENERATE_SDM_DAO);
 				}
 			} finally {
 				con.close();
@@ -119,7 +119,7 @@ public class EclipseCG {
 		}
 	}
 
-	public static void validate_all_dto(IFile root_file, IFile xml_file) {
+	public static void validate_all_sdm_dto(IFile root_file, IFile xml_file) {
 		StringBuilder output_dir = new StringBuilder();
 		Error error = new Error();
 		try {
@@ -168,7 +168,7 @@ public class EclipseCG {
 				if (current_xml_file_path.startsWith("/")) {
 					current_xml_file_path = current_xml_file_path.substring(1);
 				}
-				EclipseConsoleHelpers.add_info_msg(current_xml_file_path + " -> Validate DTO/Model classes...OK");
+				EclipseConsoleHelpers.add_info_msg(current_xml_file_path + " -> " + Const.VALIDATE_SDM_DTO_MODELS);
 			}
 		} catch (Exception e) {
 			EclipseConsoleHelpers.add_error_msg(e.getMessage());
@@ -176,7 +176,7 @@ public class EclipseCG {
 		}
 	}
 
-	public static void validate_all_dao(IFile root_file, IFile xml_file) {
+	public static void validate_all_sdm_dao(IFile root_file, IFile xml_file) {
 		StringBuilder output_dir = new StringBuilder();
 		Error error = new Error();
 		try {
@@ -225,7 +225,7 @@ public class EclipseCG {
 				if (current_xml_file_path.startsWith("/")) {
 					current_xml_file_path = current_xml_file_path.substring(1);
 				}
-				EclipseConsoleHelpers.add_info_msg(current_xml_file_path + " -> Validate DAO classes...OK");
+				EclipseConsoleHelpers.add_info_msg(current_xml_file_path + " -> " + Const.VALIDATE_SDM_DAO);
 			}
 		} catch (Exception e) {
 			EclipseConsoleHelpers.add_error_msg(e.getMessage());
@@ -269,7 +269,7 @@ public class EclipseCG {
 				if (current_xml_file_path.startsWith("/")) {
 					current_xml_file_path = current_xml_file_path.substring(1);
 				}
-				EclipseConsoleHelpers.add_info_msg(current_xml_file_path + " -> Generate DAO class...OK");
+				EclipseConsoleHelpers.add_info_msg(current_xml_file_path + " -> " + Const.GENERATE_DAO_XML);
 			}
 		} catch (Exception e) {
 			EclipseConsoleHelpers.add_error_msg(e.getMessage());
@@ -327,7 +327,7 @@ public class EclipseCG {
 			}
 			if (!error.happend) {
 				EclipseHelpers.refresh_project(xml_file.getProject());
-				EclipseConsoleHelpers.add_info_msg(current_xml_file_path + " -> Validate DAO class...OK");
+				EclipseConsoleHelpers.add_info_msg(current_xml_file_path + " -> " + Const.VALIDATE_DAO_XML);
 			}
 		} catch (Exception e) {
 			EclipseConsoleHelpers.add_error_msg(e.getMessage());

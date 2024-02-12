@@ -1,5 +1,5 @@
 /*
-	Copyright 2011-2023 sqldalmaker@gmail.com
+	Copyright 2011-2024 sqldalmaker@gmail.com
 	Read LICENSE.txt in the root of this project/archive.
 	Project web-site: https://sqldalmaker.sourceforge.net/
 */
@@ -97,8 +97,8 @@ public class EclipseToolbarDynamicMenu extends ContributionItem {
 				menuItem.addSelectionListener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent e) {
 						editor_part.setFocus(); // to make working ${project_loc}
-						EclipseCG.generate_all_dto(root_file, input_file);
-						EclipseCG.generate_all_dao(root_file, input_file);
+						EclipseCG.generate_all_sdm_dto(root_file, input_file);
+						EclipseCG.generate_all_sdm_dao(root_file, input_file);
 					}
 				});
 			}
@@ -108,8 +108,8 @@ public class EclipseToolbarDynamicMenu extends ContributionItem {
 				menuItem.addSelectionListener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent e) {
 						editor_part.setFocus(); // to make working ${project_loc}
-						EclipseCG.validate_all_dto(root_file, input_file);
-						EclipseCG.validate_all_dao(root_file, input_file);
+						EclipseCG.validate_all_sdm_dto(root_file, input_file);
+						EclipseCG.validate_all_sdm_dao(root_file, input_file);
 					}
 				});
 			}

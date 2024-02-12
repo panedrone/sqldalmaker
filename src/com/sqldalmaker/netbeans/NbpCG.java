@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2023 sqldalmaker@gmail.com
+    Copyright 2011-2024 sqldalmaker@gmail.com
     SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -31,7 +31,7 @@ import org.openide.util.RequestProcessor;
  */
 public class NbpCG {
 
-    public static void generate_all_dto(final SdmDataObject root_data_object, final FileObject xml_file, final String xml_file_title) {
+    public static void generate_all_sdm_dto(final SdmDataObject root_data_object, final FileObject xml_file, final String xml_file_title) {
         String name_ext = xml_file.getNameExt();
         if (!FileSearchHelpers.is_sdm_xml(name_ext)) {
             return;
@@ -76,7 +76,7 @@ public class NbpCG {
                             }
                         }
                         if (!error) {
-                            ide_log.add_success_message(xml_file_title + " -> Generate DTO/Model classes...OK");
+                            ide_log.add_success_message(xml_file_title + " -> " + Const.GENERATE_SDM_DTO_MODELS);
                         }
                         //ide_log.add_debug_message("DONE");
                     } finally {
@@ -91,7 +91,7 @@ public class NbpCG {
         task.schedule(0);
     }
 
-    public static void generate_all_dao(final SdmDataObject root_data_object, final FileObject xml_file, final String xml_file_title) {
+    public static void generate_all_sdm_dao(final SdmDataObject root_data_object, final FileObject xml_file, final String xml_file_title) {
         String name_ext = xml_file.getNameExt();
         if (!FileSearchHelpers.is_sdm_xml(name_ext)) {
             return;
@@ -136,7 +136,7 @@ public class NbpCG {
                             }
                         }
                         if (!error) {
-                            ide_log.add_success_message(xml_file_title + " -> Generate DAO classes...OK");
+                            ide_log.add_success_message(xml_file_title + " -> " + Const.GENERATE_SDM_DAO);
                         }
                         //ide_log.add_debug_message("DONE");
                     } finally {
@@ -151,7 +151,7 @@ public class NbpCG {
         task.schedule(0);
     }
 
-    public static void validate_all_dto(final SdmDataObject root_data_object, final FileObject xml_file, final String xml_file_title) {
+    public static void validate_all_sdm_dto(final SdmDataObject root_data_object, final FileObject xml_file, final String xml_file_title) {
         String name_ext = xml_file.getNameExt();
         if (!FileSearchHelpers.is_sdm_xml(name_ext)) {
             return;
@@ -196,7 +196,7 @@ public class NbpCG {
                             }
                         }
                         if (!error) {
-                            ide_log.add_success_message(xml_file_title + " -> Validate DTO/Model classes...OK");
+                            ide_log.add_success_message(xml_file_title + " -> " + Const.VALIDATE_SDM_DTO_MODELS);
                         }
                     } finally {
                         conn.close();
@@ -256,7 +256,7 @@ public class NbpCG {
                             }
                         }
                         if (!error) {
-                            ide_log.add_success_message(xml_file_title + " -> Validate DAO classes...OK");
+                            ide_log.add_success_message(xml_file_title + " -> " + Const.VALIDATE_SDM_DAO);
                         }
                     } finally {
                         conn.close();
@@ -311,7 +311,7 @@ public class NbpCG {
                             ide_log.add_error_message(e);
                         }
                         if (!error) {
-                            ide_log.add_success_message(xml_file_title + " -> Generate DAO class...OK");
+                            ide_log.add_success_message(xml_file_title + " -> " + Const.GENERATE_DAO_XML);
                         }
                     } finally {
                         conn.close();
@@ -368,7 +368,7 @@ public class NbpCG {
                             ide_log.add_error_message(e);
                         }
                         if (!error) {
-                            ide_log.add_success_message(xml_file_title + " -> Validate DAO class...OK");
+                            ide_log.add_success_message(xml_file_title + " -> " + Const.VALIDATE_DAO_XML);
                         }
                     } finally {
                         conn.close();
