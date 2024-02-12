@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2023 sqldalmaker@gmail.com
+    Copyright 2011-2024 sqldalmaker@gmail.com
     SQL DAL Maker Website: http://sqldalmaker.sourceforge.net
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -175,8 +175,8 @@ public final class SdmAction extends AbstractAction implements Presenter.Toolbar
         JMenuItem item_gen = new JMenuItem(new AbstractAction(name_gen) {
             @Override
             public void actionPerformed(ActionEvent e) {
-                NbpCG.generate_all_dto(root_data_object, xml_file, xml_file_title);
-                NbpCG.generate_all_dao(root_data_object, xml_file, xml_file_title);
+                NbpCG.generate_all_sdm_dto(root_data_object, xml_file, xml_file_title);
+                NbpCG.generate_all_sdm_dao(root_data_object, xml_file, xml_file_title);
             }
         });
         item_gen.setText(name_gen);
@@ -185,7 +185,7 @@ public final class SdmAction extends AbstractAction implements Presenter.Toolbar
         JMenuItem item_val = new JMenuItem(new AbstractAction(name_val) {
             @Override
             public void actionPerformed(ActionEvent e) {
-                NbpCG.validate_all_dto(root_data_object, xml_file, xml_file_title);
+                NbpCG.validate_all_sdm_dto(root_data_object, xml_file, xml_file_title);
                 NbpCG.validate_all_sdm_dao(root_data_object, xml_file, xml_file_title);
             }
         });
