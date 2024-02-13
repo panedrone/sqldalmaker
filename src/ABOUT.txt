@@ -11,6 +11,5 @@ Quick start in mp4: https://github.com/panedrone/sqldalmaker/releases/tag/latest
 
 For Eclipse: https://marketplace.eclipse.org/content/sql-dal-maker
 For IntelliJ: https://plugins.jetbrains.com/plugin/7092
-For NetBeans: https://github.com/panedrone/sqldalmaker/releases/tag/latest
 
 Contact: sqldalmaker@gmail.com
