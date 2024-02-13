@@ -8,11 +8,10 @@ Generated code is being synchronized with the current database schema using "liv
 
 ![SQL DAL Maker](sdm_python.png)
 
-Implemented in Java. There are plug-ins for [Eclipse IDE](http://marketplace.eclipse.org/content/sql-dal-maker),
-[IntelliJ-Platform](http://plugins.jetbrains.com/plugin/7092),
-and [NetBeans 11+](https://github.com/panedrone/sqldalmaker/releases/tag/latest).
+Implemented in Java. There are the plug-ins for [Eclipse IDE](http://marketplace.eclipse.org/content/sql-dal-maker) and
+[IntelliJ-Platform](http://plugins.jetbrains.com/plugin/7092).
 
-Project Website/Docs: [https://sqldalmaker.sourceforge.net](https://sqldalmaker.sourceforge.net/)
+Project website/docs: [https://sqldalmaker.sourceforge.net](https://sqldalmaker.sourceforge.net/)
 
 Quick Start in
 mp4: [https://github.com/panedrone/sqldalmaker/releases/tag/latest](https://github.com/panedrone/sqldalmaker/releases/tag/latest)
