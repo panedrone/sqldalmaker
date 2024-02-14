@@ -431,12 +431,13 @@ public class IdeaCG {
             String dao_xml_abs_path = xml_file.getPath();
             Path path = Paths.get(dao_xml_abs_path);
             String dao_xml_file_name = path.getFileName().toString();
-            String dao_class_name = Helpers.get_dao_class_name(dao_xml_file_name);
             Connection con = IdeaHelpers.get_connection(project, settings);
             try {
                 IDaoCG gen = IdeaTargetLanguageHelpers.create_dao_cg(con, project, root_file, settings, output_dir);
                 try {
                     DaoClass dao_class = xml_parser.unmarshal(dao_xml_abs_path);
+                    String dao_class_name = Helpers.get_dao_class_name(dao_xml_file_name);
+                    dao_class.setName(dao_class_name);
                     String status = validate_single_sdm_dao(project, root_file, gen, dao_class, settings);
                     if (status.isEmpty()) {
                         IdeaMessageHelpers.add_info_to_ide_log(dao_xml_file_name, Const.VALIDATE_DAO_XML);
