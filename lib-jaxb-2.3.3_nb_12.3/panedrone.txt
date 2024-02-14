@@ -1,0 +1,21 @@
+DynamicImport-Package: org.glassfish.hk2.osgiresourcelocator
+
+Import-Package: 
+javax.activation,
+javax.xml.bind;version="[2.3,3)",
+javax.xml.bind.annotation;version="[2.3,3)",
+javax.xml.bind.annotation.adapters;version="[2.3,3)",
+javax.xml.bind.attachment;version="[2.3,3)",
+javax.xml.datatype,
+javax.xml.namespace,
+javax.xml.parsers,
+javax.xml.stream,
+javax.xml.transform,
+javax.xml.transform.dom,
+javax.xml.transform.sax,
+javax.xml.transform.stream,
+javax.xml.validation,
+org.w3c.dom,
+org.xml.sax,
+org.xml.sax.ext,
+org.xml.sax.helpers

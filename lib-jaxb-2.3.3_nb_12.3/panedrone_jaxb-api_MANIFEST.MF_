@@ -1,0 +1,40 @@
+Manifest-Version: 1.0
+Created-By: Apache Maven Bundle Plugin
+Build-Jdk-Spec: 11
+Build-Jdk: 11.0.4
+Bundle-Description: Jakarta XML Binding API 2.3 Design Specification
+Bundle-DocURL: https://www.eclipse.org
+Bundle-License: http://www.eclipse.org/org/documents/edl-v10.php
+Bundle-ManifestVersion: 2
+Bundle-Name: Jakarta XML Binding API
+Bundle-SymbolicName: jakarta.xml.bind-api
+Bundle-Vendor: Eclipse Foundation
+Bundle-Version: 2.3.3
+DynamicImport-Package: org.glassfish.hk2.osgiresourcelocator
+Export-Package: javax.xml.bind;version="2.3.3";uses:="javax.xml.bind.ann
+ otation.adapters,javax.xml.bind.attachment,javax.xml.namespace,javax.xm
+ l.stream,javax.xml.transform,javax.xml.validation,org.w3c.dom,org.xml.s
+ ax",javax.xml.bind.annotation;version="2.3.3";uses:="javax.xml.bind,jav
+ ax.xml.parsers,javax.xml.transform,javax.xml.transform.dom,org.w3c.dom"
+ ,javax.xml.bind.annotation.adapters;version="2.3.3",javax.xml.bind.atta
+ chment;version="2.3.3";uses:="javax.activation",javax.xml.bind.helpers;
+ version="2.3.3";uses:="javax.xml.bind,javax.xml.bind.annotation.adapter
+ s,javax.xml.bind.attachment,javax.xml.stream,javax.xml.transform,javax.
+ xml.validation,org.w3c.dom,org.xml.sax",javax.xml.bind.util;version="2.
+ 3.3";uses:="javax.xml.bind,javax.xml.transform.sax"
+Extension-Name: jakarta.xml.bind
+Implementation-Build-Id: 2.3.3-RELEASE-fd06b2b
+Implementation-Version: 2.3.3
+Import-Package: javax.activation,javax.xml.bind;version="[2.3,3)",javax.
+ xml.bind.annotation;version="[2.3,3)",javax.xml.bind.annotation.adapter
+ s;version="[2.3,3)",javax.xml.bind.attachment;version="[2.3,3)",javax.x
+ ml.datatype,javax.xml.namespace,javax.xml.parsers,javax.xml.stream,java
+ x.xml.transform,javax.xml.transform.dom,javax.xml.transform.sax,javax.x
+ ml.transform.stream,javax.xml.validation,org.w3c.dom,org.xml.sax,org.xm
+ l.sax.ext,org.xml.sax.helpers
+Multi-Release: true
+Require-Capability: osgi.ee;filter:="(&(osgi.ee=JavaSE)(version=1.8))"
+Specification-Vendor: Eclipse Foundation
+Specification-Version: 2.3
+Tool: Bnd-4.2.0.201903051501
+
