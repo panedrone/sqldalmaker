@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2023 sqldalmaker@gmail.com
+    Copyright 2011-2024 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -17,7 +17,7 @@ import com.intellij.psi.filters.TagNameFilter;
 import com.intellij.psi.filters.position.ParentElementFilter;
 import com.intellij.psi.xml.XmlAttributeValue;
 import com.intellij.xml.util.XmlUtil;
-import com.sqldalmaker.common.FileSearchHelpers;
+import com.sqldalmaker.cg.Helpers;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -49,7 +49,7 @@ public class PsiReferenceContributorCommon extends PsiReferenceContributor {
                 return false;
             }
             String name = vf.getName();
-            return FileSearchHelpers.is_sdm_xml(name);
+            return Helpers.is_sdm_xml(name);
         }
 
         @Override
@@ -74,7 +74,7 @@ public class PsiReferenceContributorCommon extends PsiReferenceContributor {
                 return false;
             }
             String name = vf.getName();
-            boolean res = FileSearchHelpers.is_sdm_xml(name) || FileSearchHelpers.is_dao_xml(name);
+            boolean res = Helpers.is_sdm_xml(name) || Helpers.is_dao_xml(name);
             return res;
         }
 
@@ -86,38 +86,50 @@ public class PsiReferenceContributorCommon extends PsiReferenceContributor {
 
     public void registerReferenceProviders(@NotNull final PsiReferenceRegistrar registrar) {
         // based on com.intellij.xml.util.XmlReferenceContributor
-        PsiReferenceDtoClassProvider ref_provider_dto_class = new PsiReferenceDtoClassProvider();
-        XmlUtil.registerXmlAttributeValueReferenceProvider(registrar, new String[]{"name"}, new ScopeFilter(
-                new AndFilter(
-                        new SdmXmlDocElementFilter(),
-                        new ParentElementFilter(new TagNameFilter(IdeaReferenceCompletion.ELEMENT.DTO_CLASS), 2)
-                )
-        ), true, ref_provider_dto_class);
-        XmlUtil.registerXmlAttributeValueReferenceProvider(registrar, new String[]{"name"}, new ScopeFilter(
-                new AndFilter(
-                        new SdmXmlDocElementFilter(),
-                        new ParentElementFilter(new TagNameFilter(IdeaReferenceCompletion.ELEMENT.DAO_CLASS), 2)
-                )
-        ), true, ref_provider_dto_class);
-        XmlUtil.registerXmlAttributeValueReferenceProvider(registrar, new String[]{"dto"}, new ScopeFilter(
-                new AndFilter(
-                        new DaoXmlDocElementFilter(),
-                        new ParentElementFilter(new TagNameFilter(IdeaReferenceCompletion.DAO_TAGS_USING_DTO), 2)
-                )
-        ), true, ref_provider_dto_class);
-        /////////////////////////////////////////////////////////
-        PsiReferenceSqlProvider ref_provider_sql_file = new PsiReferenceSqlProvider();
-        XmlUtil.registerXmlAttributeValueReferenceProvider(registrar, new String[]{"ref"}, new ScopeFilter(
-                new AndFilter(
-                        new SdmXmlDocElementFilter(),
-                        new ParentElementFilter(new TagNameFilter(IdeaReferenceCompletion.ELEMENT.DTO_CLASS), 2)
-                )
-        ), true, ref_provider_sql_file);
-        XmlUtil.registerXmlAttributeValueReferenceProvider(registrar, new String[]{"ref"}, new ScopeFilter(
-                new AndFilter(
-                        new DaoXmlDocElementFilter(),
-                        new ParentElementFilter(new TagNameFilter(IdeaReferenceCompletion.DAO_TAGS_USING_REF), 2)
-                )
-        ), true, ref_provider_sql_file);
+        {
+            PsiReferenceDtoClassProvider ref_provider_dto_class = new PsiReferenceDtoClassProvider();
+            XmlUtil.registerXmlAttributeValueReferenceProvider(registrar, new String[]{"name"}, new ScopeFilter(
+                    new AndFilter(
+                            new SdmXmlDocElementFilter(),
+                            new ParentElementFilter(new TagNameFilter(IdeaRefUtils.ELEMENT.DTO_CLASS), 2)
+                    )
+            ), true, ref_provider_dto_class);
+            XmlUtil.registerXmlAttributeValueReferenceProvider(registrar, new String[]{"name"}, new ScopeFilter(
+                    new AndFilter(
+                            new SdmXmlDocElementFilter(),
+                            new ParentElementFilter(new TagNameFilter(IdeaRefUtils.ELEMENT.DAO_CLASS), 2)
+                    )
+            ), true, ref_provider_dto_class);
+            XmlUtil.registerXmlAttributeValueReferenceProvider(registrar, new String[]{"dto"}, new ScopeFilter(
+                    new AndFilter(
+                            new DaoXmlDocElementFilter(),
+                            new ParentElementFilter(new TagNameFilter(IdeaRefUtils.DAO_TAGS_USING_DTO), 2)
+                    )
+            ), true, ref_provider_dto_class);
+        }
+        {
+            PsiReferenceSqlProvider ref_provider_sql_file = new PsiReferenceSqlProvider();
+            XmlUtil.registerXmlAttributeValueReferenceProvider(registrar, new String[]{"ref"}, new ScopeFilter(
+                    new AndFilter(
+                            new SdmXmlDocElementFilter(),
+                            new ParentElementFilter(new TagNameFilter(IdeaRefUtils.ELEMENT.DTO_CLASS), 2)
+                    )
+            ), true, ref_provider_sql_file);
+            XmlUtil.registerXmlAttributeValueReferenceProvider(registrar, new String[]{"ref"}, new ScopeFilter(
+                    new AndFilter(
+                            new DaoXmlDocElementFilter(),
+                            new ParentElementFilter(new TagNameFilter(IdeaRefUtils.DAO_TAGS_USING_REF), 2)
+                    )
+            ), true, ref_provider_sql_file);
+        }
+        {
+            PsiReferenceExternalDaoXmllProvider ref_provider_external_dao_xml_file = new PsiReferenceExternalDaoXmllProvider();
+            XmlUtil.registerXmlAttributeValueReferenceProvider(registrar, new String[]{"ref"}, new ScopeFilter(
+                    new AndFilter(
+                            new SdmXmlDocElementFilter(),
+                            new ParentElementFilter(new TagNameFilter(IdeaRefUtils.ELEMENT.DAO_CLASS), 2)
+                    )
+            ), true, ref_provider_external_dao_xml_file);
+        }
     }
 }

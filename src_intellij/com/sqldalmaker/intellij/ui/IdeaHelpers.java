@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2023 sqldalmaker@gmail.com
+    Copyright 2011-2024 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -21,7 +21,8 @@ import com.sqldalmaker.cg.Helpers;
 import com.sqldalmaker.common.Const;
 import com.sqldalmaker.common.InternalException;
 import com.sqldalmaker.common.SdmUtils;
-import com.sqldalmaker.intellij.references.IdeaReferenceCompletion;
+import com.sqldalmaker.intellij.references.IdeaRefUtils;
+import com.sqldalmaker.jaxb.sdm.DaoClass;
 import com.sqldalmaker.jaxb.settings.Settings;
 import org.jetbrains.annotations.NotNull;
 
@@ -367,7 +368,7 @@ public class IdeaHelpers {
     private static void navigate_to_source(Project project, PsiElement psi_element) {
         PsiFile containing_file = psi_element.getContainingFile();
         // VirtualFile virtual_file = containingFile.find_virtual_file();
-        VirtualFile virtual_file = IdeaReferenceCompletion.find_virtual_file(containing_file);
+        VirtualFile virtual_file = IdeaRefUtils.find_virtual_file(containing_file);
         if (virtual_file != null) {
             FileEditorManager manager = FileEditorManager.getInstance(project);
             FileEditor[] file_editors = manager.openFile(virtual_file, true);
@@ -382,7 +383,11 @@ public class IdeaHelpers {
         }
     }
 
-    public static void navigate_to_dto_class_declaration(Project project, VirtualFile root_file, String dto_class_name) throws Exception {
+    public static void navigate_to_dto_class_declaration(
+            Project project,
+            VirtualFile root_file,
+            String dto_class_name) throws Exception {
+
         VirtualFile xml_file_dir = root_file.getParent();
         if (xml_file_dir == null) {
             throw new Exception("Cannot get parent folder for " + root_file.getName());
@@ -391,14 +396,18 @@ public class IdeaHelpers {
         if (sdm_xml_file == null) {
             throw new Exception(Const.SDM_XML + " not found");
         }
-        PsiElement psi_element = IdeaReferenceCompletion.find_dto_class_xml_tag(project, sdm_xml_file, dto_class_name);
+        PsiElement psi_element = IdeaRefUtils.find_dto_class_xml_tag(project, sdm_xml_file, dto_class_name);
         if (psi_element == null) {
             throw new Exception(dto_class_name + ": declaration not found");
         }
         navigate_to_source(project, psi_element);
     }
 
-    public static boolean navigate_to_dao_class_declaration(Project project, VirtualFile root_file, String dao_class_name) {
+    public static boolean navigate_to_dao_class_declaration(
+            Project project,
+            VirtualFile root_file,
+            String dao_class_name) {
+
         VirtualFile xml_file_dir = root_file.getParent();
         if (xml_file_dir == null) {
             return false;
@@ -407,11 +416,35 @@ public class IdeaHelpers {
         if (sdm_xml_file == null) {
             return false;
         }
-        PsiElement psi_element = IdeaReferenceCompletion.find_dao_class_xml_tag(project, sdm_xml_file, dao_class_name);
+        PsiElement psi_element = IdeaRefUtils.find_dao_class_xml_tag(project, sdm_xml_file, dao_class_name);
         if (psi_element == null) {
             return false;
         }
         navigate_to_source(project, psi_element);
         return true;
+    }
+
+    public static List<DaoClass> load_all_sdm_dao_classes(VirtualFile root_file) throws Exception {
+        String sdm_folder_abs_path = root_file.getParent().getPath();
+        String sdm_xml_abs_path = Helpers.concat_path(sdm_folder_abs_path, Const.SDM_XML);
+        String sdm_xsd_abs_path = Helpers.concat_path(sdm_folder_abs_path, Const.SDM_XSD);
+        List<DaoClass> jaxb_dao_classes = SdmUtils.get_dao_classes(sdm_xml_abs_path, sdm_xsd_abs_path);
+        return jaxb_dao_classes;
+    }
+
+    public static void enum_root_files(Project project, VirtualFile current_folder, List<VirtualFile> root_files) {
+        @SuppressWarnings("UnsafeVfsRecursion") VirtualFile[] children = current_folder.getChildren();
+        for (VirtualFile c : children) {
+            if (c.isDirectory()) {
+                if (!c.getName().equals("bin")) {
+                    enum_root_files(project, c, root_files);
+                }
+            } else {
+                String path = IdeaTargetLanguageHelpers.get_root_file_relative_path(project, c);
+                if (path != null) {
+                    root_files.add(c);
+                }
+            }
+        }
     }
 }

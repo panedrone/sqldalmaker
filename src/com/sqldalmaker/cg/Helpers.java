@@ -5,6 +5,7 @@
  */
 package com.sqldalmaker.cg;
 
+import com.sqldalmaker.common.Const;
 import com.sqldalmaker.jaxb.settings.Settings;
 
 import java.io.*;
@@ -519,5 +520,42 @@ public class Helpers {
         old_text = old_text.replace("\r", "\n").replace("\n\n", "\n");
         text = text.replace("\r", "\n").replace("\n\n", "\n");
         return old_text.equals(text);
+    }
+
+    public static boolean is_sdm_xml(String name) {
+        return name != null && name.equals(Const.SDM_XML);
+    }
+
+    public static boolean is_dao_xml(String name) {
+        if (name == null) {
+            return false;
+        }
+        if (is_sdm_xml(name)) {
+            return false;
+        }
+        if (is_setting_xml(name)) {
+            return false;
+        }
+        return name.endsWith(".xml");
+    }
+
+    public static boolean is_setting_xml(String name) {
+        return Const.SETTINGS_XML.equals(name);
+    }
+
+    public interface IFileList {
+        void add(String fileName);
+    }
+
+    public static void enum_dao_xml_file_names(String sdm_xml_folder_abs_path, IFileList file_list) {
+        File dir = new File(sdm_xml_folder_abs_path);
+        String[] children = dir.list();
+        if (children != null) {
+            for (String fileName : children) {
+                if (Helpers.is_dao_xml(fileName)) {
+                    file_list.add(fileName);
+                }
+            }
+        }
     }
 }

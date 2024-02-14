@@ -40,7 +40,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
 import com.sqldalmaker.common.Const;
-import com.sqldalmaker.common.FileSearchHelpers;
 import com.sqldalmaker.common.SdmUtils;
 import com.sqldalmaker.jaxb.settings.Settings;
 

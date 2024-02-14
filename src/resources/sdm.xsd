@@ -44,6 +44,7 @@
             <xs:complexContent>
                 <xs:extension base="dao-node">
                     <xs:attribute name="name" use="required" type="xs:NCName"/>
+                    <xs:attribute name="ref" use="optional" type="xs:string"/>
                 </xs:extension>
             </xs:complexContent>
         </xs:complexType>

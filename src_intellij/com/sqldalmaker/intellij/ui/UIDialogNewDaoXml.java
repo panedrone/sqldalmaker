@@ -8,6 +8,7 @@ package com.sqldalmaker.intellij.ui;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.sqldalmaker.cg.Helpers;
 import com.sqldalmaker.common.Const;
 import com.sqldalmaker.common.InternalException;
 
@@ -98,21 +99,25 @@ public class UIDialogNewDaoXml extends JDialog {
         ApplicationManager.getApplication().runWriteAction(new Runnable() {
             @Override
             public void run() {
-
                 try {
                     VirtualFile dir = propFile.getParent();
-                    String name = textField1.getText();
-                    VirtualFile f = dir.findChild(name);
+                    String dao_xml_file_name = textField1.getText();
+                    VirtualFile f = dir.findChild(dao_xml_file_name);
                     if (f != null) {
-                        throw new InternalException("The file already exists: " + name);
+                        throw new InternalException("Already exists: " + dao_xml_file_name);
                     }
-                    f = dir.createChildData(null, name);
+                    f = dir.createChildData(null, dao_xml_file_name);
                     String xml = IdeaHelpers.read_from_jar_resources(Const.EMPTY_DAO_XML);
                     f.setBinaryContent(xml.getBytes());
                     IdeaHelpers.start_write_action_from_ui_thread_and_refresh_folder_sync(dir);
                     IdeaEditorHelpers.open_local_file_in_editor_sync(project, f);
                     success = true;
                     dispose();
+
+                    String dao_class_name = Helpers.get_dao_class_name(dao_xml_file_name);
+                    IdeaMessageHelpers.show_info_in_ui_thread(String.format("Now you need to register it in \"sdm.xml\":\r\n" +
+                            "≤dao-class name=\"%s\" ref=\"%s\"/>", dao_class_name, dao_xml_file_name));
+
                 } catch (Exception e) {
                     // e.printStackTrace();
                     IdeaMessageHelpers.show_error_in_ui_thread(e);

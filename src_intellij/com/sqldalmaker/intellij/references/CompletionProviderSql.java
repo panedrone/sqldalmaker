@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2023 sqldalmaker@gmail.com
+    Copyright 2011-2024 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -36,7 +36,10 @@ import java.util.List;
 public class CompletionProviderSql extends CompletionProvider<CompletionParameters> {
 
     @Override
-    protected void addCompletions(@NotNull CompletionParameters parameters, @NotNull ProcessingContext context, @NotNull CompletionResultSet result) {
+    protected void addCompletions(
+            @NotNull CompletionParameters parameters,
+            @NotNull ProcessingContext context,
+            @NotNull CompletionResultSet result) {
 
         XmlAttributeValue attribute_value = PsiTreeUtil.getParentOfType(parameters.getPosition(), XmlAttributeValue.class, false);
         if (attribute_value == null) {
@@ -50,7 +53,7 @@ public class CompletionProviderSql extends CompletionProvider<CompletionParamete
         if (containing_file == null) {
             return;
         }
-        VirtualFile this_xml_file = IdeaReferenceCompletion.find_virtual_file(containing_file);
+        VirtualFile this_xml_file = IdeaRefUtils.find_virtual_file(containing_file);
         if (this_xml_file == null) {
             return;
         }
@@ -93,7 +96,6 @@ public class CompletionProviderSql extends CompletionProvider<CompletionParamete
 
     @SuppressWarnings("rawtypes")
     private void find_sql_files_recursive(VirtualFile base_dir, final List<String> res) {
-
         VfsUtilCore.visitChildrenRecursively(base_dir, new VirtualFileVisitor() {
             @Override
             public boolean visitFile(@NotNull VirtualFile file) {

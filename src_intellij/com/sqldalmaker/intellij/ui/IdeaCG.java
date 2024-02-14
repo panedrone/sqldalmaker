@@ -26,7 +26,7 @@ public class IdeaCG {
 
     public static void generate_all_sdm_dto(Project project, VirtualFile xml_file) {
         String name = xml_file.getName();
-        if (!FileSearchHelpers.is_sdm_xml(name)) {
+        if (!Helpers.is_sdm_xml(name)) {
             return;
         }
         VirtualFile xml_file_dir = xml_file.getParent();
@@ -97,7 +97,7 @@ public class IdeaCG {
 
     public static void generate_all_sdm_dao(Project project, VirtualFile xml_file) {
         String name = xml_file.getName();
-        if (!FileSearchHelpers.is_sdm_xml(name)) {
+        if (!Helpers.is_sdm_xml(name)) {
             return;
         }
         VirtualFile xml_file_dir = xml_file.getParent();
@@ -134,7 +134,7 @@ public class IdeaCG {
                             List<DaoClass> dao_classes = SdmUtils.get_dao_classes(sdm_xml_abs_path, sdm_xsd_abs_path);
                             for (DaoClass cls : dao_classes) {
                                 ProgressManager.progress(cls.getName());
-                                String[] file_content = gen.translate(cls.getName(), cls);
+                                String[] file_content = generate_single_sdm_dao(project, root_file, gen, cls, settings);
                                 IdeaTargetLanguageHelpers.prepare_generated_file_data(root_file, cls.getName(), file_content, list);
                             }
                         } catch (Throwable e) {
@@ -168,7 +168,7 @@ public class IdeaCG {
 
     public static void validate_all_sdm_dto(Project project, VirtualFile xml_file) {
         String name = xml_file.getName();
-        if (!FileSearchHelpers.is_sdm_xml(name)) {
+        if (!Helpers.is_sdm_xml(name)) {
             return;
         }
         VirtualFile xml_file_dir = xml_file.getParent();
@@ -231,9 +231,9 @@ public class IdeaCG {
         ProgressManager.getInstance().runProcessWithProgressSynchronously(runnable, "DTO/Models", false, project);
     }
 
-    public static void validate_all_sdm_dao(Project project, VirtualFile xml_file) {
+    public static void validate_all_sdm_dao_action(Project project, VirtualFile xml_file) {
         String name = xml_file.getName();
-        if (!FileSearchHelpers.is_sdm_xml(name)) {
+        if (!Helpers.is_sdm_xml(name)) {
             return;
         }
         VirtualFile xml_file_dir = xml_file.getParent();
@@ -266,10 +266,7 @@ public class IdeaCG {
                         for (DaoClass cls : dao_classes) {
                             try {
                                 ProgressManager.progress(cls.getName());
-                                String[] file_content = gen.translate(cls.getName(), cls);
-                                StringBuilder validationBuff = new StringBuilder();
-                                IdeaTargetLanguageHelpers.validate_dao(project, root_file, settings, cls.getName(), file_content, validationBuff);
-                                String status = validationBuff.toString();
+                                String status = validate_single_sdm_dao(project, root_file, gen, cls, settings);
                                 if (!status.isEmpty()) {
                                     error = true;
                                     IdeaMessageHelpers.add_error_to_ide_log("ERROR", " DAO class '" + cls.getName() + "'. " + status);
@@ -298,7 +295,7 @@ public class IdeaCG {
 
     public static void generate_dao(Project project, VirtualFile dao_xml_file) {
         String name = dao_xml_file.getName();
-        if (!FileSearchHelpers.is_dao_xml(name)) {
+        if (!Helpers.is_dao_xml(name)) {
             return;
         }
         VirtualFile xml_file_dir = dao_xml_file.getParent();
@@ -358,9 +355,58 @@ public class IdeaCG {
         }
     }
 
-    public static void validate_dao(Project project, VirtualFile xml_file) {
+    public static String[] generate_single_sdm_dao(
+            Project project,
+            VirtualFile root_file,
+            IDaoCG gen,
+            DaoClass sdm_dao_class,
+            Settings settings) throws Exception {
+
+        String dao_class_name = sdm_dao_class.getName();
+        String[] file_content;
+        String ref = sdm_dao_class.getRef();
+        if (ref == null || ref.trim().isEmpty()) { // nullable
+            file_content = gen.translate(dao_class_name, sdm_dao_class);
+        } else {
+            DaoClass external_dao_class = load_external_dao_class(root_file, sdm_dao_class);
+            file_content = gen.translate(dao_class_name, external_dao_class);
+        }
+        return file_content;
+    }
+
+    public static String validate_single_sdm_dao(
+            Project project,
+            VirtualFile root_file,
+            IDaoCG gen,
+            DaoClass sdm_dao_class,
+            Settings settings) throws Exception {
+
+        StringBuilder validation_buff = new StringBuilder();
+        String dao_class_name = sdm_dao_class.getName();
+        String[] file_content;
+        String ref = sdm_dao_class.getRef();
+        if (ref == null || ref.trim().isEmpty()) { // nullable
+            file_content = gen.translate(dao_class_name, sdm_dao_class);
+        } else {
+            DaoClass external_dao_class = load_external_dao_class(root_file, sdm_dao_class);
+            file_content = gen.translate(dao_class_name, external_dao_class);
+        }
+        IdeaTargetLanguageHelpers.validate_dao(project, root_file, settings, dao_class_name, file_content, validation_buff);
+        return validation_buff.toString();
+    }
+
+    private static DaoClass load_external_dao_class(VirtualFile root_file, DaoClass sdm_dao_class) throws Exception {
+        String local_abs_path = root_file.getParent().getPath();
+        String dao_xml_rel_path = sdm_dao_class.getRef();
+        String dao_xml_abs_path = Helpers.concat_path(local_abs_path, dao_xml_rel_path);
+        String contextPath = DaoClass.class.getPackage().getName();
+        XmlParser xml_parser = new XmlParser(contextPath, Helpers.concat_path(local_abs_path, Const.DAO_XSD));
+        return xml_parser.unmarshal(dao_xml_abs_path);
+    }
+
+    public static void validate_external_dao_xml_action(Project project, VirtualFile xml_file) {
         String name = xml_file.getName();
-        if (!FileSearchHelpers.is_dao_xml(name)) {
+        if (!Helpers.is_dao_xml(name)) {
             return;
         }
         VirtualFile xml_file_dir = xml_file.getParent();
@@ -391,10 +437,7 @@ public class IdeaCG {
                 IDaoCG gen = IdeaTargetLanguageHelpers.create_dao_cg(con, project, root_file, settings, output_dir);
                 try {
                     DaoClass dao_class = xml_parser.unmarshal(dao_xml_abs_path);
-                    String[] file_content = gen.translate(dao_class_name, dao_class);
-                    StringBuilder validationBuff = new StringBuilder();
-                    IdeaTargetLanguageHelpers.validate_dao(project, root_file, settings, dao_class_name, file_content, validationBuff);
-                    String status = validationBuff.toString();
+                    String status = validate_single_sdm_dao(project, root_file, gen, dao_class, settings);
                     if (status.isEmpty()) {
                         IdeaMessageHelpers.add_info_to_ide_log(dao_xml_file_name, Const.VALIDATE_DAO_XML);
                     } else {

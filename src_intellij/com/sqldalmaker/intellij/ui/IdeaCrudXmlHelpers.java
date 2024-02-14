@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2023 sqldalmaker@gmail.com
+    Copyright 2011-2024 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -17,6 +17,7 @@ import com.sqldalmaker.jaxb.settings.Settings;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -77,16 +78,13 @@ public class IdeaCrudXmlHelpers {
         return res;
     }
 
-    private static ArrayList<String> fill_dao_file_path_list(VirtualFile root_file) {
+    private static ArrayList<String> fill_dao_file_path_list(VirtualFile root_file) throws Exception {
         final ArrayList<String> res = new ArrayList<String>();
-        FileSearchHelpers.IFileList file_list = new FileSearchHelpers.IFileList() {
-            @Override
-            public void add(String file_path) {
-                res.add(file_path);
-            }
-        };
-        String xml_configs_folder_full_path = root_file.getParent().getPath();
-        FileSearchHelpers.enum_dao_xml_file_names(xml_configs_folder_full_path, file_list);
+        List<DaoClass> jaxb_dao_classes = IdeaHelpers.load_all_sdm_dao_classes(root_file);
+        // if (!jaxb_dao_classes.isEmpty()) {
+        for (DaoClass cls : jaxb_dao_classes) {
+            res.add(cls.getName());
+        }
         return res;
     }
 

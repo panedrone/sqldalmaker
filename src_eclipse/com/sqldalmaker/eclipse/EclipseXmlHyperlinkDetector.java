@@ -17,7 +17,6 @@ import org.eclipse.jface.text.hyperlink.IHyperlink;
 
 import com.sqldalmaker.cg.Helpers;
 import com.sqldalmaker.common.Const;
-import com.sqldalmaker.common.FileSearchHelpers;
 import com.sqldalmaker.common.SdmUtils;
 import com.sqldalmaker.jaxb.settings.Settings;
 

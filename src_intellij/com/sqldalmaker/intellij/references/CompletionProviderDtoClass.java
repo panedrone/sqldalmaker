@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2023 sqldalmaker@gmail.com
+    Copyright 2011-2024 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -46,7 +46,7 @@ public class CompletionProviderDtoClass extends CompletionProvider<CompletionPar
         if (containing_file == null) {
             return;
         }
-        VirtualFile this_xml_file = IdeaReferenceCompletion.find_virtual_file(containing_file);
+        VirtualFile this_xml_file = IdeaRefUtils.find_virtual_file(containing_file);
         if (this_xml_file == null) {
             return;
         }
@@ -87,8 +87,8 @@ public class CompletionProviderDtoClass extends CompletionProvider<CompletionPar
         for (PsiElement el : tags) {
             if (el instanceof XmlTag) {
                 XmlTag t = (XmlTag) el;
-                if (IdeaReferenceCompletion.ELEMENT.DTO_CLASS.equals(t.getName())) {
-                    XmlAttribute a = t.getAttribute(IdeaReferenceCompletion.ATTRIBUTE.NAME);
+                if (IdeaRefUtils.ELEMENT.DTO_CLASS.equals(t.getName())) {
+                    XmlAttribute a = t.getAttribute(IdeaRefUtils.ATTRIBUTE.NAME);
                     if (a != null) {
                         String v = a.getValue();
                         if (v != null && !v.isEmpty()) {

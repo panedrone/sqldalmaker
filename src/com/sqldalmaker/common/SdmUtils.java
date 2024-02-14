@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2023 sqldalmaker@gmail.com
+    Copyright 2011-2024 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -18,15 +18,28 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
-/**
+/*
  * @author sqldalmaker@gmail.com
+ *
+ * 17.12.2023 02:16 1.292 sdm.xml
+ * 19.01.2023 20:57 1.276
+ * 16.11.2022 08:02 1.269
+ * 06.08.2022 08:37 1.261 no 'crud-auto' anymore, just empty 'crud' instead
+ * 22.05.2022 20:02 1.244 PHP
+ * 23.04.2022 12:00 1.225 Flask-SQLAlchemy
+ * 17.05.2021 11:28
+ * 01.05.2021 22:33
+ *
  */
 public class SdmUtils {
 
     /*
         Used in XML assistants
      */
-    public static Set<String> find_dto_used_in_dao_xml_crud(String sdm_folder_abs_path, List<String> dao_xml_file_name_list) throws Exception {
+    public static Set<String> find_dto_used_in_dao_xml_crud(
+            String sdm_folder_abs_path,
+            List<String> dao_xml_file_name_list) throws Exception {
+
         String context_path = DaoClass.class.getPackage().getName();
         XmlParser xml_parser = new XmlParser(context_path, Helpers.concat_path(sdm_folder_abs_path, Const.DAO_XSD));
         Set<String> res = new HashSet<String>();
@@ -38,7 +51,10 @@ public class SdmUtils {
         return res;
     }
 
-    private static Set<String> find_dto_used_in_dao_xml_crud(XmlParser xml_parser, String xml_file_abs_path) throws Exception {
+    private static Set<String> find_dto_used_in_dao_xml_crud(
+            XmlParser xml_parser,
+            String xml_file_abs_path) throws Exception {
+
         Set<String> res = new HashSet<String>();
         DaoClass dao_class = xml_parser.unmarshal(xml_file_abs_path);
         List<Object> tags = dao_class.getCrudOrQueryOrQueryList();

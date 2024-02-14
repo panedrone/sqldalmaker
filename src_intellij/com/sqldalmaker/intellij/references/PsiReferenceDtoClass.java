@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2023 sqldalmaker@gmail.com
+    Copyright 2011-2024 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -11,8 +11,8 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiReferenceBase;
 import com.intellij.util.ArrayUtil;
+import com.sqldalmaker.cg.Helpers;
 import com.sqldalmaker.common.Const;
-import com.sqldalmaker.common.FileSearchHelpers;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -41,7 +41,7 @@ public class PsiReferenceDtoClass extends PsiReferenceBase<PsiElement> {
         if (containing_file == null) {
             return null;
         }
-        VirtualFile this_xml_file = IdeaReferenceCompletion.find_virtual_file(containing_file);
+        VirtualFile this_xml_file = IdeaRefUtils.find_virtual_file(containing_file);
         if (this_xml_file == null) {
             return null;
         }
@@ -55,20 +55,20 @@ public class PsiReferenceDtoClass extends PsiReferenceBase<PsiElement> {
         }
         Project project = containing_file.getProject(); // @NotNull
         String this_file_name = containing_file.getName();
-        if (FileSearchHelpers.is_dao_xml(this_file_name)) {
-            return IdeaReferenceCompletion.find_dto_class_xml_tag(project, sdm_xml_file, canonical_text);
-        } else if (FileSearchHelpers.is_sdm_xml(this_file_name)) {
+        if (Helpers.is_dao_xml(this_file_name)) {
+            return IdeaRefUtils.find_dto_class_xml_tag(project, sdm_xml_file, canonical_text);
+        } else if (Helpers.is_sdm_xml(this_file_name)) {
             PsiElement parent = myElement.getParent();
-            if (parent.getText().startsWith(IdeaReferenceCompletion.ATTRIBUTE.DTO)) {
-                return IdeaReferenceCompletion.find_dto_class_xml_tag(project, sdm_xml_file, canonical_text);
+            if (parent.getText().startsWith(IdeaRefUtils.ATTRIBUTE.DTO)) {
+                return IdeaRefUtils.find_dto_class_xml_tag(project, sdm_xml_file, canonical_text);
             }
             String tag = parent.getParent().getText().replace("<", "").trim();
-            if (tag.startsWith(IdeaReferenceCompletion.ELEMENT.DAO_CLASS)) {
+            if (tag.startsWith(IdeaRefUtils.ELEMENT.DAO_CLASS)) {
                 String dao_class_name = canonical_text;
-                return IdeaReferenceCompletion.find_dao_class_target_file(project, sdm_xml_file, dao_class_name);
+                return IdeaRefUtils.find_dao_class_target_file(project, sdm_xml_file, dao_class_name);
             }
             String dto_class_name = canonical_text;
-            return IdeaReferenceCompletion.find_dto_class_target_file(project, sdm_xml_file, dto_class_name);
+            return IdeaRefUtils.find_dto_class_target_file(project, sdm_xml_file, dto_class_name);
 
         }
         return null;
@@ -83,7 +83,7 @@ public class PsiReferenceDtoClass extends PsiReferenceBase<PsiElement> {
     @Override
     public boolean isSoft() {
         PsiElement parent = myElement.getParent();
-        if (parent.getText().startsWith(IdeaReferenceCompletion.ATTRIBUTE.DTO)) {
+        if (parent.getText().startsWith(IdeaRefUtils.ATTRIBUTE.DTO)) {
             return false;
         }
         // defaults: if 'false' then wrong class name is highlighted in red
@@ -92,7 +92,7 @@ public class PsiReferenceDtoClass extends PsiReferenceBase<PsiElement> {
             return true;
         }
         String name = containing_file.getName();
-        return FileSearchHelpers.is_sdm_xml(name);
+        return Helpers.is_sdm_xml(name);
     }
 
 //      === panedrone: 1) marked as @Experimental 2) suppresses links in idea 2020

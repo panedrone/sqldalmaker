@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2023 sqldalmaker@gmail.com
+    Copyright 2011-2024 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -30,20 +30,21 @@ public class PsiReferenceSqlProvider extends PsiReferenceProvider {
     private final Set<String> dao_tag_names = new HashSet<String>();
 
     public PsiReferenceSqlProvider() {
-
-        List<String> list = Arrays.asList(IdeaReferenceCompletion.DAO_TAGS_USING_REF);
+        List<String> list = Arrays.asList(IdeaRefUtils.DAO_TAGS_USING_REF);
         dao_tag_names.addAll(list);
-        dao_tag_names.add(IdeaReferenceCompletion.ELEMENT.DTO_CLASS);
+        dao_tag_names.add(IdeaRefUtils.ELEMENT.DTO_CLASS);
     }
 
     @Override
-    public PsiReference @NotNull [] getReferencesByElement(@NotNull PsiElement element, @NotNull ProcessingContext context) {
+    public PsiReference @NotNull [] getReferencesByElement(
+            @NotNull PsiElement element,
+            @NotNull ProcessingContext context) {
 
         if (element instanceof XmlAttributeValue) {
             PsiElement attr_element = element.getParent();
             if (attr_element instanceof XmlAttribute) {
                 final String attr_name = ((XmlAttribute) attr_element).getName();
-                if (IdeaReferenceCompletion.ATTRIBUTE.REF.equals(attr_name)) {
+                if (IdeaRefUtils.ATTRIBUTE.REF.equals(attr_name)) {
                     PsiElement parent_tag = attr_element.getParent();
                     if (parent_tag != null) {
                         final String tag_name = ((XmlTag) parent_tag).getName();

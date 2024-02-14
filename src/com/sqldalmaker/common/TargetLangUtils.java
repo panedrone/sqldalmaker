@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2023 sqldalmaker@gmail.com
+    Copyright 2011-2024 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -20,6 +20,18 @@ import java.nio.file.Paths;
 import java.sql.Connection;
 import java.util.List;
 
+/*
+ * @author sqldalmaker@gmail.com
+ *
+ * 28.12.2023 13:12 1.292
+ * 28.12.2023 08:29 1.292
+ * 01.09.2023 12:21 1.287
+ * 27.03.2023 10:03
+ * 23.02.2023 14:11 1.279
+ * 16.11.2022 08:02 1.269
+ * 21.05.2022 11:59 1.243
+ *
+ */
 public class TargetLangUtils {
 
     public static String file_name_from_class_name(String root_fn, String class_name) throws Exception {

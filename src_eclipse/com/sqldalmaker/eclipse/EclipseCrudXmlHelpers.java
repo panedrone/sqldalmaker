@@ -15,8 +15,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.swt.widgets.Shell;
 
 import com.sqldalmaker.cg.FieldNamesMode;
-import com.sqldalmaker.common.FileSearchHelpers;
-import com.sqldalmaker.common.FileSearchHelpers.IFileList;
 import com.sqldalmaker.common.ISelectDbSchemaCallback;
 import com.sqldalmaker.common.SdmUtils;
 import com.sqldalmaker.jaxb.sdm.*;

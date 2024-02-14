@@ -11,7 +11,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.sqldalmaker.cg.Helpers;
-import com.sqldalmaker.common.FileSearchHelpers;
 import com.sqldalmaker.jaxb.settings.Settings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -36,25 +35,6 @@ public class IdeaActionGroup extends ActionGroup implements AlwaysVisibleActionG
         }
     }
 
-    private static void enum_root_files(
-            Project project,
-            VirtualFile current_folder,
-            List<VirtualFile> root_files) {
-
-        @SuppressWarnings("UnsafeVfsRecursion") VirtualFile[] children = current_folder.getChildren();
-        for (VirtualFile c : children) {
-            if (c.isDirectory()) {
-                if (!c.getName().equals("bin")) {
-                    enum_root_files(project, c, root_files);
-                }
-            } else {
-                String path = IdeaTargetLanguageHelpers.get_root_file_relative_path(project, c);
-                if (path != null) {
-                    root_files.add(c);
-                }
-            }
-        }
-    }
 
     private void add_common_actions(
             Project project,
@@ -105,7 +85,7 @@ public class IdeaActionGroup extends ActionGroup implements AlwaysVisibleActionG
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
                 IdeaCG.validate_all_sdm_dto(project, xml_file);
-                IdeaCG.validate_all_sdm_dao(project, xml_file);
+                IdeaCG.validate_all_sdm_dao_action(project, xml_file);
             }
         };
         drop_down_actions_list.add(action_validate);
@@ -127,7 +107,7 @@ public class IdeaActionGroup extends ActionGroup implements AlwaysVisibleActionG
         SdmAction action_validate = new SdmAction(xml_file_rel_path + " -> Validate") {
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
-                IdeaCG.validate_dao(project, xml_file);
+                IdeaCG.validate_external_dao_xml_action(project, xml_file);
             }
         };
         drop_down_actions_list.add(action_validate);
@@ -188,12 +168,12 @@ public class IdeaActionGroup extends ActionGroup implements AlwaysVisibleActionG
         }
         VirtualFile root_file = root_files.get(0);
         String name = xml_file.getName();
-        if (FileSearchHelpers.is_sdm_xml(name)) {
+        if (Helpers.is_sdm_xml(name)) {
             add_sdm_actions(project, drop_down_actions_list, xml_file);
-        } else if (FileSearchHelpers.is_dao_xml(name)) {
+        } else if (Helpers.is_dao_xml(name)) {
             add_dao_actions(project, drop_down_actions_list, xml_file);
         }
-        if (FileSearchHelpers.is_sdm_xml(name) || FileSearchHelpers.is_dao_xml(name)) {
+        if (Helpers.is_sdm_xml(name) || Helpers.is_dao_xml(name)) {
             String root_file_rel_path = IdeaHelpers.get_relative_path(project, root_file);
             SdmAction action = new SdmAction(root_file_rel_path) {
                 @Override
@@ -207,7 +187,7 @@ public class IdeaActionGroup extends ActionGroup implements AlwaysVisibleActionG
             };
             drop_down_actions_list.add(action);
         }
-        if (FileSearchHelpers.is_dao_xml(name)) {
+        if (Helpers.is_dao_xml(name)) {
             add_open_dao_target_action(project, root_file, xml_file, drop_down_actions_list);
         }
         return true;
@@ -241,7 +221,7 @@ public class IdeaActionGroup extends ActionGroup implements AlwaysVisibleActionG
             // there may be several MP in one project. start searching from project_base_dir:
             VirtualFile project_base_dir = IdeaHelpers.get_project_base_dir(project);
             List<VirtualFile> root_files = new ArrayList<VirtualFile>();
-            enum_root_files(project, project_base_dir, root_files);
+            IdeaHelpers.enum_root_files(project, project_base_dir, root_files);
             if (drop_down_actions_list.isEmpty()) {
                 add_common_actions(project, drop_down_actions_list, root_files);
             } else {

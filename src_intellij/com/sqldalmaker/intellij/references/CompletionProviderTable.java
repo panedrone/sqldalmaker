@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2023 sqldalmaker@gmail.com
+    Copyright 2011-2024 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -31,7 +31,10 @@ import org.jetbrains.annotations.NotNull;
 public class CompletionProviderTable extends CompletionProvider<CompletionParameters> {
 
     @Override
-    protected void addCompletions(@NotNull CompletionParameters completionParameters, @NotNull ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
+    protected void addCompletions(
+            @NotNull CompletionParameters completionParameters,
+            @NotNull ProcessingContext processingContext,
+            @NotNull CompletionResultSet completionResultSet) {
 
         XmlAttributeValue attribute_value = PsiTreeUtil.getParentOfType(completionParameters.getPosition(), XmlAttributeValue.class, false);
         if (attribute_value == null) {
@@ -46,7 +49,7 @@ public class CompletionProviderTable extends CompletionProvider<CompletionParame
         if (containing_file == null) {
             return;
         }
-        VirtualFile this_xml_file = IdeaReferenceCompletion.find_virtual_file(containing_file);
+        VirtualFile this_xml_file = IdeaRefUtils.find_virtual_file(containing_file);
         if (this_xml_file == null) {
             return;
         }
@@ -86,8 +89,8 @@ public class CompletionProviderTable extends CompletionProvider<CompletionParame
         for (PsiElement el : tags) {
             if (el instanceof XmlTag) {
                 XmlTag t = (XmlTag) el;
-                if (IdeaReferenceCompletion.ELEMENT.DTO_CLASS.equals(t.getName())) {
-                    XmlAttribute a = t.getAttribute(IdeaReferenceCompletion.ATTRIBUTE.REF);
+                if (IdeaRefUtils.ELEMENT.DTO_CLASS.equals(t.getName())) {
+                    XmlAttribute a = t.getAttribute(IdeaRefUtils.ATTRIBUTE.REF);
                     if (a != null) {
                         String ref_value = a.getValue();
                         if (SqlUtils.is_table_ref(ref_value)) {

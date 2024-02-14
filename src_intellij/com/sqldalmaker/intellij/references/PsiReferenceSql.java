@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2023 sqldalmaker@gmail.com
+    Copyright 2011-2024 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -12,8 +12,8 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.PsiReferenceBase;
 import com.intellij.util.ArrayUtil;
+import com.sqldalmaker.cg.Helpers;
 import com.sqldalmaker.cg.SqlUtils;
-import com.sqldalmaker.common.FileSearchHelpers;
 import com.sqldalmaker.common.SdmUtils;
 import com.sqldalmaker.intellij.ui.IdeaHelpers;
 import com.sqldalmaker.jaxb.settings.Settings;
@@ -41,14 +41,14 @@ public class PsiReferenceSql extends PsiReferenceBase<PsiElement> {
             return null;
         }
         String file_name = containing_file.getName();
-        if (!FileSearchHelpers.is_sdm_xml(file_name) && ! FileSearchHelpers.is_dao_xml(file_name)) {
+        if (!Helpers.is_sdm_xml(file_name) && ! Helpers.is_dao_xml(file_name)) {
             return null;
         }
         String canonical_text = getCanonicalText(); // @NotNull
         if (SqlUtils.is_sql_file_ref_base(canonical_text) == false) {
             return null;
         }
-        VirtualFile this_xml_file = IdeaReferenceCompletion.find_virtual_file(containing_file);
+        VirtualFile this_xml_file = IdeaRefUtils.find_virtual_file(containing_file);
         if (this_xml_file == null) {
             return null;
         }
@@ -103,12 +103,12 @@ public class PsiReferenceSql extends PsiReferenceBase<PsiElement> {
         if (canonical_text.trim().isEmpty()) {
             return true; // ref is empty
         }
-        if (FileSearchHelpers.is_sdm_xml(file_name)) {
+        if (Helpers.is_sdm_xml(file_name)) {
             if (SqlUtils.is_sql_file_ref_base(canonical_text)) {
                 return false;
             }
             return true;
-        } else if (FileSearchHelpers.is_dao_xml(file_name)) {
+        } else if (Helpers.is_dao_xml(file_name)) {
             if (SqlUtils.is_sql_file_ref_base(canonical_text)) {
                 return false;
             }

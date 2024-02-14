@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2023 sqldalmaker@gmail.com
+    Copyright 2011-2024 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -11,9 +11,8 @@ import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiReferenceProvider;
 import com.intellij.psi.xml.XmlAttribute;
 import com.intellij.psi.xml.XmlAttributeValue;
-import com.intellij.psi.xml.XmlTag;
 import com.intellij.util.ProcessingContext;
-import com.sqldalmaker.common.FileSearchHelpers;
+import com.sqldalmaker.cg.Helpers;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -31,9 +30,8 @@ public class PsiReferenceDtoClassProvider extends PsiReferenceProvider {
 //        Collections.addAll(dao_tag_names, IdeaReferenceCompletion.ELEMENT.DTO_CLASS);
     }
 
-    @NotNull
     @Override
-    public PsiReference [] getReferencesByElement(@NotNull PsiElement element, @NotNull ProcessingContext context) {
+    public PsiReference @NotNull [] getReferencesByElement(@NotNull PsiElement element, @NotNull ProcessingContext context) {
         if (!(element instanceof XmlAttributeValue)) {
             return PsiReference.EMPTY_ARRAY;
         }
@@ -42,7 +40,7 @@ public class PsiReferenceDtoClassProvider extends PsiReferenceProvider {
             return PsiReference.EMPTY_ARRAY;
         }
         PsiElement parent_tag = attr_element.getParent();
-        if (!(parent_tag instanceof XmlTag)) {
+        if (parent_tag == null) {
             return PsiReference.EMPTY_ARRAY;
         }
         final PsiFile containing_file = parent_tag.getContainingFile();
@@ -51,21 +49,21 @@ public class PsiReferenceDtoClassProvider extends PsiReferenceProvider {
         }
         String file_name = containing_file.getName();
         final String attr_name = ((XmlAttribute) attr_element).getName();
-        if (FileSearchHelpers.is_dao_xml(file_name)) {
-            if (IdeaReferenceCompletion.ATTRIBUTE.DTO.equals(attr_name)) {
+        if (Helpers.is_dao_xml(file_name)) {
+            if (IdeaRefUtils.ATTRIBUTE.DTO.equals(attr_name)) {
 //                    final String parent_tag_name = ((XmlTag) parent_tag).getName();
 //                    if (dao_tag_names.contains(parent_tag_name)) {
                 return new PsiReference[]{new PsiReferenceDtoClass(element/*, element.getTextRange()*/)};
 //                    }
             }
-        } else if (FileSearchHelpers.is_sdm_xml(file_name)) {
-            if (IdeaReferenceCompletion.ATTRIBUTE.DTO.equals(attr_name)) {
+        } else if (Helpers.is_sdm_xml(file_name)) {
+            if (IdeaRefUtils.ATTRIBUTE.DTO.equals(attr_name)) {
 //                    final String parent_tag_name = ((XmlTag) parent_tag).getName();
 //                    if (dao_tag_names.contains(parent_tag_name)) {
                 return new PsiReference[]{new PsiReferenceDtoClass(element/*, element.getTextRange()*/)};
 //                    }
             }
-            else if (IdeaReferenceCompletion.ATTRIBUTE.NAME.equals(attr_name)) {
+            else if (IdeaRefUtils.ATTRIBUTE.NAME.equals(attr_name)) {
 //                    final String parent_tag_name = ((XmlTag) parent_tag).getName();
 //                    if (dao_tag_names.contains(parent_tag_name)) {
                 return new PsiReference[]{new PsiReferenceDtoClass(element/*, element.getTextRange()*/)};

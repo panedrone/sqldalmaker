@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2023 sqldalmaker@gmail.com
+    Copyright 2011-2024 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -20,8 +20,17 @@ import javax.xml.transform.*;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-/**
+/*
  * @author sqldalmaker@gmail.com
+ *
+ * 28.12.2023 13:12 1.292
+ * 28.12.2023 8:29 1.292
+ * 17.12.2023 2:16 1.292 sdm.xml
+ * 15.10.2023 11:16
+ * 16.11.2022 8:02 1.269
+ * 19.07.2022 13:04
+ * 17.05.2021 11:28
+ *
  */
 public class XmlHelpers {
 

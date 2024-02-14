@@ -123,21 +123,21 @@ public class IdeaMessageHelpers {
         } else {
             m = e.getClass().getName() + ":\n" + e.getMessage();
         }
-        // Messages.show... ---- if there is "<" in messages, the text is now shown
-        final String msg = m.replace("<", "");
         ApplicationManager.getApplication().invokeLater(new Runnable() {
             public void run() {
+                // Messages.show... ---- the text after "<" disappears
+                String msg = m.replace("<", "");
                 Messages.showErrorDialog(msg, "Error");
             }
         });
     }
 
     public static void show_info_in_ui_thread(String title, String m) {
-        // Messages.show... ---- if there is "<" in messages, the text is now shown
-        final String msg = m.replace("<", "");
         ApplicationManager.getApplication().invokeLater(new Runnable() {
             public void run() {
-                Messages.showInfoMessage(msg, title);
+                // Messages.show... ---- the text after "<" disappears
+                String msg = m.replace("<", "");
+                Messages.showInfoMessage(m, title);
             }
         });
     }

@@ -27,7 +27,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.ResourceUtil;
 
 import com.sqldalmaker.cg.Helpers;
-import com.sqldalmaker.common.FileSearchHelpers;
 import com.sqldalmaker.common.SdmUtils;
 import com.sqldalmaker.jaxb.settings.Settings;
 

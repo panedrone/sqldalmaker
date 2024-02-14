@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2023 sqldalmaker@gmail.com
+    Copyright 2011-2024 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -30,25 +30,32 @@ public class CompletionContributorCommon extends CompletionContributor {
 
         extend(CompletionType.BASIC,
                 PlatformPatterns.psiElement().
-                        inside(XmlPatterns.xmlAttributeValue().withLocalName(IdeaReferenceCompletion.ATTRIBUTE.REF).
-                                withSuperParent(3, XmlPatterns.xmlTag().withName(IdeaReferenceCompletion.ELEMENT.DAO_CLASS))),
+                        inside(XmlPatterns.xmlAttributeValue().withLocalName(IdeaRefUtils.ATTRIBUTE.REF).
+                                withSuperParent(3, XmlPatterns.xmlTag().withName(IdeaRefUtils.ELEMENT.DAO_CLASS))),
                 new CompletionProviderSql());
 
         extend(CompletionType.BASIC,
-                PlatformPatterns.psiElement().inside(XmlPatterns.xmlAttributeValue().withLocalName(IdeaReferenceCompletion.ATTRIBUTE.REF)
-                        .inside(XmlPatterns.xmlFile().withName(Const.SDM_XML))),
+                PlatformPatterns.psiElement().inside(XmlPatterns.xmlAttributeValue().withLocalName(IdeaRefUtils.ATTRIBUTE.REF).
+                                withSuperParent(2, XmlPatterns.xmlTag().withName(IdeaRefUtils.ELEMENT.DTO_CLASS)).
+                        inside(XmlPatterns.xmlFile().withName(Const.SDM_XML))),
                 new CompletionProviderSql());
+
+        extend(CompletionType.BASIC,
+                PlatformPatterns.psiElement().inside(XmlPatterns.xmlAttributeValue().withLocalName(IdeaRefUtils.ATTRIBUTE.REF).
+                        withSuperParent(2, XmlPatterns.xmlTag().withName(IdeaRefUtils.ELEMENT.DAO_CLASS)).
+                        inside(XmlPatterns.xmlFile().withName(Const.SDM_XML))),
+                new CompletionProviderExternalDaoXml());
 
         extend(CompletionType.BASIC,
                 PlatformPatterns.psiElement().
-                        inside(XmlPatterns.xmlAttributeValue().withLocalName(IdeaReferenceCompletion.ATTRIBUTE.DTO).
-                                withSuperParent(3, XmlPatterns.xmlTag().withName(IdeaReferenceCompletion.ELEMENT.DAO_CLASS))),
+                        inside(XmlPatterns.xmlAttributeValue().withLocalName(IdeaRefUtils.ATTRIBUTE.DTO).
+                                withSuperParent(3, XmlPatterns.xmlTag().withName(IdeaRefUtils.ELEMENT.DAO_CLASS))),
                 new CompletionProviderDtoClass());
 
         extend(CompletionType.BASIC,
                 PlatformPatterns.psiElement().
-                        inside(XmlPatterns.xmlAttributeValue().withLocalName(IdeaReferenceCompletion.ATTRIBUTE.TABLE).
-                                withSuperParent(3, XmlPatterns.xmlTag().withName(IdeaReferenceCompletion.ELEMENT.DAO_CLASS))),
+                        inside(XmlPatterns.xmlAttributeValue().withLocalName(IdeaRefUtils.ATTRIBUTE.TABLE).
+                                withSuperParent(3, XmlPatterns.xmlTag().withName(IdeaRefUtils.ELEMENT.DAO_CLASS))),
                 new CompletionProviderTable());
     }
 }

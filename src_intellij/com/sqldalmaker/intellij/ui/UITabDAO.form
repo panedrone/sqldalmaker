@@ -35,6 +35,21 @@
             </properties>
             <border type="none"/>
             <children>
+              <component id="b21e9" class="javax.swing.JButton" binding="open_sdm_xml">
+                <constraints/>
+                <properties>
+                  <borderPainted value="false"/>
+                  <contentAreaFilled value="false"/>
+                  <icon value="img/xmldoc.gif"/>
+                  <margin top="0" left="0" bottom="0" right="0"/>
+                  <maximumSize width="32" height="32"/>
+                  <minimumSize width="32" height="32"/>
+                  <opaque value="false"/>
+                  <preferredSize width="32" height="32"/>
+                  <text value=""/>
+                  <toolTipText value="Open XML file"/>
+                </properties>
+              </component>
               <component id="ca7e1" class="javax.swing.JButton" binding="btn_NewXML">
                 <constraints/>
                 <properties>
@@ -55,7 +70,7 @@
                 <properties>
                   <borderPainted value="false"/>
                   <contentAreaFilled value="false"/>
-                  <icon value="img/xmldoc.gif"/>
+                  <icon value="img/arrow-curve-090-left.png"/>
                   <margin top="0" left="0" bottom="0" right="0"/>
                   <maximumSize width="32" height="32"/>
                   <minimumSize width="32" height="32"/>

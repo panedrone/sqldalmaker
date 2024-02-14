@@ -53,7 +53,6 @@ import com.sqldalmaker.cg.Helpers;
 import com.sqldalmaker.cg.IDaoCG;
 import com.sqldalmaker.cg.JaxbUtils;
 import com.sqldalmaker.common.Const;
-import com.sqldalmaker.common.FileSearchHelpers;
 import com.sqldalmaker.common.InternalException;
 import com.sqldalmaker.common.SdmUtils;
 import com.sqldalmaker.common.XmlParser;

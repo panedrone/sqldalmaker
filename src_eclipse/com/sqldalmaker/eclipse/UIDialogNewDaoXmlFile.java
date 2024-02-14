@@ -20,7 +20,6 @@ import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 
 import com.sqldalmaker.common.Const;
-import com.sqldalmaker.common.FileSearchHelpers;
 import com.sqldalmaker.common.InternalException;
 
 /**
