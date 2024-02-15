@@ -1,5 +1,5 @@
 /*
-	Copyright 2011-2023 sqldalmaker@gmail.com
+	Copyright 2011-2024 sqldalmaker@gmail.com
 	Read LICENSE.txt in the root of this project/archive.
 	Project web-site: https://sqldalmaker.sourceforge.net/
 */
@@ -39,6 +39,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
+import com.sqldalmaker.cg.Helpers;
 import com.sqldalmaker.common.Const;
 import com.sqldalmaker.common.SdmUtils;
 import com.sqldalmaker.jaxb.settings.Settings;
@@ -68,8 +69,8 @@ public class EclipseXmlCompletionProposalComputer implements ICompletionProposal
 			if (this_xml_file == null) {
 				return NONE;
 			}
-			boolean is_sdm_xml = FileSearchHelpers.is_sdm_xml(this_xml_file.getName());
-			boolean is_dao_xml = FileSearchHelpers.is_dao_xml(this_xml_file.getName());
+			boolean is_sdm_xml = Helpers.is_sdm_xml(this_xml_file.getName());
+			boolean is_dao_xml = Helpers.is_dao_xml(this_xml_file.getName());
 			if (!is_sdm_xml && !is_dao_xml) {
 				return NONE;
 			}

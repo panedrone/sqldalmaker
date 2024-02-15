@@ -1,5 +1,5 @@
 /*
-	Copyright 2011-2023 sqldalmaker@gmail.com
+	Copyright 2011-2024 sqldalmaker@gmail.com
 	Read LICENSE.txt in the root of this project/archive.
 	Project web-site: https://sqldalmaker.sourceforge.net/
 */
@@ -19,6 +19,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 
+import com.sqldalmaker.cg.Helpers;
 import com.sqldalmaker.common.Const;
 import com.sqldalmaker.common.InternalException;
 
@@ -125,7 +126,7 @@ public class UIDialogNewDaoXmlFile extends WizardDialog {
 
 			String name = page.getResource();
 
-			res = FileSearchHelpers.is_dao_xml(name);
+			res = Helpers.is_dao_xml(name);
 
 			return res;
 		}

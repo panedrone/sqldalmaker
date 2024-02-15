@@ -1,5 +1,5 @@
 /*
-	Copyright 2011-2023 sqldalmaker@gmail.com
+	Copyright 2011-2024 sqldalmaker@gmail.com
 	Read LICENSE.txt in the root of this project/archive.
 	Project web-site: https://sqldalmaker.sourceforge.net/
 */
@@ -805,7 +805,7 @@ public class UIEditorPageDAO extends Composite {
 				}
 
 			} else {
-				FileSearchHelpers.IFileList fileList = new FileSearchHelpers.IFileList() {
+				Helpers.IFileList fileList = new Helpers.IFileList() {
 					@Override
 					public void add(String fileName) {
 						String dao_class_name = fileName.replace(".xml", "");
@@ -814,7 +814,7 @@ public class UIEditorPageDAO extends Composite {
 						items.add(item);
 					}
 				};
-				FileSearchHelpers.enum_dao_xml_file_names(editor2.get_sdm_folder_abs_path(), fileList);
+				Helpers.enum_dao_xml_file_names(editor2.get_sdm_folder_abs_path(), fileList);
 			}
 		} finally {
 			tableViewer.setInput(items);

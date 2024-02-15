@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2023 sqldalmaker@gmail.com
+ * Copyright 2011-2024 sqldalmaker@gmail.com
  * Read LICENSE.txt in the root of this project/archive.
  * Project web-site: https://sqldalmaker.sourceforge.net/
  */

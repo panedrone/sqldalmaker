@@ -547,6 +547,7 @@ public class Helpers {
         void add(String fileName);
     }
 
+    // still used in eclipse
     public static void enum_dao_xml_file_names(String sdm_xml_folder_abs_path, IFileList file_list) {
         File dir = new File(sdm_xml_folder_abs_path);
         String[] children = dir.list();

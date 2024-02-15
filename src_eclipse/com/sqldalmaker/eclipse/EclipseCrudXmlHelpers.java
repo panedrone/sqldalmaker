@@ -1,5 +1,5 @@
 /*
-	Copyright 2011-2023 sqldalmaker@gmail.com
+	Copyright 2011-2024 sqldalmaker@gmail.com
 	Read LICENSE.txt in the root of this project/archive.
 	Project web-site: https://sqldalmaker.sourceforge.net/
 */
@@ -15,6 +15,8 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.swt.widgets.Shell;
 
 import com.sqldalmaker.cg.FieldNamesMode;
+import com.sqldalmaker.cg.Helpers;
+import com.sqldalmaker.cg.Helpers.IFileList;
 import com.sqldalmaker.common.ISelectDbSchemaCallback;
 import com.sqldalmaker.common.SdmUtils;
 import com.sqldalmaker.jaxb.sdm.*;
@@ -81,7 +83,7 @@ public class EclipseCrudXmlHelpers {
 				res.add(abs_file_path);
 			}
 		};
-		FileSearchHelpers.enum_dao_xml_file_names(xml_configs_folder_full_path, file_list);
+		Helpers.enum_dao_xml_file_names(xml_configs_folder_full_path, file_list);
 		return res;
 	}
 
