@@ -1,6 +1,6 @@
-2024-02-14
+2024-02-15
 
-Starting from v1.294, register DAO XML files in "sdm.xml":
+Starting from v1.294, you need to register DAO XML files in "sdm.xml":
 
     <dao-class name="CategoryDao" ref="CategoryDao.xml"/>
     <dao-class name="CategoryPictureDao" ref="CategoryPictureDao.xml"/>
@@ -12,7 +12,7 @@ Starting from v1.294, register DAO XML files in "sdm.xml":
 
         --- Click "Create/Overwrite XSD files" to make this 'ref' available. ---
 
-From now, you can use both "inline" and "external" DAO XML at the same time.
+		--- Both "inline" and "external" DAO XML can be used together. ---
 
 2023-12-09
 

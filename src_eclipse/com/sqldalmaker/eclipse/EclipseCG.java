@@ -29,7 +29,7 @@ import com.sqldalmaker.jaxb.settings.Settings;
  */
 public class EclipseCG {
 
-	static class Error {
+	private static class Error {
 		public boolean happend = false;
 	}
 
@@ -90,9 +90,11 @@ public class EclipseCG {
 				String sdm_xml_abs_path = xml_file.getLocation().toPortableString();
 				String sdm_xsd_abs_path = Helpers.concat_path(xml_mp_abs_path, Const.SDM_XSD);
 				List<DaoClass> dao_classes = SdmUtils.get_dao_classes(sdm_xml_abs_path, sdm_xsd_abs_path);
+				String contextPath = DaoClass.class.getPackage().getName();
+				XmlParser dao_xml_parser = new XmlParser(contextPath, sdm_xsd_abs_path);
 				for (DaoClass cls : dao_classes) {
 					try {
-						String[] file_content = gen.translate(cls.getName(), cls);
+						String[] file_content = generate_single_sdm_dao(gen, dao_xml_parser, cls, sdm_xml_abs_path);
 						String target_file_path = TargetLangUtils.get_target_file_path(root_file.getName(),
 								output_dir.toString(), cls.getName());
 						EclipseHelpers.save_text_to_file(target_file_path, file_content[0]);
@@ -180,19 +182,21 @@ public class EclipseCG {
 		StringBuilder output_dir = new StringBuilder();
 		Error error = new Error();
 		try {
-			String xml_mp_abs_path = root_file.getParent().getLocation().toPortableString();
-			Settings settings = SdmUtils.load_settings(xml_mp_abs_path);
+			String sdm_folder_abs_path = root_file.getParent().getLocation().toPortableString();
+			Settings settings = SdmUtils.load_settings(sdm_folder_abs_path);
 			IProject project = root_file.getProject();
 			Connection con = EclipseHelpers.get_connection(project, settings);
 			String sdm_xml_abs_path = xml_file.getLocation().toPortableString();
-			String sdm_xsd_abs_path = Helpers.concat_path(xml_mp_abs_path, Const.SDM_XSD);
+			String sdm_xsd_abs_path = Helpers.concat_path(sdm_folder_abs_path, Const.SDM_XSD);
 			List<DaoClass> dao_classes = SdmUtils.get_dao_classes(sdm_xml_abs_path, sdm_xsd_abs_path);
+			String contextPath = DaoClass.class.getPackage().getName();
+			XmlParser dao_xml_parser = new XmlParser(contextPath, sdm_xsd_abs_path);
 			try {
 				IDaoCG gen = EclipseTargetLanguageHelpers.create_dao_cg(con, project, root_file.getName(), settings,
-						xml_mp_abs_path, output_dir);
+						sdm_folder_abs_path, output_dir);
 				for (DaoClass cls : dao_classes) {
 					try {
-						String[] file_content = gen.translate(cls.getName(), cls);
+						String[] file_content = generate_single_sdm_dao(gen, dao_xml_parser, cls, sdm_xml_abs_path);
 						String target_file_path = TargetLangUtils.get_target_file_path(root_file.getName(),
 								output_dir.toString(), cls.getName());
 						String old_text = Helpers.load_text_from_file(target_file_path);
@@ -250,8 +254,9 @@ public class EclipseCG {
 				String dao_xml_abs_path = xml_file.getLocation().toPortableString();
 				String dao_class_name = Helpers.get_dao_class_name(xml_file.getName());
 				DaoClass dao_class = dao_xml_parser.unmarshal(dao_xml_abs_path);
+				dao_class.setName(dao_class_name);
 				try {
-					String[] file_content = gen.translate(dao_class_name, dao_class);
+					String[] file_content = generate_single_sdm_dao(gen, dao_xml_parser, dao_class, dao_xml_abs_path);
 					String target_file_path = TargetLangUtils.get_target_file_path(root_file.getName(),
 							output_dir_abs_path.toString(), dao_class_name);
 					EclipseHelpers.save_text_to_file(target_file_path, file_content[0]);
@@ -298,18 +303,19 @@ public class EclipseCG {
 				String dao_xml_abs_path = xml_file.getLocation().toPortableString();
 				String dao_class_name = Helpers.get_dao_class_name(xml_file.getName());
 				DaoClass dao_class = dao_xml_parser.unmarshal(dao_xml_abs_path);
+				dao_class.setName(dao_class_name);
 				try {
-					String[] file_content = gen.translate(dao_class_name, dao_class);
+					String[] file_content = generate_single_sdm_dao(gen, dao_xml_parser, dao_class, dao_xml_abs_path);
 					String target_file_path = TargetLangUtils.get_target_file_path(root_file.getName(),
 							output_dir_abs_path.toString(), dao_class_name);
 					StringBuilder validation_buff = new StringBuilder();
 					String oldText = Helpers.load_text_from_file(target_file_path);
 					if (oldText == null) {
-						validation_buff.append("Generated file is missing");
+						validation_buff.append(Const.OUTPUT_FILE_IS_MISSING);
 					} else {
 						String text = file_content[0];
 						if (!oldText.equals(text)) {
-							validation_buff.append("Generated file is out of date");
+							validation_buff.append(Const.OUTPUT_FILE_IS_OUT_OF_DATE);
 						}
 					}
 					String status = validation_buff.toString();
@@ -333,5 +339,26 @@ public class EclipseCG {
 			EclipseConsoleHelpers.add_error_msg(e.getMessage());
 			e.printStackTrace();
 		}
+	}
+
+	private static DaoClass load_external_dao_class(XmlParser dao_xml_parser, String dao_xml_abs_path)
+			throws Exception {
+		DaoClass dao_class = dao_xml_parser.unmarshal(dao_xml_abs_path);
+		return dao_class;
+	}
+
+	public static String[] generate_single_sdm_dao(IDaoCG gen, XmlParser dao_xml_parser, DaoClass sdm_dao_class,
+			String dao_xml_abs_path) throws Exception {
+
+		String dao_class_name = sdm_dao_class.getName();
+		String[] file_content;
+		String ref = sdm_dao_class.getRef();
+		if (ref == null || ref.trim().isEmpty()) { // nullable
+			file_content = gen.translate(dao_class_name, sdm_dao_class);
+		} else {
+			DaoClass external_dao_class = load_external_dao_class(dao_xml_parser, dao_xml_abs_path);
+			file_content = gen.translate(dao_class_name, external_dao_class);
+		}
+		return file_content;
 	}
 }

@@ -24,42 +24,52 @@ import java.util.List;
 
 public class IdeaCG {
 
-    public static void generate_all_sdm_dto(Project project, VirtualFile xml_file) {
-        String name = xml_file.getName();
-        if (!Helpers.is_sdm_xml(name)) {
-            return;
-        }
-        VirtualFile xml_file_dir = xml_file.getParent();
-        if (xml_file_dir == null) {
-            return;
-        }
-        List<VirtualFile> root_files = IdeaTargetLanguageHelpers.find_root_files(xml_file_dir);
+    private static VirtualFile find_root_file(VirtualFile sdm_xml_folder) {
+        List<VirtualFile> root_files = IdeaTargetLanguageHelpers.find_root_files(sdm_xml_folder);
         if (root_files.isEmpty()) {
-            IdeaMessageHelpers.add_error_to_ide_log("ERROR", "Root-file not found");
-            return;
+            IdeaMessageHelpers.add_error_to_ide_log("ERROR", "root-file not found");
+            return null;
         }
         VirtualFile root_file = root_files.get(0);
         if (root_files.size() > 1) {
-            IdeaMessageHelpers.add_warning_to_ide_log("Several Root-files found. Selected " + root_file.getName());
+            IdeaMessageHelpers.add_warning_to_ide_log("Several root-files found, '" + root_file.getName() + "' selected");
+        }
+        return root_file;
+    }
+
+    private static class Error {
+        public boolean occurred = false;
+    }
+
+    // IdeaActionGroup
+    public static void action_generate_all_sdm_dto(Project project, VirtualFile sdm_xml_file) {
+        String name = sdm_xml_file.getName();
+        if (!Helpers.is_sdm_xml(name)) {
+            return;
+        }
+        VirtualFile sdm_xml_folder = sdm_xml_file.getParent();
+        if (sdm_xml_folder == null) {
+            return;
+        }
+        VirtualFile root_file = find_root_file(sdm_xml_folder);
+        if (root_file == null) {
+            return;
         }
         List<IdeaHelpers.GeneratedFileData> list = new ArrayList<IdeaHelpers.GeneratedFileData>();
         StringBuilder output_dir = new StringBuilder();
-        class Error {
-            public boolean occurred = false;
-        }
         Error err = new Error();
         final Runnable runnable = new Runnable() {
             @Override
             public void run() {
                 try {
-                    Settings settings = SdmUtils.load_settings(xml_file_dir.getPath());
-                    String xml_mp_abs_path = root_file.getParent().getPath();
+                    Settings settings = SdmUtils.load_settings(sdm_xml_folder.getPath());
+                    String sdm_xml_folder_abs_path = sdm_xml_folder.getPath();
                     Connection con = IdeaHelpers.get_connection(project, settings);
                     try {
                         IDtoCG gen = IdeaTargetLanguageHelpers.create_dto_cg(con, project, root_file, settings, output_dir);
                         try {
-                            String sdm_xml_abs_path = xml_file.getPath();
-                            String sdm_xsd_abs_path = xml_mp_abs_path + "/" + Const.SDM_XSD;
+                            String sdm_xml_abs_path = sdm_xml_file.getPath();
+                            String sdm_xsd_abs_path = sdm_xml_folder_abs_path + "/" + Const.SDM_XSD;
                             List<DtoClass> dto_classes = SdmUtils.get_dto_classes(sdm_xml_abs_path, sdm_xsd_abs_path);
                             for (DtoClass cls : dto_classes) {
                                 ProgressManager.progress(cls.getName());
@@ -83,7 +93,7 @@ public class IdeaCG {
         ProgressManager.getInstance().runProcessWithProgressSynchronously(runnable, "DTO/Models", false, project);
         try { // outside Runnable
             if (!list.isEmpty()) {
-                String xml_file_rel_path = IdeaHelpers.get_relative_path(project, xml_file);
+                String xml_file_rel_path = IdeaHelpers.get_relative_path(project, sdm_xml_file);
                 IdeaHelpers.run_write_action_to_generate_source_file(output_dir.toString(), list, project);
                 if (!err.occurred) {
                     IdeaMessageHelpers.add_info_to_ide_log(xml_file_rel_path, Const.GENERATE_SDM_DTO_MODELS);
@@ -95,42 +105,96 @@ public class IdeaCG {
         }
     }
 
-    public static void generate_all_sdm_dao(Project project, VirtualFile xml_file) {
-        String name = xml_file.getName();
+    // IdeaActionGroup
+    public static void action_validate_all_sdm_dto(Project project, VirtualFile sdm_xml_file) {
+        String name = sdm_xml_file.getName();
         if (!Helpers.is_sdm_xml(name)) {
             return;
         }
-        VirtualFile xml_file_dir = xml_file.getParent();
-        if (xml_file_dir == null) {
+        VirtualFile sdm_xml_folder = sdm_xml_file.getParent();
+        if (sdm_xml_folder == null) {
             return;
         }
-        List<VirtualFile> root_files = IdeaTargetLanguageHelpers.find_root_files(xml_file_dir);
-        if (root_files.isEmpty()) {
-            IdeaMessageHelpers.add_error_to_ide_log("ERROR", "Root-file not found");
+        VirtualFile root_file = find_root_file(sdm_xml_folder);
+        if (root_file == null) {
             return;
         }
-        VirtualFile root_file = root_files.get(0);
-        if (root_files.size() > 1) {
-            IdeaMessageHelpers.add_warning_to_ide_log("Several Root-files found. Selected " + root_file.getName());
+        final Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Settings settings = SdmUtils.load_settings(sdm_xml_folder.getPath());
+                    StringBuilder output_dir = new StringBuilder();
+                    Connection con = IdeaHelpers.get_connection(project, settings);
+                    try {
+                        IDtoCG gen = IdeaTargetLanguageHelpers.create_dto_cg(con, project, root_file, settings, output_dir);
+                        String sdm_xml_abs_path = sdm_xml_file.getPath();
+                        String sdm_xml_folder_abs_path = sdm_xml_folder.getPath();
+                        String sdm_xsd_abs_path = sdm_xml_folder_abs_path + "/" + Const.SDM_XSD;
+                        List<DtoClass> dto_classes = SdmUtils.get_dto_classes(sdm_xml_abs_path, sdm_xsd_abs_path);
+                        boolean error = false;
+                        for (DtoClass cls : dto_classes) {
+                            try {
+                                ProgressManager.progress(cls.getName());
+                                String[] file_content = gen.translate(cls.getName());
+                                StringBuilder validationBuff = new StringBuilder();
+                                IdeaTargetLanguageHelpers.validate_dto(project, root_file, settings, cls.getName(), file_content, validationBuff);
+                                String status = validationBuff.toString();
+                                if (!status.isEmpty()) {
+                                    error = true;
+                                    IdeaMessageHelpers.add_error_to_ide_log("ERROR", " DTO/Model '" + cls.getName() + "'. " + status);
+                                }
+                            } catch (Throwable e) {
+                                error = true;
+                                String msg = e.getMessage();
+                                IdeaMessageHelpers.add_error_to_ide_log("ERROR", msg);
+                            }
+                        }
+                        if (!error) {
+                            String xml_file_rel_path = IdeaHelpers.get_relative_path(project, sdm_xml_file);
+                            IdeaMessageHelpers.add_info_to_ide_log(xml_file_rel_path, Const.VALIDATE_SDM_DTO_MODELS);
+                        }
+                    } finally {
+                        con.close();
+                    }
+                } catch (Exception e) {
+                    IdeaMessageHelpers.add_error_to_ide_log("ERROR", e.getMessage());
+                    // e.printStackTrace();
+                }
+            }
+        };
+        ProgressManager.getInstance().runProcessWithProgressSynchronously(runnable, "DTO/Models", false, project);
+    }
+
+    // IdeaActionGroup
+    public static void action_generate_all_sdm_dao(Project project, VirtualFile sdm_xml_file) {
+        String name = sdm_xml_file.getName();
+        if (!Helpers.is_sdm_xml(name)) {
+            return;
+        }
+        VirtualFile sdm_xml_folder = sdm_xml_file.getParent();
+        if (sdm_xml_folder == null) {
+            return;
+        }
+        VirtualFile root_file = find_root_file(sdm_xml_folder);
+        if (root_file == null) {
+            return;
         }
         List<IdeaHelpers.GeneratedFileData> list = new ArrayList<IdeaHelpers.GeneratedFileData>();
         StringBuilder output_dir = new StringBuilder();
-        class Error {
-            public boolean occurred = false;
-        }
         Error err = new Error();
         final Runnable runnable = new Runnable() {
             @Override
             public void run() {
                 try {
-                    Settings settings = SdmUtils.load_settings(xml_file_dir.getPath());
-                    String xml_mp_abs_path = root_file.getParent().getPath();
+                    Settings settings = SdmUtils.load_settings(sdm_xml_folder.getPath());
+                    String sdm_xml_folder_abs_path = sdm_xml_folder.getPath();
                     Connection con = IdeaHelpers.get_connection(project, settings);
                     try {
                         IDaoCG gen = IdeaTargetLanguageHelpers.create_dao_cg(con, project, root_file, settings, output_dir);
                         try {
-                            String sdm_xml_abs_path = xml_file.getPath();
-                            String sdm_xsd_abs_path = xml_mp_abs_path + "/" + Const.SDM_XSD;
+                            String sdm_xml_abs_path = sdm_xml_file.getPath();
+                            String sdm_xsd_abs_path = sdm_xml_folder_abs_path + "/" + Const.SDM_XSD;
                             List<DaoClass> dao_classes = SdmUtils.get_dao_classes(sdm_xml_abs_path, sdm_xsd_abs_path);
                             for (DaoClass cls : dao_classes) {
                                 ProgressManager.progress(cls.getName());
@@ -154,10 +218,10 @@ public class IdeaCG {
         ProgressManager.getInstance().runProcessWithProgressSynchronously(runnable, "DAO Code Generation", false, project);
         try { // outside Runnable
             if (!list.isEmpty()) {
-                String xml_file_rel_path = IdeaHelpers.get_relative_path(project, xml_file);
                 IdeaHelpers.run_write_action_to_generate_source_file(output_dir.toString(), list, project);
                 if (!err.occurred) {
-                    IdeaMessageHelpers.add_info_to_ide_log(xml_file_rel_path, Const.GENERATE_SDM_DAO);
+                    String sdm_xml_file_rel_path = IdeaHelpers.get_relative_path(project, sdm_xml_file);
+                    IdeaMessageHelpers.add_info_to_ide_log(sdm_xml_file_rel_path, Const.GENERATE_SDM_DAO);
                 }
             }
         } catch (Exception e) {
@@ -166,101 +230,32 @@ public class IdeaCG {
         }
     }
 
-    public static void validate_all_sdm_dto(Project project, VirtualFile xml_file) {
-        String name = xml_file.getName();
+    // IdeaActionGroup
+    public static void action_validate_all_sdm_dao(Project project, VirtualFile sdm_xml_file) {
+        String name = sdm_xml_file.getName();
         if (!Helpers.is_sdm_xml(name)) {
             return;
         }
-        VirtualFile xml_file_dir = xml_file.getParent();
-        if (xml_file_dir == null) {
+        VirtualFile sdm_xml_folder = sdm_xml_file.getParent();
+        if (sdm_xml_folder == null) {
             return;
         }
-        List<VirtualFile> root_files = IdeaTargetLanguageHelpers.find_root_files(xml_file_dir);
-        if (root_files.isEmpty()) {
-            IdeaMessageHelpers.add_error_to_ide_log("ERROR", "root-file not found");
+        VirtualFile root_file = find_root_file(sdm_xml_folder);
+        if (root_file == null) {
             return;
-        }
-        VirtualFile root_file = root_files.get(0);
-        if (root_files.size() > 1) {
-            IdeaMessageHelpers.add_warning_to_ide_log("Several root-files found. " + root_file.getName() + "selected");
         }
         final Runnable runnable = new Runnable() {
             @Override
             public void run() {
                 try {
-                    Settings settings = SdmUtils.load_settings(xml_file_dir.getPath());
+                    Settings settings = SdmUtils.load_settings(sdm_xml_folder.getPath());
                     StringBuilder output_dir = new StringBuilder();
-                    Connection con = IdeaHelpers.get_connection(project, settings);
-                    try {
-                        IDtoCG gen = IdeaTargetLanguageHelpers.create_dto_cg(con, project, root_file, settings, output_dir);
-                        String sdm_xml_abs_path = xml_file.getPath();
-                        String sdm_folder_abs_path = root_file.getParent().getPath();
-                        String sdm_xsd_abs_path = sdm_folder_abs_path + "/" + Const.SDM_XSD;
-                        List<DtoClass> dto_classes = SdmUtils.get_dto_classes(sdm_xml_abs_path, sdm_xsd_abs_path);
-                        boolean error = false;
-                        for (DtoClass cls : dto_classes) {
-                            try {
-                                ProgressManager.progress(cls.getName());
-                                String[] file_content = gen.translate(cls.getName());
-                                StringBuilder validationBuff = new StringBuilder();
-                                IdeaTargetLanguageHelpers.validate_dto(project, root_file, settings, cls.getName(), file_content, validationBuff);
-                                String status = validationBuff.toString();
-                                if (!status.isEmpty()) {
-                                    error = true;
-                                    IdeaMessageHelpers.add_error_to_ide_log("ERROR", " DTO/Model '" + cls.getName() + "'. " + status);
-                                }
-                            } catch (Throwable e) {
-                                error = true;
-                                String msg = e.getMessage();
-                                IdeaMessageHelpers.add_error_to_ide_log("ERROR", msg);
-                            }
-                        }
-                        if (!error) {
-                            String xml_file_rel_path = IdeaHelpers.get_relative_path(project, xml_file);
-                            IdeaMessageHelpers.add_info_to_ide_log(xml_file_rel_path, Const.VALIDATE_SDM_DTO_MODELS);
-                        }
-                    } finally {
-                        con.close();
-                    }
-                } catch (Exception e) {
-                    IdeaMessageHelpers.add_error_to_ide_log("ERROR", e.getMessage());
-                    // e.printStackTrace();
-                }
-            }
-        };
-        ProgressManager.getInstance().runProcessWithProgressSynchronously(runnable, "DTO/Models", false, project);
-    }
-
-    public static void validate_all_sdm_dao_action(Project project, VirtualFile xml_file) {
-        String name = xml_file.getName();
-        if (!Helpers.is_sdm_xml(name)) {
-            return;
-        }
-        VirtualFile xml_file_dir = xml_file.getParent();
-        if (xml_file_dir == null) {
-            return;
-        }
-        List<VirtualFile> root_files = IdeaTargetLanguageHelpers.find_root_files(xml_file_dir);
-        if (root_files.isEmpty()) {
-            IdeaMessageHelpers.add_error_to_ide_log("ERROR", "Root-file not found");
-            return;
-        }
-        VirtualFile root_file = root_files.get(0);
-        if (root_files.size() > 1) {
-            IdeaMessageHelpers.add_warning_to_ide_log("Several Root-files found. Selected " + root_file.getName());
-        }
-        final Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Settings settings = SdmUtils.load_settings(xml_file_dir.getPath());
-                    StringBuilder output_dir = new StringBuilder();
-                    String sdm_abs_path = root_file.getParent().getPath();
+                    String sdm_xml_folder_abs_path = sdm_xml_folder.getPath();
                     Connection con = IdeaHelpers.get_connection(project, settings);
                     try {
                         IDaoCG gen = IdeaTargetLanguageHelpers.create_dao_cg(con, project, root_file, settings, output_dir);
-                        String sdm_xml_abs_path = xml_file.getPath();
-                        String sdm_xsd_abs_path = sdm_abs_path + "/" + Const.SDM_XSD;
+                        String sdm_xml_abs_path = sdm_xml_file.getPath();
+                        String sdm_xsd_abs_path = sdm_xml_folder_abs_path + "/" + Const.SDM_XSD;
                         List<DaoClass> dao_classes = SdmUtils.get_dao_classes(sdm_xml_abs_path, sdm_xsd_abs_path);
                         boolean error = false;
                         for (DaoClass cls : dao_classes) {
@@ -278,7 +273,7 @@ public class IdeaCG {
                             }
                         }
                         if (!error && !dao_classes.isEmpty()) {
-                            String xml_file_rel_path = IdeaHelpers.get_relative_path(project, xml_file);
+                            String xml_file_rel_path = IdeaHelpers.get_relative_path(project, sdm_xml_file);
                             IdeaMessageHelpers.add_info_to_ide_log(xml_file_rel_path, Const.VALIDATE_SDM_DAO);
                         }
                     } finally {
@@ -293,31 +288,27 @@ public class IdeaCG {
         ProgressManager.getInstance().runProcessWithProgressSynchronously(runnable, "DAO", false, project);
     }
 
-    public static void generate_dao(Project project, VirtualFile dao_xml_file) {
+    // IdeaActionGroup
+    public static void action_generate_dao_xml(Project project, VirtualFile dao_xml_file) {
         String name = dao_xml_file.getName();
         if (!Helpers.is_dao_xml(name)) {
             return;
         }
-        VirtualFile xml_file_dir = dao_xml_file.getParent();
-        if (xml_file_dir == null) {
+        VirtualFile sdm_xml_folder = dao_xml_file.getParent();
+        if (sdm_xml_folder == null) {
             return;
         }
-        List<VirtualFile> root_files = IdeaTargetLanguageHelpers.find_root_files(xml_file_dir);
-        if (root_files.isEmpty()) {
-            IdeaMessageHelpers.add_error_to_ide_log("ERROR", "Root-file not found");
+        VirtualFile root_file = find_root_file(sdm_xml_folder);
+        if (root_file == null) {
             return;
-        }
-        VirtualFile root_file = root_files.get(0);
-        if (root_files.size() > 1) {
-            IdeaMessageHelpers.add_warning_to_ide_log("Several Root-files found. Selected " + root_file.getName());
         }
         try {
-            Settings settings = SdmUtils.load_settings(xml_file_dir.getPath());
+            Settings settings = SdmUtils.load_settings(sdm_xml_folder.getPath());
             List<IdeaHelpers.GeneratedFileData> list = new ArrayList<IdeaHelpers.GeneratedFileData>();
             StringBuilder output_dir = new StringBuilder();
-            String xml_metaprogram_abs_path = root_file.getParent().getPath();
+            String sdm_xml_folder_abs_path = root_file.getParent().getPath();
             String contextPath = DaoClass.class.getPackage().getName();
-            XmlParser xml_parser = new XmlParser(contextPath, Helpers.concat_path(xml_metaprogram_abs_path, Const.DAO_XSD));
+            XmlParser xml_parser = new XmlParser(contextPath, Helpers.concat_path(sdm_xml_folder_abs_path, Const.DAO_XSD));
             boolean error = false;
             String dao_xml_abs_path = dao_xml_file.getPath();
             Path path = Paths.get(dao_xml_abs_path);
@@ -328,7 +319,8 @@ public class IdeaCG {
                 IDaoCG gen = IdeaTargetLanguageHelpers.create_dao_cg(con, project, root_file, settings, output_dir);
                 try {
                     DaoClass dao_class = xml_parser.unmarshal(dao_xml_abs_path);
-                    String[] file_content = gen.translate(dao_class_name, dao_class);
+                    dao_class.setName(dao_class_name);
+                    String[] file_content = generate_single_sdm_dao(project, root_file, gen, dao_class, settings);
                     IdeaTargetLanguageHelpers.prepare_generated_file_data(root_file, dao_class_name, file_content, list);
                 } catch (Throwable e) {
                     String msg = e.getMessage();
@@ -355,6 +347,56 @@ public class IdeaCG {
         }
     }
 
+    // IdeaActionGroup
+    public static void action_validate_dao_xml(Project project, VirtualFile dao_xml_file) {
+        String name = dao_xml_file.getName();
+        if (!Helpers.is_dao_xml(name)) {
+            return;
+        }
+        VirtualFile sdm_xml_folder = dao_xml_file.getParent();
+        if (sdm_xml_folder == null) {
+            return;
+        }
+        VirtualFile root_file = find_root_file(sdm_xml_folder);
+        if (root_file == null) {
+            return;
+        }
+        try {
+            Settings settings = SdmUtils.load_settings(sdm_xml_folder.getPath());
+            StringBuilder output_dir = new StringBuilder();
+            String sdm_folder_abs_path = root_file.getParent().getPath();
+            String contextPath = DaoClass.class.getPackage().getName();
+            XmlParser xml_parser = new XmlParser(contextPath, Helpers.concat_path(sdm_folder_abs_path, Const.DAO_XSD));
+            String dao_xml_abs_path = dao_xml_file.getPath();
+            Path path = Paths.get(dao_xml_abs_path);
+            String dao_xml_file_name = path.getFileName().toString();
+            Connection con = IdeaHelpers.get_connection(project, settings);
+            try {
+                IDaoCG gen = IdeaTargetLanguageHelpers.create_dao_cg(con, project, root_file, settings, output_dir);
+                try {
+                    DaoClass dao_class = xml_parser.unmarshal(dao_xml_abs_path);
+                    String dao_class_name = Helpers.get_dao_class_name(dao_xml_file_name);
+                    dao_class.setName(dao_class_name);
+                    String status = validate_single_sdm_dao(project, root_file, gen, dao_class, settings);
+                    if (status.isEmpty()) {
+                        IdeaMessageHelpers.add_info_to_ide_log(dao_xml_file_name, Const.VALIDATE_DAO_XML);
+                    } else {
+                        IdeaMessageHelpers.add_error_to_ide_log(dao_xml_file_name, " " + dao_xml_file.getNameWithoutExtension() + ". " + status);
+                    }
+                } catch (Throwable e) {
+                    String msg = e.getMessage();
+                    IdeaMessageHelpers.add_error_to_ide_log(dao_xml_file_name, msg);
+                }
+            } finally {
+                con.close();
+            }
+        } catch (Exception e) {
+            IdeaMessageHelpers.add_error_to_ide_log("ERROR", e.getMessage());
+            // e.printStackTrace();
+        }
+    }
+
+    // IdeaCG, UITabDAO
     public static String[] generate_single_sdm_dao(
             Project project,
             VirtualFile root_file,
@@ -374,6 +416,7 @@ public class IdeaCG {
         return file_content;
     }
 
+    // IdeaCG, UITabDAO
     public static String validate_single_sdm_dao(
             Project project,
             VirtualFile root_file,
@@ -402,58 +445,5 @@ public class IdeaCG {
         String contextPath = DaoClass.class.getPackage().getName();
         XmlParser xml_parser = new XmlParser(contextPath, Helpers.concat_path(local_abs_path, Const.DAO_XSD));
         return xml_parser.unmarshal(dao_xml_abs_path);
-    }
-
-    public static void validate_external_dao_xml_action(Project project, VirtualFile xml_file) {
-        String name = xml_file.getName();
-        if (!Helpers.is_dao_xml(name)) {
-            return;
-        }
-        VirtualFile xml_file_dir = xml_file.getParent();
-        if (xml_file_dir == null) {
-            return;
-        }
-        List<VirtualFile> root_files = IdeaTargetLanguageHelpers.find_root_files(xml_file_dir);
-        if (root_files.isEmpty()) {
-            IdeaMessageHelpers.add_error_to_ide_log("ERROR", "Root-file not found");
-            return;
-        }
-        VirtualFile root_file = root_files.get(0);
-        if (root_files.size() > 1) {
-            IdeaMessageHelpers.add_warning_to_ide_log("Several Root-files found. Selected " + root_file.getName());
-        }
-        try {
-            Settings settings = SdmUtils.load_settings(xml_file_dir.getPath());
-            StringBuilder output_dir = new StringBuilder();
-            String sdm_folder_abs_path = root_file.getParent().getPath();
-            String contextPath = DaoClass.class.getPackage().getName();
-            XmlParser xml_parser = new XmlParser(contextPath, Helpers.concat_path(sdm_folder_abs_path, Const.DAO_XSD));
-            String dao_xml_abs_path = xml_file.getPath();
-            Path path = Paths.get(dao_xml_abs_path);
-            String dao_xml_file_name = path.getFileName().toString();
-            Connection con = IdeaHelpers.get_connection(project, settings);
-            try {
-                IDaoCG gen = IdeaTargetLanguageHelpers.create_dao_cg(con, project, root_file, settings, output_dir);
-                try {
-                    DaoClass dao_class = xml_parser.unmarshal(dao_xml_abs_path);
-                    String dao_class_name = Helpers.get_dao_class_name(dao_xml_file_name);
-                    dao_class.setName(dao_class_name);
-                    String status = validate_single_sdm_dao(project, root_file, gen, dao_class, settings);
-                    if (status.isEmpty()) {
-                        IdeaMessageHelpers.add_info_to_ide_log(dao_xml_file_name, Const.VALIDATE_DAO_XML);
-                    } else {
-                        IdeaMessageHelpers.add_error_to_ide_log(dao_xml_file_name, " " + xml_file.getNameWithoutExtension() + ". " + status);
-                    }
-                } catch (Throwable e) {
-                    String msg = e.getMessage();
-                    IdeaMessageHelpers.add_error_to_ide_log(dao_xml_file_name, msg);
-                }
-            } finally {
-                con.close();
-            }
-        } catch (Exception e) {
-            IdeaMessageHelpers.add_error_to_ide_log("ERROR", e.getMessage());
-            // e.printStackTrace();
-        }
     }
 }

@@ -320,7 +320,7 @@ public class UIEditorPageDAO extends Composite {
 				return;
 			}
 			String class_name = items.get(0).get_class_name();
-			List<DaoClass> jaxb_dao_classes = load_sdm_dao();
+			List<DaoClass> jaxb_dao_classes = load_all_sdm_dao();
 			if (jaxb_dao_classes.size() > 0) {
 				IFile sdm_file = editor2.find_sdm_xml();
 				if (sdm_file == null) {
@@ -403,7 +403,7 @@ public class UIEditorPageDAO extends Composite {
 		return items;
 	}
 
-	private List<DaoClass> load_sdm_dao() throws Exception {
+	private List<DaoClass> load_all_sdm_dao() throws Exception {
 		String sdm_folder_abs_path = editor2.get_sdm_folder_abs_path();
 		String sdm_xml_abs_path = Helpers.concat_path(sdm_folder_abs_path, Const.SDM_XML);
 		String sdm_xsd_abs_path = Helpers.concat_path(sdm_folder_abs_path, Const.SDM_XSD);
@@ -443,13 +443,8 @@ public class UIEditorPageDAO extends Composite {
 					// !!!! after 'try'
 					IDaoCG gen = EclipseTargetLanguageHelpers.create_dao_cg(conn, editor2.get_project(), editor2,
 							settings, output_dir);
-					List<DaoClass> jaxb_dao_classes = load_sdm_dao();
 					monitor.beginTask(get_name(), get_total_work());
-					if (jaxb_dao_classes.size() > 0) {
-						generated = generate_for_sdm_xml(monitor, gen, settings, items, jaxb_dao_classes, output_dir);
-					} else {
-						generated = generate_for_dao_xml(monitor, gen, settings, items, output_dir);
-					}
+					generated = generate_for_selected_dao(monitor, gen, settings, items, output_dir);
 				} finally {
 					conn.close();
 					if (generated) {
@@ -465,85 +460,56 @@ public class UIEditorPageDAO extends Composite {
 					});
 				}
 			}
-
-			private boolean generate_for_sdm_xml(IProgressMonitor monitor, IDaoCG gen, Settings settings,
-					List<Item> items, List<DaoClass> jaxb_dao_classes, StringBuilder output_dir) {
-
-				boolean generated = false;
-				for (Item item : items) {
-					if (monitor.isCanceled()) {
-						return generated;
-					}
-					String dao_class_name = item.get_class_name();
-					monitor.subTask(dao_class_name);
-					try {
-						DaoClass dao_class = JaxbUtils.find_jaxb_dao_class(dao_class_name, jaxb_dao_classes);
-						String[] fileContent = gen.translate(dao_class_name, dao_class);
-						String fileName = EclipseTargetLanguageHelpers.get_rel_path(editor2, output_dir.toString(),
-								dao_class_name);
-						EclipseHelpers.save_text_to_file(fileName, fileContent[0]);
-						item.set_status(Const.STATUS_GENERATED);
-						generated = true;
-					} catch (Throwable ex) {
-						String msg = ex.getMessage();
-						if (msg == null) {
-							msg = "???";
-						}
-						item.set_status(msg);
-						// throw ex; // outer 'catch' cannot read the
-						// message
-						// !!!! not Internal_Exception to show Exception
-						// class
-						// throw new Exception(ex);
-						EclipseConsoleHelpers.add_error_msg(dao_class_name + ": " + msg);
-					}
-					monitor.worked(1);
-				}
-				return generated;
-			}
-
-			private boolean generate_for_dao_xml(IProgressMonitor monitor, IDaoCG gen, Settings settings,
-					List<Item> items, StringBuilder output_dir) throws Exception {
-
-				boolean generated = false;
-				String dao_xsd_abs_path = editor2.get_dao_xsd_abs_path();
-				String contextPath = DaoClass.class.getPackage().getName();
-				XmlParser dao_xml_parser = new XmlParser(contextPath, dao_xsd_abs_path);
-				for (Item item : items) {
-					if (monitor.isCanceled()) {
-						return generated;
-					}
-					String dao_class_name = item.get_class_name();
-					monitor.subTask(dao_class_name);
-					try {
-						String dao_xml_rel_path = dao_class_name + ".xml";
-						String dao_xml_abs_path = editor2.get_metaprogram_file_abs_path(dao_xml_rel_path);
-						DaoClass dao_class = dao_xml_parser.unmarshal(dao_xml_abs_path);
-						String[] fileContent = gen.translate(dao_class_name, dao_class);
-						String fileName = EclipseTargetLanguageHelpers.get_rel_path(editor2, output_dir.toString(),
-								dao_class_name);
-						EclipseHelpers.save_text_to_file(fileName, fileContent[0]);
-						item.set_status(Const.STATUS_GENERATED);
-						generated = true;
-					} catch (Throwable ex) {
-						String msg = ex.getMessage();
-						if (msg == null) {
-							msg = "???";
-						}
-						item.set_status(msg);
-						// throw ex; // outer 'catch' cannot read the
-						// message
-						// !!!! not Internal_Exception to show Exception
-						// class
-						// throw new Exception(ex);
-						EclipseConsoleHelpers.add_error_msg(dao_class_name + ": " + msg);
-					}
-					monitor.worked(1);
-				}
-				return generated;
-			}
 		};
 		EclipseSyncActionHelper.run_with_progress(getShell(), action);
+	}
+
+	private String[] generate_single_sdm_dao(IDaoCG gen, XmlParser dao_xml_parser, DaoClass sdm_dao_class)
+			throws Exception {
+		String dao_class_name = sdm_dao_class.getName();
+		String dao_xml_rel_path = dao_class_name + ".xml";
+		String dao_xml_abs_path = editor2.get_metaprogram_file_abs_path(dao_xml_rel_path);
+		return EclipseCG.generate_single_sdm_dao(gen, dao_xml_parser, sdm_dao_class, dao_xml_abs_path);
+	}
+
+	private boolean generate_for_selected_dao(IProgressMonitor monitor, IDaoCG gen, Settings settings, List<Item> items,
+			StringBuilder output_dir) throws Exception {
+
+		boolean generated = false;
+		String dao_xsd_abs_path = editor2.get_dao_xsd_abs_path();
+		String contextPath = DaoClass.class.getPackage().getName();
+		XmlParser dao_xml_parser = new XmlParser(contextPath, dao_xsd_abs_path);
+		List<DaoClass> jaxb_dao_classes = load_all_sdm_dao();
+		for (Item item : items) {
+			if (monitor.isCanceled()) {
+				return generated;
+			}
+			String dao_class_name = item.get_class_name();
+			monitor.subTask(dao_class_name);
+			try {
+				DaoClass sdm_dao_class = JaxbUtils.find_jaxb_dao_class(dao_class_name, jaxb_dao_classes);
+				String[] fileContent = generate_single_sdm_dao(gen, dao_xml_parser, sdm_dao_class);
+				String fileName = EclipseTargetLanguageHelpers.get_rel_path(editor2, output_dir.toString(),
+						dao_class_name);
+				EclipseHelpers.save_text_to_file(fileName, fileContent[0]);
+				item.set_status(Const.STATUS_GENERATED);
+				generated = true;
+			} catch (Throwable ex) {
+				String msg = ex.getMessage();
+				if (msg == null) {
+					msg = "???";
+				}
+				item.set_status(msg);
+				// throw ex; // outer 'catch' cannot read the
+				// message
+				// !!!! not Internal_Exception to show Exception
+				// class
+				// throw new Exception(ex);
+				EclipseConsoleHelpers.add_error_msg(dao_class_name + ": " + msg);
+			}
+			monitor.worked(1);
+		}
+		return generated;
 	}
 
 	protected void validate_with_progress() {
@@ -575,7 +541,6 @@ public class UIEditorPageDAO extends Composite {
 				Connection con = EclipseHelpers.get_connection(editor2);
 				monitor.subTask("Connected.");
 				try {
-
 					EclipseConsoleHelpers.init_console();
 					Settings settings = EclipseHelpers.load_settings(editor2);
 					StringBuilder output_dir = new StringBuilder();
@@ -583,13 +548,8 @@ public class UIEditorPageDAO extends Composite {
 					IDaoCG gen = EclipseTargetLanguageHelpers.create_dao_cg(con, editor2.get_project(), editor2,
 							settings, output_dir);
 					monitor.beginTask(get_name(), get_total_work());
-					List<DaoClass> jaxb_dao_classes = load_sdm_dao();
-					if (jaxb_dao_classes.size() > 0) {
-						validate_by_sdm(monitor, gen, items, settings, jaxb_dao_classes, output_dir);
-					} else {
-						validate_by_xml_files(monitor, gen, items, settings, output_dir);
-					}
-
+					List<DaoClass> jaxb_dao_classes = load_all_sdm_dao();
+					validate_all(monitor, gen, items, settings, jaxb_dao_classes, output_dir);
 				} finally {
 					con.close();
 					Display.getDefault().asyncExec(new Runnable() {
@@ -600,9 +560,12 @@ public class UIEditorPageDAO extends Composite {
 				}
 			}
 
-			private void validate_by_sdm(IProgressMonitor monitor, IDaoCG gen, List<Item> items, Settings settings,
-					List<DaoClass> jaxb_dao_classes, StringBuilder output_dir) {
+			private void validate_all(IProgressMonitor monitor, IDaoCG gen, List<Item> items, Settings settings,
+					List<DaoClass> sdm_dao_classes, StringBuilder output_dir) throws Exception {
 
+				String dao_xsd_abs_path = editor2.get_dao_xsd_abs_path();
+				String contextPath = DaoClass.class.getPackage().getName();
+				XmlParser dao_xml_parser = new XmlParser(contextPath, dao_xsd_abs_path);
 				for (int i = 0; i < items.size(); i++) {
 					if (monitor.isCanceled()) {
 						return;
@@ -610,8 +573,8 @@ public class UIEditorPageDAO extends Composite {
 					String dao_class_name = items.get(i).get_class_name();
 					monitor.subTask(dao_class_name);
 					try {
-						DaoClass dao_class = JaxbUtils.find_jaxb_dao_class(dao_class_name, jaxb_dao_classes);
-						String[] file_content = gen.translate(dao_class_name, dao_class);
+						DaoClass sdm_dao_class = JaxbUtils.find_jaxb_dao_class(dao_class_name, sdm_dao_classes);
+						String[] file_content = generate_single_sdm_dao(gen, dao_xml_parser, sdm_dao_class);
 						String file_name = EclipseTargetLanguageHelpers.get_rel_path(editor2, output_dir.toString(),
 								dao_class_name);
 						StringBuilder validation_buff = new StringBuilder();
@@ -631,54 +594,6 @@ public class UIEditorPageDAO extends Composite {
 							items.get(i).set_status(status);
 							EclipseConsoleHelpers.add_error_msg(dao_class_name + ": " + status);
 						}
-
-					} catch (Throwable ex) {
-						ex.printStackTrace();
-						String msg = ex.getMessage();
-						items.get(i).set_status(msg);
-						EclipseConsoleHelpers.add_error_msg(dao_class_name + ": " + msg);
-					}
-					monitor.worked(1);
-				}
-			}
-
-			private void validate_by_xml_files(IProgressMonitor monitor, IDaoCG gen, List<Item> items,
-					Settings settings, StringBuilder output_dir) throws Exception {
-
-				String daoXsdFileName = editor2.get_dao_xsd_abs_path();
-				String contextPath = DaoClass.class.getPackage().getName();
-				XmlParser daoXml_Parser = new XmlParser(contextPath, daoXsdFileName);
-				for (int i = 0; i < items.size(); i++) {
-					if (monitor.isCanceled()) {
-						return;
-					}
-					String dao_class_name = items.get(i).get_class_name();
-					monitor.subTask(dao_class_name);
-					try {
-						String dao_xml_rel_path = dao_class_name + ".xml";
-						String dao_xml_abs_path = editor2.get_metaprogram_file_abs_path(dao_xml_rel_path);
-						DaoClass dao_class = daoXml_Parser.unmarshal(dao_xml_abs_path);
-						String[] file_content = gen.translate(dao_class_name, dao_class);
-						String file_name = EclipseTargetLanguageHelpers.get_rel_path(editor2, output_dir.toString(),
-								dao_class_name);
-						StringBuilder validation_buff = new StringBuilder();
-						String old_text = Helpers.load_text_from_file(file_name);
-						if (old_text == null) {
-							validation_buff.append(Const.OUTPUT_FILE_IS_MISSING);
-						} else {
-							String text = file_content[0];
-							if (!Helpers.equal_ignoring_eol(text, old_text)) {
-								validation_buff.append(Const.OUTPUT_FILE_IS_OUT_OF_DATE);
-							}
-						}
-						String status = validation_buff.toString();
-						if (status.length() == 0) {
-							items.get(i).set_status(Const.STATUS_OK);
-						} else {
-							items.get(i).set_status(status);
-							EclipseConsoleHelpers.add_error_msg(dao_xml_rel_path + ": " + status);
-						}
-
 					} catch (Throwable ex) {
 						ex.printStackTrace();
 						String msg = ex.getMessage();
@@ -796,7 +711,7 @@ public class UIEditorPageDAO extends Composite {
 	private ArrayList<Item> reload_table() throws Exception {
 		final ArrayList<Item> items = new ArrayList<Item>();
 		try {
-			List<DaoClass> jaxb_dao_classes = load_sdm_dao();
+			List<DaoClass> jaxb_dao_classes = load_all_sdm_dao();
 			if (jaxb_dao_classes.size() > 0) {
 				for (DaoClass cls : jaxb_dao_classes) {
 					Item item = new Item();

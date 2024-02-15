@@ -122,11 +122,11 @@ public class EclipseTargetLanguageHelpers {
 	}
 
 	public static IDaoCG create_dao_cg(Connection conn, IProject project, String root_fn, Settings settings,
-			String xml_configs_folder_full_path, StringBuilder output_dir_abs_path) throws Exception {
+			String sdm_folder_abs_path, StringBuilder output_dir_abs_path) throws Exception {
 
 		String project_abs_path = project.getLocation().toPortableString();
 		StringBuilder output_dir_rel_path = new StringBuilder();
-		IDaoCG gen = TargetLangUtils.create_dao_cg(root_fn, project_abs_path, xml_configs_folder_full_path, conn,
+		IDaoCG gen = TargetLangUtils.create_dao_cg(root_fn, project_abs_path, sdm_folder_abs_path, conn,
 				settings, output_dir_rel_path);
 		String abs_path = EclipseHelpers.get_absolute_dir_path_str(project, output_dir_rel_path.toString());
 		output_dir_abs_path.append(abs_path);

@@ -76,16 +76,16 @@ public class IdeaActionGroup extends ActionGroup implements AlwaysVisibleActionG
         SdmAction action_generate = new SdmAction(xml_file_rel_path + " -> Generate All") {
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
-                IdeaCG.generate_all_sdm_dto(project, xml_file);
-                IdeaCG.generate_all_sdm_dao(project, xml_file);
+                IdeaCG.action_generate_all_sdm_dto(project, xml_file);
+                IdeaCG.action_generate_all_sdm_dao(project, xml_file);
             }
         };
         drop_down_actions_list.add(action_generate);
         SdmAction action_validate = new SdmAction(xml_file_rel_path + " -> Validate All") {
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
-                IdeaCG.validate_all_sdm_dto(project, xml_file);
-                IdeaCG.validate_all_sdm_dao_action(project, xml_file);
+                IdeaCG.action_validate_all_sdm_dto(project, xml_file);
+                IdeaCG.action_validate_all_sdm_dao(project, xml_file);
             }
         };
         drop_down_actions_list.add(action_validate);
@@ -100,14 +100,14 @@ public class IdeaActionGroup extends ActionGroup implements AlwaysVisibleActionG
         SdmAction action_generate = new SdmAction(xml_file_rel_path + " -> Generate") {
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
-                IdeaCG.generate_dao(project, xml_file);
+                IdeaCG.action_generate_dao_xml(project, xml_file);
             }
         };
         drop_down_actions_list.add(action_generate);
         SdmAction action_validate = new SdmAction(xml_file_rel_path + " -> Validate") {
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
-                IdeaCG.validate_external_dao_xml_action(project, xml_file);
+                IdeaCG.action_validate_dao_xml(project, xml_file);
             }
         };
         drop_down_actions_list.add(action_validate);
