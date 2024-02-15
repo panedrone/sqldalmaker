@@ -72,23 +72,23 @@ public class PsiReferenceExternalDaoXml extends PsiReferenceBase<PsiElement> {
     @Override
     public boolean isSoft() {
         // defaults: if 'false' then wrong value is highlighted in red
-        PsiFile containing_file = myElement.getContainingFile();
-        if (containing_file == null) {
-            return false;
-        }
-        String canonical_text = getCanonicalText(); // @NotNull
-        String file_name = containing_file.getName();
-        if (canonical_text.trim().isEmpty()) {
-            return true; // ref is empty
-        }
-        if (Helpers.is_sdm_xml(file_name)) {
-            if (Helpers.is_dao_xml(canonical_text)) {
-                return false; // not soft
-            }
-            return true;
-        } else if (Helpers.is_dao_xml(file_name)) {
-            return false;
-        }
+//        PsiFile containing_file = myElement.getContainingFile();
+//        if (containing_file == null) {
+//            return false;
+//        }
+//        String canonical_text = getCanonicalText(); // @NotNull
+//        String file_name = containing_file.getName();
+//        if (canonical_text.trim().isEmpty()) {
+//            return true; // ref is empty
+//        }
+//        if (Helpers.is_sdm_xml(file_name)) {
+//            if (Helpers.is_dao_xml(canonical_text)) {
+//                return false; // not soft
+//            }
+//            return true;
+//        } else if (Helpers.is_dao_xml(file_name)) {
+//            return false;
+//        }
         return false;
     }
 
