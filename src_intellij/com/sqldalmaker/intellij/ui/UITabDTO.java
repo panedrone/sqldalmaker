@@ -71,7 +71,7 @@ public class UITabDTO {
         btn_Generate.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                generate_with_progress_sync();
+                generate_selected_with_progress_sync();
             }
         });
         btn_OpenSQL.addActionListener(new ActionListener() {
@@ -95,7 +95,7 @@ public class UITabDTO {
         btn_genTmpFieldTags.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                gen_field_wizard_jaxb();
+                jaxb_fields_wizard();
             }
         });
         btn_CrudXML.addActionListener(new ActionListener() {
@@ -130,7 +130,7 @@ public class UITabDTO {
         // table.getColumnModel().getColumn(2).setPreferredWidth(300);
         // https://stackoverflow.com/questions/953972/java-jtable-setting-column-width
         // JTable.AUTO_RESIZE_LAST_COLUMN is defined as "During all resize operations,
-        // apply adjustments to the last column only" which means you have to set the autoresizemode
+        // apply adjustments to the last column only" which means you have to set the auto resize mode
         // at the end of your code, otherwise setPreferredWidth() won't affect anything!
         table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
         table.doLayout();
@@ -341,7 +341,7 @@ public class UITabDTO {
     }
 
     private void createUIComponents() {
-        final ColorTableCellRenderer colorRenderer = new ColorTableCellRenderer();
+        ColorTableCellRenderer colorRenderer = new ColorTableCellRenderer();
         table = new JTable() {
             public TableCellRenderer getCellRenderer(int row, int column) {
                 if (column == 2) {
@@ -409,7 +409,7 @@ public class UITabDTO {
         }
     }
 
-    protected void gen_field_wizard_jaxb() {
+    protected void jaxb_fields_wizard() {
         try {
             int[] selected_rows = get_selection();
             String class_name = (String) table.getValueAt(selected_rows[0], 0);
@@ -437,7 +437,7 @@ public class UITabDTO {
             try {
                 // !!!! after 'try'
                 IDtoCG gen = IdeaTargetLanguageHelpers.create_dto_cg(con, project, root_file, settings, null);
-                validate_with_progress_sync(gen, my_table_model, settings);
+                validate_all_with_progress_sync(gen, my_table_model, settings);
             } finally {
                 con.close();
             }
@@ -447,60 +447,20 @@ public class UITabDTO {
         }
     }
 
-    private void validate_with_progress_sync(IDtoCG gen, AbstractTableModel model, Settings settings) {
-        ProgressManager progressManager = ProgressManager.getInstance();
-        // ProgressIndicator indicator = progressManager.getProgressIndicator();
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                // === panedrone: don't ask it in loop because of
-                // "Cannot read the array length because "<local3>" is null"
-                int rc = model.getRowCount();
-                for (int i = 0; i < rc; i++) {
-                    String dto_class_name = (String) model.getValueAt(i, 0);
-                    ProgressManager.progress(dto_class_name);
-                    progressManager.getProgressIndicator().setText(dto_class_name);
-                    try {
-                        String[] fileContent = gen.translate(dto_class_name);
-                        StringBuilder validationBuff = new StringBuilder();
-                        IdeaTargetLanguageHelpers.validate_dto(project, root_file, settings, dto_class_name, fileContent, validationBuff);
-                        String status = validationBuff.toString();
-                        if (status.isEmpty()) {
-                            model.setValueAt(Const.STATUS_OK, i, 2);
-                        } else {
-                            model.setValueAt(status, i, 2);
-                            IdeaMessageHelpers.add_dto_error_message(settings, root_file, dto_class_name, status);
-                        }
-                    } catch (Throwable e) {
-                        // // e.printStackTrace();
-                        String msg = e.getMessage();
-                        model.setValueAt(msg, i, 2);
-                        IdeaMessageHelpers.add_dto_error_message(settings, root_file, dto_class_name, msg);
-                    }
-                    update_table_async();
-                }
-            }
-        };
-        progressManager.runProcessWithProgressSynchronously(runnable, "Validating", false, project);
-    }
-
-    protected void generate_with_progress_sync() {
-        final StringBuilder output_dir = new StringBuilder();
+    protected void generate_selected_with_progress_sync() {
+        StringBuilder output_dir = new StringBuilder();
         // 1. open connection
         // 2. create the list of generated text
         // 3. close connection
         // 4. update the files from the list
-        final List<IdeaHelpers.GeneratedFileData> list = new ArrayList<IdeaHelpers.GeneratedFileData>();
-        class Error {
-            public Exception error = null;
-        }
-        final Error error = new Error();
-        final Runnable runnable = new Runnable() {
+        List<IdeaHelpers.GeneratedFileData> list = new ArrayList<IdeaHelpers.GeneratedFileData>();
+        IdeaCG.ProgressError error = new IdeaCG.ProgressError();
+        Runnable runnable = new Runnable() {
             @Override
             public void run() {
                 try {
-                    final Settings settings = IdeaHelpers.load_settings(root_file);
-                    final int[] selected_rows = get_selection();
+                    Settings settings = IdeaHelpers.load_settings(root_file);
+                    int[] selected_rows = get_selection();
                     for (int row : selected_rows) {
                         table.setValueAt("", row, 2);
                     }
@@ -515,7 +475,7 @@ public class UITabDTO {
                             try {
                                 ProgressManager.progress(dto_class_name);
                                 String[] fileContent = gen.translate(dto_class_name);
-                                IdeaTargetLanguageHelpers.prepare_generated_file_data(root_file, dto_class_name, fileContent, list);
+                                IdeaCG.prepare_generated_file_data(root_file, dto_class_name, fileContent, list);
                                 table.setValueAt(Const.STATUS_GENERATED, row, 2);
                                 update_table_async();
                             } catch (Throwable e) {
@@ -548,6 +508,43 @@ public class UITabDTO {
         update_table_async();
     }
 
+    private void validate_all_with_progress_sync(IDtoCG gen, AbstractTableModel model, Settings settings) {
+        ProgressManager progressManager = ProgressManager.getInstance();
+        // ProgressIndicator indicator = progressManager.getProgressIndicator();
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                // === panedrone: don't ask it in loop because of
+                // "Cannot read the array length because "<local3>" is null"
+                int rc = model.getRowCount();
+                for (int i = 0; i < rc; i++) {
+                    String dto_class_name = (String) model.getValueAt(i, 0);
+                    ProgressManager.progress(dto_class_name);
+                    progressManager.getProgressIndicator().setText(dto_class_name);
+                    try {
+                        String[] fileContent = gen.translate(dto_class_name);
+                        StringBuilder validationBuff = new StringBuilder();
+                        IdeaCG.validate_single_dto_ignoring_eol(project, root_file, settings, dto_class_name, fileContent, validationBuff);
+                        String status = validationBuff.toString();
+                        if (status.isEmpty()) {
+                            model.setValueAt(Const.STATUS_OK, i, 2);
+                        } else {
+                            model.setValueAt(status, i, 2);
+                            IdeaMessageHelpers.add_dto_error_message(settings, root_file, dto_class_name, status);
+                        }
+                    } catch (Throwable e) {
+                        // // e.printStackTrace();
+                        String msg = e.getMessage();
+                        model.setValueAt(msg, i, 2);
+                        IdeaMessageHelpers.add_dto_error_message(settings, root_file, dto_class_name, msg);
+                    }
+                    update_table_async();
+                }
+            }
+        };
+        progressManager.runProcessWithProgressSynchronously(runnable, "Validating", false, project);
+    }
+
     private void update_table_async() {
         // to prevent:
         // WARN - intellij.ide.HackyRepaintManager
@@ -578,7 +575,7 @@ public class UITabDTO {
 
     private void reload_table() throws Exception {
         try {
-            final ArrayList<String[]> list = my_table_model.getList();
+            ArrayList<String[]> list = my_table_model.getList();
             list.clear();
             String xml_configs_folder_full_path = root_file.getParent().getPath();
             String sdm_xml_abs_path = xml_configs_folder_full_path + "/" + Const.SDM_XML;

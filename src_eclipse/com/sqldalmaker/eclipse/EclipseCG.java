@@ -42,7 +42,7 @@ public class EclipseCG {
 			IProject project = root_file.getProject();
 			Connection con = EclipseHelpers.get_connection(project, settings);
 			try {
-				IDtoCG gen = EclipseTargetLanguageHelpers.create_dto_cg(con, project, settings, root_file.getName(),
+				IDtoCG gen = create_dto_cg(con, project, settings, root_file.getName(),
 						xml_mp_abs_path, output_dir);
 				String sdm_xml_abs_path = xml_file.getLocation().toPortableString();
 				String sdm_xsd_abs_path = Helpers.concat_path(xml_mp_abs_path, Const.SDM_XSD);
@@ -85,7 +85,7 @@ public class EclipseCG {
 			IProject project = root_file.getProject();
 			Connection con = EclipseHelpers.get_connection(project, settings);
 			try {
-				IDaoCG gen = EclipseTargetLanguageHelpers.create_dao_cg(con, project, root_file.getName(), settings,
+				IDaoCG gen = create_dao_cg(con, project, root_file.getName(), settings,
 						xml_mp_abs_path, output_dir);
 				String sdm_xml_abs_path = xml_file.getLocation().toPortableString();
 				String sdm_xsd_abs_path = Helpers.concat_path(xml_mp_abs_path, Const.SDM_XSD);
@@ -133,7 +133,7 @@ public class EclipseCG {
 			String sdm_xsd_abs_path = Helpers.concat_path(xml_mp_abs_path, Const.SDM_XSD);
 			List<DtoClass> dto_classes = SdmUtils.get_dto_classes(sdm_xml_abs_path, sdm_xsd_abs_path);
 			try {
-				IDtoCG gen = EclipseTargetLanguageHelpers.create_dto_cg(con, project, settings, root_file.getName(),
+				IDtoCG gen = create_dto_cg(con, project, settings, root_file.getName(),
 						xml_mp_abs_path, output_dir);
 				for (DtoClass cls : dto_classes) {
 					try {
@@ -192,7 +192,7 @@ public class EclipseCG {
 			String contextPath = DaoClass.class.getPackage().getName();
 			XmlParser dao_xml_parser = new XmlParser(contextPath, sdm_xsd_abs_path);
 			try {
-				IDaoCG gen = EclipseTargetLanguageHelpers.create_dao_cg(con, project, root_file.getName(), settings,
+				IDaoCG gen = create_dao_cg(con, project, root_file.getName(), settings,
 						sdm_folder_abs_path, output_dir);
 				for (DaoClass cls : dao_classes) {
 					try {
@@ -246,7 +246,7 @@ public class EclipseCG {
 			Connection conn = EclipseHelpers.get_connection(project, settings);
 			try {
 				StringBuilder output_dir_abs_path = new StringBuilder();
-				IDaoCG gen = EclipseTargetLanguageHelpers.create_dao_cg(conn, project, root_file.getName(), settings,
+				IDaoCG gen = create_dao_cg(conn, project, root_file.getName(), settings,
 						xml_mp_abs_path, output_dir_abs_path);
 				String dao_xsd_abs_path = Helpers.concat_path(xml_mp_abs_path, Const.DAO_XSD);
 				String context_path = DaoClass.class.getPackage().getName();
@@ -295,7 +295,7 @@ public class EclipseCG {
 			Connection conn = EclipseHelpers.get_connection(project, settings);
 			try {
 				StringBuilder output_dir_abs_path = new StringBuilder();
-				IDaoCG gen = EclipseTargetLanguageHelpers.create_dao_cg(conn, project, root_file.getName(), settings,
+				IDaoCG gen = create_dao_cg(conn, project, root_file.getName(), settings,
 						xml_mp_abs_path, output_dir_abs_path);
 				String dao_xsd_abs_path = Helpers.concat_path(xml_mp_abs_path, Const.DAO_XSD);
 				String context_path = DaoClass.class.getPackage().getName();
@@ -360,5 +360,48 @@ public class EclipseCG {
 			file_content = gen.translate(dao_class_name, external_dao_class);
 		}
 		return file_content;
+	}
+	
+	////////////////////////////////////////////////
+	
+	public static IDtoCG create_dto_cg(Connection conn, IEditor2 editor2, Settings settings,
+			StringBuilder output_dir_rel_path) throws Exception {
+
+		IProject project = editor2.get_project();
+		String root_fn = editor2.get_root_file_name();
+		String xml_configs_folder_full_path = editor2.get_sdm_folder_abs_path();
+		return create_dto_cg(conn, project, settings, root_fn, xml_configs_folder_full_path, output_dir_rel_path);
+	}
+
+	public static IDtoCG create_dto_cg(Connection conn, IProject project, Settings settings, String root_fn,
+			String xml_configs_folder_full_path, StringBuilder output_dir_abs_path) throws Exception {
+
+		String project_abs_path = project.getLocation().toPortableString();
+		StringBuilder output_dir_rel_path = new StringBuilder();
+		IDtoCG gen = TargetLangUtils.create_dto_cg(root_fn, project_abs_path, xml_configs_folder_full_path, conn,
+				settings, output_dir_rel_path);
+		String abs_path = EclipseHelpers.get_absolute_dir_path_str(project, output_dir_rel_path.toString());
+		output_dir_abs_path.append(abs_path);
+		return gen;
+	}
+
+	public static IDaoCG create_dao_cg(Connection conn, IProject project, IEditor2 editor2, Settings settings,
+			StringBuilder output_dir_abs_path) throws Exception {
+
+		String root_fn = editor2.get_root_file_name();
+		String xml_configs_folder_full_path = editor2.get_sdm_folder_abs_path();
+		return create_dao_cg(conn, project, root_fn, settings, xml_configs_folder_full_path, output_dir_abs_path);
+	}
+
+	public static IDaoCG create_dao_cg(Connection conn, IProject project, String root_fn, Settings settings,
+			String sdm_folder_abs_path, StringBuilder output_dir_abs_path) throws Exception {
+
+		String project_abs_path = project.getLocation().toPortableString();
+		StringBuilder output_dir_rel_path = new StringBuilder();
+		IDaoCG gen = TargetLangUtils.create_dao_cg(root_fn, project_abs_path, sdm_folder_abs_path, conn,
+				settings, output_dir_rel_path);
+		String abs_path = EclipseHelpers.get_absolute_dir_path_str(project, output_dir_rel_path.toString());
+		output_dir_abs_path.append(abs_path);
+		return gen;
 	}
 }

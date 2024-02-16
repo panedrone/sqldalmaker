@@ -252,6 +252,7 @@ public class GoCG {
             }
             Map<String, Object> context = new HashMap<String, Object>();
             context.put("package", dao_package);
+            imports_set.add("context");
             String[] imports_arr = imports_set.toArray(new String[0]);
             Arrays.sort(imports_arr);
             context.put("imports", imports_arr);

@@ -34,7 +34,7 @@ import java.util.Set;
  * 02.01.2020 07:21
  * 03.09.2019 15:55
  * 07.02.2019 19:50 initial commit
- * 
+ *
  */
 public class Helpers {
 
@@ -516,10 +516,14 @@ public class Helpers {
         return pk_col_name;
     }
 
-    public static boolean equal_ignoring_eol(String old_text, String text) {
-        old_text = old_text.replace("\r", "\n").replace("\n\n", "\n");
-        text = text.replace("\r", "\n").replace("\n\n", "\n");
-        return old_text.equals(text);
+    public static String remove_cr_and_lf(String text) {
+        return text.replace("\r", "\n").replace("\n\n", "\n").trim();
+    }
+
+    public static boolean equal_ignoring_eol(String text1, String text2) {
+        text1 = remove_cr_and_lf(text1);
+        text2 = remove_cr_and_lf(text2);
+        return text1.equals(text2);
     }
 
     public static boolean is_sdm_xml(String name) {

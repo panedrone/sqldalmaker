@@ -62,13 +62,13 @@ public class UITabDAO {
         btn_Validate.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                validate_with_progress_sync();
+                validate_all_with_progress_sync();
             }
         });
         btn_Generate.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                generate_with_progress_sync();
+                generate_selected_with_progress_sync();
             }
         });
         btn_OpenXML.addActionListener(new ActionListener() {
@@ -137,7 +137,7 @@ public class UITabDAO {
     }
 
     private void createUIComponents() {
-        final ColorRenderer colorRenderer = new ColorRenderer();
+        ColorRenderer colorRenderer = new ColorRenderer();
         table = new JTable() {
             public TableCellRenderer getCellRenderer(int row, int column) {
                 if (column == 1) {
@@ -171,7 +171,7 @@ public class UITabDAO {
     }
 
     private void new_dao_xml() {
-        final UIDialogNewDaoXml d = new UIDialogNewDaoXml(project, root_file);
+        UIDialogNewDaoXml d = new UIDialogNewDaoXml(project, root_file);
         d.pack();
         d.setLocationRelativeTo(null);  // after pack!!!
         d.addWindowListener(new WindowAdapter() {
@@ -201,7 +201,7 @@ public class UITabDAO {
     private void open_generated_source_file() {
         try {
             int[] selectedRows = get_selection();
-            final Settings settings = IdeaHelpers.load_settings(root_file);
+            Settings settings = IdeaHelpers.load_settings(root_file);
             String dao_class_name = (String) table.getValueAt(selectedRows[0], 0);
             IdeaTargetLanguageHelpers.open_dao_sync(project, root_file, settings, dao_class_name);
         } catch (Exception e) {
@@ -234,7 +234,7 @@ public class UITabDAO {
                 ProgressManager.progress(dao_class_name);
                 DaoClass dao_class = JaxbUtils.find_jaxb_dao_class(dao_class_name, jaxb_dao_classes);
                 String[] file_content = IdeaCG.generate_single_sdm_dao(project, root_file, gen, dao_class, settings);
-                IdeaTargetLanguageHelpers.prepare_generated_file_data(root_file, dao_class_name, file_content, list);
+                IdeaCG.prepare_generated_file_data(root_file, dao_class_name, file_content, list);
                 table.setValueAt(Const.STATUS_GENERATED, row, 1);
             } catch (Throwable e) {
                 String msg = e.getMessage();
@@ -246,19 +246,16 @@ public class UITabDAO {
         }
     }
 
-    private void generate_with_progress_sync() {
-        final List<IdeaHelpers.GeneratedFileData> list = new ArrayList<IdeaHelpers.GeneratedFileData>();
-        final StringBuilder output_dir = new StringBuilder();
-        class Error {
-            public Throwable error = null;
-        }
-        Error error = new Error();
-        final Runnable runnable = new Runnable() {
+    private void generate_selected_with_progress_sync() {
+        List<IdeaHelpers.GeneratedFileData> list = new ArrayList<IdeaHelpers.GeneratedFileData>();
+        StringBuilder output_dir = new StringBuilder();
+        IdeaCG.ProgressError error = new IdeaCG.ProgressError();
+        Runnable runnable = new Runnable() {
             @Override
             public void run() {
                 try {
-                    final Settings settings = IdeaHelpers.load_settings(root_file);
-                    final int[] selectedRows = get_selection();
+                    Settings settings = IdeaHelpers.load_settings(root_file);
+                    int[] selectedRows = get_selection();
                     for (int row : selectedRows) {
                         table.setValueAt("", row, 1);
                     }
@@ -311,7 +308,7 @@ public class UITabDAO {
         return selected_rows;
     }
 
-    private void validate_with_progress_sync(IDaoCG gen, TableModel model, Settings settings) {
+    private void validate_all_with_progress_sync(IDaoCG gen, TableModel model, Settings settings) {
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
@@ -347,7 +344,7 @@ public class UITabDAO {
         ProgressManager.getInstance().runProcessWithProgressSynchronously(runnable, "Validating", false, project);
     }
 
-    private void validate_with_progress_sync() {
+    private void validate_all_with_progress_sync() {
         try {
             reload_table();
             Settings profile = IdeaHelpers.load_settings(root_file);
@@ -355,7 +352,7 @@ public class UITabDAO {
             try {
                 // !!!! after 'try'
                 IDaoCG gen = IdeaTargetLanguageHelpers.create_dao_cg(con, project, root_file, profile, null);
-                validate_with_progress_sync(gen, my_table_model, profile);
+                validate_all_with_progress_sync(gen, my_table_model, profile);
             } finally {
                 con.close();
             }
@@ -576,7 +573,7 @@ public class UITabDAO {
 
     private void reload_table() throws Exception {
         try {
-            final ArrayList<String[]> list = my_table_model.getList();
+            ArrayList<String[]> list = my_table_model.getList();
             list.clear();
             List<DaoClass> jaxb_dao_classes = IdeaHelpers.load_all_sdm_dao_classes(root_file);
             for (DaoClass cls : jaxb_dao_classes) {

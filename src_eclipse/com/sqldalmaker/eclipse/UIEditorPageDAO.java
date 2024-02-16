@@ -102,7 +102,7 @@ public class UIEditorPageDAO extends Composite {
 	 */
 	public UIEditorPageDAO(Composite parent, int style) {
 		super(parent, style);
-		createActions();
+		createToolbarActions();
 		addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(DisposeEvent e) {
 				toolkit.dispose();
@@ -199,7 +199,7 @@ public class UIEditorPageDAO extends Composite {
 		toolBarManager.update(true);
 	}
 
-	private void createActions() {
+	private void createToolbarActions() {
 		{
 			action_refresh = new Action("") {
 				@Override
@@ -216,7 +216,7 @@ public class UIEditorPageDAO extends Composite {
 
 				@Override
 				public void run() {
-					generate_crud_dao_xml();
+					crud_dao_xml_wizard();
 				}
 			};
 			action_getCrudDao.setToolTipText("DAO CRUD XML Assistant");
@@ -249,7 +249,7 @@ public class UIEditorPageDAO extends Composite {
 			action_newXml = new Action("") {
 				@Override
 				public void run() {
-					create_xml_file();
+					create_dao_xml_file();
 				}
 			};
 			action_newXml.setToolTipText("New XML file");
@@ -297,7 +297,7 @@ public class UIEditorPageDAO extends Composite {
 
 	protected void open_generated_source_file() {
 		try {
-			List<Item> items = prepare_selected_items();
+			List<Item> items = get_selected_items();
 			if (items == null) {
 				return;
 			}
@@ -315,7 +315,7 @@ public class UIEditorPageDAO extends Composite {
 
 	protected void open_xml() {
 		try {
-			List<Item> items = prepare_selected_items();
+			List<Item> items = get_selected_items();
 			if (items == null) {
 				return;
 			}
@@ -340,7 +340,7 @@ public class UIEditorPageDAO extends Composite {
 		}
 	}
 
-	protected void generate_crud_dao_xml() {
+	protected void crud_dao_xml_wizard() {
 		try {
 			EclipseCrudXmlHelpers.get_crud_dao_xml(getShell(), editor2);
 		} catch (Throwable e) {
@@ -349,7 +349,7 @@ public class UIEditorPageDAO extends Composite {
 		}
 	}
 
-	protected void create_xml_file() {
+	protected void create_dao_xml_file() {
 		try {
 			IFile file = UIDialogNewDaoXmlFile.open(getShell(), editor2);
 			if (file != null) {
@@ -368,7 +368,7 @@ public class UIEditorPageDAO extends Composite {
 		}
 	}
 
-	private List<Item> prepare_selected_items() {
+	private List<Item> get_selected_items() {
 		@SuppressWarnings("unchecked")
 		List<Item> items = (List<Item>) tableViewer.getInput();
 		if (items == null || items.size() == 0) {
@@ -396,7 +396,7 @@ public class UIEditorPageDAO extends Composite {
 
 	@SuppressWarnings("unchecked")
 	private List<Item> get_items() {
-		List<Item> items = prepare_selected_items();
+		List<Item> items = get_selected_items();
 		if (items == null) {
 			items = (List<Item>) tableViewer.getInput();
 		}
@@ -441,7 +441,7 @@ public class UIEditorPageDAO extends Composite {
 					Settings settings = EclipseHelpers.load_settings(editor2);
 					StringBuilder output_dir = new StringBuilder();
 					// !!!! after 'try'
-					IDaoCG gen = EclipseTargetLanguageHelpers.create_dao_cg(conn, editor2.get_project(), editor2,
+					IDaoCG gen = EclipseCG.create_dao_cg(conn, editor2.get_project(), editor2,
 							settings, output_dir);
 					monitor.beginTask(get_name(), get_total_work());
 					generated = generate_for_selected_dao(monitor, gen, settings, items, output_dir);
@@ -545,7 +545,7 @@ public class UIEditorPageDAO extends Composite {
 					Settings settings = EclipseHelpers.load_settings(editor2);
 					StringBuilder output_dir = new StringBuilder();
 					// !!!! after 'try'
-					IDaoCG gen = EclipseTargetLanguageHelpers.create_dao_cg(con, editor2.get_project(), editor2,
+					IDaoCG gen = EclipseCG.create_dao_cg(con, editor2.get_project(), editor2,
 							settings, output_dir);
 					monitor.beginTask(get_name(), get_total_work());
 					List<DaoClass> jaxb_dao_classes = load_all_sdm_dao();
@@ -606,13 +606,6 @@ public class UIEditorPageDAO extends Composite {
 		};
 		EclipseSyncActionHelper.run_with_progress(getShell(), action);
 	}
-
-	// private IJavaProject getJavaProject() {
-	//
-	// IJavaProject jproject = JavaCore.create(project);
-	//
-	// return jproject;
-	// }
 
 	private class ItemLabelProvider extends LabelProvider implements ITableLabelProvider, IColorProvider {
 

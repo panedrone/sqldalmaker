@@ -60,7 +60,6 @@ package ${package}
 // https://sqldalmaker.sourceforge.net/
 
 import (
-	"context"
 #foreach($imp in ${imports})
 	"${imp}"
 #end

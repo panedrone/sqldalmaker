@@ -95,40 +95,6 @@ public class IdeaTargetLanguageHelpers {
         IdeaEditorHelpers.open_project_file_in_editor_sync(project, rel_path);
     }
 
-    public static void prepare_generated_file_data(
-            VirtualFile root_file,
-            String class_name,
-            String[] file_content,
-            List<IdeaHelpers.GeneratedFileData> list) throws Exception {
-
-        String file_name = TargetLangUtils.file_name_from_class_name(root_file.getName(), class_name);
-        IdeaHelpers.GeneratedFileData gf = new IdeaHelpers.GeneratedFileData();
-        gf.file_name = file_name;
-        gf.file_content = file_content[0];
-        list.add(gf);
-    }
-
-    public static void validate_dto(
-            Project project,
-            VirtualFile root_file,
-            Settings settings,
-            String dto_class_name,
-            String[] file_content,
-            StringBuilder err_buff) throws Exception {
-
-        String target_file_abs_path = get_dto_file_abs_path(project, root_file, settings, dto_class_name);
-        String old_text = Helpers.load_text_from_file(target_file_abs_path);
-        if (old_text.isEmpty()) {
-            err_buff.append(Const.OUTPUT_FILE_IS_MISSING);
-        } else {
-            String text = file_content[0];
-            if (Helpers.equal_ignoring_eol(text, old_text)) {
-                return;
-            }
-            err_buff.append(Const.OUTPUT_FILE_IS_OUT_OF_DATE);
-        }
-    }
-
     public static String get_target_folder_abs_path(
             Project project,
             VirtualFile root_file,
@@ -177,27 +143,6 @@ public class IdeaTargetLanguageHelpers {
         }
         String target_file_abs_path = TargetLangUtils.get_target_file_path(root_file_fn, target_folder_abs_path, dao_class_name);
         return target_file_abs_path;
-    }
-
-    public static void validate_dao(
-            Project project,
-            VirtualFile root_file,
-            Settings settings,
-            String dao_class_name,
-            String[] file_content,
-            StringBuilder err_buff) throws Exception {
-
-        String target_file_abs_path = get_dao_file_abs_path(project, root_file, settings, dao_class_name);
-        String old_text = Helpers.load_text_from_file(target_file_abs_path);
-        if (old_text.isEmpty()) {
-            err_buff.append(Const.OUTPUT_FILE_IS_MISSING);
-        } else {
-            String text = file_content[0];
-            if (Helpers.equal_ignoring_eol(old_text, text)) {
-                return;
-            }
-            err_buff.append(Const.OUTPUT_FILE_IS_OUT_OF_DATE);
-        }
     }
 
     /*

@@ -94,6 +94,25 @@ public class EclipseXmlAttrHelpers {
 		return -1;
 	}
 
+	public static String get_parent_tag(int offset, String text) {
+		// if cursor is inside of empty attribute, then the quote is in current
+		// position
+		// this is why I start from offset - 1
+		int tag_start = -1;
+		for (int i = offset - 1; i >= 0; i--) {
+			if (text.charAt(i) == '<') {
+				tag_start = i;
+				break;
+			}
+		}
+		String tag_start_str = text.substring(tag_start + 1, offset).trim();
+		String[] splited = tag_start_str.split("\\s+");
+		if (splited.length > 0) {
+			return splited[0];
+		}
+		return "";
+	}
+
 	public static int get_end_offset(int offset, String text) {
 		for (int i = offset; i < text.length(); i++) {
 			if (text.charAt(i) == '\"') {

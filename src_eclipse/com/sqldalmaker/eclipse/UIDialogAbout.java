@@ -77,7 +77,7 @@ public class UIDialogAbout extends Dialog {
 	 */
 	@Override
 	protected Point getInitialSize() {
-		return new Point(570, 360);
+		return new Point(772, 528);
 	}
 
 }

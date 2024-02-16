@@ -98,7 +98,7 @@ public class UIEditorPageDTO extends Composite {
 	 */
 	public UIEditorPageDTO(Composite parent, int style) {
 		super(parent, style);
-		createActions();
+		createToolbarActions();
 		addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(DisposeEvent e) {
 				toolkit.dispose();
@@ -206,7 +206,7 @@ public class UIEditorPageDTO extends Composite {
 		toolBarManager.update(true);
 	}
 
-	private void createActions() {
+	private void createToolbarActions() {
 		{
 			action_refresh = new Action("") {
 				@Override
@@ -352,8 +352,7 @@ public class UIEditorPageDTO extends Composite {
 					Settings settings = EclipseHelpers.load_settings(editor2);
 					StringBuilder output_dir_abs_path = new StringBuilder();
 					// !!!! after 'try'
-					IDtoCG gen = EclipseTargetLanguageHelpers.create_dto_cg(con, editor2, settings,
-							output_dir_abs_path);
+					IDtoCG gen = EclipseCG.create_dto_cg(con, editor2, settings, output_dir_abs_path);
 					monitor.beginTask(get_name(), get_total_work());
 					for (int i = 0; i < items.size(); i++) {
 						if (monitor.isCanceled()) {
@@ -470,7 +469,7 @@ public class UIEditorPageDTO extends Composite {
 					Settings settings = EclipseHelpers.load_settings(editor2);
 					StringBuilder output_dir = new StringBuilder();
 					// !!!! after 'try'
-					IDtoCG gen = EclipseTargetLanguageHelpers.create_dto_cg(con, editor2, settings, output_dir);
+					IDtoCG gen = EclipseCG.create_dto_cg(con, editor2, settings, output_dir);
 					monitor.beginTask(get_name(), get_total_work());
 					for (Item item : items) {
 						if (monitor.isCanceled()) {

@@ -37,8 +37,12 @@ public class IdeaCG {
         return root_file;
     }
 
-    private static class Error {
+    private static class ErrorSign {
         public boolean occurred = false;
+    }
+
+    public static class ProgressError {
+        public Throwable error = null;
     }
 
     // IdeaActionGroup
@@ -57,7 +61,7 @@ public class IdeaCG {
         }
         List<IdeaHelpers.GeneratedFileData> list = new ArrayList<IdeaHelpers.GeneratedFileData>();
         StringBuilder output_dir = new StringBuilder();
-        Error err = new Error();
+        ErrorSign err = new ErrorSign();
         final Runnable runnable = new Runnable() {
             @Override
             public void run() {
@@ -74,7 +78,7 @@ public class IdeaCG {
                             for (DtoClass cls : dto_classes) {
                                 ProgressManager.progress(cls.getName());
                                 String[] file_content = gen.translate(cls.getName());
-                                IdeaTargetLanguageHelpers.prepare_generated_file_data(root_file, cls.getName(), file_content, list);
+                                prepare_generated_file_data(root_file, cls.getName(), file_content, list);
                             }
                         } catch (Throwable e) {
                             String msg = e.getMessage();
@@ -138,7 +142,7 @@ public class IdeaCG {
                                 ProgressManager.progress(cls.getName());
                                 String[] file_content = gen.translate(cls.getName());
                                 StringBuilder validationBuff = new StringBuilder();
-                                IdeaTargetLanguageHelpers.validate_dto(project, root_file, settings, cls.getName(), file_content, validationBuff);
+                                validate_single_dto_ignoring_eol(project, root_file, settings, cls.getName(), file_content, validationBuff);
                                 String status = validationBuff.toString();
                                 if (!status.isEmpty()) {
                                     error = true;
@@ -182,7 +186,7 @@ public class IdeaCG {
         }
         List<IdeaHelpers.GeneratedFileData> list = new ArrayList<IdeaHelpers.GeneratedFileData>();
         StringBuilder output_dir = new StringBuilder();
-        Error err = new Error();
+        ErrorSign err = new ErrorSign();
         final Runnable runnable = new Runnable() {
             @Override
             public void run() {
@@ -199,7 +203,7 @@ public class IdeaCG {
                             for (DaoClass cls : dao_classes) {
                                 ProgressManager.progress(cls.getName());
                                 String[] file_content = generate_single_sdm_dao(project, root_file, gen, cls, settings);
-                                IdeaTargetLanguageHelpers.prepare_generated_file_data(root_file, cls.getName(), file_content, list);
+                                prepare_generated_file_data(root_file, cls.getName(), file_content, list);
                             }
                         } catch (Throwable e) {
                             String msg = e.getMessage();
@@ -321,7 +325,7 @@ public class IdeaCG {
                     DaoClass dao_class = xml_parser.unmarshal(dao_xml_abs_path);
                     dao_class.setName(dao_class_name);
                     String[] file_content = generate_single_sdm_dao(project, root_file, gen, dao_class, settings);
-                    IdeaTargetLanguageHelpers.prepare_generated_file_data(root_file, dao_class_name, file_content, list);
+                    prepare_generated_file_data(root_file, dao_class_name, file_content, list);
                 } catch (Throwable e) {
                     String msg = e.getMessage();
                     IdeaMessageHelpers.add_error_to_ide_log(dao_xml_file_name, msg);
@@ -434,7 +438,7 @@ public class IdeaCG {
             DaoClass external_dao_class = load_external_dao_class(root_file, sdm_dao_class);
             file_content = gen.translate(dao_class_name, external_dao_class);
         }
-        IdeaTargetLanguageHelpers.validate_dao(project, root_file, settings, dao_class_name, file_content, validation_buff);
+        validate_single_dao_ignoring_eol(project, root_file, settings, dao_class_name, file_content, validation_buff);
         return validation_buff.toString();
     }
 
@@ -445,5 +449,58 @@ public class IdeaCG {
         String contextPath = DaoClass.class.getPackage().getName();
         XmlParser xml_parser = new XmlParser(contextPath, Helpers.concat_path(local_abs_path, Const.DAO_XSD));
         return xml_parser.unmarshal(dao_xml_abs_path);
+    }
+
+    public static void prepare_generated_file_data(
+            VirtualFile root_file,
+            String class_name,
+            String[] file_content,
+            List<IdeaHelpers.GeneratedFileData> list) throws Exception {
+
+        String file_name = TargetLangUtils.file_name_from_class_name(root_file.getName(), class_name);
+        IdeaHelpers.GeneratedFileData gf = new IdeaHelpers.GeneratedFileData();
+        gf.file_name = file_name;
+        gf.file_content = file_content[0];
+        list.add(gf);
+    }
+
+    public static boolean equal_ignoring_eol(String text, String old_text, StringBuilder err_buff) {
+        if (old_text.isEmpty()) {
+            err_buff.append(Const.OUTPUT_FILE_IS_MISSING);
+            return false;
+        }
+        if (Helpers.equal_ignoring_eol(text, old_text)) {
+            return true;
+        }
+        err_buff.append(Const.OUTPUT_FILE_IS_OUT_OF_DATE);
+        return false;
+    }
+
+    // IdeaCG, UITabDTO
+    public static boolean validate_single_dto_ignoring_eol(
+            Project project,
+            VirtualFile root_file,
+            Settings settings,
+            String dto_class_name,
+            String[] file_content,
+            StringBuilder err_buff) throws Exception {
+
+        String target_file_abs_path = IdeaTargetLanguageHelpers.get_dto_file_abs_path(project, root_file, settings, dto_class_name);
+        String old_text = Helpers.load_text_from_file(target_file_abs_path);
+        return equal_ignoring_eol(file_content[0], old_text, err_buff);
+    }
+
+    // only IdeaCG
+    private static boolean validate_single_dao_ignoring_eol(
+            Project project,
+            VirtualFile root_file,
+            Settings settings,
+            String dao_class_name,
+            String[] file_content,
+            StringBuilder err_buff) throws Exception {
+
+        String target_file_abs_path = IdeaTargetLanguageHelpers.get_dao_file_abs_path(project, root_file, settings, dao_class_name);
+        String old_text = Helpers.load_text_from_file(target_file_abs_path);
+        return equal_ignoring_eol(file_content[0], old_text, err_buff);
     }
 }

@@ -43,7 +43,7 @@ public class EclipseTargetLanguageHelpers {
 			throw new Exception("IFolder expected");
 		}
 		List<IFile> root_files = new ArrayList<IFile>();
-		String[] rf_names = { Const.Root.PHP, Const.Root.JAVA, Const.Root.CPP, Const.Root.GO };
+		String[] rf_names = { Const.Root.PHP, Const.Root.JAVA, Const.Root.CPP, Const.Root.PYTHON, Const.Root.GO };
 		for (String rf : rf_names) {
 			IResource res = xml_mp_folder.findMember(rf);
 			if (res instanceof IFile) {
@@ -90,46 +90,5 @@ public class EclipseTargetLanguageHelpers {
 			}
 		}
 		return null;
-	}
-
-	public static IDtoCG create_dto_cg(Connection conn, IEditor2 editor2, Settings settings,
-			StringBuilder output_dir_rel_path) throws Exception {
-
-		IProject project = editor2.get_project();
-		String root_fn = editor2.get_root_file_name();
-		String xml_configs_folder_full_path = editor2.get_sdm_folder_abs_path();
-		return create_dto_cg(conn, project, settings, root_fn, xml_configs_folder_full_path, output_dir_rel_path);
-	}
-
-	public static IDtoCG create_dto_cg(Connection conn, IProject project, Settings settings, String root_fn,
-			String xml_configs_folder_full_path, StringBuilder output_dir_abs_path) throws Exception {
-
-		String project_abs_path = project.getLocation().toPortableString();
-		StringBuilder output_dir_rel_path = new StringBuilder();
-		IDtoCG gen = TargetLangUtils.create_dto_cg(root_fn, project_abs_path, xml_configs_folder_full_path, conn,
-				settings, output_dir_rel_path);
-		String abs_path = EclipseHelpers.get_absolute_dir_path_str(project, output_dir_rel_path.toString());
-		output_dir_abs_path.append(abs_path);
-		return gen;
-	}
-
-	public static IDaoCG create_dao_cg(Connection conn, IProject project, IEditor2 editor2, Settings settings,
-			StringBuilder output_dir_abs_path) throws Exception {
-
-		String root_fn = editor2.get_root_file_name();
-		String xml_configs_folder_full_path = editor2.get_sdm_folder_abs_path();
-		return create_dao_cg(conn, project, root_fn, settings, xml_configs_folder_full_path, output_dir_abs_path);
-	}
-
-	public static IDaoCG create_dao_cg(Connection conn, IProject project, String root_fn, Settings settings,
-			String sdm_folder_abs_path, StringBuilder output_dir_abs_path) throws Exception {
-
-		String project_abs_path = project.getLocation().toPortableString();
-		StringBuilder output_dir_rel_path = new StringBuilder();
-		IDaoCG gen = TargetLangUtils.create_dao_cg(root_fn, project_abs_path, sdm_folder_abs_path, conn,
-				settings, output_dir_rel_path);
-		String abs_path = EclipseHelpers.get_absolute_dir_path_str(project, output_dir_rel_path.toString());
-		output_dir_abs_path.append(abs_path);
-		return gen;
 	}
 }

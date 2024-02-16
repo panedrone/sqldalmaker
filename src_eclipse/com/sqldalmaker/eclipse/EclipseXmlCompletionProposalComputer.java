@@ -100,24 +100,30 @@ public class EclipseXmlCompletionProposalComputer implements ICompletionProposal
 			}
 			int attr_offset = region.getOffset() - 2;
 			if (EclipseXmlAttrHelpers.is_value_of("ref", attr_offset, text)) {
-				// === panedrone: this is incorrect condition because
-				// "dict/" is correct qualifier
-				// for dict/get_categories.sql
-				// if (value.toLowerCase().endsWith(".sql") == false) {
-				// return NONE;
-				// }
 				IContainer this_folder = this_xml_file.getParent();
-				IResource root = EclipseTargetLanguageHelpers.find_root_file(this_folder);
-				String xml_metaprogram_folder_path = root.getParent().getLocation().toPortableString();
-				Settings settings = SdmUtils.load_settings(xml_metaprogram_folder_path);
-				String sql_root_rel_path = settings.getFolders().getSql();
-				IProject project = this_xml_file.getProject();
-				IFolder sql_root = project.getFolder(sql_root_rel_path);
-				if (sql_root == null) {
+				if (!(this_folder instanceof IFolder)) {
 					return NONE;
 				}
 				List<String> list = new ArrayList<String>();
-				enum_sql_files(sql_root, list, sql_root.getFullPath().toPortableString());
+				String parent_tag = EclipseXmlAttrHelpers.get_parent_tag(attr_offset, text);
+				if ("dao-class".equals(parent_tag)) {
+					IFolder sdm_xml_folder = (IFolder) this_folder;
+					enum_dao_xml_files(sdm_xml_folder, list);
+				} else {
+					IResource root = EclipseTargetLanguageHelpers.find_root_file(this_folder);
+					String sdm_folder_abs_path = root.getParent().getLocation().toPortableString();
+					Settings settings = SdmUtils.load_settings(sdm_folder_abs_path);
+					String sql_root_rel_path = settings.getFolders().getSql();
+					IProject project = this_xml_file.getProject();
+					IFolder sql_root = project.getFolder(sql_root_rel_path);
+					if (sql_root == null) {
+						return NONE;
+					}
+					enum_sql_files_recursive(sql_root, list, sql_root.getFullPath().toPortableString());
+				}
+				if (list.size() == 0) {
+					return NONE;
+				}
 				List<ICompletionProposal> prop_list = new ArrayList<ICompletionProposal>();
 				compute_structure_proposals(qualifier, cursor_offset, prop_list, list);
 				return prop_list;
@@ -219,19 +225,41 @@ public class EclipseXmlCompletionProposalComputer implements ICompletionProposal
 		}
 	}
 
-	private static void enum_sql_files(IFolder dir, List<String> res, String sql_root_rel_path) throws Exception {
+	private static void enum_sql_files_recursive(IFolder dir, List<String> res, String sql_root_rel_path)
+			throws Exception {
 		if (dir.exists() == false) { // e.g. incorrect value in settings.xml
 			return;
 		}
 		IResource[] members = dir.members();
 		for (IResource r : members) {
 			if (r instanceof IFolder) {
-				enum_sql_files((IFolder) r, res, sql_root_rel_path);
+				enum_sql_files_recursive((IFolder) r, res, sql_root_rel_path);
 			} else if (r instanceof IFile) {
 				String rel_path = ((IFile) r).getFullPath().toPortableString();
 				if (rel_path.endsWith(".sql")) {
 					int start = sql_root_rel_path.length() + 1;
 					String path = rel_path.substring(start);
+					res.add(path);
+				}
+			}
+		}
+	}
+
+	private static void enum_dao_xml_files(IFolder foder, List<String> res) throws Exception {
+		if (foder.exists() == false) { // e.g. incorrect value in settings.xml
+			return;
+		}
+		IResource[] members = foder.members();
+		for (IResource r : members) {
+			if (r instanceof IFolder) {
+				// === panedrone: not recursive so far
+				// enum_dao_xml_files((IFolder) r, res, sdm_folder_rel_path); // ===
+			} else if (r instanceof IFile) {
+				String folder_rel_path = foder.getFullPath().toPortableString();
+				String rel_path = ((IFile) r).getFullPath().toPortableString();
+				int start = folder_rel_path.length() + 1;
+				String path = rel_path.substring(start);
+				if (Helpers.is_dao_xml(path)) {
 					res.add(path);
 				}
 			}
