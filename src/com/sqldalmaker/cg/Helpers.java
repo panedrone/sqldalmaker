@@ -516,16 +516,6 @@ public class Helpers {
         return pk_col_name;
     }
 
-    public static String remove_cr_and_lf(String text) {
-        return text.replace("\r", "\n").replace("\n\n", "\n").trim();
-    }
-
-    public static boolean equal_ignoring_eol(String text1, String text2) {
-        text1 = remove_cr_and_lf(text1);
-        text2 = remove_cr_and_lf(text2);
-        return text1.equals(text2);
-    }
-
     public static boolean is_sdm_xml(String name) {
         return name != null && name.equals(Const.SDM_XML);
     }
@@ -562,5 +552,27 @@ public class Helpers {
                 }
             }
         }
+    }
+
+    public static String remove_cr_and_lf(String text) {
+        return text.replace("\r", "\n").replace("\n\n", "\n").trim();
+    }
+
+    public static boolean equal_ignoring_eol(String text1, String text2) {
+        text1 = remove_cr_and_lf(text1);
+        text2 = remove_cr_and_lf(text2);
+        return text1.equals(text2);
+    }
+
+    public static boolean equal_ignoring_eol(String text, String old_text, StringBuilder err_buff) {
+        if (old_text.isEmpty()) {
+            err_buff.append(Const.OUTPUT_FILE_IS_MISSING);
+            return false;
+        }
+        if (Helpers.equal_ignoring_eol(text, old_text)) {
+            return true;
+        }
+        err_buff.append(Const.OUTPUT_FILE_IS_OUT_OF_DATE);
+        return false;
     }
 }

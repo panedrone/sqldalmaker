@@ -141,9 +141,9 @@ public class IdeaCG {
                             try {
                                 ProgressManager.progress(cls.getName());
                                 String[] file_content = gen.translate(cls.getName());
-                                StringBuilder validationBuff = new StringBuilder();
-                                validate_single_dto_ignoring_eol(project, root_file, settings, cls.getName(), file_content, validationBuff);
-                                String status = validationBuff.toString();
+                                StringBuilder err_buf = new StringBuilder();
+                                validate_single_dto_ignoring_eol(project, root_file, settings, cls.getName(), file_content, err_buf);
+                                String status = err_buf.toString();
                                 if (!status.isEmpty()) {
                                     error = true;
                                     IdeaMessageHelpers.add_error_to_ide_log("ERROR", " DTO/Model '" + cls.getName() + "'. " + status);
@@ -464,18 +464,6 @@ public class IdeaCG {
         list.add(gf);
     }
 
-    public static boolean equal_ignoring_eol(String text, String old_text, StringBuilder err_buff) {
-        if (old_text.isEmpty()) {
-            err_buff.append(Const.OUTPUT_FILE_IS_MISSING);
-            return false;
-        }
-        if (Helpers.equal_ignoring_eol(text, old_text)) {
-            return true;
-        }
-        err_buff.append(Const.OUTPUT_FILE_IS_OUT_OF_DATE);
-        return false;
-    }
-
     // IdeaCG, UITabDTO
     public static boolean validate_single_dto_ignoring_eol(
             Project project,
@@ -487,7 +475,7 @@ public class IdeaCG {
 
         String target_file_abs_path = IdeaTargetLanguageHelpers.get_dto_file_abs_path(project, root_file, settings, dto_class_name);
         String old_text = Helpers.load_text_from_file(target_file_abs_path);
-        return equal_ignoring_eol(file_content[0], old_text, err_buff);
+        return Helpers.equal_ignoring_eol(file_content[0], old_text, err_buff);
     }
 
     // only IdeaCG
@@ -501,6 +489,6 @@ public class IdeaCG {
 
         String target_file_abs_path = IdeaTargetLanguageHelpers.get_dao_file_abs_path(project, root_file, settings, dao_class_name);
         String old_text = Helpers.load_text_from_file(target_file_abs_path);
-        return equal_ignoring_eol(file_content[0], old_text, err_buff);
+        return Helpers.equal_ignoring_eol(file_content[0], old_text, err_buff);
     }
 }
