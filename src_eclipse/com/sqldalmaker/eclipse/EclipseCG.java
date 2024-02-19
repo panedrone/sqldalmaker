@@ -29,23 +29,21 @@ import com.sqldalmaker.jaxb.settings.Settings;
  */
 public class EclipseCG {
 
-	private static class Error {
-		public boolean happend = false;
-	}
+	/// DTO ////////////////////////////////////////
 
 	public static void generate_all_sdm_dto(IFile root_file, IFile xml_file) {
-		StringBuilder output_dir = new StringBuilder();
-		Error error = new Error();
 		try {
-			String xml_mp_abs_path = root_file.getParent().getLocation().toPortableString();
-			Settings settings = SdmUtils.load_settings(xml_mp_abs_path);
+			boolean err_happened = false;
+			String sdm_folder_abs_path = root_file.getParent().getLocation().toPortableString();
+			Settings settings = SdmUtils.load_settings(sdm_folder_abs_path);
 			IProject project = root_file.getProject();
 			Connection con = EclipseHelpers.get_connection(project, settings);
 			try {
-				IDtoCG gen = create_dto_cg(con, project, settings, root_file.getName(),
-						xml_mp_abs_path, output_dir);
+				StringBuilder output_dir = new StringBuilder();
+				IDtoCG gen = create_dto_cg(con, project, settings, root_file.getName(), sdm_folder_abs_path,
+						output_dir);
 				String sdm_xml_abs_path = xml_file.getLocation().toPortableString();
-				String sdm_xsd_abs_path = Helpers.concat_path(xml_mp_abs_path, Const.SDM_XSD);
+				String sdm_xsd_abs_path = Helpers.concat_path(sdm_folder_abs_path, Const.SDM_XSD);
 				List<DtoClass> dto_classes = SdmUtils.get_dto_classes(sdm_xml_abs_path, sdm_xsd_abs_path);
 				for (DtoClass cls : dto_classes) {
 					try {
@@ -56,10 +54,10 @@ public class EclipseCG {
 					} catch (Throwable e) {
 						String msg = e.getMessage();
 						EclipseConsoleHelpers.add_error_msg(cls.getName() + ": " + msg);
-						error.happend = true;
+						err_happened = true;
 					}
 				}
-				if (!error.happend && !dto_classes.isEmpty()) {
+				if (!err_happened && !dto_classes.isEmpty()) {
 					EclipseHelpers.refresh_project(xml_file.getProject());
 					String current_xml_file_path = xml_file.getFullPath().toPortableString();
 					if (current_xml_file_path.startsWith("/")) {
@@ -76,65 +74,20 @@ public class EclipseCG {
 		}
 	}
 
-	public static void generate_all_sdm_dao(IFile root_file, IFile xml_file) {
-		StringBuilder output_dir = new StringBuilder();
-		Error error = new Error();
-		try {
-			String xml_mp_abs_path = root_file.getParent().getLocation().toPortableString();
-			Settings settings = SdmUtils.load_settings(xml_mp_abs_path);
-			IProject project = root_file.getProject();
-			Connection con = EclipseHelpers.get_connection(project, settings);
-			try {
-				IDaoCG gen = create_dao_cg(con, project, root_file.getName(), settings,
-						xml_mp_abs_path, output_dir);
-				String sdm_xml_abs_path = xml_file.getLocation().toPortableString();
-				String sdm_xsd_abs_path = Helpers.concat_path(xml_mp_abs_path, Const.SDM_XSD);
-				List<DaoClass> dao_classes = SdmUtils.get_dao_classes(sdm_xml_abs_path, sdm_xsd_abs_path);
-				String contextPath = DaoClass.class.getPackage().getName();
-				XmlParser dao_xml_parser = new XmlParser(contextPath, sdm_xsd_abs_path);
-				for (DaoClass cls : dao_classes) {
-					try {
-						String[] file_content = generate_single_sdm_dao(gen, dao_xml_parser, cls, sdm_xml_abs_path);
-						String target_file_path = TargetLangUtils.get_target_file_path(root_file.getName(),
-								output_dir.toString(), cls.getName());
-						EclipseHelpers.save_text_to_file(target_file_path, file_content[0]);
-					} catch (Throwable e) {
-						String msg = e.getMessage();
-						EclipseConsoleHelpers.add_error_msg(cls.getName() + ": " + msg);
-						error.happend = true;
-					}
-				}
-				if (!error.happend && !dao_classes.isEmpty()) {
-					EclipseHelpers.refresh_project(xml_file.getProject());
-					String current_xml_file_path = xml_file.getFullPath().toPortableString();
-					if (current_xml_file_path.startsWith("/")) {
-						current_xml_file_path = current_xml_file_path.substring(1);
-					}
-					EclipseConsoleHelpers.add_info_msg(current_xml_file_path + " -> " + Const.GENERATE_SDM_DAO);
-				}
-			} finally {
-				con.close();
-			}
-		} catch (Exception e) {
-			EclipseConsoleHelpers.add_error_msg(e.getMessage());
-			e.printStackTrace();
-		}
-	}
-
 	public static void validate_all_sdm_dto(IFile root_file, IFile xml_file) {
-		StringBuilder output_dir = new StringBuilder();
-		Error error = new Error();
 		try {
-			String xml_mp_abs_path = root_file.getParent().getLocation().toPortableString();
-			Settings settings = SdmUtils.load_settings(xml_mp_abs_path);
+			String sdm_folder_abs_path = root_file.getParent().getLocation().toPortableString();
+			Settings settings = SdmUtils.load_settings(sdm_folder_abs_path);
 			IProject project = root_file.getProject();
 			Connection con = EclipseHelpers.get_connection(project, settings);
 			String sdm_xml_abs_path = xml_file.getLocation().toPortableString();
-			String sdm_xsd_abs_path = Helpers.concat_path(xml_mp_abs_path, Const.SDM_XSD);
+			String sdm_xsd_abs_path = Helpers.concat_path(sdm_folder_abs_path, Const.SDM_XSD);
 			List<DtoClass> dto_classes = SdmUtils.get_dto_classes(sdm_xml_abs_path, sdm_xsd_abs_path);
+			boolean err_happened = false;
 			try {
-				IDtoCG gen = create_dto_cg(con, project, settings, root_file.getName(),
-						xml_mp_abs_path, output_dir);
+				StringBuilder output_dir = new StringBuilder();
+				IDtoCG gen = create_dto_cg(con, project, settings, root_file.getName(), sdm_folder_abs_path,
+						output_dir);
 				for (DtoClass cls : dto_classes) {
 					try {
 						String[] file_content = gen.translate(cls.getName());
@@ -152,19 +105,19 @@ public class EclipseCG {
 						}
 						String status = validation_buff.toString();
 						if (status.length() > 0) {
-							error.happend = true;
+							err_happened = true;
 							EclipseConsoleHelpers.add_error_msg(cls.getName() + ": " + status);
 						}
 					} catch (Throwable e) {
 						String msg = e.getMessage();
 						EclipseConsoleHelpers.add_error_msg(cls.getName() + ": " + msg);
-						error.happend = true;
+						err_happened = true;
 					}
 				}
 			} finally {
 				con.close();
 			}
-			if (!error.happend && !dto_classes.isEmpty()) {
+			if (!err_happened && !dto_classes.isEmpty()) {
 				EclipseHelpers.refresh_project(xml_file.getProject());
 				String current_xml_file_path = xml_file.getFullPath().toPortableString();
 				if (current_xml_file_path.startsWith("/")) {
@@ -178,9 +131,54 @@ public class EclipseCG {
 		}
 	}
 
+	/// DAO ////////////////////////////////////////
+
+	public static void generate_all_sdm_dao(IFile root_file, IFile xml_file) {
+		try {
+			String sdm_folder_abs_path = root_file.getParent().getLocation().toPortableString();
+			Settings settings = SdmUtils.load_settings(sdm_folder_abs_path);
+			IProject project = root_file.getProject();
+			Connection con = EclipseHelpers.get_connection(project, settings);
+			try {
+				StringBuilder output_dir = new StringBuilder();
+				IDaoCG gen = create_dao_cg(con, project, root_file.getName(), settings, sdm_folder_abs_path,
+						output_dir);
+				String sdm_xml_abs_path = xml_file.getLocation().toPortableString();
+				String sdm_xsd_abs_path = Helpers.concat_path(sdm_folder_abs_path, Const.SDM_XSD);
+				List<DaoClass> dao_classes = SdmUtils.get_dao_classes(sdm_xml_abs_path, sdm_xsd_abs_path);
+				String contextPath = DaoClass.class.getPackage().getName();
+				XmlParser dao_xml_parser = new XmlParser(contextPath, sdm_xsd_abs_path);
+				boolean err_happened = false;
+				for (DaoClass cls : dao_classes) {
+					try {
+						String[] file_content = generate_single_sdm_dao(gen, dao_xml_parser, cls, sdm_xml_abs_path);
+						String target_file_path = TargetLangUtils.get_target_file_path(root_file.getName(),
+								output_dir.toString(), cls.getName());
+						EclipseHelpers.save_text_to_file(target_file_path, file_content[0]);
+					} catch (Throwable e) {
+						String msg = e.getMessage();
+						EclipseConsoleHelpers.add_error_msg(cls.getName() + ": " + msg);
+						err_happened = true;
+					}
+				}
+				if (!err_happened && !dao_classes.isEmpty()) {
+					EclipseHelpers.refresh_project(xml_file.getProject());
+					String current_xml_file_path = xml_file.getFullPath().toPortableString();
+					if (current_xml_file_path.startsWith("/")) {
+						current_xml_file_path = current_xml_file_path.substring(1);
+					}
+					EclipseConsoleHelpers.add_info_msg(current_xml_file_path + " -> " + Const.GENERATE_SDM_DAO);
+				}
+			} finally {
+				con.close();
+			}
+		} catch (Exception e) {
+			EclipseConsoleHelpers.add_error_msg(e.getMessage());
+			e.printStackTrace();
+		}
+	}
+
 	public static void validate_all_sdm_dao(IFile root_file, IFile xml_file) {
-		StringBuilder output_dir = new StringBuilder();
-		Error error = new Error();
 		try {
 			String sdm_folder_abs_path = root_file.getParent().getLocation().toPortableString();
 			Settings settings = SdmUtils.load_settings(sdm_folder_abs_path);
@@ -191,9 +189,11 @@ public class EclipseCG {
 			List<DaoClass> dao_classes = SdmUtils.get_dao_classes(sdm_xml_abs_path, sdm_xsd_abs_path);
 			String contextPath = DaoClass.class.getPackage().getName();
 			XmlParser dao_xml_parser = new XmlParser(contextPath, sdm_xsd_abs_path);
+			boolean err_happened = false;
 			try {
-				IDaoCG gen = create_dao_cg(con, project, root_file.getName(), settings,
-						sdm_folder_abs_path, output_dir);
+				StringBuilder output_dir = new StringBuilder();
+				IDaoCG gen = create_dao_cg(con, project, root_file.getName(), settings, sdm_folder_abs_path,
+						output_dir);
 				for (DaoClass cls : dao_classes) {
 					try {
 						String[] file_content = generate_single_sdm_dao(gen, dao_xml_parser, cls, sdm_xml_abs_path);
@@ -211,19 +211,19 @@ public class EclipseCG {
 						}
 						String status = validation_buff.toString();
 						if (status.length() > 0) {
-							error.happend = true;
+							err_happened = true;
 							EclipseConsoleHelpers.add_error_msg(cls.getName() + ": " + status);
 						}
 					} catch (Throwable e) {
 						String msg = e.getMessage();
 						EclipseConsoleHelpers.add_error_msg(cls.getName() + ": " + msg);
-						error.happend = true;
+						err_happened = true;
 					}
 				}
 			} finally {
 				con.close();
 			}
-			if (!error.happend && !dao_classes.isEmpty()) {
+			if (!err_happened && !dao_classes.isEmpty()) {
 				EclipseHelpers.refresh_project(xml_file.getProject());
 				String current_xml_file_path = xml_file.getFullPath().toPortableString();
 				if (current_xml_file_path.startsWith("/")) {
@@ -237,18 +237,18 @@ public class EclipseCG {
 		}
 	}
 
-	public static void generate_dao(IFile root_file, IFile xml_file) {
-		Error error = new Error();
+	public static void generate_external_dao(IFile root_file, IFile xml_file) {
 		try {
-			String xml_mp_abs_path = root_file.getParent().getLocation().toPortableString();
-			Settings settings = SdmUtils.load_settings(xml_mp_abs_path);
+			String sdm_folder_abs_path = root_file.getParent().getLocation().toPortableString();
+			Settings settings = SdmUtils.load_settings(sdm_folder_abs_path);
 			IProject project = root_file.getProject();
 			Connection conn = EclipseHelpers.get_connection(project, settings);
+			boolean err_happened = false;
 			try {
 				StringBuilder output_dir_abs_path = new StringBuilder();
-				IDaoCG gen = create_dao_cg(conn, project, root_file.getName(), settings,
-						xml_mp_abs_path, output_dir_abs_path);
-				String dao_xsd_abs_path = Helpers.concat_path(xml_mp_abs_path, Const.DAO_XSD);
+				IDaoCG gen = create_dao_cg(conn, project, root_file.getName(), settings, sdm_folder_abs_path,
+						output_dir_abs_path);
+				String dao_xsd_abs_path = Helpers.concat_path(sdm_folder_abs_path, Const.DAO_XSD);
 				String context_path = DaoClass.class.getPackage().getName();
 				XmlParser dao_xml_parser = new XmlParser(context_path, dao_xsd_abs_path);
 				String dao_xml_abs_path = xml_file.getLocation().toPortableString();
@@ -263,12 +263,12 @@ public class EclipseCG {
 				} catch (Throwable e) {
 					String msg = e.getMessage();
 					EclipseConsoleHelpers.add_error_msg(dao_class_name + ": " + msg);
-					error.happend = true;
+					err_happened = true;
 				}
 			} finally {
 				conn.close();
 			}
-			if (!error.happend) {
+			if (!err_happened) {
 				EclipseHelpers.refresh_project(xml_file.getProject());
 				String current_xml_file_path = xml_file.getFullPath().toPortableString();
 				if (current_xml_file_path.startsWith("/")) {
@@ -282,22 +282,22 @@ public class EclipseCG {
 		}
 	}
 
-	public static void validate_dao(IFile root_file, IFile xml_file) {
+	public static void validate_external_dao(IFile root_file, IFile xml_file) {
 		String current_xml_file_path = xml_file.getFullPath().toPortableString();
 		if (current_xml_file_path.startsWith("/")) {
 			current_xml_file_path = current_xml_file_path.substring(1);
 		}
-		Error error = new Error();
 		try {
-			String xml_mp_abs_path = root_file.getParent().getLocation().toPortableString();
-			Settings settings = SdmUtils.load_settings(xml_mp_abs_path);
+			String sdm_folder_abs_path = root_file.getParent().getLocation().toPortableString();
+			Settings settings = SdmUtils.load_settings(sdm_folder_abs_path);
 			IProject project = root_file.getProject();
 			Connection conn = EclipseHelpers.get_connection(project, settings);
+			boolean err_happened = false;
 			try {
 				StringBuilder output_dir_abs_path = new StringBuilder();
-				IDaoCG gen = create_dao_cg(conn, project, root_file.getName(), settings,
-						xml_mp_abs_path, output_dir_abs_path);
-				String dao_xsd_abs_path = Helpers.concat_path(xml_mp_abs_path, Const.DAO_XSD);
+				IDaoCG gen = create_dao_cg(conn, project, root_file.getName(), settings, sdm_folder_abs_path,
+						output_dir_abs_path);
+				String dao_xsd_abs_path = Helpers.concat_path(sdm_folder_abs_path, Const.DAO_XSD);
 				String context_path = DaoClass.class.getPackage().getName();
 				XmlParser dao_xml_parser = new XmlParser(context_path, dao_xsd_abs_path);
 				String dao_xml_abs_path = xml_file.getLocation().toPortableString();
@@ -321,17 +321,17 @@ public class EclipseCG {
 					String status = validation_buff.toString();
 					if (status.length() > 0) {
 						EclipseConsoleHelpers.add_error_msg(current_xml_file_path + ": " + status);
-						error.happend = true;
+						err_happened = true;
 					}
 				} catch (Throwable e) {
 					String msg = e.getMessage();
 					EclipseConsoleHelpers.add_error_msg(dao_class_name + ": " + msg);
-					error.happend = true;
+					err_happened = true;
 				}
 			} finally {
 				conn.close();
 			}
-			if (!error.happend) {
+			if (!err_happened) {
 				EclipseHelpers.refresh_project(xml_file.getProject());
 				EclipseConsoleHelpers.add_info_msg(current_xml_file_path + " -> " + Const.VALIDATE_DAO_XML);
 			}
@@ -341,7 +341,7 @@ public class EclipseCG {
 		}
 	}
 
-	private static DaoClass load_external_dao_class(XmlParser dao_xml_parser, String dao_xml_abs_path)
+	private static DaoClass load_external_dao_xml(XmlParser dao_xml_parser, String dao_xml_abs_path)
 			throws Exception {
 		DaoClass dao_class = dao_xml_parser.unmarshal(dao_xml_abs_path);
 		return dao_class;
@@ -356,30 +356,30 @@ public class EclipseCG {
 		if (ref == null || ref.trim().isEmpty()) { // nullable
 			file_content = gen.translate(dao_class_name, sdm_dao_class);
 		} else {
-			DaoClass external_dao_class = load_external_dao_class(dao_xml_parser, dao_xml_abs_path);
+			DaoClass external_dao_class = load_external_dao_xml(dao_xml_parser, dao_xml_abs_path);
 			file_content = gen.translate(dao_class_name, external_dao_class);
 		}
 		return file_content;
 	}
-	
+
 	////////////////////////////////////////////////
-	
+
 	public static IDtoCG create_dto_cg(Connection conn, IEditor2 editor2, Settings settings,
 			StringBuilder output_dir_rel_path) throws Exception {
 
 		IProject project = editor2.get_project();
 		String root_fn = editor2.get_root_file_name();
-		String xml_configs_folder_full_path = editor2.get_sdm_folder_abs_path();
-		return create_dto_cg(conn, project, settings, root_fn, xml_configs_folder_full_path, output_dir_rel_path);
+		String sdm_folder_abs_path = editor2.get_sdm_folder_abs_path();
+		return create_dto_cg(conn, project, settings, root_fn, sdm_folder_abs_path, output_dir_rel_path);
 	}
 
 	public static IDtoCG create_dto_cg(Connection conn, IProject project, Settings settings, String root_fn,
-			String xml_configs_folder_full_path, StringBuilder output_dir_abs_path) throws Exception {
+			String sdm_folder_abs_path, StringBuilder output_dir_abs_path) throws Exception {
 
 		String project_abs_path = project.getLocation().toPortableString();
 		StringBuilder output_dir_rel_path = new StringBuilder();
-		IDtoCG gen = TargetLangUtils.create_dto_cg(root_fn, project_abs_path, xml_configs_folder_full_path, conn,
-				settings, output_dir_rel_path);
+		IDtoCG gen = TargetLangUtils.create_dto_cg(root_fn, project_abs_path, sdm_folder_abs_path, conn, settings,
+				output_dir_rel_path);
 		String abs_path = EclipseHelpers.get_absolute_dir_path_str(project, output_dir_rel_path.toString());
 		output_dir_abs_path.append(abs_path);
 		return gen;
@@ -389,8 +389,8 @@ public class EclipseCG {
 			StringBuilder output_dir_abs_path) throws Exception {
 
 		String root_fn = editor2.get_root_file_name();
-		String xml_configs_folder_full_path = editor2.get_sdm_folder_abs_path();
-		return create_dao_cg(conn, project, root_fn, settings, xml_configs_folder_full_path, output_dir_abs_path);
+		String sdm_folder_abs_path = editor2.get_sdm_folder_abs_path();
+		return create_dao_cg(conn, project, root_fn, settings, sdm_folder_abs_path, output_dir_abs_path);
 	}
 
 	public static IDaoCG create_dao_cg(Connection conn, IProject project, String root_fn, Settings settings,
@@ -398,8 +398,8 @@ public class EclipseCG {
 
 		String project_abs_path = project.getLocation().toPortableString();
 		StringBuilder output_dir_rel_path = new StringBuilder();
-		IDaoCG gen = TargetLangUtils.create_dao_cg(root_fn, project_abs_path, sdm_folder_abs_path, conn,
-				settings, output_dir_rel_path);
+		IDaoCG gen = TargetLangUtils.create_dao_cg(root_fn, project_abs_path, sdm_folder_abs_path, conn, settings,
+				output_dir_rel_path);
 		String abs_path = EclipseHelpers.get_absolute_dir_path_str(project, output_dir_rel_path.toString());
 		output_dir_abs_path.append(abs_path);
 		return gen;

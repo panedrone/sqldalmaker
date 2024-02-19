@@ -119,7 +119,7 @@ public class EclipseToolbarDynamicMenu extends ContributionItem {
 				menuItem.addSelectionListener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent e) {
 						editor_part.setFocus(); // to make working ${project_loc}
-						EclipseCG.generate_dao(root_file, input_file);
+						EclipseCG.generate_external_dao(root_file, input_file);
 					}
 				});
 			}
@@ -129,7 +129,7 @@ public class EclipseToolbarDynamicMenu extends ContributionItem {
 				menuItem.addSelectionListener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent e) {
 						editor_part.setFocus(); // to make working ${project_loc}
-						EclipseCG.validate_dao(root_file, input_file);
+						EclipseCG.validate_external_dao(root_file, input_file);
 					}
 				});
 			}

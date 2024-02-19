@@ -268,7 +268,7 @@ public class UIEditorPageDTO extends Composite {
 					open_xml();
 				}
 			};
-			action_openXml.setToolTipText("Open XML file");
+			action_openXml.setToolTipText("Open 'sdm.xml'");
 			action_openXml
 					.setImageDescriptor(ResourceManager.getImageDescriptor(UIEditorPageDTO.class, "/img/xmldoc.gif"));
 		}

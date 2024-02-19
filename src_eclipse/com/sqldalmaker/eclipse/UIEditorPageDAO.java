@@ -58,6 +58,7 @@ import com.sqldalmaker.common.SdmUtils;
 import com.sqldalmaker.common.XmlParser;
 import com.sqldalmaker.jaxb.sdm.DaoClass;
 import com.sqldalmaker.jaxb.settings.Settings;
+import org.eclipse.jface.resource.ImageDescriptor;
 
 /**
  * @author sqldalmaker@gmail.com
@@ -81,9 +82,10 @@ public class UIEditorPageDAO extends Composite {
 	private Action action_generate;
 	private Action action_validate;
 	private Action action_newXml;
-	private Action action_openXml;
+	private Action action_openDaoXmlFile;
 	private Action action_getCrudDao;
 	private Action action_goto_source;
+	private Action action_openSdmXml;
 
 	private ToolBarManager toolBarManager;
 	private ToolBar toolBar1;
@@ -126,8 +128,9 @@ public class UIEditorPageDAO extends Composite {
 		toolBarManager = new ToolBarManager(toolBar1);
 		toolkit.adapt(toolBar1);
 		toolkit.paintBordersFor(toolBar1);
+		toolBarManager.add(action_openSdmXml);
 		toolBarManager.add(action_newXml);
-		toolBarManager.add(action_openXml);
+		toolBarManager.add(action_openDaoXmlFile);
 		toolBarManager.add(action_goto_source);
 		toolBarManager.add(action_getCrudDao);
 		toolBarManager.add(action_FK);
@@ -170,7 +173,7 @@ public class UIEditorPageDAO extends Composite {
 					}
 				}
 				if (clicked_column_index == 0) {
-					open_xml();
+					open_detailed_dao_xml();
 				} else {
 					open_generated_source_file();
 				}
@@ -200,6 +203,17 @@ public class UIEditorPageDAO extends Composite {
 	}
 
 	private void createToolbarActions() {
+		{
+			action_openSdmXml = new Action("") {
+				@Override
+				public void run() {
+					open_sdm_xml();
+				}
+			};
+			action_openSdmXml.setToolTipText("Open 'sdm.xml'");
+			action_openSdmXml
+					.setImageDescriptor(ResourceManager.getImageDescriptor(UIEditorPageDAO.class, "/img/xmldoc.gif"));
+		}
 		{
 			action_refresh = new Action("") {
 				@Override
@@ -252,20 +266,20 @@ public class UIEditorPageDAO extends Composite {
 					create_dao_xml_file();
 				}
 			};
-			action_newXml.setToolTipText("New XML file");
+			action_newXml.setToolTipText("New DAO XML file");
 			action_newXml
 					.setImageDescriptor(ResourceManager.getImageDescriptor(UIEditorPageDAO.class, "/img/new_xml.gif"));
 		}
 		{
-			action_openXml = new Action("") {
+			action_openDaoXmlFile = new Action("") {
 				@Override
 				public void run() {
-					open_xml();
+					open_detailed_dao_xml();
 				}
 			};
-			action_openXml.setToolTipText("Open XML file");
-			action_openXml
-					.setImageDescriptor(ResourceManager.getImageDescriptor(UIEditorPageDAO.class, "/img/xmldoc.gif"));
+			action_openDaoXmlFile.setToolTipText("Go to detailed DAO XML");
+			action_openDaoXmlFile
+					.setImageDescriptor(ImageDescriptor.createFromFile(UIEditorPageDAO.class, "/img/xmldoc_16x16.gif"));
 		}
 		{
 			action_goto_source = new Action("") {
@@ -313,27 +327,50 @@ public class UIEditorPageDAO extends Composite {
 		}
 	}
 
-	protected void open_xml() {
+	private void open_sdm_xml() {
 		try {
+			IFile sdm_xml_file = editor2.find_sdm_xml();
+			if (sdm_xml_file == null) {
+				throw new InternalException("File not found: " + Const.SDM_XML);
+			}
 			List<Item> items = get_selected_items();
 			if (items == null) {
+				EclipseEditorHelpers.open_editor_sync(getShell(), sdm_xml_file);
 				return;
 			}
-			String class_name = items.get(0).get_class_name();
+			String dao_class_name = items.get(0).get_class_name();
+			EclipseXmlAttrHelpers.goto_sdm_class_declaration(getShell(), sdm_xml_file, dao_class_name);
+		} catch (Throwable e) {
+			e.printStackTrace();
+			EclipseMessageHelpers.show_error(e);
+		}
+	}
+
+	private void open_detailed_dao_xml() {
+		List<Item> items = get_selected_items();
+		if (items == null) {
+			return;
+		}
+		// if <dao-class 'ref' exists, open by 'ref', else go to declaration in sdm.xml
+		String dao_class_name = items.get(0).get_class_name();
+		try {
 			List<DaoClass> jaxb_dao_classes = load_all_sdm_dao();
 			if (jaxb_dao_classes.size() > 0) {
-				IFile sdm_file = editor2.find_sdm_xml();
-				if (sdm_file == null) {
-					throw new InternalException("File not found: " + Const.SDM_XML);
-				}
-				EclipseXmlAttrHelpers.goto_sdm_class_declaration(getShell(), sdm_file, class_name);
-			} else {
-				String relative = class_name + ".xml";
-				IFile dao_file = editor2.find_metaprogram_file(relative);
-				if (dao_file != null) {
-					EclipseEditorHelpers.open_editor_sync(getShell(), dao_file);
+				DaoClass jaxb_dao_class = JaxbUtils.find_jaxb_dao_class(dao_class_name, jaxb_dao_classes);
+				String dao_xml_ref = jaxb_dao_class.getRef();
+				if (dao_xml_ref != null) {
+					IFile external_dao_xml = editor2.find_metaprogram_file(dao_xml_ref);
+					if (external_dao_xml != null) {
+						EclipseEditorHelpers.open_editor_sync(getShell(), external_dao_xml);
+						return;
+					}
 				}
 			}
+			IFile sdm_file = editor2.find_sdm_xml();
+			if (sdm_file == null) {
+				throw new InternalException("File not found: " + Const.SDM_XML);
+			}
+			EclipseXmlAttrHelpers.goto_sdm_class_declaration(getShell(), sdm_file, dao_class_name);
 		} catch (Throwable e) {
 			e.printStackTrace();
 			EclipseMessageHelpers.show_error(e);
@@ -441,8 +478,7 @@ public class UIEditorPageDAO extends Composite {
 					Settings settings = EclipseHelpers.load_settings(editor2);
 					StringBuilder output_dir = new StringBuilder();
 					// !!!! after 'try'
-					IDaoCG gen = EclipseCG.create_dao_cg(conn, editor2.get_project(), editor2,
-							settings, output_dir);
+					IDaoCG gen = EclipseCG.create_dao_cg(conn, editor2.get_project(), editor2, settings, output_dir);
 					monitor.beginTask(get_name(), get_total_work());
 					generated = generate_for_selected_dao(monitor, gen, settings, items, output_dir);
 				} finally {
@@ -545,8 +581,7 @@ public class UIEditorPageDAO extends Composite {
 					Settings settings = EclipseHelpers.load_settings(editor2);
 					StringBuilder output_dir = new StringBuilder();
 					// !!!! after 'try'
-					IDaoCG gen = EclipseCG.create_dao_cg(con, editor2.get_project(), editor2,
-							settings, output_dir);
+					IDaoCG gen = EclipseCG.create_dao_cg(con, editor2.get_project(), editor2, settings, output_dir);
 					monitor.beginTask(get_name(), get_total_work());
 					List<DaoClass> jaxb_dao_classes = load_all_sdm_dao();
 					validate_all(monitor, gen, items, settings, jaxb_dao_classes, output_dir);
@@ -758,7 +793,7 @@ public class UIEditorPageDAO extends Composite {
 //			enabled = indexes.length > 0;
 //		}
 		action_generate.setEnabled(enabled);
-		action_openXml.setEnabled(enabled);
+		action_openDaoXmlFile.setEnabled(enabled);
 		action_goto_source.setEnabled(enabled);
 	}
 }
