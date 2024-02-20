@@ -181,7 +181,7 @@ public class UITabDTO {
         btn_OpenXML.setOpaque(false);
         btn_OpenXML.setPreferredSize(new Dimension(32, 32));
         btn_OpenXML.setText("");
-        btn_OpenXML.setToolTipText("Open XML file");
+        btn_OpenXML.setToolTipText("Open 'sdm.xml'");
         tool_panel.add(btn_OpenXML);
         btn_OpenSQL = new JButton();
         btn_OpenSQL.setBorderPainted(false);
@@ -402,7 +402,7 @@ public class UITabDTO {
             int[] selected_rows = get_selection();
             Settings settings = IdeaHelpers.load_settings(root_file);
             String dto_class_name = (String) table.getValueAt(selected_rows[0], 0);
-            IdeaTargetLanguageHelpers.open_dto_sync(project, root_file, settings, dto_class_name);
+            IdeaTargetLanguageHelpers.open_target_dto_sync(project, root_file, settings, dto_class_name);
         } catch (Exception e) {
             // e.printStackTrace();
             IdeaMessageHelpers.show_error_in_ui_thread(e);
@@ -577,9 +577,9 @@ public class UITabDTO {
         try {
             ArrayList<String[]> list = my_table_model.getList();
             list.clear();
-            String xml_configs_folder_full_path = root_file.getParent().getPath();
-            String sdm_xml_abs_path = xml_configs_folder_full_path + "/" + Const.SDM_XML;
-            String sdm_xsd_abs_path = xml_configs_folder_full_path + "/" + Const.SDM_XSD;
+            String sdm_xml_folder_full_path = root_file.getParent().getPath();
+            String sdm_xml_abs_path = sdm_xml_folder_full_path + "/" + Const.SDM_XML;
+            String sdm_xsd_abs_path = sdm_xml_folder_full_path + "/" + Const.SDM_XSD;
             List<DtoClass> res = SdmUtils.get_dto_classes(sdm_xml_abs_path, sdm_xsd_abs_path);
             for (DtoClass cls : res) {
                 String[] item = new String[3];

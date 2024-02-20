@@ -9,10 +9,11 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.JBColor;
+import com.sqldalmaker.cg.Helpers;
 import com.sqldalmaker.cg.IDaoCG;
 import com.sqldalmaker.cg.JaxbUtils;
 import com.sqldalmaker.common.Const;
-import com.sqldalmaker.common.InternalException;
+import com.sqldalmaker.common.SdmUtils;
 import com.sqldalmaker.jaxb.sdm.DaoClass;
 import com.sqldalmaker.jaxb.settings.Settings;
 
@@ -39,7 +40,7 @@ public class UITabDAO {
     private JButton btn_Refresh;
     private JButton btn_Generate;
     private JButton btn_Validate;
-    private JButton btn_OpenXML;
+    private JButton btn_goto_detailed_dao_xml;
     private JButton btn_OpenJava;
     private JButton btn_CrudDao;
     private JPanel top_panel_1;
@@ -68,19 +69,19 @@ public class UITabDAO {
         btn_Generate.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                generate_selected_with_progress_sync();
+                generate_for_dao_selected_in_ui_with_progress_sync();
             }
         });
-        btn_OpenXML.addActionListener(new ActionListener() {
+        btn_goto_detailed_dao_xml.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                open_xml();
+                open_detailed_dao_xml_sync();
             }
         });
         btn_OpenJava.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                open_generated_source_file();
+                open_target_file_sync();
             }
         });
         btn_NewXML.addActionListener(new ActionListener() {
@@ -131,17 +132,24 @@ public class UITabDAO {
             }
 
             private void open_sdm_xml() {
+                int[] selected_rows = get_ui_table_selection();
+                if (selected_rows.length > 0) {
+                    String dao_class_name = (String) table.getValueAt(selected_rows[0], 0);
+                    if (IdeaHelpers.navigate_to_sdm_xml_dao_class_declaration(project, root_file, dao_class_name)) {
+                        return;
+                    }
+                }
                 IdeaEditorHelpers.open_sdm_xml_sync(project, root_file);
             }
         });
     }
 
     private void createUIComponents() {
-        ColorRenderer colorRenderer = new ColorRenderer();
+        ColorRenderer color_renderer = new ColorRenderer();
         table = new JTable() {
             public TableCellRenderer getCellRenderer(int row, int column) {
                 if (column == 1) {
-                    return colorRenderer;
+                    return color_renderer;
                 }
                 return super.getCellRenderer(row, column);
             }
@@ -156,9 +164,9 @@ public class UITabDAO {
                     int row = table.rowAtPoint(new Point(e.getX(), e.getY()));
                     if (row >= 0) {
                         if (col == 0) {
-                            open_xml();
+                            open_detailed_dao_xml_sync();
                         } else if (col == 1) {
-                            open_generated_source_file();
+                            open_target_file_sync();
                         }
                     }
                 }
@@ -184,32 +192,51 @@ public class UITabDAO {
         d.setVisible(true);
     }
 
-    protected void open_xml() {
+    private List<DaoClass> load_all_sdm_dao() throws Exception {
+        String sdm_folder_abs_path = root_file.getParent().getPath();
+        String sdm_xml_abs_path = Helpers.concat_path(sdm_folder_abs_path, Const.SDM_XML);
+        String sdm_xsd_abs_path = Helpers.concat_path(sdm_folder_abs_path, Const.SDM_XSD);
+        List<DaoClass> jaxb_dao_classes = SdmUtils.get_dao_classes(sdm_xml_abs_path, sdm_xsd_abs_path);
+        return jaxb_dao_classes;
+    }
+
+    protected void open_detailed_dao_xml_sync() {
         try {
-            int[] selected_rows = get_selection();
-            String dao_class_name = (String) table.getValueAt(selected_rows[0], 0);
-            if (!IdeaHelpers.navigate_to_dao_class_declaration(project, root_file, dao_class_name)) {
-                String relDirPath = table.getValueAt(selected_rows[0], 0) + ".xml";
-                IdeaEditorHelpers.open_local_file_in_editor_sync(project, root_file, relDirPath);
+            int[] selected_rows = get_ui_table_selection();
+            if (selected_rows.length == 0) {
+                return;
             }
+            String dao_class_name = (String) table.getValueAt(selected_rows[0], 0);
+            List<DaoClass> jaxb_dao_classes = load_all_sdm_dao();
+            DaoClass jaxb_dao_class = JaxbUtils.find_jaxb_dao_class(dao_class_name, jaxb_dao_classes);
+            String ref = jaxb_dao_class.getRef();
+            if (ref == null || ref.trim().isEmpty()) {
+                if (IdeaHelpers.navigate_to_sdm_xml_dao_class_declaration(project, root_file, dao_class_name)) {
+                    return;
+                }
+            }
+            IdeaEditorHelpers.open_local_file_in_editor_sync(project, root_file, ref);
         } catch (Exception e) {
             // e.printStackTrace();
             IdeaMessageHelpers.show_error_in_ui_thread(e);
         }
     }
 
-    private void open_generated_source_file() {
+    private void open_target_file_sync() {
         try {
-            int[] selectedRows = get_selection();
+            int[] selectedRows = get_ui_table_selection();
+            if (selectedRows.length == 0) {
+                IdeaMessageHelpers.add_warning_to_ide_log("Select a class");
+                return;
+            }
             Settings settings = IdeaHelpers.load_settings(root_file);
             String dao_class_name = (String) table.getValueAt(selectedRows[0], 0);
-            IdeaTargetLanguageHelpers.open_dao_sync(project, root_file, settings, dao_class_name);
+            IdeaTargetLanguageHelpers.open_target_dao_sync(project, root_file, settings, dao_class_name);
         } catch (Exception e) {
             // e.printStackTrace();
             IdeaMessageHelpers.show_error_in_ui_thread(e);
         }
     }
-
 
     private void update_table_async() {
         // to prevent:
@@ -221,32 +248,7 @@ public class UITabDAO {
         });
     }
 
-    private void generate_for_selected_dao(
-            IDaoCG gen,
-            List<IdeaHelpers.GeneratedFileData> list,
-            Settings settings,
-            int[] selectedRows,
-            List<DaoClass> jaxb_dao_classes) {
-
-        for (int row : selectedRows) {
-            String dao_class_name = (String) table.getValueAt(row, 0);
-            try {
-                ProgressManager.progress(dao_class_name);
-                DaoClass dao_class = JaxbUtils.find_jaxb_dao_class(dao_class_name, jaxb_dao_classes);
-                String[] file_content = IdeaCG.generate_single_sdm_dao(project, root_file, gen, dao_class, settings);
-                IdeaCG.prepare_generated_file_data(root_file, dao_class_name, file_content, list);
-                table.setValueAt(Const.STATUS_GENERATED, row, 1);
-            } catch (Throwable e) {
-                String msg = e.getMessage();
-                table.setValueAt(msg, row, 1);
-                IdeaMessageHelpers.add_dao_error_message(settings, root_file, dao_class_name, msg);
-                // break; // exit the loop
-            }
-            update_table_async();
-        }
-    }
-
-    private void generate_selected_with_progress_sync() {
+    private void generate_for_dao_selected_in_ui_with_progress_sync() {
         List<IdeaHelpers.GeneratedFileData> list = new ArrayList<IdeaHelpers.GeneratedFileData>();
         StringBuilder output_dir = new StringBuilder();
         IdeaCG.ProgressError error = new IdeaCG.ProgressError();
@@ -255,8 +257,8 @@ public class UITabDAO {
             public void run() {
                 try {
                     Settings settings = IdeaHelpers.load_settings(root_file);
-                    int[] selectedRows = get_selection();
-                    for (int row : selectedRows) {
+                    int[] selected_rows = get_ui_table_selection();
+                    for (int row : selected_rows) {
                         table.setValueAt("", row, 1);
                     }
                     update_table_async();
@@ -265,7 +267,22 @@ public class UITabDAO {
                         // !!!! after 'try'
                         IDaoCG gen = IdeaTargetLanguageHelpers.create_dao_cg(con, project, root_file, settings, output_dir);
                         List<DaoClass> jaxb_dao_classes = IdeaHelpers.load_all_sdm_dao_classes(root_file);
-                        generate_for_selected_dao(gen, list, settings, selectedRows, jaxb_dao_classes);
+                        for (int row : selected_rows) {
+                            String dao_class_name = (String) table.getValueAt(row, 0);
+                            try {
+                                ProgressManager.progress(dao_class_name);
+                                DaoClass dao_class = JaxbUtils.find_jaxb_dao_class(dao_class_name, jaxb_dao_classes);
+                                String[] file_content = IdeaCG.generate_single_sdm_dao(project, root_file, gen, dao_class, settings);
+                                IdeaCG.prepare_generated_file_data(root_file, dao_class_name, file_content, list);
+                                table.setValueAt(Const.STATUS_GENERATED, row, 1);
+                            } catch (Throwable e) {
+                                String msg = e.getMessage();
+                                table.setValueAt(msg, row, 1);
+                                IdeaMessageHelpers.add_dao_error_message(settings, root_file, dao_class_name, msg);
+                                // break; // exit the loop
+                            }
+                            update_table_async();
+                        }
                     } finally {
                         con.close();
                     }
@@ -290,7 +307,7 @@ public class UITabDAO {
         }
     }
 
-    private int[] get_selection() throws Exception {
+    private int[] get_ui_table_selection() {
         int rc = table.getModel().getRowCount();
         if (rc == 1) {
             return new int[]{0};
@@ -301,9 +318,6 @@ public class UITabDAO {
             for (int i = 0; i < rc; i++) {
                 selected_rows[i] = i;
             }
-        }
-        if (selected_rows.length == 0) {
-            throw new InternalException("Selection is empty");
         }
         return selected_rows;
     }
@@ -408,7 +422,7 @@ public class UITabDAO {
         open_sdm_xml.setOpaque(false);
         open_sdm_xml.setPreferredSize(new Dimension(32, 32));
         open_sdm_xml.setText("");
-        open_sdm_xml.setToolTipText("Open XML file");
+        open_sdm_xml.setToolTipText("Open 'sdm.xml'");
         tool_panel.add(open_sdm_xml);
         btn_NewXML = new JButton();
         btn_NewXML.setBorderPainted(false);
@@ -422,18 +436,18 @@ public class UITabDAO {
         btn_NewXML.setText("");
         btn_NewXML.setToolTipText("New XML file");
         tool_panel.add(btn_NewXML);
-        btn_OpenXML = new JButton();
-        btn_OpenXML.setBorderPainted(false);
-        btn_OpenXML.setContentAreaFilled(false);
-        btn_OpenXML.setIcon(new ImageIcon(getClass().getResource("/img/arrow-curve-090-left.png")));
-        btn_OpenXML.setMargin(new Insets(0, 0, 0, 0));
-        btn_OpenXML.setMaximumSize(new Dimension(32, 32));
-        btn_OpenXML.setMinimumSize(new Dimension(32, 32));
-        btn_OpenXML.setOpaque(false);
-        btn_OpenXML.setPreferredSize(new Dimension(32, 32));
-        btn_OpenXML.setText("");
-        btn_OpenXML.setToolTipText("Open XML file");
-        tool_panel.add(btn_OpenXML);
+        btn_goto_detailed_dao_xml = new JButton();
+        btn_goto_detailed_dao_xml.setBorderPainted(false);
+        btn_goto_detailed_dao_xml.setContentAreaFilled(false);
+        btn_goto_detailed_dao_xml.setIcon(new ImageIcon(getClass().getResource("/img/xmldoc_16x16.gif")));
+        btn_goto_detailed_dao_xml.setMargin(new Insets(0, 0, 0, 0));
+        btn_goto_detailed_dao_xml.setMaximumSize(new Dimension(32, 32));
+        btn_goto_detailed_dao_xml.setMinimumSize(new Dimension(32, 32));
+        btn_goto_detailed_dao_xml.setOpaque(false);
+        btn_goto_detailed_dao_xml.setPreferredSize(new Dimension(32, 32));
+        btn_goto_detailed_dao_xml.setText("");
+        btn_goto_detailed_dao_xml.setToolTipText("Go to detailed DAO XML");
+        tool_panel.add(btn_goto_detailed_dao_xml);
         btn_OpenJava = new JButton();
         btn_OpenJava.setBorderPainted(false);
         btn_OpenJava.setContentAreaFilled(false);

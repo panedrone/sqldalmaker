@@ -403,7 +403,7 @@ public class IdeaHelpers {
         navigate_to_source(project, psi_element);
     }
 
-    public static boolean navigate_to_dao_class_declaration(
+    public static boolean navigate_to_sdm_xml_dao_class_declaration(
             Project project,
             VirtualFile root_file,
             String dao_class_name) {

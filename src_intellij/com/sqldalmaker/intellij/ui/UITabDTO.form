@@ -34,7 +34,7 @@
                   <opaque value="false"/>
                   <preferredSize width="32" height="32"/>
                   <text value=""/>
-                  <toolTipText value="Open XML file"/>
+                  <toolTipText value="Open 'sdm.xml'"/>
                 </properties>
               </component>
               <component id="208" class="javax.swing.JButton" binding="btn_OpenSQL">

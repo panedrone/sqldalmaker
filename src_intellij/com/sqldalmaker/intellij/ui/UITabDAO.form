@@ -47,7 +47,7 @@
                   <opaque value="false"/>
                   <preferredSize width="32" height="32"/>
                   <text value=""/>
-                  <toolTipText value="Open XML file"/>
+                  <toolTipText value="Open 'sdm.xml'"/>
                 </properties>
               </component>
               <component id="ca7e1" class="javax.swing.JButton" binding="btn_NewXML">
@@ -65,19 +65,19 @@
                   <toolTipText value="New XML file"/>
                 </properties>
               </component>
-              <component id="9732e" class="javax.swing.JButton" binding="btn_OpenXML">
+              <component id="9732e" class="javax.swing.JButton" binding="btn_goto_detailed_dao_xml">
                 <constraints/>
                 <properties>
                   <borderPainted value="false"/>
                   <contentAreaFilled value="false"/>
-                  <icon value="img/arrow-curve-090-left.png"/>
+                  <icon value="img/xmldoc_16x16.gif"/>
                   <margin top="0" left="0" bottom="0" right="0"/>
                   <maximumSize width="32" height="32"/>
                   <minimumSize width="32" height="32"/>
                   <opaque value="false"/>
                   <preferredSize width="32" height="32"/>
                   <text value=""/>
-                  <toolTipText value="Open XML file"/>
+                  <toolTipText value="Go to detailed DAO XML"/>
                 </properties>
               </component>
               <component id="4b090" class="javax.swing.JButton" binding="btn_OpenJava">

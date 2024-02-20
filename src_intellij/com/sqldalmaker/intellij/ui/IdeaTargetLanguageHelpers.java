@@ -73,7 +73,7 @@ public class IdeaTargetLanguageHelpers {
         return rel_path;
     }
 
-    public static void open_dto_sync(
+    public static void open_target_dto_sync(
             Project project,
             VirtualFile root_file,
             Settings settings,
@@ -84,7 +84,7 @@ public class IdeaTargetLanguageHelpers {
         IdeaEditorHelpers.open_project_file_in_editor_sync(project, rel_path);
     }
 
-    public static void open_dao_sync(
+    public static void open_target_dao_sync(
             Project project,
             VirtualFile root_file,
             Settings settings,

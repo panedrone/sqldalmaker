@@ -127,7 +127,7 @@ public class IdeaActionGroup extends ActionGroup implements AlwaysVisibleActionG
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
                 try {
-                    IdeaTargetLanguageHelpers.open_dao_sync(project, root_file, settings, dao_class_name);
+                    IdeaTargetLanguageHelpers.open_target_dao_sync(project, root_file, settings, dao_class_name);
                 } catch (Exception e) {
                     // e.printStackTrace();
                     IdeaMessageHelpers.show_error_in_ui_thread(e);
