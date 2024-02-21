@@ -210,7 +210,7 @@ public class UIEditorPageDAO extends Composite {
 					open_sdm_xml();
 				}
 			};
-			action_openSdmXml.setToolTipText("Find to selected item in 'sdm.xml'");
+			action_openSdmXml.setToolTipText("Find selected item in 'sdm.xml'");
 			action_openSdmXml
 					.setImageDescriptor(ResourceManager.getImageDescriptor(UIEditorPageDAO.class, "/img/xmldoc.gif"));
 		}

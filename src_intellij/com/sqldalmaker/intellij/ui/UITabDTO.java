@@ -181,7 +181,7 @@ public class UITabDTO {
         btn_OpenXML.setOpaque(false);
         btn_OpenXML.setPreferredSize(new Dimension(32, 32));
         btn_OpenXML.setText("");
-        btn_OpenXML.setToolTipText("Navigate to XML declaration in 'sdm.xml' (double-click on left-most cell)");
+        btn_OpenXML.setToolTipText("Find selected item in 'sdm.xml' (double-click on left-most cell)");
         tool_panel.add(btn_OpenXML);
         btn_OpenSQL = new JButton();
         btn_OpenSQL.setBorderPainted(false);

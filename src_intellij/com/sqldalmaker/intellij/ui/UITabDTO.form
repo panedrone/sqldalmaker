@@ -34,7 +34,7 @@
                   <opaque value="false"/>
                   <preferredSize width="32" height="32"/>
                   <text value=""/>
-                  <toolTipText value="Find to selected item in 'sdm.xml' (double-click on left-most cell)"/>
+                  <toolTipText value="Find selected item in 'sdm.xml' (double-click on left-most cell)"/>
                 </properties>
               </component>
               <component id="208" class="javax.swing.JButton" binding="btn_OpenSQL">

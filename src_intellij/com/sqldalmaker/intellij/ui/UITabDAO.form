@@ -62,7 +62,7 @@
                   <opaque value="false"/>
                   <preferredSize width="32" height="32"/>
                   <text value=""/>
-                  <toolTipText value="Find to selected item in 'sdm.xml'"/>
+                  <toolTipText value="Find selected item in 'sdm.xml'"/>
                 </properties>
               </component>
               <component id="9732e" class="javax.swing.JButton" binding="btn_goto_detailed_dao_xml">

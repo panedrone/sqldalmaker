@@ -268,7 +268,7 @@ public class UIEditorPageDTO extends Composite {
 					open_xml();
 				}
 			};
-			action_openXml.setToolTipText("Find to selected item in 'sdm.xml' (double-click on left-most cell)");
+			action_openXml.setToolTipText("Find selected item in 'sdm.xml' (double-click on left-most cell)");
 			action_openXml
 					.setImageDescriptor(ResourceManager.getImageDescriptor(UIEditorPageDTO.class, "/img/xmldoc.gif"));
 		}
