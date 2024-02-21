@@ -181,7 +181,7 @@ public class UITabDTO {
         btn_OpenXML.setOpaque(false);
         btn_OpenXML.setPreferredSize(new Dimension(32, 32));
         btn_OpenXML.setText("");
-        btn_OpenXML.setToolTipText("Open 'sdm.xml'");
+        btn_OpenXML.setToolTipText("Navigate to XML declaration in 'sdm.xml' (double-click on left-most cell)");
         tool_panel.add(btn_OpenXML);
         btn_OpenSQL = new JButton();
         btn_OpenSQL.setBorderPainted(false);
@@ -193,7 +193,7 @@ public class UITabDTO {
         btn_OpenSQL.setOpaque(false);
         btn_OpenSQL.setPreferredSize(new Dimension(32, 32));
         btn_OpenSQL.setText("");
-        btn_OpenSQL.setToolTipText("Open SQL file");
+        btn_OpenSQL.setToolTipText("Navigate to SQL file (double-click on middle cell)");
         tool_panel.add(btn_OpenSQL);
         btn_OpenJava = new JButton();
         btn_OpenJava.setBorderPainted(false);
@@ -204,7 +204,7 @@ public class UITabDTO {
         btn_OpenJava.setOpaque(false);
         btn_OpenJava.setPreferredSize(new Dimension(32, 32));
         btn_OpenJava.setText("");
-        btn_OpenJava.setToolTipText("Go to generated source");
+        btn_OpenJava.setToolTipText("Navigate to generated code (double-click on right-most cell)");
         tool_panel.add(btn_OpenJava);
         btn_genTmpFieldTags = new JButton();
         btn_genTmpFieldTags.setBorderPainted(false);

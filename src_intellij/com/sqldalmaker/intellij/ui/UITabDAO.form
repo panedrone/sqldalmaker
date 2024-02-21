@@ -35,21 +35,6 @@
             </properties>
             <border type="none"/>
             <children>
-              <component id="b21e9" class="javax.swing.JButton" binding="open_sdm_xml">
-                <constraints/>
-                <properties>
-                  <borderPainted value="false"/>
-                  <contentAreaFilled value="false"/>
-                  <icon value="img/xmldoc.gif"/>
-                  <margin top="0" left="0" bottom="0" right="0"/>
-                  <maximumSize width="32" height="32"/>
-                  <minimumSize width="32" height="32"/>
-                  <opaque value="false"/>
-                  <preferredSize width="32" height="32"/>
-                  <text value=""/>
-                  <toolTipText value="Open 'sdm.xml'"/>
-                </properties>
-              </component>
               <component id="ca7e1" class="javax.swing.JButton" binding="btn_NewXML">
                 <constraints/>
                 <properties>
@@ -65,19 +50,34 @@
                   <toolTipText value="New XML file"/>
                 </properties>
               </component>
-              <component id="9732e" class="javax.swing.JButton" binding="btn_goto_detailed_dao_xml">
+              <component id="b21e9" class="javax.swing.JButton" binding="open_sdm_xml">
                 <constraints/>
                 <properties>
                   <borderPainted value="false"/>
                   <contentAreaFilled value="false"/>
-                  <icon value="img/xmldoc_16x16.gif"/>
+                  <icon value="img/xmldoc.gif"/>
                   <margin top="0" left="0" bottom="0" right="0"/>
                   <maximumSize width="32" height="32"/>
                   <minimumSize width="32" height="32"/>
                   <opaque value="false"/>
                   <preferredSize width="32" height="32"/>
                   <text value=""/>
-                  <toolTipText value="Go to detailed DAO XML"/>
+                  <toolTipText value="Find to selected item in 'sdm.xml'"/>
+                </properties>
+              </component>
+              <component id="9732e" class="javax.swing.JButton" binding="btn_goto_detailed_dao_xml">
+                <constraints/>
+                <properties>
+                  <borderPainted value="false"/>
+                  <contentAreaFilled value="false"/>
+                  <icon value="img/xmldoc_12x12.gif"/>
+                  <margin top="0" left="0" bottom="0" right="0"/>
+                  <maximumSize width="32" height="32"/>
+                  <minimumSize width="32" height="32"/>
+                  <opaque value="false"/>
+                  <preferredSize width="32" height="32"/>
+                  <text value=""/>
+                  <toolTipText value="Navigate to XML definition (double-click on left-most cell)"/>
                 </properties>
               </component>
               <component id="4b090" class="javax.swing.JButton" binding="btn_OpenJava">
@@ -92,7 +92,7 @@
                   <opaque value="false"/>
                   <preferredSize width="32" height="32"/>
                   <text value=""/>
-                  <toolTipText value="Go to generated source"/>
+                  <toolTipText value="Navigate to generated code (double-click on right-most cell)"/>
                 </properties>
               </component>
               <component id="93bcc" class="javax.swing.JButton" binding="btn_CrudDao">

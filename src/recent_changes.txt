@@ -10,9 +10,9 @@ Starting from v1.294, you need to register DAO XML files in "sdm.xml":
     <dao-class name="ProductsDao" ref="ProductsDao.xml"/>
     <dao-class name="SalesDao" ref="SalesDao.xml"/>
 
-        --- Click "Create/Overwrite XSD files" to make this 'ref' available. ---
+        --- Click "Create/Overwrite XSD files" to make attribute 'ref' available. ---
 
-		--- Both "inline" and "external" DAO XML can be used together. ---
+		--- Both "inline" and "external" DAO XML can be mixed. ---
 
 2023-12-09
 

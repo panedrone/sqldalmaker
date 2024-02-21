@@ -257,7 +257,7 @@ public class UIEditorPageDTO extends Composite {
 					open_sql();
 				}
 			};
-			action_openSQL.setToolTipText("Open SQL file");
+			action_openSQL.setToolTipText("Navigate to SQL file (double-click on middle cell)");
 			action_openSQL
 					.setImageDescriptor(ResourceManager.getImageDescriptor(UIEditorPageDTO.class, "/img/qrydoc.gif"));
 		}
@@ -268,7 +268,7 @@ public class UIEditorPageDTO extends Composite {
 					open_xml();
 				}
 			};
-			action_openXml.setToolTipText("Open 'sdm.xml'");
+			action_openXml.setToolTipText("Find to selected item in 'sdm.xml' (double-click on left-most cell)");
 			action_openXml
 					.setImageDescriptor(ResourceManager.getImageDescriptor(UIEditorPageDTO.class, "/img/xmldoc.gif"));
 		}
@@ -281,7 +281,7 @@ public class UIEditorPageDTO extends Composite {
 			};
 			action_open_target.setImageDescriptor(
 					ResourceManager.getImageDescriptor(UIEditorPageDTO.class, "/img/GeneratedFile.gif"));
-			action_open_target.setToolTipText("Go to generated source");
+			action_open_target.setToolTipText("Navigate to generated code (double-click on right-most cell)");
 		}
 		{
 			action_genTmpFieldTags = new Action("") {

@@ -128,8 +128,8 @@ public class UIEditorPageDAO extends Composite {
 		toolBarManager = new ToolBarManager(toolBar1);
 		toolkit.adapt(toolBar1);
 		toolkit.paintBordersFor(toolBar1);
-		toolBarManager.add(action_openSdmXml);
 		toolBarManager.add(action_newXml);
+		toolBarManager.add(action_openSdmXml);
 		toolBarManager.add(action_openDaoXmlFile);
 		toolBarManager.add(action_goto_source);
 		toolBarManager.add(action_getCrudDao);
@@ -210,7 +210,7 @@ public class UIEditorPageDAO extends Composite {
 					open_sdm_xml();
 				}
 			};
-			action_openSdmXml.setToolTipText("Open 'sdm.xml'");
+			action_openSdmXml.setToolTipText("Find to selected item in 'sdm.xml'");
 			action_openSdmXml
 					.setImageDescriptor(ResourceManager.getImageDescriptor(UIEditorPageDAO.class, "/img/xmldoc.gif"));
 		}
@@ -277,7 +277,7 @@ public class UIEditorPageDAO extends Composite {
 					open_detailed_dao_xml();
 				}
 			};
-			action_openDaoXmlFile.setToolTipText("Go to detailed DAO XML");
+			action_openDaoXmlFile.setToolTipText("Navigate to XML definition (double-click on left-most cell)");
 			action_openDaoXmlFile
 					.setImageDescriptor(ImageDescriptor.createFromFile(UIEditorPageDAO.class, "/img/xmldoc_16x16.gif"));
 		}
@@ -290,7 +290,7 @@ public class UIEditorPageDAO extends Composite {
 			};
 			action_goto_source.setImageDescriptor(
 					ResourceManager.getImageDescriptor(UIEditorPageDAO.class, "/img/GeneratedFile.gif"));
-			action_goto_source.setToolTipText("Go to generated source");
+			action_goto_source.setToolTipText("Navigate to generated code (double-click on right-most cell)");
 		}
 		{
 			action_FK = new Action("") {
