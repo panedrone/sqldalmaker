@@ -130,18 +130,18 @@ public class UITabDAO {
             public void actionPerformed(ActionEvent e) {
                 open_sdm_xml();
             }
-
-            private void open_sdm_xml() {
-                int[] selected_rows = get_ui_table_selection();
-                if (selected_rows.length > 0) {
-                    String dao_class_name = (String) table.getValueAt(selected_rows[0], 0);
-                    if (IdeaHelpers.navigate_to_sdm_xml_dao_class_declaration(project, root_file, dao_class_name)) {
-                        return;
-                    }
-                }
-                IdeaEditorHelpers.open_sdm_xml_sync(project, root_file);
-            }
         });
+    }
+
+    private void open_sdm_xml() {
+        int[] selected_rows = get_ui_table_selection();
+        if (selected_rows.length > 0) {
+            String dao_class_name = (String) table.getValueAt(selected_rows[0], 0);
+            if (IdeaHelpers.navigate_to_sdm_xml_dao_class_declaration(project, root_file, dao_class_name)) {
+                return;
+            }
+        }
+        IdeaEditorHelpers.open_sdm_xml_sync(project, root_file);
     }
 
     private void createUIComponents() {
@@ -159,7 +159,8 @@ public class UITabDAO {
         table.getTableHeader().setReorderingAllowed(false);
         table.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) {
+                int click_count = e.getClickCount();
+                if (click_count == 2) {
                     int col = table.columnAtPoint(new Point(e.getX(), e.getY()));
                     int row = table.rowAtPoint(new Point(e.getX(), e.getY()));
                     if (row >= 0) {
@@ -168,6 +169,10 @@ public class UITabDAO {
                         } else if (col == 1) {
                             open_target_file_sync();
                         }
+                    }
+                } else if (click_count == 1) {
+                    if (e.isAltDown()) {
+                        open_sdm_xml();
                     }
                 }
             }
@@ -434,7 +439,7 @@ public class UITabDAO {
         open_sdm_xml.setOpaque(false);
         open_sdm_xml.setPreferredSize(new Dimension(32, 32));
         open_sdm_xml.setText("");
-        open_sdm_xml.setToolTipText("Find selected item in 'sdm.xml'");
+        open_sdm_xml.setToolTipText("Find selected item in 'sdm.xml' (Alt + click on selected row)");
         tool_panel.add(open_sdm_xml);
         btn_goto_detailed_dao_xml = new JButton();
         btn_goto_detailed_dao_xml.setBorderPainted(false);
