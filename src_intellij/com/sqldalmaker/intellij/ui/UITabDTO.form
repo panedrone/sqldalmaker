@@ -34,7 +34,7 @@
                   <opaque value="false"/>
                   <preferredSize width="32" height="32"/>
                   <text value=""/>
-                  <toolTipText value="Find selected item in 'sdm.xml' (double-click on left-most cell)"/>
+                  <toolTipText value="Find selected item in 'sdm.xml' (double-click one the left-most cells)"/>
                 </properties>
               </component>
               <component id="208" class="javax.swing.JButton" binding="btn_OpenSQL">
@@ -49,7 +49,7 @@
                   <opaque value="false"/>
                   <preferredSize width="32" height="32"/>
                   <text value=""/>
-                  <toolTipText value="Navigate to SQL file (double-click on middle cell)"/>
+                  <toolTipText value="Navigate to SQL file (double-click one the middle cells)"/>
                 </properties>
               </component>
               <component id="5e7cc" class="javax.swing.JButton" binding="btn_OpenJava">
@@ -63,7 +63,7 @@
                   <opaque value="false"/>
                   <preferredSize width="32" height="32"/>
                   <text value=""/>
-                  <toolTipText value="Navigate to generated code (double-click on right-most cell)"/>
+                  <toolTipText value="Navigate to generated code (double-click one the right-most cells)"/>
                 </properties>
               </component>
               <component id="aa2ed" class="javax.swing.JButton" binding="btn_genTmpFieldTags">

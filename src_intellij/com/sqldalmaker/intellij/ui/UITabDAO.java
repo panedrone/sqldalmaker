@@ -47,7 +47,7 @@ public class UITabDAO {
 
     private Project project;
     private VirtualFile root_file;
-    private MyTableModel dao_table_model;
+    private MyDaoTableModel dao_table_model;
 
     private final int COL_INDEX_NAME = 0;
     private final int COL_INDEX_REF = 1;
@@ -161,7 +161,8 @@ public class UITabDAO {
                 return super.getCellRenderer(row, column);
             }
         };
-        dao_table_model = new MyTableModel();
+        // createUIComponents() is called from constructor --> $$$setupUI$$$();
+        dao_table_model = new MyDaoTableModel();
         table.setModel(dao_table_model);
         table.getTableHeader().setReorderingAllowed(false);
         table.addMouseListener(new MouseAdapter() {
@@ -433,18 +434,6 @@ public class UITabDAO {
         tool_panel.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
         tool_panel.setOpaque(false);
         panel1.add(tool_panel);
-        btn_NewXML = new JButton();
-        btn_NewXML.setBorderPainted(false);
-        btn_NewXML.setContentAreaFilled(false);
-        btn_NewXML.setIcon(new ImageIcon(getClass().getResource("/img/new_xml.gif")));
-        btn_NewXML.setMargin(new Insets(0, 0, 0, 0));
-        btn_NewXML.setMaximumSize(new Dimension(32, 32));
-        btn_NewXML.setMinimumSize(new Dimension(32, 32));
-        btn_NewXML.setOpaque(false);
-        btn_NewXML.setPreferredSize(new Dimension(32, 32));
-        btn_NewXML.setText("");
-        btn_NewXML.setToolTipText("New XML file");
-        tool_panel.add(btn_NewXML);
         open_sdm_xml = new JButton();
         open_sdm_xml.setBorderPainted(false);
         open_sdm_xml.setContentAreaFilled(false);
@@ -455,7 +444,7 @@ public class UITabDAO {
         open_sdm_xml.setOpaque(false);
         open_sdm_xml.setPreferredSize(new Dimension(32, 32));
         open_sdm_xml.setText("");
-        open_sdm_xml.setToolTipText("Find selected item in 'sdm.xml' (double-click on left-most cell)");
+        open_sdm_xml.setToolTipText("Find selected item in 'sdm.xml' (double-click one of the left-most cells)");
         tool_panel.add(open_sdm_xml);
         btn_goto_detailed_dao_xml = new JButton();
         btn_goto_detailed_dao_xml.setBorderPainted(false);
@@ -467,7 +456,7 @@ public class UITabDAO {
         btn_goto_detailed_dao_xml.setOpaque(false);
         btn_goto_detailed_dao_xml.setPreferredSize(new Dimension(32, 32));
         btn_goto_detailed_dao_xml.setText("");
-        btn_goto_detailed_dao_xml.setToolTipText("Navigate to XML definition (double-click on middle cell)");
+        btn_goto_detailed_dao_xml.setToolTipText("Navigate to XML definition (double-click one of the middle cells)");
         tool_panel.add(btn_goto_detailed_dao_xml);
         btn_OpenJava = new JButton();
         btn_OpenJava.setBorderPainted(false);
@@ -479,8 +468,20 @@ public class UITabDAO {
         btn_OpenJava.setOpaque(false);
         btn_OpenJava.setPreferredSize(new Dimension(32, 32));
         btn_OpenJava.setText("");
-        btn_OpenJava.setToolTipText("Navigate to generated code (double-click on right-most cell)");
+        btn_OpenJava.setToolTipText("Navigate to generated code (double-click one of the right-most cells)");
         tool_panel.add(btn_OpenJava);
+        btn_NewXML = new JButton();
+        btn_NewXML.setBorderPainted(false);
+        btn_NewXML.setContentAreaFilled(false);
+        btn_NewXML.setIcon(new ImageIcon(getClass().getResource("/img/new_xml.gif")));
+        btn_NewXML.setMargin(new Insets(0, 0, 0, 0));
+        btn_NewXML.setMaximumSize(new Dimension(32, 32));
+        btn_NewXML.setMinimumSize(new Dimension(32, 32));
+        btn_NewXML.setOpaque(false);
+        btn_NewXML.setPreferredSize(new Dimension(32, 32));
+        btn_NewXML.setText("");
+        btn_NewXML.setToolTipText("New DAO XML file");
+        tool_panel.add(btn_NewXML);
         btn_CrudDao = new JButton();
         btn_CrudDao.setBorderPainted(false);
         btn_CrudDao.setContentAreaFilled(false);
@@ -577,7 +578,7 @@ public class UITabDAO {
         }
     }
 
-    private static class MyTableModel extends AbstractTableModel {
+    private static class MyDaoTableModel extends AbstractTableModel {
 
         private final ArrayList<String[]> list = new ArrayList<String[]>();
 

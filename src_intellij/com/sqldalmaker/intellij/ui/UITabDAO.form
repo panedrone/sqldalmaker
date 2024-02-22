@@ -35,21 +35,6 @@
             </properties>
             <border type="none"/>
             <children>
-              <component id="ca7e1" class="javax.swing.JButton" binding="btn_NewXML">
-                <constraints/>
-                <properties>
-                  <borderPainted value="false"/>
-                  <contentAreaFilled value="false"/>
-                  <icon value="img/new_xml.gif"/>
-                  <margin top="0" left="0" bottom="0" right="0"/>
-                  <maximumSize width="32" height="32"/>
-                  <minimumSize width="32" height="32"/>
-                  <opaque value="false"/>
-                  <preferredSize width="32" height="32"/>
-                  <text value=""/>
-                  <toolTipText value="New XML file"/>
-                </properties>
-              </component>
               <component id="b21e9" class="javax.swing.JButton" binding="open_sdm_xml">
                 <constraints/>
                 <properties>
@@ -62,7 +47,7 @@
                   <opaque value="false"/>
                   <preferredSize width="32" height="32"/>
                   <text value=""/>
-                  <toolTipText value="Find selected item in 'sdm.xml' (double-click on left-most cell)"/>
+                  <toolTipText value="Find selected item in 'sdm.xml' (double-click one of the left-most cells)"/>
                 </properties>
               </component>
               <component id="9732e" class="javax.swing.JButton" binding="btn_goto_detailed_dao_xml">
@@ -77,7 +62,7 @@
                   <opaque value="false"/>
                   <preferredSize width="32" height="32"/>
                   <text value=""/>
-                  <toolTipText value="Navigate to XML definition (double-click on middle cell)"/>
+                  <toolTipText value="Navigate to XML definition (double-click one of the middle cells)"/>
                 </properties>
               </component>
               <component id="4b090" class="javax.swing.JButton" binding="btn_OpenJava">
@@ -92,7 +77,22 @@
                   <opaque value="false"/>
                   <preferredSize width="32" height="32"/>
                   <text value=""/>
-                  <toolTipText value="Navigate to generated code (double-click on right-most cell)"/>
+                  <toolTipText value="Navigate to generated code (double-click one of the right-most cells)"/>
+                </properties>
+              </component>
+              <component id="ca7e1" class="javax.swing.JButton" binding="btn_NewXML">
+                <constraints/>
+                <properties>
+                  <borderPainted value="false"/>
+                  <contentAreaFilled value="false"/>
+                  <icon value="img/new_xml.gif"/>
+                  <margin top="0" left="0" bottom="0" right="0"/>
+                  <maximumSize width="32" height="32"/>
+                  <minimumSize width="32" height="32"/>
+                  <opaque value="false"/>
+                  <preferredSize width="32" height="32"/>
+                  <text value=""/>
+                  <toolTipText value="New DAO XML file"/>
                 </properties>
               </component>
               <component id="93bcc" class="javax.swing.JButton" binding="btn_CrudDao">

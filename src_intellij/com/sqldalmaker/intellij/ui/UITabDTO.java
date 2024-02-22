@@ -49,7 +49,7 @@ public class UITabDTO {
 
     private Project project;
     private VirtualFile root_file;
-    private MyTableModel dto_table_model;
+    private MyDtoTableModel dto_table_model;
 
     private final int COL_INDEX_NAME = 0;
     private final int COL_INDEX_REF = 1;
@@ -186,7 +186,7 @@ public class UITabDTO {
         btn_OpenXML.setOpaque(false);
         btn_OpenXML.setPreferredSize(new Dimension(32, 32));
         btn_OpenXML.setText("");
-        btn_OpenXML.setToolTipText("Find selected item in 'sdm.xml' (double-click on left-most cell)");
+        btn_OpenXML.setToolTipText("Find selected item in 'sdm.xml' (double-click one the left-most cells)");
         tool_panel.add(btn_OpenXML);
         btn_OpenSQL = new JButton();
         btn_OpenSQL.setBorderPainted(false);
@@ -198,7 +198,7 @@ public class UITabDTO {
         btn_OpenSQL.setOpaque(false);
         btn_OpenSQL.setPreferredSize(new Dimension(32, 32));
         btn_OpenSQL.setText("");
-        btn_OpenSQL.setToolTipText("Navigate to SQL file (double-click on middle cell)");
+        btn_OpenSQL.setToolTipText("Navigate to SQL file (double-click one the middle cells)");
         tool_panel.add(btn_OpenSQL);
         btn_OpenJava = new JButton();
         btn_OpenJava.setBorderPainted(false);
@@ -209,7 +209,7 @@ public class UITabDTO {
         btn_OpenJava.setOpaque(false);
         btn_OpenJava.setPreferredSize(new Dimension(32, 32));
         btn_OpenJava.setText("");
-        btn_OpenJava.setToolTipText("Navigate to generated code (double-click on right-most cell)");
+        btn_OpenJava.setToolTipText("Navigate to generated code (double-click one the right-most cells)");
         tool_panel.add(btn_OpenJava);
         btn_genTmpFieldTags = new JButton();
         btn_genTmpFieldTags.setBorderPainted(false);
@@ -280,7 +280,7 @@ public class UITabDTO {
         return rootPanel;
     }
 
-    private static class MyTableModel extends AbstractTableModel {
+    private static class MyDtoTableModel extends AbstractTableModel {
 
         private final ArrayList<String[]> list = new ArrayList<String[]>();
 
@@ -354,14 +354,15 @@ public class UITabDTO {
                 return super.getCellRenderer(row, column);
             }
         };
-        // createUIComponents() is called before constructors
-        dto_table_model = new MyTableModel();
+        // createUIComponents() is called from constructor --> $$$setupUI$$$();
+        dto_table_model = new MyDtoTableModel();
         table.setModel(dto_table_model);
         table.getTableHeader().setReorderingAllowed(false);
         // table.setRowHeight(24);
         table.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) {
+                int click_count = e.getClickCount();
+                if (click_count == 2) {
                     int col = table.columnAtPoint(new Point(e.getX(), e.getY()));
                     int row = table.rowAtPoint(new Point(e.getX(), e.getY()));
                     if (row >= 0) {
@@ -374,6 +375,10 @@ public class UITabDTO {
                         }
                     } else {
                         open_sdm_xml();
+                    }
+                } else if (click_count == 1) {
+                    if (e.isAltDown()) {
+                        navigate_to_dto_class_declaration();
                     }
                 }
             }
