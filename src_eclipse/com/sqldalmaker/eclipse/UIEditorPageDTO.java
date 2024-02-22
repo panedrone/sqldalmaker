@@ -159,7 +159,7 @@ public class UIEditorPageDTO extends Composite {
 				Point pt = new Point(e.x, e.y);
 				TableItem item = table.getItem(pt);
 				if (item == null) {
-					open_xml();
+					open_sdm_xml();
 					return;
 				}
 				int clicked_column_index = -1;
@@ -171,7 +171,7 @@ public class UIEditorPageDTO extends Composite {
 					}
 				}
 				if (clicked_column_index == 0) {
-					open_xml();
+					open_sdm_xml();
 				} else if (clicked_column_index == 1) {
 					open_sql();
 				} else {
@@ -257,7 +257,7 @@ public class UIEditorPageDTO extends Composite {
 					open_sql();
 				}
 			};
-			action_openSQL.setToolTipText("Navigate to SQL file (double-click on middle cell)");
+			action_openSQL.setToolTipText("Navigate to SQL file (double-click one the middle cells)");
 			action_openSQL
 					.setImageDescriptor(ResourceManager.getImageDescriptor(UIEditorPageDTO.class, "/img/qrydoc.gif"));
 		}
@@ -265,10 +265,10 @@ public class UIEditorPageDTO extends Composite {
 			action_openXml = new Action("") {
 				@Override
 				public void run() {
-					open_xml();
+					open_sdm_xml();
 				}
 			};
-			action_openXml.setToolTipText("Find selected item in 'sdm.xml' (double-click on left-most cell)");
+			action_openXml.setToolTipText("Find selected item in 'sdm.xml' (double-click one the left-most cells)");
 			action_openXml
 					.setImageDescriptor(ResourceManager.getImageDescriptor(UIEditorPageDTO.class, "/img/xmldoc.gif"));
 		}
@@ -281,7 +281,7 @@ public class UIEditorPageDTO extends Composite {
 			};
 			action_open_target.setImageDescriptor(
 					ResourceManager.getImageDescriptor(UIEditorPageDTO.class, "/img/GeneratedFile.gif"));
-			action_open_target.setToolTipText("Navigate to generated code (double-click on right-most cell)");
+			action_open_target.setToolTipText("Navigate to generated code (double-click one the right-most cells)");
 		}
 		{
 			action_genTmpFieldTags = new Action("") {
@@ -545,7 +545,7 @@ public class UIEditorPageDTO extends Composite {
 		}
 	}
 
-	protected void open_xml() {
+	protected void open_sdm_xml() {
 		try {
 			IFile file = editor2.find_sdm_xml();
 			if (file == null) {

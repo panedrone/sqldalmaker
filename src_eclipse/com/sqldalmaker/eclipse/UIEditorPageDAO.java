@@ -92,6 +92,10 @@ public class UIEditorPageDAO extends Composite {
 	private Composite composite_1;
 	private Action action_FK;
 
+	private final int COL_INDEX_NAME = 0;
+	private final int COL_INDEX_REF = 1;
+	private final int COL_INDEX_STATUS = 2;
+
 	public ToolBar getToolBarManager() {
 		return toolBar1;
 	}
@@ -172,7 +176,9 @@ public class UIEditorPageDAO extends Composite {
 						break;
 					}
 				}
-				if (clicked_column_index == 0) {
+				if (clicked_column_index == COL_INDEX_NAME) {
+					open_sdm_xml();
+				} else if (clicked_column_index == COL_INDEX_REF) {
 					open_detailed_dao_xml();
 				} else {
 					open_generated_source_file();
@@ -180,17 +186,20 @@ public class UIEditorPageDAO extends Composite {
 			}
 		});
 
-		TableViewerColumn tableViewerColumn = new TableViewerColumn(tableViewer, SWT.NONE);
-		TableColumn tblclmnNewColumn = tableViewerColumn.getColumn();
-		tblclmnNewColumn.setWidth(260);
-		tblclmnNewColumn.setText("File");
-
 		TableViewerColumn tableViewerColumn_1 = new TableViewerColumn(tableViewer, SWT.NONE);
 		TableColumn tblclmnNewColumn_1 = tableViewerColumn_1.getColumn();
-		tblclmnNewColumn_1.setWidth(300);
-		tblclmnNewColumn_1.setText("State");
-		table.setLinesVisible(true);
-		table.setHeaderVisible(true);
+		tblclmnNewColumn_1.setWidth(260);
+		tblclmnNewColumn_1.setText("Class");
+
+		TableViewerColumn tableViewerColumn_2 = new TableViewerColumn(tableViewer, SWT.NONE);
+		TableColumn tblclmnNewColumn_2 = tableViewerColumn_2.getColumn();
+		tblclmnNewColumn_2.setWidth(360);
+		tblclmnNewColumn_2.setText("Ref.");
+
+		TableViewerColumn tableViewerColumn_3 = new TableViewerColumn(tableViewer, SWT.NONE);
+		TableColumn tblclmnNewColumn_3 = tableViewerColumn_3.getColumn();
+		tblclmnNewColumn_3.setWidth(300);
+		tblclmnNewColumn_3.setText("State");
 
 		tableViewer.setContentProvider(new ArrayContentProvider());
 		IBaseLabelProvider labelProvider = new ItemLabelProvider();
@@ -210,7 +219,8 @@ public class UIEditorPageDAO extends Composite {
 					open_sdm_xml();
 				}
 			};
-			action_openSdmXml.setToolTipText("Find selected item in 'sdm.xml'");
+			action_openSdmXml
+					.setToolTipText("Find selected item in 'sdm.xml' (double-click one of the left-most cells)");
 			action_openSdmXml
 					.setImageDescriptor(ResourceManager.getImageDescriptor(UIEditorPageDAO.class, "/img/xmldoc.gif"));
 		}
@@ -277,7 +287,7 @@ public class UIEditorPageDAO extends Composite {
 					open_detailed_dao_xml();
 				}
 			};
-			action_openDaoXmlFile.setToolTipText("Navigate to XML definition (double-click on left-most cell)");
+			action_openDaoXmlFile.setToolTipText("Navigate to XML definition (double-click one of the middle cells)");
 			action_openDaoXmlFile
 					.setImageDescriptor(ImageDescriptor.createFromFile(UIEditorPageDAO.class, "/img/xmldoc_16x16.gif"));
 		}
@@ -290,7 +300,7 @@ public class UIEditorPageDAO extends Composite {
 			};
 			action_goto_source.setImageDescriptor(
 					ResourceManager.getImageDescriptor(UIEditorPageDAO.class, "/img/GeneratedFile.gif"));
-			action_goto_source.setToolTipText("Navigate to generated code (double-click on right-most cell)");
+			action_goto_source.setToolTipText("Navigate to generated code (double-click one of the right-most cells)");
 		}
 		{
 			action_FK = new Action("") {
@@ -648,10 +658,13 @@ public class UIEditorPageDAO extends Composite {
 			String result = "";
 			Item item = (Item) element;
 			switch (columnIndex) {
-			case 0:
+			case COL_INDEX_NAME:
 				result = item.get_class_name();
 				break;
-			case 1:
+			case COL_INDEX_REF:
+				result = item.get_ref();
+				break;
+			case COL_INDEX_STATUS:
 				result = item.get_status();
 				break;
 			default:
@@ -686,15 +699,8 @@ public class UIEditorPageDAO extends Composite {
 	static class Item {
 
 		private String class_name;
+		private String ref;
 		private String status;
-
-		public String get_status() {
-			return status;
-		}
-
-		public void set_status(String status) {
-			this.status = status;
-		}
 
 		public String get_class_name() {
 			return class_name;
@@ -702,6 +708,22 @@ public class UIEditorPageDAO extends Composite {
 
 		public void set_class_name(String class_name) {
 			this.class_name = class_name;
+		}
+
+		public String get_ref() {
+			return ref;
+		}
+
+		public void set_ref(String ref) {
+			this.ref = ref;
+		}
+
+		public String get_status() {
+			return status;
+		}
+
+		public void set_status(String status) {
+			this.status = status;
 		}
 	}
 
@@ -744,20 +766,9 @@ public class UIEditorPageDAO extends Composite {
 				for (DaoClass cls : jaxb_dao_classes) {
 					Item item = new Item();
 					item.set_class_name(cls.getName());
+					item.set_ref(cls.getRef());
 					items.add(item);
 				}
-
-			} else {
-				Helpers.IFileList fileList = new Helpers.IFileList() {
-					@Override
-					public void add(String fileName) {
-						String dao_class_name = fileName.replace(".xml", "");
-						Item item = new Item();
-						item.set_class_name(dao_class_name);
-						items.add(item);
-					}
-				};
-				Helpers.enum_dao_xml_file_names(editor2.get_sdm_folder_abs_path(), fileList);
 			}
 		} finally {
 			tableViewer.setInput(items);
