@@ -9,11 +9,9 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.JBColor;
-import com.sqldalmaker.cg.Helpers;
 import com.sqldalmaker.cg.IDaoCG;
 import com.sqldalmaker.cg.JaxbUtils;
 import com.sqldalmaker.common.Const;
-import com.sqldalmaker.common.SdmUtils;
 import com.sqldalmaker.jaxb.sdm.DaoClass;
 import com.sqldalmaker.jaxb.settings.Settings;
 
@@ -21,7 +19,6 @@ import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.*;
 import java.sql.Connection;
@@ -50,7 +47,11 @@ public class UITabDAO {
 
     private Project project;
     private VirtualFile root_file;
-    private MyTableModel my_table_model;
+    private MyTableModel dao_table_model;
+
+    private final int COL_INDEX_NAME = 0;
+    private final int COL_INDEX_REF = 1;
+    private final int COL_INDEX_STATUS = 2;
 
     public UITabDAO() {
         $$$setupUI$$$();
@@ -117,27 +118,34 @@ public class UITabDAO {
                 IdeaCrudXmlHelpers.get_fk_access_xml(project, root_file);
             }
         });
-
-        // === panedrone:
-        // Set up columns after $$$setupUI$$$().
-        // Do not do it in createUIComponents() which is called in beginning of $$$setupUI$$$();
-        table.getColumnModel().getColumn(0).setPreferredWidth(220);
-        table.getColumnModel().getColumn(0).setMaxWidth(2000); // === panedrone: AUTO_RESIZE_LAST_COLUMN not working without it
-        /* During UI adjustment, change subsequent columns to preserve the total width */
-        table.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
         open_sdm_xml.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 open_sdm_xml();
             }
         });
+
+        // === panedrone:
+        // Set up columns after $$$setupUI$$$().
+        // Do not do it in createUIComponents() which is called in beginning of $$$setupUI$$$();
+        table.getColumnModel().getColumn(COL_INDEX_NAME).setPreferredWidth(220);
+        table.getColumnModel().getColumn(COL_INDEX_NAME).setMaxWidth(2000); // === panedrone: AUTO_RESIZE_LAST_COLUMN not working without it
+        table.getColumnModel().getColumn(COL_INDEX_REF).setPreferredWidth(300);
+        table.getColumnModel().getColumn(COL_INDEX_REF).setMaxWidth(2000); // === panedrone: AUTO_RESIZE_LAST_COLUMN not working without it
+        // table.getColumnModel().getColumn(2).setPreferredWidth(300);
+        // https://stackoverflow.com/questions/953972/java-jtable-setting-column-width
+        // JTable.AUTO_RESIZE_LAST_COLUMN is defined as "During all resize operations,
+        // apply adjustments to the last column only" which means you have to set the auto resize mode
+        // at the end of your code, otherwise setPreferredWidth() won't affect anything!
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
+        table.doLayout();
     }
 
     private void open_sdm_xml() {
         int[] selected_rows = get_ui_table_selection();
         if (selected_rows.length > 0) {
             String dao_class_name = (String) table.getValueAt(selected_rows[0], 0);
-            if (IdeaHelpers.navigate_to_sdm_xml_dao_class_declaration(project, root_file, dao_class_name)) {
+            if (IdeaHelpers.navigate_to_sdm_xml_dao_class_by_name(project, root_file, dao_class_name)) {
                 return;
             }
         }
@@ -145,17 +153,16 @@ public class UITabDAO {
     }
 
     private void createUIComponents() {
-        ColorRenderer color_renderer = new ColorRenderer();
         table = new JTable() {
             public TableCellRenderer getCellRenderer(int row, int column) {
-                if (column == 1) {
-                    return color_renderer;
+                if (column == COL_INDEX_STATUS) {
+                    return new DaoTableColorRenderer();
                 }
                 return super.getCellRenderer(row, column);
             }
         };
-        my_table_model = new MyTableModel();
-        table.setModel(my_table_model);
+        dao_table_model = new MyTableModel();
+        table.setModel(dao_table_model);
         table.getTableHeader().setReorderingAllowed(false);
         table.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
@@ -164,9 +171,11 @@ public class UITabDAO {
                     int col = table.columnAtPoint(new Point(e.getX(), e.getY()));
                     int row = table.rowAtPoint(new Point(e.getX(), e.getY()));
                     if (row >= 0) {
-                        if (col == 0) {
+                        if (col == COL_INDEX_NAME) {
+                            open_sdm_dao_xml_sync();
+                        } else if (col == COL_INDEX_REF) {
                             open_detailed_dao_xml_sync();
-                        } else if (col == 1) {
+                        } else {
                             open_target_file_sync();
                         }
                     }
@@ -197,12 +206,21 @@ public class UITabDAO {
         d.setVisible(true);
     }
 
-    private List<DaoClass> load_all_sdm_dao() throws Exception {
-        String sdm_folder_abs_path = root_file.getParent().getPath();
-        String sdm_xml_abs_path = Helpers.concat_path(sdm_folder_abs_path, Const.SDM_XML);
-        String sdm_xsd_abs_path = Helpers.concat_path(sdm_folder_abs_path, Const.SDM_XSD);
-        List<DaoClass> jaxb_dao_classes = SdmUtils.get_dao_classes(sdm_xml_abs_path, sdm_xsd_abs_path);
-        return jaxb_dao_classes;
+    protected void open_sdm_dao_xml_sync() {
+        try {
+            int[] selected_rows = get_ui_table_selection();
+            if (selected_rows.length == 0) {
+                return;
+            }
+            String dao_class_name = (String) table.getValueAt(selected_rows[0], COL_INDEX_NAME);
+            if (dao_class_name == null || dao_class_name.trim().isEmpty()) {
+                return;
+            }
+            IdeaHelpers.navigate_to_sdm_xml_dao_class_by_name(project, root_file, dao_class_name);
+        } catch (Exception e) {
+            // e.printStackTrace();
+            IdeaMessageHelpers.show_error_in_ui_thread(e);
+        }
     }
 
     protected void open_detailed_dao_xml_sync() {
@@ -211,16 +229,14 @@ public class UITabDAO {
             if (selected_rows.length == 0) {
                 return;
             }
-            String dao_class_name = (String) table.getValueAt(selected_rows[0], 0);
-            List<DaoClass> jaxb_dao_classes = load_all_sdm_dao();
-            DaoClass jaxb_dao_class = JaxbUtils.find_jaxb_dao_class(dao_class_name, jaxb_dao_classes);
-            String ref = jaxb_dao_class.getRef();
-            if (ref == null || ref.trim().isEmpty()) {
-                if (IdeaHelpers.navigate_to_sdm_xml_dao_class_declaration(project, root_file, dao_class_name)) {
+            String dao_class_ref = (String) table.getValueAt(selected_rows[0], COL_INDEX_REF);
+            if (dao_class_ref == null || dao_class_ref.trim().isEmpty()) {
+                String dao_class_name = (String) table.getValueAt(selected_rows[0], COL_INDEX_NAME);
+                if (IdeaHelpers.navigate_to_sdm_xml_dao_class_by_name(project, root_file, dao_class_name)) {
                     return;
                 }
             }
-            IdeaEditorHelpers.open_local_file_in_editor_sync(project, root_file, ref);
+            IdeaEditorHelpers.open_local_file_in_editor_sync(project, root_file, dao_class_ref);
         } catch (Exception e) {
             // e.printStackTrace();
             IdeaMessageHelpers.show_error_in_ui_thread(e);
@@ -264,7 +280,7 @@ public class UITabDAO {
                     Settings settings = IdeaHelpers.load_settings(root_file);
                     int[] selected_rows = get_ui_table_selection();
                     for (int row : selected_rows) {
-                        table.setValueAt("", row, 1);
+                        table.setValueAt("", row, COL_INDEX_STATUS);
                     }
                     update_table_async();
                     Connection con = IdeaHelpers.get_connection(project, settings);
@@ -279,10 +295,10 @@ public class UITabDAO {
                                 DaoClass dao_class = JaxbUtils.find_jaxb_dao_class(dao_class_name, jaxb_dao_classes);
                                 String[] file_content = IdeaCG.generate_single_sdm_dao(project, root_file, gen, dao_class, settings);
                                 IdeaCG.prepare_generated_file_data(root_file, dao_class_name, file_content, list);
-                                table.setValueAt(Const.STATUS_GENERATED, row, 1);
+                                table.setValueAt(Const.STATUS_GENERATED, row, COL_INDEX_STATUS);
                             } catch (Throwable e) {
                                 String msg = e.getMessage();
-                                table.setValueAt(msg, row, 1);
+                                table.setValueAt(msg, row, COL_INDEX_STATUS);
                                 IdeaMessageHelpers.add_dao_error_message(settings, root_file, dao_class_name, msg);
                                 // break; // exit the loop
                             }
@@ -327,29 +343,29 @@ public class UITabDAO {
         return selected_rows;
     }
 
-    private void validate_all_with_progress_sync(IDaoCG gen, TableModel model, Settings settings) {
+    private void validate_all_with_progress_sync(IDaoCG gen, Settings settings) {
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
                 try {
                     List<DaoClass> jaxb_dao_classes = IdeaHelpers.load_all_sdm_dao_classes(root_file);
-                    int rc = model.getRowCount();
+                    int rc = dao_table_model.getRowCount();
                     for (int i = 0; i < rc; i++) {
-                        String dao_class_name = (String) model.getValueAt(i, 0);
+                        String dao_class_name = (String) dao_table_model.getValueAt(i, 0);
                         try {
                             ProgressManager.progress(dao_class_name);
                             DaoClass sdm_dao_class = JaxbUtils.find_jaxb_dao_class(dao_class_name, jaxb_dao_classes);
                             String status = IdeaCG.validate_single_sdm_dao(project, root_file, gen, sdm_dao_class, settings);
                             if (status.isEmpty()) {
-                                model.setValueAt(Const.STATUS_OK, i, 1);
+                                dao_table_model.setValueAt(Const.STATUS_OK, i, COL_INDEX_STATUS);
                             } else {
-                                model.setValueAt(status, i, 1);
+                                dao_table_model.setValueAt(status, i, COL_INDEX_STATUS);
                                 IdeaMessageHelpers.add_dao_error_message(settings, root_file, dao_class_name, status);
                             }
                         } catch (Throwable ex) {
                             // ex.printStackTrace();
                             String msg = ex.getMessage();
-                            model.setValueAt(msg, i, 1);
+                            dao_table_model.setValueAt(msg, i, COL_INDEX_STATUS);
                             IdeaMessageHelpers.add_dao_error_message(settings, root_file, dao_class_name, msg);
                         }
                         update_table_async();
@@ -371,7 +387,7 @@ public class UITabDAO {
             try {
                 // !!!! after 'try'
                 IDaoCG gen = IdeaTargetLanguageHelpers.create_dao_cg(con, project, root_file, profile, null);
-                validate_all_with_progress_sync(gen, my_table_model, profile);
+                validate_all_with_progress_sync(gen, profile);
             } finally {
                 con.close();
             }
@@ -439,7 +455,7 @@ public class UITabDAO {
         open_sdm_xml.setOpaque(false);
         open_sdm_xml.setPreferredSize(new Dimension(32, 32));
         open_sdm_xml.setText("");
-        open_sdm_xml.setToolTipText("Find selected item in 'sdm.xml' (Alt + click on selected row)");
+        open_sdm_xml.setToolTipText("Find selected item in 'sdm.xml' (double-click on left-most cell)");
         tool_panel.add(open_sdm_xml);
         btn_goto_detailed_dao_xml = new JButton();
         btn_goto_detailed_dao_xml.setBorderPainted(false);
@@ -451,7 +467,7 @@ public class UITabDAO {
         btn_goto_detailed_dao_xml.setOpaque(false);
         btn_goto_detailed_dao_xml.setPreferredSize(new Dimension(32, 32));
         btn_goto_detailed_dao_xml.setText("");
-        btn_goto_detailed_dao_xml.setToolTipText("Navigate to XML definition (double-click on left-most cell)");
+        btn_goto_detailed_dao_xml.setToolTipText("Navigate to XML definition (double-click on middle cell)");
         tool_panel.add(btn_goto_detailed_dao_xml);
         btn_OpenJava = new JButton();
         btn_OpenJava.setBorderPainted(false);
@@ -534,11 +550,20 @@ public class UITabDAO {
         return rootPanel;
     }
 
-    private static class ColorRenderer extends DefaultTableCellRenderer {
+    private static class DaoTableColorRenderer extends DefaultTableCellRenderer {
         @Override
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean
-                hasFocus, int row, int column) {
+        public Component getTableCellRendererComponent(
+                JTable table,
+                Object value,
+                boolean isSelected,
+                boolean hasFocus,
+                int row,
+                int column) {
+
             Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            if (column != 2) {
+                return c;
+            }
             String sValue = (String) value;
             setText(sValue);
             if (isSelected || Const.STATUS_OK.equals(sValue) || Const.STATUS_GENERATED.equals(sValue)) {
@@ -565,13 +590,22 @@ public class UITabDAO {
             super.fireTableDataChanged();
         }
 
+        @Override
         public String getColumnName(int col) {
-            return col == 0 ? "Class" : "State";
+            switch (col) {
+                case 0:
+                    return "Class";
+                case 1:
+                    return "Ref.";
+                case 2:
+                    return "State";
+            }
+            return "";
         }
 
         @Override
         public int getColumnCount() {
-            return 2;
+            return 3;
         }
 
         @Override
@@ -592,17 +626,18 @@ public class UITabDAO {
 
     private void reload_table() throws Exception {
         try {
-            ArrayList<String[]> list = my_table_model.getList();
+            ArrayList<String[]> list = dao_table_model.getList();
             list.clear();
             List<DaoClass> jaxb_dao_classes = IdeaHelpers.load_all_sdm_dao_classes(root_file);
             for (DaoClass cls : jaxb_dao_classes) {
-                String[] item = new String[2];
-                item[0] = cls.getName();
-                item[1] = "";
+                String[] item = new String[3];
+                item[COL_INDEX_NAME] = cls.getName();
+                item[COL_INDEX_REF] = cls.getRef();
+                item[COL_INDEX_STATUS] = "";
                 list.add(item);
             }
         } finally {
-            my_table_model.refresh(); // // table.updateUI();
+            dao_table_model.refresh(); // // table.updateUI();
         }
     }
 

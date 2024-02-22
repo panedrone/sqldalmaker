@@ -123,10 +123,48 @@ public class IdeaRefUtils {
                 continue;
             }
             String v = a.getValue();
-            if (v == null || v.isEmpty()) {
+            if (v == null) {
                 continue;
             }
-            if (dao_class_name.equals(v)) {
+            if (v.equals(dao_class_name)) {
+                return el;
+            }
+        }
+        return null;
+    }
+
+    public static @Nullable PsiElement find_first_dao_class_xml_tag_by_ref(
+            @NotNull Project project,
+            @NotNull VirtualFile sdm_xml_file,
+            @NotNull String dao_class_ref) {
+
+        PsiElement res = PsiManager.getInstance(project).findFile(sdm_xml_file);// @Nullable
+        if (!(res instanceof XmlFile)) {
+            return null;
+        }
+        XmlFile xml_file = (XmlFile) res;
+        XmlTag root = xml_file.getRootTag(); // nullable
+        if (root == null) {
+            return null;
+        }
+        PsiElement[] tags = root.getChildren(); // notnull;
+        for (PsiElement el : tags) {
+            if (!(el instanceof XmlTag)) {
+                continue;
+            }
+            XmlTag t = (XmlTag) el;
+            if (!t.getName().equals(ELEMENT.DAO_CLASS)) {
+                continue;
+            }
+            XmlAttribute a = t.getAttribute(ATTRIBUTE.REF);
+            if (a == null) {
+                continue;
+            }
+            String v = a.getValue();
+            if (v == null) {
+                continue;
+            }
+            if (v.equals(dao_class_ref)) {
                 return el;
             }
         }

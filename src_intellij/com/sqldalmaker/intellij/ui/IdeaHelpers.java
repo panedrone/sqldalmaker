@@ -403,20 +403,43 @@ public class IdeaHelpers {
         navigate_to_source(project, psi_element);
     }
 
-    public static boolean navigate_to_sdm_xml_dao_class_declaration(
+    public static boolean navigate_to_sdm_xml_dao_class_by_name(
             Project project,
             VirtualFile root_file,
             String dao_class_name) {
 
-        VirtualFile xml_file_dir = root_file.getParent();
-        if (xml_file_dir == null) {
+        VirtualFile sdm_xml_file_dir = root_file.getParent();
+        if (sdm_xml_file_dir == null) {
             return false;
         }
-        VirtualFile sdm_xml_file = xml_file_dir.findFileByRelativePath(Const.SDM_XML);
+        VirtualFile sdm_xml_file = sdm_xml_file_dir.findFileByRelativePath(Const.SDM_XML);
         if (sdm_xml_file == null) {
             return false;
         }
         PsiElement psi_element = IdeaRefUtils.find_dao_class_xml_tag(project, sdm_xml_file, dao_class_name);
+        if (psi_element == null) {
+            return false;
+        }
+        navigate_to_source(project, psi_element);
+        return true;
+    }
+
+    public static boolean navigate_to_sdm_xml_dao_class_by_ref(
+            Project project,
+            VirtualFile root_file,
+            String dao_class_ref) {
+
+        // === panedrone: no usages so far
+
+        VirtualFile sdm_xml_file_dir = root_file.getParent();
+        if (sdm_xml_file_dir == null) {
+            return false;
+        }
+        VirtualFile sdm_xml_file = sdm_xml_file_dir.findFileByRelativePath(Const.SDM_XML);
+        if (sdm_xml_file == null) {
+            return false;
+        }
+        PsiElement psi_element = IdeaRefUtils.find_first_dao_class_xml_tag_by_ref(project, sdm_xml_file, dao_class_ref);
         if (psi_element == null) {
             return false;
         }
