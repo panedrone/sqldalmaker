@@ -246,6 +246,10 @@ public class IdeaHelpers {
         return plugin_version + " on Java " + jv;
     }
 
+    public static void invokeLater(Runnable runnable) {
+        ApplicationManager.getApplication().invokeLater(runnable);
+    }
+
     public static class GeneratedFileData {
         String file_name;
         String file_content;
@@ -264,7 +268,7 @@ public class IdeaHelpers {
             if (file == null) {
                 // createChildData may show dialog and throw
                 // java.lang.IllegalStateException: The DialogWrapper can be used only on event dispatch thread.
-                // if it is called outside of WriteAction
+                // if it is called outside WriteAction
                 file = dir.createChildData(null, gf.file_name);
             } else {
                 // rename if the case differs

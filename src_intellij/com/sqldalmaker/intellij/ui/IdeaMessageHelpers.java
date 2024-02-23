@@ -9,7 +9,6 @@ import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationGroup;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -93,7 +92,7 @@ public class IdeaMessageHelpers {
                 return;
             }
         }
-        ApplicationManager.getApplication().invokeLater(new Runnable() {
+        IdeaHelpers.invokeLater(new Runnable() {
             @Override
             public void run() {
                 add_error_to_ide_log(dto_class_name, msg);
@@ -108,7 +107,7 @@ public class IdeaMessageHelpers {
                 return;
             }
         }
-        ApplicationManager.getApplication().invokeLater(new Runnable() {
+        IdeaHelpers.invokeLater(new Runnable() {
             @Override
             public void run() {
                 add_error_to_ide_log(dao_xml_rel_path, msg);
@@ -123,7 +122,7 @@ public class IdeaMessageHelpers {
         } else {
             m = e.getClass().getName() + ":\n" + e.getMessage();
         }
-        ApplicationManager.getApplication().invokeLater(new Runnable() {
+        IdeaHelpers.invokeLater(new Runnable() {
             public void run() {
                 // Messages.show... ---- the text after "<" disappears
                 String msg = m.replace("<", "");
@@ -133,7 +132,7 @@ public class IdeaMessageHelpers {
     }
 
     public static void show_info_in_ui_thread(String title, String m) {
-        ApplicationManager.getApplication().invokeLater(new Runnable() {
+        IdeaHelpers.invokeLater(new Runnable() {
             public void run() {
                 // Messages.show... ---- the text after "<" disappears
                 String msg = m.replace("<", "");

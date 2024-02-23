@@ -33,7 +33,7 @@ import java.util.List;
 public class UITabDAO {
     private JButton btn_NewXML;
     private JTable table;
-    protected JPanel rootPanel;
+    private JPanel rootPanel;
     private JButton btn_Refresh;
     private JButton btn_Generate;
     private JButton btn_Validate;
@@ -76,13 +76,13 @@ public class UITabDAO {
         btn_goto_detailed_dao_xml.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                open_detailed_dao_xml_sync();
+                open_detailed_dao_xml_async();
             }
         });
         btn_OpenJava.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                open_target_file_sync();
+                open_target_file_async();
             }
         });
         btn_NewXML.addActionListener(new ActionListener() {
@@ -144,7 +144,7 @@ public class UITabDAO {
     private void open_sdm_xml() {
         int[] selected_rows = get_ui_table_selection();
         if (selected_rows.length > 0) {
-            String dao_class_name = (String) table.getValueAt(selected_rows[0], 0);
+            String dao_class_name = (String) table.getValueAt(selected_rows[0], COL_INDEX_NAME);
             if (IdeaHelpers.navigate_to_sdm_xml_dao_class_by_name(project, root_file, dao_class_name)) {
                 return;
             }
@@ -152,6 +152,7 @@ public class UITabDAO {
         IdeaEditorHelpers.open_sdm_xml_sync(project, root_file);
     }
 
+    // it is called from constructor --> $$$setupUI$$$();
     private void createUIComponents() {
         table = new JTable() {
             public TableCellRenderer getCellRenderer(int row, int column) {
@@ -161,7 +162,6 @@ public class UITabDAO {
                 return super.getCellRenderer(row, column);
             }
         };
-        // createUIComponents() is called from constructor --> $$$setupUI$$$();
         dao_table_model = new MyDaoTableModel();
         table.setModel(dao_table_model);
         table.getTableHeader().setReorderingAllowed(false);
@@ -173,11 +173,11 @@ public class UITabDAO {
                     int row = table.rowAtPoint(new Point(e.getX(), e.getY()));
                     if (row >= 0) {
                         if (col == COL_INDEX_NAME) {
-                            open_sdm_dao_xml_sync();
+                            open_sdm_dao_xml_async();
                         } else if (col == COL_INDEX_REF) {
-                            open_detailed_dao_xml_sync();
+                            open_detailed_dao_xml_async();
                         } else {
-                            open_target_file_sync();
+                            open_target_file_async();
                         }
                     }
                 } else if (click_count == 1) {
@@ -207,63 +207,74 @@ public class UITabDAO {
         d.setVisible(true);
     }
 
-    protected void open_sdm_dao_xml_sync() {
-        try {
-            int[] selected_rows = get_ui_table_selection();
-            if (selected_rows.length == 0) {
-                return;
-            }
-            String dao_class_name = (String) table.getValueAt(selected_rows[0], COL_INDEX_NAME);
-            if (dao_class_name == null || dao_class_name.trim().isEmpty()) {
-                return;
-            }
-            IdeaHelpers.navigate_to_sdm_xml_dao_class_by_name(project, root_file, dao_class_name);
-        } catch (Exception e) {
-            // e.printStackTrace();
-            IdeaMessageHelpers.show_error_in_ui_thread(e);
+    private void open_sdm_dao_xml_async() {
+        int[] selected_rows = get_ui_table_selection();
+        if (selected_rows.length == 0) {
+            return;
         }
-    }
-
-    protected void open_detailed_dao_xml_sync() {
-        try {
-            int[] selected_rows = get_ui_table_selection();
-            if (selected_rows.length == 0) {
-                return;
-            }
-            String dao_class_ref = (String) table.getValueAt(selected_rows[0], COL_INDEX_REF);
-            if (dao_class_ref == null || dao_class_ref.trim().isEmpty()) {
-                String dao_class_name = (String) table.getValueAt(selected_rows[0], COL_INDEX_NAME);
-                if (IdeaHelpers.navigate_to_sdm_xml_dao_class_by_name(project, root_file, dao_class_name)) {
-                    return;
+        String dao_class_name = (String) table.getValueAt(selected_rows[0], COL_INDEX_NAME);
+        if (dao_class_name == null || dao_class_name.trim().isEmpty()) {
+            return;
+        }
+        IdeaHelpers.invokeLater(new Runnable() {
+            public void run() {
+                try {
+                    IdeaHelpers.navigate_to_sdm_xml_dao_class_by_name(project, root_file, dao_class_name);
+                } catch (Exception e) {
+                    // e.printStackTrace();
+                    IdeaMessageHelpers.show_error_in_ui_thread(e);
                 }
             }
-            IdeaEditorHelpers.open_local_file_in_editor_sync(project, root_file, dao_class_ref);
-        } catch (Exception e) {
-            // e.printStackTrace();
-            IdeaMessageHelpers.show_error_in_ui_thread(e);
-        }
+        });
     }
 
-    private void open_target_file_sync() {
-        try {
-            int[] selectedRows = get_ui_table_selection();
-            if (selectedRows.length == 0) {
-                IdeaMessageHelpers.add_warning_to_ide_log("Select a class");
+    private void open_detailed_dao_xml_async() {
+        int[] selected_rows = get_ui_table_selection();
+        if (selected_rows.length == 0) {
+            return;
+        }
+        String dao_class_ref = (String) table.getValueAt(selected_rows[0], COL_INDEX_REF);
+        if (dao_class_ref == null || dao_class_ref.trim().isEmpty()) {
+            String dao_class_name = (String) table.getValueAt(selected_rows[0], COL_INDEX_NAME);
+            if (IdeaHelpers.navigate_to_sdm_xml_dao_class_by_name(project, root_file, dao_class_name)) {
                 return;
             }
-            Settings settings = IdeaHelpers.load_settings(root_file);
-            String dao_class_name = (String) table.getValueAt(selectedRows[0], 0);
-            IdeaTargetLanguageHelpers.open_target_dao_sync(project, root_file, settings, dao_class_name);
-        } catch (Exception e) {
-            // e.printStackTrace();
-            IdeaMessageHelpers.show_error_in_ui_thread(e);
         }
+        IdeaHelpers.invokeLater(new Runnable() {
+            public void run() {
+                try {
+                    IdeaEditorHelpers.open_local_file_in_editor_sync(project, root_file, dao_class_ref);
+                } catch (Exception e) {
+                    // e.printStackTrace();
+                    IdeaMessageHelpers.show_error_in_ui_thread(e);
+                }
+            }
+        });
+    }
+
+    private void open_target_file_async() {
+        int[] selectedRows = get_ui_table_selection();
+        if (selectedRows.length == 0) {
+            return;
+        }
+        String dao_class_name = (String) table.getValueAt(selectedRows[0], COL_INDEX_NAME);
+        IdeaHelpers.invokeLater(new Runnable() {
+            public void run() {
+                try {
+                    Settings settings = IdeaHelpers.load_settings(root_file);
+                    IdeaTargetLanguageHelpers.open_target_dao_sync(project, root_file, settings, dao_class_name);
+                } catch (Exception e) {
+                    // e.printStackTrace();
+                    IdeaMessageHelpers.show_error_in_ui_thread(e);
+                }
+            }
+        });
     }
 
     private void update_table_async() {
         // to prevent:
         // WARN - intellij.ide.HackyRepaintManager
-        SwingUtilities.invokeLater(new Runnable() {
+        IdeaHelpers.invokeLater(new Runnable() {
             public void run() {
                 table.updateUI();
             }
@@ -290,7 +301,7 @@ public class UITabDAO {
                         IDaoCG gen = IdeaTargetLanguageHelpers.create_dao_cg(con, project, root_file, settings, output_dir);
                         List<DaoClass> jaxb_dao_classes = IdeaHelpers.load_all_sdm_dao_classes(root_file);
                         for (int row : selected_rows) {
-                            String dao_class_name = (String) table.getValueAt(row, 0);
+                            String dao_class_name = (String) table.getValueAt(row, COL_INDEX_NAME);
                             try {
                                 ProgressManager.progress(dao_class_name);
                                 DaoClass dao_class = JaxbUtils.find_jaxb_dao_class(dao_class_name, jaxb_dao_classes);
@@ -352,7 +363,7 @@ public class UITabDAO {
                     List<DaoClass> jaxb_dao_classes = IdeaHelpers.load_all_sdm_dao_classes(root_file);
                     int rc = dao_table_model.getRowCount();
                     for (int i = 0; i < rc; i++) {
-                        String dao_class_name = (String) dao_table_model.getValueAt(i, 0);
+                        String dao_class_name = (String) dao_table_model.getValueAt(i, COL_INDEX_NAME);
                         try {
                             ProgressManager.progress(dao_class_name);
                             DaoClass sdm_dao_class = JaxbUtils.find_jaxb_dao_class(dao_class_name, jaxb_dao_classes);
@@ -402,7 +413,7 @@ public class UITabDAO {
         this.project = project;
     }
 
-    public void set_file(VirtualFile propFile) {
+    public void set_root_file(VirtualFile propFile) {
         this.root_file = propFile;
     }
 
@@ -578,7 +589,7 @@ public class UITabDAO {
         }
     }
 
-    private static class MyDaoTableModel extends AbstractTableModel {
+    private class MyDaoTableModel extends AbstractTableModel {
 
         private final ArrayList<String[]> list = new ArrayList<String[]>();
 
@@ -594,11 +605,11 @@ public class UITabDAO {
         @Override
         public String getColumnName(int col) {
             switch (col) {
-                case 0:
+                case COL_INDEX_NAME:
                     return "Class";
-                case 1:
+                case COL_INDEX_REF:
                     return "Ref.";
-                case 2:
+                case COL_INDEX_STATUS:
                     return "State";
             }
             return "";

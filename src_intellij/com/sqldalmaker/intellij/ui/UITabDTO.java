@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2023 sqldalmaker@gmail.com
+    Copyright 2011-2024 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -12,13 +12,14 @@ import com.intellij.ui.JBColor;
 import com.sqldalmaker.cg.IDtoCG;
 import com.sqldalmaker.cg.SqlUtils;
 import com.sqldalmaker.common.Const;
-import com.sqldalmaker.common.InternalException;
 import com.sqldalmaker.common.SdmUtils;
 import com.sqldalmaker.jaxb.sdm.DtoClass;
 import com.sqldalmaker.jaxb.settings.Settings;
 
 import javax.swing.*;
-import javax.swing.table.*;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -82,19 +83,19 @@ public class UITabDTO {
         btn_OpenSQL.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                open_sql();
+                open_sql_async();
             }
         });
         btn_OpenXML.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                open_sdm_xml();
+                navigate_to_sdm_dto_class_async();
             }
         });
         btn_OpenJava.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                open_generated_source_file();
+                open_target_file_async();
             }
         });
         btn_genTmpFieldTags.addActionListener(new ActionListener() {
@@ -139,21 +140,6 @@ public class UITabDTO {
         // at the end of your code, otherwise setPreferredWidth() won't affect anything!
         table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
         table.doLayout();
-    }
-
-    private void open_sdm_xml() {
-        IdeaEditorHelpers.open_sdm_xml_sync(project, root_file);
-    }
-
-    private void navigate_to_dto_class_declaration() {
-        try {
-            int[] selected_rows = get_selection();
-            String dto_class_name = (String) table.getValueAt(selected_rows[0], 0);
-            IdeaHelpers.navigate_to_dto_class_declaration(project, root_file, dto_class_name);
-        } catch (Exception e) {
-            IdeaMessageHelpers.show_error_in_ui_thread(e);
-            // e.printStackTrace();
-        }
     }
 
     /**
@@ -280,7 +266,7 @@ public class UITabDTO {
         return rootPanel;
     }
 
-    private static class MyDtoTableModel extends AbstractTableModel {
+    private class MyDtoTableModel extends AbstractTableModel {
 
         private final ArrayList<String[]> list = new ArrayList<String[]>();
 
@@ -296,11 +282,11 @@ public class UITabDTO {
         @Override
         public String getColumnName(int col) {
             switch (col) {
-                case 0:
+                case COL_INDEX_NAME:
                     return "Class";
-                case 1:
+                case COL_INDEX_REF:
                     return "Ref.";
-                case 2:
+                case COL_INDEX_STATUS:
                     return "State";
             }
             return "";
@@ -329,8 +315,14 @@ public class UITabDTO {
 
     private static class DtoTableCellRenderer extends DefaultTableCellRenderer {
         @Override
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-                                                       boolean hasFocus, int row, int column) {
+        public Component getTableCellRendererComponent(
+                JTable table,
+                Object value,
+                boolean isSelected,
+                boolean hasFocus,
+                int row,
+                int column) {
+
             Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             String sValue = (String) value;
             setText(sValue);
@@ -367,18 +359,18 @@ public class UITabDTO {
                     int row = table.rowAtPoint(new Point(e.getX(), e.getY()));
                     if (row >= 0) {
                         if (col == COL_INDEX_NAME) {
-                            navigate_to_dto_class_declaration();
+                            navigate_to_sdm_dto_class_async();
                         } else if (col == COL_INDEX_REF) {
-                            open_sql();
+                            open_sql_async();
                         } else {
-                            open_generated_source_file();
+                            open_target_file_async();
                         }
                     } else {
-                        open_sdm_xml();
+                        open_sdm_xml_async();
                     }
                 } else if (click_count == 1) {
                     if (e.isAltDown()) {
-                        navigate_to_dto_class_declaration();
+                        navigate_to_sdm_dto_class_async();
                     }
                 }
             }
@@ -389,40 +381,82 @@ public class UITabDTO {
         IdeaCrudXmlHelpers.get_crud_sdm_xml(project, root_file);
     }
 
-    private void open_sql() {
-        try {
-            int[] selected_rows = get_selection();
-            String ref = (String) table.getValueAt(selected_rows[0], 1);
-            if (SqlUtils.is_sql_file_ref(ref) == false) {
-                return;
+    private void navigate_to_sdm_dto_class_async() {
+        int[] selected_rows = get_selection();
+        String dto_class_name = (String) table.getValueAt(selected_rows[0], 0);
+        IdeaHelpers.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    IdeaHelpers.navigate_to_dto_class_declaration(project, root_file, dto_class_name);
+                } catch (Exception e) {
+                    IdeaMessageHelpers.show_error_in_ui_thread(e);
+                    // e.printStackTrace();
+                }
             }
-            Settings settings = IdeaHelpers.load_settings(root_file);
-            String relPath = settings.getFolders().getSql() + "/" + ref;
-            IdeaEditorHelpers.open_project_file_in_editor_sync(project, relPath);
-        } catch (Exception e) {
-            IdeaMessageHelpers.show_error_in_ui_thread(e);
-            // e.printStackTrace();
-        }
+        });
     }
 
-    protected void open_generated_source_file() {
-        try {
-            int[] selected_rows = get_selection();
-            Settings settings = IdeaHelpers.load_settings(root_file);
-            String dto_class_name = (String) table.getValueAt(selected_rows[0], 0);
-            IdeaTargetLanguageHelpers.open_target_dto_sync(project, root_file, settings, dto_class_name);
-        } catch (Exception e) {
-            // e.printStackTrace();
-            IdeaMessageHelpers.show_error_in_ui_thread(e);
+    private void open_sdm_xml_async() {
+        IdeaHelpers.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                IdeaEditorHelpers.open_sdm_xml_sync(project, root_file);
+            }
+        });
+    }
+
+    private void open_sql_async() {
+        int[] selected_rows = get_selection();
+        if (selected_rows.length == 0) {
+            return;
         }
+        String ref = (String) table.getValueAt(selected_rows[0], 1);
+        if (SqlUtils.is_sql_file_ref(ref) == false) {
+            navigate_to_sdm_dto_class_async();
+            return;
+        }
+        IdeaHelpers.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Settings settings = IdeaHelpers.load_settings(root_file);
+                    String relPath = settings.getFolders().getSql() + "/" + ref;
+                    IdeaEditorHelpers.open_project_file_in_editor_sync(project, relPath);
+                } catch (Exception e) {
+                    IdeaMessageHelpers.show_error_in_ui_thread(e);
+                    // e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    protected void open_target_file_async() {
+        int[] selected_rows = get_selection();
+        if (selected_rows.length == 0) {
+            return;
+        }
+        String dto_class_name = (String) table.getValueAt(selected_rows[0], COL_INDEX_NAME);
+        IdeaHelpers.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Settings settings = IdeaHelpers.load_settings(root_file);
+                    IdeaTargetLanguageHelpers.open_target_dto_sync(project, root_file, settings, dto_class_name);
+                } catch (Exception e) {
+                    // e.printStackTrace();
+                    IdeaMessageHelpers.show_error_in_ui_thread(e);
+                }
+            }
+        });
     }
 
     protected void jaxb_fields_wizard() {
+        int[] selected_rows = get_selection();
+        String dto_class_name = (String) table.getValueAt(selected_rows[0], COL_INDEX_NAME);
+        String ref = (String) table.getValueAt(selected_rows[0], COL_INDEX_REF);
         try {
-            int[] selected_rows = get_selection();
-            String class_name = (String) table.getValueAt(selected_rows[0], 0);
-            String ref = (String) table.getValueAt(selected_rows[0], 1);
-            IdeaEditorHelpers.gen_field_wizard_jaxb(class_name, ref, project, root_file);
+            IdeaEditorHelpers.gen_field_wizard_jaxb(dto_class_name, ref, project, root_file);
         } catch (Exception e) {
             // e.printStackTrace();
             IdeaMessageHelpers.show_error_in_ui_thread(e);
@@ -433,7 +467,7 @@ public class UITabDTO {
         this.project = project;
     }
 
-    public void set_file(VirtualFile file) {
+    public void set_root_file(VirtualFile file) {
         this.root_file = file;
     }
 
@@ -479,7 +513,7 @@ public class UITabDTO {
                         // !!!! after 'try'
                         IDtoCG gen = IdeaTargetLanguageHelpers.create_dto_cg(con, project, root_file, settings, output_dir);
                         for (int row : selected_rows) {
-                            String dto_class_name = (String) dto_table_model.getValueAt(row, 0);
+                            String dto_class_name = (String) dto_table_model.getValueAt(row, COL_INDEX_NAME);
                             try {
                                 ProgressManager.progress(dto_class_name);
                                 String[] fileContent = gen.translate(dto_class_name);
@@ -526,7 +560,7 @@ public class UITabDTO {
                 // "Cannot read the array length because "<local3>" is null"
                 int rc = dto_table_model.getRowCount();
                 for (int i = 0; i < rc; i++) {
-                    String dto_class_name = (String) dto_table_model.getValueAt(i, 0);
+                    String dto_class_name = (String) dto_table_model.getValueAt(i, COL_INDEX_NAME);
                     ProgressManager.progress(dto_class_name);
                     progressManager.getProgressIndicator().setText(dto_class_name);
                     try {
@@ -556,14 +590,14 @@ public class UITabDTO {
     private void update_table_async() {
         // to prevent:
         // WARN - intellij.ide.HackyRepaintManager
-        SwingUtilities.invokeLater(new Runnable() {
+        IdeaHelpers.invokeLater(new Runnable() {
             public void run() {
                 table.updateUI();
             }
         });
     }
 
-    private int[] get_selection() throws InternalException {
+    private int[] get_selection() {
         int rc = table.getModel().getRowCount();
         if (rc == 1) {
             return new int[]{0};
@@ -574,9 +608,6 @@ public class UITabDTO {
             for (int i = 0; i < rc; i++) {
                 selected_rows[i] = i;
             }
-        }
-        if (selected_rows.length == 0) {
-            throw new InternalException("Selection is empty");
         }
         return selected_rows;
     }

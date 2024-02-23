@@ -114,12 +114,12 @@ public class UIProfileEditor {
             UITabDTO tabDTO1 = new UITabDTO();
             cards1.add(tabDTO1.get_root_panel(), DTO);
             tabDTO1.set_project(project);
-            tabDTO1.set_file(root_file);
+            tabDTO1.set_root_file(root_file);
             tabDTO1.reload_table(false);
             UITabDAO tabDAO1 = new UITabDAO();
             cards1.add(tabDAO1.get_root_panel(), DAO);
             tabDAO1.set_project(project);
-            tabDAO1.set_file(root_file);
+            tabDAO1.set_root_file(root_file);
             tabDAO1.reload_table(false);
             UITabAdmin tabAdmin = new UITabAdmin();
             cards1.add(tabAdmin.getRootPanel(), Admin);
