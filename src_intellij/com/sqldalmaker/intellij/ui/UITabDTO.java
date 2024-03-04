@@ -9,6 +9,7 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.JBColor;
+import com.sqldalmaker.cg.Helpers;
 import com.sqldalmaker.cg.IDtoCG;
 import com.sqldalmaker.cg.SqlUtils;
 import com.sqldalmaker.common.Const;
@@ -83,19 +84,31 @@ public class UITabDTO {
         btn_OpenSQL.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                open_sql_async();
+                int[] selected_rows = get_selection();
+                if (selected_rows.length == 0) {
+                    return;
+                }
+                open_sql_async(selected_rows[0]);
             }
         });
         btn_OpenXML.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                navigate_to_sdm_dto_class_async();
+                int[] selected_rows = get_selection();
+                if (selected_rows.length == 0) {
+                    return;
+                }
+                navigate_to_sdm_dto_class_async(selected_rows[0]);
             }
         });
         btn_OpenJava.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                open_target_file_async();
+                int[] selected_rows = get_selection();
+                if (selected_rows.length == 0) {
+                    return;
+                }
+                open_target_file_async(selected_rows[0]);
             }
         });
         btn_genTmpFieldTags.addActionListener(new ActionListener() {
@@ -352,25 +365,22 @@ public class UITabDTO {
         table.getTableHeader().setReorderingAllowed(false);
         // table.setRowHeight(24);
         table.addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent e) {
+            // public void mouseClicked(MouseEvent e) {  // not working sometime
+            public void mousePressed(MouseEvent e) {
                 int click_count = e.getClickCount();
-                if (click_count == 2) {
+                if (click_count == 2 || (click_count == 1 && e.isAltDown())) {
                     int col = table.columnAtPoint(new Point(e.getX(), e.getY()));
                     int row = table.rowAtPoint(new Point(e.getX(), e.getY()));
                     if (row >= 0) {
                         if (col == COL_INDEX_NAME) {
-                            navigate_to_sdm_dto_class_async();
+                            navigate_to_sdm_dto_class_async(row);
                         } else if (col == COL_INDEX_REF) {
-                            open_sql_async();
+                            open_sql_async(row);
                         } else {
-                            open_target_file_async();
+                            open_target_file_async(row);
                         }
                     } else {
                         open_sdm_xml_async();
-                    }
-                } else if (click_count == 1) {
-                    if (e.isAltDown()) {
-                        navigate_to_sdm_dto_class_async();
                     }
                 }
             }
@@ -381,9 +391,8 @@ public class UITabDTO {
         IdeaCrudXmlHelpers.get_crud_sdm_xml(project, root_file);
     }
 
-    private void navigate_to_sdm_dto_class_async() {
-        int[] selected_rows = get_selection();
-        String dto_class_name = (String) table.getValueAt(selected_rows[0], 0);
+    private void navigate_to_sdm_dto_class_async(int row) {
+        String dto_class_name = (String) table.getValueAt(row, COL_INDEX_NAME);
         IdeaHelpers.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -406,22 +415,18 @@ public class UITabDTO {
         });
     }
 
-    private void open_sql_async() {
-        int[] selected_rows = get_selection();
-        if (selected_rows.length == 0) {
-            return;
-        }
-        String ref = (String) table.getValueAt(selected_rows[0], 1);
+    private void open_sql_async(int row) {
+        String ref = (String) table.getValueAt(row, COL_INDEX_REF);
         if (SqlUtils.is_sql_file_ref(ref) == false) {
-            navigate_to_sdm_dto_class_async();
+            navigate_to_sdm_dto_class_async(row);
             return;
         }
         IdeaHelpers.invokeLater(new Runnable() {
             @Override
             public void run() {
                 try {
-                    Settings settings = IdeaHelpers.load_settings(root_file);
-                    String relPath = settings.getFolders().getSql() + "/" + ref;
+                    String sql_rel_path = IdeaHelpers.load_settings(root_file).getFolders().getSql();
+                    String relPath = Helpers.concat_path(sql_rel_path, ref);
                     IdeaEditorHelpers.open_project_file_in_editor_sync(project, relPath);
                 } catch (Exception e) {
                     IdeaMessageHelpers.show_error_in_ui_thread(e);
@@ -431,12 +436,8 @@ public class UITabDTO {
         });
     }
 
-    protected void open_target_file_async() {
-        int[] selected_rows = get_selection();
-        if (selected_rows.length == 0) {
-            return;
-        }
-        String dto_class_name = (String) table.getValueAt(selected_rows[0], COL_INDEX_NAME);
+    protected void open_target_file_async(int row) {
+        String dto_class_name = (String) table.getValueAt(row, COL_INDEX_NAME);
         IdeaHelpers.invokeLater(new Runnable() {
             @Override
             public void run() {

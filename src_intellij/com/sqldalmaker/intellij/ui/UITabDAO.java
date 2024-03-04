@@ -76,13 +76,21 @@ public class UITabDAO {
         btn_goto_detailed_dao_xml.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                open_detailed_dao_xml_async();
+                int[] selected_rows = get_ui_table_selection();
+                if (selected_rows.length == 0) {
+                    return;
+                }
+                open_detailed_dao_xml_async(selected_rows[0]);
             }
         });
         btn_OpenJava.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                open_target_file_async();
+                int[] selected_rows = get_ui_table_selection();
+                if (selected_rows.length == 0) {
+                    return;
+                }
+                open_target_file_async(selected_rows[0]);
             }
         });
         btn_NewXML.addActionListener(new ActionListener() {
@@ -166,23 +174,20 @@ public class UITabDAO {
         table.setModel(dao_table_model);
         table.getTableHeader().setReorderingAllowed(false);
         table.addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent e) {
+            // public void mouseClicked(MouseEvent e) {  // not working sometime
+            public void mousePressed(MouseEvent e) {
                 int click_count = e.getClickCount();
-                if (click_count == 2) {
+                if (click_count == 2 || (click_count == 1 && e.isAltDown())) {
                     int col = table.columnAtPoint(new Point(e.getX(), e.getY()));
                     int row = table.rowAtPoint(new Point(e.getX(), e.getY()));
                     if (row >= 0) {
                         if (col == COL_INDEX_NAME) {
-                            open_sdm_dao_xml_async();
+                            navigate_to_sdm_dao_xml_async(row);
                         } else if (col == COL_INDEX_REF) {
-                            open_detailed_dao_xml_async();
+                            open_detailed_dao_xml_async(row);
                         } else {
-                            open_target_file_async();
+                            open_target_file_async(row);
                         }
-                    }
-                } else if (click_count == 1) {
-                    if (e.isAltDown()) {
-                        open_sdm_xml();
                     }
                 }
             }
@@ -207,12 +212,8 @@ public class UITabDAO {
         d.setVisible(true);
     }
 
-    private void open_sdm_dao_xml_async() {
-        int[] selected_rows = get_ui_table_selection();
-        if (selected_rows.length == 0) {
-            return;
-        }
-        String dao_class_name = (String) table.getValueAt(selected_rows[0], COL_INDEX_NAME);
+    private void navigate_to_sdm_dao_xml_async(int row) {
+        String dao_class_name = (String) table.getValueAt(row, COL_INDEX_NAME);
         if (dao_class_name == null || dao_class_name.trim().isEmpty()) {
             return;
         }
@@ -228,14 +229,10 @@ public class UITabDAO {
         });
     }
 
-    private void open_detailed_dao_xml_async() {
-        int[] selected_rows = get_ui_table_selection();
-        if (selected_rows.length == 0) {
-            return;
-        }
-        String dao_class_ref = (String) table.getValueAt(selected_rows[0], COL_INDEX_REF);
+    private void open_detailed_dao_xml_async(int row) {
+    String dao_class_ref = (String) table.getValueAt(row, COL_INDEX_REF);
         if (dao_class_ref == null || dao_class_ref.trim().isEmpty()) {
-            String dao_class_name = (String) table.getValueAt(selected_rows[0], COL_INDEX_NAME);
+            String dao_class_name = (String) table.getValueAt(row, COL_INDEX_NAME);
             if (IdeaHelpers.navigate_to_sdm_xml_dao_class_by_name(project, root_file, dao_class_name)) {
                 return;
             }
@@ -252,12 +249,8 @@ public class UITabDAO {
         });
     }
 
-    private void open_target_file_async() {
-        int[] selectedRows = get_ui_table_selection();
-        if (selectedRows.length == 0) {
-            return;
-        }
-        String dao_class_name = (String) table.getValueAt(selectedRows[0], COL_INDEX_NAME);
+    private void open_target_file_async(int row) {
+        String dao_class_name = (String) table.getValueAt(row, COL_INDEX_NAME);
         IdeaHelpers.invokeLater(new Runnable() {
             public void run() {
                 try {

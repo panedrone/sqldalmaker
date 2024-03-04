@@ -60,7 +60,7 @@
         <!-- sqlite3 -->
 
         <!--        <type detected="sqlx-java.lang.Integer" target="int64${json-sqlx} -> SetInt64"/>-->
-        <!--        <type detected="sqlx-java.lang.Float" target="float32${json-sqlx} -> SetFloat64"/>-->
+        <!--        <type detected="sqlx-java.lang.Float" target="float32${json-sqlx} -> SetFloat32"/>-->
         <!--        <type detected="sqlx-java.lang.Double" target="float64${json-sqlx} -> SetFloat64"/>-->
         <!--        <type detected="sqlx-java.lang.String" target="string${json-sqlx} -> SetString"/>-->
         <!--        <type detected="sqlx-java.util.Date" target="time:time.Time${json-sqlx} -> SetTime"/>-->
@@ -68,7 +68,7 @@
         <!--        <type detected="sqlx-java.lang.Object" target="interface{}${json-sqlx}"/>-->
 
         <!--        <type detected="java.lang.Integer" target="int64${json} -> SetInt64"/>-->
-        <!--        <type detected="java.lang.Float" target="float32${json} -> SetFloat64"/>-->
+        <!--        <type detected="java.lang.Float" target="float32${json} -> SetFloat32"/>-->
         <!--        <type detected="java.lang.Double" target="float64${json} -> SetFloat64"/>-->
         <!--        <type detected="java.lang.String" target="string${json} -> SetString"/>-->
         <!--        <type detected="java.util.Date" target="time:time.Time${json} -> SetTime"/>-->
