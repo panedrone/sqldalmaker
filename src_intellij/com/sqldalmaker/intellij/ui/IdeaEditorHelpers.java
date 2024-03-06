@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2023 sqldalmaker@gmail.com
+    Copyright 2011-2024 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -211,6 +211,6 @@ public class IdeaEditorHelpers {
         String text = XmlHelpers.get_dao_xml_text(object_factory, root);
         String[] parts = text.split("\\?>");
         text = parts[0] + Const.COMMENT_GENERATED_DAO_XML + parts[1];
-        IdeaEditorHelpers.open_text_in_new_editor(project, file_name, text);
+        open_text_in_new_editor(project, file_name, text);
     }
 }

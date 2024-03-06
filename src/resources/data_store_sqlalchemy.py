@@ -5,7 +5,7 @@
     Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store_sqlalchemy.py
 
     Successfully tested with:
-    
+
         sqlite3 ---------------- built-in
         postgresql ------------- pip install psycopg2
         mysql+mysqlconnector --- pip install mysql-connector-python
@@ -21,7 +21,7 @@
 import sqlalchemy.orm
 
 
-# from sqlalchemy.dialects import oracle
+from sqlalchemy.dialects import oracle
 
 
 class OutParam:
@@ -186,42 +186,42 @@ ForeignKey = sqlalchemy.ForeignKey
 
 # if oracle:
 #
-#     SmallInteger = oracle.NUMBER
-#     Integer = oracle.NUMBER
-#     BigInteger = oracle.NUMBER
-#
-#     Numeric = oracle.NUMBER
-#     Float = oracle.NUMBER
-#
-#     # unlike default "Float", INSERT works correctly with IDENTITY columns like
-#     # g_id = Column('G_ID', NUMBER, primary_key=True, autoincrement=True)
-#     NUMBER = oracle.NUMBER
-#
-#     # https://stackoverflow.com/questions/64903159/convert-oracle-datatypes-to-sqlalchemy-types
-#     # https://docs.sqlalchemy.org/en/14/dialects/oracle.html
-#     # Provide the oracle DATE type.
-#     #     This type has no special Python behavior, except that it subclasses
-#     #     :class:`_types.DateTime`; this is to suit the fact that the Oracle
-#     #     ``DATE`` type supports a time value.
-#     DateTime = oracle.DATE  # (timezone=False)
-#
-#     String = oracle.NVARCHAR
-#     Boolean = oracle.LONG
-#     LargeBinary = oracle.BLOB
+SmallInteger = oracle.NUMBER
+Integer = oracle.NUMBER
+BigInteger = oracle.NUMBER
+
+Numeric = oracle.NUMBER
+Float = oracle.NUMBER
+
+# unlike default "Float", INSERT works correctly with IDENTITY columns like
+# g_id = Column('G_ID', NUMBER, primary_key=True, autoincrement=True)
+NUMBER = oracle.NUMBER
+
+# https://stackoverflow.com/questions/64903159/convert-oracle-datatypes-to-sqlalchemy-types
+# https://docs.sqlalchemy.org/en/14/dialects/oracle.html
+# Provide the oracle DATE type.
+#     This type has no special Python behavior, except that it subclasses
+#     :class:`_types.DateTime`; this is to suit the fact that the Oracle
+#     ``DATE`` type supports a time value.
+DateTime = oracle.DATE  # (timezone=False)
+
+String = oracle.NVARCHAR
+Boolean = oracle.LONG
+LargeBinary = oracle.BLOB
 #
 # else:
 
-SmallInteger = sqlalchemy.SmallInteger
-Integer = sqlalchemy.Integer
-BigInteger = sqlalchemy.BigInteger
-
-Float = sqlalchemy.Float
-
-DateTime = sqlalchemy.DateTime
-
-String = sqlalchemy.String
-Boolean = sqlalchemy.Boolean
-LargeBinary = sqlalchemy.LargeBinary
+# SmallInteger = sqlalchemy.SmallInteger
+# Integer = sqlalchemy.Integer
+# BigInteger = sqlalchemy.BigInteger
+#
+# Float = sqlalchemy.Float
+#
+# DateTime = sqlalchemy.DateTime
+#
+# String = sqlalchemy.String
+# Boolean = sqlalchemy.Boolean
+# LargeBinary = sqlalchemy.LargeBinary
 
 
 # --------------------------------------------------------------------------------------------
@@ -428,20 +428,20 @@ class _DS(DataStore):
         if params is None:
             params = []
 
-        cursor_result = self._exec(cls.SQL, params)
+        exec_res = self._create_exec_result(cls.SQL, params)
         try:
-            cursor = cursor_result.cursor
+            cursor = exec_res.cursor
             # === panedrone: lower() is required because of oracle column names are always in upper case
             col_names = [tup[0].lower() for tup in cursor.description]
             res = []
-            for row in cursor_result:
+            for row in exec_res:
                 row_values = [i for i in row]
                 row_as_dict = dict(zip(col_names, row_values))
                 r = cls(**dict(row_as_dict))
                 res.append(r)
             return res
         finally:
-            cursor_result.close()
+            exec_res.close()
 
     def get_one_raw(self, cls, params=None):
         rows = self.get_all_raw(cls, params)
@@ -489,7 +489,7 @@ class _DS(DataStore):
         self.orm_session.flush()
         return rc
 
-    def _exec(self, sql, params):
+    def _create_exec_result(self, sql, params):
         """
         :param sql:
         :param params:
@@ -518,16 +518,16 @@ class _DS(DataStore):
                 out_params.append(p)
             else:
                 call_params.append(p)
-        cursor = self._exec(sql, call_params)
+        exec_res = self._create_exec_result(sql, call_params)
         try:
             if len(out_params) > 0:
-                row0 = cursor.fetchone()
+                row0 = exec_res.fetchone()
                 i = 0
                 for value in row0:
                     out_params[i].value = value
                     i += 1
         finally:
-            cursor.close()
+            exec_res.close()
 
     def _exec_sp_mysql(self, sp, params):
         call_params = self._get_call_params(params)
@@ -566,11 +566,11 @@ class _DS(DataStore):
         sql = self._format_sql(sql)
         sp = self._get_sp_name(sql)
         if sp is None:
-            cursor = self._exec(sql, params)
+            exec_res = self._create_exec_result(sql, params)
             try:
-                return cursor.rowcount
+                return exec_res.rowcount
             finally:
-                cursor.close()
+                exec_res.close()
         if self.engine_type == self.EngineType.postgresql:
             self._exec_proc_pg(sql, params)  # sql!
         elif self.engine_type == self.EngineType.mysql:
@@ -595,13 +595,13 @@ class _DS(DataStore):
         res = []
         sp = self._get_sp_name(sql)
         if sp is None:
-            cursor = self._exec(sql, params)
+            exec_res = self._create_exec_result(sql, params)
             try:
-                for row in cursor:
+                for row in exec_res:
                     res.append(row[0])
                 return res
             finally:
-                cursor.close()
+                exec_res.close()
         if self.engine_type != self.EngineType.mysql:
             raise Exception('Not supported for this engine')
 
@@ -625,21 +625,21 @@ class _DS(DataStore):
         sql = self._format_sql(sql)
         sp = self._get_sp_name(sql)
         if sp is None:
-            cursor_result = self._exec(sql, params)
+            exec_res = self._create_exec_result(sql, params)
             try:
-                cursor = cursor_result.cursor
+                cursor = exec_res.cursor
                 # === panedrone:
                 #       the same logic is used in "get_all_raw(...",
                 #       but "tup[0].lower()" should not be used in "query_all_rows(..."
                 #       because "col_names" must be used as-is:
                 col_names = [tup[0] for tup in cursor.description]
-                for row in cursor_result:
+                for row in exec_res:
                     row_values = [i for i in row]
                     row_as_dict = dict(zip(col_names, row_values))
                     callback(row_as_dict)
                 return
             finally:
-                cursor_result.close()
+                exec_res.close()
         if self.engine_type != self.EngineType.mysql:
             raise Exception('Not supported for this engine')
         self._query_sp_mysql(sp, lambda result: self._fetch_all(result, callback), params)

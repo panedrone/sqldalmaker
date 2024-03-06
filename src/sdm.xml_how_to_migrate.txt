@@ -9,9 +9,7 @@ How to migrate:
 4. delete "dto.xml" and "dto.xsd"
 5. click "Validate Configuration" -> done.
 
-Where to declare DAO classes with v1.292+:
+Where to declare DAO classes:
 
-- "option 1": separate XML files like in prev. versions
-- "option 2": tags "<dao-class..." in "sdm.xml"
-
-Once you start using "option 2", "option 1" is ignored.
+- inline tags "<dao-class..." in "sdm.xml"
+- external XML files + registering in "sdm.xml" with "<dao-class ref="..."
