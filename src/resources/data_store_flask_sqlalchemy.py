@@ -196,6 +196,9 @@ String = None
 Boolean = None
 LargeBinary = None
 
+Numeric = None
+NUMBER = None
+
 
 #
 # How to pre-configure flask_sqlalchemy (do it somewhere in __main__):
@@ -235,7 +238,7 @@ def init_ds(db: flask_sqlalchemy.SQLAlchemy):
     _DS.orm_scoped_session = db.session
 
     global Base, Column, ForeignKey, \
-        SmallInteger, Integer, BigInteger, Float, DateTime, String, Boolean, LargeBinary
+        SmallInteger, Integer, BigInteger, Float, DateTime, String, Boolean, LargeBinary, Numeric, NUMBER
 
     Base = db.Model
 
