@@ -6,12 +6,8 @@ programming languages: PHP, Java, C++, Python, and Go. To generate the class, yo
 At the stage of code generation, the target database must exist and be available for JDBC connection.
 Generated code is being synchronized with the current database schema using "live" JDBC metadata.
 
-<table>
-<tr>
-<th> Hello Example </th> <th> Generated Code in Action </th>
-</tr>
-<tr>
-<td> 
+Hello Example:
+
 
 ```xml
 <sdm>
@@ -25,9 +21,6 @@ Generated code is being synchronized with the current database schema using "liv
 
 </sdm>
 ```
-
-</td>
-<td>
 
 ```python
 ds = create_ds()
@@ -46,10 +39,6 @@ for msg in dao.get_messages_like("hello%"):
 
 dao.delete_message(m.id)
 ```
-
-</td>
-</tr>
-</table>
 
 Implemented in Java as plug-ins for [Eclipse IDE](http://marketplace.eclipse.org/content/sql-dal-maker) and
 [IntelliJ-Platform](http://plugins.jetbrains.com/plugin/7092).
