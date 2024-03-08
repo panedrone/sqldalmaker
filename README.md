@@ -6,12 +6,55 @@ programming languages: PHP, Java, C++, Python, and Go. To generate the class, yo
 At the stage of code generation, the target database must exist and be available for JDBC connection.
 Generated code is being synchronized with the current database schema using "live" JDBC metadata.
 
-![SQL DAL Maker](sdm_python.png)
+<table>
+<tr>
+<th> Hello Example </th> <th> Generated Code in Action </th>
+</tr>
+<tr>
+<td> 
+
+```xml
+<sdm>
+
+    <dto-class name="Message" ref="messages"/>
+
+    <dao-class name="MessagesDao">
+        <crud dto="Message"/>
+        <query-list method="get_messages_like(key)" ref="get_messages_like.sql"/>
+    </dao-class>
+
+</sdm>
+```
+
+</td>
+<td>
+
+```python
+ds = create_ds()
+dao = MessagesDao(ds)
+
+m = Message()
+m.text = "Hello"
+dao.create_message(m)
+print(m.id)
+
+m.text = "Hello SDM!"
+dao.update_message(m)
+
+for msg in dao.get_messages_like("hello%"):
+    print(msg)
+
+dao.delete_message(m.id)
+```
+
+</td>
+</tr>
+</table>
 
 Implemented in Java as plug-ins for [Eclipse IDE](http://marketplace.eclipse.org/content/sql-dal-maker) and
 [IntelliJ-Platform](http://plugins.jetbrains.com/plugin/7092).
 
-Project website/docs: [https://sqldalmaker.sourceforge.net](https://sqldalmaker.sourceforge.net/)
+Project Web-Site/Docs: [https://sqldalmaker.sourceforge.net](https://sqldalmaker.sourceforge.net/)
 
 Quick Start in
 mp4: [https://github.com/panedrone/sqldalmaker/releases/tag/latest](https://github.com/panedrone/sqldalmaker/releases/tag/latest)
