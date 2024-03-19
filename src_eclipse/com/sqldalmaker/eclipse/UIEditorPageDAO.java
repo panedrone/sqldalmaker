@@ -132,10 +132,10 @@ public class UIEditorPageDAO extends Composite {
 		toolBarManager = new ToolBarManager(toolBar1);
 		toolkit.adapt(toolBar1);
 		toolkit.paintBordersFor(toolBar1);
-		toolBarManager.add(action_newXml);
 		toolBarManager.add(action_openSdmXml);
 		toolBarManager.add(action_openDaoXmlFile);
 		toolBarManager.add(action_goto_source);
+		toolBarManager.add(action_newXml);
 		toolBarManager.add(action_getCrudDao);
 		toolBarManager.add(action_FK);
 		toolBarManager.add(action_refresh);

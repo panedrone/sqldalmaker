@@ -257,7 +257,7 @@ public class UIEditorPageDTO extends Composite {
 					open_sql();
 				}
 			};
-			action_openSQL.setToolTipText("Navigate to SQL file (double-click one the middle cells)");
+			action_openSQL.setToolTipText("Navigate to \"Ref.\" (double-click one of the middle cells)");
 			action_openSQL
 					.setImageDescriptor(ResourceManager.getImageDescriptor(UIEditorPageDTO.class, "/img/qrydoc.gif"));
 		}
@@ -268,7 +268,7 @@ public class UIEditorPageDTO extends Composite {
 					open_sdm_xml();
 				}
 			};
-			action_openXml.setToolTipText("Find selected item in 'sdm.xml' (double-click one the left-most cells)");
+			action_openXml.setToolTipText("Find selected item in 'sdm.xml' (double-click one of the left-most cells)");
 			action_openXml
 					.setImageDescriptor(ResourceManager.getImageDescriptor(UIEditorPageDTO.class, "/img/xmldoc.gif"));
 		}
@@ -281,7 +281,7 @@ public class UIEditorPageDTO extends Composite {
 			};
 			action_open_target.setImageDescriptor(
 					ResourceManager.getImageDescriptor(UIEditorPageDTO.class, "/img/GeneratedFile.gif"));
-			action_open_target.setToolTipText("Navigate to generated code (double-click one the right-most cells)");
+			action_open_target.setToolTipText("Navigate to generated code (double-click one of the right-most cells)");
 		}
 		{
 			action_genTmpFieldTags = new Action("") {
@@ -525,10 +525,8 @@ public class UIEditorPageDTO extends Composite {
 				return;
 			}
 			String relative = items.get(0).getRef();
-			if (relative == null || relative.trim().length() == 0) {
-				return;
-			}
 			if (SqlUtils.is_sql_file_ref(relative) == false) {
+				open_sdm_xml();
 				return;
 			}
 			Settings settings = EclipseHelpers.load_settings(editor2);

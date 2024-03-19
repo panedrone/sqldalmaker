@@ -308,7 +308,7 @@ public class SqlUtils {
     }
 
     public static boolean is_sql_file_ref_base(String ref) {
-        return ref != null && ref.length() > 4 && ref.endsWith(".sql");
+        return ref != null && ref.trim().length() > 4 && ref.endsWith(".sql");
     }
 
     public static boolean is_empty_ref(String ref) {

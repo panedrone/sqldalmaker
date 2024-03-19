@@ -235,7 +235,7 @@ NUMBER = None
 # init_ds(db)  # ===== call it only once at app start
 
 def init_ds(db: flask_sqlalchemy.SQLAlchemy):
-    _DS.orm_scoped_session = db.session
+    _ScopedDS.orm_scoped_session = db.session
 
     global Base, Column, ForeignKey, \
         SmallInteger, Integer, BigInteger, Float, DateTime, String, Boolean, LargeBinary, Numeric, NUMBER
@@ -283,10 +283,10 @@ def init_ds(db: flask_sqlalchemy.SQLAlchemy):
 
 
 def scoped_ds() -> DataStore:
-    return _DS()
+    return _ScopedDS()
 
 
-class _DS(DataStore):
+class _ScopedDS(DataStore):
     class EngineType:
         sqlite3 = 1
         mysql = 2
@@ -323,7 +323,7 @@ class _DS(DataStore):
 
     def __init__(self):
 
-        self.orm_session: sqlalchemy.orm.session = _DS.orm_scoped_session()
+        self.orm_session: sqlalchemy.orm.session = _ScopedDS.orm_scoped_session()
 
         conn = self.orm_session.connection()
 
