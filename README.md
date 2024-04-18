@@ -11,33 +11,27 @@ Hello Example:
 
 ```xml
 <sdm>
-
     <dto-class name="Message" ref="messages"/>
-
     <dao-class name="MessagesDao">
         <crud dto="Message"/>
         <query-list method="get_messages_like(key)" ref="get_messages_like.sql"/>
     </dao-class>
-
 </sdm>
 ```
 
 ```python
-ds = create_ds()
-dao = MessagesDao(ds)
-
-m = Message()
-m.text = "Hello"
-dao.create_message(m)
-print(m.id)
-
-m.text = "Hello SDM!"
-dao.update_message(m)
-
-for msg in dao.get_messages_like("hello%"):
-    print(msg)
-
-dao.delete_message(m.id)
+def generated_code_in_action():
+    ds = scoped_ds()
+    dao = MessagesDao(ds)
+    m = Message()
+    m.text = "Hello, World!"
+    dao.create_message(m)
+    print(m.id) # new "id" is available now
+    m.text = "Hello, SDM World!"
+    dao.update_message(m)
+    for msg in dao.get_messages_like("hello%"):
+        print(msg)
+    dao.delete_message(m.id)
 ```
 
 Implemented in Java as plug-ins for [Eclipse IDE](http://marketplace.eclipse.org/content/sql-dal-maker) and
