@@ -1,4 +1,4 @@
-# SQL DAL Maker
+# SQL DAL Maker (SDM)
 
 SQL DAL Maker is a generator of DTO, Model, and DAO classes to access relational databases. Target
 programming languages: PHP, Java, C++, Python, and Go. To generate the class, you declare it in XML meta-program. 
