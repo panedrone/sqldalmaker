@@ -857,6 +857,10 @@ func SetString(d *string, row map[string]interface{}, colName string, errMap map
 }
 
 func _setString(d *string, value interface{}) error {
+	if value == nil {
+		*d = ""
+		return nil
+	}
 	switch v := value.(type) {
 	case []byte:
 		*d = string(v)
