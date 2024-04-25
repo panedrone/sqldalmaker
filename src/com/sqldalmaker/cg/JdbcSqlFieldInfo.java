@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2023 sqldalmaker@gmail.com
+    Copyright 2011-2024 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -20,7 +20,7 @@ import java.util.Set;
  */
 class JdbcSqlFieldInfo {
 
-    static void get_field_info_by_jdbc_sql(
+    public static void get_field_info_by_jdbc_sql(
             String model,
             Connection conn,
             FieldNamesMode dto_field_names_mode,

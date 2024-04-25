@@ -52,7 +52,7 @@ class JdbcTableInfo {
     private final String explicit_auto_column_name;
     private final String explicit_auto_column_generation_type;
 
-    static JdbcTableInfo forDao(
+    public static JdbcTableInfo forDao(
             String model,
             Connection conn,
             JaxbTypeMap type_map,
@@ -65,7 +65,7 @@ class JdbcTableInfo {
                 jaxb_explicit_pk, jaxb_dto_class.getAuto());
     }
 
-    static JdbcTableInfo forDto(
+    public static JdbcTableInfo forDto(
             String model,
             Connection conn,
             JaxbTypeMap type_map,
@@ -151,7 +151,7 @@ class JdbcTableInfo {
         throw new Exception("Not found: '" + table_name_pattern + "'. The search is case-sensitive.");
     }
 
-    static ResultSet get_tables_rs(
+    public static ResultSet get_tables_rs(
             Connection conn,
             String table_name_pattern, // it may include schema like "public.%"
             boolean include_views) throws SQLException {

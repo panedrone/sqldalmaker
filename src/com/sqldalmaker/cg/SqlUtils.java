@@ -6,6 +6,8 @@
 package com.sqldalmaker.cg;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /*
  * 28.12.2023 08:29 1.292
@@ -322,7 +324,18 @@ public class SqlUtils {
     }
 
     public static boolean is_table_ref(String ref) {
-        if (ref == null || ref.isEmpty()) {
+        if (ref == null) {
+            return false;
+        }
+        ref = ref.trim();
+        if (ref.isEmpty()) {
+            return false;
+        }
+        // https://stackoverflow.com/questions/11488478/how-do-i-check-whether-input-string-contains-any-spaces
+        Pattern space = Pattern.compile("\\s+");
+        Matcher matcherSpace = space.matcher(ref);
+        boolean containsSpace = matcherSpace.find();
+        if (containsSpace) {
             return false;
         }
         if (is_sql_shortcut_ref(ref)) {

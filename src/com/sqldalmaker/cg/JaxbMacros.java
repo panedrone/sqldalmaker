@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2023 sqldalmaker@gmail.com
+    Copyright 2011-2024 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -44,27 +44,27 @@ import java.util.Set;
         }
     }
 
-    Set<String> get_built_in_names() {
+    public Set<String> get_built_in_names() {
         return built_in.keySet();
     }
 
-    Set<String> get_custom_names() {
+    public Set<String> get_custom_names() {
         return custom.keySet();
     }
 
-    Set<String> get_vm_macro_names() {
+    public Set<String> get_vm_macro_names() {
         return custom_vm.keySet();
     }
 
-    String get_custom(String name) {
+    public String get_custom(String name) {
         return custom.get(name);
     }
 
-    Macros.Macro get_vm_macro(String name) {
+    public Macros.Macro get_vm_macro(String name) {
         return custom_vm.get(name);
     }
 
-    void substitute_type_params(FieldInfo fi) throws Exception {
+    public void substitute_type_params(FieldInfo fi) throws Exception {
         String type_name = fi.getType();
         int local_field_type_params_start = type_name.indexOf('|');
         Map<String, String> params = new HashMap<String, String>();

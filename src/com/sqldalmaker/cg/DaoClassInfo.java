@@ -37,7 +37,7 @@ class DaoClassInfo {
     private final JaxbMacros jaxb_macros;
     private final JaxbTypeMap jaxb_type_map;
 
-    DaoClassInfo(
+    public DaoClassInfo(
             Connection conn,
             FieldNamesMode dto_field_names_mode,
             FieldNamesMode method_params_names_mode,
@@ -51,7 +51,7 @@ class DaoClassInfo {
         this.jaxb_type_map = jaxb_type_map;
     }
 
-    private FieldInfo _get_ret_field_info(String explicit_ret_type, List<FieldInfo> dao_fields) throws Exception {
+    private FieldInfo _get_returned_field_info(String explicit_ret_type, List<FieldInfo> dao_fields) throws Exception {
         String ret_col_name = "ret_value";
         String ret_type_name;
         if (explicit_ret_type != null && !explicit_ret_type.trim().isEmpty()) {
@@ -64,7 +64,7 @@ class DaoClassInfo {
                 ret_type_name = dao_fields.get(0).getType();
             }
         }
-        return new FieldInfo(dto_field_names_mode, ret_type_name, ret_col_name, "ret-value");
+        return new FieldInfo(dto_field_names_mode, ret_type_name, ret_col_name, "returned-value");
     }
 
     private void _refine_dao_fields_by_dto_fields(
@@ -74,7 +74,12 @@ class DaoClassInfo {
 
         DtoClassInfo dto_info = new DtoClassInfo(conn, jaxb_type_map, jaxb_macros, dto_field_names_mode);
         boolean ignore_model = true;
-        Map<String, FieldInfo> dto_fields_map = dto_info.get_dto_field_info(ignore_model, jaxb_dto_class, sql_root_abs_path, new ArrayList<FieldInfo>());
+        List<FieldInfo> dto_fields = new ArrayList<FieldInfo>();
+        Map<String, FieldInfo> dto_fields_map = dto_info.get_dto_field_info(ignore_model, jaxb_dto_class, sql_root_abs_path, dto_fields);
+        //        if (dao_fields.isEmpty()) {
+        //            dao_fields.addAll(dto_fields);
+        //            return;
+        //        }
         Set<FieldInfo> excluded_dao_fields = new HashSet<FieldInfo>();
         for (FieldInfo dao_fi : dao_fields) {
             String dao_col_name = dao_fi.getColumnName();
@@ -83,7 +88,7 @@ class DaoClassInfo {
                 continue;
             }
             FieldInfo dto_fi = dto_fields_map.get(dao_col_name);
-            // Always prefer DTO field type
+            // Always prefer DTO field type:
             //      1. if its original name is not Object
             //      2. if target type name of DTO field is not "object"
             String dto_fi_original_type_name = dto_fi.getOriginalType();
@@ -145,7 +150,7 @@ class DaoClassInfo {
             _refine_dao_fields_by_dto_fields(sql_root_abs_path, jaxb_dto_class, res_fields);
         } else {
             // return type is scalar, so dto class name is not available
-            FieldInfo ret_fi = _get_ret_field_info(jaxb_dto_or_return_type, table_info.fields_all);
+            FieldInfo ret_fi = _get_returned_field_info(jaxb_dto_or_return_type, table_info.fields_all);
             res_fields.add(ret_fi); // need to enable checks even if no columns in record set
         }
         if (!res_fields.isEmpty()) {
@@ -154,7 +159,7 @@ class DaoClassInfo {
         }
     }
 
-    void _get_shortcut_params(
+    private void _get_shortcut_params(
             FieldNamesMode param_names_mode,
             String[] method_param_descriptors,
             List<FieldInfo> _table_fields,
@@ -271,7 +276,7 @@ class DaoClassInfo {
         if (jaxb_return_type_is_dto) {
             _get_custom_sql_ret_field_info(sql_root_abs_path, jaxb_dto_or_return_type, jaxb_dto_classes, dao_fields_jdbc, dao_fields_res, error);
         } else {
-            FieldInfo fi = _get_ret_field_info(jaxb_dto_or_return_type, dao_fields_jdbc);
+            FieldInfo fi = _get_returned_field_info(jaxb_dto_or_return_type, dao_fields_jdbc);
             dao_fields_res.add(fi);
         }
     }
@@ -341,7 +346,7 @@ class DaoClassInfo {
         return dao_query_jdbc_sql;
     }
 
-    void get_dao_fields_for_crud_create(
+    public void get_dao_fields_for_crud_create(
             DtoClass jaxb_dto_class,
             String table_name,
             HashSet<String> dao_crud_auto_columns,
@@ -371,7 +376,7 @@ class DaoClassInfo {
         }
     }
 
-    JdbcTableInfo get_dao_fields_for_crud(
+    public JdbcTableInfo get_dao_fields_for_crud(
             DtoClass jaxb_dto_class,
             String table_name,
             String explicit_pk,

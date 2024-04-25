@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2023 sqldalmaker@gmail.com
+    Copyright 2011-2024 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -41,7 +41,7 @@ class DtoClassInfo {
 
     private final FieldNamesMode dto_field_names_mode;
 
-    DtoClassInfo(
+    public DtoClassInfo(
             Connection conn,
             JaxbTypeMap jaxb_type_map,
             JaxbMacros macros,
@@ -53,7 +53,7 @@ class DtoClassInfo {
         this.dto_field_names_mode = dto_field_names_mode;
     }
 
-    List<FieldInfo> get_field_info_for_wizard(DtoClass jaxb_dto_class, String sql_root_abs_path) throws Exception {
+    public List<FieldInfo> get_field_info_for_wizard(DtoClass jaxb_dto_class, String sql_root_abs_path) throws Exception {
         List<FieldInfo> res_dto_fields = new ArrayList<FieldInfo>();
         _prepare_by_jdbc(false, jaxb_dto_class, sql_root_abs_path, res_dto_fields);
         for (FieldInfo fi : res_dto_fields) {
@@ -64,7 +64,7 @@ class DtoClassInfo {
         return res_dto_fields;
     }
 
-    Map<String, FieldInfo> get_dto_field_info(
+    public Map<String, FieldInfo> get_dto_field_info(
             boolean ignore_model,
             DtoClass jaxb_dto_class,
             String sql_root_abs_path,
