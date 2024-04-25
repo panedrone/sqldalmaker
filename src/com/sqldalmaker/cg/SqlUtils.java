@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2023 sqldalmaker@gmail.com
+    Copyright 2011-2024 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -242,11 +242,19 @@ public class SqlUtils {
         return "select * from " + table_name + " where 1 = 0";
     }
 
-    static String jdbc_sql_by_query_ref(String ref, String sql_root_abs_path) throws Exception {
+    public static String jdbc_sql_by_table_name(String table_name) {
+        return "select * from " + table_name + " where 1 = 0";
+    }
+
+    public static String jdbc_sql_by_ref(String ref, String sql_root_abs_path) throws Exception {
+        if (is_table_ref(ref)) {
+            return "select * from " + ref;
+        }
         if (is_sql_file_ref(ref)) {
             String sql_file_path = Helpers.concat_path(sql_root_abs_path, ref);
             return Helpers.load_text_from_file(sql_file_path);
-        } else if (is_sql_shortcut_ref(ref)) {
+        }
+        if (is_sql_shortcut_ref(ref)) {
             String res = _sql_shortcut_to_jdbc_sql(ref);
             return res;
         }

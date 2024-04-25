@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2023 sqldalmaker@gmail.com
+    Copyright 2011-2024 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -21,7 +21,7 @@ import com.sqldalmaker.jaxb.sdm.Crud;
  */
 public interface IDaoCG {
 
-    String[] translate(String dao_class_name, DaoClass dao_class) throws Exception;
+    String[] translate(DaoClass dao_class) throws Exception;
 
     StringBuilder render_jaxb_query(Object jaxb_query) throws Exception;
 

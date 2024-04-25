@@ -210,7 +210,7 @@ public class GoCG {
 
         private final String sql_root_abs_path;
         private final List<DtoClass> jaxb_dto_classes;
-        private final Set<String> imports_set = new HashSet<String>();
+        private final Set<String> imports = new HashSet<String>();
         private final TemplateEngine te;
         private final JdbcUtils db_utils;
         private final Settings settings;
@@ -241,9 +241,9 @@ public class GoCG {
         }
 
         @Override
-        public String[] translate(String dao_class_name, DaoClass dao_class) throws Exception {
-            imports_set.clear();
-            this.dao_class_name = dao_class_name;
+        public String[] translate(DaoClass dao_class) throws Exception {
+            imports.clear();
+            this.dao_class_name = dao_class.getName();
             List<String> methods = new ArrayList<String>();
             JaxbUtils.process_jaxb_dao_class(this, dao_class_name, dao_class, methods);
             for (int i = 0; i < methods.size(); i++) {
@@ -252,8 +252,8 @@ public class GoCG {
             }
             Map<String, Object> context = new HashMap<String, Object>();
             context.put("package", dao_package);
-            imports_set.add("context");
-            String[] imports_arr = imports_set.toArray(new String[0]);
+            imports.add("context");
+            String[] imports_arr = imports.toArray(new String[0]);
             Arrays.sort(imports_arr);
             context.put("imports", imports_arr);
             context.put("class_name", dao_class_name);
@@ -322,7 +322,7 @@ public class GoCG {
                 FieldInfo ret_fi = fields.get(0);
                 String imp = _get_type_import(ret_fi);
                 if (imp != null) {
-                    imports_set.add(imp);
+                    imports.add(imp);
                 }
                 returned_type_name = _get_type_without_import_and_tag(ret_fi);
                 ret_fi.refine_rendered_type(returned_type_name);
@@ -407,10 +407,10 @@ public class GoCG {
             } else {
                 dto_import = Helpers.concat_path(module, dto_scope);
             }
-            if (imports_set.contains(dto_import)) {
+            if (imports.contains(dto_import)) {
                 return;
             }
-            imports_set.add(dto_import);
+            imports.add(dto_import);
         }
 
         @Override
@@ -453,7 +453,7 @@ public class GoCG {
             for (FieldInfo pi : _params) {
                 String imp = _get_type_import(pi);
                 if (imp != null) {
-                    imports_set.add(imp);
+                    imports.add(imp);
                 }
                 String just_type = _get_type_without_import_and_tag(pi);
                 pi.refine_rendered_type(just_type);
@@ -570,7 +570,7 @@ public class GoCG {
                 for (FieldInfo pi : params) {
                     String imp = _get_type_import(pi);
                     if (imp != null) {
-                        imports_set.add(imp);
+                        imports.add(imp);
                     }
                     String just_type = _get_type_without_import_and_tag(pi);
                     pi.refine_rendered_type(just_type);
@@ -580,7 +580,7 @@ public class GoCG {
             if (context.get("imports") != null) {
                 throw new Exception("Invalid assignment of 'imports'");
             }
-            context.put("imports", imports_set);
+            context.put("imports", imports);
         }
 
         private String[] _parse_method_declaration2(String method_text, String dto_package) throws Exception {

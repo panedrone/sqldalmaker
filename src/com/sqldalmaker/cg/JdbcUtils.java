@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2023 sqldalmaker@gmail.com
+    Copyright 2011-2024 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -119,10 +119,10 @@ public class JdbcUtils {
             List<FieldInfo> res_params) throws Exception {
 
         DaoClassInfo info = new DaoClassInfo(conn, dto_field_names_mode, method_params_names_mode, jaxb_macros, jaxb_type_map);
-        String dao_query_jdbc_sql = info.get_dao_query_info(sql_root_abs_path, dao_jaxb_ref, dto_param_type,
+        String sql = info.get_dao_query_info(sql_root_abs_path, dao_jaxb_ref, dto_param_type,
                 method_param_descriptors, jaxb_dto_or_return_type,
                 jaxb_return_type_is_dto, jaxb_dto_classes, res_fields, res_params);
-        return dao_query_jdbc_sql;
+        return sql;
     }
 
     public void get_dao_exec_dml_info(

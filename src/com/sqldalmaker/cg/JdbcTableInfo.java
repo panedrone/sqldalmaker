@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2023 sqldalmaker@gmail.com
+    Copyright 2011-2024 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -120,7 +120,7 @@ class JdbcTableInfo {
             }
         }
         //////////////////////////////////////
-        String jdbc_sql = _jdbc_sql_by_table_name(table_name);
+        String jdbc_sql = SqlUtils.jdbc_sql_by_table_name(table_name);
         JdbcSqlFieldInfo.get_field_info_by_jdbc_sql(model, conn, dto_field_names_mode, jdbc_sql, "", fields_map, fields_all);
         Set<String> lower_case_pk_col_names = _get_lower_case_pk_col_names(table_name, jaxb_explicit_pk);
         for (FieldInfo fi : fields_all) {
@@ -351,10 +351,6 @@ class JdbcTableInfo {
 
     private String _get_type_name(String type_name) {
         return model + type_name;
-    }
-
-    private static String _jdbc_sql_by_table_name(String table_name) {
-        return "select * from " + table_name + " where 1 = 0";
     }
 
     private void _refine_by_type_map() {

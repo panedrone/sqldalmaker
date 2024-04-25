@@ -125,8 +125,9 @@ public class JavaCG {
         }
 
         @Override
-        public String[] translate(String dao_class_name, DaoClass dao_class) throws Exception {
+        public String[] translate(DaoClass dao_class) throws Exception {
             imports.clear();
+            String dao_class_name = dao_class.getName();
             List<String> methods = new ArrayList<String>();
             JaxbUtils.process_jaxb_dao_class(this, dao_class_name, dao_class, methods);
             Map<String, Object> context = new HashMap<String, Object>();

@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2023 sqldalmaker@gmail.com
+    Copyright 2011-2024 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -297,7 +297,8 @@ class DaoClassInfo {
         return mode;
     }
 
-    String get_dao_query_info(
+    // returns SQL statement
+    public String get_dao_query_info(
             String sql_root_abs_path,
             String dao_jaxb_ref,
             String dto_param_type,
@@ -322,11 +323,8 @@ class DaoClassInfo {
                 throw new Exception("Both DAO 'ref' and DTO 'ref' are empty");
             }
             dao_jaxb_ref = dto_jaxb_ref;
-            if (SqlUtils.is_table_ref(dao_jaxb_ref)) {
-                dao_jaxb_ref += "()"; // process it as sql_shortcut
-            }
         }
-        String dao_query_jdbc_sql = SqlUtils.jdbc_sql_by_query_ref(dao_jaxb_ref, sql_root_abs_path);
+        String dao_query_jdbc_sql = SqlUtils.jdbc_sql_by_ref(dao_jaxb_ref, sql_root_abs_path);
         FieldNamesMode param_names_mode = _refine_method_params_names_mode(dto_param_type);
         if (SqlUtils.is_sql_shortcut_ref(dao_jaxb_ref)) {
             _get_sql_shortcut_info(dao_jaxb_ref, sql_root_abs_path, method_param_descriptors, param_names_mode,
