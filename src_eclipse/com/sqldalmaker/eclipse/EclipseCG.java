@@ -354,10 +354,11 @@ public class EclipseCG {
 		String[] file_content;
 		String ref = sdm_dao_class.getRef();
 		if (ref == null || ref.trim().isEmpty()) { // nullable
-			file_content = gen.translate(dao_class_name, sdm_dao_class);
+			file_content = gen.translate(sdm_dao_class);
 		} else {
 			DaoClass external_dao_class = load_external_dao_xml(dao_xml_parser, dao_xml_abs_path);
-			file_content = gen.translate(dao_class_name, external_dao_class);
+			external_dao_class.setName(dao_class_name);
+			file_content = gen.translate(external_dao_class);
 		}
 		return file_content;
 	}

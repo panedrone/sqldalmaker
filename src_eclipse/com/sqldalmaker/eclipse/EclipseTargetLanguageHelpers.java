@@ -5,7 +5,6 @@
 */
 package com.sqldalmaker.eclipse;
 
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,8 +14,6 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 
-import com.sqldalmaker.cg.IDaoCG;
-import com.sqldalmaker.cg.IDtoCG;
 import com.sqldalmaker.common.Const;
 import com.sqldalmaker.common.SdmUtils;
 import com.sqldalmaker.common.TargetLangUtils;

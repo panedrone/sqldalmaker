@@ -14,4 +14,4 @@ For IntelliJ: https://plugins.jetbrains.com/plugin/7092
 
 Contact: sqldalmaker@gmail.com
 
-Donate (PayPal): https://www.paypal.com/donate/?hosted_button_id=9K57U72LTPRJS
+Donate: https://www.paypal.com/donate/?hosted_button_id=9K57U72LTPRJS
