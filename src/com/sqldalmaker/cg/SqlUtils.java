@@ -8,6 +8,7 @@ package com.sqldalmaker.cg;
 import java.util.List;
 
 /*
+ * 28.12.2023 08:29 1.292
  * 27.03.2023 10:03
  * 19.01.2023 20:57 1.276
  * 16.11.2022 08:02 1.269
@@ -184,10 +185,6 @@ public class SqlUtils {
         return res.toString();
     }
 
-    public static String jdbc_sql_to_ruby_string(String jdbc_sql) /*throws Exception*/ {
-        return jdbc_sql_to_python_string(jdbc_sql);
-    }
-
     public static String jdbc_sql_to_python_string(String jdbc_sql) /*throws Exception*/ {
         return python_sql_to_python_string(jdbc_sql);
     }
@@ -239,16 +236,16 @@ public class SqlUtils {
         } else {
             throw new Exception("Invalid ref: <dto-class ref=\"" + ref + "\"");
         }
-        return "select * from " + table_name + " where 1 = 0";
+        return jdbc_sql_by_table_name(table_name);
     }
 
     public static String jdbc_sql_by_table_name(String table_name) {
-        return "select * from " + table_name + " where 1 = 0";
+        return "select * from " + table_name;
     }
 
     public static String jdbc_sql_by_ref(String ref, String sql_root_abs_path) throws Exception {
         if (is_table_ref(ref)) {
-            return "select * from " + ref;
+            return jdbc_sql_by_table_name(ref);
         }
         if (is_sql_file_ref(ref)) {
             String sql_file_path = Helpers.concat_path(sql_root_abs_path, ref);
@@ -265,7 +262,8 @@ public class SqlUtils {
         if (is_sql_file_ref(ref)) {
             String sql_file_path = Helpers.concat_path(sql_root_abs_path, ref);
             return Helpers.load_text_from_file(sql_file_path);
-        } else if (is_sql_shortcut_ref(ref)) {
+        }
+        if (is_sql_shortcut_ref(ref)) {
             throw new Exception("SQL-shortcuts are not allowed here: ref=\"" + ref + "\"");
         }
         return ref;
@@ -375,7 +373,6 @@ public class SqlUtils {
     public static boolean is_sp_call_shortcut(String text) {
         String[] parts = text.split("\\s+");
         if (parts.length < 2) {
-
             return false;
         }
         String call = parts[0].trim();
@@ -447,7 +444,7 @@ public class SqlUtils {
         }
         String sql;
         if (shc.col_names == null) {
-            sql = "select * from " + shc.table_name;
+            sql = jdbc_sql_by_table_name(shc.table_name);
         } else {
             sql = "select " + shc.col_names + " from " + shc.table_name;
         }
@@ -473,7 +470,7 @@ public class SqlUtils {
     }
 
     public static String create_crud_read_sql(String dao_table_name, List<FieldInfo> fields_pk, boolean fetch_list) throws Exception {
-        String dao_jdbc_sql = "select * from " + dao_table_name;
+        String dao_jdbc_sql = jdbc_sql_by_table_name(dao_table_name);
         if (!fetch_list) {
             if (fields_pk.isEmpty()) {
                 throw new Exception("PK columns not found. Ensure lower/upper case.");

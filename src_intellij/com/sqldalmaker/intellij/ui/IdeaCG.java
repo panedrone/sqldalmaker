@@ -437,6 +437,7 @@ public class IdeaCG {
             file_content = gen.translate(sdm_dao_class);
         } else {
             DaoClass external_dao_class = load_external_dao_class(root_file, sdm_dao_class);
+            external_dao_class.setName(dao_class_name);
             file_content = gen.translate(external_dao_class);
         }
         validate_single_dao_ignoring_eol(project, root_file, settings, dao_class_name, file_content, validation_buff);
