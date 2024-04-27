@@ -1,12 +1,22 @@
 # SQL DAL Maker
 
+### About
+
 SQL DAL Maker is a generator of DTO, Model, and DAO classes to access relational databases. Target
 programming languages: PHP, Java, C++, Python, and Go. To generate the class, you declare it in XML meta-program. 
 
 At the stage of code generation, the target database must exist and be available for JDBC connection.
 Generated code is being synchronized with the current database schema using "live" JDBC metadata.
 
-Hello Example:
+Implemented in Java as plug-ins for [Eclipse IDE](http://marketplace.eclipse.org/content/sql-dal-maker) and
+[IntelliJ-Platform](http://plugins.jetbrains.com/plugin/7092).
+
+Project Docs: [https://sqldalmaker.sourceforge.net](https://sqldalmaker.sourceforge.net/)
+
+Quick Start in mp4: [https://github.com/panedrone/sqldalmaker/releases/tag/latest](https://github.com/panedrone/sqldalmaker/releases/tag/latest)
+
+
+### Hello Example
 
 
 ```xml
@@ -34,15 +44,7 @@ def generated_code_in_action():
     dao.delete_message(m.id)
 ```
 
-Implemented in Java as plug-ins for [Eclipse IDE](http://marketplace.eclipse.org/content/sql-dal-maker) and
-[IntelliJ-Platform](http://plugins.jetbrains.com/plugin/7092).
-
-Project Web-Site/Docs: [https://sqldalmaker.sourceforge.net](https://sqldalmaker.sourceforge.net/)
-
-Quick Start in
-mp4: [https://github.com/panedrone/sqldalmaker/releases/tag/latest](https://github.com/panedrone/sqldalmaker/releases/tag/latest)
-
-Demo-Projects:
+### Demo-Projects
 
 <table>
 <tr>
