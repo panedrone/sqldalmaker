@@ -83,7 +83,7 @@ class JdbcTableInfo {
             Connection conn,
             JaxbTypeMap type_map,
             FieldNamesMode dto_field_names_mode,
-            String table_name,
+            String table_ref,
             String jaxb_explicit_pk,
             String jaxb_explicit_auto_column) throws Exception {
 
@@ -93,12 +93,12 @@ class JdbcTableInfo {
             model = "";
         }
         this.model = model;
-        if (!SqlUtils.is_table_ref(table_name)) {
-            throw new Exception("Table name expected: " + table_name);
+        if (!SqlUtils.is_table_ref(table_ref)) {
+            throw new Exception("Table name expected: " + table_ref);
         }
         //////////////////////////////////////
-        _validate_table_name(table_name); // Oracle PK are not detected with lower case table name
-        this.table_name = table_name;
+        _validate_table_name(table_ref); // Oracle PK are not detected with lower case table name
+        this.table_name = table_ref;
         //////////////////////////////////////
         if (jaxb_explicit_auto_column == null) {
             jaxb_explicit_auto_column = "";
@@ -120,9 +120,9 @@ class JdbcTableInfo {
             }
         }
         //////////////////////////////////////
-        String jdbc_sql = SqlUtils.jdbc_sql_by_table_name(table_name);
+        String jdbc_sql = SqlUtils.jdbc_sql_by_table_name(table_ref);
         JdbcSqlFieldInfo.get_field_info_by_jdbc_sql(model, conn, dto_field_names_mode, jdbc_sql, "", fields_map, fields_all);
-        Set<String> lower_case_pk_col_names = _get_lower_case_pk_col_names(table_name, jaxb_explicit_pk);
+        Set<String> lower_case_pk_col_names = _get_lower_case_pk_col_names(table_ref, jaxb_explicit_pk);
         for (FieldInfo fi : fields_all) {
             String col_name = fi.getColumnName();
             String lower_case_col_name = Helpers.get_pk_col_name_alias(col_name);
@@ -139,7 +139,8 @@ class JdbcTableInfo {
     }
 
     private void _validate_table_name(String table_name_pattern) throws Exception {
-        // it may include schema like "public.%"
+        // 1. Oracle PK are not detected with lower case table names
+        // 2. it may include schema like "public.%"
         ResultSet rs = get_tables_rs(conn, table_name_pattern, true);
         try {
             if (rs.next()) {

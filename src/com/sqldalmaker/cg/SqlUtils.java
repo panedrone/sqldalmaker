@@ -272,7 +272,11 @@ public class SqlUtils {
     }
 
     public static boolean is_sql_shortcut_ref(String ref) {
-        if (ref == null || ref.isEmpty()) {
+        if (ref == null) {
+            return false;
+        }
+        ref = ref.trim();
+        if (ref.isEmpty()) {
             return false;
         }
         if (is_sql_file_ref_base(ref)) {

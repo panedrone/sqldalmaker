@@ -302,6 +302,27 @@ class DaoClassInfo {
         return mode;
     }
 
+    private static String _refine_dao_ref(
+            String jaxb_dto_or_return_type,
+            boolean jaxb_return_type_is_dto,
+            List<DtoClass> jaxb_dto_classes,
+            String dao_jaxb_ref) throws Exception {
+
+        if (dao_jaxb_ref == null || dao_jaxb_ref.trim().isEmpty()) { // empty "ref"
+            if (!jaxb_return_type_is_dto) {
+                throw new Exception("Empty 'ref' is not allowed here");
+            }
+            String dto_class_name = jaxb_dto_or_return_type;
+            DtoClass jaxb_dto = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
+            String dto_jaxb_ref = jaxb_dto.getRef();
+            if (dto_jaxb_ref == null || dto_jaxb_ref.trim().isEmpty()) {
+                throw new Exception("Both DAO 'ref' and DTO 'ref' are empty");
+            }
+            dao_jaxb_ref = dto_jaxb_ref;
+        }
+        return dao_jaxb_ref.trim();
+    }
+
     // returns SQL statement
     public String get_dao_query_info(
             String sql_root_abs_path,
@@ -317,18 +338,7 @@ class DaoClassInfo {
         res_fields.clear();
         res_params.clear();
         Helpers.check_duplicates(method_param_descriptors);
-        if (dao_jaxb_ref == null || dao_jaxb_ref.trim().isEmpty()) { // empty "ref"
-            if (!jaxb_return_type_is_dto) {
-                throw new Exception("Empty 'ref' is not allowed here");
-            }
-            String dto_class_name = jaxb_dto_or_return_type;
-            DtoClass jaxb_dto = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
-            String dto_jaxb_ref = jaxb_dto.getRef();
-            if (dto_jaxb_ref == null || dto_jaxb_ref.trim().isEmpty()) {
-                throw new Exception("Both DAO 'ref' and DTO 'ref' are empty");
-            }
-            dao_jaxb_ref = dto_jaxb_ref;
-        }
+        dao_jaxb_ref = _refine_dao_ref(jaxb_dto_or_return_type, jaxb_return_type_is_dto, jaxb_dto_classes, dao_jaxb_ref);
         String dao_query_jdbc_sql = SqlUtils.jdbc_sql_by_ref(dao_jaxb_ref, sql_root_abs_path);
         FieldNamesMode param_names_mode = _refine_method_params_names_mode(dto_param_type);
         if (SqlUtils.is_sql_shortcut_ref(dao_jaxb_ref)) {
