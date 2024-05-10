@@ -117,9 +117,11 @@
         <type detected="gorm-java.math.BigDecimal" target="float64${json-gorm} -> SetFloat64"/>
 
         <type detected="gorm-java.lang.String" target="string${json-gorm} -> SetString"/>
-        <type detected="gorm-java.util.Date" target="time:time.Time${json-gorm} -> SetTime"/>
         <type detected="gorm-byte[]" target="string${json-gorm}"/>
         <type detected="gorm-java.lang.Boolean" target="bool${json-gorm} -> SetBool"/>
+
+        <type detected="gorm-java.util.Date" target="time:time.Time${json-gorm} -> SetTime"/>
+        <type detected="gorm-java.time.LocalDateTime" target="time:time.Time${json-gorm} -> SetTime"/>
 
         <type detected="gorm-java.lang.Object" target="interface{}${json-gorm}"/>
 
@@ -136,9 +138,11 @@
         <type detected="java.math.BigDecimal" target="float64${json} -> SetFloat64"/>
 
         <type detected="java.lang.String" target="string${json} -> SetString"/>
-        <type detected="java.util.Date" target="time:time.Time${json} -> SetTime"/>
         <type detected="byte[]" target="[]byte${json} -> "/>
         <type detected="java.lang.Boolean" target="bool${json} -> SetBool"/>
+
+        <type detected="java.util.Date" target="time:time.Time${json} -> SetTime"/>
+        <type detected="java.time.LocalDateTime" target="time:time.Time${json} -> SetTime"/>
 
         <type detected="java.lang.Object" target="interface{}${json}"/>
 
