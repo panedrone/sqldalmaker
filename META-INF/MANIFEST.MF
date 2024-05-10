@@ -3,7 +3,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: com.sqldalmaker.eclipse
 Bundle-SymbolicName: com.sqldalmaker.eclipse;singleton:=true
-Bundle-Version: 1.297.0.qualifier
+Bundle-Version: 1.297.1.qualifier
 Bundle-Activator: com.sqldalmaker.eclipse.Activator
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
@@ -20,9 +20,9 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ClassPath: .,
  lib/velocity-1.7-dep.jar,
- lib-jaxb-2.3.3_nb_12.3/activation.jar,
- lib-jaxb-2.3.3_nb_12.3/jaxb-api.jar,
- lib-jaxb-2.3.3_nb_12.3/jaxb-impl.jar,
- lib-jaxb-2.3.3_nb_12.3/jaxb-xjc.jar
+ lib/jaxb-2.3.3_nb_12.3/activation.jar,
+ lib/jaxb-2.3.3_nb_12.3/jaxb-api.jar,
+ lib/jaxb-2.3.3_nb_12.3/jaxb-impl.jar,
+ lib/jaxb-2.3.3_nb_12.3/jaxb-xjc.jar
 Bundle-Vendor: sqldalmaker@gmail.com
 
