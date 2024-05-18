@@ -95,16 +95,7 @@ func (dao *${class_name}) ${method_name}(ctx context.Context, item *${dto_param}
 
 func (dao *${class_name}) ${method_name}(ctx context.Context#param_decls($is_external_sql $params)) (res []${returned_type_name}, err error) {
 #sql_var($is_external_sql $sql)
-	errMap := make(map[string]int)
-	onRow := func(val interface{}) {
-		var data ${returned_type_name}
-		SetScalarValue(&data, val, errMap)
-		res = append(res, data)
-	}
-	err = dao.ds.QueryAll(ctx, sql, onRow#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
-	if err == nil {
-		err = ErrMapToErr(errMap)
-	}
+	err = dao.ds.QueryAll(ctx, sql, &res#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
 	return
 }
 ## ======================================================================================

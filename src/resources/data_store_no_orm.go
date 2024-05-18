@@ -42,8 +42,8 @@ type DataStore interface {
 	Insert(ctx context.Context, sqlString string, aiNames string, args ...interface{}) (id interface{}, err error)
 	Exec(ctx context.Context, sqlString string, args ...interface{}) (rowsAffected int64, err error)
 
-	Query(ctx context.Context, sqlString string, dest interface{}, args ...interface{}) error
-	QueryAll(ctx context.Context, sqlString string, onRow func(interface{}), args ...interface{}) error
+	Query(ctx context.Context, sqlString string, destPtr interface{}, args ...interface{}) error
+	QueryAll(ctx context.Context, sqlString string, destSlicePtr interface{}, args ...interface{}) error
 	QueryRow(ctx context.Context, sqlString string, args ...interface{}) (row map[string]interface{}, err error)
 	QueryAllRows(ctx context.Context, sqlString string, onRow func(map[string]interface{}), args ...interface{}) error
 
@@ -642,7 +642,7 @@ func (ds *_DS) Exec(ctx context.Context, sqlString string, args ...interface{}) 
 	return ds.exec2(ctx, sqlString, onRowArr, queryArgs...)
 }
 
-func (ds *_DS) Query(ctx context.Context, sqlString string, dest interface{}, args ...interface{}) error {
+func (ds *_DS) Query(ctx context.Context, sqlString string, destPtr interface{}, args ...interface{}) error {
 	sqlString = ds.formatSQL(sqlString)
 	var onRowArr []interface{}
 	var queryArgs []interface{}
@@ -669,7 +669,7 @@ func (ds *_DS) Query(ctx context.Context, sqlString string, dest interface{}, ar
 	if err != nil {
 		return err
 	}
-	err = SetRes(dest, values)
+	err = SetRes(destPtr, values)
 	if err != nil {
 		return err
 	}
@@ -683,34 +683,93 @@ func (ds *_DS) Query(ctx context.Context, sqlString string, dest interface{}, ar
 	return nil
 }
 
-func (ds *_DS) QueryAll(ctx context.Context, sqlString string, onRow func(interface{}), args ...interface{}) (err error) {
+func (ds *_DS) QueryAll(ctx context.Context, sqlString string, destSlicePtr interface{}, args ...interface{}) (err error) {
 	sqlString = ds.formatSQL(sqlString)
 	rows, err := ds.query(ctx, sqlString, args...)
 	if err != nil {
 		return
 	}
 	defer _close(rows)
+	err = ds.selectAllScalars(rows, destSlicePtr)
+	return
+}
+
+func (ds *_DS) selectAllScalars(rows *sql.Rows, dest interface{}) error {
+	base, direct, elemIsPtr, err := prepareSelectScalars(dest)
+	if err != nil {
+		return err
+	}
+	errMap := make(map[string]int)
 	for {
 		// re-detect columns for each ResultSet
 		// fetch all columns! if to fetch less, Scan returns nil-s
 		_, values, valuePointers, pfErr := ds.prepareFetch(rows)
 		if pfErr != nil {
-			err = pfErr
-			return
+			return pfErr
 		}
 		for rows.Next() {
 			err = rows.Scan(valuePointers...)
 			if err != nil {
-				return
+				return err
 			}
-			// return whole row to enable multiple out params in mssql sp
-			onRow(values)
+			vp := reflect.New(base)
+			dataPtr := vp.Interface()
+			SetScalarValue(dataPtr, values, errMap)
+			// append
+			if elemIsPtr {
+				direct.Set(reflect.Append(direct, vp))
+			} else {
+				direct.Set(reflect.Append(direct, reflect.Indirect(vp)))
+			}
 		}
 		if !rows.NextResultSet() {
 			break
 		}
 	}
+	err = rows.Err()
+	if err != nil {
+		return err
+	}
+	err = ErrMapToErr(errMap)
+	return err
+}
+
+func prepareSelectScalars(dest interface{}) (base reflect.Type, direct reflect.Value, elemIsPtr bool, err error) {
+	value := reflect.ValueOf(dest)
+	if value.Kind() != reflect.Ptr {
+		err = errors.New("must pass a pointer, not a value")
+		return
+	}
+	if value.IsNil() {
+		err = errors.New("nil pointer passed")
+		return
+	}
+	direct = reflect.Indirect(value)
+	slice, errBase := baseType(value.Type(), reflect.Slice)
+	if errBase != nil {
+		err = errBase
+		return
+	}
+	direct.SetLen(0)
+	elemIsPtr = slice.Elem().Kind() == reflect.Ptr
+	base = Deref(slice.Elem())
 	return
+}
+
+func baseType(t reflect.Type, expected reflect.Kind) (reflect.Type, error) {
+	t = Deref(t)
+	if t.Kind() != expected {
+		return nil, fmt.Errorf("expected %s but got %s", expected, t.Kind())
+	}
+	return t, nil
+}
+
+// Deref is Indirect for reflect.Types
+func Deref(t reflect.Type) reflect.Type {
+	if t.Kind() == reflect.Ptr {
+		t = t.Elem()
+	}
+	return t
 }
 
 func (ds *_DS) QueryRow(ctx context.Context, sqlString string, args ...interface{}) (row map[string]interface{}, err error) {
@@ -1139,7 +1198,7 @@ func _setBytes(d *[]byte, value interface{}) error {
 //	value, err := _getValue(row, colName, errMap)
 //	if err == nil {
 //		err = _setNumber(d, value)
-//		_updateErrMap(err, colName, errMap)
+//		updateErrMap(err, colName, errMap)
 //	}
 //}
 //
@@ -1152,7 +1211,7 @@ func _setBytes(d *[]byte, value interface{}) error {
 //	value, err := _getValue(row, colName, errMap)
 //	if err == nil {
 //		err = _setUUID(d, value)
-//		_updateErrMap(err, colName, errMap)
+//		updateErrMap(err, colName, errMap)
 //	}
 //}
 //
