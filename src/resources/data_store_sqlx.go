@@ -1307,18 +1307,13 @@ func _setBytes(d *[]byte, value interface{}) error {
 //	}
 //}
 //
-//func _setUUID(d *uuid.UUID, value interface{}) error {
-//	switch bv := value.(type) {
-//	case []byte:
-//		err := d.Scan(bv)
-//		if err != nil {
-//			return assignErr(d, value, "_setAny", err.Error())
-//		}
-//		return nil
-//	default:
-//		return unknownTypeErr(d, value, "_setAny")
-//	}
-//}
+// func _setUUID(d *uuid.UUID, value interface{}) error {
+// 	err := d.Scan(value)
+// 	if err != nil {
+// 		return assignErr(d, value, "_setAny", err.Error())
+// 	}
+// 	return nil
+// }
 
 func _getValue(row map[string]interface{}, colName string, errMap map[string]int) (value interface{}, err error) {
 	var ok bool
