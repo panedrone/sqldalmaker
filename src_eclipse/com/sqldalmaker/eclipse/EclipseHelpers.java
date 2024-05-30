@@ -16,8 +16,10 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.sql.Connection;
 import java.sql.Driver;
+import java.util.List;
 import java.util.Properties;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
@@ -30,6 +32,7 @@ import org.osgi.framework.Version;
 import com.sqldalmaker.cg.Helpers;
 import com.sqldalmaker.common.InternalException;
 import com.sqldalmaker.common.SdmUtils;
+import com.sqldalmaker.jaxb.sdm.DaoClass;
 import com.sqldalmaker.jaxb.sdm.DtoClass;
 import com.sqldalmaker.jaxb.sdm.ObjectFactory;
 import com.sqldalmaker.jaxb.settings.Settings;
@@ -46,6 +49,17 @@ public class EclipseHelpers {
 		return SdmUtils.load_settings(xml_mp_folder_abs_path);
 	}
 
+	public static Settings load_settings(IFile sdm_folder_file) throws Exception {
+        String sdm_folder_abs_path = sdm_folder_file.getParent().getLocation().toPortableString();
+		return SdmUtils.load_settings(sdm_folder_abs_path);
+	}
+	
+	public static List<DaoClass> load_all_sdm_dao_classes(IFile sdm_folder_file) throws Exception {
+        String sdm_folder_abs_path = sdm_folder_file.getParent().getLocation().toPortableString();
+        List<DaoClass> jaxb_dao_classes = SdmUtils.load_all_sdm_dao_classes(sdm_folder_abs_path);
+        return jaxb_dao_classes;
+    }
+	
 	public static String get_absolute_dir_path_str(IProject project, String rel_dir_path) {
 		String res = project.getLocation().append(rel_dir_path).toPortableString();
 		return res;

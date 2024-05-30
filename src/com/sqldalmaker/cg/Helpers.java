@@ -5,17 +5,24 @@
  */
 package com.sqldalmaker.cg;
 
-import com.sqldalmaker.common.Const;
-import com.sqldalmaker.jaxb.sdm.DaoClass;
-import com.sqldalmaker.jaxb.settings.Settings;
-
-import java.io.*;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import com.sqldalmaker.common.Const;
+import com.sqldalmaker.jaxb.settings.Settings;
 
 /*
+ * 30.05.2024 12.26 1.299
  * 12.05.2023 12:04
  * 12.05.2023 11:50
  * 07.05.2023 15:37
@@ -38,8 +45,6 @@ public class Helpers {
 
     // http://stackoverflow.com/questions/5032898/how-to-instantiate-class-class-for-a-primitive-type
     public static final Map<String, Class<?>> PRIMITIVE_CLASSES = new HashMap<String, Class<?>>();
-
-    private static final String IFN = "Invalid file name: ";
 
     static {
         // Use the wrapper variant if necessary, like Integer.class,

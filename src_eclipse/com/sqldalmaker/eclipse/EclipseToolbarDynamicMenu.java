@@ -27,7 +27,8 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.ResourceUtil;
 
 import com.sqldalmaker.cg.Helpers;
-import com.sqldalmaker.common.SdmUtils;
+import com.sqldalmaker.cg.JaxbUtils;
+import com.sqldalmaker.jaxb.sdm.DaoClass;
 import com.sqldalmaker.jaxb.settings.Settings;
 
 /**
@@ -119,7 +120,7 @@ public class EclipseToolbarDynamicMenu extends ContributionItem {
 				menuItem.addSelectionListener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent e) {
 						editor_part.setFocus(); // to make working ${project_loc}
-						EclipseCG.generate_external_dao(root_file, input_file);
+						EclipseCG.toolbar_action_generate_external_dao(root_file, input_file);
 					}
 				});
 			}
@@ -129,22 +130,22 @@ public class EclipseToolbarDynamicMenu extends ContributionItem {
 				menuItem.addSelectionListener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent e) {
 						editor_part.setFocus(); // to make working ${project_loc}
-						EclipseCG.validate_external_dao(root_file, input_file);
+						EclipseCG.toolbar_action_validate_external_dao(root_file, input_file);
 					}
 				});
 			}
 		}
 		if (is_sdm_xml || is_dao_xml) {
-			path = root_file.getFullPath().toPortableString();
-			if (path.startsWith("/")) {
-				path = path.substring(1);
-			}
-			String root_file_rel_path = path;
 			MenuItem menuItem = new MenuItem(menu, SWT.PUSH, index++);
-			menuItem.setText(root_file_rel_path);
+			menuItem.setText("Open SDM-Root");
 			menuItem.addSelectionListener(new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent e) {
 					try {
+						String path = root_file.getFullPath().toPortableString();
+						if (path.startsWith("/")) {
+							path = path.substring(1);
+						}
+						String root_file_rel_path = path;
 						EclipseToolbarUtils.open_root_file(root_file_rel_path, projects);
 					} catch (Exception e1) {
 						e1.printStackTrace();
@@ -167,19 +168,19 @@ public class EclipseToolbarDynamicMenu extends ContributionItem {
 
 	private static void add_goto_target_menu(Menu menu, int index, String current_xml_file_rel_path, IFile root_file)
 			throws Exception {
-		
-		String dao_class_name = Helpers.get_dao_class_name(current_xml_file_rel_path);
-		String xml_mp_abs_path = root_file.getParent().getLocation().toPortableString();
-		Settings settings = SdmUtils.load_settings(xml_mp_abs_path);
-		String root_file_nm = root_file.getName();
-		IProject project = root_file.getProject();
-		IFile target_file = EclipseTargetLanguageHelpers.find_source_file_in_project_tree(project, settings,
-				dao_class_name, settings.getDao().getScope(), root_file_nm);
+
 		MenuItem menuItem = new MenuItem(menu, SWT.PUSH, index);
-		menuItem.setText(target_file.getFullPath().toPortableString().substring(1));
+		menuItem.setText("Open Target");
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				try {
+					List<DaoClass> jaxb_dao_classes = EclipseHelpers.load_all_sdm_dao_classes(root_file);
+					String dao_class_name = JaxbUtils.get_dao_class_name_by_dao_xml_path(jaxb_dao_classes, current_xml_file_rel_path);
+					Settings settings = EclipseHelpers.load_settings(root_file);
+					String root_file_nm = root_file.getName();
+					IProject project = root_file.getProject();
+					IFile target_file = EclipseTargetLanguageHelpers.find_source_file_in_project_tree(project, settings,
+							dao_class_name, settings.getDao().getScope(), root_file_nm);
 					IWorkbenchWindow win = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 					Shell active_shell = win.getShell();
 					EclipseEditorHelpers.open_editor_sync(active_shell, target_file);
@@ -214,7 +215,7 @@ public class EclipseToolbarDynamicMenu extends ContributionItem {
 				});
 			}
 		}
-		
+
 		MenuItem menuItem = new MenuItem(menu, SWT.PUSH, index++);
 		menuItem.setText("About");
 		menuItem.addSelectionListener(new SelectionAdapter() {
@@ -222,7 +223,7 @@ public class EclipseToolbarDynamicMenu extends ContributionItem {
 				Shell active_shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
 				UIDialogAbout.show_modal(active_shell);
 			}
-		});		
+		});
 	}
 
 	@Override

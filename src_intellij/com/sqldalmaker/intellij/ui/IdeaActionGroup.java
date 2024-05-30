@@ -37,7 +37,6 @@ public class IdeaActionGroup extends ActionGroup implements AlwaysVisibleActionG
         }
     }
 
-
     private void add_common_actions(
             Project project,
             List<AnAction> drop_down_actions_list,
@@ -121,15 +120,14 @@ public class IdeaActionGroup extends ActionGroup implements AlwaysVisibleActionG
             VirtualFile xml_file,
             List<AnAction> drop_down_actions_list) throws Exception {
 
-        Settings settings = IdeaHelpers.load_settings(root_file);
-        String xml_file_path = xml_file.getPath();
-        List<DaoClass> jaxb_dao_classes = IdeaHelpers.load_all_sdm_dao_classes(root_file);
-        String dao_class_name = JaxbUtils.get_dao_class_name_by_dao_xml_path(jaxb_dao_classes, xml_file_path);
-        String target_rel_path = IdeaTargetLanguageHelpers.get_target_folder_rel_path(project, root_file, settings, dao_class_name, settings.getDao().getScope());
-        SdmAction action_goto_target = new SdmAction(target_rel_path) {
+        SdmAction action_goto_target = new SdmAction("Open Target") {
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
                 try {
+                    Settings settings = IdeaHelpers.load_settings(root_file);
+                    String xml_file_path = xml_file.getPath();
+                    List<DaoClass> jaxb_dao_classes = IdeaHelpers.load_all_sdm_dao_classes(root_file);
+                    String dao_class_name = JaxbUtils.get_dao_class_name_by_dao_xml_path(jaxb_dao_classes, xml_file_path);
                     IdeaTargetLanguageHelpers.open_target_dao_sync(project, root_file, settings, dao_class_name);
                 } catch (Exception e) {
                     // e.printStackTrace();
@@ -177,11 +175,11 @@ public class IdeaActionGroup extends ActionGroup implements AlwaysVisibleActionG
             add_dao_actions(project, drop_down_actions_list, xml_file);
         }
         if (Helpers.is_sdm_xml(name) || Helpers.is_dao_xml(name)) {
-            String root_file_rel_path = IdeaHelpers.get_relative_path(project, root_file);
-            SdmAction action = new SdmAction(root_file_rel_path) {
+            SdmAction action = new SdmAction("Open SDM-Root") {
                 @Override
                 public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
                     try {
+                        String root_file_rel_path = IdeaHelpers.get_relative_path(project, root_file);
                         IdeaEditorHelpers.open_project_file_in_editor_sync(anActionEvent.getProject(), root_file_rel_path);
                     } catch (Exception e) {
                         IdeaMessageHelpers.add_error_to_ide_log("ERROR", e.getMessage());

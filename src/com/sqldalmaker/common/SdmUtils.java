@@ -5,7 +5,6 @@
  */
 package com.sqldalmaker.common;
 
-import com.intellij.openapi.vfs.VirtualFile;
 import com.sqldalmaker.cg.JdbcUtils;
 import com.sqldalmaker.cg.FieldInfo;
 import com.sqldalmaker.cg.FieldNamesMode;
@@ -22,6 +21,7 @@ import java.util.*;
 /*
  * @author sqldalmaker@gmail.com
  *
+ * 30.05.2024 13:00 1.299
  * 17.12.2023 02:16 1.292 sdm.xml
  * 19.01.2023 20:57 1.276
  * 16.11.2022 08:02 1.269

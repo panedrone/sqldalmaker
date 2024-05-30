@@ -25,6 +25,7 @@ import com.sqldalmaker.jaxb.sdm.TypeMethod;
 import com.sqldalmaker.jaxb.sdm.DtoClass;
 
 /*
+ * 30.05.2024 13:00 1.299
  * 11.02.2024 06.-- 1.293
  * 27.03.2023 10:23
  * 21.11.2022 22:07
