@@ -25,6 +25,8 @@ import com.sqldalmaker.jaxb.sdm.TypeMethod;
 import com.sqldalmaker.jaxb.sdm.DtoClass;
 
 /*
+ * @author sqldalmaker@gmail.com
+ *
  * 30.05.2024 13:00 1.299
  * 11.02.2024 06.-- 1.293
  * 27.03.2023 10:23

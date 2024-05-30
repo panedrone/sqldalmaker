@@ -19,6 +19,9 @@ import java.util.HashMap;
 import java.util.ArrayList;
 
 /*
+ * @author sqldalmaker@gmail.com
+ *
+ * 30.05.2024 20:00 1.299
  * 06.04.2023 02:56 1.281
  * 27.03.2023 10:03
  * 15.02.2023 14:11
@@ -199,10 +202,10 @@ class DtoClassInfo {
             List<FieldInfo> res_dto_fields,
             Map<String, FieldInfo> fields_map) throws Exception {
 
-        String explicit_pk = "*";
-        JdbcTableInfo info = JdbcTableInfo.forDto(model, conn, jaxb_type_map, dto_field_names_mode, table_name, explicit_pk, auto_column);
         res_dto_fields.clear();
-        for (FieldInfo fi : info.fields_all) {
+        String explicit_pk = "*";
+        JdbcTableInfo table_info = new JdbcTableInfo(model, conn, jaxb_type_map, dto_field_names_mode, table_name, explicit_pk, auto_column);
+        for (FieldInfo fi : table_info.fields_all) {
             String col_nm = fi.getColumnName();
             if (fields_map.containsKey(col_nm)) {
                 res_dto_fields.add(fi);

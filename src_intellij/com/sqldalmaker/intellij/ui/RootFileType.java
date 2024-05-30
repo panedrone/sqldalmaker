@@ -14,6 +14,12 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
+/*
+ * @author sqldalmaker@gmail.com
+ *
+ * 30.05.2024 20:00 1.299
+ *
+ */
 public class RootFileType implements FileType {
     /*
     Language and File Type

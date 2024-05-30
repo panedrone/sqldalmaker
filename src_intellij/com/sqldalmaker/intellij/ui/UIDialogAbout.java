@@ -11,9 +11,10 @@ import javax.swing.event.HyperlinkListener;
 import java.awt.*;
 import java.awt.event.*;
 
-/**
- * @author panedrone
+/*
+ * @author sqldalmaker@gmail.com
  *
+ * 30.05.2024 20:00 1.299
  * 01.09.2023 12:21 1.287
  *
  */

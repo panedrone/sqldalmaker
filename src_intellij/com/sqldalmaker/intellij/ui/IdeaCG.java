@@ -23,6 +23,18 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
+/*
+ * @author sqldalmaker@gmail.com
+ *
+ * 30.05.2024 20:00 1.299
+ * 25.04.2024 08:46 1.297
+ * 18.02.2024 18:38 1.294
+ * 17.12.2023 02:16 1.292 sdm.xml
+ * 16.11.2022 08:02 1.269
+ * 06.04.2022 19:58 1.218 navigation from XML to generated files
+ * 30.03.2022 20:33 intellij event log + balloons
+ *
+ */
 public class IdeaCG {
 
     private static VirtualFile find_root_file(VirtualFile sdm_xml_folder) {
@@ -290,12 +302,12 @@ public class IdeaCG {
     }
 
     // IdeaActionGroup
-    public static void action_generate_dao_xml(Project project, VirtualFile dao_xml_file) {
-        String name = dao_xml_file.getName();
+    public static void toolbar_action_generate_external_dao_xml(Project project, VirtualFile external_dao_xml_file) {
+        String name = external_dao_xml_file.getName();
         if (!Helpers.is_dao_xml(name)) {
             return;
         }
-        VirtualFile sdm_xml_folder = dao_xml_file.getParent();
+        VirtualFile sdm_xml_folder = external_dao_xml_file.getParent();
         if (sdm_xml_folder == null) {
             return;
         }
@@ -311,9 +323,9 @@ public class IdeaCG {
             String contextPath = DaoClass.class.getPackage().getName();
             XmlParser xml_parser = new XmlParser(contextPath, Helpers.concat_path(sdm_xml_folder_abs_path, Const.DAO_XSD));
             boolean error = false;
-            String dao_xml_abs_path = dao_xml_file.getPath();
+            String dao_xml_abs_path = external_dao_xml_file.getPath();
             Path path = Paths.get(dao_xml_abs_path);
-            String xml_file_path = dao_xml_file.getPath();
+            String xml_file_path = external_dao_xml_file.getPath();
             List<DaoClass> jaxb_dao_classes = IdeaHelpers.load_all_sdm_dao_classes(root_file);
             String dao_class_name = JaxbUtils.get_dao_class_name_by_dao_xml_path(jaxb_dao_classes, xml_file_path);
             String dao_xml_file_name = path.getFileName().toString();
@@ -351,12 +363,12 @@ public class IdeaCG {
     }
 
     // IdeaActionGroup
-    public static void action_validate_dao_xml(Project project, VirtualFile dao_xml_file) {
-        String name = dao_xml_file.getName();
+    public static void toolbar_action_action_validate_external_dao_xml(Project project, VirtualFile external_dao_xml_file) {
+        String name = external_dao_xml_file.getName();
         if (!Helpers.is_dao_xml(name)) {
             return;
         }
-        VirtualFile sdm_xml_folder = dao_xml_file.getParent();
+        VirtualFile sdm_xml_folder = external_dao_xml_file.getParent();
         if (sdm_xml_folder == null) {
             return;
         }
@@ -370,7 +382,7 @@ public class IdeaCG {
             String sdm_folder_abs_path = root_file.getParent().getPath();
             String contextPath = DaoClass.class.getPackage().getName();
             XmlParser xml_parser = new XmlParser(contextPath, Helpers.concat_path(sdm_folder_abs_path, Const.DAO_XSD));
-            String dao_xml_abs_path = dao_xml_file.getPath();
+            String dao_xml_abs_path = external_dao_xml_file.getPath();
             Path path = Paths.get(dao_xml_abs_path);
             String dao_xml_file_name = path.getFileName().toString();
             Connection con = IdeaHelpers.get_connection(project, settings);
@@ -378,7 +390,7 @@ public class IdeaCG {
                 IDaoCG gen = IdeaTargetLanguageHelpers.create_dao_cg(con, project, root_file, settings, output_dir);
                 try {
                     DaoClass dao_class = xml_parser.unmarshal(dao_xml_abs_path);
-                    String xml_file_path = dao_xml_file.getPath();
+                    String xml_file_path = external_dao_xml_file.getPath();
                     List<DaoClass> jaxb_dao_classes = IdeaHelpers.load_all_sdm_dao_classes(root_file);
                     String dao_class_name = JaxbUtils.get_dao_class_name_by_dao_xml_path(jaxb_dao_classes, xml_file_path);
                     dao_class.setName(dao_class_name);
@@ -386,7 +398,7 @@ public class IdeaCG {
                     if (status.isEmpty()) {
                         IdeaMessageHelpers.add_info_to_ide_log(dao_xml_file_name, Const.VALIDATE_DAO_XML);
                     } else {
-                        IdeaMessageHelpers.add_error_to_ide_log(dao_xml_file_name, " " + dao_xml_file.getNameWithoutExtension() + ". " + status);
+                        IdeaMessageHelpers.add_error_to_ide_log(dao_xml_file_name, " " + external_dao_xml_file.getNameWithoutExtension() + ". " + status);
                     }
                 } catch (Throwable e) {
                     String msg = e.getMessage();

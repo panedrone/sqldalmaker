@@ -18,9 +18,10 @@ import java.util.Set;
 
 import org.apache.cayenne.dba.TypesMapping;
 
-import com.sqldalmaker.jaxb.sdm.DtoClass;
-
 /*
+ * @author sqldalmaker@gmail.com
+ *
+ * 30.05.2024 20:00 1.299
  * 30.09.2023 11:29 1.289
  * 07.05.2023 15:37
  * 06.04.2023 02:56 1.281
@@ -52,33 +53,7 @@ class JdbcTableInfo {
     private final String explicit_auto_column_name;
     private final String explicit_auto_column_generation_type;
 
-    public static JdbcTableInfo forDao(
-            String model,
-            Connection conn,
-            JaxbTypeMap type_map,
-            FieldNamesMode dto_field_names_mode,
-            String table_name,
-            String jaxb_explicit_pk,
-            DtoClass jaxb_dto_class) throws Exception {
-
-        return new JdbcTableInfo(model, conn, type_map, dto_field_names_mode, table_name,
-                jaxb_explicit_pk, jaxb_dto_class.getAuto());
-    }
-
-    public static JdbcTableInfo forDto(
-            String model,
-            Connection conn,
-            JaxbTypeMap type_map,
-            FieldNamesMode dto_field_names_mode,
-            String table_name,
-            String jaxb_explicit_pk,
-            String jaxb_explicit_auto_column) throws Exception {
-
-        return new JdbcTableInfo(model, conn, type_map, dto_field_names_mode, table_name,
-                jaxb_explicit_pk, jaxb_explicit_auto_column);
-    }
-
-    private JdbcTableInfo(
+    public JdbcTableInfo(
             String model,
             Connection conn,
             JaxbTypeMap type_map,

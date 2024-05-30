@@ -28,6 +28,21 @@ import java.util.List;
  * -->
  * ActionGroup is disabled. Why?
  * <a href="https://intellij-support.jetbrains.com/hc/en-us/community/posts/360008627020-ActionGroup-is-disabled-Why-">...</a>
+ *
+ * 30.05.2024 20:00 1.299
+ * 14.02.2024 18:50 1.294 <dao-class ref="...
+ * 28.12.2023 13:12 1.292
+ * 01.09.2023 12:21 1.287
+ * 18.03.2023 08:46 adapted for python3.11
+ * 16.11.2022 08:02 1.269
+ * 16.07.2022 13:49 enabled separate modules for dto and dao
+ * 09.04.2022 19:15 Revert "Revert "[fix] intellij xml navigation""
+ * 30.03.2022 20:33 intellij event log + balloons
+ * 17.05.2021 11:28 intellij -> optimized SDM toolbar drop-down
+ * 02.08.2020 01:29 fix of xml ==> sql navigation in intellij
+ * 10.05.2020 04:51 New approach of field mappings
+ * 07.02.2019 19:50 initial commit
+ *
  */
 public class IdeaActionGroup extends ActionGroup implements AlwaysVisibleActionGroup {
 
@@ -101,14 +116,14 @@ public class IdeaActionGroup extends ActionGroup implements AlwaysVisibleActionG
         SdmAction action_generate = new SdmAction(xml_file_rel_path + " -> Generate") {
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
-                IdeaCG.action_generate_dao_xml(project, xml_file);
+                IdeaCG.toolbar_action_generate_external_dao_xml(project, xml_file);
             }
         };
         drop_down_actions_list.add(action_generate);
         SdmAction action_validate = new SdmAction(xml_file_rel_path + " -> Validate") {
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
-                IdeaCG.action_validate_dao_xml(project, xml_file);
+                IdeaCG.toolbar_action_action_validate_external_dao_xml(project, xml_file);
             }
         };
         drop_down_actions_list.add(action_validate);
@@ -118,7 +133,7 @@ public class IdeaActionGroup extends ActionGroup implements AlwaysVisibleActionG
             Project project,
             VirtualFile root_file,
             VirtualFile xml_file,
-            List<AnAction> drop_down_actions_list) throws Exception {
+            List<AnAction> drop_down_actions_list) {
 
         SdmAction action_goto_target = new SdmAction("Open Target") {
             @Override

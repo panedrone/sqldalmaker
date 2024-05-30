@@ -19,6 +19,9 @@ import java.util.HashMap;
 import java.util.ArrayList;
 
 /*
+ * @author sqldalmaker@gmail.com
+ *
+ * 30.05.2024 20:00 1.299
  * 17.10.2023 12:14 1.290
  * 29.09.2023 09:58 1.289
  * 09.04.2023 20:31 1.282
@@ -125,8 +128,12 @@ class DaoClassInfo {
         SqlUtils.SqlShortcut shc = SqlUtils.parse_sql_shortcut_ref(dao_jaxb_ref); // class name is not available here
         String dao_table_name = shc.table_name;
         String no_model = "";
-        DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(jaxb_dto_or_return_type, jaxb_dto_classes);
-        JdbcTableInfo table_info = JdbcTableInfo.forDao(no_model, conn, jaxb_type_map, dto_field_names_mode, dao_table_name, "*", jaxb_dto_class);
+        String jaxb_explicit_auto_column = "";
+        DtoClass jaxb_dto_class = null;
+        if (jaxb_return_type_is_dto) {
+            jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(jaxb_dto_or_return_type, jaxb_dto_classes);
+        }
+        JdbcTableInfo table_info = new JdbcTableInfo(no_model, conn, jaxb_type_map, dto_field_names_mode, dao_table_name, "*", jaxb_explicit_auto_column);
         String filter_col_names_str = shc.params;
         if (filter_col_names_str != null) {
             String[] filter_col_names = Helpers.get_listed_items(filter_col_names_str, false);
@@ -364,9 +371,8 @@ class DaoClassInfo {
             List<FieldInfo> res_dao_fields_generated) throws Exception {
 
         String no_model = "";
-        JdbcTableInfo t_info = JdbcTableInfo.forDao(no_model, conn, jaxb_type_map, dto_field_names_mode, table_name, "*", jaxb_dto_class);
-        List<FieldInfo> dao_fields_all = t_info.fields_all;
-        for (FieldInfo dao_field : dao_fields_all) {
+        JdbcTableInfo table_info = new JdbcTableInfo(no_model, conn, jaxb_type_map, dto_field_names_mode, table_name, "*", jaxb_dto_class.getAuto());
+        for (FieldInfo dao_field : table_info.fields_all) {
             String dao_col_name = dao_field.getColumnName();
             String gen_dao_col_name = dao_col_name.toLowerCase();
             if (dao_crud_auto_columns.contains(gen_dao_col_name)) {
@@ -393,8 +399,8 @@ class DaoClassInfo {
             String sql_root_abs_path) throws Exception {
 
         String no_model = "";
-        JdbcTableInfo t_info = JdbcTableInfo.forDao(no_model, conn, jaxb_type_map, dto_field_names_mode, table_name, explicit_pk, jaxb_dto_class);
-        _refine_dao_fields_by_dto_fields(sql_root_abs_path, jaxb_dto_class, t_info.fields_all);
-        return t_info;
+        JdbcTableInfo table_info = new JdbcTableInfo(no_model, conn, jaxb_type_map, dto_field_names_mode, table_name, explicit_pk, jaxb_dto_class.getAuto());
+        _refine_dao_fields_by_dto_fields(sql_root_abs_path, jaxb_dto_class, table_info.fields_all);
+        return table_info;
     }
 }
