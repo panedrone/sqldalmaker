@@ -451,11 +451,9 @@ public class IdeaHelpers {
         return true;
     }
 
-    public static List<DaoClass> load_all_sdm_dao_classes(VirtualFile root_file) throws Exception {
-        String sdm_folder_abs_path = root_file.getParent().getPath();
-        String sdm_xml_abs_path = Helpers.concat_path(sdm_folder_abs_path, Const.SDM_XML);
-        String sdm_xsd_abs_path = Helpers.concat_path(sdm_folder_abs_path, Const.SDM_XSD);
-        List<DaoClass> jaxb_dao_classes = SdmUtils.get_dao_classes(sdm_xml_abs_path, sdm_xsd_abs_path);
+    public static List<DaoClass> load_all_sdm_dao_classes(VirtualFile sdm_folder_file) throws Exception {
+        String sdm_folder_abs_path = sdm_folder_file.getParent().getPath();
+        List<DaoClass> jaxb_dao_classes = SdmUtils.load_all_sdm_dao_classes(sdm_folder_abs_path);
         return jaxb_dao_classes;
     }
 

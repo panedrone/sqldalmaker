@@ -6,16 +6,14 @@
 package com.sqldalmaker.cg;
 
 import com.sqldalmaker.common.Const;
+import com.sqldalmaker.jaxb.sdm.DaoClass;
 import com.sqldalmaker.jaxb.settings.Settings;
 
 import java.io.*;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /*
  * 12.05.2023 12:04
@@ -300,42 +298,6 @@ public class Helpers {
                 throw new Exception("Invalid character in the name of item: " + name);
             }
         }
-    }
-
-    public static String get_dao_class_name(String dao_xml_path) throws Exception {
-        String[] parts = dao_xml_path.split("[/\\\\]");
-        if (parts.length == 0) {
-            throw new Exception(IFN + dao_xml_path);
-        }
-        parts = parts[parts.length - 1].split("\\.");
-        String class_name;
-        switch (parts.length) {
-            case 2:
-                class_name = parts[0];
-                if (!parts[1].equals("xml")) {
-                    throw new Exception(IFN + dao_xml_path);
-                }
-                break;
-            case 3:
-                if (parts[0].equals("dao")) {
-                    class_name = parts[1];
-                } else {
-                    class_name = parts[0];
-                }
-                if (!parts[2].equals("xml")) {
-                    throw new Exception(IFN + dao_xml_path);
-                }
-                break;
-            default:
-                throw new Exception(IFN + dao_xml_path);
-        }
-        if (class_name.isEmpty()) {
-            throw new Exception(IFN + dao_xml_path);
-        }
-        if (Character.isLowerCase(class_name.charAt(0))) {
-            throw new Exception("Class name must start with an uppercase letter: " + class_name);
-        }
-        return class_name;
     }
 
     // public for eclipse

@@ -5,6 +5,7 @@
  */
 package com.sqldalmaker.common;
 
+import com.intellij.openapi.vfs.VirtualFile;
 import com.sqldalmaker.cg.JdbcUtils;
 import com.sqldalmaker.cg.FieldInfo;
 import com.sqldalmaker.cg.FieldNamesMode;
@@ -354,12 +355,19 @@ public class SdmUtils {
         return res;
     }
 
-    public static List<DaoClass> get_dao_classes(String sdm_xml_abs_path, String sdm_xsd_abs_path) throws Exception {
+    private static List<DaoClass> get_dao_classes(String sdm_xml_abs_path, String sdm_xsd_abs_path) throws Exception {
         String context_path = Sdm.class.getPackage().getName();
         XmlParser xml_parser = new XmlParser(context_path, sdm_xsd_abs_path);
         Sdm elements = xml_parser.unmarshal(sdm_xml_abs_path);
         List<DaoClass> res = new ArrayList<DaoClass>(elements.getDaoClass());
         return res;
+    }
+
+    public static List<DaoClass> load_all_sdm_dao_classes(String sdm_folder_abs_path) throws Exception {
+        String sdm_xml_abs_path = Helpers.concat_path(sdm_folder_abs_path, Const.SDM_XML);
+        String sdm_xsd_abs_path = Helpers.concat_path(sdm_folder_abs_path, Const.SDM_XSD);
+        List<DaoClass> jaxb_dao_classes = get_dao_classes(sdm_xml_abs_path, sdm_xsd_abs_path);
+        return jaxb_dao_classes;
     }
 
     public static Set<String> get_dto_class_names_used_in_sdm_xml(String sdm_xml_abs_path, String sdm_xsd_abs_path) throws Exception {

@@ -11,6 +11,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.sqldalmaker.cg.Helpers;
 import com.sqldalmaker.cg.IDaoCG;
 import com.sqldalmaker.cg.IDtoCG;
+import com.sqldalmaker.cg.JaxbUtils;
 import com.sqldalmaker.common.*;
 import com.sqldalmaker.jaxb.sdm.DaoClass;
 import com.sqldalmaker.jaxb.sdm.DtoClass;
@@ -197,9 +198,7 @@ public class IdeaCG {
                     try {
                         IDaoCG gen = IdeaTargetLanguageHelpers.create_dao_cg(con, project, root_file, settings, output_dir);
                         try {
-                            String sdm_xml_abs_path = sdm_xml_file.getPath();
-                            String sdm_xsd_abs_path = sdm_xml_folder_abs_path + "/" + Const.SDM_XSD;
-                            List<DaoClass> dao_classes = SdmUtils.get_dao_classes(sdm_xml_abs_path, sdm_xsd_abs_path);
+                            List<DaoClass> dao_classes = IdeaHelpers.load_all_sdm_dao_classes(sdm_xml_file);
                             for (DaoClass cls : dao_classes) {
                                 ProgressManager.progress(cls.getName());
                                 String[] file_content = generate_single_sdm_dao(project, root_file, gen, cls, settings);
@@ -258,9 +257,7 @@ public class IdeaCG {
                     Connection con = IdeaHelpers.get_connection(project, settings);
                     try {
                         IDaoCG gen = IdeaTargetLanguageHelpers.create_dao_cg(con, project, root_file, settings, output_dir);
-                        String sdm_xml_abs_path = sdm_xml_file.getPath();
-                        String sdm_xsd_abs_path = sdm_xml_folder_abs_path + "/" + Const.SDM_XSD;
-                        List<DaoClass> dao_classes = SdmUtils.get_dao_classes(sdm_xml_abs_path, sdm_xsd_abs_path);
+                        List<DaoClass> dao_classes = IdeaHelpers.load_all_sdm_dao_classes(sdm_xml_file);
                         boolean error = false;
                         for (DaoClass cls : dao_classes) {
                             try {
@@ -316,8 +313,10 @@ public class IdeaCG {
             boolean error = false;
             String dao_xml_abs_path = dao_xml_file.getPath();
             Path path = Paths.get(dao_xml_abs_path);
+            String xml_file_path = dao_xml_file.getPath();
+            List<DaoClass> jaxb_dao_classes = IdeaHelpers.load_all_sdm_dao_classes(root_file);
+            String dao_class_name = JaxbUtils.get_dao_class_name_by_dao_xml_path(jaxb_dao_classes, xml_file_path);
             String dao_xml_file_name = path.getFileName().toString();
-            String dao_class_name = Helpers.get_dao_class_name(dao_xml_file_name);
             Connection con = IdeaHelpers.get_connection(project, settings);
             try {
                 IDaoCG gen = IdeaTargetLanguageHelpers.create_dao_cg(con, project, root_file, settings, output_dir);
@@ -379,7 +378,9 @@ public class IdeaCG {
                 IDaoCG gen = IdeaTargetLanguageHelpers.create_dao_cg(con, project, root_file, settings, output_dir);
                 try {
                     DaoClass dao_class = xml_parser.unmarshal(dao_xml_abs_path);
-                    String dao_class_name = Helpers.get_dao_class_name(dao_xml_file_name);
+                    String xml_file_path = dao_xml_file.getPath();
+                    List<DaoClass> jaxb_dao_classes = IdeaHelpers.load_all_sdm_dao_classes(root_file);
+                    String dao_class_name = JaxbUtils.get_dao_class_name_by_dao_xml_path(jaxb_dao_classes, xml_file_path);
                     dao_class.setName(dao_class_name);
                     String status = validate_single_sdm_dao(project, root_file, gen, dao_class, settings);
                     if (status.isEmpty()) {

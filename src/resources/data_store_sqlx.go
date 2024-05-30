@@ -1296,6 +1296,9 @@ func _setBytes(d *[]byte, value interface{}) error {
 //
 //func _setNumber(d *godror.Number, value interface{}) error {
 //	err := d.Scan(value)
+// 	if err != nil {
+// 		return assignErr(d, value, "_setNumber", err.Error())
+// 	}
 //	return err
 //}
 
@@ -1310,7 +1313,7 @@ func _setBytes(d *[]byte, value interface{}) error {
 // func _setUUID(d *uuid.UUID, value interface{}) error {
 // 	err := d.Scan(value)
 // 	if err != nil {
-// 		return assignErr(d, value, "_setAny", err.Error())
+// 		return assignErr(d, value, "_setUUID", err.Error())
 // 	}
 // 	return nil
 // }

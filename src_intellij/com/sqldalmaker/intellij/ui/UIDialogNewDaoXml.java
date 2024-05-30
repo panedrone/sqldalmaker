@@ -113,11 +113,7 @@ public class UIDialogNewDaoXml extends JDialog {
                     IdeaEditorHelpers.open_local_file_in_editor_sync(project, f);
                     success = true;
                     dispose();
-
-                    String dao_class_name = Helpers.get_dao_class_name(dao_xml_file_name);
-                    IdeaMessageHelpers.show_info_in_ui_thread(String.format("Now you need to register it in \"sdm.xml\":\r\n" +
-                            "≤dao-class name=\"%s\" ref=\"%s\"/>", dao_class_name, dao_xml_file_name));
-
+                    IdeaMessageHelpers.show_info_in_ui_thread("Ensure to register it in \"sdm.xml\"");
                 } catch (Exception e) {
                     // e.printStackTrace();
                     IdeaMessageHelpers.show_error_in_ui_thread(e);

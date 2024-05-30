@@ -5,6 +5,8 @@
  */
 package com.sqldalmaker.cg;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -69,6 +71,20 @@ public class JaxbUtils {
         }
         throw new Exception("XML element not found <dao-class name=\"" + dao_class_name + "\"");
     }
+
+    public static String get_dao_class_name_by_dao_xml_path(List<DaoClass> jaxb_dao_classes, String dao_xml_path) throws Exception {
+        if (dao_xml_path == null || dao_xml_path.trim().isEmpty()) {
+            throw new Exception("Invalid DAO class ref: " + dao_xml_path);
+        }
+        Path p = Paths.get(dao_xml_path);
+        String file_name = p.getFileName().toString();
+        for (DaoClass cls : jaxb_dao_classes) {
+            String ref = cls.getRef();
+            if (ref != null && ref.equals(file_name)) {
+                return cls.getName();
+            }
+        }
+        throw new Exception("XML element not found <dao-class ref=\"" + file_name + "\"");    }
 
     public static void process_jaxb_dao_class(
             IDaoCG dao_cg,

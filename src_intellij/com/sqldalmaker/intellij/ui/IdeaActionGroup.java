@@ -11,6 +11,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.sqldalmaker.cg.Helpers;
+import com.sqldalmaker.cg.JaxbUtils;
+import com.sqldalmaker.jaxb.sdm.DaoClass;
 import com.sqldalmaker.jaxb.settings.Settings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -121,9 +123,10 @@ public class IdeaActionGroup extends ActionGroup implements AlwaysVisibleActionG
 
         Settings settings = IdeaHelpers.load_settings(root_file);
         String xml_file_path = xml_file.getPath();
-        String dao_class_name = Helpers.get_dao_class_name(xml_file_path);
-        String rel_path = IdeaTargetLanguageHelpers.get_target_folder_rel_path(project, root_file, settings, dao_class_name, settings.getDao().getScope());
-        SdmAction action_goto_target = new SdmAction(rel_path) {
+        List<DaoClass> jaxb_dao_classes = IdeaHelpers.load_all_sdm_dao_classes(root_file);
+        String dao_class_name = JaxbUtils.get_dao_class_name_by_dao_xml_path(jaxb_dao_classes, xml_file_path);
+        String target_rel_path = IdeaTargetLanguageHelpers.get_target_folder_rel_path(project, root_file, settings, dao_class_name, settings.getDao().getScope());
+        SdmAction action_goto_target = new SdmAction(target_rel_path) {
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
                 try {

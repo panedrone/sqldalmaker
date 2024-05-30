@@ -49,21 +49,11 @@ Where to declare DAO classes:
 
     [+] github.com/jmoiron/sqlx
 
-2023-09-01
-
-    [+] added form "About"
-
-    [-] "<cpp..." removed from settings.xml
-
 2023-08-25
 
     [+] separate examples of "settings.xml"
 
     [!] minor fixes for PHP
-
-2023-08-14
-
-    [!] improvements for Python
 
 2023-08-01
 
@@ -88,10 +78,6 @@ Where to declare DAO classes:
                 return 'No rows'
             return 'More than 1 row exists'
 
-2023-05-07
-
-    Fixed incorrect returning scalar types.
-
 2023-04-10
 
     Strong typing in generated DAO classes, Android + SQLite3:
@@ -111,164 +97,11 @@ Where to declare DAO classes:
 
 2023-04-09
 
-    Strong typing in generated DAO classes, JDBC + SQLite3:
-
-    <type-map default="">
-        <type detected="java.lang.Integer" target="Integer -> getInteger"/>
-        <type detected="java.lang.Double" target="Double -> getDouble"/>
-        <type detected="java.lang.String" target="String -> getString"/>
-        <type detected="byte[]" target="byte[] -> getBytes"/>
-    </type-map>
-
-
-2023-04-08
-
-    Strong typing in generated DAO classes, JDBC + Oracle:
-
-    <type-map default="">
-        <type detected="java.math.BigDecimal" target="java.math.BigDecimal -> getBigDecimal"/>
-        <type detected="java.lang.String" target="String -> getString"/>
-        <type detected="java.util.Date" target="java.util.Date -> getDate"/>
-        <type detected="byte[]" target="byte[] -> getBytes"/>
-    </type-map>
-
-2023-04-07
-
-    Strong typing in generated DAO classes, JDBC + MySQL/PostgreSQL:
-
-    <type-map default="">
-        <type detected="java.lang.Short" target="Short -> getShort"/>
-        <type detected="java.lang.Integer" target="Integer -> getInteger"/>
-        <type detected="java.lang.Long" target="Long -> getLong"/>
-
-        <type detected="java.lang.Float" target="Float -> getFloat"/>
-        <type detected="java.lang.Double" target="Double -> getDouble"/>
-        <type detected="java.math.BigDecimal" target="java.math.BigDecimal -> getBigDecimal"/>
-
-        <type detected="java.lang.String" target="String -> getString"/>
-        <type detected="java.util.Date" target="java.util.Date -> getDate"/>
-        <type detected="byte[]" target="byte[] -> getBytes"/>
-        <type detected="java.lang.Boolean" target="Boolean -> getBoolean"/>
-    </type-map>
-
+    Strong typing in generated DAO classes, JDBC.
 
 2023-04-06
 
-    Strong typing in generated DAO classes, Golang + Oracle:
-
-    <type-map default="">
-
-        <type detected="gorm-java.math.BigDecimal" target="github.com/godror/godror:godror.Number${json-gorm} -> SetNumber"/>
-        <type detected="gorm-java.math.BigDecimal+auto" target="github.com/godror/godror:godror.Number${json-gorm}|1:;autoIncrement -> SetNumber"/>
-
-        <type detected="gorm-java.lang.String" target="string${json-gorm} -> SetString"/>
-        <type detected="gorm-java.util.Date" target="time:time.Time${json-gorm} -> SetTime"/>
-        <type detected="gorm-byte[]" target="string${json-gorm}"/>
-        <type detected="gorm-java.lang.Boolean" target="int64${json-gorm} -> SetBool"/>
-
-        <type detected="gorm-java.lang.Object" target="interface{}${json}-gorm"/>
-
-        <type detected="java.math.BigDecimal" target="github.com/godror/godror:godror.Number${json} -> SetNumber"/>
-
-        <type detected="java.lang.String" target="string${json} -> SetString"/>
-        <type detected="java.util.Date" target="time:time.Time${json} -> SetTime"/>
-        <type detected="byte[]" target="string${json}"/>
-        <type detected="java.lang.Boolean" target="int64${json} -> SetBool"/>
-
-        <type detected="java.lang.Object" target="interface{}${json}"/>
-
-    </type-map>
-
-2023-04-05
-
-    Strong typing in generated DAO classes, Golang + MySQL and PostgeSQL:
-
-    <type-map default="">
-
-        <type detected="gorm-java.lang.Short" target="int16${json-gorm} -> SetInt16"/>
-        <type detected="gorm-java.lang.Integer" target="int32${json-gorm} -> SetInt32"/>
-        <type detected="gorm-java.lang.Long" target="int64${json-gorm} -> SetInt64"/>
-
-        <type detected="gorm-java.lang.Float" target="float32${json-gorm} -> SetFloat32"/>
-        <type detected="gorm-java.lang.Double" target="float64${json-gorm} -> SetFloat64"/>
-        <type detected="gorm-java.math.BigDecimal" target="float64${json-gorm} -> SetFloat64"/>
-
-        <type detected="gorm-java.lang.String" target="string${json-gorm} -> SetString"/>
-        <type detected="gorm-java.util.Date" target="time:time.Time${json-gorm} -> SetTime"/>
-        <type detected="gorm-byte[]" target="string${json-gorm}"/>
-        <type detected="gorm-java.lang.Boolean" target="bool${json-gorm} -> SetBool"/>
-
-        <type detected="gorm-java.lang.Object" target="interface{}${json-gorm}"/>
-
-        <type detected="java.lang.Short" target="int16${json} -> SetInt16"/>
-        <type detected="java.lang.Integer" target="int32${json} -> SetInt32"/>
-        <type detected="java.lang.Long" target="int64${json} -> SetInt64"/>
-
-        <type detected="java.lang.Float" target="float32${json} -> SetFloat32"/>
-        <type detected="java.lang.Double" target="float64${json} -> SetFloat64"/>
-        <type detected="java.math.BigDecimal" target="float64${json} -> SetFloat64"/>
-
-        <type detected="java.lang.String" target="string${json} -> SetString"/>
-        <type detected="java.util.Date" target="time:time.Time${json} -> SetTime"/>
-        <type detected="byte[]" target="string${json} -> "/>
-        <type detected="java.lang.Boolean" target="bool${json} -> SetBool"/>
-
-        <type detected="java.lang.Object" target="interface{}${json}"/>
-
-    </type-map>
-
-2023-04-04
-
-    Strong typing in generated DAO classes, Golang + SQLite3:
-
-    <type-map default="">
-
-        <type detected="gorm-java.lang.Integer" target="int64${json-gorm} -> SetInt64"/>
-
-        <type detected="gorm-java.lang.Float" target="float32${json-gorm} -> SetFloat64"/>
-        <type detected="gorm-java.lang.Double" target="float64${json-gorm} -> SetFloat64"/>
-
-        <type detected="gorm-java.lang.String" target="string${json-gorm} -> SetString"/>
-        <type detected="gorm-java.util.Date" target="time:time.Time${json-gorm} -> SetTime"/>
-        <type detected="gorm-byte[]" target="byte[]{$json-gorm} -> SetBytes"/>
-
-        <type detected="gorm-java.lang.Object" target="interface{}${json-gorm}"/>
-
-        <type detected="%int64" target="int64${json} -> SetInt64"/>
-        <type detected="%float64" target="float64${json} -> SetFloat64"/>
-        <type detected="%string" target="string${json} -> SetString"/>
-
-        <type detected="java.lang.Integer" target="int64${json} -> SetInt64"/>
-
-        <type detected="java.lang.Float" target="float32${json} -> SetFloat64"/>
-        <type detected="java.lang.Double" target="float64${json} -> SetFloat64"/>
-
-        <type detected="java.lang.String" target="string${json} -> SetString"/>
-        <type detected="java.util.Date" target="time:time.Time${json} -> SetTime"/>
-        <type detected="byte[]" target="byte[]{$json} -> SetBytes"/>
-
-        <type detected="java.lang.Object" target="interface{}${json}"/>
-
-    </type-map>
-
-    func (dao *TasksDao) GetProjectTasks(ctx context.Context, gId string) (res []*models.TaskLi, err error) {
-        sql := `select t_id, t_priority, t_date, t_subject from tasks where p_id =?
-            order by t_id`
-        errMap := make(map[string]int)
-        _onRow := func(row map[string]interface{}) {
-            obj := models.TaskLi{}
-            SetInt64(&obj.TId, row, "t_id", errMap)
-            SetInt64(&obj.TPriority, row, "t_priority", errMap)
-            SetString(&obj.TDate, row, "t_date", errMap)
-            SetString(&obj.TSubject, row, "t_subject", errMap)
-            res = append(res, &obj)
-        }
-        err = dao.ds.QueryAllRows(ctx, sql, _onRow, gId)
-        if err == nil {
-            err = ErrMapToErr(errMap)
-        }
-        return
-    }
+    Strong typing in generated DAO classes, Golang.
 
 2023-03-27
 
@@ -301,23 +134,6 @@ Where to declare DAO classes:
     "<dao scope":
 
             - Golang: base folder of generated DAO files (relative to the project root)
-
-2023-01-28
-
-    Sorting of imports in Golang DTO-s.
-
-2023-01-20
-
-    Possible SQL-shortcuts:
-
-            // table()
-            // table() / field1, field2, ...
-            // table / field1, field2, ...
-            // table(param1, param2, ...)
-            // table(param1, param2, ...) / field1, field2, ...
-
-    NOTE. Column/param info for SQL-shortcuts is obtained directly from data table.
-          It may be used as workaround if such info obtained from SQL is incorrect/incomplete.
 
 2022-12-31
 
@@ -363,79 +179,11 @@ Where to declare DAO classes:
         https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store_sqlalchemy.py
         https://github.com/panedrone/sdm_demo_flask_sqlalchemy_todolist
 
-2022-12-04
-
-    Improvements of code generator for Python. Update data_store_sqlalchemy.py and data_store.py according to examples:
-
-        https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store_sqlalchemy.py
-        https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store.py
-
-    See also updated demo projects:
-
-        https://github.com/panedrone/sdm_demo_django_todolist_sqlite3
-        https://github.com/panedrone/sdm_demo_flask_sqlalchemy_todolist
-        https://github.com/panedrone/sdm_demo_todolist_fastapi_sqlalchemy
-
-2022-11-20
-
-    "go.vm" --> "dao_query" divided to "dao_query_all" and "dao_query_all_dto". See "go.vm" in the tab "Admin".
-
-2022-11-02
-
-    Fixes for Django
-
 2022-10-25
 
-    This update is about workarounds of "extreme" cases in CRUD scenario:
+    Workarounds of "extreme" cases in CRUD scenario:
+
     "lack of primary key in data table" and "AutoIncrement is not detected".
-
-    After updating the plugin, overwrite XSD files with fresh versions (tab "Admin").
-
-    Helper attributes <crud pk="..." generated="..."... were moved to <dto-class...
-
-    Attribute "generated" was renamed to "auto".
-
-    Moving of "pk" allows specifying just <dto-class name="Group" ref="groups" pk="g_id"/>
-
-    instead of tricks like this
-
-        <dto-class name="Group" ref="groups">
-                <field column="g_id" type="|1:, primary_key=True"/>
-        </dto-class>
-
-    Use "auto" when AutoIncrement is not detected. If you obtain this
-
-        g_id = models.IntegerField(db_column='g_id', primary_key=True)
-
-    instead of
-
-        g_id = models.AutoField(db_column='g_id', primary_key=True)
-
-    then
-
-        1. extend type-map: <type detected="dj-java.lang.Integer+auto" target="${dj-type}|0:AutoField"/>
-
-        2. specify "auto" explicitly: <dto-class auto="g_id"...
-
-2022-08-24
-
-    For Gorm and Beego. Added field-assign-mode="3" - direct ptr to resulting slice:
-
-        func (dao *GroupsDao) GetAllGroupsLI() (res []*models.GroupLI, err error) {
-            sql := `select g.*,
-                (select count(*) from tasks where g_id=g.g_id) as g_tasks_count
-                from groups g`
-            err = dao.ds.QueryByFA(sql, &res)
-            return
-        }
-
-2022-08-14
-
-    Fixes of DTO fields wizard
-
-2022-08-10
-
-    Fixes for PHP
 
 2022-08-08
 
@@ -529,16 +277,6 @@ Where to declare DAO classes:
     + dto macro
     + dao macro
 
-2022-05-28
-
-    Fixes regarding PHP namespaces.
-
-2022-05-21
-
-    + DataStore_Doctrine_ORM.php
-
-        https://github.com/panedrone/sdm_demo_todolist_php_doctrine
-
 2022-05-12
 
     + Gorm
@@ -572,33 +310,13 @@ Where to declare DAO classes:
 
     + (Flask-)SQLAlchemy "ForeignKey", "index", "unique"
 
-2022-04-22
-
-    Improvements fo Python
-
-2022-04-21
-
-    Fix related to incorrect AI detection in sqlite-jdbc-3.19.3.jar
-
 2022-04-20
 
-    - Fixes for SQLAlchemy + Oracle.
-
-        Re-define identity keys as Integer-s because of auto-detected Float-s are not working:
-
-        <dto-class name="sa-Group" ref="GROUPS">
-            <field type="|0:Integer" column="G_ID"/>
-        </dto-class>
-
-        ^^ also, specify table names in upper-case to detect primary keys correctly.
-
-        https://docs.sqlalchemy.org/en/14/dialects/oracle.html
-
-    - Fixes of imports.
+    Fixes for SQLAlchemy + Oracle.
 
 2022-04-17
 
-    # SQLAlchemy models (update XSD files from the tab 'Admin'):
+    + SQLAlchemy models (update XSD files from the tab 'Admin'):
 
     ds = DataStore()
     ds.open()
@@ -634,14 +352,6 @@ Where to declare DAO classes:
 
     Allowed not-PK/FK columns in SQL-shortcuts
 
-2022-03-12
-
-    UI adapted for NetBeans 13
-
-2021-10-01
-
-    [FIX] data_store.go --> _isPtrToNil
-
 2021-09-23
 
     SQLAlchemy Raw SQL --> data_store_sqlalchemy.py
@@ -650,24 +360,10 @@ Where to declare DAO classes:
 
     Single data_store.py for sqlite3, mysql.connector, postgresql_psycopg2, and django
 
-2021-09-13
-
-    Disabled IntelliJ warnings about deprecated API usage
-
-2021-08-07
-
-    Disabled Warning -> Do not request resource from classloader using path with leading slash
-
 2021-06-10
 
     - Go -> return error instead of panic
     - Go -> fix of SQL formatting
-
-2021-05-17
-
-    - IntelliJ -> prevented asking for child nodes when SDM toolbar drop-down is hidden.
-    - Kebab-case for field-comment
-        <dto-class name="Task" ref="tasks" field-comment="`xml:&quot;{kebab-case(column)}&quot;`"/>
 
 2021-05-10
 
@@ -771,10 +467,6 @@ Where to declare DAO classes:
 
     - Added DataStoreManagerJDBC.java
 
-2020-09-21
-
-    - Bugfix of Eclipse IDE tool-bar button
-
 2020-09-14
 
     - DataStoreManager.java adapted for JSF
@@ -808,13 +500,7 @@ Where to declare DAO classes:
 2020-08-04
 
     Added DataStore_oci8.php
-
-2020-08-02
-
     Added DataStore_cx_Oracle.py
-
-2020-07-06
-
     Added DataStore_pyodbc_Oracle.py
 
 2020-07-02
@@ -890,17 +576,13 @@ Where to declare DAO classes:
 		
    Update XSD files.
 	
-2020-01-11
-
-    Fixes of <query... return-type="...".
-	
 2020-01-07
 
     DTO fields may be declared in XML even they are missing in metadata. You calculate the values of such fields outside of RDBMS.
 
 2019-12-31
 	
-    Enabled <crud(-auto) table="my_schema.orders"...
+    Enabled <crud table="my_schema.orders"...
 
 2019-09-30
 
@@ -914,7 +596,7 @@ Where to declare DAO classes:
 
 2019-08-14
 
-    Adapted for xerial PK column names like '[employeeid] asc'.
+    Adapted for column names like '[employeeid] asc'.
 
 2019-08-13
 
@@ -940,18 +622,6 @@ Where to declare DAO classes:
         
            <xs:attribute name="column" use="required" type="xs:string" /> 
       
-2019-08-02
-
-    Fixed incorrect detection of PK for CRUD + SQLite3    
-	
-2019-01-11
-
-    Fixes for DTO/DAO XML assistants + MySQL.
-
-2018-11-11
-
-    Fixes for DTO/DAO XML assistants + MySQL.
-
 2018-11-07
 
     - Added an option to exclude views in DTO/DAO assistants.
@@ -970,6 +640,6 @@ Where to declare DAO classes:
 
 2017-04-01
 
-    Shortcuts for simple reading data through FK-s:
+    + SQL Shortcuts:
 
         '<query-dto-list method="findCustomers(companyName, region)" dto="Customer" ref="customers(CompanyName, Region)"/>'
