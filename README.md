@@ -3,7 +3,7 @@
 ### About
 
 SQL DAL Maker is a generator of DTO, Model, and DAO classes to access relational databases. Target
-programming languages: PHP, Java, C++, Python, and Go. To generate the class, you declare it in XML meta-program. 
+programming languages: PHP, Java, C++, Python, and Go. To generate the class, you declare it in XML meta-program.
 
 At the stage of code generation, the target database must exist and be available for JDBC connection.
 Generated code is being synchronized with the current database schema using "live" JDBC metadata.
@@ -13,13 +13,13 @@ Implemented in Java as plug-ins for [Eclipse IDE](http://marketplace.eclipse.org
 
 Project Docs: [https://sqldalmaker.sourceforge.net](https://sqldalmaker.sourceforge.net/)
 
-Quick Start in mp4: [https://github.com/panedrone/sqldalmaker/releases/tag/latest](https://github.com/panedrone/sqldalmaker/releases/tag/latest)
-
+Quick Start in
+mp4: [https://github.com/panedrone/sqldalmaker/releases/tag/latest](https://github.com/panedrone/sqldalmaker/releases/tag/latest)
 
 ### Hello Example
 
-
 ```xml
+
 <sdm>
     <dto-class name="Message" ref="messages"/>
     <dao-class name="MessagesDao">
@@ -44,7 +44,7 @@ def generated_code_in_action():
     dao.delete_message(m.id)
 ```
 
-### Demo-Projects
+### Demo Projects
 
 <table>
 <tr>
@@ -108,10 +108,11 @@ def generated_code_in_action():
         Go
     </td>
     <td>
-        <a href="https://github.com/panedrone/sdm_todolist_golang_react_js">database/sql + sqlx + gorm</a>
+        database/sql + sqlx + gorm
     </td>
     <td>
-        React.js
+        <a href="https://github.com/panedrone/sdm_todolist_go_react16_sqlite3_npm">React.js</a>,
+        <a href="https://github.com/panedrone/sdm_todolist_go_vue2_sqlite3_npm">Vue.js</a>        
     </td>
 </tr>
 </table>

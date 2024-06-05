@@ -1,16 +1,16 @@
 SQL DAL Maker %s
 
-Newer versions of the plug-in may require partial update/rework of existing XSD and XML files.
-Be familiar with "News". Use "Validate Configuration", then "Create/Overwrite XSD files"
-and make related fixes if needed.
+Newer versions of the plug-in may require updating of existing XSD and XML files.
+Be familiar with "News". Click "Validate Configuration" and "Create/Overwrite XSD files".
+Make related fixes if needed.
 
-Website: https://sqldalmaker.sourceforge.net/
-Pre-config: https://sqldalmaker.sourceforge.net/preconfig.html
-GitHub repo: https://github.com/panedrone/sqldalmaker
-Quick start in mp4: https://github.com/panedrone/sqldalmaker/releases/tag/latest
+Project Docs: https://sqldalmaker.sourceforge.net/
+GitHub Repo: https://github.com/panedrone/sqldalmaker
+Pre-Config: https://sqldalmaker.sourceforge.net/preconfig.html
+Quick Start in mp4: https://github.com/panedrone/sqldalmaker/releases/tag/latest
 
 For Eclipse: https://marketplace.eclipse.org/content/sql-dal-maker
-For IntelliJ: https://plugins.jetbrains.com/plugin/7092
+For IntelliJ-Platform: https://plugins.jetbrains.com/plugin/7092
 
 Contact: sqldalmaker@gmail.com
 
