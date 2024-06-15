@@ -1,3 +1,37 @@
+2024-06-15
+
+    DTO field comments for Golang:
+
+    <dto-class name="gorm-Order" ref="orders" auto="id">
+        <comments>
+            {{Id}}           PK
+            {{UserId}}       FK ref. column -> User
+            {{CurrencyId}}   FK ref. column -> Currency
+            {{RecipientId}}  FK ref. column -> TakeUser
+            {{TakeUser}}     FK -> User
+            {{User}}         FK -> User
+            {{Currency}}     FK -> Currency
+        </comments>
+        <field column="TakeUser" type="User `gorm:&quot;foreignKey:RecipientID&quot;`"/>
+        <field column="User" type="User"/>
+        <field column="Currency" type="Currency"/>
+    </dto-class>
+
+    -->
+
+    type Order struct {
+        Id           uuid.UUID `json:"id" gorm:"column:id;primary_key;type:uuid;default:gen_random_uuid()"` // PK
+        CreationDate time.Time `json:"creation_date" gorm:"column:creation_date"`
+        Amount       float64   `json:"amount" gorm:"column:amount"`
+        Description  string    `json:"description" gorm:"column:description"`
+        CurrencyId   uuid.UUID `json:"currency_id" gorm:"column:currency_id;type:uuid"`   // FK ref. column -> Currency
+        RecipientId  uuid.UUID `json:"recipient_id" gorm:"column:recipient_id;type:uuid"` // FK ref. column -> TakeUser
+        UserId       uuid.UUID `json:"user_id" gorm:"column:user_id;type:uuid"`           // FK ref. column -> User
+        TakeUser     User      `gorm:"foreignKey:RecipientID"`                            // FK -> User
+        User         User      // FK -> User
+        Currency     Currency  // FK -> Currency
+    }
+
 2024-02-15
 
 Starting from v1.294, you need to register DAO XML files in "sdm.xml":

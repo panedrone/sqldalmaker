@@ -78,12 +78,16 @@ public class FieldInfo {
                 throw new Exception("Invalid field type: " + original_field_type);
             }
         }
+        if (jdbc_db_col_name == null) {
+            jdbc_db_col_name = "";
+        }
         this.scalar_type = this.original_scalar_type;
         this.column_name = jdbc_db_col_name;
         this.rendered_type = original_field_type;
         this.rendered_name = jdbc_db_col_name;
 
-        if (this.rendered_name.contains("func(") == false &&
+        if (!this.rendered_name.isEmpty() &&
+                this.rendered_name.contains("func(") == false &&
                 this.rendered_name.contains("new RowHandler[]") == false) {
 
             this.rendered_name = this.rendered_name.replace("-", "_"); // for MySQL: `api-key`

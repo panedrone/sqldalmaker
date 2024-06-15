@@ -136,57 +136,22 @@ public class GoCG {
                 context.put("model", model);
             }
             context.put("package", dto_package);
+            String header = jaxb_dto_class.getHeader();
+            context.put("header", header);
             Set<String> imports_set = new HashSet<String>();
-            int max_name_len = -1;
-            int max_type_name_len = -1;
             for (FieldInfo fi : fields) {
                 String type_import = _get_type_import(fi);
                 if (type_import != null) {
                     imports_set.add(type_import);
                 }
-                int name_len;
-                String just_type = _get_type_without_import_and_tag(fi);
-                if (fi.getName().isEmpty()) {
-                    name_len = just_type.length();
-                } else {
-                    name_len = fi.getName().length();
-                }
-                if (name_len > max_name_len) {
-                    max_name_len = name_len;
-                }
-                if (just_type.length() > max_type_name_len) {
-                    max_type_name_len = just_type.length();
-                }
             }
-            String name_format = "%-" + max_name_len + "." + max_name_len + "s";
-            for (FieldInfo fi : fields) {
-                String just_type = _get_type_without_import_and_tag(fi);
-                String name = fi.getName();
-                if (name.isEmpty()) {
-                    name = String.format(name_format, just_type);
-                } else {
-                    name = String.format(name_format, name);
-                }
-                fi.refine_name(name);
-                String type_name = _get_type_without_import(fi.getType());
-                if (max_type_name_len > 0) {
-                    int just_type_len = just_type.length();
-                    if (just_type_len < type_name.length()) {
-                        String type_tag = type_name.substring(just_type_len + 1);
-                        String type_format = "%-" + max_type_name_len + "." + max_type_name_len + "s %s";
-                        type_name = String.format(type_format, just_type, type_tag);
-                    }
-                }
-                fi.refine_rendered_type(type_name);
-            }
-            String header = jaxb_dto_class.getHeader();
-            context.put("header", header);
             String[] imports_arr = imports_set.toArray(new String[0]);
             Arrays.sort(imports_arr);
             context.put("imports", imports_arr);
             context.put("class_name", dto_class_name);
             context.put("ref", jaxb_dto_class.getRef());
-            context.put("fields", fields);
+            List<FormattedField> formatted_fields = _get_formatted_fields(jaxb_dto_class, fields);
+            context.put("fields", formatted_fields);
             context.put("mode", "dto_class");
             String ref = jaxb_dto_class.getRef();
             if (SqlUtils.is_table_ref(ref)) {
@@ -200,6 +165,169 @@ public class GoCG {
             // seems like Go fmt makes \n
             text = text.replace("\r\n", "\n");
             return new String[]{text};
+        }
+
+        private static class FieldsBlock {
+            int max_len = 0;
+        }
+
+        private static Map<String, FieldsBlock> _get_tp_blocks(Map<String, String> fi_comments, List<FieldInfo> fields) {
+            Map<String, FieldsBlock> res = new HashMap<String, FieldsBlock>();
+            FieldsBlock current_block = null;
+            for (FieldInfo fi : fields) {
+                String just_type = _get_type_without_import_and_tag(fi);
+                if (fi.getName().isEmpty()) {
+                    continue;
+                }
+                int just_tp_len = just_type.length();
+                String type_name = _get_type_without_import(fi.getType());
+                boolean tag_exists = just_tp_len < type_name.length();
+                String comment = fi_comments.get(fi.getName());
+                if (!tag_exists && comment == null) {
+                    current_block = null;
+                } else {
+                    if (current_block == null) {
+                        current_block = new FieldsBlock();
+                    }
+                    if (just_tp_len > current_block.max_len) {
+                        current_block.max_len = just_tp_len;
+                    }
+                }
+                res.put(fi.getName(), current_block);
+            }
+            return res;
+        }
+
+        private static Map<String, FieldsBlock> _get_tag_blocks(Map<String, String> fi_comments, List<FieldInfo> fields) {
+            Map<String, FieldsBlock> res = new HashMap<String, FieldsBlock>();
+            FieldsBlock current_block = null;
+            for (FieldInfo fi : fields) {
+                String just_type = _get_type_without_import_and_tag(fi);
+                if (fi.getName().isEmpty()) {
+                    continue;
+                }
+                String comment = fi_comments.get(fi.getName());
+                if (comment == null) {
+                    current_block = null;
+                } else {
+                    String type_name = _get_type_without_import(fi.getType());
+                    int just_tp_len = just_type.length();
+                    boolean tag_exists = just_tp_len < type_name.length();
+                    if (tag_exists) {
+                        if (current_block == null) {
+                            current_block = new FieldsBlock();
+                        }
+                        String just_tag = type_name.substring(just_tp_len + 1).trim();
+                        int just_tag_len = just_tag.length();
+                        if (just_tag_len > current_block.max_len) {
+                            current_block.max_len = just_tag_len;
+                        }
+                    }
+                }
+                res.put(fi.getName(), current_block);
+            }
+            return res;
+        }
+
+        private static List<FormattedField> _get_formatted_fields(DtoClass jaxb_dto_class, List<FieldInfo> fields) {
+            int max_name_len = -1;
+            List<FormattedField> formatted_fields = new ArrayList<FormattedField>();
+            for (FieldInfo fi : fields) {
+                String just_type = _get_type_without_import_and_tag(fi);
+                String name = fi.getName();
+                if (name.isEmpty()) {
+                    formatted_fields.add(new FormattedField(just_type));
+                    continue;
+                }
+                int name_len = name.length();
+                if (name_len > max_name_len) {
+                    max_name_len = name_len;
+                }
+            }
+            Map<String, String> fi_comments = _get_fi_comments(jaxb_dto_class);
+            Map<String, FieldsBlock> tp_blocks = _get_tp_blocks(fi_comments, fields);
+            Map<String, FieldsBlock> tag_blocks = _get_tag_blocks(fi_comments, fields);
+            _set_formatted(formatted_fields, fields, max_name_len, tp_blocks, tag_blocks, fi_comments);
+            return formatted_fields;
+        }
+
+        private static Map<String, String> _get_fi_comments(DtoClass jaxb_dto_class) {
+            Map<String, String> fi_comments = new HashMap<String, String>();
+            String field_comments_str = jaxb_dto_class.getComments();
+            if (field_comments_str != null) {
+                _parse_field_comments(field_comments_str, fi_comments);
+            }
+            return fi_comments;
+        }
+
+        private static void _set_formatted(
+                List<FormattedField> formatted_fields,
+                List<FieldInfo> fields,
+                int max_name_len,
+                Map<String, FieldsBlock> tp_blocks,
+                Map<String, FieldsBlock> tag_blocks,
+                Map<String, String> fi_comments) {
+
+            final String name_format = "%-" + max_name_len + "." + max_name_len + "s";
+            for (FieldInfo fi : fields) {
+                String just_type = _get_type_without_import_and_tag(fi);
+                if (fi.getName().isEmpty()) {
+                    continue;
+                }
+                String just_tp_fmt;
+                {
+                    FieldsBlock block = tp_blocks.get(fi.getName());
+                    int max_tp_len = block == null ? 0 : block.max_len;
+                    if (max_tp_len == 0) {
+                        just_tp_fmt = "%s";
+                    } else {
+                        just_tp_fmt = "%-" + max_tp_len + "." + max_tp_len + "s";
+                    }
+                }
+                String type_name = _get_type_without_import(fi.getType());
+                int just_tp_len = just_type.length();
+                boolean tag_exists = just_tp_len < type_name.length();
+                if (tag_exists) {
+                    String type_format;
+                    FieldsBlock block = tag_blocks.get(fi.getName());
+                    int max_tag_len = block == null ? 0 : block.max_len;
+                    if (max_tag_len > 0) {
+                        type_format = just_tp_fmt + " %-" + max_tag_len + "." + max_tag_len + "s";
+                    } else {
+                        type_format = just_tp_fmt + " %s";
+                    }
+                    String just_tag = type_name.substring(just_tp_len + 1).trim();
+                    type_name = String.format(type_format, just_type, just_tag); // no trim
+                } else {
+                    type_name = String.format(just_tp_fmt, just_type, ""); // no trim
+                }
+                String name = String.format(name_format, fi.getName());
+                String fmt;
+                String comment = fi_comments.get(fi.getName()); // Returns null if this map contains no mapping for the key
+                if (comment == null) {
+                    fmt = String.format("%s %s", name, type_name).trim();
+                } else {
+                    if (comment.isEmpty()) {
+                        fmt = String.format("%s %s //", name, type_name);
+                    } else {
+                        fmt = String.format("%s %s // %s", name, type_name, comment.trim());
+                    }
+                }
+                formatted_fields.add(new FormattedField(fmt));
+            }
+        }
+
+        private static void _parse_field_comments(String field_comments_str, Map<String, String> field_comments) {
+            String[] parts = field_comments_str.split("\\{\\{");
+            for (String part : parts) {
+                part = part.trim();
+                int pos = part.indexOf("}}");
+                if (pos >= 0) {
+                    String field_name = part.substring(0, pos);
+                    String comment = part.substring(pos + 2);
+                    field_comments.put(field_name, comment);
+                }
+            }
         }
     }
 
