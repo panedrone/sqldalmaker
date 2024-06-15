@@ -171,7 +171,7 @@ public class GoCG {
             int max_len = 0;
         }
 
-        private static Map<String, FieldsBlock> _get_tp_blocks(Map<String, String> fi_comments, List<FieldInfo> fields) {
+        private static Map<String, FieldsBlock> _get_tp_blocks(Map<String, CustomField> custom_fields, List<FieldInfo> fields) {
             Map<String, FieldsBlock> res = new HashMap<String, FieldsBlock>();
             FieldsBlock current_block = null;
             for (FieldInfo fi : fields) {
@@ -182,7 +182,11 @@ public class GoCG {
                 int just_tp_len = just_type.length();
                 String type_name = _get_type_without_import(fi.getType());
                 boolean tag_exists = just_tp_len < type_name.length();
-                String comment = fi_comments.get(fi.getName());
+                String comment = null;
+                CustomField cf = custom_fields.get(fi.getName());
+                if (cf != null) {
+                    comment = cf.comment;
+                }
                 if (!tag_exists && comment == null) {
                     current_block = null;
                 } else {
@@ -198,7 +202,7 @@ public class GoCG {
             return res;
         }
 
-        private static Map<String, FieldsBlock> _get_tag_blocks(Map<String, String> fi_comments, List<FieldInfo> fields) {
+        private static Map<String, FieldsBlock> _get_tag_blocks(Map<String, CustomField> custom_fields, List<FieldInfo> fields) {
             Map<String, FieldsBlock> res = new HashMap<String, FieldsBlock>();
             FieldsBlock current_block = null;
             for (FieldInfo fi : fields) {
@@ -206,7 +210,11 @@ public class GoCG {
                 if (fi.getName().isEmpty()) {
                     continue;
                 }
-                String comment = fi_comments.get(fi.getName());
+                String comment = null;
+                CustomField cf = custom_fields.get(fi.getName());
+                if (cf != null) {
+                    comment = cf.comment;
+                }
                 if (comment == null) {
                     current_block = null;
                 } else {
@@ -229,9 +237,15 @@ public class GoCG {
             return res;
         }
 
-        private static List<FormattedField> _get_formatted_fields(DtoClass jaxb_dto_class, List<FieldInfo> fields) {
+        private static List<FormattedField> _get_formatted_fields(DtoClass jaxb_dto_class, List<FieldInfo> fields) throws Exception {
             int max_name_len = -1;
             List<FormattedField> formatted_fields = new ArrayList<FormattedField>();
+            List<CustomField> custom_field_list  = _get_custom_fields(jaxb_dto_class);
+            _add_custom_fields(custom_field_list, fields);
+            Map<String, CustomField> custom_fields = new HashMap<>();
+            for (CustomField cf : custom_field_list) {
+                custom_fields.put(cf.name, cf);
+            }
             for (FieldInfo fi : fields) {
                 String just_type = _get_type_without_import_and_tag(fi);
                 String name = fi.getName();
@@ -244,20 +258,31 @@ public class GoCG {
                     max_name_len = name_len;
                 }
             }
-            Map<String, String> fi_comments = _get_fi_comments(jaxb_dto_class);
-            Map<String, FieldsBlock> tp_blocks = _get_tp_blocks(fi_comments, fields);
-            Map<String, FieldsBlock> tag_blocks = _get_tag_blocks(fi_comments, fields);
-            _set_formatted(formatted_fields, fields, max_name_len, tp_blocks, tag_blocks, fi_comments);
+            Map<String, FieldsBlock> tp_blocks = _get_tp_blocks(custom_fields, fields);
+            Map<String, FieldsBlock> tag_blocks = _get_tag_blocks(custom_fields, fields);
+            _set_formatted(formatted_fields, fields, max_name_len, tp_blocks, tag_blocks, custom_fields);
             return formatted_fields;
         }
 
-        private static Map<String, String> _get_fi_comments(DtoClass jaxb_dto_class) {
-            Map<String, String> fi_comments = new HashMap<String, String>();
-            String field_comments_str = jaxb_dto_class.getComments();
-            if (field_comments_str != null) {
-                _parse_field_comments(field_comments_str, fi_comments);
+        private static void _add_custom_fields(List<CustomField> custom_field_list, List<FieldInfo> fields) throws Exception {
+            for (CustomField cf : custom_field_list) {
+                if (cf.type.isEmpty()) {
+                    continue;
+                }
+                FieldInfo fi = new FieldInfo(FieldNamesMode.AS_IS, "", "", "");
+                fi.refine_name(cf.name);
+                fi.refine_rendered_type(String.format("%s %s", cf.type, cf.tag));
+                fields.add(fi);
             }
-            return fi_comments;
+        }
+
+        private static List<CustomField> _get_custom_fields(DtoClass jaxb_dto_class) {
+            List<CustomField> res = new ArrayList<CustomField>();
+            String field_comments_str = jaxb_dto_class.getCustom();
+            if (field_comments_str != null) {
+                _parse_field_comments(field_comments_str, res);
+            }
+            return res;
         }
 
         private static void _set_formatted(
@@ -266,7 +291,7 @@ public class GoCG {
                 int max_name_len,
                 Map<String, FieldsBlock> tp_blocks,
                 Map<String, FieldsBlock> tag_blocks,
-                Map<String, String> fi_comments) {
+                Map<String, CustomField> custom_fields) {
 
             final String name_format = "%-" + max_name_len + "." + max_name_len + "s";
             for (FieldInfo fi : fields) {
@@ -303,7 +328,11 @@ public class GoCG {
                 }
                 String name = String.format(name_format, fi.getName());
                 String fmt;
-                String comment = fi_comments.get(fi.getName()); // Returns null if this map contains no mapping for the key
+                String comment = null;
+                CustomField cf = custom_fields.get(fi.getName());
+                if (cf != null) {
+                    comment = cf.comment;
+                }
                 if (comment == null) {
                     fmt = String.format("%s %s", name, type_name).trim();
                 } else {
@@ -317,16 +346,40 @@ public class GoCG {
             }
         }
 
-        private static void _parse_field_comments(String field_comments_str, Map<String, String> field_comments) {
-            String[] parts = field_comments_str.split("\\{\\{");
-            for (String part : parts) {
-                part = part.trim();
-                int pos = part.indexOf("}}");
+        private static class CustomField {
+            String name = "";
+            String type = "";
+            String tag = "";
+            String comment = null;
+        }
+
+        private static void _parse(String line, CustomField cf) {
+            String[] field_parts = line.split("\\s+");
+            if (field_parts.length > 0) {
+                cf.name = field_parts[0];
+            }
+            if (field_parts.length > 1) {
+                cf.type = field_parts[1];
+            }
+            if (field_parts.length > 2) {
+                cf.tag = field_parts[2];
+            }
+        }
+
+        private static void _parse_field_comments(String field_comments_str, List<CustomField> res) {
+            String lines[] = field_comments_str.split("[\\r\\n]+");
+            for (String line : lines) {
+                line = line.trim();
+                int pos = line.indexOf("//");
+                CustomField cf = new CustomField();
                 if (pos >= 0) {
-                    String field_name = part.substring(0, pos);
-                    String comment = part.substring(pos + 2);
-                    field_comments.put(field_name, comment);
+                    String field = line.substring(0, pos).trim();
+                    _parse(field, cf);
+                    cf.comment = line.substring(pos + 2);
+                } else {
+                    _parse(line, cf);
                 }
+                res.add(cf);
             }
         }
     }

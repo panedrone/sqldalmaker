@@ -1,20 +1,18 @@
 2024-06-15
 
-    DTO field comments for Golang:
+    [+] <dto-class...<custom... for Golang:
 
     <dto-class name="gorm-Order" ref="orders" auto="id">
-        <comments>
-            {{Id}}           PK
-            {{UserId}}       FK ref. column -> User
-            {{CurrencyId}}   FK ref. column -> Currency
-            {{RecipientId}}  FK ref. column -> TakeUser
-            {{TakeUser}}     FK -> User
-            {{User}}         FK -> User
-            {{Currency}}     FK -> Currency
-        </comments>
-        <field column="TakeUser" type="User `gorm:&quot;foreignKey:RecipientID&quot;`"/>
-        <field column="User" type="User"/>
-        <field column="Currency" type="Currency"/>
+        <custom>
+            Id // PK
+            CreationDate //
+            UserId // FK ref. column -> User
+            CurrencyId // FK ref. column -> Currency
+            RecipientId // FK ref. column -> Recipient
+            Recipient User `gorm:"foreignKey:RecipientID"` // FK -> User
+            User User // FK -> User
+            Currency Currency // FK -> Currency
+        </custom>
     </dto-class>
 
     -->
