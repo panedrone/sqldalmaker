@@ -510,10 +510,8 @@ public class UIEditorPageDAO extends Composite {
 
 	private String[] generate_single_sdm_dao(IDaoCG gen, XmlParser dao_xml_parser, DaoClass sdm_dao_class)
 			throws Exception {
-		String dao_class_name = sdm_dao_class.getName();
-		String dao_xml_rel_path = dao_class_name + ".xml";
-		String dao_xml_abs_path = editor2.get_metaprogram_file_abs_path(dao_xml_rel_path);
-		return EclipseCG.generate_single_sdm_dao(gen, dao_xml_parser, sdm_dao_class, dao_xml_abs_path);
+		String sdm_folder_abs_path = editor2.get_sdm_folder_abs_path();
+		return EclipseCG.generate_single_sdm_dao(gen, dao_xml_parser, sdm_dao_class, sdm_folder_abs_path);
 	}
 
 	private boolean generate_for_selected_dao(IProgressMonitor monitor, IDaoCG gen, Settings settings, List<Item> items,
