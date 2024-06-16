@@ -4,7 +4,7 @@
 
     <dto-class name="gorm-Department" ref="departments" auto="id">
         <custom>
-            {base} pwg_dashboard_api/gorm/dbal/thread:thread.BaseModel
+            {base} app/dbal/thread:thread.BaseModel
             Users []User `gorm:"foreignKey:DepartmentID"`
         </custom>
     </dto-class>
