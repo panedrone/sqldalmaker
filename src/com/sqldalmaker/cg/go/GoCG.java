@@ -17,6 +17,11 @@ import java.sql.Connection;
 import java.util.*;
 
 /*
+ * @author sqldalmaker@gmail.com
+ *
+ * 16.06.2024 02:56 1.301 [+] <dto-class...<custom...
+ * 25.04.2024 05:15 1.297
+ * 14.02.2024 18:50 1.294 <dao-class ref="...
  * 16.12.2023 09:01 1.292 sdm.xml
  * 08.10.2023 19:37 1.290
  * 20.09.2023 14:36 1.289
@@ -138,6 +143,7 @@ public class GoCG {
             context.put("package", dto_package);
             String header = jaxb_dto_class.getHeader();
             context.put("header", header);
+            List<FormattedField> formatted_fields = _process_fields(jaxb_dto_class, fields); // !!! before imports
             Set<String> imports_set = new HashSet<String>();
             for (FieldInfo fi : fields) {
                 String type_import = _get_type_import(fi);
@@ -150,7 +156,6 @@ public class GoCG {
             context.put("imports", imports_arr);
             context.put("class_name", dto_class_name);
             context.put("ref", jaxb_dto_class.getRef());
-            List<FormattedField> formatted_fields = _get_formatted_fields(jaxb_dto_class, fields);
             context.put("fields", formatted_fields);
             context.put("mode", "dto_class");
             String ref = jaxb_dto_class.getRef();
@@ -237,15 +242,11 @@ public class GoCG {
             return res;
         }
 
-        private static List<FormattedField> _get_formatted_fields(DtoClass jaxb_dto_class, List<FieldInfo> fields) throws Exception {
+        private static List<FormattedField> _process_fields(DtoClass jaxb_dto_class, List<FieldInfo> fields) throws Exception {
+            List<CustomField> custom_field_list = _get_custom_fields(jaxb_dto_class);
+            _add_custom_fields(custom_field_list, fields);
             int max_name_len = -1;
             List<FormattedField> formatted_fields = new ArrayList<FormattedField>();
-            List<CustomField> custom_field_list  = _get_custom_fields(jaxb_dto_class);
-            _add_custom_fields(custom_field_list, fields);
-            Map<String, CustomField> custom_fields = new HashMap<>();
-            for (CustomField cf : custom_field_list) {
-                custom_fields.put(cf.name, cf);
-            }
             for (FieldInfo fi : fields) {
                 String just_type = _get_type_without_import_and_tag(fi);
                 String name = fi.getName();
@@ -256,6 +257,12 @@ public class GoCG {
                 int name_len = name.length();
                 if (name_len > max_name_len) {
                     max_name_len = name_len;
+                }
+            }
+            Map<String, CustomField> custom_fields = new HashMap<>();
+            for (CustomField cf : custom_field_list) {
+                if (!cf.name.isEmpty()) {
+                    custom_fields.put(cf.name, cf);
                 }
             }
             Map<String, FieldsBlock> tp_blocks = _get_tp_blocks(custom_fields, fields);
@@ -278,9 +285,9 @@ public class GoCG {
 
         private static List<CustomField> _get_custom_fields(DtoClass jaxb_dto_class) {
             List<CustomField> res = new ArrayList<CustomField>();
-            String field_comments_str = jaxb_dto_class.getCustom();
-            if (field_comments_str != null) {
-                _parse_field_comments(field_comments_str, res);
+            String custom = jaxb_dto_class.getCustom();
+            if (custom != null) {
+                _parse_custom(custom, res);
             }
             return res;
         }
@@ -366,12 +373,26 @@ public class GoCG {
             }
         }
 
-        private static void _parse_field_comments(String field_comments_str, List<CustomField> res) {
-            String lines[] = field_comments_str.split("[\\r\\n]+");
+        private static final String BASE = "{base}";
+
+        private static void _parse_custom(String custom, List<CustomField> res) {
+            String lines[] = custom.split("[\\r\\n]+");
             for (String line : lines) {
                 line = line.trim();
-                int pos = line.indexOf("//");
+                if (line.isEmpty()) {
+                    continue;
+                }
                 CustomField cf = new CustomField();
+                if (line.startsWith(BASE)) {
+                    String tp = line.substring(BASE.length()).trim();
+                    if (tp.isEmpty()) {
+                        continue;
+                    }
+                    cf.type = tp; // no comments for {base}
+                    res.add(cf);
+                    continue;
+                }
+                int pos = line.indexOf("//");
                 if (pos >= 0) {
                     String field = line.substring(0, pos).trim();
                     _parse(field, cf);

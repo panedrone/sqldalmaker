@@ -1,3 +1,26 @@
+2024-06-16
+
+    [+] <dto-class...<custom...{base} for Golang:
+
+    <dto-class name="gorm-Department" ref="departments" auto="id">
+        <custom>
+            {base} pwg_dashboard_api/gorm/dbal/thread:thread.BaseModel
+            Users []User `gorm:"foreignKey:DepartmentID"`
+        </custom>
+    </dto-class>
+
+    import (
+        "github.com/google/uuid"
+        "app/dbal/thread"
+    )
+
+    type Department struct {
+        thread.BaseModel
+        Id            uuid.UUID `json:"id" gorm:"column:id;primary_key;type:uuid;default:gen_random_uuid()"`
+        Name          string    `json:"name" gorm:"column:name"`
+        Users         []User    `gorm:"foreignKey:DepartmentID"`
+    }
+
 2024-06-15
 
     [+] <dto-class...<custom... for Golang:
