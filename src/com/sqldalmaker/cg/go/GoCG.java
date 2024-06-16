@@ -366,17 +366,24 @@ public class GoCG {
                 cf.name = field_parts[0];
             }
             if (field_parts.length > 1) {
-                cf.type = field_parts[1];
+                cf.type = field_parts[1]; // no spaces inside type!!!
             }
             if (field_parts.length > 2) {
-                cf.tag = field_parts[2];
+                int pos_name = line.indexOf(cf.name);
+                if (pos_name != -1) {
+                    String after_name = line.substring(pos_name + cf.name.length());
+                    int post_type = after_name.indexOf(cf.type);
+                    if (post_type != -1) {
+                        cf.tag = after_name.substring(post_type + cf.type.length()).trim();
+                    }
+                }
             }
         }
 
         private static final String BASE = "{base}";
 
         private static void _parse_custom(String custom, List<CustomField> res) {
-            String lines[] = custom.split("[\\r\\n]+");
+            String[] lines = custom.split("[\\r\\n]+");
             for (String line : lines) {
                 line = line.trim();
                 if (line.isEmpty()) {
