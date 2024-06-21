@@ -171,24 +171,25 @@
                 <if var="$fi.PK">
                     <print var=";primaryKey"/>
                 </if>
+                <if var="$fi.ColumnSize > 0">
+                    <print var=";size:$fi.ColumnSize"/>
+                </if>
                 <if var="$fi.AI">
                     <print var=";autoIncrement"/>
                 </if>
-                <if var="!$fi.PK">
-                    <if var="$fi.Unique &amp;&amp; $fi.Indexed">
-                        <print var=";uniqueIndex"/>
-                        <else>
-                            <if var="$fi.Unique">
-                                <print var=";unique"/>
-                            </if>
-                            <if var="$fi.Indexed">
-                                <print var=";index"/>
-                            </if>
-                        </else>
-                    </if>
-                    <if var="!$fi.Nullable">
-                        <print var=";not null"/>
-                    </if>
+                <if var="$fi.Unique &amp;&amp;$fi.Indexed">
+                    <print var=";uniqueIndex"/>
+                    <else>
+                        <if var="$fi.Unique">
+                            <print var=";unique"/>
+                        </if>
+                        <if var="$fi.Indexed">
+                            <print var=";index"/>
+                        </if>
+                    </else>
+                </if>
+                <if var="!$fi.Nullable">
+                    <print var=";not null"/>
                 </if>
             </vm-xml>
         </macro>

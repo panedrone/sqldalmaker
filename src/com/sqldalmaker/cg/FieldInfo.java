@@ -55,6 +55,10 @@ public class FieldInfo {
 
     private String assign_func = "";
 
+    private int precision = 0;
+
+    private int display_size = 0;
+
     public FieldInfo(
             FieldNamesMode field_names_mode,
             String original_field_type,
@@ -259,5 +263,21 @@ public class FieldInfo {
 
     public void setDecimalDigits(int decimal_digits) {
         this.decimal_digits = decimal_digits;
+    }
+
+    public int getPrecision() {
+        return this.precision;
+    }
+
+    public void setPrecision(int precision) {
+        this.precision = precision;
+    }
+
+    public int getDisplaySize() {
+        return this.display_size;
+    }
+
+    public void setDisplaySize(int display_size) {
+        this.display_size = display_size;
     }
 }

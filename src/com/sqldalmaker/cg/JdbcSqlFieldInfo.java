@@ -33,29 +33,38 @@ class JdbcSqlFieldInfo {
         fields_all.clear();
         PreparedStatement ps = JdbcUtils.prepare_jdbc_sql(conn, jdbc_sql);
         try {
-            ResultSetMetaData rsmd = _get_rs_md(ps);
-            int column_count = _get_col_count(rsmd);
+            ResultSetMetaData rs_md = _get_rs_md(ps);
+            int column_count = _get_col_count(rs_md);
             for (int col_num = 1; col_num <= column_count; col_num++) {
-                String col_name = _get_jdbc_col_name(rsmd, col_num);
-                String type_name = model + _get_jdbc_col_type_name(rsmd, col_num);
+                String col_name = _get_jdbc_col_name(rs_md, col_num);
+                String type_name = model + _get_jdbc_col_type_name(rs_md, col_num);
                 //FieldInfo field = new FieldInfo(dto_field_names_mode, type_name, col_name, "q(" + col_name + ")");
                 FieldInfo fi = new FieldInfo(dto_field_names_mode, type_name, col_name, "q");
                 // === panedrone: it is nullable for all columns except PK (sqlite3)
                 // field.setNullable(rsmd.isNullable(col_num) == ResultSetMetaData.columnNullable);
-                boolean is_ai = rsmd.isAutoIncrement(col_num);
+                boolean is_ai = rs_md.isAutoIncrement(col_num);
                 fi.setAI(is_ai);
                 fields_map.put(col_name, fi);
                 fields_all.add(fi);
-
-                // useless 2147483647 for all cols (SQLite)
-//                int displaySize = rsmd.getColumnDisplaySize(col_num);
-
-                int scale = rsmd.getScale(col_num);
-                fi.setDecimalDigits(scale);
-//                System.out.println(scale);
-
-//                int precision = rsmd.getPrecision(col_num);
-//                System.out.println(precision);
+                try {
+                    int scale = rs_md.getScale(col_num);
+                    fi.setDecimalDigits(scale);
+                } catch (SQLException e) {
+                    fi.setDecimalDigits(0);
+                }
+                try {
+                    int precision = rs_md.getPrecision(col_num);
+                    fi.setPrecision(precision);
+                } catch (SQLException e) {
+                    fi.setPrecision(0);
+                }
+                try {
+                    // 2147483647 for all cols (SQLite)
+                    int displaySize = rs_md.getColumnDisplaySize(col_num);
+                    fi.setDisplaySize(displaySize);
+                } catch (SQLException e) {
+                    fi.setDisplaySize(0);
+                }
             }
         } finally {
             ps.close();

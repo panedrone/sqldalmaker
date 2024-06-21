@@ -34,7 +34,7 @@ import org.apache.cayenne.dba.TypesMapping;
  * 10.05.2022 19:27 1.239
  * 24.04.2022 08:20 1.229
  * 17.04.2022 11:25 1.219
- * 
+ *
  */
 class JdbcTableInfo {
 
@@ -257,9 +257,18 @@ class JdbcTableInfo {
         String fi_type = fi.getScalarType();
         if (string_type.equals(fi_type)) {
             try {
+                final int max_size = 0x3FFF;  // 16K
                 int size = columns_rs.getInt("COLUMN_SIZE");
-                if (size > 0xffff) { // sqlite3 2000000000
-                    size = 0xffff;
+                if (size > max_size) { // sqlite3 2000000000
+                    size = 0;
+                }
+                int precision = fi.getPrecision();
+                if (precision > 0 && precision < max_size) {
+                    // How to get the size of a column of a table using JDBC?
+                    // https://www.tutorialspoint.com/how-to-get-the-size-of-a-column-of-a-table-using-jdbc
+                    if (size == 0 || precision < size) {
+                        size = precision;
+                    }
                 }
                 fi.setColumnSize(size);
             } catch (SQLException e) {
