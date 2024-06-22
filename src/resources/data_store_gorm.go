@@ -6,7 +6,7 @@ import (
 	"database/sql/driver"
 	"errors"
 	"fmt"
-	// "github.com/godror/godror"
+	"github.com/godror/godror"
 	// "github.com/google/uuid"
 	"gorm.io/gorm"
 	"io"
@@ -121,7 +121,7 @@ func (ds *_DS) isMsSql() bool {
 /*
 	Implement the method initDb() in an external file. This is an example:
 
-// data_store_sqlx_ex.go
+// data_store_no_orm_ex.go
 
 package dbal
 
@@ -1178,21 +1178,26 @@ func _setBytes(d *[]byte, value interface{}) error {
 	return nil
 }
 
-//func SetNumber(d *godror.Number, row map[string]interface{}, colName string, errMap map[string]int) {
-//	value, err := _getValue(row, colName, errMap)
-//	if err == nil {
-//		err = _setNumber(d, value)
-//		updateErrMap(err, colName, errMap)
-//	}
-//}
-//
-//func _setNumber(d *godror.Number, value interface{}) error {
-//	err := d.Scan(value)
-// 	if err != nil {
-// 		return assignErr(d, value, "_setNumber", err.Error())
-// 	}
-//	return err
-//}
+func SetNumber(d interface{}, row map[string]interface{}, colName string, errMap map[string]int) {
+	value, err := _getValue(row, colName, errMap)
+	if err == nil {
+		v, ok := d.(*godror.Number)
+		if ok {
+			err = _setNumber(v, value)
+		} else {
+			err = unknownTypeErr(d, value, "SetNumber")
+		}
+	}
+	updateErrMap(err, colName, errMap)
+}
+
+func _setNumber(d *godror.Number, value interface{}) error {
+	err := d.Scan(value)
+	if err != nil {
+		return assignErr(d, value, "_setNumber", err.Error())
+	}
+	return err
+}
 
 //func SetUUID(d *uuid.UUID, row map[string]interface{}, colName string, errMap map[string]int) {
 //	value, err := _getValue(row, colName, errMap)
@@ -1255,8 +1260,8 @@ func _setAny(dstPtr interface{}, value interface{}) error {
 		err = _setBool(d, value)
 	case *[]byte: // the same as uint8
 		err = _setBytes(d, value)
-	//case *godror.Number:
-	//	err = _setNumber(d, value)
+	case *godror.Number:
+		err = _setNumber(d, value)
 	//case *uuid.UUID:
 	//	err = _setUUID(d, value)
 	//case *[]string:

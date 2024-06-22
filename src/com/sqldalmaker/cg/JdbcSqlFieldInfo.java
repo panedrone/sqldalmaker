@@ -49,6 +49,7 @@ class JdbcSqlFieldInfo {
                 try {
                     int scale = rs_md.getScale(col_num);
                     fi.setDecimalDigits(scale);
+                    fi.setScale(scale);
                 } catch (SQLException e) {
                     fi.setDecimalDigits(0);
                 }

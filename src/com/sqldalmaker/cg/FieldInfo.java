@@ -56,6 +56,7 @@ public class FieldInfo {
     private String assign_func = "";
 
     private int precision = 0;
+    private int scale = 0;
 
     private int display_size = 0;
 
@@ -271,6 +272,14 @@ public class FieldInfo {
 
     public void setPrecision(int precision) {
         this.precision = precision;
+    }
+
+    public int getScale() {
+        return this.scale;
+    }
+
+    public void setScale(int scale) {
+        this.scale = scale;
     }
 
     public int getDisplaySize() {
