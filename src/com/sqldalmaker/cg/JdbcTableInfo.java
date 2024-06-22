@@ -277,6 +277,20 @@ class JdbcTableInfo {
         }
     }
 
+    class Oracle {
+        // Field descriptor #7 I
+        // public static final int TIMESTAMP = 93; // === panedrone: 93 is known in "TypesMapping.getJavaBySqlType"
+
+        // Field descriptor #7 I (deprecated)
+        public static final int TIMESTAMPNS = -100;
+
+        // Field descriptor #7 I
+        public static final int TIMESTAMPTZ = -101;
+
+        // Field descriptor #7 I
+        public static final int TIMESTAMPLTZ = -102;
+    }
+
     private void _init_with_jdbc_type(FieldInfo fi, ResultSet columns_rs) {
         String sql_type = fi.getOriginalType();
         String no_type = _get_type_name(Object.class.getName());
@@ -285,6 +299,20 @@ class JdbcTableInfo {
             try {
                 int type = columns_rs.getInt("DATA_TYPE");
                 String apache_java_type_name = TypesMapping.getJavaBySqlType(type);
+                if (Object.class.getName().equals(apache_java_type_name)) {
+                    switch (type) {
+                        // case Oracle.TIMESTAMP:
+                        case Oracle.TIMESTAMPNS:
+                            apache_java_type_name = java.util.Date.class.getName();
+                            break;
+                        case Oracle.TIMESTAMPTZ:
+                            apache_java_type_name = java.time.ZonedDateTime.class.getName();
+                            break;
+                        case Oracle.TIMESTAMPLTZ:
+                            apache_java_type_name = java.time.LocalDateTime.class.getName();
+                            break;
+                    }
+                }
                 fi.refine_scalar_type(apache_java_type_name);
                 String rendered_type_name = _get_type_name(apache_java_type_name);
                 fi.refine_rendered_type(rendered_type_name);

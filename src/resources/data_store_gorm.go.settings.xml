@@ -77,20 +77,32 @@
 
         <!-- oracle -->
 
-        <!--        <type detected="gorm-java.math.BigDecimal" target="github.com/godror/godror:godror.Number${json-gorm} -> SetNumber"/>-->
-        <!--        <type detected="gorm-java.math.BigDecimal+auto" target="github.com/godror/godror:godror.Number${json-gorm}|1:;autoIncrement -> SetNumber"/>-->
+        <!--        <type detected="gorm-java.lang.Double" target="github.com/godror/godror:godror.Number${json-gorm} -> SetNumber"/>-->
+        <!--        <type detected="gorm-java.math.BigDecimal"-->
+        <!--              target="github.com/godror/godror:godror.Number${json-gorm} -> SetNumber"/>-->
+        <!--        <type detected="gorm-java.math.BigDecimal+auto"-->
+        <!--              target="github.com/godror/godror:godror.Number${json-gorm}|1:;autoIncrement -> SetNumber"/>-->
 
         <!--        <type detected="gorm-java.lang.String" target="string${json-gorm} -> SetString"/>-->
+
         <!--        <type detected="gorm-java.util.Date" target="time:time.Time${json-gorm} -> SetTime"/>-->
+        <!--        <type detected="gorm-java.time.ZonedDateTime" target="time:time.Time${json-gorm} -> SetTime"/>-->
+        <!--        <type detected="gorm-java.time.LocalDateTime" target="time:time.Time${json-gorm} -> SetTime"/>-->
+
         <!--        <type detected="gorm-byte[]" target="string${json-gorm}"/>-->
         <!--        <type detected="gorm-java.lang.Boolean" target="int64${json-gorm} -> SetBool"/>-->
 
-        <!--        <type detected="gorm-java.lang.Object" target="interface{}${json}-gorm"/>-->
+        <!--        <type detected="gorm-java.lang.Object" target="interface{}${json-gorm}"/>-->
 
+        <!--        <type detected="java.lang.Double" target="github.com/godror/godror:godror.Number${json} -> SetNumber"/>-->
         <!--        <type detected="java.math.BigDecimal" target="github.com/godror/godror:godror.Number${json} -> SetNumber"/>-->
 
         <!--        <type detected="java.lang.String" target="string${json} -> SetString"/>-->
+
         <!--        <type detected="java.util.Date" target="time:time.Time${json} -> SetTime"/>-->
+        <!--        <type detected="java.time.ZonedDateTime" target="time:time.Time${json} -> SetTime"/>-->
+        <!--        <type detected="java.time.LocalDateTime" target="time:time.Time${json-gorm} -> SetTime"/>-->
+
         <!--        <type detected="byte[]" target="string${json}"/>-->
         <!--        <type detected="java.lang.Boolean" target="int64${json} -> SetBool"/>-->
 
