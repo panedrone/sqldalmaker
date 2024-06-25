@@ -107,18 +107,14 @@ import (
    	// _ "github.com/mattn/go-sqlite3"      // SQLite3
    	// _ "github.com/denisenkom/go-mssqldb" // SQL Server
    	// _ "github.com/godror/godror"			// Oracle
-   	_ "github.com/go-sql-driver/mysql"      // MySQL
+   	// _ "github.com/go-sql-driver/mysql"   // MySQL
    	// _ "github.com/ziutek/mymysql/godrv"  // MySQL
-   	// _ "github.com/lib/pq"                // PostgeSQL
+   	_ "github.com/lib/pq"                   // PostgeSQL
 )
 
 var ds = &_DS{}
 
 func (ds *_DS) initDb() (err error) {
-	// === PostgeSQL ===========================
-	ds.paramPrefix = "$"
-	ds.db, err = sqlx.Open("postgres", "postgres://postgres:sa@localhost/my-tests?sslmode=disable")
-	// ds.db, err = sqlx.Open("postgres", "postgres://postgres:sa@localhost/my-tests?sslmode=verify-full")
 	// === SQLite3 =============================
 	// ds.db, err = sqlx.Open("sqlite3", "./log.sqlite")
 	// ds.db, err = sqlx.Open("sqlite3", "./northwindEF.sqlite")
@@ -137,7 +133,11 @@ func (ds *_DS) initDb() (err error) {
 	// === Oracle =============================
 	// "github.com/godror/godror"
 	//ds.paramPrefix = ":"
-	//ds.db, err = sqlx.Open("godror", `user="ORDERS" password="root" connectString="localhost:1521/orcl"`)
+	//ds.db, err = sqlx.Open("godror", `user="MY_TESTS" password="sa" connectString="127.0.0.1:1521/XE" timezone="Local"`)
+	// === PostgeSQL ===========================
+	ds.paramPrefix = "$"
+	ds.db, err = sqlx.Open("postgres", "postgres://postgres:sa@localhost/my-tests?sslmode=disable")
+	// ds.db, err = sqlx.Open("postgres", "postgres://postgres:sa@localhost/my-tests?sslmode=verify-full")
 	return
 }
 
@@ -1296,9 +1296,9 @@ func _setBytes(d *[]byte, value interface{}) error {
 //
 //func _setNumber(d *godror.Number, value interface{}) error {
 //	err := d.Scan(value)
-// 	if err != nil {
-// 		return assignErr(d, value, "_setNumber", err.Error())
-// 	}
+//	if err != nil {
+//		return assignErr(d, value, "_setNumber", err.Error())
+//	}
 //	return err
 //}
 

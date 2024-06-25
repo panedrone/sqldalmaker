@@ -1,12 +1,13 @@
 SQL DAL Maker %s
 
+This is how to start: https://sqldalmaker.sourceforge.net/preconfig.html
+
 Newer versions of the plug-in may require updating of existing XSD and XML files.
 Be familiar with "News". Click "Validate Configuration" and "Create/Overwrite XSD files".
 Make related fixes if needed.
 
 Project Docs: https://sqldalmaker.sourceforge.net/
 GitHub Repo: https://github.com/panedrone/sqldalmaker
-Pre-Config: https://sqldalmaker.sourceforge.net/preconfig.html
 Quick Start in mp4: https://github.com/panedrone/sqldalmaker/releases/tag/latest
 
 For Eclipse: https://marketplace.eclipse.org/content/sql-dal-maker

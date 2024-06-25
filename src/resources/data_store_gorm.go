@@ -6,8 +6,6 @@ import (
 	"database/sql/driver"
 	"errors"
 	"fmt"
-	"github.com/godror/godror"
-	// "github.com/google/uuid"
 	"gorm.io/gorm"
 	"io"
 	"reflect"
@@ -24,9 +22,10 @@ import (
 	Successfully tested with:
 
 		- "gorm.io/driver/sqlite"
-		- "gorm.io/driver/mysql"
-		- "github.com/cengsin/oracle"
 		- "gorm.io/driver/postgres"
+		- "gorm.io/driver/sqlserver"
+		- "gorm.io/driver/mysql"
+		- "github.com/cengsin/oracle" // bugs of AutoMigrate
 
 	Copy-paste this code to your project and change it for your needs.
 	Improvements are welcome: sqldalmaker@gmail.com
@@ -119,9 +118,7 @@ func (ds *_DS) isMsSql() bool {
 }
 
 /*
-	Implement the method initDb() in an external file. This is an example:
-
-// data_store_no_orm_ex.go
+	Implement the method initDb() in an external file (e.g. "data_store_gorm_ex.go"):
 
 package dbal
 
@@ -130,6 +127,7 @@ import (
 	// "github.com/go-sql-driver/mysql"
 	// "gorm.io/driver/postgres"
 	// "gorm.io/driver/sqlite"
+	// "gorm.io/driver/sqlserver"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
@@ -139,21 +137,30 @@ func (ds *_DS) initDb() (err error) {
 	//ds.rootDb, err = gorm.Open(sqlite.Open("./todolist.sqlite"), &gorm.Config{
 	//	Logger: logger.Default.LogMode(logger.Info),
 	//})
+	// === PostgeSQL ===========================
+	// ds.paramPrefix = "$"
+	//dsn := "host=localhost user=postgres password=sa dbname=my_tests port=5432 sslmode=disable"
+	//ds.rootDb, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
+	//	Logger: logger.Default.LogMode(logger.Info),
+	//})
 	// === MySQL ===============================
 	//dsn := "root:sa@tcp(127.0.0.1:3306)/my_tests?charset=utf8mb4&parseTime=True&loc=Local"
 	//ds.rootDb, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
 	//	Logger: logger.Default.LogMode(logger.Info),
 	//})
-	// === PostgeSQL ===========================
-	//dsn := "host=localhost user=postgres password=sa dbname=my_tests port=5432 sslmode=disable"
-	//ds.rootDb, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
-	//	Logger: logger.Default.LogMode(logger.Info),
-	//})
 	// === Oracle ==============================
+	ds.paramPrefix = ":"
 	dsn := "MY_TESTS/sa@127.0.0.1:1521/XE?charset=utf8mb4&parseTime=True&loc=Local"
 	ds.rootDb, err = gorm.Open(oracle.Open(dsn), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Info),
 	})
+	// === SQL Server ==============================
+	//ds.paramPrefix = "@p"
+	//github.com/denisenkom/go-mssqldb
+	//dsn := "sqlserver://sa:LoremIpsum86@localhost:1433?database=WideWorldImporters"
+	//ds.rootDb, err = gorm.Open(sqlserver.Open(dsn), &gorm.Config{
+	//  Logger: logger.Default.LogMode(logger.Info),
+	//})
 	return
 }
 
@@ -941,8 +948,8 @@ func SetInt64(d *int64, row map[string]interface{}, colName string, errMap map[s
 	value, err := _getValue(row, colName, errMap)
 	if err == nil {
 		err = _setInt64(d, value)
-		updateErrMap(err, colName, errMap)
 	}
+	updateErrMap(err, colName, errMap)
 }
 
 func _setInt64(d *int64, value interface{}) error {
@@ -979,8 +986,8 @@ func SetInt(d *int, row map[string]interface{}, colName string, errMap map[strin
 	value, err := _getValue(row, colName, errMap)
 	if err == nil {
 		err = _setInt(d, value)
-		updateErrMap(err, colName, errMap)
 	}
+	updateErrMap(err, colName, errMap)
 }
 
 func _setInt(d *int, value interface{}) error {
@@ -1018,8 +1025,8 @@ func SetInt32(d *int32, row map[string]interface{}, colName string, errMap map[s
 	value, err := _getValue(row, colName, errMap)
 	if err == nil {
 		err = _setInt32(d, value)
-		updateErrMap(err, colName, errMap)
 	}
+	updateErrMap(err, colName, errMap)
 }
 
 func _setInt32(d *int32, value interface{}) error {
@@ -1055,8 +1062,8 @@ func SetFloat32(d *float32, row map[string]interface{}, colName string, errMap m
 	value, err := _getValue(row, colName, errMap)
 	if err == nil {
 		err = _setFloat32(d, value)
-		updateErrMap(err, colName, errMap)
 	}
+	updateErrMap(err, colName, errMap)
 }
 
 func _setFloat32(d *float32, value interface{}) error {
@@ -1088,8 +1095,8 @@ func SetFloat64(d *float64, row map[string]interface{}, colName string, errMap m
 	value, err := _getValue(row, colName, errMap)
 	if err == nil {
 		err = _setFloat64(d, value)
-		updateErrMap(err, colName, errMap)
 	}
+	updateErrMap(err, colName, errMap)
 }
 
 func _setFloat64(d *float64, value interface{}) error {
@@ -1121,8 +1128,8 @@ func SetTime(d *time.Time, row map[string]interface{}, colName string, errMap ma
 	value, err := _getValue(row, colName, errMap)
 	if err == nil {
 		err = _setTime(d, value)
-		updateErrMap(err, colName, errMap)
 	}
+	updateErrMap(err, colName, errMap)
 }
 
 func _setTime(d *time.Time, value interface{}) error {
@@ -1139,8 +1146,8 @@ func SetBool(d *bool, row map[string]interface{}, colName string, errMap map[str
 	value, err := _getValue(row, colName, errMap)
 	if err == nil {
 		err = _setBool(d, value)
-		updateErrMap(err, colName, errMap)
 	}
+	updateErrMap(err, colName, errMap)
 }
 
 func _setBool(d *bool, value interface{}) error {
@@ -1164,8 +1171,8 @@ func SetBytes(d *[]byte, row map[string]interface{}, colName string, errMap map[
 	value, err := _getValue(row, colName, errMap)
 	if err == nil {
 		err = _setBytes(d, value)
-		updateErrMap(err, colName, errMap)
 	}
+	updateErrMap(err, colName, errMap)
 }
 
 func _setBytes(d *[]byte, value interface{}) error {
@@ -1178,42 +1185,34 @@ func _setBytes(d *[]byte, value interface{}) error {
 	return nil
 }
 
-func SetNumber(d interface{}, row map[string]interface{}, colName string, errMap map[string]int) {
+func SetNum(d interface{}, row map[string]interface{}, colName string, errMap map[string]int) {
 	value, err := _getValue(row, colName, errMap)
 	if err == nil {
-		v, ok := d.(*godror.Number)
+		s, ok := d.(sql.Scanner)
 		if ok {
-			err = _setNumber(v, value)
+			err = _scan(s, value)
 		} else {
-			err = unknownTypeErr(d, value, "SetNumber")
+			err = _setAny(d, value)
 		}
 	}
 	updateErrMap(err, colName, errMap)
 }
 
-func _setNumber(d *godror.Number, value interface{}) error {
-	err := d.Scan(value)
-	if err != nil {
-		return assignErr(d, value, "_setNumber", err.Error())
+func Scan(d sql.Scanner, row map[string]interface{}, colName string, errMap map[string]int) {
+	value, err := _getValue(row, colName, errMap)
+	if err == nil {
+		err = _scan(d, value)
+		updateErrMap(err, colName, errMap)
 	}
-	return err
 }
 
-//func SetUUID(d *uuid.UUID, row map[string]interface{}, colName string, errMap map[string]int) {
-//	value, err := _getValue(row, colName, errMap)
-//	if err == nil {
-//		err = _setUUID(d, value)
-//		updateErrMap(err, colName, errMap)
-//	}
-//}
-//
-// func _setUUID(d *uuid.UUID, value interface{}) error {
-// 	err := d.Scan(value)
-// 	if err != nil {
-// 		return assignErr(d, value, "_setUUID", err.Error())
-// 	}
-// 	return nil
-// }
+func _scan(d sql.Scanner, value interface{}) error {
+	err := d.Scan(value)
+	if err != nil {
+		return assignErr(d, value, "_scan", err.Error())
+	}
+	return nil
+}
 
 func _getValue(row map[string]interface{}, colName string, errMap map[string]int) (value interface{}, err error) {
 	var ok bool
@@ -1241,6 +1240,17 @@ func _setAny(dstPtr interface{}, value interface{}) error {
 		return nil // leave as-is
 	}
 	var err error
+	// n, ok := value.(godror.Number)
+	n, ok := value.(driver.Valuer)
+	if ok {
+		v, e := n.Value()
+		if e == nil {
+			err = _setAny(dstPtr, v)
+		} else {
+			err = e
+		}
+		return err
+	}
 	switch d := dstPtr.(type) {
 	case *string:
 		err = _setString(d, value)
@@ -1260,10 +1270,8 @@ func _setAny(dstPtr interface{}, value interface{}) error {
 		err = _setBool(d, value)
 	case *[]byte: // the same as uint8
 		err = _setBytes(d, value)
-	case *godror.Number:
-		err = _setNumber(d, value)
-	//case *uuid.UUID:
-	//	err = _setUUID(d, value)
+	case sql.Scanner:
+		err = _scan(d, value)
 	//case *[]string:
 	//	switch bv := value.(type) {
 	//	case []byte:

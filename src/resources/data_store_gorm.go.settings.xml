@@ -77,8 +77,6 @@
 
         <!-- oracle -->
 
-        <!-- oracle -->
-
         <!--        package model-->
 
         <!--        import (-->
@@ -142,7 +140,7 @@
 
         <!--        <type detected="java.lang.Object" target="interface{}${json}"/>-->
 
-        <!-- mysql, postgres -->
+        <!-- mysql, postgres, ms-sql -->
 
         <type detected="gorm-java.util.UUID" target="github.com/google/uuid:uuid.UUID${json-gorm}|1:;type:uuid"/>
         <!--        <type detected="gorm-java.util.UUID+auto"-->

@@ -6,8 +6,8 @@ import (
 	"database/sql/driver"
 	"errors"
 	"fmt"
-	// "github.com/google/uuid"
 	// "github.com/godror/godror"
+	// "github.com/google/uuid"
 	"io"
 	"reflect"
 	"strconv"
@@ -95,33 +95,26 @@ func (ds *_DS) Db() *sql.DB {
 /*
 
 // 	Implement "func (ds *_DS) initDb()" in an external file. This is an example:
-//
-// 	https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store_no_orm_ex.go
 
 package dbal
 
 import (
 	"database/sql"
-	// _ "github.com/mattn/go-sqlite3" // SQLite3
-	// _ "github.com/denisenkom/go-mssqldb" // SQL Server
-	// _ "github.com/godror/godror"			// Oracle
-	// only strings for MySQL (so far). see _prepareFetch below and related comments.
-	_ "github.com/go-sql-driver/mysql" // MySQL
-	// _ "github.com/ziutek/mymysql/godrv" // MySQL
-	// _ "github.com/lib/pq" // PostgeSQL
+   	// _ "github.com/mattn/go-sqlite3"      // SQLite3
+   	// _ "github.com/denisenkom/go-mssqldb" // SQL Server
+   	// _ "github.com/godror/godror"			// Oracle
+   	// _ "github.com/go-sql-driver/mysql"      // MySQL
+   	// _ "github.com/ziutek/mymysql/godrv"  // MySQL
+   	_ "github.com/lib/pq"                // PostgeSQL
 )
 
-func (ds *_DS)initDb() (err error) {
-	// === PostgeSQL ===========================
-	// ds.paramPrefix = "$"
-	// ds.db, err = sql.Open("postgres", "postgres://postgres:sa@localhost/my-tests?sslmode=disable")
-	// ds.db, err = sql.Open("postgres", "postgres://postgres:sa@localhost/my-tests?sslmode=verify-full")
+func (ds *_DS) initDb() (err error) {
 	// === SQLite3 =============================
 	// ds.db, err = sql.Open("sqlite3", "./log.sqlite")
 	// ds.db, err = sql.Open("sqlite3", "./northwindEF.sqlite")
 	// === MySQL ===============================
-	ds.db, err = sql.Open("mysql", "root:root@/sakila")
-	//ds.db, err = sql.Open("mymysql", "sakila/root/root")
+	// ds.db, err = sql.Open("mysql", "root:root@/sakila")
+	// ds.db, err = sql.Open("mymysql", "sakila/root/root")
 	// === SQL Server ==========================
 	// https://github.com/denisenkom/go-mssqldb
 	// The sqlserver driver uses normal MS SQL Server syntax and expects parameters in the
@@ -129,12 +122,16 @@ func (ds *_DS)initDb() (err error) {
 	// ensure sqlserver:// in beginning. this one is not valid:
 	// ------ ds.db, err = sql.Open("sqlserver", "sa:root@/localhost:1433/SQLExpress?database=AdventureWorks2014")
 	// this one is ok:
-	//ds.paramPrefix = "@p"
-	//ds.db, err = sql.Open("sqlserver", "sqlserver://sa:root@localhost:1433?database=AdventureWorks2014")
+	ds.paramPrefix = "@p"
+	ds.db, err = sql.Open("sqlserver", "sqlserver://sa:root@localhost:1433?database=AdventureWorks2014")
 	// === Oracle =============================
 	// "github.com/godror/godror"
 	//ds.paramPrefix = ":"
-	//ds.db, err = sql.Open("godror", `user="ORDERS" password="root" connectString="localhost:1521/orcl"`)
+	//ds.db, err = sql.Open("godror", `user="MY_TESTS" password="sa" connectString="127.0.0.1:1521/XE" timezone="Local"`)
+	// === PostgeSQL ===========================
+	ds.paramPrefix = "$"
+	ds.db, err = sql.Open("postgres", "postgres://postgres:sa@localhost/my-tests?sslmode=disable")
+	// ds.db, err = sql.Open("postgres", "postgres://postgres:sa@localhost/my-tests?sslmode=verify-full")
 	return
 }
 
@@ -1205,9 +1202,9 @@ func _setBytes(d *[]byte, value interface{}) error {
 //
 //func _setNumber(d *godror.Number, value interface{}) error {
 //	err := d.Scan(value)
-// 	if err != nil {
-// 		return assignErr(d, value, "_setNumber", err.Error())
-// 	}
+//	if err != nil {
+//		return assignErr(d, value, "_setNumber", err.Error())
+//	}
 //	return err
 //}
 
