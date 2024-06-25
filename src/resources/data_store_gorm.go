@@ -14,7 +14,7 @@ import (
 )
 
 /*
-	This file is a part of SQL DAL Maker project: https://sqldalmaker.sourceforge.net
+	This file is a part of SQL DAL Maker Project: https://sqldalmaker.sourceforge.net
 	It demonstrates how to implement an interface DataStore in Go + Gorm.
 	More about DataStore: https://sqldalmaker.sourceforge.net/preconfig.html#ds
 	Recent version: https://github.com/panedrone/sqldalmaker/blob/master/src/resources/data_store_gorm.go
@@ -30,7 +30,7 @@ import (
 	Copy-paste this code to your project and change it for your needs.
 	Improvements are welcome: sqldalmaker@gmail.com
 
-	Demo project: https://github.com/panedrone/sdm_demo_todolist_golang
+	Demo project: https://github.com/panedrone/sdm_todolist_go_react_16_npm_sqlite3
 */
 
 type DataStore interface {
