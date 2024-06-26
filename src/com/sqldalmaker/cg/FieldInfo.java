@@ -27,6 +27,8 @@ public class FieldInfo {
 
     private String rendered_name;
 
+    private String lower_camel_case;
+
     private String rendered_type;
     private final String original_type;
     private final String original_scalar_type;
@@ -104,6 +106,9 @@ public class FieldInfo {
                 this.rendered_name = this.rendered_name.replace("[", "");  // [OrderDetails].OrderID
                 this.rendered_name = this.rendered_name.replace("]", "");  // [OrderDetails].OrderID
             }
+
+            this.lower_camel_case = Helpers.lower_camel_case(rendered_name);
+
             // don't apply to callback-params
             if (FieldNamesMode.LOWER_CAMEL_CASE.equals(field_names_mode)) {
                 this.rendered_name = Helpers.lower_camel_case(this.rendered_name);
@@ -114,6 +119,7 @@ public class FieldInfo {
                 this.name_prefix = "_";
             }
         }
+
         this.comment = comment;
     }
 
@@ -134,8 +140,7 @@ public class FieldInfo {
     }
 
     public String getLowerCamelCaseName() { // for Golang VM template
-        String res = Helpers.lower_camel_case(this.rendered_name);
-        return res;
+        return lower_camel_case;
     }
 
     public String getType() { // this method is for use in VM templates

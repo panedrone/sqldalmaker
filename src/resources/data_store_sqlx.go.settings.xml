@@ -75,41 +75,7 @@
         <!--        <type detected="byte[]" target="[]byte${json} -> SetBytes"/>-->
         <!--        <type detected="java.lang.Object" target="interface{}${json}"/>-->
 
-        <!-- oracle -->
-
-        <!--        <type detected="sqlx-java.lang.Double"-->
-        <!--              target="github.com/godror/godror:godror.Number${json-sqlx} -> SetNumber"/>-->
-        <!--        <type detected="sqlx-java.math.BigDecimal"-->
-        <!--              target="github.com/godror/godror:godror.Number${json-sqlx} -> SetNumber"/>-->
-        <!--        <type detected="sqlx-java.math.BigDecimal+auto"-->
-        <!--              target="github.com/godror/godror:godror.Number${json-sqlx}|1:;autoIncrement -> SetNumber"/>-->
-
-        <!--        <type detected="sqlx-java.lang.String" target="string${json-sqlx} -> SetString"/>-->
-
-        <!--        <type detected="sqlx-java.util.Date" target="time:time.Time${json-sqlx} -> SetTime"/>-->
-        <!--        <type detected="sqlx-java.time.ZonedDateTime" target="time:time.Time${json-sqlx} -> SetTime"/>-->
-        <!--        <type detected="sqlx-java.time.LocalDateTime" target="time:time.Time${json-sqlx} -> SetTime"/>-->
-
-        <!--        <type detected="sqlx-byte[]" target="string${json-sqlx}"/>-->
-        <!--        <type detected="sqlx-java.lang.Boolean" target="int64${json-sqlx} -> SetBool"/>-->
-
-        <!--        <type detected="sqlx-java.lang.Object" target="interface{}${json-sqlx}"/>-->
-
-        <!--        <type detected="java.lang.Double" target="github.com/godror/godror:godror.Number${json} -> SetNumber"/>-->
-        <!--        <type detected="java.math.BigDecimal" target="github.com/godror/godror:godror.Number${json} -> SetNumber"/>-->
-
-        <!--        <type detected="java.lang.String" target="string${json} -> SetString"/>-->
-
-        <!--        <type detected="java.util.Date" target="time:time.Time${json} -> SetTime"/>-->
-        <!--        <type detected="java.time.ZonedDateTime" target="time:time.Time${json} -> SetTime"/>-->
-        <!--        <type detected="java.time.LocalDateTime" target="time:time.Time${json-sqlx} -> SetTime"/>-->
-
-        <!--        <type detected="byte[]" target="string${json}"/>-->
-        <!--        <type detected="java.lang.Boolean" target="int64${json} -> SetBool"/>-->
-
-        <!--        <type detected="java.lang.Object" target="interface{}${json}"/>-->
-
-        <!-- mysql, postgres -->
+        <!-- mysql, postgres, sql server  -->
 
         <type detected="sqlx-java.util.UUID" target="github.com/google/uuid:uuid.UUID${json-sqlx}|1:;type:uuid"/>
         <type detected="sqlx-java.util.UUID+auto"
@@ -156,6 +122,37 @@
 
         <type detected="java.sql.ResultSet" target="string"/> <!-- PG cursor param -->
 
+        <!-- oracle -->
+
+        <!--        <type detected="sqlx-java.lang.Double" target="float64${json} -> SetFloat64"/>-->
+        <!--        <type detected="sqlx-java.math.BigDecimal"-->
+        <!--              target="github.com/godror/godror:godror.Number${json-sqlx} -> SetNum"/>-->
+
+        <!--        <type detected="sqlx-java.lang.String" target="string${json-sqlx} -> SetString"/>-->
+
+        <!--        <type detected="sqlx-java.util.Date" target="${json-sqlx-time}"/>-->
+        <!--        <type detected="sqlx-java.time.ZonedDateTime" target="${json-sqlx-time}"/>-->
+        <!--        <type detected="sqlx-java.time.LocalDateTime" target="${json-sqlx-time}"/>-->
+
+        <!--        <type detected="sqlx-byte[]" target="string${json-sqlx}"/>-->
+        <!--        <type detected="sqlx-java.lang.Boolean" target="int64${json-sqlx} -> SetBool"/>-->
+
+        <!--        <type detected="sqlx-java.lang.Object" target="interface{}${json-sqlx}"/>-->
+
+        <!--        <type detected="java.lang.Double" target="float64${json} -> SetFloat64"/>-->
+        <!--        <type detected="java.math.BigDecimal" target="github.com/godror/godror:godror.Number${json} -> SetNum"/>-->
+
+        <!--        <type detected="java.lang.String" target="string${json} -> SetString"/>-->
+
+        <!--        <type detected="java.util.Date" target="${json-time}"/>-->
+        <!--        <type detected="java.time.ZonedDateTime" target="${json-time}"/>-->
+        <!--        <type detected="java.time.LocalDateTime" target="${json-time}"/>-->
+
+        <!--        <type detected="byte[]" target="string${json}"/>-->
+        <!--        <type detected="java.lang.Boolean" target="int64${json} -> SetBool"/>-->
+
+        <!--        <type detected="java.lang.Object" target="interface{}${json}"/>-->
+
     </type-map>
 
     <macros>
@@ -168,11 +165,15 @@
 
         <macro name="${col}" value="${lower_snake_case(column)}"/>
 
+        <macro name="${json-sqlx}" value=" `json:&quot;${col}${0}&quot; db:&quot;${column}&quot;`"/>
+
         <macro name="${json}" value=" `json:&quot;${col}${0}&quot;`"/>
 
-        <macro name="${json-sqlx}"
-               value=" `json:&quot;${col}${0}&quot; db:&quot;${column}&quot;`"/>
+        <macro name="${json-sqlx-time}" value="time:time.Time${json-sqlx} -> SetTime"/>
+
+        <macro name="${json-time}" value="time:time.Time${json} -> SetTime"/>
 
     </macros>
+
 
 </settings>

@@ -65,14 +65,6 @@
         <!--        <type detected="byte[]" target="[]byte${json} -> SetBytes"/>-->
         <!--        <type detected="java.lang.Object" target="interface{}${json}"/>-->
 
-        <!-- oracle -->
-
-        <!--        <type detected="java.math.BigDecimal" target="github.com/godror/godror:godror.Number${json} -> SetNumber"/>-->
-        <!--        <type detected="java.lang.String" target="string${json} -> SetString"/>-->
-        <!--        <type detected="java.util.Date" target="time:time.Time${json} -> SetTime"/>-->
-        <!--        <type detected="byte[]" target="string${json} -> SetBytes"/>-->
-        <!--        <type detected="java.lang.Object" target="interface{}${json}"/>-->
-
         <!-- mysql, postgres -->
 
         <type detected="java.util.UUID" target="github.com/google/uuid:uuid.UUID${json} -> SetUUID"/>
@@ -95,6 +87,23 @@
 
         <type detected="java.lang.Object" target="interface{}${json}"/>
 
+        <!-- oracle -->
+
+        <!--        <type detected="java.math.BigDecimal" target="${json-number}"/>-->
+        <!--        <type detected="java.math.BigDecimal+auto" target="${json-number}"/>-->
+        <!--        <type detected="java.lang.Double" target="float64${json} -> SetFloat64"/>-->
+
+        <!--        <type detected="java.lang.String" target="string${json} -> SetString"/>-->
+
+        <!--        <type detected="java.util.Date" target="time:time.Time${json} -> SetTime"/>-->
+        <!--        <type detected="java.time.ZonedDateTime" target="time:time.Time${json} -> SetTime"/>-->
+        <!--        <type detected="java.time.LocalDateTime" target="time:time.Time${json} -> SetTime"/>-->
+
+        <!--        <type detected="byte[]" target="string${json} -> SetBytes"/>-->
+        <!--        <type detected="java.lang.Boolean" target="int64${json} -> SetBool"/>-->
+
+        <!--        <type detected="java.lang.Object" target="interface{}${json}"/>-->
+
     </type-map>
 
     <macros>
@@ -105,9 +114,33 @@
         <macro value="=built-in=" name="${TitleCase(column)}"/>
         <macro value="=built-in=" name="${kebab-case(column)}"/>
 
-        <macro name="${col}" value="${lower_snake_case(column)}"/>
+        <macro name="${json-col}" value="${lower_snake_case(column)}"/>
 
-        <macro name="${json}" value=" `json:&quot;${col}${0}&quot;`"/>
+        <macro name="${json}" value=" `json:&quot;${json-col}${0}&quot;`"/>
+
+        <macro name="${json-number}" value="${number-type} `json:&quot;${json-col}${0}&quot;` -> ${number-setter}"/>
+
+        <macro name="${number-type}">
+            <vm-xml>
+                <if var="$fi.Precision == 38 &amp;&amp; $fi.Scale == 0">
+                    <print var=" int64"/>
+                    <else>
+                        <print var=" github.com/godror/godror:godror.Number"/>
+                    </else>
+                </if>
+            </vm-xml>
+        </macro>
+
+        <macro name="${number-setter}">
+            <vm-xml>
+                <if var="$fi.Precision == 38 &amp;&amp; $fi.Scale == 0">
+                    <print var=" SetInt64"/>
+                    <else>
+                        <print var=" SetNum"/>
+                    </else>
+                </if>
+            </vm-xml>
+        </macro>
 
     </macros>
 
