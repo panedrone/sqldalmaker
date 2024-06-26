@@ -169,9 +169,9 @@ public class Helpers {
 
     public static String get_method_name(String method_name, FieldNamesMode field_names_mode) {
         if (FieldNamesMode.LOWER_CAMEL_CASE.equals(field_names_mode)) {
-            return to_lower_camel_or_title_case(method_name, false);
+            return lower_camel_case(method_name);
         } else if (FieldNamesMode.TITLE_CASE.equals(field_names_mode)) {
-            return to_lower_camel_or_title_case(method_name, true);
+            return title_case(method_name);
         } else if (FieldNamesMode.SNAKE_CASE.equals(field_names_mode)) {
             return camel_case_to_lower_snake_case(method_name);
         }
@@ -419,7 +419,35 @@ public class Helpers {
         }
     }
 
-    public static String to_lower_camel_or_title_case(String str, boolean title_case) {
+    final static String[] _ids = new String[]{"Id", "Uuid"};
+
+    public static String lower_camel_case(String str) {
+        String res = _lower_camel_or_title_case(str, false);
+        for (String id : _ids) {
+            if (res.equals(id)) {
+                return res.toUpperCase();
+            }
+            if (res.endsWith(id)) {
+                return res.substring(0, res.length() - id.length()) + id.toUpperCase();
+            }
+        }
+        return res;
+    }
+
+    public static String title_case(String str) {
+        String res = _lower_camel_or_title_case(str, true);
+        for (String id : _ids) {
+            if (res.equals(id)) {
+                return res.toUpperCase();
+            }
+            if (res.endsWith(id)) {
+                return res.substring(0, res.length() - id.length()) + id.toUpperCase();
+            }
+        }
+        return res;
+    }
+
+    private static String _lower_camel_or_title_case(String str, boolean title_case) {
         if (str.toUpperCase().equals(str)) {
             str = str.toLowerCase(); // "PROJECTS" --> "projects"
         }

@@ -746,7 +746,7 @@ public class GoCG {
 
         private MappingInfo _create_mapping(String[] parts) throws Exception {
             MappingInfo m = new MappingInfo();
-            m.method_param_name = Helpers.to_lower_camel_or_title_case(parts[0].trim(), false);
+            m.method_param_name = Helpers.lower_camel_case(parts[0].trim());
             String cb_param_name = String.format("%sMapper", m.method_param_name);
             m.exec_dml_param_name = cb_param_name;
             String declared_dto_class_name = parts[1].trim();

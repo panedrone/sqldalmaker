@@ -669,8 +669,8 @@ func (rx *_Rows) Scan(_fa ...interface{}) error {
 }
 
 func (rx *_Rows) toMap(data map[string]interface{}) {
-	for i, colName := range rx.colNames {
-		data[colName] = rx.values[i]
+	for i, col := range rx.colNames {
+		data[col] = rx.values[i]
 	}
 }
 
@@ -1011,8 +1011,8 @@ func (ds *_DS) formatSQL(sqlString string) string {
 
 /////////////////////////////////////////////////////////////
 
-func SetString(d *string, row map[string]interface{}, colName string, errMap map[string]int) {
-	_getValue(row, colName, errMap, func(value interface{}) error {
+func SetString(d *string, row map[string]interface{}, col string, errMap map[string]int) {
+	_copy(row, col, errMap, func(value interface{}) error {
 		return _setString(d, value)
 	})
 }
@@ -1039,8 +1039,8 @@ func _setString(d *string, value interface{}) error {
 	return nil
 }
 
-func SetInt64(d *int64, row map[string]interface{}, colName string, errMap map[string]int) {
-	_getValue(row, colName, errMap, func(value interface{}) error {
+func SetInt64(d *int64, row map[string]interface{}, col string, errMap map[string]int) {
+	_copy(row, col, errMap, func(value interface{}) error {
 		return _setInt64(d, value)
 	})
 }
@@ -1075,8 +1075,8 @@ func _setInt64(d *int64, value interface{}) error {
 	return nil
 }
 
-func SetInt(d *int, row map[string]interface{}, colName string, errMap map[string]int) {
-	_getValue(row, colName, errMap, func(value interface{}) error {
+func SetInt(d *int, row map[string]interface{}, col string, errMap map[string]int) {
+	_copy(row, col, errMap, func(value interface{}) error {
 		return _setInt(d, value)
 	})
 }
@@ -1112,8 +1112,8 @@ func _setInt(d *int, value interface{}) error {
 	return nil
 }
 
-func SetInt32(d *int32, row map[string]interface{}, colName string, errMap map[string]int) {
-	_getValue(row, colName, errMap, func(value interface{}) error {
+func SetInt32(d *int32, row map[string]interface{}, col string, errMap map[string]int) {
+	_copy(row, col, errMap, func(value interface{}) error {
 		return _setInt32(d, value)
 	})
 }
@@ -1147,8 +1147,8 @@ func _setInt32(d *int32, value interface{}) error {
 	return nil
 }
 
-func SetFloat32(d *float32, row map[string]interface{}, colName string, errMap map[string]int) {
-	_getValue(row, colName, errMap, func(value interface{}) error {
+func SetFloat32(d *float32, row map[string]interface{}, col string, errMap map[string]int) {
+	_copy(row, col, errMap, func(value interface{}) error {
 		return _setFloat32(d, value)
 	})
 }
@@ -1178,8 +1178,8 @@ func _setFloat32(d *float32, value interface{}) error {
 	return nil
 }
 
-func SetFloat64(d *float64, row map[string]interface{}, colName string, errMap map[string]int) {
-	_getValue(row, colName, errMap, func(value interface{}) error {
+func SetFloat64(d *float64, row map[string]interface{}, col string, errMap map[string]int) {
+	_copy(row, col, errMap, func(value interface{}) error {
 		return _setFloat64(d, value)
 	})
 }
@@ -1209,8 +1209,8 @@ func _setFloat64(d *float64, value interface{}) error {
 	return nil
 }
 
-func SetTime(d *time.Time, row map[string]interface{}, colName string, errMap map[string]int) {
-	_getValue(row, colName, errMap, func(value interface{}) error {
+func SetTime(d *time.Time, row map[string]interface{}, col string, errMap map[string]int) {
+	_copy(row, col, errMap, func(value interface{}) error {
 		return _setTime(d, value)
 	})
 }
@@ -1225,8 +1225,8 @@ func _setTime(d *time.Time, value interface{}) error {
 	return nil
 }
 
-func SetBool(d *bool, row map[string]interface{}, colName string, errMap map[string]int) {
-	_getValue(row, colName, errMap, func(value interface{}) error {
+func SetBool(d *bool, row map[string]interface{}, col string, errMap map[string]int) {
+	_copy(row, col, errMap, func(value interface{}) error {
 		return _setBool(d, value)
 	})
 }
@@ -1248,8 +1248,8 @@ func _setBool(d *bool, value interface{}) error {
 	return nil
 }
 
-func SetBytes(d *[]byte, row map[string]interface{}, colName string, errMap map[string]int) {
-	_getValue(row, colName, errMap, func(value interface{}) error {
+func SetBytes(d *[]byte, row map[string]interface{}, col string, errMap map[string]int) {
+	_copy(row, col, errMap, func(value interface{}) error {
 		return _setBytes(d, value)
 	})
 }
@@ -1264,8 +1264,8 @@ func _setBytes(d *[]byte, value interface{}) error {
 	return nil
 }
 
-func SetNum(d interface{}, row map[string]interface{}, colName string, errMap map[string]int) {
-	_getValue(row, colName, errMap, func(value interface{}) error {
+func SetNum(d interface{}, row map[string]interface{}, col string, errMap map[string]int) {
+	_copy(row, col, errMap, func(value interface{}) error {
 		s, ok := d.(sql.Scanner)
 		if ok {
 			return _scan(s, value)
@@ -1274,8 +1274,8 @@ func SetNum(d interface{}, row map[string]interface{}, colName string, errMap ma
 	})
 }
 
-func Scan(d sql.Scanner, row map[string]interface{}, colName string, errMap map[string]int) {
-	_getValue(row, colName, errMap, func(value interface{}) error {
+func Scan(d sql.Scanner, row map[string]interface{}, col string, errMap map[string]int) {
+	_copy(row, col, errMap, func(value interface{}) error {
 		return _scan(d, value)
 	})
 }
@@ -1288,11 +1288,11 @@ func _scan(d sql.Scanner, value interface{}) error {
 	return nil
 }
 
-func _getValue(row map[string]interface{}, colName string, errMap map[string]int, fn func(value interface{}) error) {
+func _copy(row map[string]interface{}, col string, errMap map[string]int, fn func(value interface{}) error) {
 	var ok bool
-	value, ok := row[colName]
+	value, ok := row[col]
 	if !ok {
-		key := fmt.Sprintf("[%s] column not found", colName)
+		key := fmt.Sprintf("[%s] column not found", col)
 		count, ok := errMap[key]
 		if ok {
 			errMap[key] = count + 1
@@ -1302,14 +1302,15 @@ func _getValue(row map[string]interface{}, colName string, errMap map[string]int
 		return
 	}
 	err := fn(value)
-	if err != nil {
-		key := fmt.Sprintf("[%s] %s", colName, err.Error())
-		count, ok := errMap[key]
-		if ok {
-			errMap[key] = count + 1
-		} else {
-			errMap[key] = 1
-		}
+	if err == nil {
+		return
+	}
+	key := fmt.Sprintf("[%s] %s", col, err.Error())
+	count, ok := errMap[key]
+	if ok {
+		errMap[key] = count + 1
+	} else {
+		errMap[key] = 1
 	}
 }
 
@@ -1412,8 +1413,8 @@ func SetScalarValue(dstPtr interface{}, value interface{}, errMap map[string]int
 	}
 }
 
-func SetAny(dstPtr interface{}, row map[string]interface{}, colName string, errMap map[string]int) {
-	_getValue(row, colName, errMap, func(value interface{}) error {
+func SetAny(dstPtr interface{}, row map[string]interface{}, col string, errMap map[string]int) {
+	_copy(row, col, errMap, func(value interface{}) error {
 		SetScalarValue(dstPtr, value, errMap)
 		return nil
 	})

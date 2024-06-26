@@ -309,13 +309,13 @@ class DtoClassInfo {
         macros.put("${camelCase(column)}", new IMacro() {
             @Override
             public String exec(FieldInfo fi) {
-                return Helpers.to_lower_camel_or_title_case(fi.getColumnName(), false);
+                return Helpers.lower_camel_case(fi.getColumnName());
             }
         });
         macros.put("${TitleCase(column)}", new IMacro() {
             @Override
             public String exec(FieldInfo fi) {
-                return Helpers.to_lower_camel_or_title_case(fi.getColumnName(), true);
+                return Helpers.title_case(fi.getColumnName());
             }
         });
         macros.put("${kebab-case(column)}", new IMacro() {

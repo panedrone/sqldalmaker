@@ -106,9 +106,9 @@ public class FieldInfo {
             }
             // don't apply to callback-params
             if (FieldNamesMode.LOWER_CAMEL_CASE.equals(field_names_mode)) {
-                this.rendered_name = Helpers.to_lower_camel_or_title_case(this.rendered_name, false);
+                this.rendered_name = Helpers.lower_camel_case(this.rendered_name);
             } else if (FieldNamesMode.TITLE_CASE.equals(field_names_mode)) {
-                this.rendered_name = Helpers.to_lower_camel_or_title_case(this.rendered_name, true);
+                this.rendered_name = Helpers.title_case(this.rendered_name);
             } else if (FieldNamesMode.SNAKE_CASE.equals(field_names_mode)) {
                 this.rendered_name = Helpers.camel_case_to_lower_snake_case(this.rendered_name);
                 this.name_prefix = "_";
@@ -134,7 +134,7 @@ public class FieldInfo {
     }
 
     public String getLowerCamelCaseName() { // for Golang VM template
-        String res = Helpers.to_lower_camel_or_title_case(this.rendered_name, false);
+        String res = Helpers.lower_camel_case(this.rendered_name);
         return res;
     }
 
