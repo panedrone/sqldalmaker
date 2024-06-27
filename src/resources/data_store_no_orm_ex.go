@@ -8,11 +8,11 @@ import (
 	// only strings for MySQL (so far). see _prepareFetch below and related comments.
 	_ "github.com/go-sql-driver/mysql" // MySQL
 	// _ "github.com/ziutek/mymysql/godrv" // MySQL
-	// _ "github.com/lib/pq" // PostgeSQL
+	// _ "github.com/lib/pq" // PostgreSQL
 )
 
 func (ds *_DS)initDb() (err error) {
-	// === PostgeSQL ===========================
+	// === PostgreSQL ===========================
 	// ds.paramPrefix = "$"
 	// ds.db, err = sql.Open("postgres", "postgres://postgres:sa@localhost/my-tests?sslmode=disable")
 	// ds.db, err = sql.Open("postgres", "postgres://postgres:sa@localhost/my-tests?sslmode=verify-full")

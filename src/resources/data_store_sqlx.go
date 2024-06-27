@@ -105,13 +105,13 @@ import (
    	// _ "github.com/godror/godror"			// Oracle
    	_ "github.com/go-sql-driver/mysql"      // MySQL
    	// _ "github.com/ziutek/mymysql/godrv"  // MySQL
-   	// _ "github.com/lib/pq"                // PostgeSQL
+   	// _ "github.com/lib/pq"                // PostgreSQL
 )
 
 var ds = &_DS{}
 
 func (ds *_DS) initDb() (err error) {
-	// === PostgeSQL ===========================
+	// === PostgreSQL ===========================
 	ds.paramPrefix = "$"
 	ds.db, err = sqlx.Open("postgres", "postgres://postgres:sa@localhost/my-tests?sslmode=disable")
 	// ds.db, err = sqlx.Open("postgres", "postgres://postgres:sa@localhost/my-tests?sslmode=verify-full")
@@ -1160,7 +1160,7 @@ func _setFloat32(d *float32, value interface{}) error {
 	case float64:
 		*d = float32(v)
 	case []byte:
-		str := string(v) // PostgeSQL
+		str := string(v) // PostgreSQL
 		d64, err := strconv.ParseFloat(str, 64)
 		if err != nil {
 			return assignErr(d, value, "_setFloat32", err.Error())
@@ -1191,7 +1191,7 @@ func _setFloat64(d *float64, value interface{}) error {
 	case float32:
 		*d = float64(v)
 	case []byte:
-		str := string(v) // PostgeSQL, MySQL
+		str := string(v) // PostgreSQL, MySQL
 		var err error
 		*d, err = strconv.ParseFloat(str, 64)
 		if err != nil {

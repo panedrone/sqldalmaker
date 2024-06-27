@@ -22,9 +22,13 @@ import java.util.List;
  */
 class JdbcSqlParamInfo {
 
-    static void get_jdbc_sql_params_info(
+    //
+    // get_jdbc_sql_params_info should not be used for CRUD
+    //
+    public static void get_jdbc_sql_params_info(
             Connection conn,
             JaxbTypeMap type_map,
+            JaxbMacros jaxb_macros,
             String dao_jdbc_sql,
             FieldNamesMode param_names_mode,
             String[] method_param_descriptors,
@@ -33,21 +37,20 @@ class JdbcSqlParamInfo {
         Helpers.check_duplicates(method_param_descriptors);
         PreparedStatement ps = JdbcUtils.prepare_jdbc_sql(conn, dao_jdbc_sql);
         try {
-            get_params_info(ps, type_map, param_names_mode, method_param_descriptors, res_params);
+            _get_params_info(ps, type_map, jaxb_macros, param_names_mode, method_param_descriptors, res_params);
         } finally {
             ps.close();
         }
     }
 
-    public static void get_params_info(
+    private static void _get_params_info(
             PreparedStatement ps,
             JaxbTypeMap type_map,
+            JaxbMacros jaxb_macros,
             FieldNamesMode param_names_mode,
             String[] method_param_descriptors,
             List<FieldInfo> _params) throws Exception {
-        //
-        // get_params_info should not be used for CRUD
-        //
+
         if (method_param_descriptors == null) {
             method_param_descriptors = new String[]{};
         }
@@ -63,7 +66,7 @@ class JdbcSqlParamInfo {
         // o_date BETWEEN ? AND ?'
         // and for SQL statements without parameters
         //
-        // PostgeSQL -----------------------------------
+        // PostgreSQL -----------------------------------
         // ps.getParameterMetaData() throws SQLException for both PreparedStatement and
         // CallableStatement
         int jdbc_params_count;
@@ -74,7 +77,7 @@ class JdbcSqlParamInfo {
             try {
                 jdbc_params_count = pm.getParameterCount();
             } catch (Throwable e) { // including AbstractMethodError, SQLServerException, etc.
-                _get_param_info_by_descriptors(type_map, param_names_mode, method_param_descriptors, _params);
+                _get_param_info_by_descriptors(type_map, jaxb_macros, param_names_mode, method_param_descriptors, _params);
                 return;
             }
         } catch (Throwable e) { // including AbstractMethodError, SQLServerException, etc.
@@ -92,8 +95,9 @@ class JdbcSqlParamInfo {
                 }
             } else {
                 not_cb_array_params_count++;
-                String default_param_type_name = _get_jdbc_param_type_name(pm, i);
-                FieldInfo pi = create_param_info(type_map, param_names_mode, param_descriptor, default_param_type_name);
+                String jdbc_param_type_name = _get_jdbc_param_type_name(pm, i);
+                FieldInfo base_fi = new FieldInfo(param_names_mode, jdbc_param_type_name, "base_fi", "base_fi");
+                FieldInfo pi = create_param_info(type_map, jaxb_macros, param_names_mode, param_descriptor, base_fi);
                 _params.add(pi);
             }
         }
@@ -105,13 +109,14 @@ class JdbcSqlParamInfo {
 
     private static void _get_param_info_by_descriptors(
             JaxbTypeMap type_map,
+            JaxbMacros jaxb_macros,
             FieldNamesMode param_names_mode,
             String[] method_param_descriptors,
             List<FieldInfo> res_params) throws Exception {
 
         res_params.clear();
         for (String param_descriptor : method_param_descriptors) {
-            FieldInfo pi = create_param_info(type_map, param_names_mode, param_descriptor, Object.class.getName());
+            FieldInfo pi = create_param_info(type_map, jaxb_macros, param_names_mode, param_descriptor, null);
             res_params.add(pi);
         }
     }
@@ -134,24 +139,27 @@ class JdbcSqlParamInfo {
     }
 
     public static FieldInfo create_param_info(
-            JaxbTypeMap type_map,
+            JaxbTypeMap jaxb_type_map,
+            JaxbMacros jaxb_macros,
             FieldNamesMode param_names_mode,
             String param_descriptor,
-            String default_param_type_name) throws Exception {
+            FieldInfo base_fi) throws Exception {
 
-        String param_type_name;
-        String param_name;
         String[] parts = Helpers.parse_param_descriptor(param_descriptor);
-        if (parts[0] == null) {
-            param_type_name = default_param_type_name;
-            param_name = param_descriptor;
+        String param_name = parts[1];
+        String target_type_name;
+        if (parts[0] == null || parts[0].trim().isEmpty()) {
+            if (base_fi == null) {
+                target_type_name = jaxb_type_map.get_target_type_name(Object.class.getName());
+            } else {
+                target_type_name = jaxb_type_map.get_target_type_name(base_fi.getType());
+                target_type_name = jaxb_macros.process_fi(base_fi, target_type_name); // perform parsing using base_fi
+            }
         } else {
-            param_type_name = parts[0];
-            param_name = parts[1];
+            target_type_name = jaxb_type_map.get_target_type_name(parts[0]);
         }
-        FieldInfo res = new FieldInfo(param_names_mode, param_type_name, param_name, "parameter");
-        param_type_name = type_map.get_target_type_name(param_type_name);
-        res.refine_rendered_type(param_type_name);
+        FieldInfo res = new FieldInfo(param_names_mode, Object.class.getName(), param_name, "parameter");
+        res.refine_rendered_type(target_type_name);
         return res;
     }
 }

@@ -137,7 +137,7 @@ public class JdbcUtils {
         } else {
             param_names_mode = dto_field_names_mode;
         }
-        JdbcSqlParamInfo.get_jdbc_sql_params_info(conn, jaxb_type_map, dao_jdbc_sql, param_names_mode, method_param_descriptors, res_params);
+        JdbcSqlParamInfo.get_jdbc_sql_params_info(conn, jaxb_type_map, jaxb_macros, dao_jdbc_sql, param_names_mode, method_param_descriptors, res_params);
     }
 
     // DAO. CRUD -----------------------------------------------

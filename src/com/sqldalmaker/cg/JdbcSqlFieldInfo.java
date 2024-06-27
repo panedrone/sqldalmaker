@@ -82,6 +82,7 @@ class JdbcSqlFieldInfo {
             } */
             }
         }
+
     }
 
     private static ResultSetMetaData _get_rs_md(PreparedStatement ps) throws Exception {

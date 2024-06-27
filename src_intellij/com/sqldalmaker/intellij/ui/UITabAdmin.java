@@ -673,7 +673,7 @@ public class UITabAdmin {
         gbc.gridy = 0;
         pnl_php.add(doctrineORMButton, gbc);
         btn_php_pg = new JButton();
-        btn_php_pg.setText("postgesql");
+        btn_php_pg.setText("postgres");
         gbc = new GridBagConstraints();
         gbc.gridx = 2;
         gbc.gridy = 0;

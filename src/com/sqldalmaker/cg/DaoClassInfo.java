@@ -193,10 +193,8 @@ class DaoClassInfo {
         }
         for (int i = 0; i < method_param_descriptors.length; i++) {
             String param_descriptor = method_param_descriptors[i];
-            FieldInfo fi = fields_filter.get(i);
-            String curr_type = fi.getType();
-            String default_param_type_name = jaxb_type_map.get_target_type_name(curr_type);
-            FieldInfo pi = JdbcSqlParamInfo.create_param_info(jaxb_type_map, param_names_mode, param_descriptor, default_param_type_name);
+            FieldInfo base_fi = fields_filter.get(i);
+            FieldInfo pi = JdbcSqlParamInfo.create_param_info(jaxb_type_map, jaxb_macros, param_names_mode, param_descriptor, base_fi);
             res_params.add(pi);
         }
     }
@@ -277,6 +275,11 @@ class DaoClassInfo {
             Map<String, FieldInfo> dao_fields_map = new HashMap<String, FieldInfo>();
             // no model!
             JdbcSqlFieldInfo.get_field_info_by_jdbc_sql("", conn, dto_field_names_mode, dao_query_jdbc_sql, "", dao_fields_map, dao_fields_jdbc);
+            for (FieldInfo fi : dao_fields_jdbc) {
+                String target_type = jaxb_type_map.get_target_type_name(fi.getType());
+                target_type = jaxb_macros.process_fi(fi, target_type);
+                fi.refine_rendered_type(target_type);
+            }
         } catch (Exception e) {
             error.append(e.getMessage());
         }
@@ -354,7 +357,7 @@ class DaoClassInfo {
         } else {
             _get_custom_sql_fields_info(sql_root_abs_path, dao_query_jdbc_sql,
                     jaxb_dto_or_return_type, jaxb_return_type_is_dto, jaxb_dto_classes, res_fields);
-            JdbcSqlParamInfo.get_jdbc_sql_params_info(conn, jaxb_type_map, dao_query_jdbc_sql, param_names_mode, method_param_descriptors, res_params);
+            JdbcSqlParamInfo.get_jdbc_sql_params_info(conn, jaxb_type_map, jaxb_macros, dao_query_jdbc_sql, param_names_mode, method_param_descriptors, res_params);
         }
         for (FieldInfo fi : res_fields) {
             String type_name = jaxb_type_map.get_target_type_name(fi.getType());

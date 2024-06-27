@@ -44,7 +44,7 @@
     <ide event-log="true"/>
 
     <!--    <jdbc jar="lib/sqlite-jdbc-3.45.1.0.jar" class="org.sqlite.JDBC"-->
-    <!--          url="jdbc:sqlite:$PROJECT_DIR$/todolist.sqlite" user="" pwd=""/>-->
+    <!--          url="jdbc:sqlite:$PROJECT_DIR$/db/todolist.sqlite" user="" pwd=""/>-->
 
     <!--    <jdbc jar="ojdbc10.jar" class="oracle.jdbc.driver.OracleDriver"-->
     <!--          url="jdbc:oracle:thin:@localhost:1521/XE" user="todolist" pwd="sa"/>-->
@@ -198,15 +198,15 @@
         <macro value="=built-in=" name="${TitleCase(column)}"/>
         <macro value="=built-in=" name="${kebab-case(column)}"/>
 
-        <macro name="${col}" value="${lower_snake_case(column)}"/>
+        <macro name="${json-col}" value="${lower_snake_case(column)}"/>
 
-        <macro name="${json}" value=" `json:&quot;${col}${0}&quot;`"/>
+        <macro name="${json}" value=" `json:&quot;${json-col}${0}&quot;`"/>
 
         <macro name="${json-gorm}"
-               value=" `json:&quot;${col}${0}&quot; gorm:&quot;column:${column}${gorm-params}${1}&quot;`"/>
+               value=" `json:&quot;${json-col}${0}&quot; gorm:&quot;column:${column}${gorm-params}${1}&quot;`"/>
 
         <macro name="${json-gorm-ora-identity}"
-               value=" `json:&quot;${col}${0}&quot; gorm:&quot;column:${column}${gorm-ora-identity}${1}&quot;`"/>
+               value=" `json:&quot;${json-col}${0}&quot; gorm:&quot;column:${column}${gorm-ora-identity}${1}&quot;`"/>
 
         <macro name="${json-gorm-time}" value="time:time.Time${json-gorm} -> SetTime"/>
         <macro name="${json-time}" value="time:time.Time${json} -> SetTime"/>
@@ -221,9 +221,9 @@
         </macro>
 
         <macro name="${json-gorm-ora-num}"
-               value="${num-type} `json:&quot;${col}${0}&quot; gorm:&quot;column:${column}${gorm-num-params}${1}&quot;`"/>
+               value="${ora-num} `json:&quot;${json-col}${0}&quot; gorm:&quot;column:${column}${gorm-num-params}${1}&quot;`"/>
 
-        <macro name="${num-type}">
+        <macro name="${ora-num}">
             <vm-xml>
                 <if var="$fi.Precision == 38 &amp;&amp; $fi.Scale == 0">
                     <print var=" int64"/>

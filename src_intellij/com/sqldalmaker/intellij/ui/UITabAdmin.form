@@ -170,7 +170,7 @@
                           <gridbag weightx="0.0" weighty="0.0"/>
                         </constraints>
                         <properties>
-                          <text value="postgesql"/>
+                          <text value="postgres"/>
                         </properties>
                       </component>
                       <component id="aefe3" class="javax.swing.JButton" binding="btn_doctrine">

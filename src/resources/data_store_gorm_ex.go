@@ -19,7 +19,7 @@ func (ds *_DS) initDb() (err error) {
 	//ds.rootDb, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
 	//	Logger: logger.Default.LogMode(logger.Info),
 	//})
-	// === PostgeSQL ===========================
+	// === PostgreSQL ===========================
 	//dsn := "host=localhost user=postgres password=sa dbname=my_tests port=5432 sslmode=disable"
 	//ds.rootDb, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
 	//	Logger: logger.Default.LogMode(logger.Info),

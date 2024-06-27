@@ -7,14 +7,14 @@ import (
 	// _ "github.com/godror/godror"			// Oracle
 	// _ "github.com/go-sql-driver/mysql"   // MySQL
 	// _ "github.com/ziutek/mymysql/godrv"  // MySQL
-	// _ "github.com/lib/pq"                // PostgeSQL
+	// _ "github.com/lib/pq"                // PostgreSQL
 )
 
 var ds = &_DS{}
 
 func (ds *_DS) initDb() (err error) {
 	ds.db, err = sqlx.Open("sqlite3", "./todolist.sqlite")
-	// === PostgeSQL ===========================
+	// === PostgreSQL ===========================
 	//ds.paramPrefix = "$"
 	//ds.db, err = sqlx.Open("postgres", "postgres://postgres:sa@localhost/my-tests?sslmode=disable")
 	// ds.db, err = sqlx.Open("postgres", "postgres://postgres:sa@localhost/my-tests?sslmode=verify-full")

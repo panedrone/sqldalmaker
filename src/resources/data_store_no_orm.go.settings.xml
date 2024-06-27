@@ -43,17 +43,17 @@
 
     <ide event-log="true"/>
 
-    <jdbc jar="lib/sqlite-jdbc-3.42.0.0.jar" class="org.sqlite.JDBC"
-          url="jdbc:sqlite:$PROJECT_DIR$/todolist.sqlite" user="" pwd=""/>
+    <!--    <jdbc jar="lib/sqlite-jdbc-3.45.1.0.jar" class="org.sqlite.JDBC"-->
+    <!--          url="jdbc:sqlite:$PROJECT_DIR$/db/todolist.sqlite" user="" pwd=""/>-->
 
     <!--    <jdbc jar="ojdbc10.jar" class="oracle.jdbc.driver.OracleDriver"-->
     <!--          url="jdbc:oracle:thin:@localhost:1521/XE" user="todolist" pwd="sa"/>-->
 
-    <!--    <jdbc jar="mysql-connector-java-8.0.13.jar" class="com.mysql.cj.jdbc.Driver"-->
-    <!--          url="jdbc:mysql://localhost/todolist" user="root" pwd="sa"/>-->
+    <!--    <jdbc jar="mysql-connector-j-8.4.0.jar"-->
+    <!--          class="com.mysql.cj.jdbc.Driver" url="jdbc:mysql://localhost/orders" user="root" pwd="sa"/>-->
 
-    <!--    <jdbc jar="postgresql-42.3.4.jar" class="org.postgresql.Driver"-->
-    <!--          url="jdbc:postgresql://localhost:5432/todolist" user="postgres" pwd="sa" />-->
+    <jdbc jar="postgresql-42.7.3.jar" class="org.postgresql.Driver"
+          url="jdbc:postgresql://localhost/orders" user="postgres" pwd="sa"/>
 
     <type-map default="">
 
@@ -65,7 +65,7 @@
         <!--        <type detected="byte[]" target="[]byte${json} -> SetBytes"/>-->
         <!--        <type detected="java.lang.Object" target="interface{}${json}"/>-->
 
-        <!-- mysql, postgres -->
+        <!-- mysql, postgres, sql server -->
 
         <type detected="java.util.UUID" target="github.com/google/uuid:uuid.UUID${json} -> SetUUID"/>
         <type detected="java.sql.Array" target="[]string${json}"/>
@@ -89,20 +89,20 @@
 
         <!-- oracle -->
 
-        <!--        <type detected="java.math.BigDecimal" target="${json-number}"/>-->
-        <!--        <type detected="java.math.BigDecimal+auto" target="${json-number}"/>-->
+        <!--        <type detected="java.math.BigDecimal" target="${json-ora-num}"/>-->
+        <!--        <type detected="java.math.BigDecimal+auto" target="${json-ora-num}"/>-->
         <!--        <type detected="java.lang.Double" target="float64${json} -> SetFloat64"/>-->
 
         <!--        <type detected="java.lang.String" target="string${json} -> SetString"/>-->
 
-        <!--        <type detected="java.util.Date" target="time:time.Time${json} -> SetTime"/>-->
-        <!--        <type detected="java.time.ZonedDateTime" target="time:time.Time${json} -> SetTime"/>-->
-        <!--        <type detected="java.time.LocalDateTime" target="time:time.Time${json} -> SetTime"/>-->
+        <!--        <type detected="java.util.Date" target="${json-time}"/>-->
+        <!--        <type detected="java.time.ZonedDateTime" target="${json-time}"/>-->
+        <!--        <type detected="java.time.LocalDateTime" target="${json-time}"/>-->
 
         <!--        <type detected="byte[]" target="string${json} -> SetBytes"/>-->
         <!--        <type detected="java.lang.Boolean" target="int64${json} -> SetBool"/>-->
 
-        <!--        <type detected="java.lang.Object" target="interface{}${json}"/>-->
+        <!--        <type detected="java.lang.Object" target="interface{}{$json}"/>-->
 
     </type-map>
 
@@ -118,25 +118,16 @@
 
         <macro name="${json}" value=" `json:&quot;${json-col}${0}&quot;`"/>
 
-        <macro name="${json-number}" value="${number-type} `json:&quot;${json-col}${0}&quot;` -> ${number-setter}"/>
+        <macro name="${json-time}" value="time:time.Time${json} -> SetTime"/>
 
-        <macro name="${number-type}">
+        <macro name="${json-ora-num}" value="${ora-num} `json:&quot;${json-col}${0}&quot;` -> SetNum"/>
+
+        <macro name="${ora-num}">
             <vm-xml>
                 <if var="$fi.Precision == 38 &amp;&amp; $fi.Scale == 0">
                     <print var=" int64"/>
                     <else>
                         <print var=" github.com/godror/godror:godror.Number"/>
-                    </else>
-                </if>
-            </vm-xml>
-        </macro>
-
-        <macro name="${number-setter}">
-            <vm-xml>
-                <if var="$fi.Precision == 38 &amp;&amp; $fi.Scale == 0">
-                    <print var=" SetInt64"/>
-                    <else>
-                        <print var=" SetNum"/>
                     </else>
                 </if>
             </vm-xml>

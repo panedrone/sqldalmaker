@@ -137,7 +137,7 @@ func (ds *_DS) initDb() (err error) {
 	//ds.rootDb, err = gorm.Open(sqlite.Open("./todolist.sqlite"), &gorm.Config{
 	//	Logger: logger.Default.LogMode(logger.Info),
 	//})
-	// === PostgeSQL ===========================
+	// === PostgreSQL ===========================
 	// ds.paramPrefix = "$"
 	//dsn := "host=localhost user=postgres password=sa dbname=my_tests port=5432 sslmode=disable"
 	//ds.rootDb, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
@@ -1063,7 +1063,7 @@ func _setFloat32(d *float32, value interface{}) error {
 	case float64:
 		*d = float32(v)
 	case []byte:
-		str := string(v) // PostgeSQL
+		str := string(v) // PostgreSQL
 		d64, err := strconv.ParseFloat(str, 64)
 		if err != nil {
 			return assignErr(d, value, "_setFloat32", err.Error())
@@ -1094,7 +1094,7 @@ func _setFloat64(d *float64, value interface{}) error {
 	case float32:
 		*d = float64(v)
 	case []byte:
-		str := string(v) // PostgeSQL, MySQL
+		str := string(v) // PostgreSQL, MySQL
 		var err error
 		*d, err = strconv.ParseFloat(str, 64)
 		if err != nil {

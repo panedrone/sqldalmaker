@@ -43,17 +43,17 @@
 
     <ide event-log="true"/>
 
-    <jdbc jar="lib/sqlite-jdbc-3.42.0.0.jar" class="org.sqlite.JDBC"
-          url="jdbc:sqlite:$PROJECT_DIR$/todolist.sqlite" user="" pwd=""/>
+    <!--    <jdbc jar="lib/sqlite-jdbc-3.45.1.0.jar" class="org.sqlite.JDBC"-->
+    <!--          url="jdbc:sqlite:$PROJECT_DIR$/db/todolist.sqlite" user="" pwd=""/>-->
 
     <!--    <jdbc jar="ojdbc10.jar" class="oracle.jdbc.driver.OracleDriver"-->
     <!--          url="jdbc:oracle:thin:@localhost:1521/XE" user="todolist" pwd="sa"/>-->
 
-    <!--    <jdbc jar="mysql-connector-java-8.0.13.jar" class="com.mysql.cj.jdbc.Driver"-->
-    <!--          url="jdbc:mysql://localhost/todolist" user="root" pwd="sa"/>-->
+    <!--    <jdbc jar="mysql-connector-j-8.4.0.jar"-->
+    <!--          class="com.mysql.cj.jdbc.Driver" url="jdbc:mysql://localhost/orders" user="root" pwd="sa"/>-->
 
-    <!--    <jdbc jar="postgresql-42.3.4.jar" class="org.postgresql.Driver"-->
-    <!--          url="jdbc:postgresql://localhost:5432/todolist" user="postgres" pwd="sa" />-->
+    <jdbc jar="postgresql-42.7.3.jar" class="org.postgresql.Driver"
+          url="jdbc:postgresql://localhost/orders" user="postgres" pwd="sa"/>
 
     <type-map default="">
 
@@ -124,9 +124,9 @@
 
         <!-- oracle -->
 
-        <!--        <type detected="sqlx-java.lang.Double" target="float64${json} -> SetFloat64"/>-->
-        <!--        <type detected="sqlx-java.math.BigDecimal"-->
-        <!--              target="github.com/godror/godror:godror.Number${json-sqlx} -> SetNum"/>-->
+        <!--        <type detected="sqlx-java.lang.Double" target="float64${json-sqlx} -> SetFloat64"/>-->
+        <!--        <type detected="sqlx-java.math.BigDecimal" target="${json-sqlx-ora-num}"/>-->
+        <!--        <type detected="sqlx-java.math.BigDecimal+auto" target="${json-sqlx-ora-num}"/>-->
 
         <!--        <type detected="sqlx-java.lang.String" target="string${json-sqlx} -> SetString"/>-->
 
@@ -140,7 +140,8 @@
         <!--        <type detected="sqlx-java.lang.Object" target="interface{}${json-sqlx}"/>-->
 
         <!--        <type detected="java.lang.Double" target="float64${json} -> SetFloat64"/>-->
-        <!--        <type detected="java.math.BigDecimal" target="github.com/godror/godror:godror.Number${json} -> SetNum"/>-->
+        <!--        <type detected="java.math.BigDecimal" target="${json-ora-num}"/>-->
+        <!--        <type detected="java.math.BigDecimal+auto" target="${json-ora-num}"/>-->
 
         <!--        <type detected="java.lang.String" target="string${json} -> SetString"/>-->
 
@@ -163,17 +164,32 @@
         <macro value="=built-in=" name="${TitleCase(column)}"/>
         <macro value="=built-in=" name="${kebab-case(column)}"/>
 
-        <macro name="${col}" value="${lower_snake_case(column)}"/>
+        <macro name="${json-col}" value="${lower_snake_case(column)}"/>
 
-        <macro name="${json-sqlx}" value=" `json:&quot;${col}${0}&quot; db:&quot;${column}&quot;`"/>
+        <macro name="${json-sqlx}" value=" `json:&quot;${json-col}${0}&quot; db:&quot;${column}&quot;`"/>
 
-        <macro name="${json}" value=" `json:&quot;${col}${0}&quot;`"/>
+        <macro name="${json}" value=" `json:&quot;${json-col}${0}&quot;`"/>
 
         <macro name="${json-sqlx-time}" value="time:time.Time${json-sqlx} -> SetTime"/>
 
         <macro name="${json-time}" value="time:time.Time${json} -> SetTime"/>
 
-    </macros>
+        <macro name="${json-sqlx-ora-num}"
+               value="${ora-num} `json:&quot;${json-col}${0}&quot; db:&quot;${column}&quot;` -> SetNum"/>
 
+        <macro name="${json-ora-num}" value="${ora-num} `json:&quot;${json-col}${0}&quot;` -> SetNum"/>
+
+        <macro name="${ora-num}">
+            <vm-xml>
+                <if var="$fi.Precision == 38 &amp;&amp; $fi.Scale == 0">
+                    <print var=" int64"/>
+                    <else>
+                        <print var=" github.com/godror/godror:godror.Number"/>
+                    </else>
+                </if>
+            </vm-xml>
+        </macro>
+
+    </macros>
 
 </settings>
