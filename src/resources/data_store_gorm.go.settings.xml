@@ -174,7 +174,8 @@
         <!--        <type detected="gorm-java.lang.Object" target="interface{}${json-gorm}"/>-->
 
         <!--        <type detected="java.lang.Double" target="float64$${json} -> SetFloat64"/>-->
-        <!--        <type detected="java.math.BigDecimal" target="github.com/godror/godror:godror.Number${json} -> SetNum"/>-->
+        <!--        <type detected="java.math.BigDecimal" target="${json-ora-num}"/>-->
+        <!--        <type detected="java.math.BigDecimal+auto" target="${json-ora-num}"/>-->
 
         <!--        <type detected="java.lang.String" target="string${json} -> SetString"/>-->
 
@@ -188,7 +189,6 @@
         <!--        <type detected="java.lang.Object" target="interface{}${json}"/>-->
 
     </type-map>
-
 
     <macros>
 
@@ -229,6 +229,19 @@
                     <print var=" int64"/>
                     <else>
                         <print var=" OraNum"/>
+                    </else>
+                </if>
+            </vm-xml>
+        </macro>
+
+        <macro name="${json-ora-num}" value="${ora-num2} `json:&quot;${json-col}${0}&quot;` -> SetNum"/>
+
+        <macro name="${ora-num2}">
+            <vm-xml>
+                <if var="$fi.Precision == 38 &amp;&amp; $fi.Scale == 0">
+                    <print var=" int64"/>
+                    <else>
+                        <print var=" github.com/godror/godror:godror.Number"/>
                     </else>
                 </if>
             </vm-xml>
