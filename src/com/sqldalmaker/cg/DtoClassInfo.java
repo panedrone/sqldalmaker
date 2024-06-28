@@ -6,9 +6,7 @@
 package com.sqldalmaker.cg;
 
 import com.sqldalmaker.jaxb.sdm.DtoClass;
-import com.sqldalmaker.jaxb.settings.Macros;
 
-import java.io.StringWriter;
 import java.sql.Connection;
 
 import java.util.HashSet;
@@ -210,27 +208,24 @@ class DtoClassInfo {
 
     private void _refine_fi_by_type_map_and_macros(FieldInfo fi, String type_name) throws Exception {
         type_name = type_name.trim();
-        String target_type;
+        String target_type_name;
         int local_field_type_params_start = type_name.indexOf('|');
         if (local_field_type_params_start == -1) { // explicit_type_name only, no parameters "int64"
             String type_map_target_type = jaxb_type_map.get_target_type_name(type_name);
-            target_type = _parse_target_type(fi, type_map_target_type);
+            target_type_name = _parse_target_type(fi, type_map_target_type);
         } else {
             if (local_field_type_params_start == 0) { // "|0: hello0|1:hello1"
                 String detected_jdbc_type_name = fi.getOriginalType(); // !!! original
                 String type_map_target_type = jaxb_type_map.get_target_type_name(detected_jdbc_type_name);
-                target_type = _parse_target_type(fi, type_map_target_type + type_name);
+                target_type_name = _parse_target_type(fi, type_map_target_type + type_name);
             } else { // "{type}|0:Integer|1:hello1"
-                String local_field_type_explicit = type_name.substring(0, local_field_type_params_start).trim();
-                String parsed_target_type = _parse_target_type(fi, local_field_type_explicit);
-                String local_field_type_params = type_name.substring(local_field_type_params_start);
-                target_type = parsed_target_type + local_field_type_params;
+                target_type_name = _parse_target_type(fi, type_name);
             }
         }
-        fi.refine_rendered_type(target_type);
+        fi.refine_rendered_type(target_type_name);
     }
 
-    private String _parse_target_type(FieldInfo fi, String target) throws Exception {
-        return jaxb_macros.process_fi(fi, target);
+    private String _parse_target_type(FieldInfo fi, String target_type_name) throws Exception {
+        return jaxb_macros.parse_target_type_name(target_type_name, fi);
     }
 }

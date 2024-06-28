@@ -277,7 +277,7 @@ class DaoClassInfo {
             JdbcSqlFieldInfo.get_field_info_by_jdbc_sql("", conn, dto_field_names_mode, dao_query_jdbc_sql, "", dao_fields_map, dao_fields_jdbc);
             for (FieldInfo fi : dao_fields_jdbc) {
                 String target_type = jaxb_type_map.get_target_type_name(fi.getType());
-                target_type = jaxb_macros.process_fi(fi, target_type);
+                target_type = jaxb_macros.parse_target_type_name(target_type, fi);
                 fi.refine_rendered_type(target_type);
             }
         } catch (Exception e) {

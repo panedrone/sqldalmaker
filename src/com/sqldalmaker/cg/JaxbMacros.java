@@ -17,11 +17,10 @@ import java.util.*;
  */
 class JaxbMacros {
 
-    private final Map<String, String> built_in = new HashMap<String, String>();
     private final Map<String, String> custom = new HashMap<String, String>();
     private final Map<String, Macros.Macro> custom_vm = new HashMap<String, Macros.Macro>();
 
-    JaxbMacros(Macros jaxb_macros) {
+    public JaxbMacros(Macros jaxb_macros) {
         if (jaxb_macros == null) {
             return;
         }
@@ -33,28 +32,14 @@ class JaxbMacros {
                     custom_vm.put(name, m);
                 }
             } else {
-                if (value.equals("=built-in=")) {
-                    built_in.put(name, value);
-                } else {
+                if (!value.equals("=built-in=")) {
                     custom.put(name, value);
                 }
             }
         }
     }
 
-    public Set<String> get_vm_macro_names() {
-        return custom_vm.keySet();
-    }
-
-    public String get_custom(String name) {
-        return custom.get(name);
-    }
-
-    public Macros.Macro get_vm_macro(String name) {
-        return custom_vm.get(name);
-    }
-
-    private static String _substitute_type_params(String type_name) throws Exception {
+    private static String _substitute_type_params(String type_name) {
         int local_field_type_params_start = type_name.indexOf('|');
         Map<String, String> params = new HashMap<String, String>();
         if (local_field_type_params_start != -1) {
@@ -106,13 +91,14 @@ class JaxbMacros {
         return res;
     }
 
-    public String process_fi(FieldInfo fi, String target_type_name) throws Exception {
-        String curr_type = _parse_target_type_recursive(0, fi, target_type_name);
-        curr_type = _substitute_built_in_macros(curr_type, fi.getColumnName());
-        return _substitute_type_params(curr_type);
+    public String parse_target_type_name(final String target_type_name, FieldInfo base_fi) throws Exception {
+        String parsed = _parse_target_type_recursive(0, target_type_name, base_fi);
+        parsed = _substitute_built_in_macros(parsed, base_fi);
+        String no_params = _substitute_type_params(parsed);
+        return no_params;
     }
 
-    private String _parse_target_type_recursive(int depth, FieldInfo fi, String target_type_name) throws Exception {
+    private String _parse_target_type_recursive(int depth, String target_type_name, FieldInfo base_fi) throws Exception {
         if (depth > 100) {
             throw new Exception("depth overflow: " + target_type_name);
         }
@@ -120,12 +106,12 @@ class JaxbMacros {
         boolean found = false;
         for (String m_name : custom.keySet()) {
             if (res.contains(m_name)) { // single replacement in one pass
-                res = res.replace(m_name, get_custom(m_name));
+                res = res.replace(m_name, custom.get(m_name));
                 found = true;
             }
         }
         if (!found) {
-            String tmp = _substitute_vm_macros(fi, res);
+            String tmp = _substitute_custom_vm_macros(base_fi, res);
             if (tmp != null) {
                 res = tmp; // single replacement in one pass
                 found = true;
@@ -134,17 +120,16 @@ class JaxbMacros {
         if (!found) {
             return res;
         }
-        res = _parse_target_type_recursive(depth + 1, fi, res);
-        return res;
+        return _parse_target_type_recursive(depth + 1, res, base_fi);
     }
 
-    private String _substitute_vm_macros(FieldInfo fi, String target_type_name) throws Exception {
-        for (String m_name : get_vm_macro_names()) {
+    private String _substitute_custom_vm_macros(FieldInfo fi, String target_type_name) throws Exception {
+        for (String m_name : custom_vm.keySet()) {
             if (!target_type_name.contains(m_name)) {
                 continue;
             }
             String vm_template;
-            Macros.Macro vm_macro = get_vm_macro(m_name);
+            Macros.Macro vm_macro = custom_vm.get(m_name);
             if (vm_macro.getVm() != null) {
                 vm_template = vm_macro.getVm().trim();
             } else if (vm_macro.getVmXml() != null) {
@@ -165,45 +150,45 @@ class JaxbMacros {
     }
 
     private interface IMacro {
-        String exec(String col_name);
+        String exec(FieldInfo base_fi);
     }
 
     private static Map<String, IMacro> _get_built_in_macros() {
         Map<String, IMacro> macros = new HashMap<String, IMacro>();
         macros.put("${lower_snake_case(column)}", new IMacro() {
             @Override
-            public String exec(String col_name) {
-                return Helpers.camel_case_to_lower_snake_case(col_name);
+            public String exec(FieldInfo base_fi) {
+                return Helpers.camel_case_to_lower_snake_case(base_fi.getColumnName());
             }
         });
         macros.put("${camelCase(column)}", new IMacro() {
             @Override
-            public String exec(String col_name) {
-                return Helpers.lower_camel_case(col_name);
+            public String exec(FieldInfo base_fi) {
+                return Helpers.lower_camel_case(base_fi.getColumnName());
             }
         });
         macros.put("${TitleCase(column)}", new IMacro() {
             @Override
-            public String exec(String col_name) {
-                return Helpers.title_case(col_name);
+            public String exec(FieldInfo base_fi) {
+                return Helpers.title_case(base_fi.getColumnName());
             }
         });
         macros.put("${kebab-case(column)}", new IMacro() {
             @Override
-            public String exec(String col_name) {
-                return Helpers.to_kebab_case(col_name);
+            public String exec(FieldInfo base_fi) {
+                return Helpers.to_kebab_case(base_fi.getColumnName());
             }
         });
         macros.put("${column}", new IMacro() {
             @Override
-            public String exec(String col_name) {
-                return col_name;
+            public String exec(FieldInfo base_fi) {
+                return base_fi.getColumnName();
             }
         });
         return macros;
     }
 
-    private static String _substitute_built_in_macros(String curr_type, String col_name) {
+    private static String _substitute_built_in_macros(String curr_type, FieldInfo base_fi) {
         Map<String, IMacro> built_in_macros = _get_built_in_macros();
         if (curr_type.isEmpty()) {
             return curr_type;
@@ -212,7 +197,7 @@ class JaxbMacros {
             if (!curr_type.contains(name)) {
                 continue;
             }
-            String value = built_in_macros.get(name).exec(col_name);
+            String value = built_in_macros.get(name).exec(base_fi);
             curr_type = curr_type.replace(name, value);
         }
         return curr_type;

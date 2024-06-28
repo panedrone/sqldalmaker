@@ -67,7 +67,7 @@
 
         <!-- mysql, postgres, sql server -->
 
-        <type detected="java.util.UUID" target="github.com/google/uuid:uuid.UUID${json} -> SetUUID"/>
+        <type detected="java.util.UUID" target="github.com/google/uuid:uuid.UUID${json} -> Scan"/>
         <type detected="java.sql.Array" target="[]string${json}"/>
 
         <type detected="java.lang.Short" target="int16${json} -> SetInt16"/>

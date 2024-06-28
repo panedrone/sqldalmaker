@@ -153,7 +153,7 @@ class JdbcSqlParamInfo {
                 target_type_name = jaxb_type_map.get_target_type_name(Object.class.getName());
             } else {
                 target_type_name = jaxb_type_map.get_target_type_name(base_fi.getType());
-                target_type_name = jaxb_macros.process_fi(base_fi, target_type_name); // perform parsing using base_fi
+                target_type_name = jaxb_macros.parse_target_type_name(target_type_name, base_fi); // use base_fi for parsing
             }
         } else {
             target_type_name = jaxb_type_map.get_target_type_name(parts[0]);
