@@ -112,7 +112,7 @@
         <type detected="java.math.BigDecimal" target="float64${json} -> SetFloat64"/>
 
         <type detected="java.lang.String" target="string${json} -> SetString"/>
-        <type detected="byte[]" target="string${json} -> SetBytes"/>
+        <type detected="byte[]" target="[]byte${json} -> SetBytes"/>
         <type detected="java.lang.Boolean" target="bool${json} -> SetBool"/>
 
         <type detected="java.util.Date" target="time:time.Time${json} -> SetTime"/>

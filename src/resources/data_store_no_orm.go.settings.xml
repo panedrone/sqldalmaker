@@ -60,8 +60,10 @@
         <!-- sqlite3 -->
 
         <!--        <type detected="java.lang.Integer" target="int64${json} -> SetInt64"/>-->
+        <!--        <type detected="java.lang.Float" target="float32${json} -> SetFloat32"/>-->
         <!--        <type detected="java.lang.Double" target="float64${json} -> SetFloat64"/>-->
         <!--        <type detected="java.lang.String" target="string${json} -> SetString"/>-->
+        <!--        <type detected="java.util.Date" target="time:time.Time${json} -> SetTime"/>-->
         <!--        <type detected="byte[]" target="[]byte${json} -> SetBytes"/>-->
         <!--        <type detected="java.lang.Object" target="interface{}${json}"/>-->
 
@@ -92,6 +94,7 @@
         <!--        <type detected="java.math.BigDecimal" target="${json-ora-num}"/>-->
         <!--        <type detected="java.math.BigDecimal+auto" target="${json-ora-num}"/>-->
         <!--        <type detected="java.lang.Double" target="float64${json} -> SetFloat64"/>-->
+        <!--        <type detected="java.lang.Float" target="float32${json} -> SetFloat32"/>-->
 
         <!--        <type detected="java.lang.String" target="string${json} -> SetString"/>-->
 
