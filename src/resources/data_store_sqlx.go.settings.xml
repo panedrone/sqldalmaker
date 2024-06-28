@@ -92,7 +92,7 @@
         <type detected="sqlx-java.math.BigDecimal" target="float64${json-sqlx} -> SetFloat64"/>
 
         <type detected="sqlx-java.lang.String" target="string${json-sqlx} -> SetString"/>
-        <type detected="sqlx-byte[]" target="string${json-sqlx}"/>
+        <type detected="sqlx-byte[]" target="[]byte${json-sqlx} -> SetBytes"/>
         <type detected="sqlx-java.lang.Boolean" target="bool${json-sqlx} -> SetBool"/>
 
         <type detected="sqlx-java.util.Date" target="time:time.Time${json-sqlx} -> SetTime"/>
@@ -112,7 +112,7 @@
         <type detected="java.math.BigDecimal" target="float64${json} -> SetFloat64"/>
 
         <type detected="java.lang.String" target="string${json} -> SetString"/>
-        <type detected="byte[]" target="string${json} -> "/>
+        <type detected="byte[]" target="string${json} -> SetBytes"/>
         <type detected="java.lang.Boolean" target="bool${json} -> SetBool"/>
 
         <type detected="java.util.Date" target="time:time.Time${json} -> SetTime"/>
