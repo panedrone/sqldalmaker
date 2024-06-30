@@ -40,7 +40,7 @@ import com.sqldalmaker.jaxb.sdm.DtoClass;
  * 11.05.2021 05:21 1.201
  * 22.03.2021 21:19
  * 15.05.2020 19:11
- * 
+ *
  */
 public class JaxbUtils {
 
@@ -87,7 +87,8 @@ public class JaxbUtils {
                 return cls.getName();
             }
         }
-        throw new Exception("XML element not found <dao-class ref=\"" + file_name + "\"");    }
+        throw new Exception("XML element not found <dao-class ref=\"" + file_name + "\"");
+    }
 
     public static void process_jaxb_dao_class(
             IDaoCG dao_cg,

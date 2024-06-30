@@ -129,29 +129,29 @@ public class IdeaActionGroup extends ActionGroup implements AlwaysVisibleActionG
         drop_down_actions_list.add(action_validate);
     }
 
-    private void add_open_dao_target_action(
-            Project project,
-            VirtualFile root_file,
-            VirtualFile xml_file,
-            List<AnAction> drop_down_actions_list) {
-
-        SdmAction action_goto_target = new SdmAction("Open Target") {
-            @Override
-            public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
-                try {
-                    Settings settings = IdeaHelpers.load_settings(root_file);
-                    String xml_file_path = xml_file.getPath();
-                    List<DaoClass> jaxb_dao_classes = IdeaHelpers.load_all_sdm_dao_classes(root_file);
-                    String dao_class_name = JaxbUtils.get_dao_class_name_by_dao_xml_path(jaxb_dao_classes, xml_file_path);
-                    IdeaTargetLanguageHelpers.open_target_dao_sync(project, root_file, settings, dao_class_name);
-                } catch (Exception e) {
-                    // e.printStackTrace();
-                    IdeaMessageHelpers.show_error_in_ui_thread(e);
-                }
-            }
-        };
-        drop_down_actions_list.add(action_goto_target);
-    }
+//    private void add_open_dao_target_action(
+//            Project project,
+//            VirtualFile root_file,
+//            VirtualFile xml_file,
+//            List<AnAction> drop_down_actions_list) {
+//
+//        SdmAction action_goto_target = new SdmAction("Open Target") {
+//            @Override
+//            public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
+//                try {
+//                    Settings settings = IdeaHelpers.load_settings(root_file);
+//                    String xml_file_path = xml_file.getPath();
+//                    List<DaoClass> jaxb_dao_classes = IdeaHelpers.load_all_sdm_dao_classes(root_file);
+//                    String dao_class_name = JaxbUtils.get_dao_class_name_by_dao_xml_path(jaxb_dao_classes, xml_file_path);
+//                    IdeaTargetLanguageHelpers.open_target_dao_sync(project, root_file, settings, dao_class_name);
+//                } catch (Exception e) {
+//                    // e.printStackTrace();
+//                    IdeaMessageHelpers.show_error_in_ui_thread(e);
+//                }
+//            }
+//        };
+//        drop_down_actions_list.add(action_goto_target);
+//    }
 
     private boolean add_xml_file_actions(Project project, List<AnAction> drop_down_actions_list) throws Exception {
         FileEditorManager fm = FileEditorManager.getInstance(project);
@@ -191,7 +191,7 @@ public class IdeaActionGroup extends ActionGroup implements AlwaysVisibleActionG
         }
         if (Helpers.is_sdm_xml(name) || Helpers.is_dao_xml(name)) {
             String root_file_rel_path = IdeaHelpers.get_relative_path(project, root_file);
-            SdmAction action = new SdmAction(String.format("%s -> Open", root_file_rel_path)) {
+            SdmAction action = new SdmAction(root_file_rel_path) {
                 @Override
                 public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
                     try {
@@ -203,9 +203,9 @@ public class IdeaActionGroup extends ActionGroup implements AlwaysVisibleActionG
             };
             drop_down_actions_list.add(action);
         }
-        if (Helpers.is_dao_xml(name)) {
-            add_open_dao_target_action(project, root_file, xml_file, drop_down_actions_list);
-        }
+//        if (Helpers.is_dao_xml(name)) {
+//            add_open_dao_target_action(project, root_file, xml_file, drop_down_actions_list);
+//        }
         return true;
     }
 

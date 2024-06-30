@@ -47,12 +47,6 @@ public class EclipseToolbarDynamicMenu extends ContributionItem {
 		super(id);
 	}
 
-	private static void add_item_no_items(Menu menu) {
-		MenuItem menuItem = new MenuItem(menu, SWT.PUSH, 0);
-		menuItem.setText("(empty)");
-		menuItem.setEnabled(false);
-	}
-
 	private static int add_xml_file_actions(Menu menu, int index, IProject[] projects) {
 		IWorkbenchWindow win = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 		IWorkbenchPage page = win.getActivePage();
@@ -136,21 +130,25 @@ public class EclipseToolbarDynamicMenu extends ContributionItem {
 			}
 		}
 		if (is_sdm_xml || is_dao_xml) {
-			add_goto_root_file(menu, projects, index, is_dao_xml, current_xml_file_rel_path, root_file);
+			add_goto_root_file(menu, projects, index++, current_xml_file_rel_path, root_file);
 		}
+//		if (is_dao_xml) {
+//			add_goto_target_menu(menu, index++, current_xml_file_rel_path, root_file);
+//		}
+		new MenuItem(menu, SWT.SEPARATOR, index++);
 		return index;
 	}
 
-	private static void add_goto_root_file(Menu menu, IProject[] projects, int index, boolean is_dao_xml,
+	private static void add_goto_root_file(Menu menu, IProject[] projects, final int index,
 			String current_xml_file_rel_path, IFile root_file) {
 
-		MenuItem menuItem = new MenuItem(menu, SWT.PUSH, index++);
+		MenuItem menuItem = new MenuItem(menu, SWT.PUSH, index);
 		String path = root_file.getFullPath().toPortableString();
 		if (path.startsWith("/")) {
 			path = path.substring(1);
 		}
 		String root_file_rel_path = path;
-		menuItem.setText(String.format("%s -> Open", root_file_rel_path));
+		menuItem.setText(root_file_rel_path);
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				try {
@@ -161,51 +159,40 @@ public class EclipseToolbarDynamicMenu extends ContributionItem {
 				}
 			}
 		});
-		if (is_dao_xml) {
-			try {
-				add_goto_target_menu(menu, index++, current_xml_file_rel_path, root_file);
-			} catch (Exception e1) {
-				e1.printStackTrace();
-				EclipseMessageHelpers.show_error(e1);
-			}
-		}
-		new MenuItem(menu, SWT.SEPARATOR, index++);
 	}
 
-	private static void add_goto_target_menu(Menu menu, int index, String current_xml_file_rel_path, IFile root_file)
-			throws Exception {
-
-		MenuItem menuItem = new MenuItem(menu, SWT.PUSH, index);
-		menuItem.setText("Open Target");
-		menuItem.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				try {
-					List<DaoClass> jaxb_dao_classes = EclipseHelpers.load_all_sdm_dao_classes(root_file);
-					String dao_class_name = JaxbUtils.get_dao_class_name_by_dao_xml_path(jaxb_dao_classes,
-							current_xml_file_rel_path);
-					Settings settings = EclipseHelpers.load_settings(root_file);
-					String root_file_nm = root_file.getName();
-					IProject project = root_file.getProject();
-					IFile target_file = EclipseTargetLanguageHelpers.find_source_file_in_project_tree(project, settings,
-							dao_class_name, settings.getDao().getScope(), root_file_nm);
-					IWorkbenchWindow win = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-					Shell active_shell = win.getShell();
-					EclipseEditorHelpers.open_editor_sync(active_shell, target_file);
-				} catch (Exception e1) {
-					e1.printStackTrace();
-					EclipseMessageHelpers.show_error(e1);
-				}
-			}
-		});
-	}
+//	private static void add_goto_target_menu(Menu menu, final int index, String current_xml_file_rel_path,
+//			IFile root_file) {
+//
+//		MenuItem menuItem = new MenuItem(menu, SWT.PUSH, index);
+//		menuItem.setText("Open Target");
+//		menuItem.addSelectionListener(new SelectionAdapter() {
+//			public void widgetSelected(SelectionEvent e) {
+//				try {
+//					List<DaoClass> jaxb_dao_classes = EclipseHelpers.load_all_sdm_dao_classes(root_file);
+//					String dao_class_name = JaxbUtils.get_dao_class_name_by_dao_xml_path(jaxb_dao_classes,
+//							current_xml_file_rel_path);
+//					Settings settings = EclipseHelpers.load_settings(root_file);
+//					String root_file_nm = root_file.getName();
+//					IProject project = root_file.getProject();
+//					IFile target_file = EclipseTargetLanguageHelpers.find_source_file_in_project_tree(project, settings,
+//							dao_class_name, settings.getDao().getScope(), root_file_nm);
+//					IWorkbenchWindow win = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+//					Shell active_shell = win.getShell();
+//					EclipseEditorHelpers.open_editor_sync(active_shell, target_file);
+//				} catch (Exception e1) {
+//					e1.printStackTrace();
+//					EclipseMessageHelpers.show_error(e1);
+//				}
+//			}
+//		});
+//	}
 
 	@Override
 	public void fill(Menu menu, int index) {
 		IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
 		List<String> root_file_titles = EclipseToolbarUtils.get_root_file_titles(projects);
-		if (root_file_titles.isEmpty()) {
-			add_item_no_items(menu);
-		} else {
+		if (root_file_titles.size() > 1) {
 			index = add_xml_file_actions(menu, index, projects);
 			for (String root_file_title : root_file_titles) {
 				MenuItem menuItem = new MenuItem(menu, SWT.PUSH, index++);
@@ -222,7 +209,6 @@ public class EclipseToolbarDynamicMenu extends ContributionItem {
 				});
 			}
 		}
-
 		MenuItem menuItem = new MenuItem(menu, SWT.PUSH, index++);
 		menuItem.setText("About");
 		menuItem.addSelectionListener(new SelectionAdapter() {
