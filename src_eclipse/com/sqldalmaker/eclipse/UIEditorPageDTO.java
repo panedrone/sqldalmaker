@@ -60,6 +60,7 @@ import com.sqldalmaker.common.InternalException;
 import com.sqldalmaker.common.SdmUtils;
 import com.sqldalmaker.jaxb.sdm.DtoClass;
 import com.sqldalmaker.jaxb.settings.Settings;
+import org.eclipse.jface.resource.ImageDescriptor;
 
 /**
  * @author sqldalmaker@gmail.com
@@ -89,6 +90,7 @@ public class UIEditorPageDTO extends Composite {
 
 	private ToolBarManager toolBarManager;
 	private ToolBar toolBar1;
+	private Action action_goto_xml_tag;
 
 	/**
 	 * Create the composite.
@@ -98,6 +100,7 @@ public class UIEditorPageDTO extends Composite {
 	 */
 	public UIEditorPageDTO(Composite parent, int style) {
 		super(parent, style);
+		createActions();
 		createToolbarActions();
 		addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(DisposeEvent e) {
@@ -123,6 +126,7 @@ public class UIEditorPageDTO extends Composite {
 		toolkit.adapt(toolBar1);
 		toolkit.paintBordersFor(toolBar1);
 		toolBarManager.add(action_openXml);
+		toolBarManager.add(action_goto_xml_tag);
 		toolBarManager.add(action_openSQL);
 		toolBarManager.add(action_open_target);
 		toolBarManager.add(action_genTmpFieldTags);
@@ -171,7 +175,7 @@ public class UIEditorPageDTO extends Composite {
 					}
 				}
 				if (clicked_column_index == 0) {
-					open_sdm_xml();
+					goto_xml_tag();
 				} else if (clicked_column_index == 1) {
 					open_sql();
 				} else {
@@ -204,6 +208,17 @@ public class UIEditorPageDTO extends Composite {
 		tableViewer.addFilter(filter);
 		// http://www.java2s.com/Open-Source/Java-Document/IDE-Eclipse/ui/org/eclipse/ui/forms/examples/internal/rcp/SingleHeaderEditor.java.htm
 		toolBarManager.update(true);
+	}
+	private void createActions() {
+		{
+			action_goto_xml_tag = new Action("") {				@Override
+				public void run() {
+					goto_xml_tag();
+				}
+			};
+			action_goto_xml_tag.setImageDescriptor(ImageDescriptor.createFromFile(UIEditorPageDTO.class, "/img/xmldoc_16x16.gif"));
+			action_goto_xml_tag.setToolTipText("Go to XML tag (double-click a cell in the leftmost column)");
+		}
 	}
 
 	private void createToolbarActions() {
@@ -268,7 +283,7 @@ public class UIEditorPageDTO extends Composite {
 					open_sdm_xml();
 				}
 			};
-			action_openXml.setToolTipText("Find selected item in 'sdm.xml' (double-click one of the left-most cells)");
+			action_openXml.setToolTipText("Open 'sdm.xml'");
 			action_openXml
 					.setImageDescriptor(ResourceManager.getImageDescriptor(UIEditorPageDTO.class, "/img/xmldoc.gif"));
 		}
@@ -543,7 +558,7 @@ public class UIEditorPageDTO extends Composite {
 		}
 	}
 
-	protected void open_sdm_xml() {
+	protected void goto_xml_tag() {
 		try {
 			IFile file = editor2.find_sdm_xml();
 			if (file == null) {
@@ -555,6 +570,19 @@ public class UIEditorPageDTO extends Composite {
 				return;
 			}
 			EclipseXmlAttrHelpers.goto_sdm_class_declaration(getShell(), file, items.get(0).get_name());
+		} catch (Throwable e) {
+			e.printStackTrace();
+			EclipseMessageHelpers.show_error(e);
+		}
+	}
+
+	protected void open_sdm_xml() {
+		try {
+			IFile file = editor2.find_sdm_xml();
+			if (file == null) {
+				throw new InternalException("File not found: " + Const.SDM_XML);
+			}
+			EclipseEditorHelpers.open_editor_sync(getShell(), file);
 		} catch (Throwable e) {
 			e.printStackTrace();
 			EclipseMessageHelpers.show_error(e);

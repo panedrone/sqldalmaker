@@ -136,34 +136,40 @@ public class EclipseToolbarDynamicMenu extends ContributionItem {
 			}
 		}
 		if (is_sdm_xml || is_dao_xml) {
-			MenuItem menuItem = new MenuItem(menu, SWT.PUSH, index++);
-			menuItem.setText("Open SDM-Root");
-			menuItem.addSelectionListener(new SelectionAdapter() {
-				public void widgetSelected(SelectionEvent e) {
-					try {
-						String path = root_file.getFullPath().toPortableString();
-						if (path.startsWith("/")) {
-							path = path.substring(1);
-						}
-						String root_file_rel_path = path;
-						EclipseToolbarUtils.open_root_file(root_file_rel_path, projects);
-					} catch (Exception e1) {
-						e1.printStackTrace();
-						EclipseMessageHelpers.show_error(e1);
-					}
-				}
-			});
-			if (is_dao_xml) {
+			add_goto_root_file(menu, projects, index, is_dao_xml, current_xml_file_rel_path, root_file);
+		}
+		return index;
+	}
+
+	private static void add_goto_root_file(Menu menu, IProject[] projects, int index, boolean is_dao_xml,
+			String current_xml_file_rel_path, IFile root_file) {
+
+		MenuItem menuItem = new MenuItem(menu, SWT.PUSH, index++);
+		String path = root_file.getFullPath().toPortableString();
+		if (path.startsWith("/")) {
+			path = path.substring(1);
+		}
+		String root_file_rel_path = path;
+		menuItem.setText(String.format("%s -> Open", root_file_rel_path));
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
 				try {
-					add_goto_target_menu(menu, index++, current_xml_file_rel_path, root_file);
+					EclipseToolbarUtils.open_root_file(root_file_rel_path, projects);
 				} catch (Exception e1) {
 					e1.printStackTrace();
 					EclipseMessageHelpers.show_error(e1);
 				}
 			}
-			new MenuItem(menu, SWT.SEPARATOR, index++);
+		});
+		if (is_dao_xml) {
+			try {
+				add_goto_target_menu(menu, index++, current_xml_file_rel_path, root_file);
+			} catch (Exception e1) {
+				e1.printStackTrace();
+				EclipseMessageHelpers.show_error(e1);
+			}
 		}
-		return index;
+		new MenuItem(menu, SWT.SEPARATOR, index++);
 	}
 
 	private static void add_goto_target_menu(Menu menu, int index, String current_xml_file_rel_path, IFile root_file)
@@ -175,7 +181,8 @@ public class EclipseToolbarDynamicMenu extends ContributionItem {
 			public void widgetSelected(SelectionEvent e) {
 				try {
 					List<DaoClass> jaxb_dao_classes = EclipseHelpers.load_all_sdm_dao_classes(root_file);
-					String dao_class_name = JaxbUtils.get_dao_class_name_by_dao_xml_path(jaxb_dao_classes, current_xml_file_rel_path);
+					String dao_class_name = JaxbUtils.get_dao_class_name_by_dao_xml_path(jaxb_dao_classes,
+							current_xml_file_rel_path);
 					Settings settings = EclipseHelpers.load_settings(root_file);
 					String root_file_nm = root_file.getName();
 					IProject project = root_file.getProject();

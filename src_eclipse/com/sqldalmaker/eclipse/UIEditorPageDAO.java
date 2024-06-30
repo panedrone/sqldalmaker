@@ -220,7 +220,7 @@ public class UIEditorPageDAO extends Composite {
 				}
 			};
 			action_openSdmXml
-					.setToolTipText("Find selected item in 'sdm.xml' (double-click one of the left-most cells)");
+					.setToolTipText("Open 'sdm.xml'");
 			action_openSdmXml
 					.setImageDescriptor(ResourceManager.getImageDescriptor(UIEditorPageDAO.class, "/img/xmldoc.gif"));
 		}
@@ -287,7 +287,7 @@ public class UIEditorPageDAO extends Composite {
 					open_detailed_dao_xml();
 				}
 			};
-			action_openDaoXmlFile.setToolTipText("Navigate to XML definition (double-click one of the middle cells)");
+			action_openDaoXmlFile.setToolTipText("Navigate to XML definition (double-click a cell in the middle column)");
 			action_openDaoXmlFile
 					.setImageDescriptor(ImageDescriptor.createFromFile(UIEditorPageDAO.class, "/img/xmldoc_16x16.gif"));
 		}
