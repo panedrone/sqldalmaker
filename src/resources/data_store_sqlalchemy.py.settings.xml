@@ -47,6 +47,9 @@
         <type detected="sa-java.math.BigDecimal" target="${sa-type}|0:Float"/>
 
         <type detected="sa-java.util.Date" target="${sa-type}|0:DateTime"/>
+        <type detected="sa-java.time.ZonedDateTime" target="${sa-type}|0:DateTime"/>
+        <type detected="sa-ava.time.LocalDateTime" target="${sa-type}|0:DateTime"/>
+
         <type detected="sa-java.lang.String" target="${sa-type}|0:String"/>
         <type detected="sa-java.lang.Boolean" target="${sa-type}|0:Boolean"/>
         <type detected="sa-byte[]" target="${sa-type}|0:LargeBinary"/>
@@ -63,7 +66,10 @@
         <type detected="java.lang.Float" target="float"/>
         <type detected="java.math.BigDecimal" target="float"/>
 
-        <type detected="java.util.Date" target="str"/>
+        <type detected="java.util.Date" target="datetime.datetime"/>
+        <type detected="java.time.ZonedDateTime" target="datetime.datetime"/>
+        <type detected="java.time.LocalDateTime" target="datetime.datetime"/>
+
         <type detected="java.lang.String" target="str"/>
         <type detected="java.lang.Boolean" target="bool"/>
         <type detected="byte[]" target="bytes"/>

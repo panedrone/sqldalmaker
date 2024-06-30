@@ -276,6 +276,7 @@ def init_ds(db: flask_sqlalchemy.SQLAlchemy):
     Float = db.Float
 
     DateTime = db.DateTime
+    # DateTime = db.TIMESTAMP(timezone=True)
 
     String = db.String
     Boolean = db.Boolean

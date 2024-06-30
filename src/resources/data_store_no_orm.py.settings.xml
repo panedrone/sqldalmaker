@@ -33,7 +33,10 @@
         <type detected="java.lang.Float" target="float"/>
         <type detected="java.math.BigDecimal" target="float"/>
 
-        <type detected="java.util.Date" target="str"/>
+        <type detected="java.util.Date" target="datetime.datetime"/>
+        <type detected="java.time.ZonedDateTime" target="datetime.datetime"/>
+        <type detected="java.time.LocalDateTime" target="datetime.datetime"/>
+
         <type detected="java.lang.String" target="str"/>
         <type detected="java.lang.Boolean" target="bool"/>
         <type detected="byte[]" target="bytes"/>

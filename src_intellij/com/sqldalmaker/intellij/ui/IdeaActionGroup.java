@@ -190,11 +190,11 @@ public class IdeaActionGroup extends ActionGroup implements AlwaysVisibleActionG
             add_dao_actions(project, drop_down_actions_list, xml_file);
         }
         if (Helpers.is_sdm_xml(name) || Helpers.is_dao_xml(name)) {
-            SdmAction action = new SdmAction("Open SDM-Root") {
+            String root_file_rel_path = IdeaHelpers.get_relative_path(project, root_file);
+            SdmAction action = new SdmAction(String.format("%s -> Open", root_file_rel_path)) {
                 @Override
                 public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
                     try {
-                        String root_file_rel_path = IdeaHelpers.get_relative_path(project, root_file);
                         IdeaEditorHelpers.open_project_file_in_editor_sync(anActionEvent.getProject(), root_file_rel_path);
                     } catch (Exception e) {
                         IdeaMessageHelpers.add_error_to_ide_log("ERROR", e.getMessage());

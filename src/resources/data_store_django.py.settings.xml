@@ -42,6 +42,9 @@
         <type detected="dj-java.math.BigDecimal+auto" target="${dj-type}|0:BigAutoField"/>
 
         <type detected="dj-java.util.Date" target="${dj-type}|0:DateTimeField"/>
+        <type detected="dj-java.time.ZonedDateTime" target="${dj-type}|0:DateTimeField"/>
+        <type detected="dj-java.time.LocalDateTime" target="${dj-type}|0:DateTimeField"/>
+
         <type detected="dj-java.lang.String" target="${dj-type}|0:CharField"/>
         <type detected="dj-java.lang.Boolean" target="${dj-type}|0:BooleanField"/>
         <type detected="dj-byte[]" target="${dj-type}|0:BinaryField"/>
@@ -73,7 +76,10 @@
         <type detected="java.lang.Float" target="float"/>
         <type detected="java.math.BigDecimal" target="float"/>
 
-        <type detected="java.util.Date" target="str"/>
+        <type detected="java.util.Date" target="datetime.datetime"/>
+        <type detected="java.time.ZonedDateTime" target="datetime.datetime"/>
+        <type detected="java.time.LocalDateTime" target="datetime.datetime"/>
+
         <type detected="java.lang.String" target="str"/>
         <type detected="java.lang.Boolean" target="bool"/>
         <type detected="byte[]" target="bytes"/>

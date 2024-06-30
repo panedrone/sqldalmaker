@@ -21,7 +21,7 @@
 import sqlalchemy.orm
 
 
-from sqlalchemy.dialects import oracle
+# from sqlalchemy.dialects import oracle
 
 
 class OutParam:
@@ -186,16 +186,16 @@ ForeignKey = sqlalchemy.ForeignKey
 
 # if oracle:
 #
-SmallInteger = oracle.NUMBER
-Integer = oracle.NUMBER
-BigInteger = oracle.NUMBER
+# SmallInteger = oracle.NUMBER
+# Integer = oracle.NUMBER
+# BigInteger = oracle.NUMBER
 
-Numeric = oracle.NUMBER
-Float = oracle.NUMBER
+# Numeric = oracle.NUMBER
+# Float = oracle.NUMBER
 
 # unlike default "Float", INSERT works correctly with IDENTITY columns like
 # g_id = Column('G_ID', NUMBER, primary_key=True, autoincrement=True)
-NUMBER = oracle.NUMBER
+# NUMBER = oracle.NUMBER
 
 # https://stackoverflow.com/questions/64903159/convert-oracle-datatypes-to-sqlalchemy-types
 # https://docs.sqlalchemy.org/en/14/dialects/oracle.html
@@ -203,25 +203,26 @@ NUMBER = oracle.NUMBER
 #     This type has no special Python behavior, except that it subclasses
 #     :class:`_types.DateTime`; this is to suit the fact that the Oracle
 #     ``DATE`` type supports a time value.
-DateTime = oracle.DATE  # (timezone=False)
+# DateTime = oracle.DATE  # (timezone=False)
 
-String = oracle.NVARCHAR
-Boolean = oracle.LONG
-LargeBinary = oracle.BLOB
+# String = oracle.NVARCHAR
+# Boolean = oracle.LONG
+# LargeBinary = oracle.BLOB
 #
 # else:
 
-# SmallInteger = sqlalchemy.SmallInteger
-# Integer = sqlalchemy.Integer
-# BigInteger = sqlalchemy.BigInteger
-#
-# Float = sqlalchemy.Float
-#
-# DateTime = sqlalchemy.DateTime
-#
-# String = sqlalchemy.String
-# Boolean = sqlalchemy.Boolean
-# LargeBinary = sqlalchemy.LargeBinary
+SmallInteger = sqlalchemy.SmallInteger
+Integer = sqlalchemy.Integer
+BigInteger = sqlalchemy.BigInteger
+
+Float = sqlalchemy.Float
+
+DateTime = sqlalchemy.DateTime
+# DateTime = db.TIMESTAMP(timezone=True)
+
+String = sqlalchemy.String
+Boolean = sqlalchemy.Boolean
+LargeBinary = sqlalchemy.LargeBinary
 
 
 # --------------------------------------------------------------------------------------------
