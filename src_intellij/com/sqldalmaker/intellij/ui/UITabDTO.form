@@ -34,7 +34,22 @@
                   <opaque value="false"/>
                   <preferredSize width="32" height="32"/>
                   <text value=""/>
-                  <toolTipText value="Find selected item in 'sdm.xml' (double-click one the left-most cells)"/>
+                  <toolTipText value="Open 'sdm.xml'"/>
+                </properties>
+              </component>
+              <component id="55340" class="javax.swing.JButton" binding="btn_goto_detailed_dao_xml">
+                <constraints/>
+                <properties>
+                  <borderPainted value="false"/>
+                  <contentAreaFilled value="false"/>
+                  <icon value="img/xmldoc_12x12.gif"/>
+                  <margin top="0" left="0" bottom="0" right="0"/>
+                  <maximumSize width="32" height="32"/>
+                  <minimumSize width="32" height="32"/>
+                  <opaque value="false"/>
+                  <preferredSize width="32" height="32"/>
+                  <text value=""/>
+                  <toolTipText value="Navigate to XML definition (double-click one of the middle cells)"/>
                 </properties>
               </component>
               <component id="208" class="javax.swing.JButton" binding="btn_OpenSQL">

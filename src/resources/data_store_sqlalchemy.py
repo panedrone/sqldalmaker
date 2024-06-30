@@ -218,7 +218,7 @@ BigInteger = sqlalchemy.BigInteger
 Float = sqlalchemy.Float
 
 DateTime = sqlalchemy.DateTime
-# DateTime = db.TIMESTAMP(timezone=True)
+# DateTime = sqlalchemy.TIMESTAMP(timezone=True)
 
 String = sqlalchemy.String
 Boolean = sqlalchemy.Boolean

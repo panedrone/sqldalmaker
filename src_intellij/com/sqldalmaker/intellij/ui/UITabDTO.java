@@ -48,6 +48,7 @@ public class UITabDTO {
     private JButton btn_genTmpFieldTags;
     private JButton btn_CrudXML;
     private JPanel tool_panel;
+    private JButton btn_goto_detailed_dao_xml;
 
     private Project project;
     private VirtualFile root_file;
@@ -84,7 +85,7 @@ public class UITabDTO {
         btn_OpenSQL.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int[] selected_rows = get_selection();
+                int[] selected_rows = get_ui_table_selection();
                 if (selected_rows.length == 0) {
                     return;
                 }
@@ -94,17 +95,13 @@ public class UITabDTO {
         btn_OpenXML.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int[] selected_rows = get_selection();
-                if (selected_rows.length == 0) {
-                    return;
-                }
-                navigate_to_sdm_dto_class_async(selected_rows[0]);
+                open_sdm_xml_async();
             }
         });
         btn_OpenJava.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int[] selected_rows = get_selection();
+                int[] selected_rows = get_ui_table_selection();
                 if (selected_rows.length == 0) {
                     return;
                 }
@@ -153,6 +150,16 @@ public class UITabDTO {
         // at the end of your code, otherwise setPreferredWidth() won't affect anything!
         table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
         table.doLayout();
+        btn_goto_detailed_dao_xml.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int[] selected_rows = get_ui_table_selection();
+                if (selected_rows.length > 0) {
+                    navigate_to_sdm_dto_class_async(selected_rows[0]);
+                }
+                open_sdm_xml_async();
+            }
+        });
     }
 
     /**
@@ -185,8 +192,20 @@ public class UITabDTO {
         btn_OpenXML.setOpaque(false);
         btn_OpenXML.setPreferredSize(new Dimension(32, 32));
         btn_OpenXML.setText("");
-        btn_OpenXML.setToolTipText("Find selected item in 'sdm.xml' (double-click one the left-most cells)");
+        btn_OpenXML.setToolTipText("Open 'sdm.xml'");
         tool_panel.add(btn_OpenXML);
+        btn_goto_detailed_dao_xml = new JButton();
+        btn_goto_detailed_dao_xml.setBorderPainted(false);
+        btn_goto_detailed_dao_xml.setContentAreaFilled(false);
+        btn_goto_detailed_dao_xml.setIcon(new ImageIcon(getClass().getResource("/img/xmldoc_12x12.gif")));
+        btn_goto_detailed_dao_xml.setMargin(new Insets(0, 0, 0, 0));
+        btn_goto_detailed_dao_xml.setMaximumSize(new Dimension(32, 32));
+        btn_goto_detailed_dao_xml.setMinimumSize(new Dimension(32, 32));
+        btn_goto_detailed_dao_xml.setOpaque(false);
+        btn_goto_detailed_dao_xml.setPreferredSize(new Dimension(32, 32));
+        btn_goto_detailed_dao_xml.setText("");
+        btn_goto_detailed_dao_xml.setToolTipText("Navigate to XML definition (double-click one of the middle cells)");
+        tool_panel.add(btn_goto_detailed_dao_xml);
         btn_OpenSQL = new JButton();
         btn_OpenSQL.setBorderPainted(false);
         btn_OpenSQL.setContentAreaFilled(false);
@@ -392,7 +411,7 @@ public class UITabDTO {
     }
 
     private void navigate_to_sdm_dto_class_async(int row) {
-        String dto_class_name = (String) table.getValueAt(row, COL_INDEX_NAME);
+        final String dto_class_name = (String) table.getValueAt(row, COL_INDEX_NAME);
         IdeaHelpers.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -453,7 +472,7 @@ public class UITabDTO {
     }
 
     protected void jaxb_fields_wizard() {
-        int[] selected_rows = get_selection();
+        int[] selected_rows = get_ui_table_selection();
         String dto_class_name = (String) table.getValueAt(selected_rows[0], COL_INDEX_NAME);
         String ref = (String) table.getValueAt(selected_rows[0], COL_INDEX_REF);
         try {
@@ -503,7 +522,7 @@ public class UITabDTO {
             public void run() {
                 try {
                     Settings settings = IdeaHelpers.load_settings(root_file);
-                    int[] selected_rows = get_selection();
+                    int[] selected_rows = get_ui_table_selection();
                     for (int row : selected_rows) {
                         dto_table_model.setValueAt("", row, COL_INDEX_STATUS);
                     }
@@ -598,7 +617,7 @@ public class UITabDTO {
         });
     }
 
-    private int[] get_selection() {
+    private int[] get_ui_table_selection() {
         int rc = table.getModel().getRowCount();
         if (rc == 1) {
             return new int[]{0};

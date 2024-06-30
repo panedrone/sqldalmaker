@@ -78,6 +78,7 @@ public class UITabDAO {
             public void actionPerformed(ActionEvent e) {
                 int[] selected_rows = get_ui_table_selection();
                 if (selected_rows.length == 0) {
+                    open_sdm_xml();
                     return;
                 }
                 open_detailed_dao_xml_async(selected_rows[0]);
@@ -129,6 +130,13 @@ public class UITabDAO {
         open_sdm_xml.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                int[] selected_rows = get_ui_table_selection();
+                if (selected_rows.length > 0) {
+                    String dao_class_name = (String) table.getValueAt(selected_rows[0], COL_INDEX_NAME);
+                    if (IdeaHelpers.navigate_to_sdm_xml_dao_class_by_name(project, root_file, dao_class_name)) {
+                        return;
+                    }
+                }
                 open_sdm_xml();
             }
         });
@@ -150,13 +158,13 @@ public class UITabDAO {
     }
 
     private void open_sdm_xml() {
-        int[] selected_rows = get_ui_table_selection();
-        if (selected_rows.length > 0) {
-            String dao_class_name = (String) table.getValueAt(selected_rows[0], COL_INDEX_NAME);
-            if (IdeaHelpers.navigate_to_sdm_xml_dao_class_by_name(project, root_file, dao_class_name)) {
-                return;
-            }
-        }
+//        int[] selected_rows = get_ui_table_selection();
+//        if (selected_rows.length > 0) {
+//            String dao_class_name = (String) table.getValueAt(selected_rows[0], COL_INDEX_NAME);
+//            if (IdeaHelpers.navigate_to_sdm_xml_dao_class_by_name(project, root_file, dao_class_name)) {
+//                return;
+//            }
+//        }
         IdeaEditorHelpers.open_sdm_xml_sync(project, root_file);
     }
 
@@ -230,7 +238,7 @@ public class UITabDAO {
     }
 
     private void open_detailed_dao_xml_async(int row) {
-    String dao_class_ref = (String) table.getValueAt(row, COL_INDEX_REF);
+        String dao_class_ref = (String) table.getValueAt(row, COL_INDEX_REF);
         if (dao_class_ref == null || dao_class_ref.trim().isEmpty()) {
             String dao_class_name = (String) table.getValueAt(row, COL_INDEX_NAME);
             if (IdeaHelpers.navigate_to_sdm_xml_dao_class_by_name(project, root_file, dao_class_name)) {
@@ -448,7 +456,7 @@ public class UITabDAO {
         open_sdm_xml.setOpaque(false);
         open_sdm_xml.setPreferredSize(new Dimension(32, 32));
         open_sdm_xml.setText("");
-        open_sdm_xml.setToolTipText("Find selected item in 'sdm.xml' (double-click one of the left-most cells)");
+        open_sdm_xml.setToolTipText("Open 'sdm.xml'");
         tool_panel.add(open_sdm_xml);
         btn_goto_detailed_dao_xml = new JButton();
         btn_goto_detailed_dao_xml.setBorderPainted(false);
