@@ -48,7 +48,7 @@ public class UITabDTO {
     private JButton btn_genTmpFieldTags;
     private JButton btn_CrudXML;
     private JPanel tool_panel;
-    private JButton btn_goto_detailed_dao_xml;
+    private JButton btn_goto_dto_class_in_xml;
 
     private Project project;
     private VirtualFile root_file;
@@ -150,12 +150,13 @@ public class UITabDTO {
         // at the end of your code, otherwise setPreferredWidth() won't affect anything!
         table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
         table.doLayout();
-        btn_goto_detailed_dao_xml.addActionListener(new ActionListener() {
+        btn_goto_dto_class_in_xml.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 int[] selected_rows = get_ui_table_selection();
                 if (selected_rows.length > 0) {
                     navigate_to_sdm_dto_class_async(selected_rows[0]);
+                    return;
                 }
                 open_sdm_xml_async();
             }
@@ -194,18 +195,18 @@ public class UITabDTO {
         btn_OpenXML.setText("");
         btn_OpenXML.setToolTipText("Open 'sdm.xml'");
         tool_panel.add(btn_OpenXML);
-        btn_goto_detailed_dao_xml = new JButton();
-        btn_goto_detailed_dao_xml.setBorderPainted(false);
-        btn_goto_detailed_dao_xml.setContentAreaFilled(false);
-        btn_goto_detailed_dao_xml.setIcon(new ImageIcon(getClass().getResource("/img/xmldoc_12x12.gif")));
-        btn_goto_detailed_dao_xml.setMargin(new Insets(0, 0, 0, 0));
-        btn_goto_detailed_dao_xml.setMaximumSize(new Dimension(32, 32));
-        btn_goto_detailed_dao_xml.setMinimumSize(new Dimension(32, 32));
-        btn_goto_detailed_dao_xml.setOpaque(false);
-        btn_goto_detailed_dao_xml.setPreferredSize(new Dimension(32, 32));
-        btn_goto_detailed_dao_xml.setText("");
-        btn_goto_detailed_dao_xml.setToolTipText("Navigate to XML definition (double-click one of the middle cells)");
-        tool_panel.add(btn_goto_detailed_dao_xml);
+        btn_goto_dto_class_in_xml = new JButton();
+        btn_goto_dto_class_in_xml.setBorderPainted(false);
+        btn_goto_dto_class_in_xml.setContentAreaFilled(false);
+        btn_goto_dto_class_in_xml.setIcon(new ImageIcon(getClass().getResource("/img/xmldoc_12x12.gif")));
+        btn_goto_dto_class_in_xml.setMargin(new Insets(0, 0, 0, 0));
+        btn_goto_dto_class_in_xml.setMaximumSize(new Dimension(32, 32));
+        btn_goto_dto_class_in_xml.setMinimumSize(new Dimension(32, 32));
+        btn_goto_dto_class_in_xml.setOpaque(false);
+        btn_goto_dto_class_in_xml.setPreferredSize(new Dimension(32, 32));
+        btn_goto_dto_class_in_xml.setText("");
+        btn_goto_dto_class_in_xml.setToolTipText("Navigate to XML definition (double-click one of cells in the leftmost column)");
+        tool_panel.add(btn_goto_dto_class_in_xml);
         btn_OpenSQL = new JButton();
         btn_OpenSQL.setBorderPainted(false);
         btn_OpenSQL.setContentAreaFilled(false);

@@ -62,7 +62,7 @@
                   <opaque value="false"/>
                   <preferredSize width="32" height="32"/>
                   <text value=""/>
-                  <toolTipText value="Navigate to XML definition (double-click one of the middle cells)"/>
+                  <toolTipText value="Navigate to XML definition (double-click one of cells in the middle column)"/>
                 </properties>
               </component>
               <component id="4b090" class="javax.swing.JButton" binding="btn_OpenJava">

@@ -78,7 +78,7 @@ public class UITabDAO {
             public void actionPerformed(ActionEvent e) {
                 int[] selected_rows = get_ui_table_selection();
                 if (selected_rows.length == 0) {
-                    open_sdm_xml();
+                    open_sdm_xml_async();
                     return;
                 }
                 open_detailed_dao_xml_async(selected_rows[0]);
@@ -137,7 +137,7 @@ public class UITabDAO {
                         return;
                     }
                 }
-                open_sdm_xml();
+                open_sdm_xml_async();
             }
         });
 
@@ -157,15 +157,20 @@ public class UITabDAO {
         table.doLayout();
     }
 
-    private void open_sdm_xml() {
-//        int[] selected_rows = get_ui_table_selection();
-//        if (selected_rows.length > 0) {
-//            String dao_class_name = (String) table.getValueAt(selected_rows[0], COL_INDEX_NAME);
-//            if (IdeaHelpers.navigate_to_sdm_xml_dao_class_by_name(project, root_file, dao_class_name)) {
-//                return;
-//            }
-//        }
-        IdeaEditorHelpers.open_sdm_xml_sync(project, root_file);
+    private void open_sdm_xml_async() {
+        IdeaHelpers.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                int[] selected_rows = get_ui_table_selection();
+                if (selected_rows.length > 0) {
+                    String dao_class_name = (String) table.getValueAt(selected_rows[0], COL_INDEX_NAME);
+                    if (IdeaHelpers.navigate_to_sdm_xml_dao_class_by_name(project, root_file, dao_class_name)) {
+                        return;
+                    }
+                }
+                IdeaEditorHelpers.open_sdm_xml_sync(project, root_file);
+            }
+        });
     }
 
     // it is called from constructor --> $$$setupUI$$$();
@@ -468,7 +473,7 @@ public class UITabDAO {
         btn_goto_detailed_dao_xml.setOpaque(false);
         btn_goto_detailed_dao_xml.setPreferredSize(new Dimension(32, 32));
         btn_goto_detailed_dao_xml.setText("");
-        btn_goto_detailed_dao_xml.setToolTipText("Navigate to XML definition (double-click one of the middle cells)");
+        btn_goto_detailed_dao_xml.setToolTipText("Navigate to XML definition (double-click one of cells in the middle column)");
         tool_panel.add(btn_goto_detailed_dao_xml);
         btn_OpenJava = new JButton();
         btn_OpenJava.setBorderPainted(false);
