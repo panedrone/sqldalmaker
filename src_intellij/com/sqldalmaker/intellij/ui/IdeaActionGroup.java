@@ -11,9 +11,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.sqldalmaker.cg.Helpers;
-import com.sqldalmaker.cg.JaxbUtils;
-import com.sqldalmaker.jaxb.sdm.DaoClass;
-import com.sqldalmaker.jaxb.settings.Settings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -73,7 +70,7 @@ public class IdeaActionGroup extends ActionGroup implements AlwaysVisibleActionG
         }
     }
 
-    private void add_about_actions(List<AnAction> drop_down_actions_list) {
+    private void add_about_action(List<AnAction> drop_down_actions_list) {
         SdmAction action = new SdmAction("About") {
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
@@ -153,17 +150,17 @@ public class IdeaActionGroup extends ActionGroup implements AlwaysVisibleActionG
 //        drop_down_actions_list.add(action_goto_target);
 //    }
 
-    private boolean add_xml_file_actions(Project project, List<AnAction> drop_down_actions_list) throws Exception {
+    private String add_xml_file_actions(Project project, List<AnAction> drop_down_actions_list) throws Exception {
         FileEditorManager fm = FileEditorManager.getInstance(project);
         // FileEditor editor = fm.getSelectedEditor(); // since 182.711
         VirtualFile[] files = fm.getSelectedFiles();
         if (files.length == 0) {
-            return false;
+            return null;
         }
         VirtualFile xml_file = files[0];
         String ext = xml_file.getExtension();
         if (!"xml".equals(ext)) {
-            return false;
+            return null;
         }
         // === panedrone: getSelectedEditor throws ProcessCanceledException on Goland 2022
 //        FileEditor editor = files.length == 0 ? null : fm.getSelectedEditor(files[0]);
@@ -176,11 +173,11 @@ public class IdeaActionGroup extends ActionGroup implements AlwaysVisibleActionG
 //        }
         VirtualFile xml_file_dir = xml_file.getParent();
         if (xml_file_dir == null) {
-            return false;
+            return null;
         }
         List<VirtualFile> root_files = IdeaTargetLanguageHelpers.find_root_files(xml_file_dir);
         if (root_files.isEmpty()) {
-            return false;
+            return null;
         }
         VirtualFile root_file = root_files.get(0);
         String name = xml_file.getName();
@@ -202,11 +199,12 @@ public class IdeaActionGroup extends ActionGroup implements AlwaysVisibleActionG
                 }
             };
             drop_down_actions_list.add(action);
+            return root_file_rel_path;
         }
 //        if (Helpers.is_dao_xml(name)) {
 //            add_open_dao_target_action(project, root_file, xml_file, drop_down_actions_list);
 //        }
-        return true;
+        return null;
     }
 
     @Override
@@ -233,20 +231,25 @@ public class IdeaActionGroup extends ActionGroup implements AlwaysVisibleActionG
                 return AnAction.EMPTY_ARRAY;
             }
             List<AnAction> drop_down_actions_list = new ArrayList<AnAction>();
-            add_xml_file_actions(project, drop_down_actions_list);
-            // there may be several MP in one project. start searching from project_base_dir:
+            String curr_root_file_rel_path = add_xml_file_actions(project, drop_down_actions_list);
             VirtualFile project_base_dir = IdeaHelpers.get_project_base_dir(project);
             List<VirtualFile> root_files = new ArrayList<VirtualFile>();
             IdeaHelpers.enum_root_files(project, project_base_dir, root_files);
-            if (drop_down_actions_list.isEmpty()) {
-                add_common_actions(project, drop_down_actions_list, root_files);
-            } else {
-                if (root_files.size() > 1) {
-                    drop_down_actions_list.add(Separator.create());
-                    add_common_actions(project, drop_down_actions_list, root_files);
+            if (curr_root_file_rel_path != null) {
+                for (VirtualFile root_file : root_files) {
+                    String root_file_rel_path = IdeaHelpers.get_relative_path(project, root_file);
+                    if (curr_root_file_rel_path.equals(root_file_rel_path)) {
+                        root_files.remove(root_file);
+                        break;
+                    }
                 }
+                drop_down_actions_list.add(Separator.create());
             }
-            add_about_actions(drop_down_actions_list);
+            add_common_actions(project, drop_down_actions_list, root_files);
+            if (!drop_down_actions_list.isEmpty()) {
+                drop_down_actions_list.add(Separator.create());
+            }
+            add_about_action(drop_down_actions_list);
             AnAction[] arr = new AnAction[drop_down_actions_list.size()];
             return drop_down_actions_list.toArray(arr);
         } catch (/*Exception*/ Throwable e) {

@@ -27,9 +27,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.ResourceUtil;
 
 import com.sqldalmaker.cg.Helpers;
-import com.sqldalmaker.cg.JaxbUtils;
-import com.sqldalmaker.jaxb.sdm.DaoClass;
-import com.sqldalmaker.jaxb.settings.Settings;
 
 /**
  *
@@ -47,34 +44,34 @@ public class EclipseToolbarDynamicMenu extends ContributionItem {
 		super(id);
 	}
 
-	private static int add_xml_file_actions(Menu menu, int index, IProject[] projects) {
+	private static String add_xml_file_actions(Menu menu, int index, IProject[] projects) {
 		IWorkbenchWindow win = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 		IWorkbenchPage page = win.getActivePage();
 		if (page == null) {
-			return index;
+			return null;
 		}
 		IEditorPart editor_part = page.getActiveEditor();
 		if (editor_part == null) {
-			return index;
+			return null;
 		}
 		IEditorInput input = editor_part.getEditorInput();
 		if (input == null) {
-			return index;
+			return null;
 		}
 		IFile input_file = ResourceUtil.getFile(input);
 		IContainer xml_mp_folder = input_file.getParent();
 		if (!(xml_mp_folder instanceof IFolder)) {
-			return index;
+			return null;
 		}
 		List<IFile> root_files;
 		try {
 			root_files = EclipseTargetLanguageHelpers.get_root_files(xml_mp_folder);
 		} catch (Exception e1) {
 			e1.printStackTrace();
-			return index;
+			return null;
 		}
 		if (root_files.size() != 1) {
-			return index;
+			return null;
 		}
 		IFile root_file = root_files.get(0);
 		boolean is_sdm_xml = Helpers.is_sdm_xml(input_file.getName());
@@ -130,16 +127,17 @@ public class EclipseToolbarDynamicMenu extends ContributionItem {
 			}
 		}
 		if (is_sdm_xml || is_dao_xml) {
-			add_goto_root_file(menu, projects, index++, current_xml_file_rel_path, root_file);
+			String root_file_rel_path = add_goto_root_file(menu, projects, index++, current_xml_file_rel_path,
+					root_file);
+			return root_file_rel_path;
 		}
 //		if (is_dao_xml) {
 //			add_goto_target_menu(menu, index++, current_xml_file_rel_path, root_file);
 //		}
-		new MenuItem(menu, SWT.SEPARATOR, index++);
-		return index;
+		return null;
 	}
 
-	private static void add_goto_root_file(Menu menu, IProject[] projects, final int index,
+	private static String add_goto_root_file(Menu menu, IProject[] projects, final int index,
 			String current_xml_file_rel_path, IFile root_file) {
 
 		MenuItem menuItem = new MenuItem(menu, SWT.PUSH, index);
@@ -159,6 +157,7 @@ public class EclipseToolbarDynamicMenu extends ContributionItem {
 				}
 			}
 		});
+		return root_file_rel_path;
 	}
 
 //	private static void add_goto_target_menu(Menu menu, final int index, String current_xml_file_rel_path,
@@ -191,23 +190,32 @@ public class EclipseToolbarDynamicMenu extends ContributionItem {
 	@Override
 	public void fill(Menu menu, int index) {
 		IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
+		String root_file_rel_path = add_xml_file_actions(menu, index, projects);
+		index = menu.getItems().length;
 		List<String> root_file_titles = EclipseToolbarUtils.get_root_file_titles(projects);
-		if (root_file_titles.size() > 1) {
-			index = add_xml_file_actions(menu, index, projects);
-			for (String root_file_title : root_file_titles) {
-				MenuItem menuItem = new MenuItem(menu, SWT.PUSH, index++);
-				menuItem.setText(root_file_title);
-				menuItem.addSelectionListener(new SelectionAdapter() {
-					public void widgetSelected(SelectionEvent e) {
-						try {
-							EclipseToolbarUtils.open_root_file(root_file_title, projects);
-						} catch (Exception e1) {
-							e1.printStackTrace();
-							EclipseMessageHelpers.show_error(e1);
-						}
-					}
-				});
+		if (index > 0 && root_file_titles.size() > 1) {
+			new MenuItem(menu, SWT.SEPARATOR, index++);
+		}
+		for (String root_file_title : root_file_titles) {
+			if (root_file_title.equals(root_file_rel_path)) {
+				continue;
 			}
+			MenuItem menuItem = new MenuItem(menu, SWT.PUSH, index++);
+			menuItem.setText(root_file_title);
+			menuItem.addSelectionListener(new SelectionAdapter() {
+				public void widgetSelected(SelectionEvent e) {
+					try {
+						EclipseToolbarUtils.open_root_file(root_file_title, projects);
+					} catch (Exception e1) {
+						e1.printStackTrace();
+						EclipseMessageHelpers.show_error(e1);
+					}
+				}
+			});
+		}
+		index = menu.getItems().length;
+		if (index > 1) {
+			new MenuItem(menu, SWT.SEPARATOR, index++);
 		}
 		MenuItem menuItem = new MenuItem(menu, SWT.PUSH, index++);
 		menuItem.setText("About");
