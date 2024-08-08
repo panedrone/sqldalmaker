@@ -111,8 +111,7 @@ def generated_code_in_action():
         database/sql + sqlx + gorm
     </td>
     <td>
-        <a href="https://github.com/panedrone/sdm_todolist_go_react16_sqlite3_npm">React.js</a>,
-        <a href="https://github.com/panedrone/sdm_todolist_go_vue2_sqlite3_npm">Vue.js</a>        
+        <a href="https://github.com/panedrone/sdm_todolist_go_react_vue_npm_sqlite3">React.js, Vue.js</a>        
     </td>
 </tr>
 </table>

@@ -213,7 +213,12 @@ ForeignKey = sqlalchemy.ForeignKey
 
 SmallInteger = sqlalchemy.SmallInteger
 Integer = sqlalchemy.Integer
-BigInteger = sqlalchemy.BigInteger
+
+# https://medium.com/@jorlugaqui/fixing-sqlalchemy-autoincrement-issue-for-sqlite-997300307bda
+# Fixing SQLAlchemy autoincrement issue for SQLite
+# Looking in SQLAlchemy documentation I found the trick, Only Integers are auto incremented
+
+BigInteger = sqlalchemy.BigInteger().with_variant(Integer, 'sqlite')
 
 Float = sqlalchemy.Float
 

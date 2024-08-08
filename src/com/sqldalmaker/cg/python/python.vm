@@ -281,7 +281,7 @@ class $class_name:
 #if ($method_type == "CREATE")
         self.ds.create_one(p)
 #elseif ($method_type == "UPDATE")
-        self.ds.update_one(${dto_class_name}, data, #params_dict($params))
+        return self.ds.update_one(${dto_class_name}, data, #params_dict($params))
 #elseif ($method_type == "DELETE")
         return self.ds.delete_one(${dto_class_name}, #params_dict($params))
 #else
