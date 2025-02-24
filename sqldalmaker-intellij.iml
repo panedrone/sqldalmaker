@@ -9,6 +9,9 @@
       <sourceFolder url="file://$MODULE_DIR$/resources" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src_intellij" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/META-INF" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/resources/META-INF" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src/main/resources" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src/main/resources/META-INF" type="java-resource" />
       <excludeFolder url="file://$MODULE_DIR$/bin" />
       <excludeFolder url="file://$MODULE_DIR$/build" />
       <excludeFolder url="file://$MODULE_DIR$/release" />

@@ -14,5 +14,3 @@ For Eclipse: https://marketplace.eclipse.org/content/sql-dal-maker
 For IntelliJ-Platform: https://plugins.jetbrains.com/plugin/7092
 
 Contact: sqldalmaker@gmail.com
-
-Donate: https://www.paypal.com/donate/?hosted_button_id=9K57U72LTPRJS

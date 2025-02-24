@@ -7,6 +7,7 @@ package com.sqldalmaker.intellij.ui;
 
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -41,9 +42,14 @@ import java.util.List;
  * 07.02.2019 19:50 initial commit
  *
  */
-public class IdeaActionGroup extends ActionGroup implements AlwaysVisibleActionGroup {
-
-    abstract static class SdmAction extends AnAction {
+public class IdeaActionGroup extends ActionGroup implements DynamicActionGroup
+        // === panedrone: EAP 243 AlwaysVisibleActionGroup (1) (scheduled for removal in a future release)
+        //        implements AlwaysVisibleActionGroup
+        // --> return 'about' only if empty
+{
+    // ActionGroup is disabled. Why?
+    // It's working after I make children actions implement DumbAware. What's it? No documentation for it.
+    abstract static class SdmAction extends AnAction implements DumbAware {
         SdmAction(String text) {
             this.getTemplatePresentation().setText(text, false); // to prevent parsing and replacement of '_'
         }
@@ -68,16 +74,6 @@ public class IdeaActionGroup extends ActionGroup implements AlwaysVisibleActionG
             };
             drop_down_actions_list.add(action);
         }
-    }
-
-    private void add_about_action(List<AnAction> drop_down_actions_list) {
-        SdmAction action = new SdmAction("About") {
-            @Override
-            public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
-                UIDialogAbout.show_modal();
-            }
-        };
-        drop_down_actions_list.add(action);
     }
 
     private void add_sdm_actions(
@@ -212,10 +208,13 @@ public class IdeaActionGroup extends ActionGroup implements AlwaysVisibleActionG
         try {
             if (anActionEvent == null) {
                 return AnAction.EMPTY_ARRAY;
+                // return about_only(drop_down_actions_list);
             }
+            List<AnAction> drop_down_actions_list = new ArrayList<AnAction>();
             if (anActionEvent.isFromActionToolbar()) {
                 // === panedrone: to prevent asking for children if SDM toolbar drop-down is hidden
-                return AnAction.EMPTY_ARRAY;
+//                return AnAction.EMPTY_ARRAY;
+                return about_only(drop_down_actions_list);
             }
             Project project = null;
             try {
@@ -228,9 +227,8 @@ public class IdeaActionGroup extends ActionGroup implements AlwaysVisibleActionG
                 }
             }
             if (project == null) {
-                return AnAction.EMPTY_ARRAY;
+                return about_only(drop_down_actions_list);
             }
-            List<AnAction> drop_down_actions_list = new ArrayList<AnAction>();
             String curr_root_file_rel_path = add_xml_file_actions(project, drop_down_actions_list);
             VirtualFile project_base_dir = IdeaHelpers.get_project_base_dir(project);
             List<VirtualFile> root_files = new ArrayList<VirtualFile>();
@@ -255,8 +253,25 @@ public class IdeaActionGroup extends ActionGroup implements AlwaysVisibleActionG
         } catch (/*Exception*/ Throwable e) {
             IdeaMessageHelpers.add_error_to_ide_log("ERROR", e.getMessage());
             // e.printStackTrace();
+//            return about_only(drop_down_actions_list);
             return AnAction.EMPTY_ARRAY;
         }
+    }
+
+    private void add_about_action(List<AnAction> drop_down_actions_list) {
+        SdmAction action = new SdmAction("About") {
+            @Override
+            public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
+                UIDialogAbout.show_modal();
+            }
+        };
+        drop_down_actions_list.add(action);
+    }
+
+    private AnAction[] about_only(List<AnAction> drop_down_actions_list) {
+        add_about_action(drop_down_actions_list);
+        AnAction[] arr = new AnAction[drop_down_actions_list.size()];
+        return drop_down_actions_list.toArray(arr);
     }
 
     // it cannot be overridden because of warnings of intellij checker

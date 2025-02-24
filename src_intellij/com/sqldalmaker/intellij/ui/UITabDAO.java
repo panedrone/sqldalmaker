@@ -76,7 +76,7 @@ public class UITabDAO {
         btn_goto_detailed_dao_xml.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int[] selected_rows = get_ui_table_selection();
+                int[] selected_rows = get_ui_table_sel_indexes();
                 if (selected_rows.length == 0) {
                     open_sdm_xml_async();
                     return;
@@ -87,7 +87,7 @@ public class UITabDAO {
         btn_OpenJava.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int[] selected_rows = get_ui_table_selection();
+                int[] selected_rows = get_ui_table_sel_indexes();
                 if (selected_rows.length == 0) {
                     return;
                 }
@@ -130,7 +130,7 @@ public class UITabDAO {
         open_sdm_xml.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int[] selected_rows = get_ui_table_selection();
+                int[] selected_rows = get_ui_table_sel_indexes();
                 if (selected_rows.length > 0) {
                     String dao_class_name = (String) table.getValueAt(selected_rows[0], COL_INDEX_NAME);
                     if (IdeaHelpers.navigate_to_sdm_xml_dao_class_by_name(project, root_file, dao_class_name)) {
@@ -161,7 +161,7 @@ public class UITabDAO {
         IdeaHelpers.invokeLater(new Runnable() {
             @Override
             public void run() {
-                int[] selected_rows = get_ui_table_selection();
+                int[] selected_rows = get_ui_table_sel_indexes();
                 if (selected_rows.length > 0) {
                     String dao_class_name = (String) table.getValueAt(selected_rows[0], COL_INDEX_NAME);
                     if (IdeaHelpers.navigate_to_sdm_xml_dao_class_by_name(project, root_file, dao_class_name)) {
@@ -288,6 +288,10 @@ public class UITabDAO {
     }
 
     private void generate_for_dao_selected_in_ui_with_progress_sync() {
+        final int[] selected_rows = get_ui_table_sel_indexes();
+        if (selected_rows.length == 0) {
+            return;
+        }
         List<IdeaHelpers.GeneratedFileData> list = new ArrayList<IdeaHelpers.GeneratedFileData>();
         StringBuilder output_dir = new StringBuilder();
         IdeaCG.ProgressError error = new IdeaCG.ProgressError();
@@ -296,7 +300,6 @@ public class UITabDAO {
             public void run() {
                 try {
                     Settings settings = IdeaHelpers.load_settings(root_file);
-                    int[] selected_rows = get_ui_table_selection();
                     for (int row : selected_rows) {
                         table.setValueAt("", row, COL_INDEX_STATUS);
                     }
@@ -346,14 +349,14 @@ public class UITabDAO {
         }
     }
 
-    private int[] get_ui_table_selection() {
+    private int[] get_ui_table_sel_indexes() {
         int rc = table.getModel().getRowCount();
         if (rc == 1) {
             return new int[]{0};
         }
         int[] selected_rows = table.getSelectedRows();
         if (selected_rows.length == 0) {
-            selected_rows = new int[rc];
+            selected_rows = new int[rc]; // add all rows if none selected
             for (int i = 0; i < rc; i++) {
                 selected_rows[i] = i;
             }
