@@ -11,7 +11,6 @@ import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.util.IconLoader;
-import com.intellij.openapi.util.NlsActions;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.sqldalmaker.cg.Helpers;
 import org.jetbrains.annotations.NotNull;
@@ -30,6 +29,7 @@ import java.util.List;
  * ActionGroup is disabled. Why?
  * <a href="https://intellij-support.jetbrains.com/hc/en-us/community/posts/360008627020-ActionGroup-is-disabled-Why-">...</a>
  *
+ * 25.02.2025 11:00 no menu icon fixed
  * 30.05.2024 20:00 1.299
  * 14.02.2024 18:50 1.294 <dao-class ref="...
  * 28.12.2023 13:12 1.292
@@ -59,30 +59,35 @@ public class IdeaActionGroup extends DefaultActionGroup implements DynamicAction
         return SDM_ICON;
     }
 
-
 //    @Override
 //    public void setDefaultIcon(boolean isDefaultIconSet) {
 //        super.setDefaultIcon(false);
 //    }
 
-    // https://intellij-sdk-docs-cn.github.io/intellij/sdk/docs/tutorials/action_system/grouping_action.html
     @Override
     public void update(AnActionEvent event) {
+
+//    // https://intellij-sdk-docs-cn.github.io/intellij/sdk/docs/tutorials/action_system/grouping_action.html
+
         // Enable/disable depending on whether user is editing
 //        Editor editor = event.getData(CommonDataKeys.EDITOR);
 //        event.getPresentation().setEnabled(editor != null);
         // Take this opportunity to set an icon for the menu entry.
-        event.getPresentation().setIcon(SDM_ICON);
+
+        if (event.getPresentation().getIcon() != SDM_ICON) { // IDE freeze if no check
+            event.getPresentation().setIcon(SDM_ICON);
+        }
     }
 
-//    public IdeaActionGroup() { // === panedrone: it must
-////        super("SDDDDDDDD", "DDDDDDDS", SDM_ICON); // === panedrone: the same signature as in plugin.xml
+//    public IdeaActionGroup() { // === panedrone: better to remove constructors at all
+
+    // /        super("SDM===", "SDM", SDM_ICON); // === panedrone: the same signature as in plugin.xml
 //        super();
 //    }
 
-    // IntelliJ IDEA Ultimate    //2021.3.3
+    // IntelliJ IDEA Ultimate    // 2021.3.3
 
-    // IdeaActionGroup.<init>(String, String, Icon) contains an invokespecial instruction referencing an
+    // IdeaActionGroup.<init>(String, String, Icon) contains an invoke special instruction referencing an
     // unresolved constructor DefaultActionGroup.<init>(String, String, Icon)
 
 //    public IdeaActionGroup(@Nullable String text, @Nullable String description
@@ -165,30 +170,6 @@ public class IdeaActionGroup extends DefaultActionGroup implements DynamicAction
         };
         drop_down_actions_list.add(action_validate);
     }
-
-//    private void add_open_dao_target_action(
-//            Project project,
-//            VirtualFile root_file,
-//            VirtualFile xml_file,
-//            List<AnAction> drop_down_actions_list) {
-//
-//        SdmAction action_goto_target = new SdmAction("Open Target") {
-//            @Override
-//            public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
-//                try {
-//                    Settings settings = IdeaHelpers.load_settings(root_file);
-//                    String xml_file_path = xml_file.getPath();
-//                    List<DaoClass> jaxb_dao_classes = IdeaHelpers.load_all_sdm_dao_classes(root_file);
-//                    String dao_class_name = JaxbUtils.get_dao_class_name_by_dao_xml_path(jaxb_dao_classes, xml_file_path);
-//                    IdeaTargetLanguageHelpers.open_target_dao_sync(project, root_file, settings, dao_class_name);
-//                } catch (Exception e) {
-//                    // e.printStackTrace();
-//                    IdeaMessageHelpers.show_error_in_ui_thread(e);
-//                }
-//            }
-//        };
-//        drop_down_actions_list.add(action_goto_target);
-//    }
 
     private String add_xml_file_actions(Project project, List<AnAction> drop_down_actions_list) throws Exception {
         FileEditorManager fm = FileEditorManager.getInstance(project);
