@@ -10,11 +10,14 @@ import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
+import com.intellij.openapi.util.IconLoader;
+import com.intellij.openapi.util.NlsActions;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.sqldalmaker.cg.Helpers;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,11 +45,52 @@ import java.util.List;
  * 07.02.2019 19:50 initial commit
  *
  */
-public class IdeaActionGroup extends ActionGroup implements DynamicActionGroup
+public class IdeaActionGroup extends DefaultActionGroup implements DynamicActionGroup
         // === panedrone: EAP 243 AlwaysVisibleActionGroup (1) (scheduled for removal in a future release)
         //        implements AlwaysVisibleActionGroup
         // --> return 'about' only if empty
 {
+
+    //     deprecated with no class --> Deprecated method IconLoader.findIcon
+    //     https://plugins.jetbrains.com/docs/intellij/work-with-icons-and-images.html#how-to-organize-and-how-to-use-icons
+    private static final Icon SDM_ICON = IconLoader.findIcon("/img/sqldalmaker.png", IdeaActionGroup.class);
+
+    public Icon getIcon() {
+        return SDM_ICON;
+    }
+
+
+//    @Override
+//    public void setDefaultIcon(boolean isDefaultIconSet) {
+//        super.setDefaultIcon(false);
+//    }
+
+    // https://intellij-sdk-docs-cn.github.io/intellij/sdk/docs/tutorials/action_system/grouping_action.html
+    @Override
+    public void update(AnActionEvent event) {
+        // Enable/disable depending on whether user is editing
+//        Editor editor = event.getData(CommonDataKeys.EDITOR);
+//        event.getPresentation().setEnabled(editor != null);
+        // Take this opportunity to set an icon for the menu entry.
+        event.getPresentation().setIcon(SDM_ICON);
+    }
+
+//    public IdeaActionGroup() { // === panedrone: it must
+////        super("SDDDDDDDD", "DDDDDDDS", SDM_ICON); // === panedrone: the same signature as in plugin.xml
+//        super();
+//    }
+
+    // IntelliJ IDEA Ultimate    //2021.3.3
+
+    // IdeaActionGroup.<init>(String, String, Icon) contains an invokespecial instruction referencing an
+    // unresolved constructor DefaultActionGroup.<init>(String, String, Icon)
+
+//    public IdeaActionGroup(@Nullable String text, @Nullable String description
+//            , @Nullable Icon icon
+//    ) {
+//        super(text, description, icon); // === panedrone: not called
+//    }
+
     // ActionGroup is disabled. Why?
     // It's working after I make children actions implement DumbAware. What's it? No documentation for it.
     abstract static class SdmAction extends AnAction implements DumbAware {
