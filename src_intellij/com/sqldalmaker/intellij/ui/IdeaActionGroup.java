@@ -29,6 +29,7 @@ import java.util.List;
  * ActionGroup is disabled. Why?
  * <a href="https://intellij-support.jetbrains.com/hc/en-us/community/posts/360008627020-ActionGroup-is-disabled-Why-">...</a>
  *
+ * 05.03.2025 16:30 [+] getActionUpdateThread
  * 25.02.2025 11:00 no menu icon fixed
  * 30.05.2024 20:00 1.299
  * 14.02.2024 18:50 1.294 <dao-class ref="...
@@ -45,7 +46,11 @@ import java.util.List;
  * 07.02.2019 19:50 initial commit
  *
  */
-public class IdeaActionGroup extends DefaultActionGroup implements DynamicActionGroup
+
+// === panedrone: not DefaultActionGroup!!!
+// DefaultActionGroup --> This class is used if a set of actions belonging to the group does not change at runtime, which is the majority of cases.
+
+public class IdeaActionGroup extends ActionGroup implements DynamicActionGroup
         // === panedrone: EAP 243 AlwaysVisibleActionGroup (1) (scheduled for removal in a future release)
         //        implements AlwaysVisibleActionGroup
         // --> return 'about' only if empty
@@ -59,10 +64,12 @@ public class IdeaActionGroup extends DefaultActionGroup implements DynamicAction
         return SDM_ICON;
     }
 
-//    @Override
-//    public void setDefaultIcon(boolean isDefaultIconSet) {
-//        super.setDefaultIcon(false);
-//    }
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        // === panedrone: no constructors in this example:
+        // https://github.com/JetBrains/intellij-sdk-docs/blob/main/code_samples/action_basics/src/main/java/org/intellij/sdk/action/CustomDefaultActionGroup.java
+        return ActionUpdateThread.BGT;
+    }
 
     @Override
     public void update(AnActionEvent event) {
@@ -73,6 +80,10 @@ public class IdeaActionGroup extends DefaultActionGroup implements DynamicAction
 //        Editor editor = event.getData(CommonDataKeys.EDITOR);
 //        event.getPresentation().setEnabled(editor != null);
         // Take this opportunity to set an icon for the menu entry.
+
+        if (!event.getPresentation().isEnabled()) {
+            event.getPresentation().setEnabled(true); // always
+        }
 
         if (event.getPresentation().getIcon() != SDM_ICON) { // IDE freeze if no check
             event.getPresentation().setIcon(SDM_ICON);
