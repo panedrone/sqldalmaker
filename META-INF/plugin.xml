@@ -2,7 +2,7 @@
     <id>dal-mpe</id>
     <name>SQL DAL Maker</name>
     <category>Database</category>
-    <version>1.309.2503</version>
+    <version>1.312.2512</version>
     <vendor email="sqldalmaker@gmail.com" url="https://sqldalmaker.sourceforge.net">
         SQL DAL Maker
     </vendor>
@@ -38,18 +38,18 @@ Generated code is being synchronized with the current database schema using "liv
     <module-components>
     </module-components>
 
-    <actions>
-        <!--        default constructor is called, and seems that attributes below are triggering the setters -->
-        <group class="com.sqldalmaker.intellij.ui.IdeaActionGroup"
-               id="IdeaActionGroup"
-               text="SDM"
-               description="SDM"
-               icon="/img/sqldalmaker.png"
-               popup="true">
-            <add-to-group group-id="FileMainSettingsGroup" anchor="last"/>
-            <add-to-group group-id="MainToolBarSettings" anchor="last"/>
-        </group>
-    </actions>
+<!--    <actions>-->
+<!--        &lt;!&ndash;        default constructor is called, and seems that attributes below are triggering the setters &ndash;&gt;-->
+<!--        <group class="com.sqldalmaker.intellij.ui.IdeaActionGroup"-->
+<!--               id="IdeaActionGroup"-->
+<!--               text="SDM"-->
+<!--               description="SDM"-->
+<!--               icon="/img/sqldalmaker.png"-->
+<!--               popup="true">-->
+<!--            <add-to-group group-id="FileMainSettingsGroup" anchor="last"/>-->
+<!--            <add-to-group group-id="MainToolBarSettings" anchor="last"/>-->
+<!--        </group>-->
+<!--    </actions>-->
 
     <extensions defaultExtensionNs="com.intellij">
         <!--
@@ -71,6 +71,14 @@ Generated code is being synchronized with the current database schema using "liv
                 implementation="com.sqldalmaker.intellij.references.PsiReferenceContributorCommon" language="XML"/>
         <completion.contributor language="XML"
                                 implementationClass="com.sqldalmaker.intellij.references.CompletionContributorCommon"/>
+
+        <toolWindow
+                id="SDM"
+                icon="/META-INF/pluginIcon.svg"
+                anchor="top"
+                secondary="true"
+                factoryClass="com.sqldalmaker.intellij.ui.SdmToolWindowFactory"/>
+
     </extensions>
 
 </idea-plugin>
