@@ -601,6 +601,7 @@ public class UITabAdmin {
         recentChangesButton = new JButton();
         recentChangesButton.setPreferredSize(new Dimension(60, 30));
         recentChangesButton.setText("News");
+        recentChangesButton.setVisible(false);
         gbc = new GridBagConstraints();
         gbc.gridx = 3;
         gbc.gridy = 0;

@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2024 sqldalmaker@gmail.com
+    Copyright 2011-2026 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -34,7 +34,13 @@ public class IdeaEditorHelpers {
 
     public static void open_in_editor_sync(Project project, VirtualFile file) {
         FileEditorManager fem = FileEditorManager.getInstance(project);
-        fem.openFile(file, true, true);
+
+        // If file has .sdm extension → open quietly (do not force focus)
+        if (file.getName().endsWith(".sdm")) {
+            fem.openFile(file, false, true); // false = do not request focus, true = focus if already opened
+        } else {
+            fem.openFile(file, true, true);  // default behavior for other files
+        }
     }
 
     public static VirtualFile find_case_sensitive(VirtualFile dir, String rel_path) throws Exception {
