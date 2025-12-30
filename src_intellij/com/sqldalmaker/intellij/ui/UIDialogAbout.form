@@ -17,7 +17,7 @@
             <properties/>
             <border type="none"/>
             <children>
-              <component id="30ee3" class="javax.swing.JTextPane" binding="text1">
+              <component id="30ee3" class="javax.swing.JTextPane" binding="textAbout">
                 <constraints border-constraint="Center"/>
                 <properties>
                   <editable value="false"/>

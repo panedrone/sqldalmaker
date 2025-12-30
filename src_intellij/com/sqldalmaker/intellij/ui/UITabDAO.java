@@ -1,8 +1,3 @@
-/*
-    Copyright 2011-2024 sqldalmaker@gmail.com
-    SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
-    Read LICENSE.txt in the root of this project/archive for details.
- */
 package com.sqldalmaker.intellij.ui;
 
 import com.intellij.openapi.progress.ProgressManager;
@@ -213,16 +208,11 @@ public class UITabDAO {
 
     private void new_dao_xml() {
         UIDialogNewDaoXml d = new UIDialogNewDaoXml(project, root_file);
-        d.pack();
-        d.setLocationRelativeTo(null);  // after pack!!!
-        d.addWindowListener(new WindowAdapter() {
-            public void windowClosed(WindowEvent e) {
-                if (d.isSuccess()) {
-                    reload_table(true);
-                }
-            }
-        });
-        d.setVisible(true);
+        boolean ok = d.showAndGet();   // модально, блокирует поток
+
+        if (ok && d.isSuccess()) {
+            reload_table(true);
+        }
     }
 
     private void navigate_to_sdm_dao_xml_async(int row) {

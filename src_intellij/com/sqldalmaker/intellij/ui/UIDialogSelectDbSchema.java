@@ -1,8 +1,3 @@
-/*
-    Copyright 2011-2024 sqldalmaker@gmail.com
-    SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
-    Read LICENSE.txt in the root of this project/archive for details.
- */
 package com.sqldalmaker.intellij.ui;
 
 import com.intellij.openapi.project.Project;
@@ -10,14 +5,18 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.sqldalmaker.cg.JdbcUtils;
 import com.sqldalmaker.common.ISelectDbSchemaCallback;
 import com.sqldalmaker.jaxb.settings.Settings;
+import com.intellij.openapi.ui.DialogWrapper;
+import org.jspecify.annotations.NonNull;
 
 import javax.swing.*;
 import javax.swing.plaf.FontUIResource;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.text.StyleContext;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.sql.Connection;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -25,7 +24,7 @@ import java.util.Locale;
  * User: sqldalmaker@gmail.com
  * Date: 21.06.12
  */
-public class UIDialogSelectDbSchema extends JDialog {
+public class UIDialogSelectDbSchema extends DialogWrapper {
 
     private JPanel contentPane;
     private JButton buttonOK;
@@ -42,74 +41,51 @@ public class UIDialogSelectDbSchema extends JDialog {
     private JRadioButton radio_selected_schema;
     private JRadioButton radio_user_as_schema;
     private JLabel lbl_jdbc_url;
+    private JScrollPane table1;
 
     private final Project project;
     private final Settings settings;
+    private final ISelectDbSchemaCallback callback;
 
     private String selected_schema = null;
 
-    private UIDialogSelectDbSchema(Project project, VirtualFile profile, ISelectDbSchemaCallback callback, boolean dto, boolean fk) throws Exception {
-        $$$setupUI$$$();
-        setContentPane(contentPane);
-        setModal(true);
-        getRootPane().setDefaultButton(buttonOK);
+    private UIDialogSelectDbSchema(Project project, VirtualFile profile, ISelectDbSchemaCallback callback,
+                                   boolean dto, boolean fk) throws Exception {
+        super(project, true);  // modal
         this.project = project;
         this.callback = callback;
         this.settings = IdeaHelpers.load_settings(profile);
+
+        $$$setupUI$$$();   // UI Designer
+
+        init();            // must call for DialogWrapper
         setTitle("Select a schema and provide options");
+
         lbl_jdbc_url.setText(settings.getJdbc().getUrl());
-        buttonOK.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onOK();
-            }
-        });
-        buttonCancel.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onCancel();
-            }
-        });
+
+        // listeners
+        buttonOK.addActionListener(e -> onOK());
+        buttonCancel.addActionListener(e -> close(CANCEL_EXIT_CODE));
+
         table.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) {
-                    onOK();
-                } else if (e.getClickCount() == 1) {
-                    on_selection_changed();
-                }
+                if (e.getClickCount() == 2) onOK();
+                else on_selection_changed();
             }
         });
-// call onCancel() when cross is clicked
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                onCancel();
-            }
-        });
-// call onCancel() on ESCAPE
-        contentPane.registerKeyboardAction(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onCancel();
-            }
-        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+
+        radio_selected_schema.addActionListener(e -> on_selection_changed());
+        radio_user_as_schema.addActionListener(e -> on_selection_changed());
+
         if (dto || fk) {
-            this.radioPanel.setVisible(false);
+            radioPanel.setVisible(false);
             chk_add_fk_access.setVisible(false);
         }
         if (fk) {
-            this.chk_omit.setVisible(false);
-            this.chk_including_views.setVisible(false);
+            chk_omit.setVisible(false);
+            chk_including_views.setVisible(false);
         }
-        radio_selected_schema.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                on_selection_changed();
-            }
-        });
-        radio_user_as_schema.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                on_selection_changed();
-            }
-        });
+
         refresh();
     }
 
@@ -118,8 +94,7 @@ public class UIDialogSelectDbSchema extends JDialog {
         if (radio_user_as_schema.isSelected()) {
             enabled = true;
             chk_schema_in_xml.setEnabled(true);
-            String user = settings.getJdbc().getUser();
-            selected_schema = user;
+            selected_schema = settings.getJdbc().getUser();
         } else if (radio_selected_schema.isSelected()) {
             if (table.getRowCount() == 0) {
                 chk_schema_in_xml.setSelected(false);
@@ -132,85 +107,73 @@ public class UIDialogSelectDbSchema extends JDialog {
                     enabled = true;
                     selected_schema = null;
                 } else {
-                    int[] indexes = getSelection();
+                    int[] indexes = table.getSelectedRows();
                     enabled = indexes.length == 1;
-                    if (enabled) {
-                        selected_schema = (String) table.getModel().getValueAt(indexes[0], 0);
-                    }
+                    if (enabled) selected_schema = (String) table.getModel().getValueAt(indexes[0], 0);
                 }
             }
         }
         buttonOK.setEnabled(enabled);
     }
 
-    private int[] getSelection() {
-        int rc = table.getModel().getRowCount();
-        if (rc == 1) {
-            return new int[]{0};
-        }
-        int[] selected_rows = table.getSelectedRows();
-        return selected_rows;
-    }
-
     private void onOK() {
-        callback.process_ok(chk_schema_in_xml.isSelected(), selected_schema,
-                chk_omit.isSelected(), chk_including_views.isSelected(), chk_singular.isSelected(),
-                crudAutoRadioButton.isSelected(), chk_add_fk_access.isSelected());
-        dispose();
+        callback.process_ok(
+                chk_schema_in_xml.isSelected(),
+                selected_schema,
+                chk_omit.isSelected(),
+                chk_including_views.isSelected(),
+                chk_singular.isSelected(),
+                crudAutoRadioButton.isSelected(),
+                chk_add_fk_access.isSelected()
+        );
+        close(OK_EXIT_CODE);
     }
 
-    private void onCancel() {
-// add your code here if necessary
-        dispose();
-    }
-
-    private final ISelectDbSchemaCallback callback;
-
-    static void open(Project project, VirtualFile profile, ISelectDbSchemaCallback callback, boolean dto, boolean fk) throws Exception {
+    public static void open(Project project, VirtualFile profile, ISelectDbSchemaCallback callback,
+                            boolean dto, boolean fk) throws Exception {
         UIDialogSelectDbSchema dlg = new UIDialogSelectDbSchema(project, profile, callback, dto, fk);
-        // dlg.setPreferredSize(new Dimension(520, 280));
-        dlg.pack(); // after setPreferredSize
-        dlg.setLocationRelativeTo(null);  // after pack!!!
-        dlg.setVisible(true);
+        dlg.show();  // модально показывает диалог
     }
 
     private void refresh() {
-        try {
-            Connection con = IdeaHelpers.get_connection(project, settings);
-            try {
-                table.setTableHeader(null);
-                java.util.List<String> items = JdbcUtils.get_schema_names(con);
-                table.setModel(new AbstractTableModel() {
-                    public Object getValueAt(int rowIndex, int columnIndex) {
-                        return items.get(rowIndex);
-                    }
-
-                    public int getColumnCount() {
-                        return 1;
-                    }
-
-                    public String getColumnName(int column) {
-                        return "Schema";
-                    }
-
-                    public int getRowCount() {
-                        return items.size();
-                    }
-                });
-                if (items.isEmpty()) {
-                    radio_selected_schema.setText("Without schema");
-                } else {
-                    radio_selected_schema.setText("Use selected schema");
-                    // chk_schema_in_xml.setSelected(true);
+        try (Connection con = IdeaHelpers.get_connection(project, settings)) {
+            table.setTableHeader(null);
+            List<String> items = JdbcUtils.get_schema_names(con);
+            table.setModel(new AbstractTableModel() {
+                public Object getValueAt(int rowIndex, int columnIndex) {
+                    return items.get(rowIndex);
                 }
-            } finally {
-                con.close();
-            }
+
+                public int getColumnCount() {
+                    return 1;
+                }
+
+                public String getColumnName(int column) {
+                    return "Schema";
+                }
+
+                public int getRowCount() {
+                    return items.size();
+                }
+            });
+
+            if (items.isEmpty()) radio_selected_schema.setText("Without schema");
+            else radio_selected_schema.setText("Use selected schema");
+
             on_selection_changed();
         } catch (Exception e) {
-            // e.printStackTrace();
             IdeaMessageHelpers.show_error_in_ui_thread(e);
         }
+    }
+
+    @Override
+    protected JComponent createCenterPanel() {
+        return contentPane;
+    }
+
+    @Override
+    protected Action @NonNull [] createActions() {
+        return new Action[0];  // remove default DialogWrapper buttons
     }
 
     /**
@@ -245,11 +208,11 @@ public class UIDialogSelectDbSchema extends JDialog {
         final JPanel panel3 = new JPanel();
         panel3.setLayout(new BorderLayout(0, 0));
         panel1.add(panel3, BorderLayout.CENTER);
-        final JScrollPane scrollPane1 = new JScrollPane();
-        scrollPane1.setPreferredSize(new Dimension(453, 300));
-        panel3.add(scrollPane1, BorderLayout.CENTER);
+        table1 = new JScrollPane();
+        table1.setPreferredSize(new Dimension(453, 300));
+        panel3.add(table1, BorderLayout.CENTER);
         table = new JTable();
-        scrollPane1.setViewportView(table);
+        table1.setViewportView(table);
         final JPanel panel4 = new JPanel();
         panel4.setLayout(new GridBagLayout());
         panel3.add(panel4, BorderLayout.SOUTH);

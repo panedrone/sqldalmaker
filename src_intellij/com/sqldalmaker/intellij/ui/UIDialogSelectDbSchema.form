@@ -36,7 +36,7 @@
             <properties/>
             <border type="none"/>
             <children>
-              <scrollpane id="92628">
+              <scrollpane id="92628" binding="table1">
                 <constraints border-constraint="Center"/>
                 <properties>
                   <preferredSize width="453" height="300"/>

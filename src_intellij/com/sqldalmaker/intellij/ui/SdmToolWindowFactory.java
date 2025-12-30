@@ -1,3 +1,8 @@
+/*
+    Copyright 2011-2026 sqldalmaker@gmail.com
+    SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
+    Read LICENSE.txt in the root of this project/archive for details.
+ */
 package com.sqldalmaker.intellij.ui;
 
 import com.intellij.openapi.application.ReadAction;
@@ -21,6 +26,11 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
+/*
+ * @author sqldalmaker@gmail.com
+ *
+ * 30.12.2024 20:00 1.314
+ */
 public class SdmToolWindowFactory implements ToolWindowFactory {
 
     private static final String ID = "SDM";
@@ -200,14 +210,35 @@ public class SdmToolWindowFactory implements ToolWindowFactory {
     }
 
     public static String[] readLines(VirtualFile file) {
-        com.intellij.openapi.editor.Document document = com.intellij.openapi.fileEditor.FileDocumentManager.getInstance().getDocument(file);
+        String text;
+
+        com.intellij.openapi.editor.Document document =
+                com.intellij.openapi.fileEditor.FileDocumentManager.getInstance().getDocument(file);
+
         if (document != null) {
-            return document.getText().split("\n");
+            text = document.getText();
+        } else {
+            try {
+                text = new String(file.contentsToByteArray(), file.getCharset());
+            } catch (Exception e) {
+                return new String[0];
+            }
         }
-        try {
-            return new String(file.contentsToByteArray(), file.getCharset()).split("\n");
-        } catch (Exception e) {
-            return new String[0];
+
+        List<String> result = new ArrayList<>();
+
+        for (String line : text.split("\n")) {
+            int hashIndex = line.indexOf('#');
+            if (hashIndex >= 0) {
+                line = line.substring(0, hashIndex);
+            }
+
+            line = line.trim();
+            if (!line.isEmpty()) {
+                result.add(line);
+            }
         }
+
+        return result.toArray(new String[0]);
     }
 }

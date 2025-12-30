@@ -1,103 +1,75 @@
-/*
-    Copyright 2011-2024 sqldalmaker@gmail.com
-    SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
-    Read LICENSE.txt in the root of this project/archive for details.
- */
 package com.sqldalmaker.intellij.ui;
+
+import com.intellij.openapi.ui.DialogWrapper;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.Desktop;
 
 /*
  * @author sqldalmaker@gmail.com
  *
  * 30.05.2024 20:00 1.299
  * 01.09.2023 12:21 1.287
- *
  */
-public class UIDialogAbout extends JDialog {
+public class UIDialogAbout extends DialogWrapper {
+
     private JPanel contentPane;
     private JButton buttonOK;
-    private JTextPane text1;
+    private JTextPane textAbout;
 
     public static void show_modal() {
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                UIDialogAbout dialog = new UIDialogAbout(new JFrame(), true);
-                // dialog.setPreferredSize(new Dimension(720, 300)); // don't !!!
-                // How to completely remove an icon from JDialog?
-                // https://stackoverflow.com/questions/8504731/how-to-completely-remove-an-icon-from-jdialog
-                dialog.setResizable(false);
-                dialog.pack(); // after setPreferredSize
-                dialog.setLocationRelativeTo(null);  // after pack!!!
-                dialog.setVisible(true);
-            }
-        });
+        UIDialogAbout dialog = new UIDialogAbout();
+        dialog.setResizable(false);
+        dialog.show();
     }
 
-    private UIDialogAbout(Frame parent, boolean modal) {
-        super(parent, modal);
-        setContentPane(contentPane);
-        // setModal(true);
+    private UIDialogAbout() {
+        super(true); // modal
         setTitle("About");
+        init(); // IMPORTANT: initializes DialogWrapper
+
         getRootPane().setDefaultButton(buttonOK);
 
-        buttonOK.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onCancel();
-            }
-        });
-// call onCancel() when cross is clicked
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                onCancel();
-            }
-        });
+        buttonOK.addActionListener(e -> close(OK_EXIT_CODE));
 
-// call onCancel() on ESCAPE
-        contentPane.registerKeyboardAction(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onCancel();
-            }
-        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        initText();
+    }
 
+    @Override
+    protected @Nullable JComponent createCenterPanel() {
+        return contentPane;
+    }
+
+    @Override
+    protected Action[] createActions() {
+        return new Action[0]; // only close (X), OK handled manually
+    }
+
+    private void initText() {
         try {
-            text1.setContentType("text/html");
-            text1.setEditable(false);
+            textAbout.setContentType("text/html");
+            textAbout.setEditable(false);
 
             String text = IdeaHelpers.read_from_jar("", "ABOUT.html");
             String sdm_info = IdeaHelpers.get_sdm_info();
             text = String.format(text, sdm_info);
-            text1.setText(text);
-            text1.addHyperlinkListener(new HyperlinkListener() {
-                @Override
-                public void hyperlinkUpdate(HyperlinkEvent hle) {
-                    if (HyperlinkEvent.EventType.ACTIVATED.equals(hle.getEventType())) {
-                        // System.out.println(hle.getURL());
-                        if (Desktop.isDesktopSupported()) {
-                            try {
-                                Desktop desktop = Desktop.getDesktop();
-                                desktop.browse(hle.getURL().toURI());
-                            } catch (Exception ex) {
-                                // ex.printStackTrace();
-                            }
+            textAbout.setText(text);
+
+            textAbout.addHyperlinkListener(hle -> {
+                if (HyperlinkEvent.EventType.ACTIVATED.equals(hle.getEventType())) {
+                    if (Desktop.isDesktopSupported()) {
+                        try {
+                            Desktop.getDesktop().browse(hle.getURL().toURI());
+                        } catch (Exception ignored) {
                         }
                     }
                 }
             });
-        } catch (Exception e) {
-            // e.printStackTrace();
+        } catch (Exception ignored) {
         }
-    }
-
-    private void onCancel() {
-        // add your code here
-        dispose();
     }
 
     {
@@ -123,11 +95,11 @@ public class UIDialogAbout extends JDialog {
         final JPanel panel2 = new JPanel();
         panel2.setLayout(new BorderLayout(0, 0));
         panel1.add(panel2, BorderLayout.CENTER);
-        text1 = new JTextPane();
-        text1.setEditable(false);
-        text1.setMargin(new Insets(0, 15, 15, 15));
-        text1.setText("");
-        panel2.add(text1, BorderLayout.CENTER);
+        textAbout = new JTextPane();
+        textAbout.setEditable(false);
+        textAbout.setMargin(new Insets(0, 15, 15, 15));
+        textAbout.setText("");
+        panel2.add(textAbout, BorderLayout.CENTER);
         final JPanel panel3 = new JPanel();
         panel3.setLayout(new FlowLayout(FlowLayout.RIGHT, 5, 5));
         contentPane.add(panel3, BorderLayout.SOUTH);
