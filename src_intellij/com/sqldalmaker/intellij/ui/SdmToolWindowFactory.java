@@ -11,14 +11,18 @@ import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.openapi.wm.ex.ToolWindowManagerListener;
+import com.intellij.ui.components.ActionLink;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -38,7 +42,6 @@ public class SdmToolWindowFactory implements ToolWindowFactory {
     public void createToolWindowContent(@NotNull Project project,
                                         @NotNull ToolWindow toolWindow) {
 
-        // Minimal placeholder panel
         JPanel panel = new JPanel(new BorderLayout());
         JLabel label = new JLabel("SDM", SwingConstants.CENTER);
         panel.add(label, BorderLayout.CENTER);
@@ -51,21 +54,14 @@ public class SdmToolWindowFactory implements ToolWindowFactory {
                 .connect(toolWindow.getDisposable())
                 .subscribe(ToolWindowManagerListener.TOPIC,
                         new ToolWindowManagerListener() {
-
                             @Override
                             public void stateChanged(@NotNull ToolWindowManager manager) {
 
                                 ToolWindow tw = manager.getToolWindow(ID);
 
-                                if (tw == null) {
-                                    return;
-                                }
-                                if (!tw.isAvailable()) {
-                                    return;
-                                }
-                                if (!tw.isVisible()) {
-                                    return;
-                                }
+                                if (tw == null) return;
+                                if (!tw.isAvailable()) return;
+                                if (!tw.isVisible()) return;
 
                                 // Hide immediately (acts as a trigger button)
                                 tw.hide(null);
@@ -77,12 +73,7 @@ public class SdmToolWindowFactory implements ToolWindowFactory {
     }
 
     private static void handleItems(Project project, List<String> items) {
-        if (items == null) {
-            return;
-        }
-        if (items.isEmpty()) {
-            return;
-        }
+        if (items == null || items.isEmpty()) return;
 
         if (items.size() == 1) {
             openEditorQuietly(project, items.get(0));
@@ -109,9 +100,7 @@ public class SdmToolWindowFactory implements ToolWindowFactory {
 
         for (String line : lines) {
             String path = line.trim();
-            if (path.isEmpty()) {
-                continue;
-            }
+            if (path.isEmpty()) continue;
 
             VirtualFile file = findFileByRelativePath(project, path);
             if (file == null) {
@@ -152,12 +141,26 @@ public class SdmToolWindowFactory implements ToolWindowFactory {
                     panel.add(Box.createRigidArea(new Dimension(0, 5)));
                 }
 
+                panel.add(Box.createVerticalGlue());
+
+                ActionLink sdmLink = new ActionLink(".sdm", new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        openEditorQuietly(project, ".sdm"); // открыть файл
+                        close(DialogWrapper.OK_EXIT_CODE);   // закрыть диалог
+                    }
+                });
+
+                sdmLink.setAlignmentX(Component.CENTER_ALIGNMENT); // по центру
+                panel.add(Box.createRigidArea(new Dimension(0, 10)));
+                panel.add(sdmLink);
+
                 return panel;
             }
 
             @Override
-            protected Action[] createActions() {
-                return new Action[0];
+            protected Action @NonNull [] createActions() {
+                return new Action[0]; // только кнопка закрытия (X)
             }
 
             private JButton createButton(String relativePath,
@@ -221,12 +224,9 @@ public class SdmToolWindowFactory implements ToolWindowFactory {
 
     private static VirtualFile findFileByRelativePath(Project project, String relativePath) {
         String basePath = project.getBasePath();
-        VirtualFile baseDir =
-                basePath == null ? null :
-                        LocalFileSystem.getInstance().findFileByPath(basePath);
-        if (baseDir == null) {
-            return null;
-        }
+        VirtualFile baseDir = basePath == null ? null :
+                LocalFileSystem.getInstance().findFileByPath(basePath);
+        if (baseDir == null) return null;
         return baseDir.findFileByRelativePath(relativePath);
     }
 
