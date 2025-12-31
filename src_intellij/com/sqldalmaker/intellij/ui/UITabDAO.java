@@ -2,6 +2,7 @@ package com.sqldalmaker.intellij.ui;
 
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.JBColor;
 import com.sqldalmaker.cg.IDaoCG;
@@ -50,57 +51,112 @@ public class UITabDAO {
 
     public UITabDAO() {
         $$$setupUI$$$();
-        btn_Refresh.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                reload_table(true);
-            }
-        });
-        btn_Validate.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                validate_all_with_progress_sync();
-            }
-        });
-        btn_Generate.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                generate_for_dao_selected_in_ui_with_progress_sync();
-            }
-        });
-        btn_goto_detailed_dao_xml.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int[] selected_rows = get_ui_table_sel_indexes();
-                if (selected_rows.length == 0) {
+        {
+            btn_Refresh.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    reload_table(true);
+                }
+            });
+            Icon icon = IconLoader.getIcon("/img/restartKernel.svg", UITabDAO.class);
+            btn_Refresh.setIcon(icon);
+        }
+        {
+            btn_Validate.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    validate_all_with_progress_sync();
+                }
+            });
+            Icon icon = IconLoader.getIcon("/img/validator.svg", UITabDAO.class);
+            btn_Validate.setIcon(icon);
+        }
+        {
+            btn_Generate.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    generate_for_dao_selected_in_ui_with_progress_sync();
+                }
+            });
+            Icon icon = IconLoader.getIcon("/img/buildOnFrameDeactivation.svg", UITabDAO.class);
+            btn_Generate.setIcon(icon);
+        }
+        {
+            btn_goto_detailed_dao_xml.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    int[] selected_rows = get_ui_table_sel_indexes();
+                    if (selected_rows.length == 0) {
+                        open_sdm_xml_async();
+                        return;
+                    }
+                    open_detailed_dao_xml_async(selected_rows[0]);
+                }
+            });
+            Icon icon = IconLoader.getIcon("/img/SQLDMLStatement.svg", UITabDAO.class);
+            btn_goto_detailed_dao_xml.setIcon(icon);
+        }
+        {
+            btn_OpenJava.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    int[] selected_rows = get_ui_table_sel_indexes();
+                    if (selected_rows.length == 0) {
+                        return;
+                    }
+                    open_target_file_async(selected_rows[0]);
+                }
+            });
+            Icon icon = IconLoader.getIcon("/img/toolWindowJsonPath.svg", UITabDAO.class);
+            btn_OpenJava.setIcon(icon);
+        }
+        {
+            btn_NewXML.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    new_dao_xml();
+                }
+            });
+            Icon icon = IconLoader.getIcon("/img/addFile.svg", UITabDAO.class);
+            btn_NewXML.setIcon(icon);
+        }
+        {
+            btn_CrudDao.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    crud_dao_wizard();
+                }
+            });
+            Icon icon = IconLoader.getIcon("/img/importDataCell.svg", UITabDAO.class);
+            btn_CrudDao.setIcon(icon);
+        }
+        {
+            button_fk_assistant.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    IdeaCrudXmlHelpers.get_fk_access_xml(project, root_file);
+                }
+            });
+            Icon icon = IconLoader.getIcon("/img/insightNavigate.svg", UITabDAO.class);
+            button_fk_assistant.setIcon(icon);
+        }
+        {
+            open_sdm_xml.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    int[] selected_rows = get_ui_table_sel_indexes();
+                    if (selected_rows.length > 0) {
+                        String dao_class_name = (String) table.getValueAt(selected_rows[0], COL_INDEX_NAME);
+                        if (IdeaHelpers.navigate_to_sdm_xml_dao_class_by_name(project, root_file, dao_class_name)) {
+                            return;
+                        }
+                    }
                     open_sdm_xml_async();
-                    return;
                 }
-                open_detailed_dao_xml_async(selected_rows[0]);
-            }
-        });
-        btn_OpenJava.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int[] selected_rows = get_ui_table_sel_indexes();
-                if (selected_rows.length == 0) {
-                    return;
-                }
-                open_target_file_async(selected_rows[0]);
-            }
-        });
-        btn_NewXML.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new_dao_xml();
-            }
-        });
-        btn_CrudDao.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                crud_dao_wizard();
-            }
-        });
+            });
+            Icon icon = IconLoader.getIcon("/img/dataStructure.svg", UITabDAO.class);
+            open_sdm_xml.setIcon(icon);
+        }
         Cursor wc = new Cursor(Cursor.HAND_CURSOR);
         tool_panel.setOpaque(false);
         for (Component c : tool_panel.getComponents()) {
@@ -116,25 +172,6 @@ public class UITabDAO {
                 b.setBorder(null);
             }
         }
-        button_fk_assistant.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                IdeaCrudXmlHelpers.get_fk_access_xml(project, root_file);
-            }
-        });
-        open_sdm_xml.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int[] selected_rows = get_ui_table_sel_indexes();
-                if (selected_rows.length > 0) {
-                    String dao_class_name = (String) table.getValueAt(selected_rows[0], COL_INDEX_NAME);
-                    if (IdeaHelpers.navigate_to_sdm_xml_dao_class_by_name(project, root_file, dao_class_name)) {
-                        return;
-                    }
-                }
-                open_sdm_xml_async();
-            }
-        });
 
         // === panedrone:
         // Set up columns after $$$setupUI$$$().

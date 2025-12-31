@@ -7,6 +7,7 @@ package com.sqldalmaker.intellij.ui;
 
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.JBColor;
 import com.sqldalmaker.cg.Helpers;
@@ -64,62 +65,109 @@ public class UITabDTO {
 
     public UITabDTO() {
         $$$setupUI$$$();
-        btn_Refresh.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                reload_table(true);
-            }
-        });
-        btn_Validate.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                validate();
-            }
-        });
-        btn_Generate.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                generate_selected_with_progress_sync();
-            }
-        });
-        btn_OpenSQL.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int[] selected_rows = get_ui_table_sel_indexes();
-                if (selected_rows.length == 0) {
-                    return;
+        {
+            btn_Refresh.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    reload_table(true);
                 }
-                open_sql_async(selected_rows[0]);
-            }
-        });
-        btn_OpenXML.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                open_sdm_xml_async();
-            }
-        });
-        btn_OpenJava.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int[] selected_rows = get_ui_table_sel_indexes();
-                if (selected_rows.length == 0) {
-                    return;
+            });
+            Icon icon = IconLoader.getIcon("/img/restartKernel.svg", UITabDTO.class);
+            btn_Refresh.setIcon(icon);
+        }
+        {
+            btn_Validate.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    validate();
                 }
-                open_target_file_async(selected_rows[0]);
-            }
-        });
-        btn_genTmpFieldTags.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                jaxb_fields_wizard();
-            }
-        });
-        btn_CrudXML.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                create_crud_xml();
-            }
-        });
+            });
+            Icon icon = IconLoader.getIcon("/img/validator.svg", UITabDTO.class);
+            btn_Validate.setIcon(icon);
+        }
+        {
+            btn_Generate.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    generate_selected_with_progress_sync();
+                }
+            });
+            Icon icon = IconLoader.getIcon("/img/buildOnFrameDeactivation.svg", UITabDTO.class);
+            btn_Generate.setIcon(icon);
+        }
+        {
+            btn_OpenSQL.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    int[] selected_rows = get_ui_table_sel_indexes();
+                    if (selected_rows.length == 0) {
+                        return;
+                    }
+                    open_sql_async(selected_rows[0]);
+                }
+            });
+            Icon icon = IconLoader.getIcon("/img/dbmsOutput.svg", UITabDTO.class);
+            btn_OpenSQL.setIcon(icon);
+        }
+        {
+            btn_OpenXML.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    open_sdm_xml_async();
+                }
+            });
+            Icon icon = IconLoader.getIcon("/img/dataStructure.svg", UITabDTO.class);
+            btn_OpenXML.setIcon(icon);
+        }
+        {
+            btn_goto_dto_class_in_xml.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    int[] selected_rows = get_ui_table_sel_indexes();
+                    if (selected_rows.length > 0) {
+                        navigate_to_sdm_dto_class_async(selected_rows[0]);
+                        return;
+                    }
+                    open_sdm_xml_async();
+                }
+            });
+            Icon icon = IconLoader.getIcon("/img/SQLDMLStatement.svg", UITabDTO.class);
+            btn_goto_dto_class_in_xml.setIcon(icon);
+        }
+        {
+            btn_OpenJava.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    int[] selected_rows = get_ui_table_sel_indexes();
+                    if (selected_rows.length == 0) {
+                        return;
+                    }
+                    open_target_file_async(selected_rows[0]);
+                }
+            });
+            Icon icon = IconLoader.getIcon("/img/toolWindowJsonPath.svg", UITabDTO.class);
+            btn_OpenJava.setIcon(icon);
+        }
+        {
+            btn_genTmpFieldTags.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    jaxb_fields_wizard();
+                }
+            });
+            Icon icon = IconLoader.getIcon("/img/schema.svg", UITabDTO.class);
+            btn_genTmpFieldTags.setIcon(icon);
+        }
+        {
+            btn_CrudXML.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    create_crud_xml();
+                }
+            });
+            Icon icon = IconLoader.getIcon("/img/importDataCell.svg", UITabDTO.class);
+            btn_CrudXML.setIcon(icon);
+        }
         Cursor wc = new Cursor(Cursor.HAND_CURSOR);
         tool_panel.setOpaque(false);
         for (Component c : tool_panel.getComponents()) {
@@ -150,17 +198,6 @@ public class UITabDTO {
         // at the end of your code, otherwise setPreferredWidth() won't affect anything!
         table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
         table.doLayout();
-        btn_goto_dto_class_in_xml.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int[] selected_rows = get_ui_table_sel_indexes();
-                if (selected_rows.length > 0) {
-                    navigate_to_sdm_dto_class_async(selected_rows[0]);
-                    return;
-                }
-                open_sdm_xml_async();
-            }
-        });
     }
 
     /**
