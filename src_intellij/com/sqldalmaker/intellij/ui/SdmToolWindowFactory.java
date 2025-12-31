@@ -1,24 +1,21 @@
-/*
-    Copyright 2011-2026 sqldalmaker@gmail.com
-    SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
-    Read LICENSE.txt in the root of this project/archive for details.
- */
 package com.sqldalmaker.intellij.ui;
 
 import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
+import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.openapi.wm.ex.ToolWindowManagerListener;
+import com.intellij.ui.content.Content;
+import com.intellij.ui.content.ContentFactory;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
-import org.jspecify.annotations.NonNull;
 
 import javax.swing.*;
 import java.awt.*;
@@ -27,60 +24,66 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-/*
- * @author ...
- *
- * 30.12.2024 20:00 1.314
- */
 public class SdmToolWindowFactory implements ToolWindowFactory {
 
     public static final String ID = "SDM";
 
     @Override
-    public void createToolWindowContent(@NotNull Project project,
-                                        @NotNull ToolWindow toolWindow) {
-        // ToolWindow UI is not used, acts only as a trigger button
-        toolWindow.setToHideOnEmptyContent(true);
-        toolWindow.setAutoHide(true);
+    public void init(@NotNull ToolWindow toolWindow) {
+        Icon icon = IconLoader.getIcon("/META-INF/pluginIcon.svg", SdmToolWindowFactory.class);
+        toolWindow.setIcon(icon);
     }
 
     @Override
-    public void init(@NotNull ToolWindow toolWindow) {
+    public void createToolWindowContent(@NotNull Project project,
+                                        @NotNull ToolWindow toolWindow) {
 
-        Project project = toolWindow.getProject();
+        // Minimal placeholder panel
+        JPanel panel = new JPanel(new BorderLayout());
+        JLabel label = new JLabel("SDM", SwingConstants.CENTER);
+        panel.add(label, BorderLayout.CENTER);
+
+        Content content = ContentFactory.getInstance()
+                .createContent(panel, "", false);
+        toolWindow.getContentManager().addContent(content);
 
         project.getMessageBus()
                 .connect(toolWindow.getDisposable())
                 .subscribe(ToolWindowManagerListener.TOPIC,
                         new ToolWindowManagerListener() {
 
-                            /*
-                             * Modern IntelliJ Platform API (2022.2+)
-                             * stateChanged() triggers on any ToolWindowManager update.
-                             * We only react when our ToolWindow is clicked (isVisible)
-                             */
                             @Override
                             public void stateChanged(@NotNull ToolWindowManager manager) {
 
                                 ToolWindow tw = manager.getToolWindow(ID);
-                                if (tw == null) return;          // early return: not registered
-                                if (!tw.isVisible()) return;      // early return: not a user click
 
-                                // Hide immediately to prevent flashing panel
+                                if (tw == null) {
+                                    return;
+                                }
+                                if (!tw.isAvailable()) {
+                                    return;
+                                }
+                                if (!tw.isVisible()) {
+                                    return;
+                                }
+
+                                // Hide immediately (acts as a trigger button)
                                 tw.hide(null);
 
-                                // Build SDM items
                                 List<String> items = buildItemsFromSdm(project);
-                                if (items == null || items.isEmpty()) return;
-
-                                // Handle items
                                 handleItems(project, items);
                             }
                         });
     }
 
-    /** Centralized processing of SDM items */
     private static void handleItems(Project project, List<String> items) {
+        if (items == null) {
+            return;
+        }
+        if (items.isEmpty()) {
+            return;
+        }
+
         if (items.size() == 1) {
             openEditorQuietly(project, items.get(0));
         } else {
@@ -91,6 +94,7 @@ public class SdmToolWindowFactory implements ToolWindowFactory {
     private static List<String> buildItemsFromSdm(Project project) {
         List<String> items = new ArrayList<>();
         VirtualFile sdm = findFileByRelativePath(project, ".sdm");
+
         if (sdm == null) {
             IdeaMessageHelpers.add_error_to_ide_log("ERROR", ".sdm not found in project root");
             return null;
@@ -98,15 +102,17 @@ public class SdmToolWindowFactory implements ToolWindowFactory {
 
         String[] lines = ReadAction.compute(() -> readLines(sdm));
 
-        if (lines.length == 0 || lines[0].trim().isEmpty()) {
-            IdeaMessageHelpers.add_error_to_ide_log("ERROR",
-                    ".sdm is empty, you need to specify at least one file path");
+        if (lines.length == 0) {
+            IdeaMessageHelpers.add_error_to_ide_log("ERROR", ".sdm is empty");
             return null;
         }
 
         for (String line : lines) {
             String path = line.trim();
-            if (path.isEmpty()) continue;
+            if (path.isEmpty()) {
+                continue;
+            }
+
             VirtualFile file = findFileByRelativePath(project, path);
             if (file == null) {
                 IdeaMessageHelpers.add_error_to_ide_log("ERROR", path + " not found");
@@ -116,6 +122,7 @@ public class SdmToolWindowFactory implements ToolWindowFactory {
                 IdeaMessageHelpers.add_error_to_ide_log("ERROR", path + " is a directory");
                 continue;
             }
+
             items.add(path);
         }
 
@@ -131,7 +138,8 @@ public class SdmToolWindowFactory implements ToolWindowFactory {
             }
 
             @Override
-            protected @NonNull JComponent createCenterPanel() {
+            protected JComponent createCenterPanel() {
+
                 JPanel panel = new JPanel();
                 panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
                 panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -139,21 +147,23 @@ public class SdmToolWindowFactory implements ToolWindowFactory {
                 panel.setOpaque(true);
 
                 for (String relativePath : items) {
-                    JButton button = createJetBrainsButton(relativePath, project, this);
+                    JButton button = createButton(relativePath, project, this);
                     panel.add(button);
                     panel.add(Box.createRigidArea(new Dimension(0, 5)));
                 }
 
-                panel.setMinimumSize(new Dimension(250, panel.getPreferredSize().height));
                 return panel;
             }
 
             @Override
-            protected Action @NonNull [] createActions() {
-                return new Action[0]; // only close button (X)
+            protected Action[] createActions() {
+                return new Action[0];
             }
 
-            private JButton createJetBrainsButton(String relativePath, Project project, DialogWrapper dialog) {
+            private JButton createButton(String relativePath,
+                                         Project project,
+                                         DialogWrapper dialog) {
+
                 JButton button = new JButton(relativePath);
                 button.setAlignmentX(Component.CENTER_ALIGNMENT);
                 button.setMinimumSize(JBUI.size(100, 30));
@@ -161,7 +171,6 @@ public class SdmToolWindowFactory implements ToolWindowFactory {
                 button.setFocusPainted(false);
                 button.setContentAreaFilled(true);
                 button.setOpaque(true);
-                button.setBorderPainted(true);
 
                 Color defaultBg = UIUtil.getPanelBackground();
                 Color hoverBg = UIUtil.getListSelectionBackground(true);
@@ -169,9 +178,14 @@ public class SdmToolWindowFactory implements ToolWindowFactory {
 
                 button.addMouseListener(new MouseAdapter() {
                     @Override
-                    public void mouseEntered(MouseEvent e) { button.setBackground(hoverBg); }
+                    public void mouseEntered(MouseEvent e) {
+                        button.setBackground(hoverBg);
+                    }
+
                     @Override
-                    public void mouseExited(MouseEvent e) { button.setBackground(defaultBg); }
+                    public void mouseExited(MouseEvent e) {
+                        button.setBackground(defaultBg);
+                    }
                 });
 
                 button.addActionListener(e -> {
@@ -181,10 +195,12 @@ public class SdmToolWindowFactory implements ToolWindowFactory {
 
                 return button;
             }
+
         }.show();
     }
 
     private static void openEditorQuietly(Project project, String relativePath) {
+
         VirtualFile file = findFileByRelativePath(project, relativePath);
         if (file == null) {
             IdeaMessageHelpers.add_error_to_ide_log("ERROR", relativePath + " not found");
@@ -203,20 +219,23 @@ public class SdmToolWindowFactory implements ToolWindowFactory {
         fem.openFile(file, false);
     }
 
-    // ---------------- Helper functions ----------------
-
-    public static VirtualFile findFileByRelativePath(Project project, String relativePath) {
+    private static VirtualFile findFileByRelativePath(Project project, String relativePath) {
         String basePath = project.getBasePath();
-        VirtualFile baseDir = basePath == null ? null : LocalFileSystem.getInstance().findFileByPath(basePath);
-        if (baseDir == null) return null;
+        VirtualFile baseDir =
+                basePath == null ? null :
+                        LocalFileSystem.getInstance().findFileByPath(basePath);
+        if (baseDir == null) {
+            return null;
+        }
         return baseDir.findFileByRelativePath(relativePath);
     }
 
-    public static String[] readLines(VirtualFile file) {
+    private static String[] readLines(VirtualFile file) {
         String text;
 
         com.intellij.openapi.editor.Document document =
-                com.intellij.openapi.fileEditor.FileDocumentManager.getInstance().getDocument(file);
+                com.intellij.openapi.fileEditor.FileDocumentManager
+                        .getInstance().getDocument(file);
 
         if (document != null) {
             text = document.getText();
@@ -231,11 +250,10 @@ public class SdmToolWindowFactory implements ToolWindowFactory {
         List<String> result = new ArrayList<>();
 
         for (String line : text.split("\n")) {
-            int hashIndex = line.indexOf('#');
-            if (hashIndex >= 0) {
-                line = line.substring(0, hashIndex);
+            int hash = line.indexOf('#');
+            if (hash >= 0) {
+                line = line.substring(0, hash);
             }
-
             line = line.trim();
             if (!line.isEmpty()) {
                 result.add(line);

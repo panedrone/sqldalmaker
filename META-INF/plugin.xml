@@ -28,9 +28,9 @@ Generated code is being synchronized with the current database schema using "liv
     ]]></change-notes>
 
     <!-- Legacy component tags must remain empty but kept for compatibility -->
-    <application-components></application-components>
-    <project-components></project-components>
-    <module-components></module-components>
+<!--    <application-components></application-components>-->
+<!--    <project-components></project-components>-->
+<!--    <module-components></module-components>-->
 
     <extensions defaultExtensionNs="com.intellij">
 
@@ -61,11 +61,8 @@ Generated code is being synchronized with the current database schema using "liv
         <!-- SDM Tool Window -->
         <toolWindow
                 id="SDM"
-                icon="/META-INF/pluginIcon.svg"
-                anchor="top"
-                secondary="true"
+                anchor="right"
                 factoryClass="com.sqldalmaker.intellij.ui.SdmToolWindowFactory"
-                type="DUMB"
         />
 
     </extensions>
