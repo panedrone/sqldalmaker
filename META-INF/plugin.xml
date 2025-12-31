@@ -2,10 +2,12 @@
     <id>dal-mpe</id>
     <name>SQL DAL Maker</name>
     <category>Database</category>
-    <version>1.316.2512</version>
+    <version>1.318.2512</version>
     <vendor email="sqldalmaker@gmail.com" url="https://sqldalmaker.sourceforge.net">
         SQL DAL Maker
     </vendor>
+
+    <!-- Target IntelliJ Platform (2022.2) -->
     <idea-version since-build="222.3345.118"/>
 
     <depends>com.intellij.modules.lang</depends>
@@ -20,66 +22,51 @@ Generated code is being synchronized with the current database schema using "liv
 
     <change-notes><![CDATA[
 <ul>
-<li><a href="https://github.com/panedrone/sdm_demo_todolist_golang">sqlx</a></li>
-<li><a href="https://github.com/panedrone/sdm_demo_todolist_golang">gorm</a></li>
-<li><a href="https://github.com/panedrone/sdm_demo_todolist_django">Django</a></li>
-<li><a href="https://github.com/panedrone/sdm_demo_todolist_fastapi_sqlalchemy">SQLAlchemy</a>,
-<a href="https://github.com/panedrone/sdm_demo_todolist_flask_sqlalchemy">flask_sqlalchemy</a></li>
-<li><a href="https://github.com/panedrone/sdm_demo_todolist_php_doctrine">PHP Doctrine</a></li>
+<li>[+] toolWindow</li>
+<li>[m] since IntelliJ Platform 2022.2</li>
 </ul>
-]]></change-notes>
+    ]]></change-notes>
 
-    <application-components>
-    </application-components>
-
-    <project-components>
-    </project-components>
-
-    <module-components>
-    </module-components>
-
-<!--    <actions>-->
-<!--        &lt;!&ndash;        default constructor is called, and seems that attributes below are triggering the setters &ndash;&gt;-->
-<!--        <group class="com.sqldalmaker.intellij.ui.IdeaActionGroup"-->
-<!--               id="IdeaActionGroup"-->
-<!--               text="SDM"-->
-<!--               description="SDM"-->
-<!--               icon="/img/sqldalmaker.png"-->
-<!--               popup="true">-->
-<!--            <add-to-group group-id="FileMainSettingsGroup" anchor="last"/>-->
-<!--            <add-to-group group-id="MainToolBarSettings" anchor="last"/>-->
-<!--        </group>-->
-<!--    </actions>-->
+    <!-- Legacy component tags must remain empty but kept for compatibility -->
+    <application-components></application-components>
+    <project-components></project-components>
+    <module-components></module-components>
 
     <extensions defaultExtensionNs="com.intellij">
-        <!--
-        https://plugins.jetbrains.com/docs/intellij/notifications.html
-        notificationGroup and fileType are not available in 2017.3, but errors are silent...
-        -->
-        <notificationGroup id="SDM" displayType="BALLOON"/>
-        <!--
-        Register the FileType Directly
-        Direct registration is possible when targeting version 2019.2 (and later) of the IntelliJ Platform - no FileTypeFactory is required.
-        https://jetbrains.org/intellij/sdk/docs/tutorials/custom_language_support/language_and_filetype.html
-        -->
+
+        <!-- Modern Notification Group for NotificationGroupManager API -->
+        <notificationGroup id="SDM"
+                           displayType="BALLOON"
+                           isLogByDefault="true"/>
+
+        <!-- Register DAL file type -->
         <fileType name="com.sqldalmaker.intellij.ui.RootFileType"
                   implementationClass="com.sqldalmaker.intellij.ui.RootFileType"
-                  fieldName="INSTANCE" extensions="dal"/>
+                  fieldName="INSTANCE"
+                  extensions="dal"/>
+
         <fileEditorProvider implementation="com.sqldalmaker.intellij.ui.RootFileEditorProvider"/>
-        <editorTabTitleProvider implementation="com.sqldalmaker.intellij.ui.RootFileEditorTabTitleProvider"/>
+
+        <editorTabTitleProvider
+                implementation="com.sqldalmaker.intellij.ui.RootFileEditorTabTitleProvider"/>
+
         <psi.referenceContributor
-                implementation="com.sqldalmaker.intellij.references.PsiReferenceContributorCommon" language="XML"/>
-        <completion.contributor language="XML"
-                                implementationClass="com.sqldalmaker.intellij.references.CompletionContributorCommon"/>
+                implementation="com.sqldalmaker.intellij.references.PsiReferenceContributorCommon"
+                language="XML"/>
 
-<!--        Чтобы ToolWindow оказался в правом верхнем углу, делается так:-->
+        <completion.contributor
+                language="XML"
+                implementationClass="com.sqldalmaker.intellij.references.CompletionContributorCommon"/>
 
+        <!-- SDM Tool Window -->
         <toolWindow
                 id="SDM"
                 icon="/META-INF/pluginIcon.svg"
                 anchor="top"
                 secondary="true"
-                factoryClass="com.sqldalmaker.intellij.ui.SdmToolWindowFactory"/>
+                factoryClass="com.sqldalmaker.intellij.ui.SdmToolWindowFactory"
+                type="DUMB"
+        />
 
     </extensions>
 

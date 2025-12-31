@@ -13,6 +13,7 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
+import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.openapi.wm.ex.ToolWindowManagerListener;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
@@ -27,24 +28,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 /*
- * @author sqldalmaker@gmail.com
+ * @author ...
  *
  * 30.12.2024 20:00 1.314
  */
 public class SdmToolWindowFactory implements ToolWindowFactory {
 
-    private static final String ID = "SDM";
-    private List<String> currentItems;
+    public static final String ID = "SDM";
 
     @Override
     public void createToolWindowContent(@NotNull Project project,
                                         @NotNull ToolWindow toolWindow) {
-        // ToolWindow UI is not used
+        // ToolWindow UI is not used, acts only as a trigger button
+        toolWindow.setToHideOnEmptyContent(true);
+        toolWindow.setAutoHide(true);
     }
 
     @Override
     public void init(@NotNull ToolWindow toolWindow) {
-        toolWindow.setToHideOnEmptyContent(true);
 
         Project project = toolWindow.getProject();
 
@@ -52,32 +53,42 @@ public class SdmToolWindowFactory implements ToolWindowFactory {
                 .connect(toolWindow.getDisposable())
                 .subscribe(ToolWindowManagerListener.TOPIC,
                         new ToolWindowManagerListener() {
-                            @Override
-                            public void toolWindowShown(@NotNull ToolWindow tw) {
-                                if (!ID.equals(tw.getId())) return;
 
+                            /*
+                             * Modern IntelliJ Platform API (2022.2+)
+                             * stateChanged() triggers on any ToolWindowManager update.
+                             * We only react when our ToolWindow is clicked (isVisible)
+                             */
+                            @Override
+                            public void stateChanged(@NotNull ToolWindowManager manager) {
+
+                                ToolWindow tw = manager.getToolWindow(ID);
+                                if (tw == null) return;          // early return: not registered
+                                if (!tw.isVisible()) return;      // early return: not a user click
+
+                                // Hide immediately to prevent flashing panel
+                                tw.hide(null);
+
+                                // Build SDM items
                                 List<String> items = buildItemsFromSdm(project);
                                 if (items == null || items.isEmpty()) return;
 
-                                tw.hide(null);
-
-                                currentItems = items;
-                                handleItems(project, currentItems);
+                                // Handle items
+                                handleItems(project, items);
                             }
                         });
     }
 
     /** Centralized processing of SDM items */
-    private void handleItems(Project project, List<String> items) {
+    private static void handleItems(Project project, List<String> items) {
         if (items.size() == 1) {
             openEditorQuietly(project, items.get(0));
         } else {
             showDialog(project, items);
         }
-        currentItems = null; // end of lifecycle
     }
 
-    private List<String> buildItemsFromSdm(Project project) {
+    private static List<String> buildItemsFromSdm(Project project) {
         List<String> items = new ArrayList<>();
         VirtualFile sdm = findFileByRelativePath(project, ".sdm");
         if (sdm == null) {
@@ -111,8 +122,7 @@ public class SdmToolWindowFactory implements ToolWindowFactory {
         return items;
     }
 
-    private void showDialog(Project project, List<String> items) {
-        currentItems = null; // lifecycle end
+    private static void showDialog(Project project, List<String> items) {
 
         new DialogWrapper(project, true) {
             {
@@ -165,8 +175,8 @@ public class SdmToolWindowFactory implements ToolWindowFactory {
                 });
 
                 button.addActionListener(e -> {
-                    openEditorQuietly(project, relativePath); // opens the file in editor
-                    dialog.close(DialogWrapper.OK_EXIT_CODE);   // closes the dialog
+                    openEditorQuietly(project, relativePath);
+                    dialog.close(DialogWrapper.OK_EXIT_CODE);
                 });
 
                 return button;
@@ -174,12 +184,7 @@ public class SdmToolWindowFactory implements ToolWindowFactory {
         }.show();
     }
 
-    /**
-     * Quiet editor opening: do not force focus for .sdm files
-     * fem.openFile(file, false):
-     *   false = do not request focus immediately, let IDE handle it automatically
-     */
-    private void openEditorQuietly(Project project, String relativePath) {
+    private static void openEditorQuietly(Project project, String relativePath) {
         VirtualFile file = findFileByRelativePath(project, relativePath);
         if (file == null) {
             IdeaMessageHelpers.add_error_to_ide_log("ERROR", relativePath + " not found");
@@ -188,16 +193,14 @@ public class SdmToolWindowFactory implements ToolWindowFactory {
 
         FileEditorManager fem = FileEditorManager.getInstance(project);
 
-        // If the file is already opened, activate the tab without forcing focus
         for (VirtualFile f : fem.getOpenFiles()) {
             if (f.equals(file)) {
-                fem.openFile(f, false); // do not force focus
+                fem.openFile(f, false);
                 return;
             }
         }
 
-        // New file → open without forcing focus
-        fem.openFile(file, false); // do not force focus
+        fem.openFile(file, false);
     }
 
     // ---------------- Helper functions ----------------

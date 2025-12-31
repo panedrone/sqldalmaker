@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2024 sqldalmaker@gmail.com
+    Copyright 2011-2026 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -7,113 +7,97 @@ package com.sqldalmaker.intellij.ui;
 
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationGroup;
+import com.intellij.notification.NotificationGroupManager;
 import com.intellij.notification.NotificationType;
-import com.intellij.notification.Notifications;
-import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.sqldalmaker.common.InternalException;
 import com.sqldalmaker.jaxb.settings.Ide;
 import com.sqldalmaker.jaxb.settings.Settings;
 
-/**
- * Created with IntelliJ IDEA.
- * User: sqldalmaker@gmail.com
- * Date: 21.06.12
- */
+/*
+  Created with IntelliJ IDEA.
+  User: sqldalmaker@gmail.com
+  Date: 21.06.12
+
+  2025-12-31 - Updated for IntelliJ Platform 2022.2+:
+  - Removed static initialization depending on services
+  - Switched to NotificationGroupManager API
+  - Removed duplicated code in add_dto_error_message/add_dao_error_message
+*/
 public class IdeaMessageHelpers {
 
-    // https://stackoverflow.com/questions/32928914/how-do-i-show-a-notification-in-intellij
-    // https://plugins.jetbrains.com/docs/intellij/notifications.html#editor-hints
-
-    // @SuppressWarnings("CommentedOutCode")
+    /*
+     * Lazily obtain the notification group.
+     * Group must be declared in plugin.xml:
+     *
+     * <notificationGroup id="SDM" displayType="BALLOON"/>
+     */
     private static NotificationGroup getNotificationGroup() {
-        // plugin.xml:
-        // <notificationGroup id="SDM Errors" displayType="STICKY_BALLOON"/>
-        NotificationGroup res = NotificationGroup.findRegisteredGroup("SDM"); // not available in 2017.3
-        if (res != null) {
-            return res;
-        }
-        // "Error Report" BALOON, not available in 2017.3    // BALOON is prefferable
-        // "Compiler" NONE, available in 2017.3
-        // "Run Anything" BALOON, not available in 2017.3
-        res = findRegisteredGroup(new String[]{"Error Report", "Compiler", "Run Anything"});
-        return res;
+        // Lazy retrieval ensures no static initialization depending on services
+        return NotificationGroupManager.getInstance().getNotificationGroup("SDM");
     }
 
-    private static NotificationGroup findRegisteredGroup(String[] names) {
-        for (int i = 0; i < names.length; i++) {
-            NotificationGroup res = NotificationGroup.findRegisteredGroup(names[i]);
-            if (res != null) {
-                return res;
-            }
-        }
-        return null;
+    /** Global (project = null) notify wrapper */
+    private static void notify(Notification notification) {
+        notification.notify(null);
     }
 
-    private static final NotificationGroup GROUP_DISPLAY_ID = getNotificationGroup();
-    // new NotificationGroup("sqldalmaker", NotificationDisplayType.NONE, true);  // Scheduled for removal constructor usage (1)
+    // -------------------------------------------------------------------------
+    //  Logging to IDE Event Log
+    // -------------------------------------------------------------------------
 
     public static void add_warning_to_ide_log(String msg) {
-        if (GROUP_DISPLAY_ID == null) {
-            return;
-        }
-        Notifications.Bus.notify(GROUP_DISPLAY_ID.createNotification(msg, MessageType.WARNING));
+        if (msg == null || msg.trim().isEmpty()) return;
+        Notification notification =
+                getNotificationGroup().createNotification(msg, NotificationType.WARNING);
+        notify(notification);
     }
 
     public static void add_info_to_ide_log(String title, String msg) {
-        if (GROUP_DISPLAY_ID == null) {
-            return;
-        }
         add_to_ide_log(title, msg, NotificationType.INFORMATION);
     }
 
     public static void add_to_ide_log(String title, String msg, NotificationType nt) {
-        if (msg == null || msg.trim().isEmpty()) {
-            return;
-        }
-        if (GROUP_DISPLAY_ID == null) {
-            return;
-        }
+        if (msg == null || msg.trim().isEmpty()) return;
+
         msg = msg.replace("<", "&lt;").replace(">", "&gt;");
-        //    public final fun createNotification(title: kotlin.String, content: kotlin.String, type: com.intellij.notification.NotificationType): com.intellij.notification.Notification { /* compiled code */ }
-        Notification notification = GROUP_DISPLAY_ID.createNotification("<b>" + title + ":</b> " + msg, nt);
-        Notifications.Bus.notify(notification);
+        Notification notification =
+                getNotificationGroup().createNotification("<b>" + title + ":</b> " + msg, nt);
+
+        notify(notification);
     }
 
     public static void add_error_to_ide_log(String title, String msg) {
         add_to_ide_log(title, msg, NotificationType.ERROR);
     }
 
-    public static void add_dto_error_message(Settings settings, final VirtualFile root_file, final String dto_class_name, String msg) {
+    // -------------------------------------------------------------------------
+    //  Unified internal helper for DAO + DTO error messages
+    // -------------------------------------------------------------------------
+
+    private static void add_error_message_common(Settings settings, String id, String msg) {
         Ide ide = settings.getIde();
-        if (ide != null) {
-            if (!ide.isEventLog()) {
-                return;
-            }
-        }
-        IdeaHelpers.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                add_error_to_ide_log(dto_class_name, msg);
-            }
-        });
+        // Early return: user disabled Event Log in settings
+        if (ide != null && !ide.isEventLog()) return;
+
+        // Safe invokeLater to run in EDT
+        IdeaHelpers.invokeLater(() -> add_error_to_ide_log(id, msg));
     }
 
-    public static void add_dao_error_message(Settings settings, VirtualFile root_file, String dao_xml_rel_path, String msg) {
-        Ide ide = settings.getIde();
-        if (ide != null) {
-            if (!ide.isEventLog()) {
-                return;
-            }
-        }
-        IdeaHelpers.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                add_error_to_ide_log(dao_xml_rel_path, msg);
-            }
-        });
+    public static void add_dto_error_message(Settings settings, VirtualFile root_file,
+                                             String dto_class_name, String msg) {
+        add_error_message_common(settings, dto_class_name, msg);
     }
+
+    public static void add_dao_error_message(Settings settings, VirtualFile root_file,
+                                             String dao_xml_rel_path, String msg) {
+        add_error_message_common(settings, dao_xml_rel_path, msg);
+    }
+
+    // -------------------------------------------------------------------------
+    //  UI dialogs
+    // -------------------------------------------------------------------------
 
     public static void show_error_in_ui_thread(Throwable e) {
         String m;
@@ -122,22 +106,18 @@ public class IdeaMessageHelpers {
         } else {
             m = e.getClass().getName() + ":\n" + e.getMessage();
         }
-        IdeaHelpers.invokeLater(new Runnable() {
-            public void run() {
-                // Messages.show... ---- the text after "<" disappears
-                String msg = m.replace("<", "");
-                Messages.showErrorDialog(msg, "Error");
-            }
-        });
+
+        String finalMsg = m.replace("<", "");
+
+        IdeaHelpers.invokeLater(() ->
+                Messages.showErrorDialog(finalMsg, "Error")
+        );
     }
 
-    public static void show_info_in_ui_thread(String title, String m) {
-        IdeaHelpers.invokeLater(new Runnable() {
-            public void run() {
-                // Messages.show... ---- the text after "<" disappears
-                String msg = m.replace("<", "");
-                Messages.showInfoMessage(m, title);
-            }
+    public static void show_info_in_ui_thread(String title, String message) {
+        IdeaHelpers.invokeLater(() -> {
+            String msg = message.replace("<", "");
+            Messages.showInfoMessage(msg, title);
         });
     }
 
