@@ -62,7 +62,7 @@ Generated code is being synchronized with the current database schema using "liv
         <toolWindow
                 id="SDM"
                 anchor="right"
-                factoryClass="com.sqldalmaker.intellij.ui.SdmToolWindowFactory"
+                factoryClass="com.sqldalmaker.intellij.ui.JbToolWindowFactory"
         />
 
     </extensions>

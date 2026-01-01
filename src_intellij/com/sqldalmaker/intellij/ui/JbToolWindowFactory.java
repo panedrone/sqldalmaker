@@ -28,13 +28,13 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SdmToolWindowFactory implements ToolWindowFactory {
+public class JbToolWindowFactory implements ToolWindowFactory {
 
     public static final String ID = "SDM";
 
     @Override
     public void init(@NotNull ToolWindow toolWindow) {
-        Icon icon = IconLoader.getIcon("/META-INF/pluginIcon.svg", SdmToolWindowFactory.class);
+        Icon icon = IconLoader.getIcon("/META-INF/pluginIcon.svg", JbToolWindowFactory.class);
         toolWindow.setIcon(icon);
     }
 
