@@ -13,6 +13,8 @@ import (
 	"time"
 )
 
+var DS func(context context.Context) DataStore
+
 /*
 	This file is a part of SQL DAL Maker Project: https://sqldalmaker.sourceforge.net
 	It demonstrates how to implement an interface DataStore in Go using "database/sql" package directly (no-orm scenario).

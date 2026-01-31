@@ -62,10 +62,6 @@ import (
 	"${imp}"
 #end
 )
-
-type ${class_name} struct {
-	ds DataStore
-}
 #foreach($method in ${methods})${method}#end
 ## ======================================================================================
 #elseif ($mode=="dao_create")
@@ -73,13 +69,14 @@ type ${class_name} struct {
 // (C)RUD: ${table_name}
 // Generated/AI values are passed to DTO/model.
 
-func (dao *${class_name}) ${method_name}(ctx context.Context, item *${dto_param}) error {
+var ${method_name} = func(ctx context.Context, item *${dto_param}) error {
+	ds := DS(ctx)
 #if ($model == "gorm")
-	return dao.ds.Create(ctx, "${table_name}", item)
+	return ds.Create(ctx, "${table_name}", item)
 }
 #else
 #sql_var(false $sql)
-	row, err := dao.ds.Insert(ctx, sql, "${ai_names}"#foreach($param in ${params}), item.${param.getName()}#end)
+	row, err := ds.Insert(ctx, sql, "${ai_names}"#foreach($param in ${params}), item.${param.getName()}#end)
 	if err == nil {
 #foreach ($ai in ${fields_ai})
 		err = SetRes(&item.${ai.getName()}, row)
@@ -91,17 +88,19 @@ func (dao *${class_name}) ${method_name}(ctx context.Context, item *${dto_param}
 ## ======================================================================================
 #elseif ($mode=="dao_query_all")
 
-func (dao *${class_name}) ${method_name}(ctx context.Context#param_decls($is_external_sql $params)) (res []${returned_type_name}, err error) {
-#sql_var($is_external_sql $sql)
-	err = dao.ds.QueryAll(ctx, sql, &res#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
+var ${method_name} = func(ctx context.Context#param_decls($is_external_sql $params)) (res []${returned_type_name}, err error) {
+	ds := DS(ctx)
+	#sql_var($is_external_sql $sql)
+	err = ds.QueryAll(ctx, sql, &res#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
 	return
 }
 ## ======================================================================================
 #elseif ($mode=="dao_query")
 
-func (dao *${class_name}) ${method_name}(ctx context.Context#param_decls($is_external_sql $params)) (res ${returned_type_name}, err error) {
+var ${method_name} = func(ctx context.Context#param_decls($is_external_sql $params)) (res ${returned_type_name}, err error) {
+	ds := DS(ctx)
 #sql_var($is_external_sql $sql)
-	err = dao.ds.Query(ctx, sql, &res#foreach($p in ${params}), ${p.getLowerCamelCaseName()}#end)
+	err = ds.Query(ctx, sql, &res#foreach($p in ${params}), ${p.getLowerCamelCaseName()}#end)
 	return
 }
 ## ======================================================================================
@@ -111,9 +110,10 @@ func (dao *${class_name}) ${method_name}(ctx context.Context#param_decls($is_ext
 // C(R)UD: ${ref}
 
 #end
-func (dao *${class_name}) ${method_name}(ctx context.Context#param_decls($is_external_sql $params)) (res []*${returned_type_name}, err error) {
+var ${method_name} = func(ctx context.Context#param_decls($is_external_sql $params)) (res []*${returned_type_name}, err error) {
+	ds := DS(ctx)
 #if ($method_type == "READ" && $model == "gorm")
-	err = dao.ds.ReadAll(ctx, "${table_name}", &res)
+	err = ds.ReadAll(ctx, "${table_name}", &res)
 	return
 }
 #else## --------------------------------------------------------
@@ -127,7 +127,7 @@ func (dao *${class_name}) ${method_name}(ctx context.Context#param_decls($is_ext
 #end
 		res = append(res, &item)
 	}
-	err = dao.ds.QueryAllRows(ctx, sql, _onRow#foreach($p in ${params}), ${p.getLowerCamelCaseName()}#end)
+	err = ds.QueryAllRows(ctx, sql, _onRow#foreach($p in ${params}), ${p.getLowerCamelCaseName()}#end)
 	if err == nil {
 		err = ErrMapToErr(errMap)
 	}
@@ -142,7 +142,7 @@ func (dao *${class_name}) ${method_name}(ctx context.Context#param_decls($is_ext
 				res = append(res, item)
 			}
 	}
-	err = dao.ds.Select(ctx, sql, _onRow#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
+	err = ds.Select(ctx, sql, _onRow#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
 #elseif ($assign_mode == 2)
 	_onRow := func() (interface{}, func()) {
 		item := &${returned_type_name}{}
@@ -150,9 +150,9 @@ func (dao *${class_name}) ${method_name}(ctx context.Context#param_decls($is_ext
 			res = append(res, item)
 		}
 	}
-	err = dao.ds.Select(ctx, sql, _onRow#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
+	err = ds.Select(ctx, sql, _onRow#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
 #elseif ($assign_mode == 3)
-	err = dao.ds.Select(ctx, sql, &res#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
+	err = ds.Select(ctx, sql, &res#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
 #end
 	return
 }
@@ -165,19 +165,21 @@ func (dao *${class_name}) ${method_name}(ctx context.Context#param_decls($is_ext
 
 #end
 #if ($method_type == "READ" && $model == "gorm")
-func (dao *${class_name}) ${method_name}(ctx context.Context#param_decls($is_external_sql $params)) (*${returned_type_name}, error) {
+var ${method_name} = func(ctx context.Context#param_decls($is_external_sql $params)) (*${returned_type_name}, error) {
+	ds := DS(ctx)
 	res := &${returned_type_name}{}
-	err := dao.ds.Read(ctx, "${table_name}", res#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
+	err := ds.Read(ctx, "${table_name}", res#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
 	if err == nil {
 		return res, nil
 	}
 	return nil, err
 }
 #else
-func (dao *${class_name}) ${method_name}(ctx context.Context#param_decls($is_external_sql $params)) (*${returned_type_name}, error) {
+var ${method_name} = func(ctx context.Context#param_decls($is_external_sql $params)) (*${returned_type_name}, error) {
+	ds := DS(ctx)
 #sql_var($is_external_sql $sql)
 #if ($assign_mode == 0)
-	row, err := dao.ds.QueryRow(ctx, sql#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
+	row, err := ds.QueryRow(ctx, sql#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
 	if err != nil {
 		return nil, err
 	}
@@ -195,14 +197,14 @@ func (dao *${class_name}) ${method_name}(ctx context.Context#param_decls($is_ext
 		&res.${f.getName()},
 #end
 	}
-	err := dao.ds.Select(ctx, sql, _fa#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
+	err := ds.Select(ctx, sql, _fa#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
 	if err == nil {
 		return res, nil
 	}
 	return nil, err
 #else
 	res := &${returned_type_name}{}
-	err := dao.ds.Select(ctx, sql, res#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
+	err := ds.Select(ctx, sql, res#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
 	if err == nil {
 		return res, nil
 	}
@@ -224,26 +226,28 @@ func (dao *${class_name}) ${method_name}(ctx context.Context#param_decls($is_ext
 
 #end
 #if (${dto_param} != "")
-func (dao *${class_name}) ${method_name}(ctx context.Context#param_decls_dto($is_external_sql)item *${dto_param}) (rowsAffected int64, err error) {
+var ${method_name} = func(ctx context.Context#param_decls_dto($is_external_sql)item *${dto_param}) (rowsAffected int64, err error) {
+	ds := DS(ctx)
 #if ($model == "gorm")
 #if ($method_type == "CREATE" || $method_type == "UPDATE")
-	rowsAffected, err = dao.ds.Update(ctx, "${table_name}", item)
+	rowsAffected, err = ds.Update(ctx, "${table_name}", item)
 #elseif ( $method_type == "DELETE")
-	rowsAffected, err = dao.ds.Delete(ctx, "${table_name}", item)
+	rowsAffected, err = ds.Delete(ctx, "${table_name}", item)
 #else
 	// ------------- invalid method_type
 #end
 #else
 #sql_var($is_external_sql $sql)
-	rowsAffected, err = dao.ds.Exec(ctx, sql#foreach($param in ${params}), item.${param.getName()}#end)
+	rowsAffected, err = ds.Exec(ctx, sql#foreach($param in ${params}), item.${param.getName()}#end)
 #end
 	return
 }
 #else
-func (dao *${class_name}) ${method_name}(ctx context.Context#param_decls($is_external_sql $params)) (rowsAffected int64, err error) {
+var ${method_name} = func(ctx context.Context#param_decls($is_external_sql $params)) (rowsAffected int64, err error) {
+	ds := DS(ctx)
 #sql_var($is_external_sql $sql)
 #if ($method_type == "CREATE" || $method_type == "UPDATE" || $method_type == "DELETE")
-	rowsAffected, err = dao.ds.Exec(ctx, sql#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
+	rowsAffected, err = ds.Exec(ctx, sql#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
 #else
 #if ($assign_mode == 0)
 #if ($mappings.size()>0)
@@ -279,7 +283,7 @@ func (dao *${class_name}) ${method_name}(ctx context.Context#param_decls($is_ext
 	}
 #end
 #end
-	rowsAffected, err = dao.ds.Exec(ctx, sql#foreach($param in ${params2}), ${param.getLowerCamelCaseName()}#end)
+	rowsAffected, err = ds.Exec(ctx, sql#foreach($param in ${params2}), ${param.getLowerCamelCaseName()}#end)
 #if($assign_mode == 0 && $mappings.size()>0)
 	if err == nil {
 		err = ErrMapToErr(errMap)
