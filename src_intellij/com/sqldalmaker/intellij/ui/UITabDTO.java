@@ -187,9 +187,9 @@ public class UITabDTO {
         // === panedrone:
         // Set up columns after $$$setupUI$$$().
         // Do not do it in createUIComponents() which is called in beginning of $$$setupUI$$$();
-        table.getColumnModel().getColumn(COL_INDEX_NAME).setPreferredWidth(220);
+        table.getColumnModel().getColumn(COL_INDEX_NAME).setPreferredWidth(320);
         table.getColumnModel().getColumn(COL_INDEX_NAME).setMaxWidth(2000); // === panedrone: AUTO_RESIZE_LAST_COLUMN not working without it
-        table.getColumnModel().getColumn(COL_INDEX_REF).setPreferredWidth(300);
+        table.getColumnModel().getColumn(COL_INDEX_REF).setPreferredWidth(320);
         table.getColumnModel().getColumn(COL_INDEX_REF).setMaxWidth(2000); // === panedrone: AUTO_RESIZE_LAST_COLUMN not working without it
         // table.getColumnModel().getColumn(2).setPreferredWidth(300);
         // https://stackoverflow.com/questions/953972/java-jtable-setting-column-width
