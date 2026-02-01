@@ -90,7 +90,7 @@ var ${method_name} = func(ctx context.Context, item *${dto_param}) error {
 
 var ${method_name} = func(ctx context.Context#param_decls($is_external_sql $params)) (res []${returned_type_name}, err error) {
 	ds := DS(ctx)
-	#sql_var($is_external_sql $sql)
+#sql_var($is_external_sql $sql)
 	err = ds.QueryAll(ctx, sql, &res#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
 	return
 }
