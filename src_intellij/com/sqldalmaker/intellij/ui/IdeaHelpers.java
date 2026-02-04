@@ -316,7 +316,7 @@ public class IdeaHelpers {
         }
     }
 
-    private static VirtualFile ensure_dir(VirtualFile root_dir, String rel_path) throws IOException {
+    public static VirtualFile ensure_dir(VirtualFile root_dir, String rel_path) throws IOException {
         rel_path = rel_path.replace('\\', '/');
         VirtualFile virtual_dir = root_dir.findFileByRelativePath(rel_path);
         if (virtual_dir == null) {

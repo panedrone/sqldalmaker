@@ -1,0 +1,12 @@
+# sdm root-file, ensure lower case:
+
+# sdm/php.dal
+# sdm/java.dal
+# sdm/cpp.dal
+# sdm/python.dal
+# sdm/go.dal
+
+# my favorites:
+
+README.md
+

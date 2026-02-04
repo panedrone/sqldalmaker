@@ -1,23 +1,23 @@
 package com.sqldalmaker.intellij.ui;
 
+import com.intellij.icons.AllIcons;
+import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
-import com.intellij.openapi.wm.ToolWindowManager;
-import com.intellij.openapi.wm.ex.ToolWindowManagerListener;
 import com.intellij.ui.components.ActionLink;
+import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
-import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
-import org.jspecify.annotations.NonNull;
 
 import javax.swing.*;
 import java.awt.*;
@@ -28,6 +28,11 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Created with IntelliJ IDEA.
+ * User: sqldalmaker@gmail.com
+ * Date: 2026-02-04
+ */
 public class JbToolWindowFactory implements ToolWindowFactory {
 
     public static final String ID = "SDM";
@@ -39,182 +44,215 @@ public class JbToolWindowFactory implements ToolWindowFactory {
     }
 
     @Override
-    public void createToolWindowContent(@NotNull Project project,
-                                        @NotNull ToolWindow toolWindow) {
+    public void createToolWindowContent(@NotNull final Project project,
+                                        @NotNull final ToolWindow toolWindow) {
 
-        JPanel panel = new JPanel(new BorderLayout());
-        JLabel label = new JLabel("SDM", SwingConstants.CENTER);
-        panel.add(label, BorderLayout.CENTER);
+        final JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        JBScrollPane scrollPane = new JBScrollPane(panel,
+                JBScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                JBScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
         Content content = ContentFactory.getInstance()
-                .createContent(panel, "", false);
+                .createContent(scrollPane, "", false);
         toolWindow.getContentManager().addContent(content);
 
-        project.getMessageBus()
-                .connect(toolWindow.getDisposable())
-                .subscribe(ToolWindowManagerListener.TOPIC,
-                        new ToolWindowManagerListener() {
-                            @Override
-                            public void stateChanged(@NotNull ToolWindowManager manager) {
-
-                                ToolWindow tw = manager.getToolWindow(ID);
-
-                                if (tw == null) return;
-                                if (!tw.isAvailable()) return;
-                                if (!tw.isVisible()) return;
-
-                                // Hide immediately (acts as a trigger button)
-                                tw.hide(null);
-
-                                List<String> items = buildItemsFromSdm(project);
-                                handleItems(project, items);
-                            }
-                        });
-    }
-
-    private static void handleItems(Project project, List<String> items) {
-        if (items == null || items.isEmpty()) return;
-
-        if (items.size() == 1) {
-            openEditorQuietly(project, items.get(0));
-        } else {
-            showDialog(project, items);
-        }
-    }
-
-    private static List<String> buildItemsFromSdm(Project project) {
-        List<String> items = new ArrayList<>();
-        VirtualFile sdm = findFileByRelativePath(project, ".sdm");
-
-        if (sdm == null) {
-            IdeaMessageHelpers.add_error_to_ide_log("ERROR", ".sdm not found in project root");
-            return null;
-        }
-
-        String[] lines = ReadAction.compute(() -> readLines(sdm));
-
-        if (lines.length == 0) {
-            IdeaMessageHelpers.add_error_to_ide_log("ERROR", ".sdm is empty");
-            return null;
-        }
-
-        for (String line : lines) {
-            String path = line.trim();
-            if (path.isEmpty()) continue;
-
-            VirtualFile file = findFileByRelativePath(project, path);
-            if (file == null) {
-                IdeaMessageHelpers.add_error_to_ide_log("ERROR", path + " not found");
-                continue;
-            }
-            if (file.isDirectory()) {
-                IdeaMessageHelpers.add_error_to_ide_log("ERROR", path + " is a directory");
-                continue;
-            }
-
-            items.add(path);
-        }
-
-        return items;
-    }
-
-    private static void showDialog(Project project, List<String> items) {
-
-        new DialogWrapper(project, true) {
-            {
-                setTitle("SDM");
-                init();
-            }
-
+        // Refresh button in header
+        AnAction refreshAction = new AnAction("Refresh", "Refresh", AllIcons.Actions.Refresh) {
             @Override
-            protected JComponent createCenterPanel() {
+            public void actionPerformed(@NotNull AnActionEvent e) {
+                updatePanel(project, panel);
+            }
+        };
+        toolWindow.setTitleActions(java.util.Collections.singletonList(refreshAction));
 
-                JPanel panel = new JPanel();
-                panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-                panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-                panel.setBackground(UIUtil.getPanelBackground());
-                panel.setOpaque(true);
+        toolWindow.setAutoHide(false);
+        toolWindow.setAvailable(true);
+        toolWindow.show(null);
 
-                for (String relativePath : items) {
-                    JButton button = createButton(relativePath, project, this);
+        updatePanel(project, panel);
+    }
+
+    public void updatePanel(Project project, JPanel panel) {
+
+        panel.removeAll();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+
+        VirtualFile sdmFile = findFileByRelativePath(project, ".sdm");
+
+        if (sdmFile != null) {
+            List<String> newItems = buildItemsFromSdm(project);
+            if (newItems != null) {
+                for (int i = 0; i < newItems.size(); i++) {
+                    final String path = newItems.get(i);
+
+                    JButton button = new JButton(path);
+                    button.setFocusPainted(false);
+                    button.setMaximumSize(new Dimension(Integer.MAX_VALUE, 36));
+                    button.setPreferredSize(new Dimension(100, 36));
+                    button.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+                    Color defaultBg = UIUtil.getPanelBackground();
+                    Color hoverBg = UIUtil.getListSelectionBackground(true);
+                    button.setBackground(defaultBg);
+                    button.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mouseEntered(MouseEvent e) {
+                            button.setBackground(hoverBg);
+                        }
+
+                        @Override
+                        public void mouseExited(MouseEvent e) {
+                            button.setBackground(defaultBg);
+                        }
+                    });
+
+                    attachOpenBehavior(project, path, "", button);
+
                     panel.add(button);
-                    panel.add(Box.createRigidArea(new Dimension(0, 5)));
+                    panel.add(Box.createRigidArea(new Dimension(0, 3)));
+                }
+            }
+        }
+
+        addSdmLinkAndLabel(project, panel, sdmFile);
+
+        panel.add(Box.createVerticalGlue());
+        panel.revalidate();
+        panel.repaint();
+    }
+
+    private void addSdmLinkAndLabel(Project project, JPanel panel, VirtualFile sdmFile) {
+        if (sdmFile == null) {
+            panel.removeAll();
+            panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+            panel.add(Box.createVerticalGlue()); // push content to vertical center
+
+            JLabel noLabel = new JLabel("No .sdm");
+            noLabel.setFont(UIUtil.getLabelFont().deriveFont(Font.PLAIN, 11f));
+            noLabel.setForeground(UIUtil.getContextHelpForeground());
+            noLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+            panel.add(noLabel);
+            panel.add(Box.createRigidArea(new Dimension(0, 5)));
+
+            ActionLink sdmLink = new ActionLink("Create");
+            attachSdmBehavior(project, panel, sdmLink);
+            sdmLink.setAlignmentX(Component.CENTER_ALIGNMENT);
+            panel.add(sdmLink);
+
+            panel.add(Box.createVerticalGlue()); // vertical center
+        } else {
+            // sdm exists → just add the link at the end of buttons
+            ActionLink sdmLink = new ActionLink(".sdm");
+            attachOpenBehavior(project, ".sdm", "", sdmLink);
+
+            JPanel linkWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+            linkWrapper.add(sdmLink);
+            panel.add(Box.createRigidArea(new Dimension(0, 5)));
+            panel.add(linkWrapper);
+        }
+        panel.revalidate();
+        panel.repaint();
+    }
+
+    private void attachSdmBehavior(Project project, JPanel panel, ActionLink link) {
+        link.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                VirtualFile file = findFileByRelativePath(project, ".sdm");
+                boolean created = false;
+                if (file == null) {
+                    try {
+                        VirtualFile baseDir = IdeaHelpers.get_project_base_dir(project);
+                        String defaultContent = "# " + project.getName() + "\n\n";
+                        try {
+                            String sdm = IdeaHelpers.read_from_jar("resources", ".sdm_example.txt");
+                            defaultContent = defaultContent + sdm;
+                        } catch (Exception ignore) {
+                        }
+                        file = createAndOpen(project, baseDir, ".sdm", defaultContent);
+
+                        if (file != null) {
+                            created = true;
+                        }
+                    } catch (Exception ex) {
+                        IdeaMessageHelpers.show_error_in_ui_thread(ex);
+                    }
+                }
+                if (file != null) {
+                    openEditorQuietly(project, ".sdm");
+                }
+                if (created) {
+                    updatePanel(project, panel);
+                }
+            }
+        });
+    }
+
+    private static void attachOpenBehavior(Project project, final String path, final String defaultContent, AbstractButton button) {
+        button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                VirtualFile file = findFileByRelativePath(project, path);
+                if (file == null) {
+                    try {
+                        VirtualFile baseDir = IdeaHelpers.get_project_base_dir(project);
+                        file = createAndOpen(project, baseDir, path, defaultContent);
+                    } catch (Exception ex) {
+                        IdeaMessageHelpers.show_error_in_ui_thread(ex);
+                    }
                 }
 
-                panel.add(Box.createVerticalGlue());
-
-                ActionLink sdmLink = new ActionLink(".sdm", new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        openEditorQuietly(project, ".sdm"); // открыть файл
-                        close(DialogWrapper.OK_EXIT_CODE);   // закрыть диалог
-                    }
-                });
-
-                sdmLink.setAlignmentX(Component.CENTER_ALIGNMENT); // по центру
-                panel.add(Box.createRigidArea(new Dimension(0, 10)));
-                panel.add(sdmLink);
-
-                return panel;
+                if (file != null) {
+                    openEditorQuietly(project, path);
+                }
             }
+        });
+    }
 
+    private static VirtualFile createAndOpen(Project project, VirtualFile baseDir, String path, String content) throws Exception {
+        final VirtualFile[] result = new VirtualFile[1];
+        ApplicationManager.getApplication().runWriteAction(new Runnable() {
             @Override
-            protected Action @NonNull [] createActions() {
-                return new Action[0]; // только кнопка закрытия (X)
-            }
-
-            private JButton createButton(String relativePath,
-                                         Project project,
-                                         DialogWrapper dialog) {
-
-                JButton button = new JButton(relativePath);
-                button.setAlignmentX(Component.CENTER_ALIGNMENT);
-                button.setMinimumSize(JBUI.size(100, 30));
-                button.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
-                button.setFocusPainted(false);
-                button.setContentAreaFilled(true);
-                button.setOpaque(true);
-
-                Color defaultBg = UIUtil.getPanelBackground();
-                Color hoverBg = UIUtil.getListSelectionBackground(true);
-                button.setBackground(defaultBg);
-
-                button.addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mouseEntered(MouseEvent e) {
-                        button.setBackground(hoverBg);
+            public void run() {
+                try {
+                    int slash = path.lastIndexOf('/');
+                    VirtualFile targetDir;
+                    String fileName;
+                    if (slash >= 0) {
+                        String dirPart = path.substring(0, slash);
+                        targetDir = IdeaHelpers.ensure_dir(baseDir, dirPart);
+                        fileName = path.substring(slash + 1);
+                    } else {
+                        targetDir = baseDir;
+                        fileName = path;
                     }
-
-                    @Override
-                    public void mouseExited(MouseEvent e) {
-                        button.setBackground(defaultBg);
-                    }
-                });
-
-                button.addActionListener(e -> {
-                    openEditorQuietly(project, relativePath);
-                    dialog.close(DialogWrapper.OK_EXIT_CODE);
-                });
-
-                return button;
+                    VirtualFile f = targetDir.createChildData(null, fileName);
+                    f.setBinaryContent(content.getBytes(f.getCharset()));
+                    IdeaEditorHelpers.open_local_file_in_editor_sync(project, f);
+                    result[0] = f;
+                } catch (Exception ex) {
+                    IdeaMessageHelpers.show_error_in_ui_thread(ex);
+                }
             }
-
-        }.show();
+        });
+        if (result[0] != null) {
+            baseDir.refresh(false, true);
+        }
+        return result[0];
     }
 
     private static void openEditorQuietly(Project project, String relativePath) {
-
         VirtualFile file = findFileByRelativePath(project, relativePath);
-        if (file == null) {
-            IdeaMessageHelpers.add_error_to_ide_log("ERROR", relativePath + " not found");
-            return;
-        }
+        if (file == null) return;
 
         FileEditorManager fem = FileEditorManager.getInstance(project);
-
-        for (VirtualFile f : fem.getOpenFiles()) {
-            if (f.equals(file)) {
-                fem.openFile(f, false);
+        VirtualFile[] openFiles = fem.getOpenFiles();
+        for (int i = 0; i < openFiles.length; i++) {
+            if (openFiles[i].equals(file)) {
+                fem.openFile(openFiles[i], false);
                 return;
             }
         }
@@ -224,18 +262,42 @@ public class JbToolWindowFactory implements ToolWindowFactory {
 
     private static VirtualFile findFileByRelativePath(Project project, String relativePath) {
         String basePath = project.getBasePath();
-        VirtualFile baseDir = basePath == null ? null :
-                LocalFileSystem.getInstance().findFileByPath(basePath);
+        if (basePath == null) return null;
+        VirtualFile baseDir = LocalFileSystem.getInstance().findFileByPath(basePath);
         if (baseDir == null) return null;
         return baseDir.findFileByRelativePath(relativePath);
     }
 
+    private static List<String> buildItemsFromSdm(Project project) {
+        List<String> items = new ArrayList<String>();
+        VirtualFile sdm = findFileByRelativePath(project, ".sdm");
+        if (sdm == null) return null;
+
+        String[] lines = ReadAction.compute(new com.intellij.openapi.util.ThrowableComputable<String[], RuntimeException>() {
+            @Override
+            public String[] compute() {
+                return readLines(sdm);
+            }
+        });
+
+        if (lines.length == 0) return null;
+
+        for (int i = 0; i < lines.length; i++) {
+            String line = lines[i].trim();
+            if (line.isEmpty()) {
+                continue;
+            }
+
+            items.add(line);
+        }
+
+        return items;
+    }
+
     private static String[] readLines(VirtualFile file) {
         String text;
-
         com.intellij.openapi.editor.Document document =
-                com.intellij.openapi.fileEditor.FileDocumentManager
-                        .getInstance().getDocument(file);
+                com.intellij.openapi.fileEditor.FileDocumentManager.getInstance().getDocument(file);
 
         if (document != null) {
             text = document.getText();
@@ -247,9 +309,10 @@ public class JbToolWindowFactory implements ToolWindowFactory {
             }
         }
 
-        List<String> result = new ArrayList<>();
-
-        for (String line : text.split("\n")) {
+        List<String> result = new ArrayList<String>();
+        String[] lines = text.split("\n");
+        for (int i = 0; i < lines.length; i++) {
+            String line = lines[i];
             int hash = line.indexOf('#');
             if (hash >= 0) {
                 line = line.substring(0, hash);
