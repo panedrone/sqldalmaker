@@ -51,12 +51,19 @@ public class JbToolWindowFactory implements ToolWindowFactory {
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
+        // Give panel an initial preferred size to prevent IDE from shrinking it
+        panel.setPreferredSize(new Dimension(300, 400));
+
         JBScrollPane scrollPane = new JBScrollPane(panel,
                 JBScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JBScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
+        // Wrap scrollPane in a container with BorderLayout for proper stretching
+        JPanel container = new JPanel(new BorderLayout());
+        container.add(scrollPane, BorderLayout.CENTER);
+
         Content content = ContentFactory.getInstance()
-                .createContent(scrollPane, "", false);
+                .createContent(container, "", false);
         toolWindow.getContentManager().addContent(content);
 
         // Refresh button in header
@@ -70,8 +77,10 @@ public class JbToolWindowFactory implements ToolWindowFactory {
 
         toolWindow.setAutoHide(false);
         toolWindow.setAvailable(true);
-        toolWindow.show(null);
+        //        toolWindow.show(null); unpredictable jumping
+        toolWindow.activate(null);
 
+        // Initial population
         updatePanel(project, panel);
     }
 
