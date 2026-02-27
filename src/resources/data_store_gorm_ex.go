@@ -41,3 +41,13 @@ func Ds() DataStore {
 func NewCxOracleTestDao() *CxOracleTestDao {
 	return &CxOracleTestDao{ds: _ds}
 }
+
+func WithContext(ctx context.Context) *gorm.DB {
+	return _ds.Session(ctx)
+}
+
+func RunTx(ctx context.Context, txFunc func(tx *gorm.DB) error) error {
+	return WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		return txFunc(tx)
+	})
+}

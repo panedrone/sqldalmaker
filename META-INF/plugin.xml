@@ -2,7 +2,7 @@
     <id>dal-mpe</id>
     <name>SQL DAL Maker</name>
     <category>Database</category>
-    <version>1.324.2602</version>
+    <version>1.325.2602</version>
     <vendor email="sqldalmaker@gmail.com" url="https://sqldalmaker.sourceforge.net">
         SQL DAL Maker
     </vendor>
@@ -61,7 +61,7 @@ Generated code is being synchronized with the current database schema using "liv
         <toolWindow
                 id="SDM"
                 anchor="right"
-                factoryClass="com.sqldalmaker.intellij.ui.JbToolWindowFactory"
+                factoryClass="com.sqldalmaker.intellij.ui.SdmJbToolWindowFactory"
                 secondary="false"
         />
 

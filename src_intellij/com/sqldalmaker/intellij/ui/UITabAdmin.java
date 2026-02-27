@@ -82,7 +82,6 @@ public class UITabAdmin {
     private JPanel pnl_settings;
     private JPanel pnl_vm;
     private JPanel pnl_xsd;
-    private JButton aboutButton;
     private JButton btn_sqlx_xml;
     private JButton btn_sqlx;
     private JTextPane text1;
@@ -404,12 +403,12 @@ public class UITabAdmin {
                 IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "DataStore.java.android.settings.xml", "settings.xml");
             }
         });
-        aboutButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                UIDialogAbout.show_modal();
-            }
-        });
+//        aboutButton.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                UIDialogAbout.show_modal();
+//            }
+//        });
         btn_sqlx_xml.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -606,14 +605,6 @@ public class UITabAdmin {
         gbc.gridx = 3;
         gbc.gridy = 0;
         pnl_settings.add(recentChangesButton, gbc);
-        aboutButton = new JButton();
-        aboutButton.setPreferredSize(new Dimension(60, 30));
-        aboutButton.setText("About");
-        gbc = new GridBagConstraints();
-        gbc.gridx = 4;
-        gbc.gridy = 0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        pnl_settings.add(aboutButton, gbc);
         pnl_php = new JPanel();
         pnl_php.setLayout(new GridBagLayout());
         gbc = new GridBagConstraints();

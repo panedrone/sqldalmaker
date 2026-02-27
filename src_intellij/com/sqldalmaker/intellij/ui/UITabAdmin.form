@@ -74,16 +74,6 @@
                           <visible value="false"/>
                         </properties>
                       </component>
-                      <component id="723c" class="javax.swing.JButton" binding="aboutButton" default-binding="true">
-                        <constraints>
-                          <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                          <gridbag weightx="0.0" weighty="0.0"/>
-                        </constraints>
-                        <properties>
-                          <preferredSize width="60" height="30"/>
-                          <text value="About"/>
-                        </properties>
-                      </component>
                     </children>
                   </grid>
                   <grid id="a3e0c" binding="pnl_php" layout-manager="GridBagLayout">

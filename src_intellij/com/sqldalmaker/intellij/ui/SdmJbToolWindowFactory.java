@@ -33,13 +33,13 @@ import java.util.List;
  * User: sqldalmaker@gmail.com
  * Date: 2026-02-04
  */
-public class JbToolWindowFactory implements ToolWindowFactory {
+public class SdmJbToolWindowFactory implements ToolWindowFactory {
 
     public static final String ID = "SDM";
 
     @Override
     public void init(@NotNull ToolWindow toolWindow) {
-        Icon icon = IconLoader.getIcon("/META-INF/pluginIcon.svg", JbToolWindowFactory.class);
+        Icon icon = IconLoader.getIcon("/META-INF/pluginIcon.svg", SdmJbToolWindowFactory.class);
         toolWindow.setIcon(icon);
     }
 
@@ -47,41 +47,45 @@ public class JbToolWindowFactory implements ToolWindowFactory {
     public void createToolWindowContent(@NotNull final Project project,
                                         @NotNull final ToolWindow toolWindow) {
 
-        final JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        final JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+//        buttonPanel.setPreferredSize(new Dimension(400, 400));
 
-        // Give panel an initial preferred size to prevent IDE from shrinking it
-        panel.setPreferredSize(new Dimension(300, 400));
+        {
+            JBScrollPane scrollablePanel = new JBScrollPane(buttonPanel,
+                    JBScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                    JBScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
-        JBScrollPane scrollPane = new JBScrollPane(panel,
-                JBScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                JBScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+            {
+                final Content toolContent = ContentFactory.getInstance()
+                        .createContent(scrollablePanel, "", false);
+                toolWindow.getContentManager().addContent(toolContent);
 
-        // Wrap scrollPane in a container with BorderLayout for proper stretching
-        JPanel container = new JPanel(new BorderLayout());
-        container.add(scrollPane, BorderLayout.CENTER);
+                AnAction refreshAction = new AnAction("Refresh", "Refresh", AllIcons.Actions.Refresh) {
+                    @Override
+                    public void actionPerformed(@NotNull AnActionEvent e) {
+                        updatePanel(project, buttonPanel);
+                    }
+                };
+                AnAction aboutAction = new AnAction("About SDM", "About SDM", AllIcons.Actions.Help) {
+                    @Override
+                    public void actionPerformed(@NotNull AnActionEvent e) {
+                        UIDialogAbout.show_modal();
+                    }
+                };
+                List<AnAction> actions = new java.util.ArrayList<AnAction>();
+                actions.add(refreshAction);
+                actions.add(aboutAction);
+                toolWindow.setTitleActions(actions);
 
-        Content content = ContentFactory.getInstance()
-                .createContent(container, "", false);
-        toolWindow.getContentManager().addContent(content);
-
-        // Refresh button in header
-        AnAction refreshAction = new AnAction("Refresh", "Refresh", AllIcons.Actions.Refresh) {
-            @Override
-            public void actionPerformed(@NotNull AnActionEvent e) {
-                updatePanel(project, panel);
+                toolWindow.setAutoHide(false);
+                toolWindow.setAvailable(true);
+                toolWindow.activate(null);
             }
-        };
-        toolWindow.setTitleActions(java.util.Collections.singletonList(refreshAction));
+        }
 
-        toolWindow.setAutoHide(false);
-        toolWindow.setAvailable(true);
-        //        toolWindow.show(null); unpredictable jumping
-        toolWindow.activate(null);
-
-        // Initial population
-        updatePanel(project, panel);
+        updatePanel(project, buttonPanel);
     }
 
     public void updatePanel(Project project, JPanel panel) {
