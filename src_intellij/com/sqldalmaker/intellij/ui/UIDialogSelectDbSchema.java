@@ -59,7 +59,7 @@ public class UIDialogSelectDbSchema extends DialogWrapper {
         $$$setupUI$$$();   // UI Designer
 
         init();            // must call for DialogWrapper
-        setTitle("Select a schema and provide options");
+        setTitle("Select a Schema and Provide Options");
 
         lbl_jdbc_url.setText(settings.getJdbc().getUrl());
 
@@ -227,14 +227,14 @@ public class UIDialogSelectDbSchema extends DialogWrapper {
         panel4.add(panel5, gbc);
         radio_selected_schema = new JRadioButton();
         radio_selected_schema.setSelected(true);
-        radio_selected_schema.setText("Use selected schema");
+        radio_selected_schema.setText("Use selected schema"); //NON-NLS
         panel5.add(radio_selected_schema);
         radio_user_as_schema = new JRadioButton();
-        radio_user_as_schema.setText("DB user name as schema");
+        radio_user_as_schema.setText("DB user name as schema"); //NON-NLS
         panel5.add(radio_user_as_schema);
         chk_omit = new JCheckBox();
         chk_omit.setSelected(true);
-        chk_omit.setText("Omit DTO that are already declared");
+        chk_omit.setText("Omit DTO that are already declared"); //NON-NLS
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 1;
@@ -243,7 +243,7 @@ public class UIDialogSelectDbSchema extends DialogWrapper {
         panel4.add(chk_omit, gbc);
         chk_singular = new JCheckBox();
         chk_singular.setSelected(true);
-        chk_singular.setText("English plural to English singular for DTO class names");
+        chk_singular.setText("English plural to English singular for DTO class names"); //NON-NLS
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 2;
@@ -277,7 +277,7 @@ public class UIDialogSelectDbSchema extends DialogWrapper {
         panel4.add(chk_add_fk_access, gbc);
         chk_including_views = new JCheckBox();
         chk_including_views.setSelected(true);
-        chk_including_views.setText("Including views");
+        chk_including_views.setText("Including views"); //NON-NLS
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 5;
@@ -286,7 +286,7 @@ public class UIDialogSelectDbSchema extends DialogWrapper {
         panel4.add(chk_including_views, gbc);
         chk_schema_in_xml = new JCheckBox();
         chk_schema_in_xml.setSelected(false);
-        chk_schema_in_xml.setText("Schema in generated XML declarations");
+        chk_schema_in_xml.setText("Schema in generated XML declarations"); //NON-NLS
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 6;
