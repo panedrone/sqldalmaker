@@ -143,8 +143,18 @@ public class SdmJbToolWindowFactory implements ToolWindowFactory {
                             panel.add(titledSeparatorWrapper);
                         }
                     } else {
-                        final String path = item;
-                        JButton button = new JButton(path);
+                        final String path;
+                        final String label;
+                        int pipe = item.indexOf('|');
+                        if (pipe >= 0) {
+                            path = item.substring(0, pipe).trim();
+                            String t = item.substring(pipe + 1).trim();
+                            label = t.isEmpty() ? path : t;
+                        } else {
+                            path = item;
+                            label = item;
+                        }
+                        JButton button = new JButton(label);
                         button.setFocusPainted(false);
                         // Set maximum size to preferred size to prevent stretching
                         button.setMaximumSize(button.getPreferredSize());
