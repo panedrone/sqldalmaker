@@ -347,7 +347,7 @@ public class SdmJbToolWindowFactory implements ToolWindowFactory {
         VirtualFile sdm = findFileByRelativePath(project, ".sdm");
         if (sdm == null) return null;
 
-        String[] lines = ReadAction.compute(() -> readLines(sdm));
+        String[] lines = ReadAction.nonBlocking(() -> readLines(sdm)).executeSynchronously();
 
         if (lines.length == 0) return null;
 
