@@ -2,7 +2,7 @@
     <id>dal-mpe</id>
     <name>SQL DAL Maker</name>
     <category>Database</category>
-    <version>1.329.2608</version>
+    <version>1.330.2608</version>
     <vendor email="sqldalmaker@gmail.com" url="https://sqldalmaker.sourceforge.net">
         SQL DAL Maker
     </vendor>
@@ -13,11 +13,41 @@
     <depends>com.intellij.modules.lang</depends>
 
     <description><![CDATA[
-SQL DAL Maker is a generator of DTO, model, and DAO classes to access relational databases.
-Target programming languages: PHP, Java, C++, Python, and Go. To generate the class, you declare it in XML meta-program.<br/>
-<br/>
-At the stage of code generation, the target database must exist and be available for JDBC connection.
-Generated code is being synchronized with the current database schema using "live" JDBC metadata.
+<p>
+SQL DAL Maker generates the data access layer: DTO, Model, and DAO classes
+for PHP, Java, C++, Python, and Go.
+</p>
+
+<p>
+It works in three steps:
+</p>
+
+<ol>
+<li>
+<b>Reverse-engineer.</b> The generator connects to your database over JDBC and reads live
+metadata: tables, views, and the result sets of your own SQL. The database must be up and
+reachable while you generate.
+</li>
+<li>
+<b>Fine-tune.</b> What it found is written out as an XML manifest. You override the types your
+driver got wrong, add fields it could not see, and pick which CRUD methods you actually need.
+</li>
+<li>
+<b>Translate.</b> The manifest is translated into complete source code &mdash; free of any
+direct call to PDO, JDBC, or QtSql. Those stay behind a <code>DataStore</code> interface that
+you own.
+</li>
+</ol>
+
+<p>
+The manifest persists, so regeneration is repeatable: when the schema changes, you re-run the
+generator and your corrections are still there.
+</p>
+
+<p>
+Documentation and demo projects:
+<a href="https://sqldalmaker.sourceforge.net/">sqldalmaker.sourceforge.net</a>
+</p>
     ]]></description>
 
     <change-notes><![CDATA[
