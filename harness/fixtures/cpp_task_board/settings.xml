@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="settings.xsd">
+
+    <!-- Migrated from "sdm/settings.xml" of "D:/work/sdm-cpp/qt6_sqlite3_task_board".
+         Same values, current attribute names: "<type java=" -> "<type detected=",
+         "<external-vm-file>" and "<cpp class-prefix>" are gone, "macro" and
+         "field-assign-mode" are now required. "jar", "url" and "sql" are still
+         relative to the project dir, i.e. to the demo project, not to this folder. -->
+
+    <folders target="" sql="sdm/sql"/>
+
+    <dto scope="" inheritance="" field-names-mode="0" macro=""/>
+
+    <dao scope="" field-assign-mode="0" macro=""/>
+
+    <ide event-log="true"/>
+
+    <jdbc jar="sdm/sqlite-jdbc-3.32.3.2.jar" class="org.sqlite.JDBC"
+          url="jdbc:sqlite:$PROJECT_DIR$/task_tracker.sqlite" user="" pwd=""/>
+
+    <type-map default="CValue">
+        <type detected="java.lang.Integer" target="CInteger"/>
+        <type detected="java.lang.Long" target="CLong"/>
+        <type detected="java.lang.Double" target="CDouble"/>
+        <type detected="java.lang.String" target="CText"/>
+        <type detected="byte[]" target="CBlob"/>
+    </type-map>
+
+    <macros>
+    </macros>
+
+</settings>

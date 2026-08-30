@@ -136,15 +136,15 @@ class DaoClassInfo {
         JdbcTableInfo table_info = new JdbcTableInfo(no_model, conn, jaxb_type_map, dto_field_names_mode, dao_table_name, "*", jaxb_explicit_auto_column);
         String filter_col_names_str = shc.params;
         if (filter_col_names_str != null) {
-            String[] filter_col_names = Helpers.get_listed_items(filter_col_names_str, false);
-            Helpers.check_duplicates(filter_col_names);
+            String[] filter_col_names = MethodDeclarations.get_listed_items(filter_col_names_str, false);
+            MethodDeclarations.check_duplicates(filter_col_names);
             _get_shortcut_params(param_names_mode, method_param_descriptors, table_info.fields_all, filter_col_names, res_params);
         }
         String col_list = shc.col_names;
         if (col_list == null) {
             res_fields.addAll(table_info.fields_all);
         } else {
-            String[] cc = Helpers.get_listed_items(col_list, false);
+            String[] cc = MethodDeclarations.get_listed_items(col_list, false);
             Set<String> col_names = new HashSet<String>(Arrays.asList(cc));
             for (FieldInfo fi : table_info.fields_all) {
                 if (col_names.contains(fi.getColumnName())) {
@@ -347,7 +347,7 @@ class DaoClassInfo {
 
         res_fields.clear();
         res_params.clear();
-        Helpers.check_duplicates(method_param_descriptors);
+        MethodDeclarations.check_duplicates(method_param_descriptors);
         dao_jaxb_ref = _refine_dao_ref(jaxb_dto_or_return_type, jaxb_return_type_is_dto, jaxb_dto_classes, dao_jaxb_ref);
         String dao_query_jdbc_sql = SqlUtils.jdbc_sql_by_ref(dao_jaxb_ref, sql_root_abs_path);
         FieldNamesMode param_names_mode = _refine_method_params_names_mode(dto_param_type);

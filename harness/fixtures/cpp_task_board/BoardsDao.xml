@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dao-class xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:noNamespaceSchemaLocation="dao.xsd">
+
+    <query-dto-list method="get_boards" dto="Board" ref="get_boards.sql" />
+
+    <crud dto="Board" table="boards">
+        <create method="create_board"/>
+        <read-all method="read_board_list"/>
+        <read method="read_board"/>
+        <update method="update_board"/>
+        <delete method="delete_board"/>
+    </crud>
+    
+    <exec-dml method="del_by_range(b_id1, b_id2)" ref="delete from boards where b_id between ? and ?" />
+
+</dao-class>

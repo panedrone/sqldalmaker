@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sdm xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:noNamespaceSchemaLocation="sdm.xsd">
+
+    <!-- Migrated from "sdm/dto.xml" of "D:/work/sdm-cpp/qt6_sqlite3_task_board":
+         "<dto-classes>" -> "<sdm>", "java-type" -> "type", plus the "<dao-class ref=..."
+         registrations that "dto.xml" did not have. Nothing else was changed. -->
+
+    <dto-class name="Board" ref="get_boards.sql">
+        <field type="Integer" column="b_id"/>
+        <field type="String" column="b_dt_created"/>
+        <field type="String" column="b_dt_updated"/>
+        <field type="String" column="b_name"/>
+        <field type="Integer" column="b_tasks_count"/>
+    </dto-class>
+
+    <dto-class name="Task" ref="tasks"/>
+
+    <dto-class name="NoAiPk" ref="_no_ai_pk"/>
+
+    <dto-class name="TaskUser" ref="task_users"/>
+    <dto-class name="User" ref="users"/>
+
+    <dao-class name="BoardsDao" ref="BoardsDao.xml"/>
+    <dao-class name="TasksDao" ref="TasksDao.xml"/>
+    <dao-class name="TaskUsersDao" ref="TaskUsersDao.xml"/>
+    <dao-class name="UserDao" ref="UserDao.xml"/>
+    <dao-class name="NoAiPkDao" ref="NoAiPkDao.xml"/>
+
+</sdm>

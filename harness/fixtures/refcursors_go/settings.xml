@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="settings.xsd">
+
+    <folders target="" sql="sdm/sql"/>
+
+    <dto scope="dbal/dto" inheritance="" field-names-mode="0" macro=""/>
+
+    <dao scope="dbal/dao" field-assign-mode="0" macro=""/>
+
+    <ide event-log="true"/>
+
+    <jdbc jar="sdm/sqlite-jdbc-3.32.3.2.jar" class="org.sqlite.JDBC"
+          url="jdbc:sqlite:$PROJECT_DIR$/task_tracker.sqlite" user="" pwd=""/>
+
+    <!-- plain Go types, no "${json}" macros: enough to make the generated code valid Go,
+         so that "gofmt -e" can be used as a syntax check of this fixture -->
+    <type-map default="">
+        <type detected="java.lang.Integer" target="int64 -> SetInt64"/>
+        <type detected="java.lang.Double" target="float64 -> SetFloat64"/>
+        <type detected="java.lang.String" target="string -> SetString"/>
+        <type detected="byte[]" target="[]byte -> SetBytes"/>
+        <type detected="java.lang.Object" target="interface{}"/>
+        <type detected="Object" target="interface{}"/>
+    </type-map>
+
+    <macros>
+    </macros>
+
+</settings>

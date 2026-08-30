@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dao-class xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:noNamespaceSchemaLocation="dao.xsd">
+
+    <crud dto="Task" table="tasks">
+        <create method="create_task"/>
+        <read-all method="read_task_list"/>
+        <read method="read_task"/>
+        <update method="update_task"/>
+        <delete method="delete_task"/>
+    </crud>
+
+    <query-dto-list method="get_tasks_by_board(b_id)" dto="Task" ref="tasks(b_id)"/>
+
+</dao-class>

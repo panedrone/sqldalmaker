@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="settings.xsd">
+
+    <folders target="dal" sql="sdm/sql"/>
+
+    <dto scope="" inheritance="" field-names-mode="1" macro=""/>
+
+    <dao scope="" field-assign-mode="0" macro=""/>
+
+    <ide event-log="true"/>
+
+    <jdbc jar="sdm/sqlite-jdbc-3.32.3.2.jar" class="org.sqlite.JDBC"
+          url="jdbc:sqlite:$PROJECT_DIR$/task_tracker.sqlite" user="" pwd=""/>
+
+    <type-map default="">
+    </type-map>
+
+    <macros>
+    </macros>
+
+</settings>

@@ -9,6 +9,7 @@ import com.sqldalmaker.cg.JdbcUtils;
 import com.sqldalmaker.cg.FieldInfo;
 import com.sqldalmaker.cg.FieldNamesMode;
 import com.sqldalmaker.cg.Helpers;
+import com.sqldalmaker.cg.Names;
 import com.sqldalmaker.jaxb.sdm.*;
 import com.sqldalmaker.jaxb.settings.Settings;
 
@@ -109,9 +110,9 @@ public class SdmUtils {
             for (String fk_column_name : fk_column_names) {
                 String c = fk_column_name;
                 if (field_names_mode == FieldNamesMode.SNAKE_CASE) {
-                    c = Helpers.camel_case_to_lower_snake_case(c);
+                    c = Names.camel_case_to_lower_snake_case(c);
                 } else if (field_names_mode == FieldNamesMode.LOWER_CAMEL_CASE) {
-                    c = Helpers.lower_camel_case(c);
+                    c = Names.lower_camel_case(c);
                 }
                 if (first) {
                     params += c;
@@ -128,7 +129,7 @@ public class SdmUtils {
             QueryDtoList node = new QueryDtoList();
             node.setDto(dto_class_name);
             if (field_names_mode == FieldNamesMode.SNAKE_CASE) {
-                method_name = Helpers.camel_case_to_lower_snake_case(method_name);
+                method_name = Names.camel_case_to_lower_snake_case(method_name);
             }
             String method = method_name + "(" + params + ")";
             node.setMethod(method);
@@ -145,7 +146,7 @@ public class SdmUtils {
         just table name without schema needed
      */
     public static String table_name_to_dto_class_name(String table_name, boolean plural_to_singular) {
-        String word = Helpers.title_case(table_name);
+        String word = Names.title_case(table_name);
         if (plural_to_singular) {
             int last_word_index = -1;
             String last_word;
@@ -210,7 +211,7 @@ public class SdmUtils {
                                 TypeMethod tm = new TypeMethod();
                                 String m = "create" + dto_class_name;
                                 if (field_names_mode == FieldNamesMode.SNAKE_CASE) {
-                                    m = Helpers.camel_case_to_lower_snake_case(m);
+                                    m = Names.camel_case_to_lower_snake_case(m);
                                 }
                                 tm.setMethod(m);
                                 crud.setCreate(tm);
@@ -219,7 +220,7 @@ public class SdmUtils {
                                 TypeMethod tm = new TypeMethod();
                                 String m = "read" + dto_class_name + "List";
                                 if (field_names_mode == FieldNamesMode.SNAKE_CASE) {
-                                    m = Helpers.camel_case_to_lower_snake_case(m);
+                                    m = Names.camel_case_to_lower_snake_case(m);
                                 }
                                 tm.setMethod(m);
                                 crud.setReadAll(tm);
@@ -228,7 +229,7 @@ public class SdmUtils {
                                 TypeMethod tm = new TypeMethod();
                                 String m = "read" + dto_class_name;
                                 if (field_names_mode == FieldNamesMode.SNAKE_CASE) {
-                                    m = Helpers.camel_case_to_lower_snake_case(m);
+                                    m = Names.camel_case_to_lower_snake_case(m);
                                 }
                                 tm.setMethod(m);
                                 crud.setRead(tm);
@@ -237,7 +238,7 @@ public class SdmUtils {
                                 TypeMethod tm = new TypeMethod();
                                 String m = "update" + dto_class_name;
                                 if (field_names_mode == FieldNamesMode.SNAKE_CASE) {
-                                    m = Helpers.camel_case_to_lower_snake_case(m);
+                                    m = Names.camel_case_to_lower_snake_case(m);
                                 }
                                 tm.setMethod(m);
                                 crud.setUpdate(tm);
@@ -246,7 +247,7 @@ public class SdmUtils {
                                 TypeMethod tm = new TypeMethod();
                                 String m = "delete" + dto_class_name;
                                 if (field_names_mode == FieldNamesMode.SNAKE_CASE) {
-                                    m = Helpers.camel_case_to_lower_snake_case(m);
+                                    m = Names.camel_case_to_lower_snake_case(m);
                                 }
                                 tm.setMethod(m);
                                 crud.setDelete(tm);

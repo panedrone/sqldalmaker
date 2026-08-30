@@ -297,7 +297,7 @@ public class SqlUtils {
 //                return false;
 //            }
             if (shc.params != null) {
-                Helpers.get_listed_items(shc.params, false);
+                MethodDeclarations.get_listed_items(shc.params, false);
             } else {
                 if (shc.col_names == null) {
                     return false;
@@ -450,7 +450,7 @@ public class SqlUtils {
         String params = null;
         String param_descriptors = shc.params;
         if (param_descriptors != null && !param_descriptors.trim().isEmpty()) {
-            String[] param_arr = Helpers.get_listed_items(param_descriptors, false);
+            String[] param_arr = MethodDeclarations.get_listed_items(param_descriptors, false);
             if (param_arr.length < 1) {
                 throw new Exception("Not empty list of parameters expected in SQL shortcut");
             }

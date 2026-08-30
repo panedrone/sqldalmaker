@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dao-class xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:noNamespaceSchemaLocation="dao.xsd">
+
+    <crud dto="User" table="users">
+        <create method="createUser"/>
+        <read-all method="readUserList"/>
+        <read method="readUser"/>
+        <update method="updateUser"/>
+        <delete method="deleteUser"/>
+    </crud>
+    
+</dao-class>

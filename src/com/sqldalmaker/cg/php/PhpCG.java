@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2024 sqldalmaker@gmail.com
+    Copyright 2011-2026 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -21,10 +21,6 @@ import java.util.*;
  */
 public class PhpCG {
 
-    private static String get_template_path() {
-        return Helpers.class.getPackage().getName().replace('.', '/') + "/php/php.vm";
-    }
-
     public static class DTO implements IDtoCG {
 
         private final String sql_root_abs_path;
@@ -44,19 +40,14 @@ public class PhpCG {
             this.jaxb_dto_classes = sdm.getDtoClass();
             this.jaxb_settings = jaxb_settings;
             this.sql_root_abs_path = sql_root_abs_path;
-            if (vm_template == null) {
-                te = new TemplateEngine(get_template_path(), false);
-            } else {
-                te = new TemplateEngine(vm_template, "php");
-            }
+            te = Helpers.create_template_engine(vm_template, "php", "php");
             db_utils = new JdbcUtils(connection, field_names_mode, FieldNamesMode.AS_IS, jaxb_settings, sql_root_abs_path);
         }
 
         @Override
         public String[] translate(String dto_class_name) throws Exception {
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
-            List<FieldInfo> fields = new ArrayList<FieldInfo>();
-            db_utils.get_dto_field_info(jaxb_dto_class, sql_root_abs_path, fields);
+            List<FieldInfo> fields = db_utils.get_dto_fields(jaxb_dto_class, sql_root_abs_path);
             Map<String, Object> context = new HashMap<String, Object>();
             int model_name_end_index = dto_class_name.indexOf('-');
             if (model_name_end_index != -1) {
@@ -94,10 +85,11 @@ public class PhpCG {
 
         private final String sql_root_abs_path;
         private final List<DtoClass> jaxb_dto_classes;
-        private final Set<String> imports = new HashSet<String>();
-        private final Set<String> uses = new HashSet<String>();
         private final TemplateEngine te;
         private final JdbcUtils db_utils;
+
+        private final Set<String> imports = new HashSet<String>();
+        private final Set<String> uses = new HashSet<String>();
         private final Settings jaxb_settings;
         private String model = "";
 
@@ -111,13 +103,9 @@ public class PhpCG {
 
             this.jaxb_dto_classes = jaxb_dto_classes;
             this.sql_root_abs_path = sql_root_abs_path;
+            this.te = Helpers.create_template_engine(vm_template, "php", "php");
+            this.db_utils = new JdbcUtils(connection, field_names_mode, FieldNamesMode.AS_IS, jaxb_settings, sql_root_abs_path);
             this.jaxb_settings = jaxb_settings;
-            if (vm_template == null) {
-                te = new TemplateEngine(get_template_path(), false);
-            } else {
-                te = new TemplateEngine(vm_template, "php");
-            }
-            db_utils = new JdbcUtils(connection, field_names_mode, FieldNamesMode.AS_IS, jaxb_settings, sql_root_abs_path);
         }
 
         @Override
@@ -126,7 +114,14 @@ public class PhpCG {
             uses.clear();
             String dao_class_name = dao_class.getName();
             List<String> methods = new ArrayList<String>();
-            JaxbUtils.process_jaxb_dao_class(this, dao_class_name, dao_class, methods);
+            for (DaoMethodInfo mi : JaxbUtils.plan_dao_methods(
+                    dao_class, jaxb_dto_classes, db_utils.get_dto_field_names_mode())) {
+                try {
+                    methods.add(_render(mi).toString());
+                } catch (Throwable e) {
+                    throw new Exception(Helpers.get_error_message(mi.get_error_context(), e));
+                }
+            }
             Map<String, Object> context = new HashMap<String, Object>();
             String[] arr1 = new String[imports.size()];
             String[] imports_arr = imports.toArray(arr1);
@@ -153,35 +148,58 @@ public class PhpCG {
             return new String[]{text};
         }
 
-        @Override
-        public StringBuilder render_jaxb_query(Object jaxb_element) throws Exception {
-            QueryMethodInfo mi = new QueryMethodInfo(jaxb_element);
-            String xml_node_name = JaxbUtils.get_jaxb_node_name(jaxb_element);
-            Helpers.check_required_attr(xml_node_name, mi.jaxb_method);
-            try {
-                String[] parsed = _parse_method_declaration2(mi.jaxb_method);
-                String method_name = parsed[0];
-                String param_descriptors = parsed[1];
-                String[] method_param_descriptors = Helpers.get_listed_items(param_descriptors, false);
-                List<FieldInfo> fields = new ArrayList<FieldInfo>();
-                List<FieldInfo> params = new ArrayList<FieldInfo>();
-                String dao_query_jdbc_sql = db_utils.get_dao_query_info(sql_root_abs_path, mi.jaxb_ref, "",
-                        method_param_descriptors, mi.jaxb_dto_or_return_type, mi.return_type_is_dto, jaxb_dto_classes,
-                        fields, params);
-                return _render_query(dao_query_jdbc_sql, mi.jaxb_is_external_sql, mi.jaxb_dto_or_return_type,
-                        mi.return_type_is_dto, mi.fetch_list, method_name, null, fields, params);
-            } catch (Throwable e) {
-                // e.printStackTrace();
-                String msg = "<" + xml_node_name + " method=\"" + mi.jaxb_method + "\" ref=\"" + mi.jaxb_ref
-                        + "\"...\n";
-                throw new Exception(Helpers.get_error_message(msg, e));
-            }
-        }
-
         //////////////////////////////////////////////////////////////////
         //
         // this method is called from both 'render_jaxb_query' and 'render_crud_read'
         //
+        private StringBuilder _render(DaoMethodInfo mi) throws Exception {
+            if (mi instanceof DaoQueryMethodInfo) {
+                return _render_jaxb_query((DaoQueryMethodInfo) mi);
+            }
+            if (mi instanceof DaoExecDmlMethodInfo) {
+                return _render_jaxb_exec_dml((DaoExecDmlMethodInfo) mi);
+            }
+            if (mi instanceof DaoCrudMethodInfo) {
+                return _render_crud((DaoCrudMethodInfo) mi);
+            }
+            throw new Exception("Unexpected kind of DAO method: " + mi.getClass().getName());
+        }
+
+        private StringBuilder _render_crud(DaoCrudMethodInfo mi) throws Exception {
+            _process_rendered_dto_class_name(mi.dto_class_name, null);
+            switch (mi.kind) {
+                case CREATE:
+                    return _render_crud_create(mi.method_name, mi.table_name, mi.dto_class_name,
+                            mi.fetch_generated, mi.auto_column);
+                case READ:
+                    return _render_crud_read(mi.method_name, mi.table_name, mi.dto_class_name,
+                            mi.explicit_pk, mi.fetch_list);
+                case UPDATE:
+                    return _render_crud_update(mi.method_name, mi.table_name, mi.explicit_pk,
+                            mi.dto_class_name, false);
+                case DELETE:
+                    return _render_crud_delete(mi.dto_class_name, mi.method_name, mi.table_name,
+                            mi.explicit_pk);
+            }
+            throw new Exception("Unexpected kind of CRUD method: " + mi.kind);
+        }
+
+        private StringBuilder _render_jaxb_query(DaoQueryMethodInfo mi) throws Exception {
+            JdbcUtils.DaoSqlInfo _q = db_utils.get_dao_query_info(sql_root_abs_path, mi.ref, "",
+                    mi.param_descriptors, mi.dto_or_return_type, mi.return_type_is_dto, jaxb_dto_classes);
+            return _render_query(_q.sql, mi.external_sql, mi.dto_or_return_type, mi.return_type_is_dto,
+                    mi.fetch_list, mi.method_name, null, _q.fields, _q.params);
+        }
+
+        private StringBuilder _render_jaxb_exec_dml(DaoExecDmlMethodInfo mi) throws Exception {
+            String dao_jdbc_sql = SqlUtils.jdbc_sql_by_exec_dml_ref(mi.ref, sql_root_abs_path);
+            StringBuilder buff = new StringBuilder();
+            _render_exec_dml(buff, dao_jdbc_sql, mi.external_sql, mi.method_name,
+                    mi.param_descriptors, mi.xml_node_name, mi.ref);
+            return buff;
+        }
+
+        // called from both '_render_jaxb_query' and '_render_crud_read'
         private StringBuilder _render_query(
                 String dao_query_jdbc_sql,
                 boolean is_external_sql,
@@ -279,29 +297,6 @@ public class PhpCG {
             }
         }
 
-        @Override
-        public StringBuilder render_jaxb_exec_dml(ExecDml element) throws Exception {
-            String method = element.getMethod();
-            String ref = element.getRef();
-            String xml_node_name = JaxbUtils.get_jaxb_node_name(element);
-            Helpers.check_required_attr(xml_node_name, method);
-            try {
-                String dao_jdbc_sql = SqlUtils.jdbc_sql_by_exec_dml_ref(ref, sql_root_abs_path);
-                String[] parsed = _parse_method_declaration2(method);
-                String method_name = parsed[0]; // never is null
-                String param_descriptors = parsed[1]; // never is null
-                String[] method_param_descriptors = Helpers.get_listed_items(param_descriptors, true);
-                boolean is_external_sql = element.isExternalSql();
-                StringBuilder buff = new StringBuilder();
-                _render_exec_dml(buff, dao_jdbc_sql, is_external_sql, method_name, method_param_descriptors, xml_node_name, ref);
-                return buff;
-            } catch (Throwable e) {
-                // e.printStackTrace();
-                String msg = "<" + xml_node_name + " method=\"" + method + "\" ref=\"" + ref + "\"...\n";
-                throw new Exception(Helpers.get_error_message(msg, e));
-            }
-        }
-
         // it is used only in render_jaxb_exec_dml
         private void _render_exec_dml(
                 StringBuilder buffer,
@@ -312,50 +307,37 @@ public class PhpCG {
                 String xml_node_name,
                 String sql_path) throws Exception {
 
-            List<FieldInfo> _params = new ArrayList<FieldInfo>();
-            db_utils.get_dao_exec_dml_info(jdbc_dao_sql, "", param_descriptors, _params);
+            List<FieldInfo> _params = db_utils.get_dao_exec_dml_params(jdbc_dao_sql, "", param_descriptors);
             String sql_str = SqlUtils.jdbc_sql_to_php_str(jdbc_dao_sql);
             List<MappingInfo> m_list = new ArrayList<MappingInfo>();
             List<FieldInfo> method_params = new ArrayList<FieldInfo>();
             List<FieldInfo> exec_dml_params = new ArrayList<FieldInfo>();
-            for (int pd_i = 0; pd_i < param_descriptors.length; pd_i++) {
-                String pd = param_descriptors[pd_i];
-                if (pd.startsWith("[") && pd.endsWith("]")) {
-                    String inner_list = pd.substring(1, pd.length() - 1);
-                    String[] implicit_param_descriptors = Helpers.get_listed_items(inner_list, true);
+            for (ExecDmlParamSlot slot : ExecDmlParams.parse(param_descriptors)) {
+                if (slot.kind == ExecDmlParamSlot.Kind.CURSOR_ARRAY) {
                     List<String> cb_elements = new ArrayList<String>();
-                    for (int ipd_i = 0; ipd_i < implicit_param_descriptors.length; ipd_i++) {
-                        String ipd = implicit_param_descriptors[ipd_i];
-                        String[] parts = _parse_param_descriptor(ipd);
-                        if (parts == null) {
-                            throw new Exception("Implicit cursors are specified incorrectly."
-                                    + " Expected syntax: [on_dto_1:Dto1, on_dto_2:Dto2, ...]. Specified: " + "["
-                                    + String.join(",", implicit_param_descriptors) + "]");
-                        }
-                        MappingInfo m = _create_mapping(parts);
+                    for (String[] mapping : slot.cursor_mappings) {
+                        MappingInfo m = _create_mapping(mapping);
                         m_list.add(m);
                         method_params
-                                .add(new FieldInfo(FieldNamesMode.AS_IS, "function", m.method_param_name, "parameter"));
+                                .add(FieldInfo.parameter(FieldNamesMode.AS_IS, "function", m.method_param_name));
                         cb_elements.add(m.exec_dml_param_name);
                     }
                     String exec_xml_param = "array(" + String.join(", ", cb_elements) + ")";
-                    exec_dml_params.add(new FieldInfo(FieldNamesMode.AS_IS, "[]", exec_xml_param, "parameter"));
+                    exec_dml_params.add(FieldInfo.parameter(FieldNamesMode.AS_IS, "[]", exec_xml_param));
                 } else {
-                    FieldInfo p = _params.get(pd_i);
-                    String param_descriptor = param_descriptors[pd_i];
-                    String[] parts = _parse_param_descriptor(param_descriptor);
+                    FieldInfo p = _params.get(slot.index);
                     String target_type_name = this.db_utils.get_target_type_by_type_map(p.getType());
-                    if (parts != null) {
-                        MappingInfo m = _create_mapping(parts);
+                    if (slot.kind == ExecDmlParamSlot.Kind.MAPPED) {
+                        MappingInfo m = _create_mapping(slot.mapping);
                         m_list.add(m);
                         method_params.add(
-                                new FieldInfo(FieldNamesMode.AS_IS, target_type_name, m.method_param_name, "parameter"));
+                                FieldInfo.parameter(FieldNamesMode.AS_IS, target_type_name, m.method_param_name));
                         exec_dml_params.add(
-                                new FieldInfo(FieldNamesMode.AS_IS, target_type_name, m.exec_dml_param_name, "parameter"));
+                                FieldInfo.parameter(FieldNamesMode.AS_IS, target_type_name, m.exec_dml_param_name));
                     } else {
                         method_params.add(p);
                         exec_dml_params
-                                .add(new FieldInfo(FieldNamesMode.AS_IS, target_type_name, "$" + p.getName(), "parameter"));
+                                .add(FieldInfo.parameter(FieldNamesMode.AS_IS, target_type_name, "$" + p.getName()));
                     }
                 }
             }
@@ -375,27 +357,15 @@ public class PhpCG {
             buffer.append(sw.getBuffer());
         }
 
-        private static String[] _parse_param_descriptor(String param_descriptor) {
-            String[] parts = null;
-            if (param_descriptor.contains("~")) {
-                parts = param_descriptor.split("~");
-            }
-            if (param_descriptor.contains(":")) {
-                parts = param_descriptor.split(":");
-            }
-            return parts;
-        }
-
         private MappingInfo _create_mapping(String[] parts) throws Exception {
             MappingInfo m = new MappingInfo();
             m.method_param_name = parts[0].trim();
             String cb_param_name = String.format("$_map_cb_%s", m.method_param_name);
             m.exec_dml_param_name = cb_param_name;
             m.dto_class_name = parts[1].trim();
-            List<FieldInfo> fields = new ArrayList<FieldInfo>();
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(m.dto_class_name, jaxb_dto_classes);
             _process_rendered_dto_class_name(jaxb_dto_class.getName(), null); // extends both imports and uses
-            db_utils.get_dto_field_info(jaxb_dto_class, sql_root_abs_path, fields);
+            List<FieldInfo> fields = db_utils.get_dto_fields(jaxb_dto_class, sql_root_abs_path);
             if (!fields.isEmpty()) {
                 fields.get(0).setComment(fields.get(0).getComment() + " [INFO] REF CURSOR");
             }
@@ -408,42 +378,24 @@ public class PhpCG {
             context.put("params", params);
         }
 
-        private String[] _parse_method_declaration2(String method_text) throws Exception {
-            String param_descriptors = "";
-            String method_name;
-            String[] parts = Helpers.parse_method_params(method_text);
-            method_name = parts[0];
-            if (!("".equals(parts[1]))) {
-                parts = Helpers.parse_method_params(parts[1]);
-                if (!("".equals(parts[1]))) {
-                    throw new Exception("Invalid params: " + method_text);
-                } else {
-                    param_descriptors = parts[0];
-                }
-            }
-            return new String[]{method_name, param_descriptors};
-        }
-
-        @Override
-        public StringBuilder render_crud_create(
-                String class_name,
+        private StringBuilder _render_crud_create(
                 String method_name,
                 String table_name,
                 String dto_class_name,
                 boolean fetch_generated,
                 String generated) throws Exception {
 
-            List<FieldInfo> fields_not_ai = new ArrayList<FieldInfo>();
-            List<FieldInfo> fields_ai = new ArrayList<FieldInfo>();
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
-            String dao_jdbc_sql = db_utils.get_dao_crud_create_info(table_name, jaxb_dto_class, generated, fields_not_ai, fields_ai);
+            JdbcUtils.DaoSqlInfo _c = db_utils.get_dao_crud_create_info(table_name, jaxb_dto_class, generated);
+            String dao_jdbc_sql = _c.sql;
+            List<FieldInfo> fields_not_ai = _c.fields;
+            List<FieldInfo> fields_ai = _c.params;
             String sql_str = SqlUtils.jdbc_sql_to_php_str(dao_jdbc_sql);
             Map<String, Object> context = new HashMap<String, Object>();
             context.put("method_type", "CREATE");
             context.put("model", model);
             context.put("crud", true);
             context.put("table_name", table_name);
-            context.put("class_name", class_name);
             context.put("sql", sql_str);
             context.put("method_name", method_name);
             context.put("params", fields_not_ai);
@@ -464,35 +416,34 @@ public class PhpCG {
             return buffer;
         }
 
-        @Override
-        public StringBuilder render_crud_read(
+        private StringBuilder _render_crud_read(
                 String method_name,
                 String dao_table_name,
                 String dto_class_name,
                 String explicit_pk,
                 boolean fetch_list) throws Exception {
 
-            List<FieldInfo> fields_all = new ArrayList<FieldInfo>();
-            List<FieldInfo> fields_pk = new ArrayList<FieldInfo>();
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
-            String dao_jdbc_sql = db_utils.get_dao_crud_read_info(dao_table_name, jaxb_dto_class, fetch_list, explicit_pk, fields_all, fields_pk);
+            JdbcUtils.DaoSqlInfo _c = db_utils.get_dao_crud_read_info(dao_table_name, jaxb_dto_class, fetch_list, explicit_pk);
+            String dao_jdbc_sql = _c.sql;
+            List<FieldInfo> fields_all = _c.fields;
+            List<FieldInfo> fields_pk = _c.params;
             return _render_query(dao_jdbc_sql, false, dto_class_name, true, fetch_list, method_name, dao_table_name,
                     fields_all, fields_pk);
         }
 
-        @Override
-        public StringBuilder render_crud_update(
-                String dao_class_name,
+        private StringBuilder _render_crud_update(
                 String method_name,
                 String table_name,
                 String explicit_pk,
                 String dto_class_name,
                 boolean scalar_params) throws Exception {
 
-            List<FieldInfo> updated_fields = new ArrayList<FieldInfo>();
-            List<FieldInfo> fields_pk = new ArrayList<FieldInfo>();
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
-            String dao_jdbc_sql = db_utils.get_dao_crud_update_info(table_name, jaxb_dto_class, explicit_pk, updated_fields, fields_pk);
+            JdbcUtils.DaoSqlInfo _c = db_utils.get_dao_crud_update_info(table_name, jaxb_dto_class, explicit_pk);
+            String dao_jdbc_sql = _c.sql;
+            List<FieldInfo> updated_fields = _c.fields;
+            List<FieldInfo> fields_pk = _c.params;
             if (fields_pk.isEmpty()) {
                 return Helpers.get_no_pk_warning(method_name);
             }
@@ -506,7 +457,6 @@ public class PhpCG {
             context.put("method_type", "UPDATE");
             context.put("model", model);
             context.put("crud", true);
-            context.put("dao_class_name", dao_class_name);
             context.put("method_name", method_name);
             context.put("sql", sql_str);
             context.put("table_name", table_name);
@@ -528,17 +478,16 @@ public class PhpCG {
             return buffer;
         }
 
-        @Override
-        public StringBuilder render_crud_delete(
-                String dao_class_name,
+        private StringBuilder _render_crud_delete(
                 String dto_class_name,
                 String method_name,
                 String table_name,
                 String explicit_pk) throws Exception {
 
-            List<FieldInfo> fields_pk = new ArrayList<FieldInfo>();
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
-            String dao_jdbc_sql = db_utils.get_dao_crud_delete_info(table_name, jaxb_dto_class, explicit_pk, fields_pk);
+            JdbcUtils.DaoSqlInfo _c = db_utils.get_dao_crud_delete_info(table_name, jaxb_dto_class, explicit_pk);
+            String dao_jdbc_sql = _c.sql;
+            List<FieldInfo> fields_pk = _c.params;
             if (fields_pk.isEmpty()) {
                 return Helpers.get_no_pk_warning(method_name);
             }
@@ -548,7 +497,6 @@ public class PhpCG {
             context.put("method_type", "DELETE");
             context.put("model", model);
             context.put("crud", true);
-            context.put("class_name", dao_class_name);
             context.put("method_name", method_name);
             context.put("sql", sql_str);
             context.put("table_name", table_name);
@@ -566,26 +514,6 @@ public class PhpCG {
             StringBuilder buffer = new StringBuilder();
             buffer.append(sw.getBuffer());
             return buffer;
-        }
-
-        @Override
-        public StringBuilder render_jaxb_crud(String dao_class_name, Crud jaxb_type_crud) throws Exception {
-            String node_name = JaxbUtils.get_jaxb_node_name(jaxb_type_crud);
-            String dto_class_name = jaxb_type_crud.getDto();
-            if (dto_class_name.isEmpty()) {
-                throw new Exception("<" + node_name + "...\nDTO class is not set");
-            }
-            try {
-                _process_rendered_dto_class_name(dto_class_name, null);
-                DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
-                StringBuilder code_buff = JaxbUtils.process_jaxb_crud(this, db_utils.get_dto_field_names_mode(),
-                        jaxb_type_crud, dao_class_name, jaxb_dto_class);
-                return code_buff;
-            } catch (Throwable e) {
-                // e.printStackTrace();
-                String msg = "<" + node_name + " dto=\"" + dto_class_name + "\" table=\"" + jaxb_type_crud.getTable() + "\"...\n";
-                throw new Exception(Helpers.get_error_message(msg, e));
-            }
         }
     }
 }

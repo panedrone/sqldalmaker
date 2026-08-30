@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema elementFormDefault="qualified"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xs:element name="settings">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="folders"/>
+                <xs:element ref="dto"/>
+                <xs:element ref="dao"/>
+                <xs:element ref="ide"/>
+                <xs:element ref="jdbc"/>
+                <xs:element ref="type-map"/>
+                <xs:element ref="macros"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="folders">
+        <xs:complexType>
+            <xs:attribute name="target" use="required" type="xs:string"/>
+            <xs:attribute name="sql" use="required" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="dto">
+        <xs:complexType>
+            <xs:attribute name="scope" use="required" type="xs:string"/>
+            <xs:attribute name="inheritance" use="required" type="xs:string"/>
+            <xs:attribute name="field-names-mode" use="required" type="xs:int"/>
+            <xs:attribute name="macro" use="required" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="dao">
+        <xs:complexType>
+            <xs:attribute name="scope" use="required" type="xs:string"/>
+            <xs:attribute name="field-assign-mode" use="required" type="xs:int"/>
+            <xs:attribute name="macro" use="required" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="ide">
+        <xs:complexType>
+            <xs:attribute name="event-log" use="required" type="xs:boolean"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="jdbc">
+        <xs:complexType>
+            <xs:attribute name="jar" use="required" type="xs:string"/>
+            <xs:attribute name="class" use="required" type="xs:string"/>
+            <xs:attribute name="url" use="required" type="xs:string"/>
+            <xs:attribute name="user" use="required" type="xs:string"/>
+            <xs:attribute name="pwd" use="required" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="type-map">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element ref="type"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attribute name="default" use="required"
+                          type="xs:string"/>
+        </xs:complexType>
+        <xs:unique name="type-detected">
+            <xs:selector xpath="./*"/>
+            <xs:field xpath="@detected"/>
+        </xs:unique>
+    </xs:element>
+    <xs:element name="type">
+        <xs:complexType>
+            <xs:attribute name="detected" use="required" type="xs:string"/>
+            <xs:attribute name="target" use="required" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="macros">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element name="macro">
+                        <xs:complexType>
+                            <xs:choice minOccurs="0">
+                                <xs:element name="vm" type="xs:string" minOccurs="0"/>
+                                <xs:element ref="vm-xml" minOccurs="0"/>
+                            </xs:choice>
+                            <xs:attribute ref="name" use="required"/>
+                            <xs:attribute ref="value" use="optional"/>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:choice>
+            </xs:sequence>
+        </xs:complexType>
+        <xs:unique name="macro-name">
+            <xs:selector xpath="./*"/>
+            <xs:field xpath="@name"/>
+        </xs:unique>
+    </xs:element>
+
+    <xs:attribute name="var" type="xs:string"/>
+    <xs:attribute name="in" type="xs:string"/>
+    <xs:attribute name="name" type="xs:string"/>
+    <xs:attribute name="params" type="xs:string"/>
+    <xs:attribute name="value" type="xs:string"/>
+
+    <xs:complexType name="root-statements">
+        <xs:sequence minOccurs="0" maxOccurs="unbounded">
+            <xs:choice>
+                <xs:element ref="if"/>
+                <xs:element ref="set"/>
+                <xs:element ref="foreach"/>
+                <xs:element ref="macro"/>
+                <xs:element ref="print"/>
+                <xs:element ref="br"/>
+            </xs:choice>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:element name="vm-xml">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="root-statements"/>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="if">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="root-statements">
+                    <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                        <xs:element ref="elseif" minOccurs="0" maxOccurs="unbounded"/>
+                        <xs:element ref="else" minOccurs="0" maxOccurs="1"/>
+                    </xs:sequence>
+                    <xs:attribute ref="var" use="required"/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="elseif">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="root-statements">
+                    <xs:attribute ref="var" use="required"/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="else">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="root-statements"/>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="foreach">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="root-statements">
+                    <xs:attribute ref="var" use="required"/>
+                    <xs:attribute ref="in" use="required"/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="macro">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="root-statements">
+                    <xs:attribute ref="name" use="required"/>
+                    <xs:attribute ref="params" use="required"/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="set">
+        <xs:complexType>
+            <xs:attribute ref="var" use="required"/>
+            <xs:attribute ref="value" use="required"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="print">
+        <xs:complexType>
+            <xs:attribute ref="var" use="required"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="br">
+        <xs:complexType>
+            <xs:attribute name="br" default="" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+
+</xs:schema>

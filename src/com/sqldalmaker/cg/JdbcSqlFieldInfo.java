@@ -74,7 +74,7 @@ class JdbcSqlFieldInfo {
             Set<String> lower_case_pk_col_names = JaxbUtils.get_pk_col_name_aliases_from_jaxb(jaxb_explicit_pk);
             for (FieldInfo fi : fields_all) {
                 String col_name = fi.getColumnName();
-                String lower_case_col_name = Helpers.get_pk_col_name_alias(col_name);
+                String lower_case_col_name = Names.get_pk_col_name_alias(col_name);
                 if (lower_case_pk_col_names.contains(lower_case_col_name)) {
                     fi.setPK(true);
                 } /*else {
@@ -139,7 +139,7 @@ class JdbcSqlFieldInfo {
         try {
             // sometime, it returns "[B": See comments for Class.getName() API
             String java_class_name = rsmd.getColumnClassName(col_num);
-            return Helpers.refine_java_type_name(java_class_name);
+            return JavaTypes.refine_java_type_name(java_class_name);
         } catch (ClassNotFoundException | SQLException ex) {
             return Object.class.getName();
         }

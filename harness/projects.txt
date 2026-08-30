@@ -1,0 +1,40 @@
+# Projects the harness generates code for, one per line:
+#
+#   label | project dir | sdm folder relative to the project dir
+#
+# The project dir is what '$PROJECT_DIR$' in 'settings.xml' resolves to,
+# so the JDBC url and the driver jar are found exactly as they are in the IDE.
+# Only offline (SQLite) projects belong here - the baseline must be reproducible
+# without MySQL/Oracle/PostgreSQL/MS SQL running somewhere.
+#
+# Paths are local to the developer machine on purpose: nothing is copied into
+# this repository, and demo projects are not modified by the harness.
+
+java_northwind  | D:/work/sdm-demos/sdm_demo_jasper_reports_northwindEF | sdm
+java_todolist   | D:/work/sdm-demos/sdm_demo_jsf_todolist              | sqldalmaker
+
+python_thesaurus | D:/work/sdm-demos/sdm_demo_tkinter_sqlite3_thesaurus | sdm
+python_django    | D:/work/sdm-python/1.304/py_sdm_todo/py_sdm_todo_django/py_django.db_drf_todolist_sqlite3 | sdm
+python_no_orm    | D:/work/sdm-python/1.304/py_sdm_todo/py_sdm_todo_fastapi_no_orm/py_no_orm_fastapi_todolist_sqlite3 | sdm
+python_sqlalchemy | D:/work/sdm-python/1.304/py_sdm_todo/py_sdm_todo_fastapi_sqla/py_fastapi_sqlalchemy_todolist_sqlite3 | sdm
+
+# three ORM flavours = all branches of 'field-assign-mode' in 'go.vm'
+go_northwind_no_orm | D:/work/sdm-go/1.304/cli/go_cli_sqlite3_northwindEF | no_orm/sdm
+go_northwind_gorm   | D:/work/sdm-go/1.304/cli/go_cli_sqlite3_northwindEF | gorm/sdm
+go_northwind_sqlx   | D:/work/sdm-go/1.304/cli/go_cli_sqlite3_northwindEF | sqlx/sdm
+go_log_no_orm       | D:/work/sdm-go/1.304/cli/go_cli_sqlite3_sdm_log     | no_orm/sdm
+
+php_log | D:/work/sdm_php | sdm
+
+# C++: the demo still uses the pre-1.292 'dto.xml' layout, so its XML configuration
+# was migrated to 'harness/fixtures/cpp_task_board' instead of being changed in place.
+# An absolute path in the third column means "take the XML from here"; SQL files,
+# the SQLite DB and the JDBC jar are still read from the project dir.
+cpp_task_board | D:/work/sdm-cpp/qt6_sqlite3_task_board | D:/work/sdm/sdm-plugins/harness/fixtures/cpp_task_board
+
+# Implicit cursors in "<exec-dml": the branch that no demo project exercises offline.
+# The XML lives here, the SQLite DB and the JDBC jar come from the C++ demo project.
+refcursors_java   | D:/work/sdm-cpp/qt6_sqlite3_task_board | D:/work/sdm/sdm-plugins/harness/fixtures/refcursors_java
+refcursors_go     | D:/work/sdm-cpp/qt6_sqlite3_task_board | D:/work/sdm/sdm-plugins/harness/fixtures/refcursors_go
+refcursors_python | D:/work/sdm-cpp/qt6_sqlite3_task_board | D:/work/sdm/sdm-plugins/harness/fixtures/refcursors_python
+refcursors_php    | D:/work/sdm-cpp/qt6_sqlite3_task_board | D:/work/sdm/sdm-plugins/harness/fixtures/refcursors_php

@@ -158,25 +158,25 @@ class JaxbMacros {
         macros.put("${lower_snake_case(column)}", new IMacro() {
             @Override
             public String exec(FieldInfo base_fi) {
-                return Helpers.camel_case_to_lower_snake_case(base_fi.getColumnName());
+                return Names.camel_case_to_lower_snake_case(base_fi.getColumnName());
             }
         });
         macros.put("${camelCase(column)}", new IMacro() {
             @Override
             public String exec(FieldInfo base_fi) {
-                return Helpers.lower_camel_case(base_fi.getColumnName());
+                return Names.lower_camel_case(base_fi.getColumnName());
             }
         });
         macros.put("${TitleCase(column)}", new IMacro() {
             @Override
             public String exec(FieldInfo base_fi) {
-                return Helpers.title_case(base_fi.getColumnName());
+                return Names.title_case(base_fi.getColumnName());
             }
         });
         macros.put("${kebab-case(column)}", new IMacro() {
             @Override
             public String exec(FieldInfo base_fi) {
-                return Helpers.to_kebab_case(base_fi.getColumnName());
+                return Names.to_kebab_case(base_fi.getColumnName());
             }
         });
         macros.put("${column}", new IMacro() {

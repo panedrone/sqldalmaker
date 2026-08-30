@@ -100,7 +100,7 @@ class JdbcTableInfo {
         Set<String> lower_case_pk_col_names = _get_lower_case_pk_col_names(table_ref, jaxb_explicit_pk);
         for (FieldInfo fi : fields_all) {
             String col_name = fi.getColumnName();
-            String lower_case_col_name = Helpers.get_pk_col_name_alias(col_name);
+            String lower_case_col_name = Names.get_pk_col_name_alias(col_name);
             if (lower_case_pk_col_names.contains(lower_case_col_name)) {
                 fields_pk.add(fi);
                 fi.setPK(true);
@@ -405,7 +405,7 @@ class JdbcTableInfo {
             Set<String> res = new HashSet<String>();
             while (rs.next()) {
                 String pk_col_name = rs.getString("COLUMN_NAME");
-                String pk_col_name_alias = Helpers.get_pk_col_name_alias(pk_col_name);
+                String pk_col_name_alias = Names.get_pk_col_name_alias(pk_col_name);
                 // 2 'id' happened with MySQL!
                 //if (res.contains(pk_col_name_alias)) {
                 //    throw new Exception("Multiple PK column name alias: " + pk_col_name_alias);

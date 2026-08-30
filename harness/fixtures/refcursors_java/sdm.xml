@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sdm xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:noNamespaceSchemaLocation="sdm.xsd">
+
+    <!-- Covers the "<exec-dml" parameters that no demo project uses offline:
+         implicit cursors, both as a single mapping and as an array of them.
+         The real projects that declare them (sdm-go/1.30x/cli_sp) need a live
+         PostgreSQL / MySQL / Oracle; here the same code path is reached with
+         plain SQLite, because only the number of JDBC parameters has to match. -->
+
+    <dto-class name="Task" ref="tasks"/>
+
+    <dao-class name="RefCursorsDao">
+
+        <!-- one mapping: "on_task:Task" counts as a JDBC parameter -->
+        <exec-dml method="exec_one_cursor(on_task:Task)"
+                  ref="select * from tasks where t_id = ?"/>
+
+        <!-- an array of mappings: it is NOT counted as a JDBC parameter -->
+        <exec-dml method="exec_cursor_array(t_id, [on_task_1:Task])"
+                  ref="select * from tasks where t_id = ?"/>
+
+        <!-- the array is the only parameter: Java and Go prepend "(Object) " to it.
+             It has to be the last one, "get_listed_items" wants the "]" at the end. -->
+        <exec-dml method="exec_cursor_array_only([on_task_1:Task, on_task_2:Task])"
+                  ref="select * from tasks"/>
+
+        <!-- the "~" spelling of a mapping -->
+        <exec-dml method="exec_one_cursor_tilde(on_task~Task)"
+                  ref="select * from tasks where t_id = ?"/>
+
+    </dao-class>
+
+</sdm>

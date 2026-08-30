@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2024 sqldalmaker@gmail.com
+    Copyright 2011-2026 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -19,10 +19,6 @@ import java.util.*;
  */
 public class PythonCG {
 
-    private static String get_template_path() {
-        return Helpers.class.getPackage().getName().replace('.', '/') + "/python/python.vm";
-    }
-
     public static class DTO implements IDtoCG {
 
         private final String sql_root_abs_path;
@@ -39,19 +35,14 @@ public class PythonCG {
 
             this.jaxb_dto_classes = sdm.getDtoClass();
             this.sql_root_abs_path = sql_root_abs_path;
-            if (vm_template == null) {
-                te = new TemplateEngine(get_template_path(), false);
-            } else {
-                te = new TemplateEngine(vm_template, "python");
-            }
+            te = Helpers.create_template_engine(vm_template, "python", "python");
             db_utils = new JdbcUtils(conn, FieldNamesMode.SNAKE_CASE, FieldNamesMode.SNAKE_CASE, jaxb_settings, sql_root_abs_path);
         }
 
         @Override
         public String[] translate(String dto_class_name) throws Exception {
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
-            List<FieldInfo> fields = new ArrayList<FieldInfo>();
-            db_utils.get_dto_field_info(jaxb_dto_class, sql_root_abs_path, fields);
+            List<FieldInfo> fields = db_utils.get_dto_fields(jaxb_dto_class, sql_root_abs_path);
             Map<String, Object> context = new HashMap<String, Object>();
             int model_name_end_index = dto_class_name.indexOf('-');
             if (model_name_end_index != -1) {
@@ -87,8 +78,11 @@ public class PythonCG {
     public static class DAO implements IDaoCG {
 
         private final String sql_root_abs_path;
-        private final String dto_package;
         private final List<DtoClass> jaxb_dto_classes;
+        private final TemplateEngine te;
+        private final JdbcUtils db_utils;
+
+        private final String dto_package;
 
         public static class ImportItem {
             public String file_name;
@@ -109,8 +103,6 @@ public class PythonCG {
         }
 
         private final Map<String, ImportItem> imports = new HashMap<String, ImportItem>();
-        private final TemplateEngine te;
-        private final JdbcUtils db_utils;
 
         public DAO(
                 String dto_package,
@@ -122,13 +114,10 @@ public class PythonCG {
 
             this.jaxb_dto_classes = jaxb_dto_classes;
             this.sql_root_abs_path = sql_root_abs_path;
+            this.te = Helpers.create_template_engine(vm_template, "python", "python");
+            this.db_utils = new JdbcUtils(conn, FieldNamesMode.SNAKE_CASE, FieldNamesMode.SNAKE_CASE,
+                    jaxb_settings, sql_root_abs_path);
             this.dto_package = dto_package;
-            if (vm_template == null) {
-                te = new TemplateEngine(get_template_path(), false);
-            } else {
-                te = new TemplateEngine(vm_template, "python");
-            }
-            db_utils = new JdbcUtils(conn, FieldNamesMode.SNAKE_CASE, FieldNamesMode.SNAKE_CASE, jaxb_settings, sql_root_abs_path);
         }
 
         @Override
@@ -136,7 +125,14 @@ public class PythonCG {
             imports.clear();
             String dao_class_name = dao_class.getName();
             List<String> methods = new ArrayList<String>();
-            JaxbUtils.process_jaxb_dao_class(this, dao_class_name, dao_class, methods);
+            for (DaoMethodInfo mi : JaxbUtils.plan_dao_methods(
+                    dao_class, jaxb_dto_classes, db_utils.get_dto_field_names_mode())) {
+                try {
+                    methods.add(_render(mi).toString());
+                } catch (Throwable e) {
+                    throw new Exception(Helpers.get_error_message(mi.get_error_context(), e));
+                }
+            }
             for (int i = 0; i < methods.size(); i++) {
                 String m = methods.get(i).replace("\t", "    ").replace("//", "#");
                 methods.set(i, m);
@@ -160,43 +156,60 @@ public class PythonCG {
             return new String[]{text};
         }
 
-        @Override
-        public StringBuilder render_jaxb_query(Object jaxb_query) throws Exception {
-            QueryMethodInfo mi = new QueryMethodInfo(jaxb_query);
-            String jaxb_node_name = JaxbUtils.get_jaxb_node_name(jaxb_query);
-            Helpers.check_required_attr(jaxb_node_name, mi.jaxb_method);
-            try {
-                String[] parsed = _parse_method_declaration2(mi.jaxb_method);
-                String method_name = parsed[0];
-                String param_descriptors = parsed[1];
-                String[] method_param_descriptors = Helpers.get_listed_items(param_descriptors, false);
-                boolean out_params;
-                if (method_param_descriptors.length > 0 && "out_params".equals(method_param_descriptors[method_param_descriptors.length - 1])) {
-                    out_params = true;
-                    method_param_descriptors = Arrays.copyOf(method_param_descriptors, method_param_descriptors.length - 1);
-                } else {
-                    out_params = false;
-                }
-                List<FieldInfo> fields = new ArrayList<FieldInfo>();
-                List<FieldInfo> params = new ArrayList<FieldInfo>();
-                String dao_query_jdbc_sql = db_utils.get_dao_query_info(
-                        sql_root_abs_path, mi.jaxb_ref, "", method_param_descriptors,
-                        mi.jaxb_dto_or_return_type, mi.return_type_is_dto, jaxb_dto_classes, fields, params);
-                return _render_query(dao_query_jdbc_sql, mi.jaxb_is_external_sql,
-                        mi.jaxb_dto_or_return_type, mi.return_type_is_dto, mi.fetch_list,
-                        method_name, null, fields, params, out_params);
-            } catch (Throwable e) {
-                // e.printStackTrace();
-                String msg = "<" + jaxb_node_name + " method=\"" + mi.jaxb_method + "\" ref=\"" + mi.jaxb_ref
-                        + "\"...\n";
-                throw new Exception(Helpers.get_error_message(msg, e));
+        private StringBuilder _render(DaoMethodInfo mi) throws Exception {
+            if (mi instanceof DaoQueryMethodInfo) {
+                return _render_jaxb_query((DaoQueryMethodInfo) mi);
             }
+            if (mi instanceof DaoExecDmlMethodInfo) {
+                return _render_jaxb_exec_dml((DaoExecDmlMethodInfo) mi);
+            }
+            if (mi instanceof DaoCrudMethodInfo) {
+                return _render_crud((DaoCrudMethodInfo) mi);
+            }
+            throw new Exception("Unexpected kind of DAO method: " + mi.getClass().getName());
         }
 
-        //////////////////////////////////////////////////////////////////
-        //
-        // this method is called from both 'render_jaxb_query' and 'render_crud_read'
-        //
+        private StringBuilder _render_crud(DaoCrudMethodInfo mi) throws Exception {
+            switch (mi.kind) {
+                case CREATE:
+                    return _render_crud_create(mi.method_name, mi.table_name, mi.dto_class_name,
+                            mi.fetch_generated, mi.auto_column);
+                case READ:
+                    return _render_crud_read(mi.method_name, mi.table_name, mi.dto_class_name,
+                            mi.explicit_pk, mi.fetch_list);
+                case UPDATE:
+                    return _render_crud_update(mi.method_name, mi.table_name, mi.explicit_pk,
+                            mi.dto_class_name, false);
+                case DELETE:
+                    return _render_crud_delete(mi.dto_class_name, mi.method_name, mi.table_name,
+                            mi.explicit_pk);
+            }
+            throw new Exception("Unexpected kind of CRUD method: " + mi.kind);
+        }
+
+        private StringBuilder _render_jaxb_query(DaoQueryMethodInfo mi) throws Exception {
+            // 'out_params' is a Python-only extension of the method declaration
+            String[] param_descriptors = mi.param_descriptors;
+            boolean out_params = param_descriptors.length > 0
+                    && "out_params".equals(param_descriptors[param_descriptors.length - 1]);
+            if (out_params) {
+                param_descriptors = Arrays.copyOf(param_descriptors, param_descriptors.length - 1);
+            }
+            JdbcUtils.DaoSqlInfo _q = db_utils.get_dao_query_info(sql_root_abs_path, mi.ref, "",
+                    param_descriptors, mi.dto_or_return_type, mi.return_type_is_dto, jaxb_dto_classes);
+            return _render_query(_q.sql, mi.external_sql, mi.dto_or_return_type, mi.return_type_is_dto,
+                    mi.fetch_list, mi.method_name, null, _q.fields, _q.params, out_params);
+        }
+
+        private StringBuilder _render_jaxb_exec_dml(DaoExecDmlMethodInfo mi) throws Exception {
+            String dao_jdbc_sql = SqlUtils.jdbc_sql_by_exec_dml_ref(mi.ref, sql_root_abs_path);
+            StringBuilder buff = new StringBuilder();
+            _render_exec_dml(buff, dao_jdbc_sql, mi.external_sql, mi.method_name,
+                    mi.param_descriptors, mi.xml_node_name, mi.ref);
+            return buff;
+        }
+
+        // called from both '_render_jaxb_query' and '_render_crud_read'
         private StringBuilder _render_query(
                 String dao_query_jdbc_sql,
                 boolean is_external_sql,
@@ -267,7 +280,7 @@ public class PythonCG {
                 dto_class_nm = dto_class_nm.substring(model_end + 1);
             }
             if (add_to_import) {
-                String python_fn = Helpers.camel_case_to_lower_snake_case(dto_class_nm);
+                String python_fn = Names.camel_case_to_lower_snake_case(dto_class_nm);
                 if (dto_package != null && !dto_package.isEmpty()) {
                     python_fn = dto_package + "." + python_fn;
                 }
@@ -277,30 +290,6 @@ public class PythonCG {
             return dto_class_nm;
         }
 
-        @Override
-        public StringBuilder render_jaxb_exec_dml(ExecDml element) throws Exception {
-            String method = element.getMethod();
-            String ref = element.getRef();
-            String xml_node_name = JaxbUtils.get_jaxb_node_name(element);
-            Helpers.check_required_attr(xml_node_name, method);
-            try {
-                String dao_jdbc_sql = SqlUtils.jdbc_sql_by_exec_dml_ref(ref, sql_root_abs_path);
-                String[] parsed = _parse_method_declaration2(method);
-                String method_name = parsed[0]; // never is null
-                String param_descriptors = parsed[1]; // never is null
-                String[] method_param_descriptors = Helpers.get_listed_items(param_descriptors, true);
-                boolean is_external_sql = element.isExternalSql();
-                StringBuilder buff = new StringBuilder();
-                _render_exec_dml(buff, dao_jdbc_sql, is_external_sql, method_name, method_param_descriptors, xml_node_name, ref);
-                return buff;
-            } catch (Throwable e) {
-                // e.printStackTrace();
-                String msg = "<" + xml_node_name + " method=\"" + method + "\" ref=\"" + ref + "\"...\n";
-                throw new Exception(Helpers.get_error_message(msg, e));
-            }
-        }
-
-        // it is used only in render_jaxb_exec_dml
         private void _render_exec_dml(
                 StringBuilder buffer,
                 String jdbc_dao_sql,
@@ -310,45 +299,31 @@ public class PythonCG {
                 String xml_node_name,
                 String sql_path) throws Exception {
 
-            List<FieldInfo> _params = new ArrayList<FieldInfo>();
-            db_utils.get_dao_exec_dml_info(jdbc_dao_sql, "", param_descriptors, _params);
+            List<FieldInfo> _params = db_utils.get_dao_exec_dml_params(jdbc_dao_sql, "", param_descriptors);
             List<MappingInfo> m_list = new ArrayList<MappingInfo>();
             List<FieldInfo> method_params = new ArrayList<FieldInfo>();
             List<FieldInfo> exec_dml_params = new ArrayList<FieldInfo>();
-            for (int pd_i = 0; pd_i < param_descriptors.length; pd_i++) {
-                String pd = param_descriptors[pd_i];
-                if (pd.startsWith("[") && pd.endsWith("]")) {
-                    String inner_list = pd.substring(1, pd.length() - 1);
-                    String[] implicit_param_descriptors = Helpers.get_listed_items(inner_list, true);
+            for (ExecDmlParamSlot slot : ExecDmlParams.parse(param_descriptors)) {
+                if (slot.kind == ExecDmlParamSlot.Kind.CURSOR_ARRAY) {
                     List<String> cb_elements = new ArrayList<String>();
-                    for (int ipd_i = 0; ipd_i < implicit_param_descriptors.length; ipd_i++) {
-                        String ipd = implicit_param_descriptors[ipd_i];
-                        String[] parts = _parse_param_descriptor(ipd);
-                        if (parts == null) {
-                            throw new Exception("Implicit cursors are specified incorrectly." +
-                                    " Expected syntax: [on_dto_1:Dto1, on_dto_2:Dto2, ...]. Specified: "
-                                    + "[" + String.join(",", implicit_param_descriptors) + "]");
-                        }
-                        MappingInfo m = _create_ref_cursor_mapping(parts);
+                    for (String[] mapping : slot.cursor_mappings) {
+                        MappingInfo m = _create_ref_cursor_mapping(mapping);
                         m_list.add(m);
-                        method_params.add(new FieldInfo(FieldNamesMode.SNAKE_CASE, "callable", m.method_param_name, "parameter"));
+                        method_params.add(FieldInfo.parameter(FieldNamesMode.SNAKE_CASE, "callable", m.method_param_name));
                         cb_elements.add(m.exec_dml_param_name);
                     }
                     String exec_xml_param = "[" + String.join(", ", cb_elements) + "]";
-                    exec_dml_params.add(new FieldInfo(FieldNamesMode.AS_IS, "[]", exec_xml_param, "parameter"));
+                    exec_dml_params.add(FieldInfo.parameter(FieldNamesMode.AS_IS, "[]", exec_xml_param));
+                } else if (slot.kind == ExecDmlParamSlot.Kind.MAPPED) {
+                    _params.get(slot.index); // as before: the position must exist among the SQL parameters
+                    MappingInfo m = _create_ref_cursor_mapping(slot.mapping);
+                    m_list.add(m);
+                    method_params.add(FieldInfo.parameter(FieldNamesMode.SNAKE_CASE, "callable", m.method_param_name));
+                    exec_dml_params.add(FieldInfo.parameter(FieldNamesMode.SNAKE_CASE, "callable", m.exec_dml_param_name));
                 } else {
-                    FieldInfo p = _params.get(pd_i);
-                    String param_descriptor = param_descriptors[pd_i];
-                    String[] parts = _parse_param_descriptor(param_descriptor);
-                    if (parts != null) {
-                        MappingInfo m = _create_ref_cursor_mapping(parts);
-                        m_list.add(m);
-                        method_params.add(new FieldInfo(FieldNamesMode.SNAKE_CASE, "callable", m.method_param_name, "parameter"));
-                        exec_dml_params.add(new FieldInfo(FieldNamesMode.SNAKE_CASE, "callable", m.exec_dml_param_name, "parameter"));
-                    } else {
-                        method_params.add(p);
-                        exec_dml_params.add(p);
-                    }
+                    FieldInfo p = _params.get(slot.index);
+                    method_params.add(p);
+                    exec_dml_params.add(p);
                 }
             }
             Map<String, Object> context = new HashMap<String, Object>();
@@ -368,17 +343,6 @@ public class PythonCG {
             buffer.append(sw.getBuffer());
         }
 
-        private static String[] _parse_param_descriptor(String param_descriptor) {
-            String[] parts = null;
-            if (param_descriptor.contains("~")) {
-                parts = param_descriptor.split("~");
-            }
-            if (param_descriptor.contains(":")) {
-                parts = param_descriptor.split(":");
-            }
-            return parts;
-        }
-
         private MappingInfo _create_ref_cursor_mapping(String[] parts) throws Exception {
             String dto_class_name_with_model = parts[1].trim();
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name_with_model, jaxb_dto_classes);
@@ -387,8 +351,7 @@ public class PythonCG {
             String cb_param_name = String.format("_map_cb_%s", m.method_param_name);
             m.exec_dml_param_name = cb_param_name;
             m.dto_class_name = _get_rendered_dto_class_name(dto_class_name_with_model, true); // extends imports;
-            List<FieldInfo> fields = new ArrayList<FieldInfo>();
-            db_utils.get_dto_field_info(jaxb_dto_class, sql_root_abs_path, fields);
+            List<FieldInfo> fields = db_utils.get_dto_fields(jaxb_dto_class, sql_root_abs_path);
             if (!fields.isEmpty()) {
                 fields.get(0).setComment(fields.get(0).getComment() + " [INFO] REF CURSOR");
             }
@@ -401,22 +364,6 @@ public class PythonCG {
             context.put("params", params);
         }
 
-        private String[] _parse_method_declaration2(String method_text) throws Exception {
-            String param_descriptors = "";
-            String method_name;
-            String[] parts = Helpers.parse_method_params(method_text);
-            method_name = parts[0];
-            if (!("".equals(parts[1]))) {
-                parts = Helpers.parse_method_params(parts[1]);
-                if (!("".equals(parts[1]))) {
-                    throw new Exception("Invalid params: " + method_text);
-                } else {
-                    param_descriptors = parts[0];
-                }
-            }
-            return new String[]{method_name, param_descriptors};
-        }
-
         private static String _get_model(String dto_class_name) {
             String model = "";
             int model_name_end_index = dto_class_name.indexOf('-');
@@ -426,24 +373,22 @@ public class PythonCG {
             return model;
         }
 
-        @Override
-        public StringBuilder render_crud_create(
-                String class_name,
+        private StringBuilder _render_crud_create(
                 String method_name,
                 String table_name,
                 String dto_class_name,
                 boolean fetch_generated,
                 String generated) throws Exception {
 
-            List<FieldInfo> fields_not_ai = new ArrayList<FieldInfo>();
-            List<FieldInfo> fields_ai = new ArrayList<FieldInfo>();
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
-            String dao_jdbc_sql = db_utils.get_dao_crud_create_info(table_name, jaxb_dto_class, generated, fields_not_ai, fields_ai);
+            JdbcUtils.DaoSqlInfo _c = db_utils.get_dao_crud_create_info(table_name, jaxb_dto_class, generated);
+            String dao_jdbc_sql = _c.sql;
+            List<FieldInfo> fields_not_ai = _c.fields;
+            List<FieldInfo> fields_ai = _c.params;
             String sql_str = SqlUtils.jdbc_sql_to_python_string(dao_jdbc_sql);
             Map<String, Object> context = new HashMap<String, Object>();
             context.put("method_type", "CREATE");
             context.put("table_name", table_name);
-            context.put("class_name", class_name);
             context.put("sql", sql_str);
             context.put("method_name", method_name);
             context.put("params", fields_not_ai);
@@ -465,35 +410,34 @@ public class PythonCG {
             return buffer;
         }
 
-        @Override
-        public StringBuilder render_crud_read(
+        private StringBuilder _render_crud_read(
                 String method_name,
                 String dao_table_name,
                 String dto_class_name,
                 String explicit_pk,
                 boolean fetch_list) throws Exception {
 
-            List<FieldInfo> fields_all = new ArrayList<FieldInfo>();
-            List<FieldInfo> fields_pk = new ArrayList<FieldInfo>();
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
-            String dao_jdbc_sql = db_utils.get_dao_crud_read_info(dao_table_name, jaxb_dto_class, fetch_list, explicit_pk, fields_all, fields_pk);
+            JdbcUtils.DaoSqlInfo _c = db_utils.get_dao_crud_read_info(dao_table_name, jaxb_dto_class, fetch_list, explicit_pk);
+            String dao_jdbc_sql = _c.sql;
+            List<FieldInfo> fields_all = _c.fields;
+            List<FieldInfo> fields_pk = _c.params;
             return _render_query(dao_jdbc_sql, false, dto_class_name, true, fetch_list,
                     method_name, dao_table_name, fields_all, fields_pk, false);
         }
 
-        @Override
-        public StringBuilder render_crud_update(
-                String dao_class_name,
+        private StringBuilder _render_crud_update(
                 String method_name,
                 String table_name,
                 String explicit_pk,
                 String dto_class_name,
                 boolean scalar_params) throws Exception {
 
-            List<FieldInfo> fi_updated = new ArrayList<FieldInfo>();
-            List<FieldInfo> fi_pk = new ArrayList<FieldInfo>();
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
-            String dao_jdbc_sql = db_utils.get_dao_crud_update_info(table_name, jaxb_dto_class, explicit_pk, fi_updated, fi_pk);
+            JdbcUtils.DaoSqlInfo _c = db_utils.get_dao_crud_update_info(table_name, jaxb_dto_class, explicit_pk);
+            String dao_jdbc_sql = _c.sql;
+            List<FieldInfo> fi_updated = _c.fields;
+            List<FieldInfo> fi_pk = _c.params;
             if (fi_pk.isEmpty()) {
                 return Helpers.get_no_pk_warning(method_name);
             }
@@ -505,7 +449,6 @@ public class PythonCG {
             Map<String, Object> context = new HashMap<String, Object>();
             context.put("mode", "dao_exec_dml");
             context.put("method_type", "UPDATE");
-            context.put("dao_class_name", dao_class_name);
             context.put("method_name", method_name);
             context.put("sql", sql_str);
             context.put("table_name", table_name);
@@ -528,24 +471,22 @@ public class PythonCG {
             return buffer;
         }
 
-        @Override
-        public StringBuilder render_crud_delete(
-                String dao_class_name,
+        private StringBuilder _render_crud_delete(
                 String dto_class_name,
                 String method_name,
                 String table_name,
                 String explicit_pk) throws Exception {
 
-            List<FieldInfo> fields_pk = new ArrayList<FieldInfo>();
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
-            String dao_jdbc_sql = db_utils.get_dao_crud_delete_info(table_name, jaxb_dto_class, explicit_pk, fields_pk);
+            JdbcUtils.DaoSqlInfo _c = db_utils.get_dao_crud_delete_info(table_name, jaxb_dto_class, explicit_pk);
+            String dao_jdbc_sql = _c.sql;
+            List<FieldInfo> fields_pk = _c.params;
             if (fields_pk.isEmpty()) {
                 return Helpers.get_no_pk_warning(method_name);
             }
             String python_sql_str = SqlUtils.jdbc_sql_to_python_string(dao_jdbc_sql);
             Map<String, Object> context = new HashMap<String, Object>();
             context.put("mode", "dao_exec_dml");
-            context.put("class_name", dao_class_name);
             String model = _get_model(dto_class_name);
             context.put("model", model);
             if (!model.isEmpty()) {
@@ -564,25 +505,6 @@ public class PythonCG {
             StringBuilder buffer = new StringBuilder();
             buffer.append(sw.getBuffer());
             return buffer;
-        }
-
-        @Override
-        public StringBuilder render_jaxb_crud(String dao_class_name, Crud jaxb_type_crud) throws Exception {
-            String node_name = JaxbUtils.get_jaxb_node_name(jaxb_type_crud);
-            String dto_class_name = jaxb_type_crud.getDto();
-            if (dto_class_name.isEmpty()) {
-                throw new Exception("<" + node_name + "...\nDTO class is not set");
-            }
-            try {
-                DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
-                StringBuilder code_buff = JaxbUtils.process_jaxb_crud(this, db_utils.get_dto_field_names_mode(),
-                        jaxb_type_crud, dao_class_name, jaxb_dto_class);
-                return code_buff;
-            } catch (Throwable e) {
-                // e.printStackTrace();
-                String msg = "<" + node_name + " dto=\"" + dto_class_name + "\" table=\"" + jaxb_type_crud.getTable() + "\"...\n";
-                throw new Exception(Helpers.get_error_message(msg, e));
-            }
         }
     }
 }

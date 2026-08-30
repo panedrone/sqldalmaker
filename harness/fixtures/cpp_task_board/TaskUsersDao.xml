@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dao-class xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="dao.xsd">
+
+    <crud dto="TaskUser" table="task_users">
+        <create method="createTaskUser"/>
+        <read-all method="readTaskUserList"/>
+        <read method="readTaskUser"/>
+        <update method="updateTaskUser"/>
+        <delete method="deleteTaskUser"/>
+    </crud>
+    <query-dto-list method="getTaskUsersByTask(Integer t_id)" dto="TaskUser" ref="task_users(t_id)"/>
+    <query-dto-list method="getTaskUsersByUser(Integer u_id)" dto="TaskUser" ref="task_users(u_id)"/>
+
+</dao-class>

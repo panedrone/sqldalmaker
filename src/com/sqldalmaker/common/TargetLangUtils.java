@@ -46,9 +46,9 @@ public class TargetLangUtils {
         } else if (Const.Root.CPP.equals(root_fn)) {
             return class_name + ".h";
         } else if (Const.Root.PYTHON.equals(root_fn)) {
-            return Helpers.convert_file_name_to_snake_case(class_name, "py");
+            return Names.convert_file_name_to_snake_case(class_name, "py");
         } else if (Const.Root.GO.equals(root_fn)) {
-            return Helpers.convert_file_name_to_snake_case(class_name, "go");
+            return Names.convert_file_name_to_snake_case(class_name, "go");
         }
         throw new Exception(get_unknown_root_file_msg(root_fn));
     }

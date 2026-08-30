@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dao-class xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:noNamespaceSchemaLocation="dao.xsd">
+
+    <!-- migrated from "<crud-auto dto="NoAiPk" table="_no_ai_pk"/>":
+         since 1.261 there is no "crud-auto" anymore, an empty "crud" means the same -->
+
+    <crud dto="NoAiPk" table="_no_ai_pk"/>
+
+</dao-class>

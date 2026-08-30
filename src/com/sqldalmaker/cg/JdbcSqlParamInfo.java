@@ -34,7 +34,7 @@ class JdbcSqlParamInfo {
             String[] method_param_descriptors,
             List<FieldInfo> res_params) throws Exception {
 
-        Helpers.check_duplicates(method_param_descriptors);
+        MethodDeclarations.check_duplicates(method_param_descriptors);
         PreparedStatement ps = JdbcUtils.prepare_jdbc_sql(conn, dao_jdbc_sql);
         try {
             _get_params_info(ps, type_map, jaxb_macros, param_names_mode, method_param_descriptors, res_params);
@@ -131,7 +131,7 @@ class JdbcSqlParamInfo {
             // mysql-connector-java-5.1.17-bin.jar:
             // 2) sometime it returns "[B": See comments for Class.getName() API
             java_class_name = pm.getParameterClassName(i_0_n + 1);
-            java_class_name = Helpers.refine_java_type_name(java_class_name);
+            java_class_name = JavaTypes.refine_java_type_name(java_class_name);
         } catch (Exception ex) {
             java_class_name = Object.class.getName();
         }
@@ -145,7 +145,7 @@ class JdbcSqlParamInfo {
             String param_descriptor,
             FieldInfo base_fi) throws Exception {
 
-        String[] parts = Helpers.parse_param_descriptor(param_descriptor);
+        String[] parts = MethodDeclarations.split_param_type_and_name(param_descriptor);
         String param_name = parts[1];
         String target_type_name;
         if (parts[0] == null || parts[0].trim().isEmpty()) {
@@ -158,7 +158,7 @@ class JdbcSqlParamInfo {
         } else {
             target_type_name = jaxb_type_map.get_target_type_name(parts[0]);
         }
-        FieldInfo res = new FieldInfo(param_names_mode, Object.class.getName(), param_name, "parameter");
+        FieldInfo res = FieldInfo.parameter(param_names_mode, Object.class.getName(), param_name);
         res.refine_rendered_type(target_type_name);
         return res;
     }
