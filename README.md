@@ -2,21 +2,29 @@
 
 ### About
 
-SQL DAL Maker is a generator of DTO, Model, and DAO classes to access relational databases. Target
-programming languages: PHP, Java, C++, Python, and Go. To generate the class, you declare it in XML meta-program.
+SQL DAL Maker generates the data access layer — DTO, Model, and DAO classes — for PHP, Java, C++, Python, and Go.
 
-At the stage of code generation, the target database must exist and be available for JDBC connection.
-Generated code is being synchronized with the current database schema using "live" JDBC metadata.
+It works in three steps:
+
+1. **Reverse-engineer.** The generator connects to your database over JDBC and reads live metadata: tables, views, and
+   the result sets of your own SQL. The database must be up and reachable while you generate.
+2. **Fine-tune.** What it found is written out as an XML manifest. You override the types your driver got wrong, add
+   fields it could not see, and pick which CRUD methods you actually need.
+3. **Translate.** The manifest is translated into complete source code — free of any direct call to PDO, JDBC, or QtSql.
+   Those stay behind a `DataStore` interface that you own.
+
+The manifest persists, so regeneration is repeatable: when the schema changes, you re-run the generator and your
+corrections are still there.
 
 Implemented in Java as plug-ins for [Eclipse IDE](http://marketplace.eclipse.org/content/sql-dal-maker) and
-[IntelliJ-Platform](http://plugins.jetbrains.com/plugin/7092).
+[IntelliJ Platform](http://plugins.jetbrains.com/plugin/7092).
 
 Project Docs: [https://sqldalmaker.sourceforge.net](https://sqldalmaker.sourceforge.net/)
 
 Quick Start in
 mp4: [https://github.com/panedrone/sqldalmaker/releases/tag/latest](https://github.com/panedrone/sqldalmaker/releases/tag/latest)
 
-### Hello Example
+### Hello-App
 
 ```xml
 
@@ -43,6 +51,27 @@ def generated_code_in_action():
         print(msg)
     dao.delete_message(m.id)
 ```
+
+### Install and Update
+
+**Eclipse IDE 3.8+**
+
+Follow this: [https://marketplace.eclipse.org/content/sql-dal-maker/help](https://marketplace.eclipse.org/content/sql-dal-maker/help)
+or use drag-and-drop feature from here: [https://marketplace.eclipse.org/content/sql-dal-maker](https://marketplace.eclipse.org/content/sql-dal-maker)
+
+Update site URL 1 (fast access): https://sourceforge.net/projects/sqldalmaker/files/eclipse
+
+Update site URL 2 (redirected): https://sqldalmaker.sourceforge.net/eclipse
+
+**IntelliJ Platform 222.3345.118+**
+
+Supported products: PhpStorm, IntelliJ IDEA, Android Studio, CLion, PyCharm, GoLand.
+
+IDE Menu "File" > Settings > Plugins > Marketplace > SQL DAL Maker > Install.
+
+IDE Menu "File" > Settings > Plugins > Installed > SQL DAL Maker > Update.
+
+Or use "Install..." button from the plug-in web-page: [http://plugins.jetbrains.com/plugin/7092](http://plugins.jetbrains.com/plugin/7092)
 
 ### Demo Projects
 
