@@ -1,27 +1,17 @@
 /*
-    Copyright 2011-2024 sqldalmaker@gmail.com
+    Copyright 2011-2026 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
 package com.sqldalmaker.cg;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.sql.SQLException;
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import com.sqldalmaker.common.Const;
 import com.sqldalmaker.jaxb.settings.Settings;
 
+import java.io.*;
+
 /*
+ * 30.08.2026 14:00 1.331 Claude refactor
  * 30.05.2024 12.26 1.299
  * 12.05.2023 12:04
  * 12.05.2023 11:50
@@ -39,12 +29,8 @@ import com.sqldalmaker.jaxb.settings.Settings;
  * 02.01.2020 07:21
  * 03.09.2019 15:55
  * 07.02.2019 19:50 initial commit
- *
  */
 public class Helpers {
-
-
-
 
     // the same "internal template or the one from settings.xml" choice in every target language
     public static TemplateEngine create_template_engine(
@@ -59,15 +45,6 @@ public class Helpers {
         }
         return new TemplateEngine(vm_template, vm_template_name);
     }
-
-
-
-
-
-
-
-
-
 
     public static String concat_path(String seg0, String seg1) {
         return seg0 + "/" + seg1;
@@ -90,7 +67,6 @@ public class Helpers {
         }
         return field_names_mode;
     }
-
 
     // Java File exists Case sensitive
     // https://stackoverflow.com/questions/34603505/java-file-exists-case-sensitive-jpg-and-jpg
@@ -137,8 +113,6 @@ public class Helpers {
         }
         return buffer.toString();
     }
-
-
 
     // public for eclipse
     public static InputStream res_as_stream(String res_path) throws Exception {
@@ -197,14 +171,6 @@ public class Helpers {
     public static String get_error_message(String msg, Throwable e) {
         return msg + " " + e.getMessage();
     }
-
-
-
-
-
-
-
-
 
 
     public static boolean is_sdm_xml(String name) {

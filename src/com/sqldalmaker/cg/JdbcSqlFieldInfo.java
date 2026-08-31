@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2024 sqldalmaker@gmail.com
+    Copyright 2011-2026 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -11,12 +11,12 @@ import java.util.Map;
 import java.util.Set;
 
 /*
+ * 30.08.2026 14:00 1.331 Claude refactor
  * 21.10.2023 09:42
  * 07.05.2023 15:37
  * 16.11.2022 08:02 1.269
  * 02.11.2022 06:51 1.267
  * 25.10.2022 09:26
- *
  */
 class JdbcSqlFieldInfo {
 

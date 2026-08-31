@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2024 sqldalmaker@gmail.com
+    Copyright 2011-2026 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -21,6 +21,7 @@ import java.util.ArrayList;
 /*
  * @author sqldalmaker@gmail.com
  *
+ * 30.08.2026 14:00 1.331 Claude refactor
  * 30.05.2024 20:00 1.299
  * 17.10.2023 12:14 1.290
  * 29.09.2023 09:58 1.289
@@ -29,7 +30,6 @@ import java.util.ArrayList;
  * 16.11.2022 08:02 1.269
  * 10.05.2022 19:27 1.239
  * 06.05.2022 22:05 1.236
- *
  */
 class DaoClassInfo {
 

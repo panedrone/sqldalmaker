@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2024 sqldalmaker@gmail.com
+    Copyright 2011-2026 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -33,6 +33,7 @@ public class MethodDeclarations {
         }
         return new String[]{before_brackets, inside_brackets};
     }
+
     // "get_something(param_1, param_2)" --> {"get_something", "param_1, param_2"}
     public static String[] parse_method_declaration(String method_text) throws Exception {
         String param_descriptors = "";
@@ -47,6 +48,7 @@ public class MethodDeclarations {
         }
         return new String[]{method_name, param_descriptors};
     }
+
     // "on_dto:Dto" or "on_dto~Dto" --> {"on_dto", "Dto"}; null if it is a plain parameter
     public static String[] split_mapped_param_descriptor(String param_descriptor) {
         String[] parts = null;
@@ -58,6 +60,7 @@ public class MethodDeclarations {
         }
         return parts;
     }
+
     public static String[] get_listed_items(String list, boolean allow_semicolon) throws Exception {
         if (list == null || list.trim().isEmpty()) {
             return new String[]{};
@@ -105,6 +108,7 @@ public class MethodDeclarations {
             return items;
         }
     }
+
     private static void check_item(String name, boolean allow_semicolon) throws Exception {
         if (name == null || name.isEmpty()) {
             throw new Exception("Item name is null or empty");
@@ -137,6 +141,7 @@ public class MethodDeclarations {
             }
         }
     }
+
     // "java.lang.Integer p_id" --> {"java.lang.Integer", "p_id"}; type is null if absent
     static String[] split_param_type_and_name(String param_descriptor) {
         String param_type_name;
@@ -151,6 +156,7 @@ public class MethodDeclarations {
         }
         return new String[]{param_type_name, param_name};
     }
+
     static void check_duplicates(String[] param_names) throws Exception {
         if (param_names == null) {
             return;
@@ -163,6 +169,7 @@ public class MethodDeclarations {
             set.add(param_name);
         }
     }
+
     public static void check_required_attr(String node_name, String method_name_attr) throws Exception {
         if (method_name_attr == null || method_name_attr.trim().isEmpty()) {
             throw new Exception("<" + node_name + "...\n'method' is not set.");

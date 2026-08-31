@@ -14,6 +14,9 @@ import java.sql.Connection;
 import java.util.*;
 
 /*
+ * @author sqldalmaker@gmail.com
+ *
+ * 30.08.2026 14:00 1.331 Claude refactor
  * 16.12.2023 09:01 1.292 sdm.xml
  * 29.09.2023 09:58 1.289
  * 27.03.2023 10:03 optional "<crud table"
@@ -25,14 +28,13 @@ import java.util.*;
  * 09.07.2022 23:10  + dto macro + dao macro
  * 27.05.2022 01:17 1.246
  * 21.04.2022 17:15 1.225 fixes for python and go
- * 10.05.2021 21:46 new xml attr "field-comment"
+ * 10.05.2021 21:46 new XML attr "field-comment"
  * 01.05.2021 22:33 JSON and XML comments for Go
  * 22.03.2021 21:19 TitleCase for method names
  * 16.09.2020 02:23 reduced amount of warnings in java
  * 07.01.2020 22:19 Now you can declare in XML calculated DTO fields.
  * 03.09.2019 15:55 minor code refactoring
  * 07.02.2019 19:50 initial commit
- *
  */
 public class JavaCG {
 

@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2024 sqldalmaker@gmail.com
+    Copyright 2011-2026 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -10,6 +10,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /*
+ * 30.08.2026 14:00 1.331 Claude refactor
  * 28.12.2023 08:29 1.292
  * 27.03.2023 10:03
  * 19.01.2023 20:57 1.276

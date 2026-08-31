@@ -14,8 +14,10 @@ import java.io.StringWriter;
 import java.sql.Connection;
 import java.util.*;
 
-/**
+/*
  * @author sqldalmaker@gmail.com
+ *
+ * 30.08.2026 14:00 1.331 Claude refactor
  */
 public class PythonCG {
 

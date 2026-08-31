@@ -1,11 +1,12 @@
 /*
-    Copyright 2011-2024 sqldalmaker@gmail.com
+    Copyright 2011-2026 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
 package com.sqldalmaker.cg;
 
 /*
+ * 30.08.2026 14:00 1.331 Claude refactor
  * 27.09.2023 17:56
  * 09.04.2023 20:31 1.282
  * 09.04.2023 14:52 1.282
@@ -21,7 +22,6 @@ package com.sqldalmaker.cg;
  * 06.03.2021 19:52
  * 02.01.2020 07:21
  * 07.02.2019 19:50 initial commit
- *
  */
 public class FieldInfo {
 

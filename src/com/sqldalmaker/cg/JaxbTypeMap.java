@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2024 sqldalmaker@gmail.com
+    Copyright 2011-2026 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -12,8 +12,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /*
+ * 30.08.2026 14:00 1.331 Claude refactor
  * 25.10.2022 09:26
- *
  */
 class JaxbTypeMap {
 

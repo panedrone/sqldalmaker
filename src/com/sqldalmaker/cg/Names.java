@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2024 sqldalmaker@gmail.com
+    Copyright 2011-2026 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -16,23 +16,27 @@ public class Names {
         String replacement = "$1_$2";
         return src.replaceAll(regex, replacement).toLowerCase();
     }
+
     public static String to_kebab_case(String src) {
         String sc = camel_case_to_lower_snake_case(src);
         String[] parts = sc.split("_");
         String kc = String.join("-", parts);
         return kc;
     }
+
     public static String convert_file_name_to_snake_case(String class_name, String ext) {
         // http://stackoverflow.com/questions/221320/standard-file-naming-conventions-in-ruby
         // In Rails the convention of using underscores is necessary (almost).
         return camel_case_to_lower_snake_case(class_name) + "." + ext;
     }
+
     public static String replace_char_at(String s, int pos, char c) {
         // http://www.rgagnon.com/javadetails/java-0030.html
         StringBuilder buf = new StringBuilder(s);
         buf.setCharAt(pos, c);
         return buf.toString();
     }
+
     public static boolean is_upper_case(String str) {
         for (int i = 0; i < str.length(); i++) {
             if (Character.isLowerCase(str.charAt(i))) {
@@ -41,6 +45,7 @@ public class Names {
         }
         return !str.isEmpty();
     }
+
     public static String get_method_name(String method_name, FieldNamesMode field_names_mode) {
         if (FieldNamesMode.LOWER_CAMEL_CASE.equals(field_names_mode)) {
             return lower_camel_case(method_name);
@@ -51,7 +56,9 @@ public class Names {
         }
         return method_name;
     }
+
     final static String[] _ids = new String[]{"Id", "Uuid"};
+
     public static String lower_camel_case(String str) {
         String res = _lower_camel_or_title_case(str, false);
         for (String id : _ids) {
@@ -64,6 +71,7 @@ public class Names {
         }
         return res;
     }
+
     public static String title_case(String str) {
         String res = _lower_camel_or_title_case(str, true);
         for (String id : _ids) {
@@ -76,6 +84,7 @@ public class Names {
         }
         return res;
     }
+
     private static String _lower_camel_or_title_case(String str, boolean title_case) {
         if (str.toUpperCase().equals(str)) {
             str = str.toLowerCase(); // "PROJECTS" --> "projects"
@@ -123,6 +132,7 @@ public class Names {
         }
         return sb.toString();
     }
+
     public static String get_pk_col_name_alias(String pk_col_name) {
         // === panedrone: WHY ALIASES:
         //   1) xerial SQLite3 getPrimaryKeys may return pk_col_names in lower case

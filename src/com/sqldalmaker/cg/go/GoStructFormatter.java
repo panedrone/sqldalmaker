@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2024 sqldalmaker@gmail.com
+    Copyright 2011-2026 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Map;
 
 /*
+ * @author sqldalmaker@gmail.com
+ *
  * Rendering of the fields of a Go struct: the columns of names, types and tags
  * are aligned the way 'go fmt' would align them, and the extra fields declared
  * in "<dto-class custom=..." are added.

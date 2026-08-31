@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2024 sqldalmaker@gmail.com
+    Copyright 2011-2026 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -11,9 +11,9 @@ import java.io.StringWriter;
 import java.util.*;
 
 /*
+ * 30.08.2026 14:00 1.331 Claude refactor
  * 06.04.2023 02:56 1.281
  * 25.10.2022 09:26
- *
  */
 class JaxbMacros {
 

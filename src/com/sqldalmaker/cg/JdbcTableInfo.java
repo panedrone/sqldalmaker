@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2024 sqldalmaker@gmail.com
+    Copyright 2011-2026 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -21,6 +21,7 @@ import org.apache.cayenne.dba.TypesMapping;
 /*
  * @author sqldalmaker@gmail.com
  *
+ * 30.08.2026 14:00 1.331 Claude refactor
  * 30.05.2024 20:00 1.299
  * 30.09.2023 11:29 1.289
  * 07.05.2023 15:37
@@ -34,7 +35,6 @@ import org.apache.cayenne.dba.TypesMapping;
  * 10.05.2022 19:27 1.239
  * 24.04.2022 08:20 1.229
  * 17.04.2022 11:25 1.219
- *
  */
 class JdbcTableInfo {
 

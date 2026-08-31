@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2024 sqldalmaker@gmail.com
+    Copyright 2011-2026 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -11,6 +11,7 @@ import java.sql.PreparedStatement;
 import java.util.List;
 
 /*
+ * 30.08.2026 14:00 1.331 Claude refactor
  * 07.05.2023 15:37
  * 09.04.2023 14:52 1.282
  * 16.11.2022 08:02 1.269
@@ -18,7 +19,6 @@ import java.util.List;
  * 10.05.2022 19:27 1.239
  * 26.04.2022 15:44 1.230
  * 17.04.2022 11:25 1.219
- *
  */
 class JdbcSqlParamInfo {
 

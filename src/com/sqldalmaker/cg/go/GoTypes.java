@@ -1,5 +1,5 @@
 /*
-    Copyright 2011-2024 sqldalmaker@gmail.com
+    Copyright 2011-2026 sqldalmaker@gmail.com
     SQL DAL Maker Website: https://sqldalmaker.sourceforge.net/
     Read LICENSE.txt in the root of this project/archive for details.
  */
@@ -8,6 +8,8 @@ package com.sqldalmaker.cg.go;
 import com.sqldalmaker.cg.FieldInfo;
 
 /*
+ * @author sqldalmaker@gmail.com
+ *
  * Parsing of the Go type as it is written in 'settings.xml':
  *     "time:time.Time `json:\"t_date\"`" == import + type + struct tag
  */
