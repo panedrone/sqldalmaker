@@ -4,14 +4,17 @@
 
 SQL DAL Maker generates the data access layer — DTO, Model, and DAO classes — for PHP, Java, C++, Python, and Go.
 
-It works in three steps:
+It works like this:
 
-1. **Reverse-engineer.** The generator connects to your database over JDBC and reads live metadata: tables, views, and
-   the result sets of your own SQL. The database must be up and reachable while you generate.
-2. **Fine-tune.** What it found is written out as an XML manifest. You override the types your driver got wrong, add
-   fields it could not see, and pick which CRUD methods you actually need.
-3. **Translate.** The manifest is translated into complete source code — free of any direct call to PDO, JDBC, or QtSql.
+1. **XML manifest.** The manifest describes what to generate: the DTO and model classes, the DAO methods, and the SQL
+   behind them.
+2. **Translate.** The manifest is translated into complete source code — free of any direct call to PDO, JDBC, or QtSql.
    Those stay behind a `DataStore` interface that you own.
+
+Reverse engineering serves both. It can write a first draft of the manifest, so you rarely start from an empty file —
+but the manifest is an ordinary text file and can just as well be written by hand. And it runs again during
+translation: the generator reads live metadata over JDBC — tables, views, and the result sets of your own SQL — to
+resolve everything the manifest leaves open. That is why the database must be up and reachable whenever you generate.
 
 The manifest persists, so regeneration is repeatable: when the schema changes, you re-run the generator and your
 corrections are still there.
