@@ -2,7 +2,7 @@
     <id>dal-mpe</id>
     <name>SQL DAL Maker</name>
     <category>Database</category>
-    <version>1.331.2608</version>
+    <version>1.332.2609</version>
     <vendor email="sqldalmaker@gmail.com" url="https://sqldalmaker.sourceforge.net">
         SQL DAL Maker
     </vendor>
@@ -55,8 +55,8 @@ Documentation and demo projects:
 
     <change-notes><![CDATA[
 <ul>
+<li>[+] .sdm</li>
 <li>[+] toolWindow</li>
-<li>[m] since IntelliJ Platform 2022.2</li>
 </ul>
     ]]></change-notes>
 
