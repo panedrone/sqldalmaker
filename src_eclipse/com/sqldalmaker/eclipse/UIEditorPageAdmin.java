@@ -75,7 +75,7 @@ public class UIEditorPageAdmin extends Composite {
 		toolkit.paintBordersFor(composite_top);
 
 		Composite composite_0 = new Composite(composite_top, SWT.NONE);
-		composite_0.setLayout(new GridLayout(5, false));
+		composite_0.setLayout(new GridLayout(4, false));
 		toolkit.adapt(composite_0);
 		toolkit.paintBordersFor(composite_0);
 
@@ -110,16 +110,6 @@ public class UIEditorPageAdmin extends Composite {
 		txtV.setEditable(false);
 		txtV.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, false, 1, 1));
 		toolkit.adapt(txtV, true, true);
-
-		Button btnRecentChanges = new Button(composite_0, SWT.NONE);
-		btnRecentChanges.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				EclipseResourceEditorHelpers.open_resource_file_in_editor("recent_changes.txt", "recent_changes.txt");
-			}
-		});
-		toolkit.adapt(btnRecentChanges, true, true);
-		btnRecentChanges.setText("News");
 
 		Button btnAbout = new Button(composite_0, SWT.NONE);
 		btnAbout.addSelectionListener(new SelectionAdapter() {
