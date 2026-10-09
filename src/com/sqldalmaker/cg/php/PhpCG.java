@@ -369,7 +369,7 @@ public class PhpCG {
             _process_rendered_dto_class_name(jaxb_dto_class.getName(), null); // extends both imports and uses
             List<FieldInfo> fields = db_utils.get_dto_fields(jaxb_dto_class, sql_root_abs_path);
             if (!fields.isEmpty()) {
-                fields.get(0).setComment(fields.get(0).getComment() + " [INFO] REF CURSOR");
+                fields.set(0, FieldInfo.with_comment(fields.get(0), fields.get(0).getComment() + " [INFO] REF CURSOR"));
             }
             m.fields.addAll(fields);
             return m;

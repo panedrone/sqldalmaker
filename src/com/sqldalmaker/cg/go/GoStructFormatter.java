@@ -131,8 +131,8 @@ class GoStructFormatter {
                 continue;
             }
             FieldInfo fi = new FieldInfo(FieldNamesMode.AS_IS, "", "", "");
-            fi.refine_name(cf.name);
-            fi.refine_rendered_type(String.format("%s %s", cf.type, cf.tag));
+            fi = FieldInfo.with_name(fi, cf.name);
+            fi = FieldInfo.with_rendered_type(fi, String.format("%s %s", cf.type, cf.tag));
             fields.add(fi);
         }
     }

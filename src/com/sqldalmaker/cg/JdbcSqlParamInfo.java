@@ -159,7 +159,6 @@ class JdbcSqlParamInfo {
             target_type_name = jaxb_type_map.get_target_type_name(parts[0]);
         }
         FieldInfo res = FieldInfo.parameter(param_names_mode, Object.class.getName(), param_name);
-        res.refine_rendered_type(target_type_name);
-        return res;
+        return FieldInfo.with_rendered_type(res, target_type_name);
     }
 }

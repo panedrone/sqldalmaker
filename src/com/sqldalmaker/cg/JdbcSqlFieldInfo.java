@@ -43,43 +43,47 @@ class JdbcSqlFieldInfo {
                 // === panedrone: it is nullable for all columns except PK (sqlite3)
                 // field.setNullable(rsmd.isNullable(col_num) == ResultSetMetaData.columnNullable);
                 boolean is_ai = rs_md.isAutoIncrement(col_num);
-                fi.setAI(is_ai);
-                fields_map.put(col_name, fi);
-                fields_all.add(fi);
+                fi = FieldInfo.with_ai(fi, is_ai);
+                int scale;
                 try {
-                    int scale = rs_md.getScale(col_num);
-                    fi.setDecimalDigits(scale);
-                    fi.setScale(scale);
+                    scale = rs_md.getScale(col_num);
                 } catch (SQLException e) {
-                    fi.setDecimalDigits(0);
+                    scale = 0;
                 }
+                int precision;
                 try {
-                    int precision = rs_md.getPrecision(col_num);
-                    fi.setPrecision(precision);
+                    precision = rs_md.getPrecision(col_num);
                 } catch (SQLException e) {
-                    fi.setPrecision(0);
+                    precision = 0;
                 }
+                int display_size;
                 try {
                     // 2147483647 for all cols (SQLite)
-                    int displaySize = rs_md.getColumnDisplaySize(col_num);
-                    fi.setDisplaySize(displaySize);
+                    display_size = rs_md.getColumnDisplaySize(col_num);
                 } catch (SQLException e) {
-                    fi.setDisplaySize(0);
+                    display_size = 0;
                 }
+                fi = FieldInfo.with_decimal_digits(fi, scale);
+                fi = FieldInfo.with_rs_md(fi, precision, scale, display_size);
+                fields_map.put(col_name, fi);
+                fields_all.add(fi);
             }
         } finally {
             ps.close();
         }
         if (jaxb_explicit_pk != null && !jaxb_explicit_pk.trim().isEmpty() && !"*".equals(jaxb_explicit_pk)) {
             Set<String> lower_case_pk_col_names = JaxbUtils.get_pk_col_name_aliases_from_jaxb(jaxb_explicit_pk);
-            for (FieldInfo fi : fields_all) {
+            for (int i = 0; i < fields_all.size(); i++) {
+                FieldInfo fi = fields_all.get(i);
                 String col_name = fi.getColumnName();
                 String lower_case_col_name = Names.get_pk_col_name_alias(col_name);
                 if (lower_case_pk_col_names.contains(lower_case_col_name)) {
-                    fi.setPK(true);
-                } /*else {
-                fi.setPK(false);
-            } */
+                    FieldInfo pk_fi = FieldInfo.with_pk(fi, true);
+                    fields_all.set(i, pk_fi);
+                    if (fields_map.get(col_name) == fi) {
+                        fields_map.put(col_name, pk_fi);
+                    }
+                }
             }
         }
 

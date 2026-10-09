@@ -57,10 +57,11 @@ class DtoClassInfo {
     public List<FieldInfo> get_field_info_for_wizard(DtoClass jaxb_dto_class, String sql_root_abs_path) throws Exception {
         List<FieldInfo> res_dto_fields = new ArrayList<FieldInfo>();
         _prepare_by_jdbc(false, jaxb_dto_class, sql_root_abs_path, res_dto_fields);
-        for (FieldInfo fi : res_dto_fields) {
+        for (int i = 0; i < res_dto_fields.size(); i++) {
+            FieldInfo fi = res_dto_fields.get(i);
             String type_name = fi.getType();
             type_name = jaxb_type_map.get_target_type_name(type_name);
-            fi.refine_rendered_type(type_name); // field wizard wants rendered types
+            res_dto_fields.set(i, FieldInfo.with_rendered_type(fi, type_name)); // field wizard wants rendered types
         }
         return res_dto_fields;
     }
@@ -87,14 +88,14 @@ class DtoClassInfo {
             List<FieldInfo> res_dto_fields) throws Exception {
 
         _refine_by_field_jaxb(jaxb_dto_class, res_dto_fields, fields_map);
-        _refine_scalar_types_by_type_map(res_dto_fields);
+        _refine_scalar_types_by_type_map(res_dto_fields, fields_map);
     }
 
-    private void _refine_scalar_types_by_type_map(List<FieldInfo> dto_fields) {
-        for (FieldInfo fi : dto_fields) {
+    private void _refine_scalar_types_by_type_map(List<FieldInfo> dto_fields, Map<String, FieldInfo> fields_map) {
+        for (FieldInfo fi : new ArrayList<FieldInfo>(dto_fields)) {
             String type_name = fi.getScalarType();
             type_name = jaxb_type_map.get_target_type_name(type_name);
-            fi.refine_scalar_type(type_name);
+            FieldInfoLists.replace(dto_fields, fields_map, fi, FieldInfo.with_scalar_type(fi, type_name));
         }
     }
 
@@ -150,7 +151,7 @@ class DtoClassInfo {
             Map<String, FieldInfo> fields_map) throws Exception {
 
         Set<String> refined_by_field_jaxb = new HashSet<String>();
-        Set<FieldInfo> excluded_fields = new HashSet<FieldInfo>();
+        Set<String> excluded_col_names = new HashSet<String>();
         List<DtoClass.Field> jaxb_fields = jaxb_dto_class.getField(); // not null!!
         for (DtoClass.Field jaxb_field : jaxb_fields) {
             String jaxb_field_col_name = jaxb_field.getColumn();
@@ -165,23 +166,24 @@ class DtoClassInfo {
                 fields_map.put(jaxb_field_col_name, fi);
             }
             if (jaxb_field.getType().trim().equals("-")) {
-                excluded_fields.add(fi);
+                excluded_col_names.add(fi.getColumnName());
             }
-            _refine_fi_by_type_map_and_macros(fi, jaxb_field_type_name);
+            FieldInfo refined_fi = _refine_fi_by_type_map_and_macros(fi, jaxb_field_type_name);
+            refined_fi = FieldInfo.with_scalar_type(refined_fi, jaxb_field_type_name);
+            FieldInfoLists.replace(dto_fields, fields_map, fi, refined_fi);
             refined_by_field_jaxb.add(fi.getColumnName());
-            fi.refine_scalar_type(jaxb_field_type_name);
         }
-        for (FieldInfo fi : excluded_fields) {
-            dto_fields.remove(fi);
-            String col_nm = fi.getColumnName();
+        for (String col_nm : excluded_col_names) {
+            // the one in the map is the one that was refined (and excluded) above
+            dto_fields.remove(fields_map.get(col_nm));
             fields_map.remove(col_nm);
         }
-        for (FieldInfo fi : dto_fields) {
+        for (FieldInfo fi : new ArrayList<FieldInfo>(dto_fields)) {
             if (refined_by_field_jaxb.contains(fi.getColumnName())) {
                 continue;
             }
             String type_name = fi.getType().trim(); // !!! getType(), not getOriginalType()
-            _refine_fi_by_type_map_and_macros(fi, type_name);
+            FieldInfoLists.replace(dto_fields, fields_map, fi, _refine_fi_by_type_map_and_macros(fi, type_name));
         }
     }
 
@@ -206,7 +208,7 @@ class DtoClassInfo {
         }
     }
 
-    private void _refine_fi_by_type_map_and_macros(FieldInfo fi, String type_name) throws Exception {
+    private FieldInfo _refine_fi_by_type_map_and_macros(FieldInfo fi, String type_name) throws Exception {
         type_name = type_name.trim();
         String target_type_name;
         int local_field_type_params_start = type_name.indexOf('|');
@@ -222,7 +224,7 @@ class DtoClassInfo {
                 target_type_name = _parse_target_type(fi, type_name);
             }
         }
-        fi.refine_rendered_type(target_type_name);
+        return FieldInfo.with_rendered_type(fi, target_type_name);
     }
 
     private String _parse_target_type(FieldInfo fi, String target_type_name) throws Exception {

@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.ArrayList;
 
 /*
@@ -70,7 +71,8 @@ class DaoClassInfo {
         return new FieldInfo(dto_field_names_mode, ret_type_name, ret_col_name, "returned-value");
     }
 
-    private void _refine_dao_fields_by_dto_fields(
+    // returns "original DAO field -> refined one" for the fields that remain in 'dao_fields'
+    private Map<FieldInfo, FieldInfo> _refine_dao_fields_by_dto_fields(
             String sql_root_abs_path,
             DtoClass jaxb_dto_class,
             List<FieldInfo> dao_fields) throws Exception {
@@ -83,13 +85,14 @@ class DaoClassInfo {
         //            dao_fields.addAll(dto_fields);
         //            return;
         //        }
-        Set<FieldInfo> excluded_dao_fields = new HashSet<FieldInfo>();
+        Map<FieldInfo, FieldInfo> refined = new IdentityHashMap<FieldInfo, FieldInfo>();
+        List<FieldInfo> res = new ArrayList<FieldInfo>();
         for (FieldInfo dao_fi : dao_fields) {
             String dao_col_name = dao_fi.getColumnName();
             if (dto_fields_map.containsKey(dao_col_name) == false) {
-                excluded_dao_fields.add(dao_fi);
-                continue;
+                continue; // excluded
             }
+            FieldInfo refined_fi = dao_fi;
             FieldInfo dto_fi = dto_fields_map.get(dao_col_name);
             // Always prefer DTO field type:
             //      1. if its original name is not Object
@@ -99,17 +102,19 @@ class DaoClassInfo {
             if (!Object.class.getTypeName().equals(dto_fi_original_type_name) ||
                     (!object_target_type_name.isEmpty() && !object_target_type_name.equals(dto_fi.getType()))) {
                 String dto_fi_target_type_name = dto_fi.getType();
-                dao_fi.refine_rendered_type(dto_fi_target_type_name);
+                refined_fi = FieldInfo.with_rendered_type(refined_fi, dto_fi_target_type_name);
                 String dto_fi_assign_func = dto_fi.getAssignFunc();
-                dao_fi.refine_assign_func(dto_fi_assign_func);
+                refined_fi = FieldInfo.with_assign_func(refined_fi, dto_fi_assign_func);
             }
             String dto_comment = dto_fi.getComment();
             String dao_comment = dao_fi.getComment();
-            dao_fi.setComment(dto_comment + " <- " + dao_comment);
+            refined_fi = FieldInfo.with_comment(refined_fi, dto_comment + " <- " + dao_comment);
+            refined.put(dao_fi, refined_fi);
+            res.add(refined_fi);
         }
-        for (FieldInfo fi : excluded_dao_fields) {
-            dao_fields.remove(fi);
-        }
+        dao_fields.clear();
+        dao_fields.addAll(res);
+        return refined;
     }
 
     private void _get_sql_shortcut_info(
@@ -161,8 +166,8 @@ class DaoClassInfo {
             res_fields.add(ret_fi); // need to enable checks even if no columns in record set
         }
         if (!res_fields.isEmpty()) {
-            String comment = res_fields.get(0).getComment();
-            res_fields.get(0).setComment(comment + " [INFO] SQL-shortcut");
+            FieldInfo fi = res_fields.get(0);
+            res_fields.set(0, FieldInfo.with_comment(fi, fi.getComment() + " [INFO] SQL-shortcut"));
         }
     }
 
@@ -214,14 +219,13 @@ class DaoClassInfo {
             if (error.length() > 0) {
                 comment += ", " + error;
             }
-            dao_fields_res.get(0).setComment(comment);
+            dao_fields_res.set(0, FieldInfo.with_comment(dao_fields_res.get(0), comment));
         } else {
             for (FieldInfo dao_fi : dao_fields_jdbc) {
                 String dao_col_name = dao_fi.getColumnName();
                 if (dto_fields_map.containsKey(dao_col_name)) {
                     FieldInfo dto_fi = dto_fields_map.get(dao_col_name);
-                    dto_fi.setComment(dto_fi.getComment() + " <- " + dao_fi.getComment());
-                    dao_fields_res.add(dto_fi);
+                    dao_fields_res.add(FieldInfo.with_comment(dto_fi, dto_fi.getComment() + " <- " + dao_fi.getComment()));
                 }
             }
         }
@@ -232,8 +236,8 @@ class DaoClassInfo {
         res_fields.addAll(dto_fields);
         if (error.length() > 0 && !res_fields.isEmpty()) {
             String comment = res_fields.get(0).getComment();
-            res_fields.get(0).setComment(
-                    comment + " [INFO] " + error.toString().trim().replace('\r', ' ').replace('\n', ' '));
+            res_fields.set(0, FieldInfo.with_comment(res_fields.get(0),
+                    comment + " [INFO] " + error.toString().trim().replace('\r', ' ').replace('\n', ' ')));
         }
     }
 
@@ -275,10 +279,11 @@ class DaoClassInfo {
             Map<String, FieldInfo> dao_fields_map = new HashMap<String, FieldInfo>();
             // no model!
             JdbcSqlFieldInfo.get_field_info_by_jdbc_sql("", conn, dto_field_names_mode, dao_query_jdbc_sql, "", dao_fields_map, dao_fields_jdbc);
-            for (FieldInfo fi : dao_fields_jdbc) {
+            for (int i = 0; i < dao_fields_jdbc.size(); i++) {
+                FieldInfo fi = dao_fields_jdbc.get(i);
                 String target_type = jaxb_type_map.get_target_type_name(fi.getType());
                 target_type = jaxb_macros.parse_target_type_name(target_type, fi);
-                fi.refine_rendered_type(target_type);
+                dao_fields_jdbc.set(i, FieldInfo.with_rendered_type(fi, target_type));
             }
         } catch (Exception e) {
             error.append(e.getMessage());
@@ -359,9 +364,10 @@ class DaoClassInfo {
                     jaxb_dto_or_return_type, jaxb_return_type_is_dto, jaxb_dto_classes, res_fields);
             JdbcSqlParamInfo.get_jdbc_sql_params_info(conn, jaxb_type_map, jaxb_macros, dao_query_jdbc_sql, param_names_mode, method_param_descriptors, res_params);
         }
-        for (FieldInfo fi : res_fields) {
+        for (int i = 0; i < res_fields.size(); i++) {
+            FieldInfo fi = res_fields.get(i);
             String type_name = jaxb_type_map.get_target_type_name(fi.getType());
-            fi.refine_rendered_type(type_name);
+            res_fields.set(i, FieldInfo.with_rendered_type(fi, type_name));
         }
         return dao_query_jdbc_sql;
     }
@@ -379,8 +385,7 @@ class DaoClassInfo {
             String dao_col_name = dao_field.getColumnName();
             String gen_dao_col_name = dao_col_name.toLowerCase();
             if (dao_crud_auto_columns.contains(gen_dao_col_name)) {
-                dao_field.setAI(true);
-                res_dao_fields_generated.add(dao_field);
+                res_dao_fields_generated.add(FieldInfo.with_ai(dao_field, true));
                 dao_crud_auto_columns.remove(gen_dao_col_name); // it must become empty in the end
             } else {
                 if (dao_field.isAI()) {
@@ -403,7 +408,13 @@ class DaoClassInfo {
 
         String no_model = "";
         JdbcTableInfo table_info = new JdbcTableInfo(no_model, conn, jaxb_type_map, dto_field_names_mode, table_name, explicit_pk, jaxb_dto_class.getAuto());
-        _refine_dao_fields_by_dto_fields(sql_root_abs_path, jaxb_dto_class, table_info.fields_all);
+        Map<FieldInfo, FieldInfo> refined = _refine_dao_fields_by_dto_fields(sql_root_abs_path, jaxb_dto_class, table_info.fields_all);
+        // the columns missing in DTO are excluded from 'fields_all' only: 'fields_pk' and
+        // 'fields_not_pk' keep them as they are
+        for (Map.Entry<FieldInfo, FieldInfo> e : refined.entrySet()) {
+            FieldInfoLists.replace(table_info.fields_pk, e.getKey(), e.getValue());
+            FieldInfoLists.replace(table_info.fields_not_pk, e.getKey(), e.getValue());
+        }
         return table_info;
     }
 }

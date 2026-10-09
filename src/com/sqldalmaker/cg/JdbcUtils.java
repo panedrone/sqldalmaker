@@ -32,6 +32,9 @@ public class JdbcUtils {
     private final DtoClassInfo dto_class_info;
     private final DaoClassInfo dao_class_info;
 
+    // the schema does not change during a code generation run, and JdbcUtils lives for one run
+    private final Map<String, JdbcTableInfo> crud_table_info_cache = new HashMap<String, JdbcTableInfo>();
+
     public JdbcUtils(
             Connection conn,
             FieldNamesMode dto_field_names_mode,
@@ -188,12 +191,21 @@ public class JdbcUtils {
         return new DaoSqlInfo(sql, fields_not_generated, fields_generated);
     }
 
+    // read/update/delete of one <crud> ask for the same table one after another,
+    // and each request is several JDBC round-trips (columns, PK, indexes, DTO fields):
+    // they are done once per (DTO class, table, PK) during a code generation run
     private JdbcTableInfo _get_table_info_for_crud(
             DtoClass jaxb_dto_class,
             String table_name,
             String explicit_pk) throws Exception {
 
-        return dao_class_info.get_dao_fields_for_crud(jaxb_dto_class, table_name, explicit_pk, sql_root_abs_path);
+        String key = jaxb_dto_class.getName() + "|" + table_name + "|" + explicit_pk;
+        JdbcTableInfo tfi = crud_table_info_cache.get(key);
+        if (tfi == null) {
+            tfi = dao_class_info.get_dao_fields_for_crud(jaxb_dto_class, table_name, explicit_pk, sql_root_abs_path);
+            crud_table_info_cache.put(key, tfi);
+        }
+        return tfi;
     }
 
     // 'fields' are all the columns of the table, 'params' are the PK ones

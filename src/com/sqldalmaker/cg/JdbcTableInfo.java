@@ -97,20 +97,26 @@ class JdbcTableInfo {
         //////////////////////////////////////
         String jdbc_sql = SqlUtils.jdbc_sql_by_table_name(table_ref);
         JdbcSqlFieldInfo.get_field_info_by_jdbc_sql(model, conn, dto_field_names_mode, jdbc_sql, "", fields_map, fields_all);
-        Set<String> lower_case_pk_col_names = _get_lower_case_pk_col_names(table_ref, jaxb_explicit_pk);
-        for (FieldInfo fi : fields_all) {
-            String col_name = fi.getColumnName();
-            String lower_case_col_name = Names.get_pk_col_name_alias(col_name);
-            if (lower_case_pk_col_names.contains(lower_case_col_name)) {
-                fields_pk.add(fi);
-                fi.setPK(true);
-            } else {
-                fields_not_pk.add(fi);
-                fi.setPK(false);
-            }
-        }
         _refine_field_info_by_jdbc_table();
         _refine_by_type_map();
+        // the last step: 'fields_pk' and 'fields_not_pk' get the final FieldInfo-s
+        Set<String> lower_case_pk_col_names = _get_lower_case_pk_col_names(table_ref, jaxb_explicit_pk);
+        for (FieldInfo fi : new ArrayList<FieldInfo>(fields_all)) {
+            String col_name = fi.getColumnName();
+            String lower_case_col_name = Names.get_pk_col_name_alias(col_name);
+            boolean is_pk = lower_case_pk_col_names.contains(lower_case_col_name);
+            FieldInfo pk_fi = FieldInfo.with_pk(fi, is_pk);
+            _replace(fi, pk_fi);
+            if (is_pk) {
+                fields_pk.add(pk_fi);
+            } else {
+                fields_not_pk.add(pk_fi);
+            }
+        }
+    }
+
+    private void _replace(FieldInfo old_fi, FieldInfo new_fi) {
+        FieldInfoLists.replace(fields_all, fields_map, old_fi, new_fi);
     }
 
     private void _validate_table_name(String table_name_pattern) throws Exception {
@@ -182,13 +188,13 @@ class JdbcTableInfo {
                     System.err.println("COLUMN_NAME: " + e.getMessage());
                     continue;
                 }
-                FieldInfo fi = fields_map.get(db_col_name);
-                fi.setComment("t");
-                _init_with_jdbc_type(fi, columns_rs);
-                _set_col_size(fi, columns_rs);
-                _set_decimal_digits(fi, columns_rs);
-                _set_ai(fi, columns_rs);
-                _set_nullable(fi, columns_rs);
+                FieldInfo old_fi = fields_map.get(db_col_name);
+                FieldInfo fi = FieldInfo.with_comment(old_fi, "t");
+                fi = _init_with_jdbc_type(fi, columns_rs);
+                fi = _set_col_size(fi, columns_rs);
+                fi = _set_decimal_digits(fi, columns_rs);
+                fi = _set_ai(fi, columns_rs);
+                fi = _set_nullable(fi, columns_rs);
                 // Exception: Invalid column Info
                 // Object is_gk = columns_rs.getObject("IS_GENERATEDCOLUMN"); // "NO" for oracle IDENTITY
                 // if ("yes".equals(is_gk) || "YES".equals(is_gk)) {
@@ -198,61 +204,61 @@ class JdbcTableInfo {
                     String[] res = lower_case_fk.get(lo_case_col_name);
                     String pk_table_name = res[0];
                     String pk_column_name = res[1];
-                    fi.setFK(String.format("%s.%s", pk_table_name, pk_column_name));
+                    fi = FieldInfo.with_fk(fi, String.format("%s.%s", pk_table_name, pk_column_name));
                 }
                 if (lower_case_indexed.containsKey(lo_case_col_name)) {
-                    fi.setIndexed(true);
+                    fi = FieldInfo.with_indexed(fi, true);
                 }
                 if (lower_case_unique.containsKey(lo_case_col_name)) {
-                    fi.setUnique(true);
+                    fi = FieldInfo.with_unique(fi, true);
                 }
+                _replace(old_fi, fi);
             }
         } finally {
             columns_rs.close();
         }
     }
 
-    private static void _set_nullable(FieldInfo fi, ResultSet columns_rs) {
+    private static FieldInfo _set_nullable(FieldInfo fi, ResultSet columns_rs) {
         try {
             int nullable = columns_rs.getInt("NULLABLE");
-            if (nullable == DatabaseMetaData.columnNullable) {
-                // http://www.java2s.com/Code/Java/Database-SQL-JDBC/IsColumnNullable.htm
-                fi.setNullable(true);
-            } else {
-                fi.setNullable(false);
-            }
+            // http://www.java2s.com/Code/Java/Database-SQL-JDBC/IsColumnNullable.htm
+            return FieldInfo.with_nullable(fi, nullable == DatabaseMetaData.columnNullable);
         } catch (SQLException e) {
             System.err.println("NULLABLE: " + e.getMessage());
+            return fi;
         }
     }
 
-    private static void _set_ai(FieldInfo fi, ResultSet columns_rs) {
+    private static FieldInfo _set_ai(FieldInfo fi, ResultSet columns_rs) {
         if (!fi.isAI()) {
             try {
                 // IS_AUTOINCREMENT may work incorrectly (sqlite-jdbc-3.19.3.jar).
                 // So, use it only if AI was not set by SQL columns metadata
                 Object is_ai = columns_rs.getObject("IS_AUTOINCREMENT");
                 if ("yes".equals(is_ai) || "YES".equals(is_ai)) {
-                    fi.setAI(true);
+                    return FieldInfo.with_ai(fi, true);
                 }
             } catch (SQLException e) {
                 System.err.println("IS_AUTOINCREMENT: " + e.getMessage());
             }
         }
+        return fi;
     }
 
-    private static void _set_decimal_digits(FieldInfo fi, ResultSet columns_rs) {
+    private static FieldInfo _set_decimal_digits(FieldInfo fi, ResultSet columns_rs) {
         try {
             // it is always -127 for Oracle NUMERIC-s and always 10 for all SQLite types
             // https://stackoverflow.com/questions/12931061/how-to-get-oracle-number-with-syncdb
             int decimal_digits = columns_rs.getInt("DECIMAL_DIGITS");
-            fi.setDecimalDigits(decimal_digits);
+            return FieldInfo.with_decimal_digits(fi, decimal_digits);
         } catch (SQLException e) {
             System.err.println("DECIMAL_DIGITS: " + e.getMessage());
+            return fi;
         }
     }
 
-    private static void _set_col_size(FieldInfo fi, ResultSet columns_rs) {
+    private static FieldInfo _set_col_size(FieldInfo fi, ResultSet columns_rs) {
         String string_type = String.class.getName();
         String fi_type = fi.getScalarType();
         if (string_type.equals(fi_type)) {
@@ -270,11 +276,12 @@ class JdbcTableInfo {
                         size = precision;
                     }
                 }
-                fi.setColumnSize(size);
+                return FieldInfo.with_column_size(fi, size);
             } catch (SQLException e) {
                 System.err.println("COLUMN_SIZE: " + e.getMessage());
             }
         }
+        return fi;
     }
 
     class Oracle {
@@ -291,7 +298,7 @@ class JdbcTableInfo {
         public static final int TIMESTAMPLTZ = -102;
     }
 
-    private void _init_with_jdbc_type(FieldInfo fi, ResultSet columns_rs) {
+    private FieldInfo _init_with_jdbc_type(FieldInfo fi, ResultSet columns_rs) {
         String sql_type = fi.getOriginalType();
         String no_type = _get_type_name(Object.class.getName());
         if (no_type.equals(sql_type)) {
@@ -313,13 +320,14 @@ class JdbcTableInfo {
                             break;
                     }
                 }
-                fi.refine_scalar_type(apache_java_type_name);
+                fi = FieldInfo.with_scalar_type(fi, apache_java_type_name);
                 String rendered_type_name = _get_type_name(apache_java_type_name);
-                fi.refine_rendered_type(rendered_type_name);
+                fi = FieldInfo.with_rendered_type(fi, rendered_type_name);
             } catch (SQLException e) {
                 System.err.println("DATA_TYPE: " + e.getMessage());
             }
         }
+        return fi;
     }
 
     private Map<String, String> _index_names_by_lo_case_col_names(
@@ -367,7 +375,7 @@ class JdbcTableInfo {
     }
 
     private void _refine_by_type_map() {
-        for (FieldInfo fi : fields_map.values()) {
+        for (FieldInfo fi : new ArrayList<FieldInfo>(fields_map.values())) {
             String detected_type_name;
             String db_col_name = fi.getColumnName();
             if (db_col_name.equalsIgnoreCase(explicit_auto_column_name) && !model.isEmpty()) {
@@ -376,7 +384,7 @@ class JdbcTableInfo {
                 detected_type_name = fi.getType();
             }
             String target_type_name = type_map.get_target_type_name(detected_type_name);
-            fi.refine_rendered_type(target_type_name);
+            _replace(fi, FieldInfo.with_rendered_type(fi, target_type_name));
         }
     }
 

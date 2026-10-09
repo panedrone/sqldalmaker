@@ -271,7 +271,7 @@ public class GoCG {
                     imports.add(imp);
                 }
                 returned_type_name = GoTypes.get_type_without_import_and_tag(ret_fi);
-                ret_fi.refine_rendered_type(returned_type_name);
+                fields.set(0, FieldInfo.with_rendered_type(ret_fi, returned_type_name));
             }
             String go_sql_str = SqlUtils.format_jdbc_sql_for_go(dao_query_jdbc_sql);
             Map<String, Object> context = new HashMap<String, Object>();
@@ -368,14 +368,7 @@ public class GoCG {
                 String sql_path) throws Exception {
 
             List<FieldInfo> _params = db_utils.get_dao_exec_dml_params(jdbc_dao_sql, "", param_descriptors);
-            for (FieldInfo pi : _params) {
-                String imp = GoTypes.get_type_import(pi);
-                if (imp != null) {
-                    imports.add(imp);
-                }
-                String just_type = GoTypes.get_type_without_import_and_tag(pi);
-                pi.refine_rendered_type(just_type);
-            }
+            _strip_imports_and_tags(_params);
             String go_sql = SqlUtils.format_jdbc_sql_for_go(jdbc_dao_sql);
             List<MappingInfo> m_list = new ArrayList<MappingInfo>();
             List<FieldInfo> method_params = new ArrayList<FieldInfo>();
@@ -458,20 +451,26 @@ public class GoCG {
             }
             context.put("plain_params", plain_params);
             if (plain_params) {
-                for (FieldInfo pi : params) {
-                    String imp = GoTypes.get_type_import(pi);
-                    if (imp != null) {
-                        imports.add(imp);
-                    }
-                    String just_type = GoTypes.get_type_without_import_and_tag(pi);
-                    pi.refine_rendered_type(just_type);
-                }
+                _strip_imports_and_tags(params);
             }
             context.put("params", params);
             if (context.get("imports") != null) {
                 throw new Exception("Invalid assignment of 'imports'");
             }
             context.put("imports", imports);
+        }
+
+        // the types of parameters are rendered without imports and tags, the imports go to 'imports'
+        private void _strip_imports_and_tags(List<FieldInfo> params) {
+            for (int i = 0; i < params.size(); i++) {
+                FieldInfo pi = params.get(i);
+                String imp = GoTypes.get_type_import(pi);
+                if (imp != null) {
+                    imports.add(imp);
+                }
+                String just_type = GoTypes.get_type_without_import_and_tag(pi);
+                params.set(i, FieldInfo.with_rendered_type(pi, just_type));
+            }
         }
 
         private static void _set_model(String dto_class_name, Map<String, Object> context) {

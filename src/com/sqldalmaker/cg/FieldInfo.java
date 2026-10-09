@@ -141,20 +141,134 @@ public class FieldInfo {
         this.comment = comment;
     }
 
+    private FieldInfo(FieldInfo src) {
+        this.rendered_name = src.rendered_name;
+        this.lower_camel_case = src.lower_camel_case;
+        this.rendered_type = src.rendered_type;
+        this.original_type = src.original_type;
+        this.original_scalar_type = src.original_scalar_type;
+        this.scalar_type = src.scalar_type;
+        this.model = src.model;
+        this.column_name = src.column_name;
+        this.column_size = src.column_size;
+        this.decimal_digits = src.decimal_digits;
+        this.is_auto_increment = src.is_auto_increment;
+        this.is_pk = src.is_pk;
+        this.is_nullable = src.is_nullable;
+        this.foreign_key = src.foreign_key;
+        this.is_indexed = src.is_indexed;
+        this.is_unique = src.is_unique;
+        this.comment = src.comment;
+        this.name_prefix = src.name_prefix;
+        this.assign_func = src.assign_func;
+        this.precision = src.precision;
+        this.scale = src.scale;
+        this.display_size = src.display_size;
+    }
+
+    // FieldInfo is immutable: there are getters only, and every "change" is a new
+    // FieldInfo made by one of the static methods below. Whoever holds a FieldInfo
+    // can be sure that nobody else refines it behind their back.
+
+    public static FieldInfo with_rendered_type(FieldInfo src, String type) {
+        FieldInfo res = new FieldInfo(src);
+        String[] assign_parts = type.split("->");
+        if (assign_parts.length > 1) {
+            res.rendered_type = assign_parts[0].trim();
+            res.assign_func = assign_parts[1].trim();
+        } else {
+            res.rendered_type = type.trim();
+        }
+        return res;
+    }
+
+    public static FieldInfo with_assign_func(FieldInfo src, String assign_func) {
+        FieldInfo res = new FieldInfo(src);
+        res.assign_func = assign_func;
+        return res;
+    }
+
+    public static FieldInfo with_name(FieldInfo src, String name) { // Go formatting
+        FieldInfo res = new FieldInfo(src);
+        res.rendered_name = name;
+        return res;
+    }
+
+    public static FieldInfo with_comment(FieldInfo src, String comment) {
+        FieldInfo res = new FieldInfo(src);
+        res.comment = comment;
+        return res;
+    }
+
+    public static FieldInfo with_scalar_type(FieldInfo src, String type_name) {
+        FieldInfo res = new FieldInfo(src);
+        res.scalar_type = type_name;
+        return res;
+    }
+
+    public static FieldInfo with_pk(FieldInfo src, boolean pk) {
+        FieldInfo res = new FieldInfo(src);
+        res.is_pk = pk;
+        return res;
+    }
+
+    public static FieldInfo with_ai(FieldInfo src, boolean is_auto_increment) {
+        FieldInfo res = new FieldInfo(src);
+        res.is_auto_increment = is_auto_increment;
+        return res;
+    }
+
+    public static FieldInfo with_fk(FieldInfo src, String fk) {
+        FieldInfo res = new FieldInfo(src);
+        res.foreign_key = fk;
+        return res;
+    }
+
+    public static FieldInfo with_nullable(FieldInfo src, boolean nullable) {
+        FieldInfo res = new FieldInfo(src);
+        res.is_nullable = nullable;
+        return res;
+    }
+
+    public static FieldInfo with_indexed(FieldInfo src, boolean indexed) {
+        FieldInfo res = new FieldInfo(src);
+        res.is_indexed = indexed;
+        return res;
+    }
+
+    public static FieldInfo with_unique(FieldInfo src, boolean unique) {
+        FieldInfo res = new FieldInfo(src);
+        res.is_unique = unique;
+        return res;
+    }
+
+    public static FieldInfo with_column_size(FieldInfo src, int size) {
+        FieldInfo res = new FieldInfo(src);
+        res.column_size = size;
+        return res;
+    }
+
+    public static FieldInfo with_decimal_digits(FieldInfo src, int decimal_digits) {
+        FieldInfo res = new FieldInfo(src);
+        res.decimal_digits = decimal_digits;
+        return res;
+    }
+
+    // JDBC ResultSetMetaData of a column: they always come together
+    public static FieldInfo with_rs_md(FieldInfo src, int precision, int scale, int display_size) {
+        FieldInfo res = new FieldInfo(src);
+        res.precision = precision;
+        res.scale = scale;
+        res.display_size = display_size;
+        return res;
+    }
+
     public String getAssignFunc() { // this method is for use in "java.vm" and "go.vm"
         return this.assign_func;
     }
 
-    public void refine_assign_func(String assign_func) {
-        this.assign_func = assign_func;
-    }
-
     public String getName() { // this method is for use in VM templates
         return this.rendered_name;
-    }
-
-    public void refine_name(String name) { // Go formatting
-        this.rendered_name = name;
     }
 
     public String getLowerCamelCaseName() { // for Golang VM template
@@ -163,17 +277,6 @@ public class FieldInfo {
 
     public String getType() { // this method is for use in VM templates
         return rendered_type;
-    }
-
-    public void refine_rendered_type(String type) {
-
-        String[] assign_parts = type.split("->");
-        if (assign_parts.length > 1) {
-            this.rendered_type = assign_parts[0].trim();
-            this.assign_func = assign_parts[1].trim();
-            return;
-        }
-        this.rendered_type = type.trim();
     }
 
     public String getColumnName() { // this method is for use in VM templates
@@ -187,48 +290,24 @@ public class FieldInfo {
         return this.column_size;
     }
 
-    public void setColumnSize(int size) {
-        this.column_size = size;
-    }
-
     public boolean isPK() {
         return this.is_pk;
-    }
-
-    public void setPK(boolean pk) {
-        this.is_pk = pk;
     }
 
     public boolean isAI() {
         return this.is_auto_increment;
     }
 
-    public void setAI(boolean isAutoIncrement) {
-        this.is_auto_increment = isAutoIncrement;
-    }
-
     public String getFK() {
         return foreign_key;
-    }
-
-    public void setFK(String fk) {
-        foreign_key = fk;
     }
 
     public boolean isNullable() {
         return this.is_nullable;
     }
 
-    public void setNullable(boolean nullable) {
-        this.is_nullable = nullable;
-    }
-
     public String getComment() { // this method is for use in VM templates
         return this.comment;
-    }
-
-    public void setComment(String comment) {
-        this.comment = comment;
     }
 
     // this method is for use in VM templates ONLY
@@ -253,16 +332,8 @@ public class FieldInfo {
         return is_indexed;
     }
 
-    public void setIndexed(boolean indexed) {
-        is_indexed = indexed;
-    }
-
     public boolean isUnique() {
         return is_unique;
-    }
-
-    public void setUnique(boolean unique) {
-        is_unique = unique;
     }
 
     public String getOriginalScalarType() {
@@ -273,10 +344,6 @@ public class FieldInfo {
         return scalar_type;
     }
 
-    public void refine_scalar_type(String type_name) {
-        scalar_type = type_name;
-    }
-
     public String getModel() {
         return model;
     }
@@ -285,31 +352,16 @@ public class FieldInfo {
         return this.decimal_digits;
     }
 
-    public void setDecimalDigits(int decimal_digits) {
-        this.decimal_digits = decimal_digits;
-    }
-
     public int getPrecision() {
         return this.precision;
-    }
-
-    public void setPrecision(int precision) {
-        this.precision = precision;
     }
 
     public int getScale() {
         return this.scale;
     }
 
-    public void setScale(int scale) {
-        this.scale = scale;
-    }
-
     public int getDisplaySize() {
         return this.display_size;
     }
 
-    public void setDisplaySize(int display_size) {
-        this.display_size = display_size;
-    }
 }

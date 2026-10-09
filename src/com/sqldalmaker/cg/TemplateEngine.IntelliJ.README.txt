@@ -1,1 +1,10 @@
-Remove "lib-client.jar" from Project Structure --> Platform SDK --> IntelliJ IDEA Community Edition IC-233.13135.103
+IntelliJ Platform bundles Velocity 2.x, the plug-in is built with Velocity 1.7 ("lib/velocity-1.7-dep.jar").
+If the platform one comes first in the classpath, TemplateEngine.java does not compile
+(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS, RuntimeServices.parse).
+
+Fixed in "sqldalmaker-intellij.iml": library "velocity-1.7-dep" goes BEFORE the module SDK
+(Project Structure --> Modules --> Dependencies), so nothing has to be removed from the SDK.
+
+Before 10.10.2026 the advice was to remove the platform jar from the SDK classpath by hand
+("lib-client.jar" in IC-233, "lib/intellij.libraries.velocity.jar" in IU-262), and it had to be
+repeated every time the Plugin SDK was re-created.
