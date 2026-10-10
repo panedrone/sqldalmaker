@@ -49,4 +49,15 @@ class JaxbTypeMap {
         return default_type;
     }
 
+    // A target type may be "type->assign_func": the type to render and the function that
+    // reads a value of it from a record (e.g. "Integer->getInteger" in Java).
+    // Returns {type, assign_func}; assign_func is null if there is none.
+    static String[] split_target_type(String target_type_name) {
+        String[] assign_parts = target_type_name.split("->");
+        if (assign_parts.length > 1) {
+            return new String[]{assign_parts[0].trim(), assign_parts[1].trim()};
+        }
+        return new String[]{target_type_name.trim(), null};
+    }
+
 }

@@ -133,6 +133,19 @@ public class Names {
         return sb.toString();
     }
 
+    // A DTO class may be declared as "model-ClassName", e.g. "sa-Task" for SQLAlchemy:
+    // the model is "sa", the class is "Task". Without '-' there is no model.
+
+    public static String get_model(String dto_class_name) {
+        int model_name_end_index = dto_class_name.indexOf('-');
+        return model_name_end_index == -1 ? "" : dto_class_name.substring(0, model_name_end_index);
+    }
+
+    public static String get_class_name_without_model(String dto_class_name) {
+        int model_name_end_index = dto_class_name.indexOf('-');
+        return model_name_end_index == -1 ? dto_class_name : dto_class_name.substring(model_name_end_index + 1);
+    }
+
     public static String get_pk_col_name_alias(String pk_col_name) {
         // === panedrone: WHY ALIASES:
         //   1) xerial SQLite3 getPrimaryKeys may return pk_col_names in lower case

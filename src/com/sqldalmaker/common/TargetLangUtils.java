@@ -35,10 +35,7 @@ import java.util.List;
 public class TargetLangUtils {
 
     public static String file_name_from_class_name(String root_fn, String class_name) throws Exception {
-        int model_name_end_index = class_name.indexOf('-');
-        if (model_name_end_index != -1) {
-            class_name = class_name.substring(model_name_end_index + 1);
-        }
+        class_name = Names.get_class_name_without_model(class_name);
         if (Const.Root.PHP.equals(root_fn)) {
             return class_name + ".php";
         } else if (Const.Root.JAVA.equals(root_fn)) {

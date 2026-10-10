@@ -247,12 +247,7 @@ public class JaxbUtils {
 
         String method_name = jaxb_method.getMethod();
         if (method_name == null || method_name.isEmpty()) {
-            int model_name_end_index = dto_class_name.indexOf('-');
-            if (model_name_end_index == -1) {
-                method_name = base + dto_class_name;
-            } else {
-                method_name = base + dto_class_name.substring(model_name_end_index + 1);
-            }
+            method_name = base + Names.get_class_name_without_model(dto_class_name);
         }
         return Names.get_method_name(method_name, field_names_mode);
     }

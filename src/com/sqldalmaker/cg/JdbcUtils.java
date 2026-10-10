@@ -83,8 +83,7 @@ public class JdbcUtils {
 
     public String get_target_type_by_type_map(String detected) {
         String target_type_name = jaxb_type_map.get_target_type_name(detected);
-        String[] parts = target_type_name.split("->");
-        return parts[0].trim();
+        return JaxbTypeMap.split_target_type(target_type_name)[0];
     }
 
     public static ResultSet get_tables_rs(Connection conn, String schema_name, boolean include_views) throws SQLException {

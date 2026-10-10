@@ -102,13 +102,9 @@ class DtoClassInfo {
             DtoClass jaxb_dto_class,
             String sql_root_abs_path) throws Exception {
 
-        String model = "";
-        if (!ignore_model) {
-            String dto_class_name = jaxb_dto_class.getName();
-            int model_name_end_index = dto_class_name.indexOf('-');
-            if (model_name_end_index != -1) {
-                model = dto_class_name.substring(0, model_name_end_index + 1);
-            }
+        String model = ignore_model ? "" : Names.get_model(jaxb_dto_class.getName());
+        if (!model.isEmpty()) {
+            model += "-"; // the prefix of type names: "sa-int"
         }
         String jaxb_dto_class_ref = jaxb_dto_class.getRef();
         if (SqlUtils.is_empty_ref(jaxb_dto_class_ref)) {

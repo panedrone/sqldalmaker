@@ -51,10 +51,9 @@ public class PhpCG {
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
             List<FieldInfo> fields = db_utils.get_dto_fields(jaxb_dto_class, sql_root_abs_path);
             Map<String, Object> context = new HashMap<String, Object>();
-            int model_name_end_index = dto_class_name.indexOf('-');
-            if (model_name_end_index != -1) {
-                String model = dto_class_name.substring(0, model_name_end_index);
-                dto_class_name = dto_class_name.substring(model_name_end_index + 1);
+            String model = Names.get_model(dto_class_name);
+            if (!model.isEmpty()) {
+                dto_class_name = Names.get_class_name_without_model(dto_class_name);
                 context.put("model", model);
             }
             String ref = jaxb_dto_class.getRef();
@@ -261,14 +260,13 @@ public class PhpCG {
             }
             DtoClass _jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(_dto_class_name, jaxb_dto_classes);
             String dto_class_nm = _jaxb_dto_class.getName();
-            int model_end = dto_class_nm.indexOf('-');
-            if (model_end != -1) {
-                String m = dto_class_nm.substring(0, model_end);
-                if (!this.model.isEmpty() && this.model.equals(m) == false) {
+            String m = Names.get_model(dto_class_nm);
+            if (!m.isEmpty()) {
+                if (!this.model.isEmpty() && !this.model.equals(m)) {
                     throw new Exception(String.format("Multiple models not allowed: %s, %s", this.model, m));
                 }
                 this.model = m;
-                dto_class_nm = dto_class_nm.substring(model_end + 1);
+                dto_class_nm = Names.get_class_name_without_model(dto_class_nm);
             }
             // do not add "use" if both namespaces are empty or equal
             if (dao_namespace.equals(dto_namespace)) {

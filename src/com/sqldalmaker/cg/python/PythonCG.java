@@ -46,10 +46,9 @@ public class PythonCG {
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
             List<FieldInfo> fields = db_utils.get_dto_fields(jaxb_dto_class, sql_root_abs_path);
             Map<String, Object> context = new HashMap<String, Object>();
-            int model_name_end_index = dto_class_name.indexOf('-');
-            if (model_name_end_index != -1) {
-                String model = dto_class_name.substring(0, model_name_end_index);
-                dto_class_name = dto_class_name.substring(model_name_end_index + 1);
+            String model = Names.get_model(dto_class_name);
+            if (!model.isEmpty()) {
+                dto_class_name = Names.get_class_name_without_model(dto_class_name);
                 context.put("model", model);
             }
             String ref = jaxb_dto_class.getRef();
@@ -254,7 +253,7 @@ public class PythonCG {
             context.put("sql", python_sql_str);
             String model = "";
             if (jaxb_return_type_is_dto) {
-                model = _get_model(jaxb_dto_or_return_type);
+                model = Names.get_model(jaxb_dto_or_return_type);
                 if (!model.isEmpty()) {
                     _get_rendered_dto_class_name(jaxb_dto_or_return_type, true); // add to import
                 }
@@ -277,10 +276,7 @@ public class PythonCG {
         private String _get_rendered_dto_class_name(String dto_class_name, boolean add_to_import) throws Exception {
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
             String dto_class_nm = jaxb_dto_class.getName();
-            int model_end = dto_class_nm.indexOf('-');
-            if (model_end != -1) {
-                dto_class_nm = dto_class_nm.substring(model_end + 1);
-            }
+            dto_class_nm = Names.get_class_name_without_model(dto_class_nm);
             if (add_to_import) {
                 String python_fn = Names.camel_case_to_lower_snake_case(dto_class_nm);
                 if (dto_package != null && !dto_package.isEmpty()) {
@@ -366,15 +362,6 @@ public class PythonCG {
             context.put("params", params);
         }
 
-        private static String _get_model(String dto_class_name) {
-            String model = "";
-            int model_name_end_index = dto_class_name.indexOf('-');
-            if (model_name_end_index != -1) {
-                model = dto_class_name.substring(0, model_name_end_index);
-            }
-            return model;
-        }
-
         private StringBuilder _render_crud_create(
                 String method_name,
                 String table_name,
@@ -394,7 +381,7 @@ public class PythonCG {
             context.put("sql", sql_str);
             context.put("method_name", method_name);
             context.put("params", values);
-            String model = _get_model(dto_class_name);
+            String model = Names.get_model(dto_class_name);
             context.put("model", model);
             dto_class_name = _get_rendered_dto_class_name(dto_class_name, !model.isEmpty()); // "false" because it is only for comments
             context.put("dto_param", dto_class_name);
@@ -454,7 +441,7 @@ public class PythonCG {
             context.put("method_name", method_name);
             context.put("sql", sql_str);
             context.put("table_name", table_name);
-            String model = _get_model(dto_class_name);
+            String model = Names.get_model(dto_class_name);
             context.put("model", model);
             dto_class_name = _get_rendered_dto_class_name(dto_class_name, false); // "false" because it is only for comments
             context.put("dto_class_name", dto_class_name);
@@ -489,7 +476,7 @@ public class PythonCG {
             String python_sql_str = SqlUtils.jdbc_sql_to_python_string(dao_jdbc_sql);
             Map<String, Object> context = new HashMap<String, Object>();
             context.put("mode", "dao_exec_dml");
-            String model = _get_model(dto_class_name);
+            String model = Names.get_model(dto_class_name);
             context.put("model", model);
             if (!model.isEmpty()) {
                 dto_class_name = _get_rendered_dto_class_name(dto_class_name, true);

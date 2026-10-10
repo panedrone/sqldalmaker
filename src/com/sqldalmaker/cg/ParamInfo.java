@@ -83,8 +83,7 @@ public class ParamInfo {
 
     // "type->assign_func" of type-map: a parameter needs the type only
     public static ParamInfo with_type(ParamInfo src, String type) {
-        String[] assign_parts = type.split("->");
-        String rendered_type = assign_parts.length > 1 ? assign_parts[0].trim() : type.trim();
+        String rendered_type = JaxbTypeMap.split_target_type(type)[0];
         return new ParamInfo(src.rendered_name, src.lower_camel_case, rendered_type, src.name_prefix);
     }
 

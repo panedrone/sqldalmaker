@@ -151,12 +151,10 @@ public class FieldInfo {
 
     public static FieldInfo with_rendered_type(FieldInfo src, String type) {
         FieldInfo res = new FieldInfo(src);
-        String[] assign_parts = type.split("->");
-        if (assign_parts.length > 1) {
-            res.rendered_type = assign_parts[0].trim();
-            res.assign_func = assign_parts[1].trim();
-        } else {
-            res.rendered_type = type.trim();
+        String[] type_and_assign = JaxbTypeMap.split_target_type(type);
+        res.rendered_type = type_and_assign[0];
+        if (type_and_assign[1] != null) {
+            res.assign_func = type_and_assign[1];
         }
         return res;
     }

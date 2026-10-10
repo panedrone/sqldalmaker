@@ -90,10 +90,9 @@ public class GoCG {
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
             List<FieldInfo> fields = db_utils.get_dto_fields(jaxb_dto_class, sql_root_abs_path);
             Map<String, Object> context = new HashMap<String, Object>();
-            int model_name_end_index = dto_class_name.indexOf('-');
-            if (model_name_end_index != -1) {
-                String model = dto_class_name.substring(0, model_name_end_index);
-                dto_class_name = dto_class_name.substring(model_name_end_index + 1);
+            String model = Names.get_model(dto_class_name);
+            if (!model.isEmpty()) {
+                dto_class_name = Names.get_class_name_without_model(dto_class_name);
                 context.put("model", model);
             }
             context.put("package", dto_package);
@@ -330,10 +329,7 @@ public class GoCG {
         private String _get_rendered_dto_class_name(String dto_class_name) throws Exception {
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
             String dto_class_nm = jaxb_dto_class.getName();
-            int model_end = dto_class_nm.indexOf('-');
-            if (model_end != -1) {
-                dto_class_nm = dto_class_nm.substring(model_end + 1);
-            }
+            dto_class_nm = Names.get_class_name_without_model(dto_class_nm);
             if (this.dto_package.equals(dao_package)) {
                 return dto_class_nm;
             }
@@ -474,12 +470,7 @@ public class GoCG {
         }
 
         private static void _set_model(String dto_class_name, Map<String, Object> context) {
-            String model = "";
-            int model_name_end_index = dto_class_name.indexOf('-');
-            if (model_name_end_index != -1) {
-                model = dto_class_name.substring(0, model_name_end_index);
-            }
-            context.put("model", model);
+            context.put("model", Names.get_model(dto_class_name));
         }
 
         private StringBuilder _render_crud_create(
