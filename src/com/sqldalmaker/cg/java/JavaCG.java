@@ -203,7 +203,7 @@ public class JavaCG {
                 String method_name,
                 String crud_table,
                 List<FieldInfo> fields,
-                List<FieldInfo> params) throws Exception {
+                List<ParamInfo> params) throws Exception {
 
             if (dao_query_jdbc_sql == null) {
                 return Helpers.get_no_pk_warning(method_name);
@@ -269,34 +269,34 @@ public class JavaCG {
                 String xml_node_name,
                 String sql_path) throws Exception {
 
-            List<FieldInfo> _params = db_utils.get_dao_exec_dml_params(jdbc_dao_sql, "", param_descriptors);
+            List<ParamInfo> _params = db_utils.get_dao_exec_dml_params(jdbc_dao_sql, "", param_descriptors);
             String java_sql = SqlUtils.format_jdbc_sql_for_java(jdbc_dao_sql);
             List<MappingInfo> m_list = new ArrayList<MappingInfo>();
-            List<FieldInfo> method_params = new ArrayList<FieldInfo>();
-            List<FieldInfo> exec_dml_params = new ArrayList<FieldInfo>();
+            List<ParamInfo> method_params = new ArrayList<>();
+            List<ParamInfo> exec_dml_params = new ArrayList<>();
             for (ExecDmlParamSlot slot : ExecDmlParams.parse(param_descriptors)) {
                 if (slot.kind == ExecDmlParamSlot.Kind.CURSOR_ARRAY) {
                     List<String> cb_elements = new ArrayList<String>();
                     for (String[] mapping : slot.cursor_mappings) {
                         MappingInfo m = _create_mapping(mapping);
                         m_list.add(m);
-                        method_params.add(FieldInfo.parameter(FieldNamesMode.AS_IS, String.format("final RecordHandler<%s>", m.dto_class_name), m.method_param_name));
+                        method_params.add(new ParamInfo(FieldNamesMode.AS_IS, String.format("final RecordHandler<%s>", m.dto_class_name), m.method_param_name));
                         cb_elements.add(m.exec_dml_param_name);
                     }
                     String exec_xml_param = "new RowHandler[]{" + String.join(", ", cb_elements) + "}";
                     if (slot.index == 0) {
                         exec_xml_param = "(Object) " + exec_xml_param;
                     }
-                    exec_dml_params.add(FieldInfo.parameter(FieldNamesMode.AS_IS, "[]", exec_xml_param));
+                    exec_dml_params.add(new ParamInfo(FieldNamesMode.AS_IS, "[]", exec_xml_param));
                 } else if (slot.kind == ExecDmlParamSlot.Kind.MAPPED) {
-                    FieldInfo p = _params.get(slot.index);
+                    ParamInfo p = _params.get(slot.index);
                     MappingInfo m = _create_mapping(slot.mapping);
                     m_list.add(m);
-                    method_params.add(FieldInfo.parameter(FieldNamesMode.AS_IS, String.format("final RecordHandler<%s>", m.dto_class_name), m.method_param_name));
+                    method_params.add(new ParamInfo(FieldNamesMode.AS_IS, String.format("final RecordHandler<%s>", m.dto_class_name), m.method_param_name));
                     String target_type_name = this.db_utils.get_target_type_by_type_map(p.getType());
-                    exec_dml_params.add(FieldInfo.parameter(FieldNamesMode.AS_IS, target_type_name, m.exec_dml_param_name));
+                    exec_dml_params.add(new ParamInfo(FieldNamesMode.AS_IS, target_type_name, m.exec_dml_param_name));
                 } else {
-                    FieldInfo p = _params.get(slot.index);
+                    ParamInfo p = _params.get(slot.index);
                     method_params.add(p);
                     exec_dml_params.add(p);
                 }
@@ -337,7 +337,7 @@ public class JavaCG {
             return m;
         }
 
-        private void _assign_params(List<FieldInfo> params, Map<String, Object> context) {
+        private void _assign_params(List<ParamInfo> params, Map<String, Object> context) {
             context.put("dto_param", "");
             context.put("params", params);
         }
@@ -352,15 +352,15 @@ public class JavaCG {
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
             JdbcUtils.DaoSqlInfo _c = db_utils.get_dao_crud_create_info(table_name, jaxb_dto_class, generated);
             String dao_jdbc_sql = _c.sql;
-            List<FieldInfo> fields_not_ai = _c.fields;
-            List<FieldInfo> fields_ai = _c.params;
+            List<ParamInfo> values = _c.params;
+            List<FieldInfo> fields_ai = _c.generated;
             String java_sql_str = SqlUtils.format_jdbc_sql_for_java(dao_jdbc_sql);
             Map<String, Object> context = new HashMap<String, Object>();
             context.put("method_type", "CREATE");
             context.put("table_name", table_name);
             context.put("sql", java_sql_str);
             context.put("method_name", method_name);
-            context.put("params", fields_not_ai);
+            context.put("params", values);
             context.put("dto_param", _get_rendered_dto_class_name(dto_class_name));
             if (fetch_generated && !fields_ai.isEmpty()) {
                 context.put("keys", fields_ai);
@@ -387,10 +387,8 @@ public class JavaCG {
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
             JdbcUtils.DaoSqlInfo _c = db_utils.get_dao_crud_read_info(dao_table_name, jaxb_dto_class, fetch_list, explicit_pk);
             String dao_jdbc_sql = _c.sql;
-            List<FieldInfo> fields_all = _c.fields;
-            List<FieldInfo> fields_pk = _c.params;
             return _render_query(dao_jdbc_sql, false, dto_class_name, true, fetch_list,
-                    method_name, dao_table_name, fields_all, fields_pk);
+                    method_name, dao_table_name, _c.fields, _c.params);
         }
 
         private StringBuilder _render_crud_update(
@@ -404,15 +402,16 @@ public class JavaCG {
             JdbcUtils.DaoSqlInfo _c = db_utils.get_dao_crud_update_info(table_name, jaxb_dto_class, explicit_pk);
             String dao_jdbc_sql = _c.sql;
             List<FieldInfo> fields_not_pk = _c.fields;
-            List<FieldInfo> fields_pk = _c.params;
-            if (fields_pk.isEmpty()) {
+            List<ParamInfo> pk_params = _c.params;
+            if (pk_params.isEmpty()) {
                 return Helpers.get_no_pk_warning(method_name);
             }
             if (fields_not_pk.isEmpty()) {
                 return Helpers.get_only_pk_warning(method_name);
             }
             String java_sql_str = SqlUtils.format_jdbc_sql_for_java(dao_jdbc_sql);
-            fields_not_pk.addAll(fields_pk);
+            List<ParamInfo> params = ParamInfo.of(fields_not_pk);
+            params.addAll(pk_params);
             Map<String, Object> context = new HashMap<String, Object>();
             context.put("mode", "dao_exec_dml");
             context.put("plain_params", true);
@@ -421,7 +420,7 @@ public class JavaCG {
             context.put("method_type", "UPDATE");
             context.put("table_name", table_name);
             context.put("dto_param", scalar_params ? "" : _get_rendered_dto_class_name(dto_class_name));
-            context.put("params", fields_not_pk);
+            context.put("params", params);
             context.put("is_external_sql", false);
             StringWriter sw = new StringWriter();
             te.merge(context, sw);
@@ -439,8 +438,8 @@ public class JavaCG {
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
             JdbcUtils.DaoSqlInfo _c = db_utils.get_dao_crud_delete_info(table_name, jaxb_dto_class, explicit_pk);
             String dao_jdbc_sql = _c.sql;
-            List<FieldInfo> fields_pk = _c.params;
-            if (fields_pk.isEmpty()) {
+            List<ParamInfo> pk_params = _c.params;
+            if (pk_params.isEmpty()) {
                 return Helpers.get_no_pk_warning(method_name);
             }
             String java_sql_str = SqlUtils.format_jdbc_sql_for_java(dao_jdbc_sql);
@@ -452,7 +451,7 @@ public class JavaCG {
             context.put("method_type", "DELETE");
             context.put("table_name", table_name);
             context.put("dto_param", "");
-            context.put("params", fields_pk);
+            context.put("params", pk_params);
             context.put("is_external_sql", false);
             StringWriter sw = new StringWriter();
             te.merge(context, sw);

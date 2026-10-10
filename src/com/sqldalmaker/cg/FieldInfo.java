@@ -62,25 +62,8 @@ public class FieldInfo {
 
     private int display_size = 0;
 
-    // 'comment' of a FieldInfo that stands for a method parameter and not for a column.
-    // Column names are normalized, parameter names are not.
-    public static final String PARAMETER = "parameter";
-
-    // The DAO renderers of implicit cursors put a whole expression where a column name
-    // is expected: an array of row handlers in Java, a slice of callbacks in Go. Such a
-    // "name" has to reach the template untouched.
-    // TODO: those callers should pass the expression as such, not disguised as a name.
-    private static boolean _is_rendered_expression(String name) {
-        return name.contains("func(") || name.contains("new RowHandler[]");
-    }
-
-    public static FieldInfo parameter(
-            FieldNamesMode field_names_mode,
-            String type_name,
-            String param_name) throws Exception {
-
-        return new FieldInfo(field_names_mode, type_name, param_name, PARAMETER);
-    }
+    // A column: of a table, of a result set, or a field of a DTO class.
+    // A parameter of a method is ParamInfo, not FieldInfo.
 
     public FieldInfo(
             FieldNamesMode field_names_mode,
@@ -113,21 +96,17 @@ public class FieldInfo {
         this.rendered_type = original_field_type;
         this.rendered_name = jdbc_db_col_name;
 
-        if (!this.rendered_name.isEmpty() && !_is_rendered_expression(this.rendered_name)) {
+        if (!this.rendered_name.isEmpty()) {
 
             this.rendered_name = this.rendered_name.replace("-", "_"); // for MySQL: `api-key`
             this.rendered_name = this.rendered_name.replace(".", "_"); // [OrderDetails].OrderID
             this.rendered_name = this.rendered_name.replace(":", "_"); // CustomerID:1 -- xerial SQLite3
-            if (!PARAMETER.equals(comment)) {
-                // apply only for fields
-                this.rendered_name = this.rendered_name.replace(" ", "_"); // for MySQL!
-                this.rendered_name = this.rendered_name.replace("[", "");  // [OrderDetails].OrderID
-                this.rendered_name = this.rendered_name.replace("]", "");  // [OrderDetails].OrderID
-            }
+            this.rendered_name = this.rendered_name.replace(" ", "_"); // for MySQL!
+            this.rendered_name = this.rendered_name.replace("[", "");  // [OrderDetails].OrderID
+            this.rendered_name = this.rendered_name.replace("]", "");  // [OrderDetails].OrderID
 
             this.lower_camel_case = Names.lower_camel_case(rendered_name);
 
-            // don't apply to callback-params
             if (FieldNamesMode.LOWER_CAMEL_CASE.equals(field_names_mode)) {
                 this.rendered_name = Names.lower_camel_case(this.rendered_name);
             } else if (FieldNamesMode.TITLE_CASE.equals(field_names_mode)) {
@@ -310,15 +289,19 @@ public class FieldInfo {
         return this.comment;
     }
 
+    String getNamePrefix() {
+        return this.name_prefix;
+    }
+
     // this method is for use in VM templates ONLY
-    public String getterMethod() { // NO_UCD (unused code)
+    public String getterMethod() {
         String s = this.name_prefix + this.rendered_name;
         String X = Names.replace_char_at(s, 0, Character.toUpperCase(s.charAt(0)));
         return "get" + X;
     }
 
     // this method is for use in VM templates ONLY
-    public String setterMethod() { // NO_UCD (unused code)
+    public String setterMethod() {
         String s = this.name_prefix + this.rendered_name;
         String X = Names.replace_char_at(s, 0, Character.toUpperCase(s.charAt(0)));
         return "set" + X;

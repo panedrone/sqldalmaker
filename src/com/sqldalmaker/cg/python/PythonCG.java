@@ -221,7 +221,7 @@ public class PythonCG {
                 String method_name,
                 String crud_table,
                 List<FieldInfo> fields_all,
-                List<FieldInfo> fields_pk,
+                List<ParamInfo> pk_params,
                 boolean out_params) throws Exception {
 
             if (dao_query_jdbc_sql == null) {
@@ -266,7 +266,7 @@ public class PythonCG {
             context.put("imports", imports.values());
             context.put("is_external_sql", is_external_sql);
             context.put("out_params", out_params);
-            _assign_params(fields_pk, context);
+            _assign_params(pk_params, context);
             StringWriter sw = new StringWriter();
             te.merge(context, sw);
             StringBuilder buff = new StringBuilder();
@@ -301,29 +301,29 @@ public class PythonCG {
                 String xml_node_name,
                 String sql_path) throws Exception {
 
-            List<FieldInfo> _params = db_utils.get_dao_exec_dml_params(jdbc_dao_sql, "", param_descriptors);
+            List<ParamInfo> _params = db_utils.get_dao_exec_dml_params(jdbc_dao_sql, "", param_descriptors);
             List<MappingInfo> m_list = new ArrayList<MappingInfo>();
-            List<FieldInfo> method_params = new ArrayList<FieldInfo>();
-            List<FieldInfo> exec_dml_params = new ArrayList<FieldInfo>();
+            List<ParamInfo> method_params = new ArrayList<>();
+            List<ParamInfo> exec_dml_params = new ArrayList<>();
             for (ExecDmlParamSlot slot : ExecDmlParams.parse(param_descriptors)) {
                 if (slot.kind == ExecDmlParamSlot.Kind.CURSOR_ARRAY) {
                     List<String> cb_elements = new ArrayList<String>();
                     for (String[] mapping : slot.cursor_mappings) {
                         MappingInfo m = _create_ref_cursor_mapping(mapping);
                         m_list.add(m);
-                        method_params.add(FieldInfo.parameter(FieldNamesMode.SNAKE_CASE, "callable", m.method_param_name));
+                        method_params.add(new ParamInfo(FieldNamesMode.SNAKE_CASE, "callable", m.method_param_name));
                         cb_elements.add(m.exec_dml_param_name);
                     }
                     String exec_xml_param = "[" + String.join(", ", cb_elements) + "]";
-                    exec_dml_params.add(FieldInfo.parameter(FieldNamesMode.AS_IS, "[]", exec_xml_param));
+                    exec_dml_params.add(new ParamInfo(FieldNamesMode.AS_IS, "[]", exec_xml_param));
                 } else if (slot.kind == ExecDmlParamSlot.Kind.MAPPED) {
                     _params.get(slot.index); // as before: the position must exist among the SQL parameters
                     MappingInfo m = _create_ref_cursor_mapping(slot.mapping);
                     m_list.add(m);
-                    method_params.add(FieldInfo.parameter(FieldNamesMode.SNAKE_CASE, "callable", m.method_param_name));
-                    exec_dml_params.add(FieldInfo.parameter(FieldNamesMode.SNAKE_CASE, "callable", m.exec_dml_param_name));
+                    method_params.add(new ParamInfo(FieldNamesMode.SNAKE_CASE, "callable", m.method_param_name));
+                    exec_dml_params.add(new ParamInfo(FieldNamesMode.SNAKE_CASE, "callable", m.exec_dml_param_name));
                 } else {
-                    FieldInfo p = _params.get(slot.index);
+                    ParamInfo p = _params.get(slot.index);
                     method_params.add(p);
                     exec_dml_params.add(p);
                 }
@@ -361,7 +361,7 @@ public class PythonCG {
             return m;
         }
 
-        private void _assign_params(List<FieldInfo> params, Map<String, Object> context) {
+        private void _assign_params(List<ParamInfo> params, Map<String, Object> context) {
             context.put("dto_param", "");
             context.put("params", params);
         }
@@ -385,15 +385,15 @@ public class PythonCG {
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
             JdbcUtils.DaoSqlInfo _c = db_utils.get_dao_crud_create_info(table_name, jaxb_dto_class, generated);
             String dao_jdbc_sql = _c.sql;
-            List<FieldInfo> fields_not_ai = _c.fields;
-            List<FieldInfo> fields_ai = _c.params;
+            List<ParamInfo> values = _c.params;
+            List<FieldInfo> fields_ai = _c.generated;
             String sql_str = SqlUtils.jdbc_sql_to_python_string(dao_jdbc_sql);
             Map<String, Object> context = new HashMap<String, Object>();
             context.put("method_type", "CREATE");
             context.put("table_name", table_name);
             context.put("sql", sql_str);
             context.put("method_name", method_name);
-            context.put("params", fields_not_ai);
+            context.put("params", values);
             String model = _get_model(dto_class_name);
             context.put("model", model);
             dto_class_name = _get_rendered_dto_class_name(dto_class_name, !model.isEmpty()); // "false" because it is only for comments
@@ -423,9 +423,9 @@ public class PythonCG {
             JdbcUtils.DaoSqlInfo _c = db_utils.get_dao_crud_read_info(dao_table_name, jaxb_dto_class, fetch_list, explicit_pk);
             String dao_jdbc_sql = _c.sql;
             List<FieldInfo> fields_all = _c.fields;
-            List<FieldInfo> fields_pk = _c.params;
+            List<ParamInfo> pk_params = _c.params;
             return _render_query(dao_jdbc_sql, false, dto_class_name, true, fetch_list,
-                    method_name, dao_table_name, fields_all, fields_pk, false);
+                    method_name, dao_table_name, fields_all, pk_params, false);
         }
 
         private StringBuilder _render_crud_update(
@@ -438,16 +438,16 @@ public class PythonCG {
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
             JdbcUtils.DaoSqlInfo _c = db_utils.get_dao_crud_update_info(table_name, jaxb_dto_class, explicit_pk);
             String dao_jdbc_sql = _c.sql;
-            List<FieldInfo> fi_updated = _c.fields;
-            List<FieldInfo> fi_pk = _c.params;
-            if (fi_pk.isEmpty()) {
+            List<ParamInfo> params = ParamInfo.of(_c.fields);
+            List<ParamInfo> pk_params = _c.params;
+            if (pk_params.isEmpty()) {
                 return Helpers.get_no_pk_warning(method_name);
             }
-            if (fi_updated.isEmpty()) {
+            if (params.isEmpty()) {
                 return Helpers.get_only_pk_warning(method_name);
             }
             String sql_str = SqlUtils.jdbc_sql_to_python_string(dao_jdbc_sql);
-            fi_updated.addAll(fi_pk);
+            params.addAll(pk_params);
             Map<String, Object> context = new HashMap<String, Object>();
             context.put("mode", "dao_exec_dml");
             context.put("method_type", "UPDATE");
@@ -461,9 +461,9 @@ public class PythonCG {
             String dto_param = scalar_params || !model.isEmpty() ? "" : dto_class_name;
             context.put("dto_param", dto_param);
             if (!model.isEmpty()) {
-                context.put("params", fi_pk);
+                context.put("params", pk_params);
             } else {
-                context.put("params", fi_updated);
+                context.put("params", params);
             }
             context.put("is_external_sql", false);
             StringWriter sw = new StringWriter();
@@ -482,8 +482,8 @@ public class PythonCG {
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
             JdbcUtils.DaoSqlInfo _c = db_utils.get_dao_crud_delete_info(table_name, jaxb_dto_class, explicit_pk);
             String dao_jdbc_sql = _c.sql;
-            List<FieldInfo> fields_pk = _c.params;
-            if (fields_pk.isEmpty()) {
+            List<ParamInfo> pk_params = _c.params;
+            if (pk_params.isEmpty()) {
                 return Helpers.get_no_pk_warning(method_name);
             }
             String python_sql_str = SqlUtils.jdbc_sql_to_python_string(dao_jdbc_sql);
@@ -500,7 +500,7 @@ public class PythonCG {
             context.put("method_type", "DELETE");
             context.put("table_name", table_name);
             context.put("dto_param", "");
-            context.put("params", fields_pk);
+            context.put("params", pk_params);
             context.put("is_external_sql", false);
             StringWriter sw = new StringWriter();
             te.merge(context, sw);

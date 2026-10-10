@@ -211,7 +211,7 @@ public class PhpCG {
                 String method_name,
                 String crud_table,
                 List<FieldInfo> fields,
-                List<FieldInfo> params) throws Exception {
+                List<ParamInfo> params) throws Exception {
 
             if (dao_query_jdbc_sql == null) {
                 return Helpers.get_no_pk_warning(method_name);
@@ -309,11 +309,11 @@ public class PhpCG {
                 String xml_node_name,
                 String sql_path) throws Exception {
 
-            List<FieldInfo> _params = db_utils.get_dao_exec_dml_params(jdbc_dao_sql, "", param_descriptors);
+            List<ParamInfo> _params = db_utils.get_dao_exec_dml_params(jdbc_dao_sql, "", param_descriptors);
             String sql_str = SqlUtils.jdbc_sql_to_php_str(jdbc_dao_sql);
             List<MappingInfo> m_list = new ArrayList<MappingInfo>();
-            List<FieldInfo> method_params = new ArrayList<FieldInfo>();
-            List<FieldInfo> exec_dml_params = new ArrayList<FieldInfo>();
+            List<ParamInfo> method_params = new ArrayList<>();
+            List<ParamInfo> exec_dml_params = new ArrayList<>();
             for (ExecDmlParamSlot slot : ExecDmlParams.parse(param_descriptors)) {
                 if (slot.kind == ExecDmlParamSlot.Kind.CURSOR_ARRAY) {
                     List<String> cb_elements = new ArrayList<String>();
@@ -321,25 +321,25 @@ public class PhpCG {
                         MappingInfo m = _create_mapping(mapping);
                         m_list.add(m);
                         method_params
-                                .add(FieldInfo.parameter(FieldNamesMode.AS_IS, "function", m.method_param_name));
+                                .add(new ParamInfo(FieldNamesMode.AS_IS, "function", m.method_param_name));
                         cb_elements.add(m.exec_dml_param_name);
                     }
                     String exec_xml_param = "array(" + String.join(", ", cb_elements) + ")";
-                    exec_dml_params.add(FieldInfo.parameter(FieldNamesMode.AS_IS, "[]", exec_xml_param));
+                    exec_dml_params.add(new ParamInfo(FieldNamesMode.AS_IS, "[]", exec_xml_param));
                 } else {
-                    FieldInfo p = _params.get(slot.index);
+                    ParamInfo p = _params.get(slot.index);
                     String target_type_name = this.db_utils.get_target_type_by_type_map(p.getType());
                     if (slot.kind == ExecDmlParamSlot.Kind.MAPPED) {
                         MappingInfo m = _create_mapping(slot.mapping);
                         m_list.add(m);
                         method_params.add(
-                                FieldInfo.parameter(FieldNamesMode.AS_IS, target_type_name, m.method_param_name));
+                                new ParamInfo(FieldNamesMode.AS_IS, target_type_name, m.method_param_name));
                         exec_dml_params.add(
-                                FieldInfo.parameter(FieldNamesMode.AS_IS, target_type_name, m.exec_dml_param_name));
+                                new ParamInfo(FieldNamesMode.AS_IS, target_type_name, m.exec_dml_param_name));
                     } else {
                         method_params.add(p);
                         exec_dml_params
-                                .add(FieldInfo.parameter(FieldNamesMode.AS_IS, target_type_name, "$" + p.getName()));
+                                .add(new ParamInfo(FieldNamesMode.AS_IS, target_type_name, "$" + p.getName()));
                     }
                 }
             }
@@ -375,7 +375,7 @@ public class PhpCG {
             return m;
         }
 
-        private void _assign_params(List<FieldInfo> params, Map<String, Object> context) {
+        private void _assign_params(List<ParamInfo> params, Map<String, Object> context) {
             context.put("dto_param", "");
             context.put("params", params);
         }
@@ -390,8 +390,8 @@ public class PhpCG {
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
             JdbcUtils.DaoSqlInfo _c = db_utils.get_dao_crud_create_info(table_name, jaxb_dto_class, generated);
             String dao_jdbc_sql = _c.sql;
-            List<FieldInfo> fields_not_ai = _c.fields;
-            List<FieldInfo> fields_ai = _c.params;
+            List<ParamInfo> values = _c.params;
+            List<FieldInfo> fields_ai = _c.generated;
             String sql_str = SqlUtils.jdbc_sql_to_php_str(dao_jdbc_sql);
             Map<String, Object> context = new HashMap<String, Object>();
             context.put("method_type", "CREATE");
@@ -400,7 +400,7 @@ public class PhpCG {
             context.put("table_name", table_name);
             context.put("sql", sql_str);
             context.put("method_name", method_name);
-            context.put("params", fields_not_ai);
+            context.put("params", values);
             StringBuilder rendered_class_name = new StringBuilder();
             _process_rendered_dto_class_name(dto_class_name, rendered_class_name);
             context.put("dto_param", rendered_class_name.toString());
@@ -429,9 +429,9 @@ public class PhpCG {
             JdbcUtils.DaoSqlInfo _c = db_utils.get_dao_crud_read_info(dao_table_name, jaxb_dto_class, fetch_list, explicit_pk);
             String dao_jdbc_sql = _c.sql;
             List<FieldInfo> fields_all = _c.fields;
-            List<FieldInfo> fields_pk = _c.params;
+            List<ParamInfo> pk_params = _c.params;
             return _render_query(dao_jdbc_sql, false, dto_class_name, true, fetch_list, method_name, dao_table_name,
-                    fields_all, fields_pk);
+                    fields_all, pk_params);
         }
 
         private StringBuilder _render_crud_update(
@@ -444,16 +444,16 @@ public class PhpCG {
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
             JdbcUtils.DaoSqlInfo _c = db_utils.get_dao_crud_update_info(table_name, jaxb_dto_class, explicit_pk);
             String dao_jdbc_sql = _c.sql;
-            List<FieldInfo> updated_fields = _c.fields;
-            List<FieldInfo> fields_pk = _c.params;
-            if (fields_pk.isEmpty()) {
+            List<ParamInfo> params = ParamInfo.of(_c.fields);
+            List<ParamInfo> pk_params = _c.params;
+            if (pk_params.isEmpty()) {
                 return Helpers.get_no_pk_warning(method_name);
             }
-            if (updated_fields.isEmpty()) {
+            if (params.isEmpty()) {
                 return Helpers.get_only_pk_warning(method_name);
             }
             String sql_str = SqlUtils.jdbc_sql_to_php_str(dao_jdbc_sql);
-            updated_fields.addAll(fields_pk);
+            params.addAll(pk_params);
             Map<String, Object> context = new HashMap<String, Object>();
             context.put("mode", "dao_exec_dml");
             context.put("method_type", "UPDATE");
@@ -471,7 +471,7 @@ public class PhpCG {
                 _process_rendered_dto_class_name(dto_class_name, rendered_class_name);
                 context.put("dto_param", rendered_class_name.toString());
             }
-            context.put("params", updated_fields);
+            context.put("params", params);
             context.put("is_external_sql", false);
             StringWriter sw = new StringWriter();
             te.merge(context, sw);
@@ -489,8 +489,8 @@ public class PhpCG {
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
             JdbcUtils.DaoSqlInfo _c = db_utils.get_dao_crud_delete_info(table_name, jaxb_dto_class, explicit_pk);
             String dao_jdbc_sql = _c.sql;
-            List<FieldInfo> fields_pk = _c.params;
-            if (fields_pk.isEmpty()) {
+            List<ParamInfo> pk_params = _c.params;
+            if (pk_params.isEmpty()) {
                 return Helpers.get_no_pk_warning(method_name);
             }
             String sql_str = SqlUtils.jdbc_sql_to_php_str(dao_jdbc_sql);
@@ -509,7 +509,7 @@ public class PhpCG {
                 _process_rendered_dto_class_name(dto_class_name, rendered_class_name);
                 context.put("dto_param", rendered_class_name.toString());
             }
-            context.put("params", fields_pk);
+            context.put("params", pk_params);
             context.put("is_external_sql", false);
             StringWriter sw = new StringWriter();
             te.merge(context, sw);

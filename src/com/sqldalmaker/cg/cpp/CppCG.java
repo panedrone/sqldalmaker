@@ -176,7 +176,7 @@ public class CppCG {
                 String method_name,
                 String crud_table,
                 List<FieldInfo> fields_all,
-                List<FieldInfo> fields_pk) throws Exception {
+                List<ParamInfo> pk_params) throws Exception {
 
             if (dao_query_jdbc_sql == null) {
                 return Helpers.get_no_pk_warning(method_name);
@@ -202,7 +202,7 @@ public class CppCG {
             context.put("fetch_list", fetch_list);
             context.put("imports", imports);
             context.put("is_external_sql", is_external_sql);
-            _assign_params(fields_pk, context);
+            _assign_params(pk_params, context);
             StringWriter sw = new StringWriter();
             te.merge(context, sw);
             StringBuilder buff = new StringBuilder();
@@ -229,7 +229,7 @@ public class CppCG {
                 String xml_node_name,
                 String sql_path) throws Exception {
 
-            List<FieldInfo> params = db_utils.get_dao_exec_dml_params(dao_jdbc_sql, "", param_descriptors);
+            List<ParamInfo> params = db_utils.get_dao_exec_dml_params(dao_jdbc_sql, "", param_descriptors);
             String sql_str = SqlUtils.jdbc_sql_to_cpp_str(dao_jdbc_sql);
             Map<String, Object> context = new HashMap<String, Object>();
             _assign_params(params, context);
@@ -244,7 +244,7 @@ public class CppCG {
             buffer.append(sw.getBuffer());
         }
 
-        private void _assign_params(List<FieldInfo> params, Map<String, Object> context) {
+        private void _assign_params(List<ParamInfo> params, Map<String, Object> context) {
             context.put("dto_param", "");
             context.put("params", params);
         }
@@ -259,15 +259,15 @@ public class CppCG {
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
             JdbcUtils.DaoSqlInfo _c = db_utils.get_dao_crud_create_info(table_name, jaxb_dto_class, generated);
             String dao_jdbc_sql = _c.sql;
-            List<FieldInfo> fields_not_ai = _c.fields;
-            List<FieldInfo> fields_ai = _c.params;
+            List<ParamInfo> values = _c.params;
+            List<FieldInfo> fields_ai = _c.generated;
             String sql_str = SqlUtils.jdbc_sql_to_cpp_str(dao_jdbc_sql);
             Map<String, Object> context = new HashMap<String, Object>();
             context.put("method_type", "CREATE");
             context.put("table_name", table_name);
             context.put("sql", sql_str);
             context.put("method_name", method_name);
-            context.put("params", fields_not_ai);
+            context.put("params", values);
             context.put("dto_param", _get_rendered_dto_class_name(dto_class_name));
             if (fetch_generated && !fields_ai.isEmpty()) {
                 context.put("keys", fields_ai);
@@ -294,9 +294,9 @@ public class CppCG {
             JdbcUtils.DaoSqlInfo _c = db_utils.get_dao_crud_read_info(dao_table_name, jaxb_dto_class, fetch_list, explicit_pk);
             String dao_jdbc_sql = _c.sql;
             List<FieldInfo> fields_all = _c.fields;
-            List<FieldInfo> fields_pk = _c.params;
+            List<ParamInfo> pk_params = _c.params;
             return _render_query(dao_jdbc_sql, false, dto_class_name, true, fetch_list,
-                    method_name, dao_table_name, fields_all, fields_pk);
+                    method_name, dao_table_name, fields_all, pk_params);
         }
 
         private StringBuilder _render_crud_update(
@@ -309,16 +309,16 @@ public class CppCG {
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
             JdbcUtils.DaoSqlInfo _c = db_utils.get_dao_crud_update_info(table_name, jaxb_dto_class, explicit_pk);
             String dao_jdbc_sql = _c.sql;
-            List<FieldInfo> updated_fields = _c.fields;
-            List<FieldInfo> fields_pk = _c.params;
-            if (fields_pk.isEmpty()) {
+            List<ParamInfo> params = ParamInfo.of(_c.fields);
+            List<ParamInfo> pk_params = _c.params;
+            if (pk_params.isEmpty()) {
                 return Helpers.get_no_pk_warning(method_name);
             }
-            if (updated_fields.isEmpty()) {
+            if (params.isEmpty()) {
                 return Helpers.get_only_pk_warning(method_name);
             }
             String sql_str = SqlUtils.jdbc_sql_to_cpp_str(dao_jdbc_sql);
-            updated_fields.addAll(fields_pk);
+            params.addAll(pk_params);
             Map<String, Object> context = new HashMap<String, Object>();
             context.put("mode", "dao_exec_dml");
             context.put("method_name", method_name);
@@ -327,7 +327,7 @@ public class CppCG {
             context.put("table_name", table_name);
             context.put("comment", "Updates specified record of the table '" + table_name + "'.");
             context.put("dto_param", scalar_params ? "" : _get_rendered_dto_class_name(dto_class_name));
-            context.put("params", updated_fields);
+            context.put("params", params);
             context.put("external_sql", false);
             StringWriter sw = new StringWriter();
             te.merge(context, sw);
@@ -345,8 +345,8 @@ public class CppCG {
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
             JdbcUtils.DaoSqlInfo _c = db_utils.get_dao_crud_delete_info(table_name, jaxb_dto_class, explicit_pk);
             String dao_jdbc_sql = _c.sql;
-            List<FieldInfo> fields_pk = _c.params;
-            if (fields_pk.isEmpty()) {
+            List<ParamInfo> pk_params = _c.params;
+            if (pk_params.isEmpty()) {
                 return Helpers.get_no_pk_warning(method_name);
             }
             String cpp_sql_str = SqlUtils.jdbc_sql_to_cpp_str(dao_jdbc_sql);
@@ -358,7 +358,7 @@ public class CppCG {
             context.put("table_name", table_name);
             context.put("comment", "Deletes specified record from the table '" + table_name + "'.");
             context.put("dto_param", "");
-            context.put("params", fields_pk);
+            context.put("params", pk_params);
             context.put("external_sql", false);
             StringWriter sw = new StringWriter();
             te.merge(context, sw);

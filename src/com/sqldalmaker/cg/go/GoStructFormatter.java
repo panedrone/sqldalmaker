@@ -34,7 +34,7 @@ class GoStructFormatter {
         Map<String, FieldsBlock> res = new HashMap<String, FieldsBlock>();
         FieldsBlock current_block = null;
         for (FieldInfo fi : fields) {
-            String just_type = GoTypes.get_type_without_import_and_tag(fi);
+            String just_type = GoTypes.get_type_without_import_and_tag(fi.getType());
             if (fi.getName().isEmpty()) {
                 continue;
             }
@@ -65,7 +65,7 @@ class GoStructFormatter {
         Map<String, FieldsBlock> res = new HashMap<String, FieldsBlock>();
         FieldsBlock current_block = null;
         for (FieldInfo fi : fields) {
-            String just_type = GoTypes.get_type_without_import_and_tag(fi);
+            String just_type = GoTypes.get_type_without_import_and_tag(fi.getType());
             if (fi.getName().isEmpty()) {
                 continue;
             }
@@ -102,7 +102,7 @@ class GoStructFormatter {
         int max_name_len = -1;
         List<FormattedField> formatted_fields = new ArrayList<FormattedField>();
         for (FieldInfo fi : fields) {
-            String just_type = GoTypes.get_type_without_import_and_tag(fi);
+            String just_type = GoTypes.get_type_without_import_and_tag(fi.getType());
             String name = fi.getName();
             if (name.isEmpty()) {
                 formatted_fields.add(new FormattedField(just_type));
@@ -156,7 +156,7 @@ class GoStructFormatter {
 
         final String name_format = "%-" + max_name_len + "." + max_name_len + "s";
         for (FieldInfo fi : fields) {
-            String just_type = GoTypes.get_type_without_import_and_tag(fi);
+            String just_type = GoTypes.get_type_without_import_and_tag(fi.getType());
             if (fi.getName().isEmpty()) {
                 continue;
             }

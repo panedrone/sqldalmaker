@@ -102,7 +102,7 @@ public class GoCG {
             List<FormattedField> formatted_fields = GoStructFormatter.format_fields(jaxb_dto_class, fields); // !!! before imports
             Set<String> imports_set = new HashSet<String>();
             for (FieldInfo fi : fields) {
-                String type_import = GoTypes.get_type_import(fi);
+                String type_import = GoTypes.get_type_import(fi.getType());
                 if (type_import != null) {
                     imports_set.add(type_import);
                 }
@@ -256,7 +256,7 @@ public class GoCG {
                 // String dto_param_type,
                 String crud_table,
                 List<FieldInfo> fields,
-                List<FieldInfo> params) throws Exception {
+                List<ParamInfo> params) throws Exception {
 
             if (dao_query_jdbc_sql == null) {
                 return Helpers.get_no_pk_warning(method_name);
@@ -266,11 +266,11 @@ public class GoCG {
                 returned_type_name = _get_rendered_dto_class_name(dto_or_scalar_return_type);
             } else {
                 FieldInfo ret_fi = fields.get(0);
-                String imp = GoTypes.get_type_import(ret_fi);
+                String imp = GoTypes.get_type_import(ret_fi.getType());
                 if (imp != null) {
                     imports.add(imp);
                 }
-                returned_type_name = GoTypes.get_type_without_import_and_tag(ret_fi);
+                returned_type_name = GoTypes.get_type_without_import_and_tag(ret_fi.getType());
                 fields.set(0, FieldInfo.with_rendered_type(ret_fi, returned_type_name));
             }
             String go_sql_str = SqlUtils.format_jdbc_sql_for_go(dao_query_jdbc_sql);
@@ -367,12 +367,12 @@ public class GoCG {
                 String xml_node_name,
                 String sql_path) throws Exception {
 
-            List<FieldInfo> _params = db_utils.get_dao_exec_dml_params(jdbc_dao_sql, "", param_descriptors);
+            List<ParamInfo> _params = db_utils.get_dao_exec_dml_params(jdbc_dao_sql, "", param_descriptors);
             _strip_imports_and_tags(_params);
             String go_sql = SqlUtils.format_jdbc_sql_for_go(jdbc_dao_sql);
             List<MappingInfo> m_list = new ArrayList<MappingInfo>();
-            List<FieldInfo> method_params = new ArrayList<FieldInfo>();
-            List<FieldInfo> exec_dml_params = new ArrayList<FieldInfo>();
+            List<ParamInfo> method_params = new ArrayList<>();
+            List<ParamInfo> exec_dml_params = new ArrayList<>();
             for (ExecDmlParamSlot slot : ExecDmlParams.parse(param_descriptors)) {
                 if (slot.kind == ExecDmlParamSlot.Kind.CURSOR_ARRAY) {
                     List<String> cb_elements = new ArrayList<String>();
@@ -380,23 +380,23 @@ public class GoCG {
                         MappingInfo m = _create_mapping(mapping);
                         m_list.add(m);
                         String func_type = String.format("func(*%s)", m.dto_class_name);
-                        method_params.add(FieldInfo.parameter(FieldNamesMode.LOWER_CAMEL_CASE, func_type, m.method_param_name));
+                        method_params.add(new ParamInfo(FieldNamesMode.LOWER_CAMEL_CASE, func_type, m.method_param_name));
                         cb_elements.add(m.exec_dml_param_name);
                     }
                     // no "(Object) " cast in here: unlike Java varargs, a Go variadic
                     // parameter needs no help to accept a slice as one argument
                     String exec_xml_param = "[]interface{}{" + String.join(", ", cb_elements) + "}";
-                    exec_dml_params.add(FieldInfo.parameter(FieldNamesMode.AS_IS, "[]", exec_xml_param));
+                    exec_dml_params.add(new ParamInfo(FieldNamesMode.AS_IS, "[]", exec_xml_param));
                 } else if (slot.kind == ExecDmlParamSlot.Kind.MAPPED) {
-                    FieldInfo p = _params.get(slot.index);
+                    ParamInfo p = _params.get(slot.index);
                     MappingInfo m = _create_mapping(slot.mapping);
                     m_list.add(m);
                     String func_type = String.format("func(*%s)", m.dto_class_name);
-                    method_params.add(FieldInfo.parameter(FieldNamesMode.LOWER_CAMEL_CASE, func_type, m.method_param_name));
+                    method_params.add(new ParamInfo(FieldNamesMode.LOWER_CAMEL_CASE, func_type, m.method_param_name));
                     String target_type_name = this.db_utils.get_target_type_by_type_map(p.getType());
-                    exec_dml_params.add(FieldInfo.parameter(FieldNamesMode.AS_IS, target_type_name, m.exec_dml_param_name));
+                    exec_dml_params.add(new ParamInfo(FieldNamesMode.AS_IS, target_type_name, m.exec_dml_param_name));
                 } else {
-                    FieldInfo p = _params.get(slot.index);
+                    ParamInfo p = _params.get(slot.index);
                     method_params.add(p);
                     exec_dml_params.add(p);
                 }
@@ -434,7 +434,7 @@ public class GoCG {
             return m;
         }
 
-        private void _assign_params_and_imports(List<FieldInfo> params, String dto_param_type, Map<String, Object> context) throws Exception {
+        private void _assign_params_and_imports(List<ParamInfo> params, String dto_param_type, Map<String, Object> context) throws Exception {
             int params_count = params.size();
             boolean plain_params;
             if (dto_param_type != null && !dto_param_type.isEmpty()) {
@@ -461,15 +461,15 @@ public class GoCG {
         }
 
         // the types of parameters are rendered without imports and tags, the imports go to 'imports'
-        private void _strip_imports_and_tags(List<FieldInfo> params) {
+        private void _strip_imports_and_tags(List<ParamInfo> params) {
             for (int i = 0; i < params.size(); i++) {
-                FieldInfo pi = params.get(i);
-                String imp = GoTypes.get_type_import(pi);
+                ParamInfo pi = params.get(i);
+                String imp = GoTypes.get_type_import(pi.getType());
                 if (imp != null) {
                     imports.add(imp);
                 }
-                String just_type = GoTypes.get_type_without_import_and_tag(pi);
-                params.set(i, FieldInfo.with_rendered_type(pi, just_type));
+                String just_type = GoTypes.get_type_without_import_and_tag(pi.getType());
+                params.set(i, ParamInfo.with_type(pi, just_type));
             }
         }
 
@@ -492,8 +492,8 @@ public class GoCG {
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
             JdbcUtils.DaoSqlInfo _c = db_utils.get_dao_crud_create_info(table_name, jaxb_dto_class, generated);
             String dao_jdbc_sql = _c.sql;
-            List<FieldInfo> fields_not_ai = _c.fields;
-            List<FieldInfo> fields_ai = _c.params;
+            List<ParamInfo> values = _c.params;
+            List<FieldInfo> fields_ai = _c.generated;
             String go_sql_str = SqlUtils.format_jdbc_sql_for_go(dao_jdbc_sql);
             Map<String, Object> context = new HashMap<String, Object>();
             context.put("method_type", "CREATE");
@@ -502,7 +502,7 @@ public class GoCG {
             _set_model(dto_class_name, context);
             context.put("sql", go_sql_str);
             context.put("method_name", method_name);
-            context.put("params", fields_not_ai);
+            context.put("params", values);
             context.put("dto_param", _get_rendered_dto_class_name(dto_class_name));
             if (fetch_generated && !fields_ai.isEmpty()) {
                 List<String> ai_names = new ArrayList<String>();
@@ -536,10 +536,8 @@ public class GoCG {
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
             JdbcUtils.DaoSqlInfo _c = db_utils.get_dao_crud_read_info(dao_table_name, jaxb_dto_class, fetch_list, explicit_pk);
             String dao_jdbc_sql = _c.sql;
-            List<FieldInfo> fields_all = _c.fields;
-            List<FieldInfo> fields_pk = _c.params;
             return _render_query(dao_jdbc_sql, false, dto_class_name, true, fetch_list, method_name, dao_table_name,
-                    fields_all, fields_pk);
+                    _c.fields, _c.params);
         }
 
         private StringBuilder _render_crud_update(
@@ -553,8 +551,8 @@ public class GoCG {
             JdbcUtils.DaoSqlInfo _c = db_utils.get_dao_crud_update_info(table_name, jaxb_dto_class, explicit_pk);
             String dao_jdbc_sql = _c.sql;
             List<FieldInfo> fields_not_pk = _c.fields;
-            List<FieldInfo> fields_pk = _c.params;
-            if (fields_pk.isEmpty()) {
+            List<ParamInfo> pk_params = _c.params;
+            if (pk_params.isEmpty()) {
                 return Helpers.get_no_pk_warning(method_name);
             }
             if (fields_not_pk.isEmpty()) {
@@ -569,9 +567,8 @@ public class GoCG {
             context.put("method_name", method_name);
             context.put("is_external_sql", false);
             context.put("sql", go_sql_str);
-            List<FieldInfo> params = new ArrayList<FieldInfo>();
-            params.addAll(fields_not_pk);
-            params.addAll(fields_pk);
+            List<ParamInfo> params = ParamInfo.of(fields_not_pk);
+            params.addAll(pk_params);
             String dto_param = scalar_params ? "" : dto_class_name;
             _assign_params_and_imports(params, dto_param, context);
             StringWriter sw = new StringWriter();
@@ -590,8 +587,8 @@ public class GoCG {
             DtoClass jaxb_dto_class = JaxbUtils.find_jaxb_dto_class(dto_class_name, jaxb_dto_classes);
             JdbcUtils.DaoSqlInfo _c = db_utils.get_dao_crud_delete_info(table_name, jaxb_dto_class, explicit_pk);
             String dao_jdbc_sql = _c.sql;
-            List<FieldInfo> fields_pk = _c.params;
-            if (fields_pk.isEmpty()) {
+            List<ParamInfo> pk_params = _c.params;
+            if (pk_params.isEmpty()) {
                 return Helpers.get_no_pk_warning(method_name);
             }
             String go_sql_str = SqlUtils.format_jdbc_sql_for_go(dao_jdbc_sql);
@@ -602,7 +599,7 @@ public class GoCG {
             context.put("method_name", method_name);
             context.put("sql", go_sql_str);
             context.put("is_external_sql", false);
-            _assign_params_and_imports(fields_pk, dto_class_name, context);
+            _assign_params_and_imports(pk_params, dto_class_name, context);
             _set_model(dto_class_name, context);
             StringWriter sw = new StringWriter();
             te.merge(context, sw);

@@ -7,18 +7,18 @@ package com.sqldalmaker.cg;
 
 import com.sqldalmaker.jaxb.sdm.DtoClass;
 
-import java.sql.Connection;
-
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.Map;
-import java.util.HashMap;
-import java.util.ArrayList;
+import java.util.Set;
 
 /*
  * @author sqldalmaker@gmail.com
  *
+ * 10.10.2026 1.333 Claude: reads through IDbMetadata, returns values
  * 30.08.2026 14:00 1.331 Claude refactor
  * 30.05.2024 20:00 1.299
  * 06.04.2023 02:56 1.281
@@ -35,177 +35,151 @@ import java.util.ArrayList;
  */
 class DtoClassInfo {
 
-    private final Connection conn;
+    private final IDbMetadata md;
 
     private final JaxbTypeMap jaxb_type_map;
     private final JaxbMacros jaxb_macros;
 
     private final FieldNamesMode dto_field_names_mode;
 
-    public DtoClassInfo(
-            Connection conn,
+    DtoClassInfo(
+            IDbMetadata md,
             JaxbTypeMap jaxb_type_map,
             JaxbMacros macros,
             FieldNamesMode dto_field_names_mode) {
 
-        this.conn = conn;
+        this.md = md;
         this.jaxb_type_map = jaxb_type_map;
         this.jaxb_macros = macros;
         this.dto_field_names_mode = dto_field_names_mode;
     }
 
-    public List<FieldInfo> get_field_info_for_wizard(DtoClass jaxb_dto_class, String sql_root_abs_path) throws Exception {
-        List<FieldInfo> res_dto_fields = new ArrayList<FieldInfo>();
-        _prepare_by_jdbc(false, jaxb_dto_class, sql_root_abs_path, res_dto_fields);
-        for (int i = 0; i < res_dto_fields.size(); i++) {
-            FieldInfo fi = res_dto_fields.get(i);
-            String type_name = fi.getType();
-            type_name = jaxb_type_map.get_target_type_name(type_name);
-            res_dto_fields.set(i, FieldInfo.with_rendered_type(fi, type_name)); // field wizard wants rendered types
+    List<FieldInfo> get_field_info_for_wizard(DtoClass jaxb_dto_class, String sql_root_abs_path) throws Exception {
+        List<FieldInfo> res = new ArrayList<>();
+        for (FieldInfo fi : _get_fields_by_ref(false, jaxb_dto_class, sql_root_abs_path)) {
+            String type_name = jaxb_type_map.get_target_type_name(fi.getType());
+            res.add(FieldInfo.with_rendered_type(fi, type_name)); // field wizard wants rendered types
         }
-        return res_dto_fields;
+        return Collections.unmodifiableList(res);
     }
 
-    public Map<String, FieldInfo> get_dto_field_info(
+    List<FieldInfo> get_dto_fields(
             boolean ignore_model,
             DtoClass jaxb_dto_class,
-            String sql_root_abs_path,
-            List<FieldInfo> res_dto_fields) throws Exception {
+            String sql_root_abs_path) throws Exception {
 
         try {
-            Map<String, FieldInfo> fields_map = _prepare_by_jdbc(ignore_model, jaxb_dto_class, sql_root_abs_path, res_dto_fields);
-            _refine_field_info(fields_map, jaxb_dto_class, res_dto_fields);
-            return fields_map;
+            List<FieldInfo> fields = _get_fields_by_ref(ignore_model, jaxb_dto_class, sql_root_abs_path);
+            fields = _refine_by_field_jaxb(jaxb_dto_class, fields);
+            fields = _refine_scalar_types_by_type_map(fields);
+            return Collections.unmodifiableList(fields);
         } catch (Exception e) {
             throw new Exception(String.format("<dto-class name=\"%s\"... %s: %s",
                     jaxb_dto_class.getName(), e.getClass().getName(), e.getMessage()));
         }
     }
 
-    private void _refine_field_info(
-            Map<String, FieldInfo> fields_map,
-            DtoClass jaxb_dto_class,
-            List<FieldInfo> res_dto_fields) throws Exception {
-
-        _refine_by_field_jaxb(jaxb_dto_class, res_dto_fields, fields_map);
-        _refine_scalar_types_by_type_map(res_dto_fields, fields_map);
-    }
-
-    private void _refine_scalar_types_by_type_map(List<FieldInfo> dto_fields, Map<String, FieldInfo> fields_map) {
-        for (FieldInfo fi : new ArrayList<FieldInfo>(dto_fields)) {
-            String type_name = fi.getScalarType();
-            type_name = jaxb_type_map.get_target_type_name(type_name);
-            FieldInfoLists.replace(dto_fields, fields_map, fi, FieldInfo.with_scalar_type(fi, type_name));
+    // "column name --> field"; the last one wins if a SQL returns the same column twice
+    static Map<String, FieldInfo> by_column_name(List<FieldInfo> fields) {
+        Map<String, FieldInfo> res = new HashMap<>();
+        for (FieldInfo fi : fields) {
+            res.put(fi.getColumnName(), fi);
         }
+        return res;
     }
 
-    private Map<String, FieldInfo> _prepare_by_jdbc(
+    private List<FieldInfo> _refine_scalar_types_by_type_map(List<FieldInfo> dto_fields) {
+        List<FieldInfo> res = new ArrayList<>();
+        for (FieldInfo fi : dto_fields) {
+            String type_name = jaxb_type_map.get_target_type_name(fi.getScalarType());
+            res.add(FieldInfo.with_scalar_type(fi, type_name));
+        }
+        return res;
+    }
+
+    private List<FieldInfo> _get_fields_by_ref(
             boolean ignore_model,
             DtoClass jaxb_dto_class,
-            String sql_root_abs_path,
-            List<FieldInfo> res_dto_fields) throws Exception {
+            String sql_root_abs_path) throws Exception {
 
-        String dto_class_name = jaxb_dto_class.getName();
         String model = "";
         if (!ignore_model) {
+            String dto_class_name = jaxb_dto_class.getName();
             int model_name_end_index = dto_class_name.indexOf('-');
             if (model_name_end_index != -1) {
                 model = dto_class_name.substring(0, model_name_end_index + 1);
             }
         }
         String jaxb_dto_class_ref = jaxb_dto_class.getRef();
-        Map<String, FieldInfo> fields_map = _prepare_by_jdbc(model, jaxb_dto_class_ref,
-                jaxb_dto_class.getAuto(), jaxb_dto_class.getPk(), sql_root_abs_path, res_dto_fields);
-        return fields_map;
-    }
-
-    private Map<String, FieldInfo> _prepare_by_jdbc(
-            String model,
-            String jaxb_dto_class_ref,
-            String jaxb_dto_class_auto,
-            String jaxb_dto_class_explicit_pk,
-            String sql_root_abs_path,
-            List<FieldInfo> res_dto_fields) throws Exception {
-
-        Map<String, FieldInfo> fields_map = new HashMap<String, FieldInfo>();
-        res_dto_fields.clear();
-        if (!SqlUtils.is_empty_ref(jaxb_dto_class_ref)) {
-            String jdbc_sql = SqlUtils.jdbc_sql_by_dto_class_ref(jaxb_dto_class_ref, sql_root_abs_path);
-            // get fields from sql first to omit invisible/db-specific fields
-            JdbcSqlFieldInfo.get_field_info_by_jdbc_sql(model, conn, dto_field_names_mode, jdbc_sql, jaxb_dto_class_explicit_pk,
-                    fields_map, res_dto_fields);
-            if (SqlUtils.is_table_ref(jaxb_dto_class_ref)) {
-                String table_name = jaxb_dto_class_ref;
-                _fill_by_table(jaxb_dto_class_auto, model, table_name, res_dto_fields, fields_map);
-            } else if (SqlUtils.is_sql_shortcut_ref(jaxb_dto_class_ref)) {
-                SqlUtils.SqlShortcut shc = SqlUtils.parse_sql_shortcut_ref(jaxb_dto_class_ref);
-                _fill_by_table(jaxb_dto_class_auto, model, shc.table_name, res_dto_fields, fields_map);
+        if (SqlUtils.is_empty_ref(jaxb_dto_class_ref)) {
+            return new ArrayList<>();
+        }
+        String jdbc_sql = SqlUtils.jdbc_sql_by_dto_class_ref(jaxb_dto_class_ref, sql_root_abs_path);
+        // get fields from sql first to omit invisible/db-specific fields
+        List<FieldInfo> sql_fields = ColumnFields.create(md.read_sql_columns(jdbc_sql), model,
+                dto_field_names_mode, jaxb_dto_class.getPk());
+        String table_name;
+        if (SqlUtils.is_table_ref(jaxb_dto_class_ref)) {
+            table_name = jaxb_dto_class_ref;
+        } else if (SqlUtils.is_sql_shortcut_ref(jaxb_dto_class_ref)) {
+            table_name = SqlUtils.parse_sql_shortcut_ref(jaxb_dto_class_ref).table_name;
+        } else {
+            return new ArrayList<>(sql_fields);
+        }
+        // the columns of the table that the SQL returns, but with the table metadata
+        Set<String> sql_col_names = new HashSet<>(ColumnFields.column_names(sql_fields));
+        TableFields table = TableFields.read(md, jaxb_type_map, dto_field_names_mode, model, table_name,
+                "*", jaxb_dto_class.getAuto());
+        List<FieldInfo> res = new ArrayList<>();
+        for (FieldInfo fi : table.fields_all) {
+            if (sql_col_names.contains(fi.getColumnName())) {
+                res.add(fi);
             }
         }
-        return fields_map;
+        return res;
     }
 
-    private void _refine_by_field_jaxb(
-            DtoClass jaxb_dto_class,
-            List<FieldInfo> dto_fields,
-            Map<String, FieldInfo> fields_map) throws Exception {
-
-        Set<String> refined_by_field_jaxb = new HashSet<String>();
-        Set<String> excluded_col_names = new HashSet<String>();
+    private List<FieldInfo> _refine_by_field_jaxb(DtoClass jaxb_dto_class, List<FieldInfo> dto_fields) throws Exception {
+        List<FieldInfo> res = new ArrayList<>(dto_fields);
+        // a column is refined where it occurs the last time (if a SQL returns it twice)
+        Map<String, Integer> index_by_col_name = new HashMap<>();
+        for (int i = 0; i < res.size(); i++) {
+            index_by_col_name.put(res.get(i).getColumnName(), i);
+        }
+        Set<String> refined_by_field_jaxb = new HashSet<>();
+        Set<Integer> excluded = new HashSet<>();
         List<DtoClass.Field> jaxb_fields = jaxb_dto_class.getField(); // not null!!
         for (DtoClass.Field jaxb_field : jaxb_fields) {
             String jaxb_field_col_name = jaxb_field.getColumn();
             String jaxb_field_type_name = jaxb_field.getType();
-            FieldInfo fi;
-            if (fields_map.containsKey(jaxb_field_col_name)) {
-                fi = fields_map.get(jaxb_field_col_name);
-            } else { // add the field declared in XML, but missing in SQL
-                fi = new FieldInfo(dto_field_names_mode, jaxb_field_type_name, jaxb_field_col_name,
-                        "xml(" + jaxb_field_col_name + ")");
-                dto_fields.add(fi);
-                fields_map.put(jaxb_field_col_name, fi);
+            Integer i = index_by_col_name.get(jaxb_field_col_name);
+            if (i == null) { // add the field declared in XML, but missing in SQL
+                res.add(new FieldInfo(dto_field_names_mode, jaxb_field_type_name, jaxb_field_col_name,
+                        "xml(" + jaxb_field_col_name + ")"));
+                i = res.size() - 1;
+                index_by_col_name.put(jaxb_field_col_name, i);
             }
-            if (jaxb_field.getType().trim().equals("-")) {
-                excluded_col_names.add(fi.getColumnName());
+            FieldInfo fi = res.get(i);
+            if (jaxb_field_type_name.trim().equals("-")) {
+                excluded.add(i);
             }
-            FieldInfo refined_fi = _refine_fi_by_type_map_and_macros(fi, jaxb_field_type_name);
-            refined_fi = FieldInfo.with_scalar_type(refined_fi, jaxb_field_type_name);
-            FieldInfoLists.replace(dto_fields, fields_map, fi, refined_fi);
-            refined_by_field_jaxb.add(fi.getColumnName());
+            fi = _refine_fi_by_type_map_and_macros(fi, jaxb_field_type_name);
+            res.set(i, FieldInfo.with_scalar_type(fi, jaxb_field_type_name));
+            refined_by_field_jaxb.add(jaxb_field_col_name);
         }
-        for (String col_nm : excluded_col_names) {
-            // the one in the map is the one that was refined (and excluded) above
-            dto_fields.remove(fields_map.get(col_nm));
-            fields_map.remove(col_nm);
-        }
-        for (FieldInfo fi : new ArrayList<FieldInfo>(dto_fields)) {
-            if (refined_by_field_jaxb.contains(fi.getColumnName())) {
+        List<FieldInfo> refined = new ArrayList<>();
+        for (int i = 0; i < res.size(); i++) {
+            if (excluded.contains(i)) {
                 continue;
             }
-            String type_name = fi.getType().trim(); // !!! getType(), not getOriginalType()
-            FieldInfoLists.replace(dto_fields, fields_map, fi, _refine_fi_by_type_map_and_macros(fi, type_name));
-        }
-    }
-
-    private void _fill_by_table(
-            String auto_column,
-            String model,
-            String table_name,
-            List<FieldInfo> res_dto_fields,
-            Map<String, FieldInfo> fields_map) throws Exception {
-
-        res_dto_fields.clear();
-        String explicit_pk = "*";
-        JdbcTableInfo table_info = new JdbcTableInfo(model, conn, jaxb_type_map, dto_field_names_mode, table_name, explicit_pk, auto_column);
-        for (FieldInfo fi : table_info.fields_all) {
-            String col_nm = fi.getColumnName();
-            if (fields_map.containsKey(col_nm)) {
-                res_dto_fields.add(fi);
-                fields_map.replace(col_nm, fi);
-            } else {
-                fields_map.remove(col_nm);
+            FieldInfo fi = res.get(i);
+            if (!refined_by_field_jaxb.contains(fi.getColumnName())) {
+                String type_name = fi.getType().trim(); // !!! getType(), not getOriginalType()
+                fi = _refine_fi_by_type_map_and_macros(fi, type_name);
             }
+            refined.add(fi);
         }
+        return refined;
     }
 
     private FieldInfo _refine_fi_by_type_map_and_macros(FieldInfo fi, String type_name) throws Exception {
