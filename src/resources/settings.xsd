@@ -10,6 +10,7 @@
                 <xs:element ref="dao"/>
                 <xs:element ref="ide"/>
                 <xs:element ref="jdbc"/>
+                <xs:element ref="go-db" minOccurs="0"/>
                 <xs:element ref="type-map"/>
                 <xs:element ref="macros"/>
             </xs:sequence>
@@ -48,6 +49,17 @@
             <xs:attribute name="url" use="required" type="xs:string"/>
             <xs:attribute name="user" use="required" type="xs:string"/>
             <xs:attribute name="pwd" use="required" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="go-db">
+        <xs:annotation>
+            <xs:documentation>The database of go-sdm (https://github.com/panedrone/go-sdm).
+                The IDE plug-ins use "jdbc" and ignore "go-db".</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:attribute name="url" use="required" type="xs:string"/>
+            <xs:attribute name="user" use="optional" type="xs:string"/>
+            <xs:attribute name="pwd" use="optional" type="xs:string"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="type-map">
