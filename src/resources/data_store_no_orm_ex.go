@@ -1,6 +1,8 @@
 package main
 
 import (
+	"context"
+
 	"database/sql"
 	// _ "github.com/mattn/go-sqlite3" // SQLite3
 	// _ "github.com/denisenkom/go-mssqldb" // SQL Server
@@ -8,14 +10,14 @@ import (
 	// only strings for MySQL (so far). see _prepareFetch below and related comments.
 	_ "github.com/go-sql-driver/mysql" // MySQL
 	// _ "github.com/ziutek/mymysql/godrv" // MySQL
-	// _ "github.com/lib/pq" // PostgreSQL
+	// _ "github.com/jackc/pgx/v5/stdlib" // PostgreSQL
 )
 
 func (ds *_DS)initDb() (err error) {
 	// === PostgreSQL ===========================
 	// ds.paramPrefix = "$"
-	// ds.db, err = sql.Open("postgres", "postgres://postgres:sa@localhost/my-tests?sslmode=disable")
-	// ds.db, err = sql.Open("postgres", "postgres://postgres:sa@localhost/my-tests?sslmode=verify-full")
+	// ds.db, err = sql.Open("pgx", "postgres://postgres:sa@localhost/my-tests?sslmode=disable")
+	// ds.db, err = sql.Open("pgx", "postgres://postgres:sa@localhost/my-tests?sslmode=verify-full")
 	// === SQLite3 =============================
 	// ds.db, err = sql.Open("sqlite3", "./log.sqlite")
 	// ds.db, err = sql.Open("sqlite3", "./northwindEF.sqlite")
@@ -48,10 +50,9 @@ func CloseDB() error {
 	return ds.Close()
 }
 
-func NewTasksDao() *TasksDao {
-	return &TasksDao{ds: ds}
-}
-
-func NewGroupsDao() *GroupsDao {
-	return &GroupsDao{ds: ds}
+func init() {
+	// generated DAO functions get DataStore via DS(ctx)
+	DS = func(ctx context.Context) DataStore {
+		return ds
+	}
 }

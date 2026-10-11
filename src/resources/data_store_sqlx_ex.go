@@ -1,13 +1,15 @@
 package dbal
 
 import (
+	"context"
+
 	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"
 	// _ "github.com/denisenkom/go-mssqldb" // SQL Server
 	// _ "github.com/godror/godror"			// Oracle
 	// _ "github.com/go-sql-driver/mysql"   // MySQL
 	// _ "github.com/ziutek/mymysql/godrv"  // MySQL
-	// _ "github.com/lib/pq"                // PostgreSQL
+	// _ "github.com/jackc/pgx/v5/stdlib"   // PostgreSQL
 )
 
 var ds = &_DS{}
@@ -16,8 +18,8 @@ func (ds *_DS) initDb() (err error) {
 	ds.db, err = sqlx.Open("sqlite3", "./todolist.sqlite")
 	// === PostgreSQL ===========================
 	//ds.paramPrefix = "$"
-	//ds.db, err = sqlx.Open("postgres", "postgres://postgres:sa@localhost/my-tests?sslmode=disable")
-	// ds.db, err = sqlx.Open("postgres", "postgres://postgres:sa@localhost/my-tests?sslmode=verify-full")
+	//ds.db, err = sqlx.Open("pgx", "postgres://postgres:sa@localhost/my-tests?sslmode=disable")
+	// ds.db, err = sqlx.Open("pgx", "postgres://postgres:sa@localhost/my-tests?sslmode=verify-full")
 	// === SQLite3 =============================
 	// ds.db, err = sqlx.Open("sqlite3", "./log.sqlite")
 	// ds.db, err = sqlx.Open("sqlite3", "./northwindEF.sqlite")
@@ -51,10 +53,9 @@ func CloseDB() error {
 	return ds.Close()
 }
 
-func NewProjectsDao() *ProjectsDao {
-	return &ProjectsDao{ds: ds}
-}
-
-func NewTasksDao() *TasksDao {
-	return &TasksDao{ds: ds}
+func init() {
+	// generated DAO functions get DataStore via DS(ctx)
+	DS = func(ctx context.Context) DataStore {
+		return ds
+	}
 }

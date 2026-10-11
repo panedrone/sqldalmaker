@@ -105,14 +105,14 @@ import (
    	// _ "github.com/godror/godror"			// Oracle
    	// _ "github.com/go-sql-driver/mysql"   // MySQL
    	// _ "github.com/ziutek/mymysql/godrv"  // MySQL
-   	_ "github.com/lib/pq"                   // PostgreSQL
+   	_ "github.com/jackc/pgx/v5/stdlib"      // PostgreSQL
 )
 
 func (ds *_DS) initDb() (err error) {
 	// === PostgreSQL ===========================
 	ds.paramPrefix = "$"
-	ds.db, err = sql.Open("postgres", "postgres://postgres:sa@localhost/my-tests?sslmode=disable")
-	// ds.db, err = sql.Open("postgres", "postgres://postgres:sa@localhost/my-tests?sslmode=verify-full")
+	ds.db, err = sql.Open("pgx", "postgres://postgres:sa@localhost/my-tests?sslmode=disable")
+	// ds.db, err = sql.Open("pgx", "postgres://postgres:sa@localhost/my-tests?sslmode=verify-full")
 	// === SQLite3 =============================
 	// ds.db, err = sql.Open("sqlite3", "./log.sqlite")
 	// ds.db, err = sql.Open("sqlite3", "./northwindEF.sqlite")
@@ -140,8 +140,11 @@ func Ds() DataStore {
 	return _ds
 }
 
-func NewTasksDao() *TasksDao {
-	return &TasksDao{ds: ds}
+func init() {
+	// generated DAO functions get DataStore via DS(ctx)
+	DS = func(ctx context.Context) DataStore {
+		return _ds
+	}
 }
 
 */
@@ -153,7 +156,8 @@ func (ds *_DS) Open() error {
 	}
 	name := reflect.TypeOf(ds.db.Driver()).String()
 	name = strings.ToLower(name)
-	if strings.Contains(name, "pq") {
+	// "*stdlib.driver" is pgx, "*pq.driver" is lib/pq
+	if strings.Contains(name, "stdlib") || strings.Contains(name, "pq") {
 		ds.paramPrefix = "$"
 	} else if strings.Contains(name, "or") {
 		ds.paramPrefix = ":"

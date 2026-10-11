@@ -1,6 +1,8 @@
 package dbal
 
 import (
+	"context"
+
 	"github.com/cengsin/oracle"
 	// "github.com/go-sql-driver/mysql"
 	// "gorm.io/driver/postgres"
@@ -38,8 +40,11 @@ func Ds() DataStore {
 	return _ds
 }
 
-func NewCxOracleTestDao() *CxOracleTestDao {
-	return &CxOracleTestDao{ds: _ds}
+func init() {
+	// generated DAO functions get DataStore via DS(ctx)
+	DS = func(ctx context.Context) DataStore {
+		return _ds
+	}
 }
 
 func WithContext(ctx context.Context) *gorm.DB {

@@ -172,8 +172,11 @@ func Ds() DataStore {
 	return _ds
 }
 
-func NewTasksDao() *TasksDao {
-	return &TasksDao{ds: ds}
+func init() {
+	// generated DAO functions get DataStore via DS(ctx)
+	DS = func(ctx context.Context) DataStore {
+		return _ds
+	}
 }
 
 */
