@@ -28,9 +28,9 @@
     <!-- field-assign-mode (Go only)":
 
             0 - by column name
-            1 - by field position
-            2 - ptr to DTO or ptr to slice of DTO-s (Gorm, sqlx)
-            3 - ptr to resulting slice of DTO-s (Gorm, sqlx) -->
+            1 - by field position (unsafe)
+            2 - ptr to DTO or ptr to slice of DTO-s (gorm, sqlx)
+            3 - ptr to resulting slice of DTO-s (gorm, sqlx) -->
 
     <!-- macro: VM template to render DAO classes
 

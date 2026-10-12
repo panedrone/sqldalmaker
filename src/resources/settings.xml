@@ -51,9 +51,9 @@
     <!-- field-assign-mode (Go only) use="optional":
     
             0 - by column name
-            1 - by position
-            2 - ptr to DTO (Gorm only)
-            3 - direct ptr to resulting slice of DTO-s (Gorm and Beego). -->
+            1 - by position (unsafe)
+            2 - ptr to DTO (gorm, sqlx)
+            3 - direct ptr to resulting slice of DTO-s (gorm, sqlx) -->
 
     <!-- macro: VM template to render DAO classes.
 
