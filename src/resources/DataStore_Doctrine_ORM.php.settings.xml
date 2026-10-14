@@ -23,7 +23,7 @@
     <jdbc jar="lib/sqlite-jdbc-3.42.0.0.jar" class="org.sqlite.JDBC"
           url="jdbc:sqlite:$PROJECT_DIR$/todolist.sqlite" user="" pwd=""/>
 
-    <!--    <jdbc jar="mysql-connector-java-8.0.13.jar" class="com.mysql.cj.jdbc.Driver"-->
+    <!--    <jdbc jar="mysql-connector-j-26.7.0.jar" class="com.mysql.cj.jdbc.Driver"-->
     <!--          url="jdbc:mysql://localhost/todolist" user="root" pwd="sa"/>-->
 
     <!--    <jdbc jar="postgresql-42.3.4.jar" class="org.postgresql.Driver"-->

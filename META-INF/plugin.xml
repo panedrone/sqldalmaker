@@ -51,6 +51,12 @@ generator and your corrections are still there.
 Documentation and demo projects:
 <a href="https://sqldalmaker.sourceforge.net/">sqldalmaker.sourceforge.net</a>
 </p>
+
+<p>
+    Also, welcome to <a href="https://github.com/panedrone/go-sdm">go-sdm</a> — a Golang-only CLI for
+    Postgres, MySQL, and SQLite!
+</p>
+
     ]]></description>
 
     <change-notes><![CDATA[
@@ -61,9 +67,9 @@ Documentation and demo projects:
     ]]></change-notes>
 
     <!-- Legacy component tags must remain empty but kept for compatibility -->
-<!--    <application-components></application-components>-->
-<!--    <project-components></project-components>-->
-<!--    <module-components></module-components>-->
+    <!--    <application-components></application-components>-->
+    <!--    <project-components></project-components>-->
+    <!--    <module-components></module-components>-->
 
     <extensions defaultExtensionNs="com.intellij">
 

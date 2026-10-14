@@ -20,8 +20,8 @@
         <type detected="java.lang.Double" target="float64 -> SetFloat64"/>
         <type detected="java.lang.String" target="string -> SetString"/>
         <type detected="byte[]" target="[]byte -> SetBytes"/>
-        <type detected="java.lang.Object" target="interface{}"/>
-        <type detected="Object" target="interface{}"/>
+        <type detected="java.lang.Object" target="any"/>
+        <type detected="Object" target="any"/>
     </type-map>
 
     <macros>

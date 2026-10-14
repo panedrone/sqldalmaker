@@ -19,10 +19,10 @@ python_no_orm    | D:/work/sdm-python/1.304/py_sdm_todo/py_sdm_todo_fastapi_no_o
 python_sqlalchemy | D:/work/sdm-python/1.304/py_sdm_todo/py_sdm_todo_fastapi_sqla/py_fastapi_sqlalchemy_todolist_sqlite3 | sdm
 
 # three ORM flavours = all branches of 'field-assign-mode' in 'go.vm'
-go_northwind_no_orm | D:/work/sdm-go/1.304/cli/go_cli_sqlite3_northwindEF | no_orm/sdm
-go_northwind_gorm   | D:/work/sdm-go/1.304/cli/go_cli_sqlite3_northwindEF | gorm/sdm
-go_northwind_sqlx   | D:/work/sdm-go/1.304/cli/go_cli_sqlite3_northwindEF | sqlx/sdm
-go_log_no_orm       | D:/work/sdm-go/1.304/cli/go_cli_sqlite3_sdm_log     | no_orm/sdm
+go_northwind_no_orm | D:/work/sdm-go/go-sdm/go_cli_sqlite3_northwindEF | no_orm/sdm
+go_northwind_gorm   | D:/work/sdm-go/go-sdm/go_cli_sqlite3_northwindEF | gorm/sdm
+go_northwind_sqlx   | D:/work/sdm-go/go-sdm/go_cli_sqlite3_northwindEF | sqlx/sdm
+go_log_no_orm       | D:/work/sdm-go/go-sdm/go_cli_sqlite3_sdm_log     | no_orm/sdm
 
 php_log | D:/work/sdm_php | sdm
 

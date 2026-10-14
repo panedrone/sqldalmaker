@@ -381,7 +381,7 @@ public class GoCG {
                     }
                     // no "(Object) " cast in here: unlike Java varargs, a Go variadic
                     // parameter needs no help to accept a slice as one argument
-                    String exec_xml_param = "[]interface{}{" + String.join(", ", cb_elements) + "}";
+                    String exec_xml_param = "[]any{" + String.join(", ", cb_elements) + "}";
                     exec_dml_params.add(new ParamInfo(FieldNamesMode.AS_IS, "[]", exec_xml_param));
                 } else if (slot.kind == ExecDmlParamSlot.Kind.MAPPED) {
                     ParamInfo p = _params.get(slot.index);

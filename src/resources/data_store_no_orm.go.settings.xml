@@ -49,7 +49,7 @@
     <!--    <jdbc jar="ojdbc10.jar" class="oracle.jdbc.driver.OracleDriver"-->
     <!--          url="jdbc:oracle:thin:@localhost:1521/XE" user="todolist" pwd="sa"/>-->
 
-    <!--    <jdbc jar="mysql-connector-j-8.4.0.jar"-->
+    <!--    <jdbc jar="mysql-connector-j-26.7.0.jar"-->
     <!--          class="com.mysql.cj.jdbc.Driver" url="jdbc:mysql://localhost/orders" user="root" pwd="sa"/>-->
 
     <jdbc jar="postgresql-42.7.3.jar" class="org.postgresql.Driver"
@@ -65,7 +65,7 @@
         <!--        <type detected="java.lang.String" target="string${json} -> SetString"/>-->
         <!--        <type detected="java.util.Date" target="time:time.Time${json} -> SetTime"/>-->
         <!--        <type detected="byte[]" target="[]byte${json} -> SetBytes"/>-->
-        <!--        <type detected="java.lang.Object" target="interface{}${json}"/>-->
+        <!--        <type detected="java.lang.Object" target="any${json}"/>-->
 
         <!-- mysql, postgres, sql server -->
 
@@ -87,7 +87,7 @@
         <type detected="java.util.Date" target="time:time.Time${json} -> SetTime"/>
         <type detected="java.time.LocalDateTime" target="time:time.Time${json} -> SetTime"/>
 
-        <type detected="java.lang.Object" target="interface{}${json}"/>
+        <type detected="java.lang.Object" target="any${json}"/>
 
         <!-- oracle -->
 
@@ -105,7 +105,7 @@
         <!--        <type detected="byte[]" target="string${json} -> SetBytes"/>-->
         <!--        <type detected="java.lang.Boolean" target="int64${json} -> SetBool"/>-->
 
-        <!--        <type detected="java.lang.Object" target="interface{}{$json}"/>-->
+        <!--        <type detected="java.lang.Object" target="any{$json}"/>-->
 
     </type-map>
 

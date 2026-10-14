@@ -120,7 +120,7 @@ var ${method_name} = func(ctx context.Context#param_decls($is_external_sql $para
 #sql_var($is_external_sql $sql)
 #if ($assign_mode == 0)## --------------------------------------------------------
 	errMap := make(map[string]int)
-	_onRow := func(row map[string]interface{}) {
+	_onRow := func(row map[string]any) {
 		item := ${returned_type_name}{}
 #foreach($f in ${fields})
 		#set_field($f)
@@ -132,9 +132,9 @@ var ${method_name} = func(ctx context.Context#param_decls($is_external_sql $para
 		err = ErrMapToErr(errMap)
 	}
 #elseif ($assign_mode == 1)
-	_onRow := func() (interface{}, func()) {
+	_onRow := func() (any, func()) {
 		item := &${returned_type_name}{}
-		return []interface{}{
+		return []any{
 #foreach ($f in ${fields})
 				&item.${f.getName()},
 #end
@@ -144,7 +144,7 @@ var ${method_name} = func(ctx context.Context#param_decls($is_external_sql $para
 	}
 	err = ds.Select(ctx, sql, _onRow#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
 #elseif ($assign_mode == 2)
-	_onRow := func() (interface{}, func()) {
+	_onRow := func() (any, func()) {
 		item := &${returned_type_name}{}
 		return item, func() {
 			res = append(res, item)
@@ -192,7 +192,7 @@ var ${method_name} = func(ctx context.Context#param_decls($is_external_sql $para
 	return &item, err
 #elseif ($assign_mode == 1)
 	res := &${returned_type_name}{}
-	_fa := []interface{}{
+	_fa := []any{
 #foreach($f in ${fields})
 		&res.${f.getName()},
 #end
@@ -254,7 +254,7 @@ var ${method_name} = func(ctx context.Context#param_decls($is_external_sql $para
 	errMap := make(map[string]int)
 #end
 #foreach ($m in $mappings)
-	${m.get_exec_dml_param_name()} := func(row map[string]interface{}) {
+	${m.get_exec_dml_param_name()} := func(row map[string]any) {
 		item := ${m.get_dto_class_name()}{}
 #foreach ($f in ${m.get_fields()})
 		#set_field($f)
@@ -264,10 +264,10 @@ var ${method_name} = func(ctx context.Context#param_decls($is_external_sql $para
 #end
 #else
 #foreach ($m in $mappings)
-	${m.get_exec_dml_param_name()} := func() (interface{}, func()) {
+	${m.get_exec_dml_param_name()} := func() (any, func()) {
 #if ($assign_mode == 1)
 		item := ${m.get_dto_class_name()}{}
-		return []interface{}{
+		return []any{
 #foreach($f in ${m.get_fields()})
 				&item.${f.getName()},
 #end

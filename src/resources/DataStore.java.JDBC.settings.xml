@@ -23,7 +23,7 @@
     <jdbc jar="sdm/sqlite-jdbc-3.41.2.1.jar" class="org.sqlite.JDBC"
           url="jdbc:sqlite:$PROJECT_DIR$/thesaurus.sqlite" user="" pwd=""/>
 
-    <!--    <jdbc jar="lib/mysql-connector-java-8.0.13.jar" class="com.mysql.cj.jdbc.Driver"-->
+    <!--    <jdbc jar="lib/mysql-connector-j-26.7.0.jar" class="com.mysql.cj.jdbc.Driver"-->
     <!--          url="jdbc:mysql://localhost/sakila" user="root" pwd="sa"/>-->
 
     <!--    <jdbc jar="postgresql-42.2.9.jar" class="org.postgresql.Driver"-->

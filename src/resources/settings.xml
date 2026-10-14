@@ -153,7 +153,7 @@
         <type detected="gorm-byte[]" target="string${json-gorm}"/>
         <type detected="gorm-java.lang.Boolean" target="int64${json-gorm}"/>
 
-        <type detected="gorm-java.lang.Object" target="interface{}${json-gorm}"/>
+        <type detected="gorm-java.lang.Object" target="any${json-gorm}"/>
 
         <!-- ************************************* -->
 
@@ -173,7 +173,7 @@
         <type detected="byte[]" target="string${json} -> SetBytes"/>
         <type detected="java.lang.Boolean" target="bool${json} -> SetBool"/>
 
-        <type detected="java.lang.Object" target="interface{}${json}"/>
+        <type detected="java.lang.Object" target="any${json}"/>
 
         <!-- ***** SQLAlchemy ("sqlalchemy-" or "sa-" prefix for detected types) ****************** -->
 
