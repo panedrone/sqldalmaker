@@ -132,23 +132,29 @@ var ${method_name} = func(ctx context.Context#param_decls($is_external_sql $para
 		err = ErrMapToErr(errMap)
 	}
 #elseif ($assign_mode == 1)
-	_onRow := func() (any, func()) {
+	_onRow := func(scan func(any) error) error {
 		item := &${returned_type_name}{}
-		return []any{
+		err := scan([]any{
 #foreach ($f in ${fields})
-				&item.${f.getName()},
+			&item.${f.getName()},
 #end
-			}, func() {
-				res = append(res, item)
-			}
+		})
+		if err != nil {
+			return err
+		}
+		res = append(res, item)
+		return nil
 	}
 	err = ds.Select(ctx, sql, _onRow#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
 #elseif ($assign_mode == 2)
-	_onRow := func() (any, func()) {
+	_onRow := func(scan func(any) error) error {
 		item := &${returned_type_name}{}
-		return item, func() {
-			res = append(res, item)
+		err := scan(item)
+		if err != nil {
+			return err
 		}
+		res = append(res, item)
+		return nil
 	}
 	err = ds.Select(ctx, sql, _onRow#foreach($param in ${params}), ${param.getLowerCamelCaseName()}#end)
 #elseif ($assign_mode == 3)
@@ -264,22 +270,22 @@ var ${method_name} = func(ctx context.Context#param_decls($is_external_sql $para
 #end
 #else
 #foreach ($m in $mappings)
-	${m.get_exec_dml_param_name()} := func() (any, func()) {
-#if ($assign_mode == 1)
-		item := ${m.get_dto_class_name()}{}
-		return []any{
-#foreach($f in ${m.get_fields()})
-				&item.${f.getName()},
-#end
-			}, func() {
-				${m.get_method_param_name()}(&item)
-			}
-#else
+	${m.get_exec_dml_param_name()} := func(scan func(any) error) error {
 		item := &${m.get_dto_class_name()}{}
-		return item, func() {
-			${m.get_method_param_name()}(item)
-		}
+#if ($assign_mode == 1)
+		err := scan([]any{
+#foreach($f in ${m.get_fields()})
+			&item.${f.getName()},
 #end
+		})
+#else
+		err := scan(item)
+#end
+		if err != nil {
+			return err
+		}
+		${m.get_method_param_name()}(item)
+		return nil
 	}
 #end
 #end

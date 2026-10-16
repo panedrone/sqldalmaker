@@ -347,16 +347,16 @@ func (ds *_DS) processExecParams(args []any, onRowArr *[]any, queryArgs *[]any) 
 			}
 			hasParamsImplRc = true
 			for _, fn := range param {
-				_, ok1 := fn.(func() (any, func()))
+				_, ok1 := fn.(func(func(any) error) error)
 				_, ok2 := fn.(func(map[string]any))
 				if !ok1 && !ok2 {
 					err = errors.New(fmt.Sprintf("Expected: 'func(map[string]any)' || "+
-						"'func() (any, func())'. Got: %v", reflect.TypeOf(fn)))
+						"'func(func(any) error) error'. Got: %v", reflect.TypeOf(fn)))
 					return
 				}
 				*onRowArr = append(*onRowArr, fn)
 			}
-		case func() (any, func()), func() ([]any, func()):
+		case func(func(any) error) error:
 			if hasParamsImplRc {
 				err = errUnexpectedType(args)
 				return
@@ -439,7 +439,7 @@ func (ds *_DS) queryImplRcOracle(ctx context.Context, sqlString string, onRowArr
 				}
 				onRow(data)
 			}
-		case func() (any, func()):
+		case func(func(any) error) error:
 			err = fetchRows(rows, onRow)
 			if err != nil {
 				return err
@@ -452,19 +452,19 @@ func (ds *_DS) queryImplRcOracle(ctx context.Context, sqlString string, onRowArr
 	return nil
 }
 
-func fetchRows(rows *sql.Rows, onRow func() (any, func())) (err error) {
-	for rows.Next() {
-		fa, onRowCompleted := onRow()
-		switch _fa := fa.(type) {
-		case []any:
-			err = rows.Scan(_fa...)
-		default:
-			err = errUnexpectedType(_fa)
+func fetchRows(rows *sql.Rows, onRow func(func(any) error) error) (err error) {
+	scan := func(fa any) error {
+		faArr, ok := fa.([]any)
+		if !ok {
+			return errUnexpectedType(fa)
 		}
+		return rows.Scan(faArr...)
+	}
+	for rows.Next() {
+		err = onRow(scan)
 		if err != nil {
 			return
 		}
-		onRowCompleted()
 	}
 	return
 }
@@ -494,7 +494,7 @@ func (ds *_DS) queryImplRc(ctx context.Context, sqlString string, onRowArr []any
 				}
 				onRow(data)
 			}
-		case func() (any, func()):
+		case func(func(any) error) error:
 			err = fetchRows(rows, onRow)
 			if err != nil {
 				return err
@@ -552,7 +552,20 @@ func fetchDriverRows(rows driver.Rows, onRowFunc any) error {
 			}
 			onRow(data)
 		}
-	case func() (any, func()):
+	case func(func(any) error) error:
+		scan := func(fa any) error {
+			_fa, ok := fa.([]any)
+			if !ok {
+				return errUnexpectedType(fa)
+			}
+			for i, v := range values {
+				err := _setAny(_fa[i], v)
+				if err != nil {
+					return err
+				}
+			}
+			return nil
+		}
 		for {
 			err := rows.Next(values)
 			if err != nil {
@@ -561,18 +574,9 @@ func fetchDriverRows(rows driver.Rows, onRowFunc any) error {
 				}
 				return err
 			}
-			fa, onRowCompleted := onRow()
-			switch _fa := fa.(type) {
-			case []any:
-				for i, v := range values {
-					err = _setAny(_fa[i], v)
-					if err != nil {
-						return err
-					}
-				}
-				onRowCompleted()
-			default:
-				return errUnexpectedType(fa)
+			err = onRow(scan)
+			if err != nil {
+				return err
 			}
 		}
 	default:
@@ -839,7 +843,7 @@ func (ds *_DS) Select(ctx context.Context, sqlString string, dest any, args ...a
 		}
 		return nil
 	}
-	onRow, ok := dest.(func() (any, func()))
+	onRow, ok := dest.(func(func(any) error) error)
 	if ok {
 		rows, err := ds.rawQuery(ctx, sqlString, args...)
 		if err != nil {
@@ -859,20 +863,20 @@ func (ds *_DS) Select(ctx context.Context, sqlString string, dest any, args ...a
 	return raw.Take(dest).Error
 }
 
-func fetchAll(rows *sql.Rows, onRow func() (any, func())) (err error) {
+func fetchAll(rows *sql.Rows, onRow func(func(any) error) error) (err error) {
+	scan := func(fa any) error {
+		faArr, ok := fa.([]any)
+		if !ok {
+			return errUnexpectedType(fa)
+		}
+		return rows.Scan(faArr...)
+	}
 	for {
 		for rows.Next() {
-			fa, onRowComplete := onRow()
-			faArr, ok := fa.([]any)
-			if ok {
-				err = rows.Scan(faArr...)
-			} else {
-				err = errUnexpectedType(fa)
-			}
+			err = onRow(scan)
 			if err != nil {
 				return
 			}
-			onRowComplete()
 		}
 		if !rows.NextResultSet() {
 			return
