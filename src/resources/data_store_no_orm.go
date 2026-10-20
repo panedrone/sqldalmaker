@@ -377,8 +377,8 @@ func (ds *_DS) processExecParams(args []any, onRowArr *[]any, queryArgs *[]any) 
 				_, ok1 := fn.(func(func(any) error) error)
 				_, ok2 := fn.(func(map[string]any))
 				if !ok1 && !ok2 {
-					err = errors.New(fmt.Sprintf("Expected: 'func(map[string]any)' || "+
-						"'func(func(any) error) error'. Got: %v", reflect.TypeOf(fn)))
+					err = fmt.Errorf("Expected: 'func(map[string]any)' || "+
+						"'func(func(any) error) error'. Got: %v", reflect.TypeOf(fn))
 					return
 				}
 				*onRowArr = append(*onRowArr, fn)
@@ -1341,13 +1341,13 @@ func SetAny(dstPtr any, row map[string]any, col string, errMap map[string]int) {
 
 func ErrMapToErr(errMap map[string]int) (err error) {
 	if len(errMap) > 0 {
-		err = errors.New(fmt.Sprintf("%v", errMap))
+		err = fmt.Errorf("%v", errMap)
 	}
 	return
 }
 
 func assignErr(dstPtr any, value any, funcName string, errMsg string) error {
-	return errors.New(fmt.Sprintf("%s %T <- %T %s", funcName, dstPtr, value, errMsg))
+	return fmt.Errorf("%s %T <- %T %s", funcName, dstPtr, value, errMsg)
 }
 
 func unknownTypeErr(dstPtr any, value any, funcName string) error {
@@ -1355,15 +1355,15 @@ func unknownTypeErr(dstPtr any, value any, funcName string) error {
 }
 
 func errUnexpectedType(val any) error {
-	return errors.New(fmt.Sprintf("unexpected type: %v", reflect.TypeOf(val)))
+	return fmt.Errorf("unexpected type: %v", reflect.TypeOf(val))
 }
 
 func errNoRows(sqlString string) error {
-	return errors.New(fmt.Sprintf("no rows found for %s", sqlString))
+	return fmt.Errorf("no rows found for %s", sqlString)
 }
 
 func errMultipleRows(sqlString string) error {
-	return errors.New(fmt.Sprintf("more than 1 row found for %s", sqlString))
+	return fmt.Errorf("more than 1 row found for %s", sqlString)
 }
 
 func errUnexpectedInQuery() error {
