@@ -12,6 +12,8 @@ import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
+import com.sqldalmaker.cg.Helpers;
+
 import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -36,7 +38,7 @@ public class XmlParser {
         unmarshaller = jc.createUnmarshaller();
         // http://javafaq.nu/java-example-code-988.html
         SchemaFactory sf = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema" /*XMLConstants.W3C_XML_SCHEMA_NS_URI*/);
-        InputStream is = Files.newInputStream(Paths.get(xsd_file_name));
+        InputStream is = open_xsd(xsd_file_name);
         try {
             // http://www.ibm.com/developerworks/xml/library/x-jaxpval/index.html
             Source schema_source = new StreamSource(is);
@@ -44,6 +46,18 @@ public class XmlParser {
             unmarshaller.setSchema(schema);
         } finally {
             is.close(); // !!!! - after newSchema
+        }
+    }
+
+    // The XSD of the plug-in itself, by the file name: the copy in the project folder is for the IDE (completion,
+    // validation in the editor) and may be out of date; validated by it, outdated XML (<go-db>) passed.
+    // Without the resource (the harness: no resources on the classpath), the file itself.
+    private static InputStream open_xsd(String xsd_file_name) throws Exception {
+        String name = Paths.get(xsd_file_name).getFileName().toString();
+        try {
+            return Helpers.res_as_stream("resources/" + name);
+        } catch (Exception e) {
+            return Files.newInputStream(Paths.get(xsd_file_name));
         }
     }
 

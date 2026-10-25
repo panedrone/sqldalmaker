@@ -389,7 +389,14 @@ public class SdmUtils {
         String settings_xsd_abs_path = Helpers.concat_path(sdm_folder_abs_path, Const.SETTINGS_XSD);
         String context_path = Settings.class.getPackage().getName();
         XmlParser xml_parser = new XmlParser(context_path, settings_xsd_abs_path);
-        Settings res = xml_parser.unmarshal(settings_xml_abs_path);
-        return res;
+        try {
+            return xml_parser.unmarshal(settings_xml_abs_path);
+        } catch (Exception e) {
+            if (String.valueOf(e.getMessage()).contains("go-db")) {
+                throw new Exception(Const.SETTINGS_XML + ": <go-db> is <db> now, rename the element: "
+                        + "<db url=\"...\" user=\"...\" pwd=\"...\"/>. " + e.getMessage(), e);
+            }
+            throw e;
+        }
     }
 }
