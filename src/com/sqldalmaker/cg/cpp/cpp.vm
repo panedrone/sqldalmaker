@@ -139,7 +139,11 @@ public:
     */
     int ${method_name}(#if(${dto_param} != "")#if($external_sql)DL_STR sql, #end${dto_param} &p#else#if($external_sql)DL_STR sql#if(${params.size()}>0), #end#end#out_params($params)#end) {
 #sql_var(${external_sql} $sql)
+#if(${params.size()} > 0)
 #param_array($dto_param $params)
         return m_ds.execDML(sql, ${params.size()}, params);
+#else
+        return m_ds.execDML(sql, 0, 0);
+#end
     }
 #end

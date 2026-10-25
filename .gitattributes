@@ -1,0 +1,5 @@
+# Velocity templates: line breaks of a template are line breaks of the generated code.
+# Python, Go and C++ are generated with LF, whatever core.autocrlf says.
+src/com/sqldalmaker/cg/python/python.vm text eol=lf
+src/com/sqldalmaker/cg/go/go.vm text eol=lf
+src/com/sqldalmaker/cg/cpp/cpp.vm text eol=lf

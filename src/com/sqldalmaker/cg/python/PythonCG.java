@@ -135,7 +135,7 @@ public class PythonCG {
                 }
             }
             for (int i = 0; i < methods.size(); i++) {
-                String m = methods.get(i).replace("\t", "    ").replace("//", "#");
+                String m = methods.get(i).replace("\t", "    ").replace("    // INFO:", "    # INFO:");
                 methods.set(i, m);
             }
             Map<String, Object> context = new HashMap<String, Object>();

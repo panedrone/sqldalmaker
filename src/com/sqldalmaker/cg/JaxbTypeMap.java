@@ -49,6 +49,21 @@ class JaxbTypeMap {
         return default_type;
     }
 
+    // the same without "default": for a type that is a target already
+    String get_target_type_name_no_default(String detected_type_name) {
+        String res = detected.get(detected_type_name);
+        return res == null ? detected_type_name : res;
+    }
+
+    // The type of a field: the one from JDBC (not mapped yet) is mapped as usual; a mapped one only by its
+    // key, "default" is not for it (a non-empty "default" made every mapped field the default).
+    String get_target_type_name(FieldInfo fi) {
+        if (fi.getType().equals(fi.getOriginalType())) {
+            return get_target_type_name(fi.getType());
+        }
+        return get_target_type_name_no_default(fi.getType());
+    }
+
     // A target type may be "type->assign_func": the type to render and the function that
     // reads a value of it from a record (e.g. "Integer->getInteger" in Java).
     // Returns {type, assign_func}; assign_func is null if there is none.

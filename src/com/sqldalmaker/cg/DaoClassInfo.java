@@ -91,7 +91,7 @@ class DaoClassInfo {
         }
         List<FieldInfo> res_fields = new ArrayList<>();
         for (FieldInfo fi : fields) {
-            String type_name = jaxb_type_map.get_target_type_name(fi.getType());
+            String type_name = jaxb_type_map.get_target_type_name(fi);
             res_fields.add(FieldInfo.with_rendered_type(fi, type_name));
         }
         return new DaoSqlInfo(dao_query_jdbc_sql, res_fields, params);

@@ -201,7 +201,7 @@ public class CppCG {
             context.put("returned_type_name", returned_type_name);
             context.put("fetch_list", fetch_list);
             context.put("imports", imports);
-            context.put("is_external_sql", is_external_sql);
+            context.put("external_sql", is_external_sql); // cpp.vm reads external_sql
             _assign_params(pk_params, context);
             StringWriter sw = new StringWriter();
             te.merge(context, sw);

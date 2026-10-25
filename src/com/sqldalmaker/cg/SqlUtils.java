@@ -40,23 +40,35 @@ public class SqlUtils {
         return parts;
     }
 
+    // A line of SQL in Python and C++ code: escapeJava for each character, but a character beyond the BMP is
+    // one \UXXXXXXXX, not the two halves of UTF-16: "\uD83D\uDE00" is two lone surrogates in Python and
+    // an error in C++. Character by character, '/' needs no "fix the bug in StringEscapeUtils" anymore.
+    private static String escape_sql_line(String line) {
+        StringBuilder res = new StringBuilder();
+        for (int i = 0; i < line.length(); ) {
+            int cp = line.codePointAt(i);
+            int n = Character.charCount(cp);
+            if (cp > 0xFFFF) {
+                res.append(String.format("\\U%08X", cp));
+            } else if (cp == '/') {
+                res.append('/');
+            } else {
+                // packed into Velocity JAR:
+                res.append(org.apache.commons.lang.StringEscapeUtils.escapeJava(line.substring(i, i + n)));
+            }
+            i += n;
+        }
+        return res.toString();
+    }
+
     public static String jdbc_sql_to_cpp_str(String jdbc_sql) {
         String[] parts = get_sql_lines(jdbc_sql);
-        String new_line = System.lineSeparator();
+        String new_line = "\n"; // not System.lineSeparator(): the generated code is LF on any OS
         String new_line_j = org.apache.commons.lang.StringEscapeUtils.escapeJava("\n");
         StringBuilder res = new StringBuilder();
         res.append("\"");
         for (int i = 0; i < parts.length; i++) {
-            String j_str = parts[i].replace('\t', ' ');
-            // packed into Velocity JAR:
-            j_str = org.apache.commons.lang.StringEscapeUtils.escapeJava(j_str);
-            // fix the bug in StringEscapeUtils:
-            // case '/':
-            // out.write('\\');
-            // out.write('/');
-            // break;
-            j_str = j_str.replace("\\/", "/");
-            res.append(j_str);
+            res.append(escape_sql_line(parts[i].replace('\t', ' ')));
             if (i < parts.length - 1) {
                 res.append(" ");
                 res.append(new_line_j);
@@ -197,16 +209,7 @@ public class SqlUtils {
         String new_line = "\n"; // System.getProperty("line.separator");
         StringBuilder res = new StringBuilder();
         for (int i = 0; i < parts.length; i++) {
-            String j_str = parts[i].replace('\t', ' ');
-            // packed into Velocity JAR:
-            j_str = org.apache.commons.lang.StringEscapeUtils.escapeJava(j_str);
-            // fix the bug in StringEscapeUtils:
-            // case '/':
-            // out.write('\\');
-            // out.write('/');
-            // break;
-            j_str = j_str.replace("\\/", "/");
-            res.append(j_str);
+            res.append(escape_sql_line(parts[i].replace('\t', ' ')));
             if (i < parts.length - 1) { // python wants 4 spaces instead of 1 tab
                 String s = " " + new_line + "                ";
                 res.append(s);

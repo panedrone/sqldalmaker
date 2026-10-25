@@ -159,7 +159,7 @@ class DtoClassInfo {
             if (jaxb_field_type_name.trim().equals("-")) {
                 excluded.add(i);
             }
-            fi = _refine_fi_by_type_map_and_macros(fi, jaxb_field_type_name);
+            fi = _refine_fi_by_type_map_and_macros(fi, jaxb_field_type_name, false);
             res.set(i, FieldInfo.with_scalar_type(fi, jaxb_field_type_name));
             refined_by_field_jaxb.add(jaxb_field_col_name);
         }
@@ -171,19 +171,24 @@ class DtoClassInfo {
             FieldInfo fi = res.get(i);
             if (!refined_by_field_jaxb.contains(fi.getColumnName())) {
                 String type_name = fi.getType().trim(); // !!! getType(), not getOriginalType()
-                fi = _refine_fi_by_type_map_and_macros(fi, type_name);
+                // a type mapped already (a table column) is not mapped to "default" once more:
+                // a non-empty "default" made every mapped field the default
+                boolean mapped = !type_name.equals(fi.getOriginalType().trim());
+                fi = _refine_fi_by_type_map_and_macros(fi, type_name, mapped);
             }
             refined.add(fi);
         }
         return refined;
     }
 
-    private FieldInfo _refine_fi_by_type_map_and_macros(FieldInfo fi, String type_name) throws Exception {
+    private FieldInfo _refine_fi_by_type_map_and_macros(FieldInfo fi, String type_name, boolean mapped) throws Exception {
         type_name = type_name.trim();
         String target_type_name;
         int local_field_type_params_start = type_name.indexOf('|');
         if (local_field_type_params_start == -1) { // explicit_type_name only, no parameters "int64"
-            String type_map_target_type = jaxb_type_map.get_target_type_name(type_name);
+            String type_map_target_type = mapped
+                    ? jaxb_type_map.get_target_type_name_no_default(type_name)
+                    : jaxb_type_map.get_target_type_name(type_name);
             target_type_name = _parse_target_type(fi, type_map_target_type);
         } else {
             if (local_field_type_params_start == 0) { // "|0: hello0|1:hello1"
