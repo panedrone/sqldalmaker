@@ -76,7 +76,7 @@ public:
     int ${method_name}(${dto_param} &p) {
 #sql_var(false $sql)
         CValue *params[] = {#foreach ($param in ${params})#set($p="&p."+${param.getName()})#list_item(${velocityCount} $p)#end};
-        CValue *ai_values[]= {#foreach ($key in ${keys})#set($p="&p."+${key.getColumnName()})#list_item(${velocityCount} $p)#end};
+        CValue *ai_values[]= {#foreach ($key in ${keys})#set($p="&p."+${key.getName()})#list_item(${velocityCount} $p)#end};
         return m_ds.insert(sql,	${params.size()}, params, ${keys.size()}, ai_values);
     }
 ## ====================================================================================================================
@@ -106,7 +106,7 @@ public:
 #else
         CValue *res_values[] = {&rp.buff};
 #end
-        DL_STR col_names[] = {#foreach ($field in ${fields})#if(${velocityCount} == 1)DL_T("${field.getName()}")#else, DL_T("${field.getName()}")#end#end};
+        DL_STR col_names[] = {#foreach ($field in ${fields})#if(${velocityCount} == 1)DL_T("${field.getColumnName()}")#else, DL_T("${field.getColumnName()}")#end#end};
         return m_ds.queryRowList(sql, ${params.size()},#if(${params.size()} > 0) params#else 0#end, ${fields.size()}, res_values, col_names, &rp);
     }
 #else
@@ -120,7 +120,7 @@ public:
 #else
         CValue *res_values[] = {&res};
 #end
-        DL_STR col_names[] = {#foreach ($field in ${fields})#if(${velocityCount} == 1)DL_T("${field.getName()}")#else, DL_T("${field.getName()}")#end#end};
+        DL_STR col_names[] = {#foreach ($field in ${fields})#if(${velocityCount} == 1)DL_T("${field.getColumnName()}")#else, DL_T("${field.getColumnName()}")#end#end};
         return m_ds.queryRow(sql, ${params.size()},#if(${params.size()} > 0) params#else 0#end, ${fields.size()}, res_values, col_names);
     }
 #end

@@ -21,6 +21,19 @@ import java.util.*;
  */
 public class CppCG {
 
+    // <dto field-names-mode> for the fields of DTO and the names of CRUD methods: 0 - as is (the column names,
+    // as before), 1 - lowerCamelCase, 2 - snake_case. Not Helpers.get_field_names_mode: 0 is TitleCase there.
+    static FieldNamesMode field_names_mode(Settings settings) {
+        int fnm = settings.getDto().getFieldNamesMode();
+        if (fnm == 0) {
+            return FieldNamesMode.AS_IS;
+        }
+        if (fnm == 1) {
+            return FieldNamesMode.LOWER_CAMEL_CASE;
+        }
+        return FieldNamesMode.SNAKE_CASE;
+    }
+
     public static class DTO implements IDtoCG {
 
         private final String sql_root_abs_path;
@@ -41,7 +54,7 @@ public class CppCG {
             this.dto_class_prefix = dto_class_prefix;
             this.sql_root_abs_path = sql_root_abs_path;
             te = Helpers.create_template_engine(vm_template, "cpp", "cpp");
-            db_utils = new JdbcUtils(connection, FieldNamesMode.AS_IS, FieldNamesMode.AS_IS, jaxb_settings, sql_root_abs_path);
+            db_utils = new JdbcUtils(connection, field_names_mode(jaxb_settings), FieldNamesMode.AS_IS, jaxb_settings, sql_root_abs_path);
         }
 
         @Override
@@ -80,7 +93,7 @@ public class CppCG {
             this.jaxb_dto_classes = jaxb_dto_classes;
             this.sql_root_abs_path = sql_root_abs_path;
             this.te = Helpers.create_template_engine(vm_template, "cpp", "cpp");
-            this.db_utils = new JdbcUtils(connection, FieldNamesMode.AS_IS, FieldNamesMode.AS_IS, jaxb_settings, sql_root_abs_path);
+            this.db_utils = new JdbcUtils(connection, field_names_mode(jaxb_settings), FieldNamesMode.AS_IS, jaxb_settings, sql_root_abs_path);
             this.class_prefix = class_prefix;
         }
 
