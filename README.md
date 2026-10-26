@@ -27,7 +27,9 @@ Project Docs: [https://sqldalmaker.sourceforge.net](https://sqldalmaker.sourcefo
 Quick Start in
 mp4: [https://github.com/panedrone/sqldalmaker/releases/tag/latest](https://github.com/panedrone/sqldalmaker/releases/tag/latest)
 
-Also, welcome to [https://github.com/panedrone/go-sdm](https://github.com/panedrone/go-sdm) — a Golang-only CLI for Postgres, MySQL, and SQLite!
+Also, welcome to [sdmc](https://github.com/panedrone/sdmc) — the command-line twin of this plug-in: the
+same `sdm.xml` and `settings.xml`, the same generated code for Go, Python and C++ (Qt) on PostgreSQL, MySQL
+and SQLite. No IDE needed: handy in CI.
 
 ### Hello-App
 

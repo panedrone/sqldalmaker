@@ -53,8 +53,9 @@ Documentation and demo projects:
 </p>
 
 <p>
-    Also, welcome to <a href="https://github.com/panedrone/go-sdm">go-sdm</a> — a Golang-only CLI for
-    Postgres, MySQL, and SQLite!
+Also, welcome to <a href="https://github.com/panedrone/sdmc">sdmc</a> &mdash; the command-line twin of
+this plug-in: the same <code>sdm.xml</code> and <code>settings.xml</code>, the same generated code for
+Go, Python and C++ (Qt) on PostgreSQL, MySQL and SQLite. No IDE needed: handy in CI.
 </p>
 
     ]]></description>
