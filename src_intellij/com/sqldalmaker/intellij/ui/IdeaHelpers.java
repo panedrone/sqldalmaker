@@ -7,14 +7,10 @@ package com.sqldalmaker.intellij.ui;
 
 import com.intellij.history.LocalHistory;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.fileEditor.FileEditor;
-import com.intellij.openapi.fileEditor.FileEditorManager;
-import com.intellij.openapi.fileEditor.NavigatableFileEditor;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.pom.Navigatable;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.sqldalmaker.cg.Helpers;
@@ -374,16 +370,8 @@ public class IdeaHelpers {
         // VirtualFile virtual_file = containingFile.find_virtual_file();
         VirtualFile virtual_file = IdeaRefUtils.find_virtual_file(containing_file);
         if (virtual_file != null) {
-            FileEditorManager manager = FileEditorManager.getInstance(project);
-            FileEditor[] file_editors = manager.openFile(virtual_file, true);
-            if (file_editors.length > 0) {
-                FileEditor file_editor = file_editors[0];
-                if (file_editor instanceof NavigatableFileEditor) {
-                    NavigatableFileEditor navigatableFileEditor = (NavigatableFileEditor) file_editor;
-                    Navigatable descriptor = new OpenFileDescriptor(project, virtual_file, psi_element.getTextOffset());
-                    navigatableFileEditor.navigateTo(descriptor);
-                }
-            }
+            // opens the file (see IdeaEditorHelpers.open_in_editor) and moves the caret to the element
+            new OpenFileDescriptor(project, virtual_file, psi_element.getTextOffset()).navigateInEditor(project, true);
         }
     }
 

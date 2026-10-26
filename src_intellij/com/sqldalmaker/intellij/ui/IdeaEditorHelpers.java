@@ -5,8 +5,8 @@
  */
 package com.sqldalmaker.intellij.ui;
 
-import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.fileTypes.FileTypes;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -33,14 +33,15 @@ import java.sql.Connection;
 public class IdeaEditorHelpers {
 
     public static void open_in_editor_sync(Project project, VirtualFile file) {
-        FileEditorManager fem = FileEditorManager.getInstance(project);
+        // .sdm opens quietly, without focus
+        open_in_editor(project, file, !file.getName().endsWith(".sdm"));
+    }
 
-        // If file has .sdm extension → open quietly (do not force focus)
-        if (file.getName().endsWith(".sdm")) {
-            fem.openFile(file, false, true); // false = do not request focus, true = focus if already opened
-        } else {
-            fem.openFile(file, true, true);  // default behavior for other files
-        }
+    // FileEditorManager.openFile(...) is deprecated since 263, and its replacement requestOpenFile is missing
+    // in the older builds. navigateInEditor opens the file synchronously in all of them (an already open one
+    // is activated, not opened twice) and says whether there is an editor for it.
+    public static boolean open_in_editor(Project project, VirtualFile file, boolean focus) {
+        return new OpenFileDescriptor(project, file).navigateInEditor(project, focus);
     }
 
     public static VirtualFile find_case_sensitive(VirtualFile dir, String rel_path) throws Exception {
@@ -73,23 +74,22 @@ public class IdeaEditorHelpers {
     }
 
     public static void open_text_in_new_editor(Project project, String file_name, String text) {
-        FileEditorManager fem = FileEditorManager.getInstance(project);
         String virtual_file_name = "_" + file_name; // '%' throws URI exception in NB
         // http://grepcode.com/file/repository.grepcode.com/java/ext/com.jetbrains/intellij-idea/9.0.4/com/intellij/openapi/vfs/VirtualFile.java
         // If an in-memory implementation of VirtualFile is required, LightVirtualFile from the com.intellij.testFramework package (Extended API) can be used.
         try {
-            open_text_in_new_editor(fem, virtual_file_name, text);
+            open_light_file(project, virtual_file_name, text);
         } catch (Throwable e1) {
             // e1.printStackTrace();
             IdeaMessageHelpers.show_error_in_ui_thread(e1);
         }
     }
 
-    private static void open_text_in_new_editor(FileEditorManager fem, String virtual_file_name, String text) throws Exception {
+    private static void open_light_file(Project project, String virtual_file_name, String text) throws Exception {
         // http://grepcode.com/file/repository.grepcode.com/java/ext/com.jetbrains/intellij-idea/9.0.4/com/intellij/openapi/vfs/VirtualFile.java
         // If an in-memory implementation of VirtualFile is required, LightVirtualFile from the com.intellij.testFramework package (Extended API) can be used.
         VirtualFile file;
-        FileEditor[] res;
+        boolean opened;
         // Big problems with \r\n:
         // 1. copy-paste do not work
         // 2. VM files are not opened with exception like 'Wrong line separators...'
@@ -102,16 +102,15 @@ public class IdeaEditorHelpers {
         text = text.replace("\r\n", "\n");
         try {
             file = new LightVirtualFile(virtual_file_name, text);
-            res = fem.openFile(file, true, true); // for VM: it may throw something like 'Wrong line separators...'
+            opened = open_in_editor(project, file, true); // for VM: it may throw something like 'Wrong line separators...'
         } catch (Throwable e) {
             // for VM: it will show error log message anyway, but il will open it and will not throw, at least
             file = new LightVirtualFile(virtual_file_name, FileTypes.PLAIN_TEXT, text);
-            res = fem.openFile(file, true, true);
+            opened = open_in_editor(project, file, true);
         }
-        if (/*res == null ||*/ res.length == 0) {
+        if (!opened) {
             file = new LightVirtualFile(virtual_file_name, FileTypes.PLAIN_TEXT, text);
-            res = fem.openFile(file, true, true);
-            if (/*res == null ||*/ res.length == 0) {
+            if (!open_in_editor(project, file, true)) {
                 throw new Exception("Cannot open the file in editor: " + virtual_file_name);
             }
         }
@@ -139,10 +138,10 @@ public class IdeaEditorHelpers {
         }
         try {
             if (file != null) {
-                fem.openFile(file, true, true);
+                open_in_editor(project, file, true);
             } else {
                 String text_from_jar = IdeaHelpers.read_from_jar(res_path, res_name);
-                open_text_in_new_editor(fem, virtual_file_name, text_from_jar);
+                open_light_file(project, virtual_file_name, text_from_jar);
             }
         } catch (Throwable e1) {
             // e1.printStackTrace();

@@ -5,7 +5,6 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ReadAction;
-import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.vfs.LocalFileSystem;
@@ -321,17 +320,8 @@ public class SdmJbToolWindowFactory implements ToolWindowFactory {
     private static void openEditorQuietly(Project project, String relativePath) {
         VirtualFile file = findFileByRelativePath(project, relativePath);
         if (file == null) return;
-
-        FileEditorManager fem = FileEditorManager.getInstance(project);
-        VirtualFile[] openFiles = fem.getOpenFiles();
-        for (int i = 0; i < openFiles.length; i++) {
-            if (openFiles[i].equals(file)) {
-                fem.openFile(openFiles[i], false);
-                return;
-            }
-        }
-
-        fem.openFile(file, false);
+        // an already open file is activated, not opened twice
+        IdeaEditorHelpers.open_in_editor(project, file, false);
     }
 
     private static VirtualFile findFileByRelativePath(Project project, String relativePath) {
