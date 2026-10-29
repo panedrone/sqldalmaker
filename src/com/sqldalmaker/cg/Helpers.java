@@ -162,7 +162,7 @@ public class Helpers {
     }
 
     private static void _build_warning_comment(StringBuilder buffer, String msg) {
-        String ls = System.lineSeparator();
+        String ls = "\n"; // not System.lineSeparator(): the generated code is LF on any OS
         buffer.append(ls);
         buffer.append(msg);
         buffer.append(ls);
