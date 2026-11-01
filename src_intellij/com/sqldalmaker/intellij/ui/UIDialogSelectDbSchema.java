@@ -260,10 +260,10 @@ public class UIDialogSelectDbSchema extends DialogWrapper {
         gbc.fill = GridBagConstraints.BOTH;
         panel4.add(radioPanel, gbc);
         crudDetailedRadioButton = new JRadioButton();
-        crudDetailedRadioButton.setSelected(true);
         crudDetailedRadioButton.setText("crud detailed");
         radioPanel.add(crudDetailedRadioButton);
         crudAutoRadioButton = new JRadioButton();
+        crudAutoRadioButton.setSelected(true);
         crudAutoRadioButton.setText("crud empty");
         radioPanel.add(crudAutoRadioButton);
         chk_add_fk_access = new JCheckBox();

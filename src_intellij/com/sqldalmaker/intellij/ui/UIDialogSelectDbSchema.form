@@ -108,13 +108,13 @@
                       <component id="e402b" class="javax.swing.JRadioButton" binding="crudDetailedRadioButton" default-binding="true">
                         <constraints/>
                         <properties>
-                          <selected value="true"/>
                           <text value="crud detailed"/>
                         </properties>
                       </component>
                       <component id="60116" class="javax.swing.JRadioButton" binding="crudAutoRadioButton" default-binding="true">
                         <constraints/>
                         <properties>
+                          <selected value="true"/>
                           <text value="crud empty"/>
                         </properties>
                       </component>
