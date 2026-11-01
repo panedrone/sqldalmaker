@@ -5,6 +5,7 @@
  */
 package com.sqldalmaker.cg;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -339,6 +340,33 @@ public class SqlUtils {
         if (ref.isEmpty()) {
             return false;
         }
+        // a name quoted by the rules of the database may have spaces: [Order Details], "Order Details", `Order Details`
+        List<String> parts = split_table_ref(ref);
+        if (parts == null) {
+            return false; // a quote is not closed
+        }
+        boolean quoted = false;
+        for (String s : parts) {
+            if (is_quoted_identifier(s)) {
+                quoted = true;
+            }
+        }
+        if (quoted) {
+            for (String s : parts) {
+                if (is_quoted_identifier(s)) {
+                    if (s.length() < 3) {
+                        return false; // [] or ""
+                    }
+                } else if (!_is_unquoted_table_ref(s)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return _is_unquoted_table_ref(ref);
+    }
+
+    private static boolean _is_unquoted_table_ref(String ref) {
         // https://stackoverflow.com/questions/11488478/how-do-i-check-whether-input-string-contains-any-spaces
         Pattern space = Pattern.compile("\\s+");
         Matcher matcherSpace = space.matcher(ref);
@@ -377,6 +405,78 @@ public class SqlUtils {
             }
         }
         return true;
+    }
+
+    // the parts of "schema.table" split by the dots outside of quotes; null if a quote is not closed
+    static List<String> split_table_ref(String ref) {
+        List<String> res = new ArrayList<String>();
+        StringBuilder part = new StringBuilder();
+        char close = 0;
+        for (int i = 0; i < ref.length(); i++) {
+            char c = ref.charAt(i);
+            if (close != 0) {
+                part.append(c);
+                if (c == close) {
+                    if (i + 1 < ref.length() && ref.charAt(i + 1) == close) {
+                        part.append(close); // ]] or "" inside of a quoted name
+                        i++;
+                    } else {
+                        close = 0;
+                    }
+                }
+                continue;
+            }
+            if (c == '.') {
+                res.add(part.toString());
+                part.setLength(0);
+                continue;
+            }
+            if (c == '[') {
+                close = ']';
+            } else if (c == '"' || c == '`') {
+                close = c;
+            }
+            part.append(c);
+        }
+        if (close != 0) {
+            return null;
+        }
+        res.add(part.toString());
+        return res;
+    }
+
+    static boolean is_quoted_identifier(String s) {
+        if (s.length() < 2) {
+            return false;
+        }
+        char first = s.charAt(0);
+        char last = s.charAt(s.length() - 1);
+        return (first == '[' && last == ']') || (first == '"' && last == '"') || (first == '`' && last == '`');
+    }
+
+    static String unquote_identifier(String s) {
+        if (!is_quoted_identifier(s)) {
+            return s;
+        }
+        String close = s.substring(s.length() - 1);
+        return s.substring(1, s.length() - 1).replace(close + close, close);
+    }
+
+    // the name for JDBC metadata: [dbo].[Order Details] -> dbo.Order Details; SQL keeps the quotes
+    public static String unquote_table_ref(String ref) {
+        String trimmed = ref.trim();
+        List<String> parts = split_table_ref(trimmed);
+        if (parts == null) {
+            return ref;
+        }
+        StringBuilder res = new StringBuilder();
+        for (String s : parts) {
+            if (res.length() > 0) {
+                res.append('.');
+            }
+            res.append(unquote_identifier(s));
+        }
+        return res.toString();
     }
 
     public static boolean is_jdbc_stored_proc_call(String jdbc_sql) {

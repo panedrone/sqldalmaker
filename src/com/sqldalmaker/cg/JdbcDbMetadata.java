@@ -200,10 +200,12 @@ class JdbcDbMetadata implements IDbMetadata {
         if (!SqlUtils.is_table_ref(table_ref)) {
             throw new Exception("Table name expected: " + table_ref);
         }
-        _validate_table_name(table_ref); // Oracle PK are not detected with lower case table name
+        // SQL takes the name as it is written ([Order Details]), JDBC metadata without the quotes
+        String md_table_name = SqlUtils.unquote_table_ref(table_ref);
+        _validate_table_name(md_table_name); // Oracle PK are not detected with lower case table name
         String jdbc_sql = SqlUtils.jdbc_sql_by_table_name(table_ref);
         List<Column> columns = read_sql_columns(jdbc_sql);
-        List<TableColumn> table_columns = _read_table_columns(table_ref);
+        List<TableColumn> table_columns = _read_table_columns(md_table_name);
         return new Table(columns, table_columns);
     }
 
@@ -374,7 +376,7 @@ class JdbcDbMetadata implements IDbMetadata {
     @Override
     public List<String> read_pk_col_names(String table_name) throws Exception {
         DatabaseMetaData md = conn.getMetaData(); // no close() method
-        ResultSet rs = _get_pk_rs(md, table_name);
+        ResultSet rs = _get_pk_rs(md, SqlUtils.unquote_table_ref(table_name));
         try {
             List<String> res = new ArrayList<>();
             while (rs.next()) {

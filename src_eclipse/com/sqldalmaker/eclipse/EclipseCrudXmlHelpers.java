@@ -6,17 +6,13 @@
 package com.sqldalmaker.eclipse;
 
 import java.sql.Connection;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
-import org.eclipse.core.resources.IProject;
 import org.eclipse.swt.widgets.Shell;
 
 import com.sqldalmaker.cg.FieldNamesMode;
 import com.sqldalmaker.cg.Helpers;
-import com.sqldalmaker.cg.Helpers.IFileList;
 import com.sqldalmaker.common.ISelectDbSchemaCallback;
 import com.sqldalmaker.common.SdmUtils;
 import com.sqldalmaker.jaxb.sdm.*;
@@ -74,27 +70,11 @@ public class EclipseCrudXmlHelpers {
 		return res;
 	}
 
-	private static List<String> get_dao_xml_file_name_list(IProject project, String xml_configs_folder_full_path) {
-
-		final List<String> res = new ArrayList<String>();
-		IFileList file_list = new IFileList() {
-			@Override
-			public void add(String abs_file_path) {
-				res.add(abs_file_path);
-			}
-		};
-		Helpers.enum_dao_xml_file_names(xml_configs_folder_full_path, file_list);
-		return res;
-	}
-
 	public static Set<String> find_dto_used_in_dao_xml_crud(IEditor2 editor2, String project_abs_path)
 			throws Exception {
 
-		String metaprogram_folder_abs_path = editor2.get_sdm_folder_abs_path();
-		List<String> dao_xml_file_name_list = get_dao_xml_file_name_list(editor2.get_project(),
-				editor2.get_sdm_folder_abs_path());
-		Set<String> res = SdmUtils.find_dto_used_in_dao_xml_crud(metaprogram_folder_abs_path, dao_xml_file_name_list);
-		return res;
+		// the DAO classes of sdm.xml: inline ones and those with "ref" to DAO XML files
+		return SdmUtils.find_dto_used_in_crud(editor2.get_sdm_folder_abs_path());
 	}
 
 	private static FieldNamesMode get_field_names_mode(IEditor2 editor2, Settings settings) {

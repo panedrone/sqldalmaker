@@ -15,9 +15,7 @@ import com.sqldalmaker.jaxb.sdm.Sdm;
 import com.sqldalmaker.jaxb.settings.Settings;
 
 import java.sql.Connection;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -78,21 +76,10 @@ public class IdeaCrudXmlHelpers {
         return res;
     }
 
-    private static ArrayList<String> fill_dao_file_path_list(VirtualFile root_file) throws Exception {
-        final ArrayList<String> res = new ArrayList<String>();
-        List<DaoClass> jaxb_dao_classes = IdeaHelpers.load_all_sdm_dao_classes(root_file);
-        // if (!jaxb_dao_classes.isEmpty()) {
-        for (DaoClass cls : jaxb_dao_classes) {
-            res.add(cls.getName());
-        }
-        return res;
-    }
-
     private static Set<String> find_dto_used_in_dao_xml_crud(VirtualFile root_file) throws Exception {
-        ArrayList<String> dao_xml_file_name_list = fill_dao_file_path_list(root_file);
+        // the DAO classes of sdm.xml: inline ones and those with "ref" to DAO XML files
         String meta_program_folder_abs_path = root_file.getParent().getPath();
-        Set<String> res = SdmUtils.find_dto_used_in_dao_xml_crud(meta_program_folder_abs_path, dao_xml_file_name_list);
-        return res;
+        return SdmUtils.find_dto_used_in_crud(meta_program_folder_abs_path);
     }
 
     private static FieldNamesMode get_field_names_mode(VirtualFile root_file, Settings settings) {

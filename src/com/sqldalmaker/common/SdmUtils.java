@@ -36,29 +36,28 @@ import java.util.*;
 public class SdmUtils {
 
     /*
-        Used in XML assistants
+        Used in XML assistants: the DTO classes of <crud> in the DAO classes of sdm.xml, both
+        the inline ones (<dao-class name="..."> with the elements inside) and those of the
+        DAO XML files of "ref" (<dao-class name="..." ref="TasksDao.xml"/>)
      */
-    public static Set<String> find_dto_used_in_dao_xml_crud(
-            String sdm_folder_abs_path,
-            List<String> dao_xml_file_name_list) throws Exception {
-
+    public static Set<String> find_dto_used_in_crud(String sdm_folder_abs_path) throws Exception {
         String context_path = DaoClass.class.getPackage().getName();
         XmlParser xml_parser = new XmlParser(context_path, Helpers.concat_path(sdm_folder_abs_path, Const.DAO_XSD));
         Set<String> res = new HashSet<String>();
-        for (String dao_xml_file_name : dao_xml_file_name_list) {
-            Set<String> dto_in_use = find_dto_used_in_dao_xml_crud(xml_parser,
-                    Helpers.concat_path(sdm_folder_abs_path, dao_xml_file_name));
-            res.addAll(dto_in_use);
+        for (DaoClass cls : load_all_sdm_dao_classes(sdm_folder_abs_path)) {
+            String ref = cls.getRef();
+            if (ref == null || ref.trim().isEmpty()) {
+                res.addAll(_find_dto_used_in_crud(cls));
+            } else {
+                DaoClass dao_xml = xml_parser.unmarshal(Helpers.concat_path(sdm_folder_abs_path, ref.trim()));
+                res.addAll(_find_dto_used_in_crud(dao_xml));
+            }
         }
         return res;
     }
 
-    private static Set<String> find_dto_used_in_dao_xml_crud(
-            XmlParser xml_parser,
-            String xml_file_abs_path) throws Exception {
-
+    private static Set<String> _find_dto_used_in_crud(DaoClass dao_class) {
         Set<String> res = new HashSet<String>();
-        DaoClass dao_class = xml_parser.unmarshal(xml_file_abs_path);
         List<Object> tags = dao_class.getCrudOrQueryOrQueryList();
         if (tags != null) {
             for (int i = 0; i < tags.size(); i++) {
@@ -133,10 +132,11 @@ public class SdmUtils {
             }
             String method = method_name + "(" + params + ")";
             node.setMethod(method);
+            String fk_table_ref = quote_table_name(conn, fk_table_name);
             if (schema_in_xml && selected_schema != null && !selected_schema.isEmpty()) {
-                node.setRef(selected_schema + "." + fk_table_name + "(" + columns + ")");
+                node.setRef(quote_table_name(conn, selected_schema) + "." + fk_table_ref + "(" + columns + ")");
             } else {
-                node.setRef(fk_table_name + "(" + columns + ")");
+                node.setRef(fk_table_ref + "(" + columns + ")");
             }
             nodes.add(node);
         }
@@ -146,7 +146,8 @@ public class SdmUtils {
         just table name without schema needed
      */
     public static String table_name_to_dto_class_name(String table_name, boolean plural_to_singular) {
-        String word = Names.title_case(table_name);
+        // a character a class name cannot have separates the words as "_" does: Order Details -> OrderDetails
+        String word = Names.title_case(table_name.replaceAll("[^\\p{L}\\p{Nd}_]+", "_"));
         if (plural_to_singular) {
             int last_word_index = -1;
             String last_word;
@@ -174,6 +175,27 @@ public class SdmUtils {
         return word;
     }
 
+    /*
+        A table or a schema name for "ref" and "table" of XML: as it is if it is a plain name, otherwise
+        quoted by the rules of the database ([Order Details] for SQL Server, the quote of the driver else),
+        so that it is a valid table name in SQL and in "ref".
+     */
+    public static String quote_table_name(Connection conn, String name) throws SQLException {
+        if (name.matches("[\\p{L}_][\\p{L}\\p{Nd}_$#@]*")) {
+            return name;
+        }
+        DatabaseMetaData md = conn.getMetaData();
+        if (md.getDatabaseProductName().toLowerCase().contains("sql server")) {
+            return "[" + name.replace("]", "]]") + "]";
+        }
+        String q = md.getIdentifierQuoteString();
+        if (q == null || q.trim().isEmpty()) {
+            return name; // quoting is not supported
+        }
+        q = q.trim();
+        return q + name.replace(q, q + q) + q;
+    }
+
     public static DaoClass create_crud_xml_jaxb_dao_class(
             ObjectFactory object_factory,
             Connection conn,
@@ -194,8 +216,9 @@ public class SdmUtils {
                 try {
                     String table_name = rs.getString("TABLE_NAME");
                     String dto_class_name = table_name_to_dto_class_name(table_name, plural_to_singular);
+                    table_name = quote_table_name(conn, table_name);
                     if (schema_in_xml && selected_schema != null && !selected_schema.isEmpty()) {
-                        table_name = selected_schema + "." + table_name;
+                        table_name = quote_table_name(conn, selected_schema) + "." + table_name;
                     }
                     if (!in_use.contains(dto_class_name)) {
                         if (crud_auto) {
@@ -306,8 +329,9 @@ public class SdmUtils {
             while (rs.next()) {
                 String table_name = rs.getString("TABLE_NAME");
                 String dto_class_name = table_name_to_dto_class_name(table_name, plural_to_singular);
+                table_name = quote_table_name(conn, table_name);
                 if (schema_in_xml && selected_schema != null && !selected_schema.isEmpty()) {
-                    table_name = selected_schema + "." + table_name;
+                    table_name = quote_table_name(conn, selected_schema) + "." + table_name;
                 }
                 if (!in_use.contains(dto_class_name)) {
                     DtoClass cls = object_factory.createDtoClass();
