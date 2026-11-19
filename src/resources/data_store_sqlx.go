@@ -1323,6 +1323,19 @@ func _copy(row map[string]any, col string, errMap map[string]int, fn func(value 
 }
 
 func _setAny(dstPtr any, value any) error {
+	// a nullable field *T (dstPtr is **T): nil for NULL, a new T with the value otherwise
+	if rv := reflect.ValueOf(dstPtr); rv.Kind() == reflect.Ptr && rv.Elem().Kind() == reflect.Ptr {
+		if value == nil {
+			rv.Elem().Set(reflect.Zero(rv.Elem().Type()))
+			return nil
+		}
+		p := reflect.New(rv.Elem().Type().Elem())
+		if err := _setAny(p.Interface(), value); err != nil {
+			return err
+		}
+		rv.Elem().Set(p)
+		return nil
+	}
 	if value == nil {
 		switch d := dstPtr.(type) {
 		case *any:
