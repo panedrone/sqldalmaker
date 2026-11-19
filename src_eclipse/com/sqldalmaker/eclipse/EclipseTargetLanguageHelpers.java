@@ -40,7 +40,7 @@ public class EclipseTargetLanguageHelpers {
 			throw new Exception("IFolder expected");
 		}
 		List<IFile> root_files = new ArrayList<IFile>();
-		String[] rf_names = { Const.Root.PHP, Const.Root.JAVA, Const.Root.CPP, Const.Root.PYTHON, Const.Root.GO };
+		String[] rf_names = { Const.Root.PHP, Const.Root.JAVA, Const.Root.PYTHON, Const.Root.GO };
 		for (String rf : rf_names) {
 			IResource res = xml_mp_folder.findMember(rf);
 			if (res instanceof IFile) {
@@ -78,7 +78,7 @@ public class EclipseTargetLanguageHelpers {
 
 	public static String get_root_file_relative_path(final IFile file) {
 		String fn = file.getName();
-		if (Const.Root.JAVA.equals(fn) || Const.Root.CPP.equals(fn) || Const.Root.PHP.equals(fn)
+		if (Const.Root.JAVA.equals(fn) || Const.Root.PHP.equals(fn)
 				|| Const.Root.PYTHON.equals(fn) || Const.Root.GO.equals(fn)) {
 			try {
 				return file.getFullPath().toPortableString();

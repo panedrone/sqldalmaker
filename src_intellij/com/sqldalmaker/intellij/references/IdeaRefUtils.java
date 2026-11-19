@@ -10,9 +10,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
-import com.intellij.psi.xml.XmlAttribute;
-import com.intellij.psi.xml.XmlFile;
-import com.intellij.psi.xml.XmlTag;
 import com.sqldalmaker.intellij.ui.IdeaEditorHelpers;
 import com.sqldalmaker.intellij.ui.IdeaHelpers;
 import com.sqldalmaker.intellij.ui.IdeaTargetLanguageHelpers;
@@ -63,28 +60,18 @@ public class IdeaRefUtils {
             @NotNull String dto_class_name) {
 
         PsiElement res = PsiManager.getInstance(project).findFile(sdm_xml_file);// @Nullable
-        if (!(res instanceof XmlFile)) {
+        if (!(res instanceof PsiFile)) {
             return null;
         }
-        XmlFile xml_file = (XmlFile) res;
-        XmlTag root = xml_file.getRootTag(); // nullable
+        PsiElement root = XmlPsi.root_tag((PsiFile) res); // nullable
         if (root == null) {
             return null;
         }
-        PsiElement[] tags = root.getChildren(); // notnull;
-        for (PsiElement el : tags) {
-            if (!(el instanceof XmlTag)) {
+        for (PsiElement el : XmlPsi.sub_tags(root)) {
+            if (!ELEMENT.DTO_CLASS.equals(XmlPsi.name_of(el))) {
                 continue;
             }
-            XmlTag t = (XmlTag) el;
-            if (!t.getName().equals(ELEMENT.DTO_CLASS)) {
-                continue;
-            }
-            XmlAttribute a = t.getAttribute(ATTRIBUTE.NAME);
-            if (a == null) {
-                continue;
-            }
-            String v = a.getValue();
+            String v = XmlPsi.attribute_value(el, ATTRIBUTE.NAME);
             if (v == null || v.isEmpty()) {
                 continue;
             }
@@ -101,28 +88,18 @@ public class IdeaRefUtils {
             @NotNull String dao_class_name) {
 
         PsiElement res = PsiManager.getInstance(project).findFile(sdm_xml_file);// @Nullable
-        if (!(res instanceof XmlFile)) {
+        if (!(res instanceof PsiFile)) {
             return null;
         }
-        XmlFile xml_file = (XmlFile) res;
-        XmlTag root = xml_file.getRootTag(); // nullable
+        PsiElement root = XmlPsi.root_tag((PsiFile) res); // nullable
         if (root == null) {
             return null;
         }
-        PsiElement[] tags = root.getChildren(); // notnull;
-        for (PsiElement el : tags) {
-            if (!(el instanceof XmlTag)) {
+        for (PsiElement el : XmlPsi.sub_tags(root)) {
+            if (!ELEMENT.DAO_CLASS.equals(XmlPsi.name_of(el))) {
                 continue;
             }
-            XmlTag t = (XmlTag) el;
-            if (!t.getName().equals(ELEMENT.DAO_CLASS)) {
-                continue;
-            }
-            XmlAttribute a = t.getAttribute(ATTRIBUTE.NAME);
-            if (a == null) {
-                continue;
-            }
-            String v = a.getValue();
+            String v = XmlPsi.attribute_value(el, ATTRIBUTE.NAME);
             if (v == null) {
                 continue;
             }
@@ -139,28 +116,18 @@ public class IdeaRefUtils {
             @NotNull String dao_class_ref) {
 
         PsiElement res = PsiManager.getInstance(project).findFile(sdm_xml_file);// @Nullable
-        if (!(res instanceof XmlFile)) {
+        if (!(res instanceof PsiFile)) {
             return null;
         }
-        XmlFile xml_file = (XmlFile) res;
-        XmlTag root = xml_file.getRootTag(); // nullable
+        PsiElement root = XmlPsi.root_tag((PsiFile) res); // nullable
         if (root == null) {
             return null;
         }
-        PsiElement[] tags = root.getChildren(); // notnull;
-        for (PsiElement el : tags) {
-            if (!(el instanceof XmlTag)) {
+        for (PsiElement el : XmlPsi.sub_tags(root)) {
+            if (!ELEMENT.DAO_CLASS.equals(XmlPsi.name_of(el))) {
                 continue;
             }
-            XmlTag t = (XmlTag) el;
-            if (!t.getName().equals(ELEMENT.DAO_CLASS)) {
-                continue;
-            }
-            XmlAttribute a = t.getAttribute(ATTRIBUTE.REF);
-            if (a == null) {
-                continue;
-            }
-            String v = a.getValue();
+            String v = XmlPsi.attribute_value(el, ATTRIBUTE.REF);
             if (v == null) {
                 continue;
             }

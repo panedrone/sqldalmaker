@@ -26,14 +26,9 @@ go_log_no_orm       | D:/work/sdm-go/go-sdm/go_cli_sqlite3_sdm_log     | no_orm/
 
 php_log | D:/work/sdm_php | sdm
 
-# C++: the demo still uses the pre-1.292 'dto.xml' layout, so its XML configuration
-# was migrated to 'harness/fixtures/cpp_task_board' instead of being changed in place.
-# An absolute path in the third column means "take the XML from here"; SQL files,
-# the SQLite DB and the JDBC jar are still read from the project dir.
-cpp_task_board | D:/work/sdm-cpp/qt6_sqlite3_task_board | D:/work/sdm/sdm-plugins/harness/fixtures/cpp_task_board
-
 # Implicit cursors in "<exec-dml": the branch that no demo project exercises offline.
-# The XML lives here, the SQLite DB and the JDBC jar come from the C++ demo project.
+# An absolute path in the third column means "take the XML from here"; SQL files,
+# the SQLite DB and the JDBC jar are still read from the project dir (qt6_sqlite3_task_board).
 refcursors_java   | D:/work/sdm-cpp/qt6_sqlite3_task_board | D:/work/sdm/sdm-plugins/harness/fixtures/refcursors_java
 refcursors_go     | D:/work/sdm-cpp/qt6_sqlite3_task_board | D:/work/sdm/sdm-plugins/harness/fixtures/refcursors_go
 refcursors_python | D:/work/sdm-cpp/qt6_sqlite3_task_board | D:/work/sdm/sdm-plugins/harness/fixtures/refcursors_python

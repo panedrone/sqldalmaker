@@ -37,15 +37,11 @@ public class UITabAdmin {
     private JButton dataStoreJavaAndroidButton;
     private JButton dataStorePhpButton;
     private JButton PDODataStorePhpButton;
-    private JButton dataStoreCSTLButton;
-    private JButton dataStoreCATLButton;
-    private JButton cppVmButton;
     private JButton pythonVmButton;
     private JPanel rootPanel;
     private JButton php_vm;
     private JButton java_vm;
     private JButton recentChangesButton;
-    private JButton dataStoreQt5CButton;
     private JTextField vTextField;
     private JScrollPane scroll_pane;
     private JButton btn_php_pg;
@@ -67,14 +63,12 @@ public class UITabAdmin {
     private JPanel pnl_java;
     private JPanel pnl_py;
     private JPanel pnl_go;
-    private JPanel pnl_cpp;
     private JButton btn_gorn;
     private JButton btn_go_no_orm;
     private JButton btn_sqla;
     private JButton btn_django;
     private JButton btn_cx_oracle;
     private JButton btn_py_no_orm;
-    private JButton btn_cpp;
     private JButton btn_php_no_orm;
     private JButton btn_doctrine;
     private JButton btn_jdbc;
@@ -123,7 +117,6 @@ public class UITabAdmin {
     public UITabAdmin() {
 
         Cursor wc = new Cursor(Cursor.HAND_CURSOR);
-        set_cursor(wc, pnl_cpp);
         set_cursor(wc, pnl_go);
         set_cursor(wc, pnl_java);
         set_cursor(wc, pnl_php);
@@ -178,12 +171,6 @@ public class UITabAdmin {
                 IdeaEditorHelpers.open_or_activate_jar_file_in_editor(project, "com/sqldalmaker/cg/java", "java.vm", "java.vm");
             }
         });
-        cppVmButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                IdeaEditorHelpers.open_or_activate_jar_file_in_editor(project, "com/sqldalmaker/cg/cpp", "cpp.vm", "cpp.vm");
-            }
-        });
         pythonVmButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -220,31 +207,10 @@ public class UITabAdmin {
                 IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "DataStore_PDO_SQLite3.php", "DataStore_PDO_SQLite3.php");
             }
         });
-        dataStoreCSTLButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "DataStore.STL.cpp", "DataStore.cpp");
-                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "DataStore.STL.h", "DataStore.h");
-            }
-        });
-        dataStoreCATLButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "DataStore.cpp", "DataStore.cpp");
-                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "DataStore.h", "DataStore.h");
-            }
-        });
         recentChangesButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 IdeaEditorHelpers.open_or_activate_jar_file_in_editor(project, "", "recent_changes.txt", "recent_changes.txt");
-            }
-        });
-        dataStoreQt5CButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "DataStore_Qt5.cpp", "DataStore.cpp");
-                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "DataStore_Qt5.h", "DataStore.h");
             }
         });
         btn_php_pg.addActionListener(new ActionListener() {
@@ -371,12 +337,6 @@ public class UITabAdmin {
             @Override
             public void actionPerformed(ActionEvent e) {
                 IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "data_store_no_orm.py.settings.xml", "settings.xml");
-            }
-        });
-        btn_cpp.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                IdeaEditorHelpers.open_or_activate_jar_resource_in_editor(project, "DataStore.cpp.settings.xml", "settings.xml");
             }
         });
         btn_php_no_orm.addActionListener(new ActionListener() {
@@ -994,22 +954,16 @@ public class UITabAdmin {
         gbc.gridx = 1;
         gbc.gridy = 0;
         pnl_vm.add(java_vm, gbc);
-        cppVmButton = new JButton();
-        cppVmButton.setText("cpp.vm");
-        gbc = new GridBagConstraints();
-        gbc.gridx = 2;
-        gbc.gridy = 0;
-        pnl_vm.add(cppVmButton, gbc);
         pythonVmButton = new JButton();
         pythonVmButton.setText("python.vm");
         gbc = new GridBagConstraints();
-        gbc.gridx = 3;
+        gbc.gridx = 2;
         gbc.gridy = 0;
         pnl_vm.add(pythonVmButton, gbc);
         btn_golangVM = new JButton();
         btn_golangVM.setText("go.vm");
         gbc = new GridBagConstraints();
-        gbc.gridx = 4;
+        gbc.gridx = 3;
         gbc.gridy = 0;
         pnl_vm.add(btn_golangVM, gbc);
         pnl_xsd = new JPanel();
@@ -1038,61 +992,6 @@ public class UITabAdmin {
         gbc.gridx = 1;
         gbc.gridy = 0;
         pnl_xsd.add(createOverwriteDtoXmlButton, gbc);
-        pnl_cpp = new JPanel();
-        pnl_cpp.setLayout(new GridBagLayout());
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 4;
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.fill = GridBagConstraints.VERTICAL;
-        panel2.add(pnl_cpp, gbc);
-        final JLabel label5 = new JLabel();
-        Font label5Font = this.$$$getFont$$$(null, -1, 14, label5.getFont());
-        if (label5Font != null) label5.setFont(label5Font);
-        label5.setHorizontalAlignment(4);
-        label5.setPreferredSize(new Dimension(58, 20));
-        label5.setText(" C++ ");
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-        gbc.anchor = GridBagConstraints.WEST;
-        pnl_cpp.add(label5, gbc);
-        dataStoreQt5CButton = new JButton();
-        dataStoreQt5CButton.setPreferredSize(new Dimension(60, 30));
-        dataStoreQt5CButton.setText("Qt");
-        gbc = new GridBagConstraints();
-        gbc.gridx = 1;
-        gbc.gridy = 0;
-        pnl_cpp.add(dataStoreQt5CButton, gbc);
-        dataStoreCSTLButton = new JButton();
-        dataStoreCSTLButton.setText("STL, sqlite3");
-        gbc = new GridBagConstraints();
-        gbc.gridx = 2;
-        gbc.gridy = 0;
-        pnl_cpp.add(dataStoreCSTLButton, gbc);
-        dataStoreCATLButton = new JButton();
-        dataStoreCATLButton.setText("ATL, sqlite3");
-        gbc = new GridBagConstraints();
-        gbc.gridx = 3;
-        gbc.gridy = 0;
-        pnl_cpp.add(dataStoreCATLButton, gbc);
-        btn_cpp = new JButton();
-        btn_cpp.setBorderPainted(true);
-        btn_cpp.setContentAreaFilled(true);
-        btn_cpp.setIcon(new ImageIcon(getClass().getResource("/img/xmldoc_12x12.gif")));
-        btn_cpp.setMargin(new Insets(0, 0, 0, 0));
-        btn_cpp.setMaximumSize(new Dimension(22, 24));
-        btn_cpp.setMinimumSize(new Dimension(22, 24));
-        btn_cpp.setOpaque(true);
-        btn_cpp.setPreferredSize(new Dimension(22, 24));
-        btn_cpp.setText("");
-        btn_cpp.setToolTipText("settings.xml");
-        gbc = new GridBagConstraints();
-        gbc.gridx = 4;
-        gbc.gridy = 0;
-        pnl_cpp.add(btn_cpp, gbc);
         pnl_migrate = new JPanel();
         pnl_migrate.setLayout(new BorderLayout(0, 0));
         gbc = new GridBagConstraints();

@@ -16,7 +16,6 @@ import com.sqldalmaker.cg.IDtoCG;
 import com.sqldalmaker.common.Const;
 import com.sqldalmaker.common.TargetLangUtils;
 import com.sqldalmaker.jaxb.settings.Settings;
-import org.jetbrains.annotations.NotNull;
 
 import java.sql.Connection;
 import java.util.ArrayList;
@@ -31,7 +30,7 @@ public class IdeaTargetLanguageHelpers {
 
     public static List<VirtualFile> find_root_files(VirtualFile dir) {
         List<VirtualFile> root_files = new ArrayList<VirtualFile>();
-        String[] rf_names = {Const.Root.PHP, Const.Root.JAVA, Const.Root.CPP, Const.Root.PYTHON, Const.Root.GO};
+        String[] rf_names = {Const.Root.PHP, Const.Root.JAVA, Const.Root.PYTHON, Const.Root.GO};
         for (String rf : rf_names) {
             VirtualFile root_file;
             root_file = dir.findFileByRelativePath(rf);
@@ -52,9 +51,8 @@ public class IdeaTargetLanguageHelpers {
         return TargetLangUtils.lower_camel_case_needed(fn);
     }
 
-    public static void register(@NotNull FileTypeConsumer consumer, FileType file_type) {
+    public static void register(FileTypeConsumer consumer, FileType file_type) {
         consumer.consume(file_type, new ExactFileNameMatcher(Const.Root.JAVA));
-        consumer.consume(file_type, new ExactFileNameMatcher(Const.Root.CPP));
         consumer.consume(file_type, new ExactFileNameMatcher(Const.Root.PHP));
         consumer.consume(file_type, new ExactFileNameMatcher(Const.Root.PYTHON));
         consumer.consume(file_type, new ExactFileNameMatcher(Const.Root.GO));
@@ -151,7 +149,6 @@ public class IdeaTargetLanguageHelpers {
     public static String get_root_file_relative_path(Project project, VirtualFile file) {
         String fn = file.getName();
         if (Const.Root.JAVA.equals(fn)
-                || Const.Root.CPP.equals(fn)
                 || Const.Root.PHP.equals(fn)
                 || Const.Root.PYTHON.equals(fn)
                 || Const.Root.GO.equals(fn)) {
@@ -164,7 +161,7 @@ public class IdeaTargetLanguageHelpers {
         return null;
     }
 
-    public static boolean accept(@NotNull VirtualFile file) {
+    public static boolean accept(VirtualFile file) {
         return TargetLangUtils.accept(file.getName());
     }
 

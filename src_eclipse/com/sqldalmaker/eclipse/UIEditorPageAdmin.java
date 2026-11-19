@@ -349,63 +349,6 @@ public class UIEditorPageAdmin extends Composite {
 		button_1_5.setImage(SWTResourceManager.getImage(UIEditorPageAdmin.class, "/img/xmldoc_12x12.gif"));
 		toolkit.adapt(button_1_5, true, true);
 
-		Composite composite_7 = new Composite(composite_2, SWT.NONE);
-		toolkit.adapt(composite_7);
-		toolkit.paintBordersFor(composite_7);
-		composite_7.setLayout(new GridLayout(5, false));
-
-		Label lblC = new Label(composite_7, SWT.NONE);
-		lblC.setAlignment(SWT.RIGHT);
-		toolkit.adapt(lblC, true, true);
-		lblC.setText("C++");
-
-		Button btnDatastoreCQt = new Button(composite_7, SWT.NONE);
-		btnDatastoreCQt.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore_Qt5.cpp",
-						"DataStore.cpp");
-				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore_Qt5.h", "DataStore.h");
-			}
-		});
-		toolkit.adapt(btnDatastoreCQt, true, true);
-		btnDatastoreCQt.setText("Qt");
-
-		Button btnDatastoreCStl = new Button(composite_7, SWT.NONE);
-		btnDatastoreCStl.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore.STL.cpp",
-						"DataStore.cpp");
-				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore.STL.h", "DataStore.h");
-			}
-		});
-		toolkit.adapt(btnDatastoreCStl, true, true);
-		btnDatastoreCStl.setText("stl, sqlite3");
-
-		Button btnNewButton_11 = new Button(composite_7, SWT.NONE);
-		btnNewButton_11.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore.cpp", "DataStore.cpp");
-				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore.h", "DataStore.h");
-			}
-		});
-		toolkit.adapt(btnNewButton_11, true, true);
-		btnNewButton_11.setText("atl, sqlite3");
-
-		Button button_1_6 = new Button(composite_7, SWT.NONE);
-		button_1_6.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				EclipseResourceEditorHelpers.open_resource_file_in_editor("resources/DataStore.cpp.settings.xml",
-						Const.SETTINGS_XML);
-			}
-		});
-		button_1_6.setToolTipText("settings.xml");
-		button_1_6.setImage(SWTResourceManager.getImage(UIEditorPageAdmin.class, "/img/xmldoc_12x12.gif"));
-		toolkit.adapt(button_1_6, true, true);
-
 		Composite composite_5 = new Composite(composite_2, SWT.NONE);
 		toolkit.adapt(composite_5);
 		toolkit.paintBordersFor(composite_5);
@@ -598,7 +541,7 @@ public class UIEditorPageAdmin extends Composite {
 		toolkit.adapt(button_1_8_1, true, true);
 
 		Composite composite_3 = new Composite(composite_top, SWT.NONE);
-		composite_3.setLayout(new GridLayout(5, false));
+		composite_3.setLayout(new GridLayout(4, false));
 		toolkit.adapt(composite_3);
 		toolkit.paintBordersFor(composite_3);
 
@@ -623,17 +566,6 @@ public class UIEditorPageAdmin extends Composite {
 		});
 		btnJavavm.setText("java.vm");
 		toolkit.adapt(btnJavavm, true, true);
-
-		Button button_2 = new Button(composite_3, SWT.NONE);
-		button_2.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				EclipseResourceEditorHelpers.open_resource_file_in_text_editor("com/sqldalmaker/cg/cpp/cpp.vm",
-						"cpp.vm");
-			}
-		});
-		button_2.setText("cpp.vm");
-		toolkit.adapt(button_2, true, true);
 
 		Button button_3 = new Button(composite_3, SWT.NONE);
 		button_3.addSelectionListener(new SelectionAdapter() {

@@ -8,8 +8,6 @@ package com.sqldalmaker.intellij.references;
 
 import com.intellij.codeInsight.completion.CompletionContributor;
 import com.intellij.codeInsight.completion.CompletionType;
-import com.intellij.patterns.PlatformPatterns;
-import com.intellij.patterns.XmlPatterns;
 import com.sqldalmaker.common.Const;
 
 /*
@@ -29,33 +27,24 @@ public class CompletionContributorCommon extends CompletionContributor {
         // com.intellij.diagnostic.PluginException: No key specified for extension of class class my.reference.MyXmlCompletionContributor
 
         extend(CompletionType.BASIC,
-                PlatformPatterns.psiElement().
-                        inside(XmlPatterns.xmlAttributeValue().withLocalName(IdeaRefUtils.ATTRIBUTE.REF).
-                                withSuperParent(3, XmlPatterns.xmlTag().withName(IdeaRefUtils.ELEMENT.DAO_CLASS))),
+                XmlPsi.inside_attribute_value(IdeaRefUtils.ATTRIBUTE.REF, 3,
+                        new String[]{IdeaRefUtils.ELEMENT.DAO_CLASS}, null),
                 new CompletionProviderSql());
-
         extend(CompletionType.BASIC,
-                PlatformPatterns.psiElement().inside(XmlPatterns.xmlAttributeValue().withLocalName(IdeaRefUtils.ATTRIBUTE.REF).
-                                withSuperParent(2, XmlPatterns.xmlTag().withName(IdeaRefUtils.ELEMENT.DTO_CLASS)).
-                        inside(XmlPatterns.xmlFile().withName(Const.SDM_XML))),
+                XmlPsi.inside_attribute_value(IdeaRefUtils.ATTRIBUTE.REF, 2,
+                        new String[]{IdeaRefUtils.ELEMENT.DTO_CLASS}, Const.SDM_XML),
                 new CompletionProviderSql());
-
         extend(CompletionType.BASIC,
-                PlatformPatterns.psiElement().inside(XmlPatterns.xmlAttributeValue().withLocalName(IdeaRefUtils.ATTRIBUTE.REF).
-                        withSuperParent(2, XmlPatterns.xmlTag().withName(IdeaRefUtils.ELEMENT.DAO_CLASS)).
-                        inside(XmlPatterns.xmlFile().withName(Const.SDM_XML))),
+                XmlPsi.inside_attribute_value(IdeaRefUtils.ATTRIBUTE.REF, 2,
+                        new String[]{IdeaRefUtils.ELEMENT.DAO_CLASS}, Const.SDM_XML),
                 new CompletionProviderExternalDaoXml());
-
         extend(CompletionType.BASIC,
-                PlatformPatterns.psiElement().
-                        inside(XmlPatterns.xmlAttributeValue().withLocalName(IdeaRefUtils.ATTRIBUTE.DTO).
-                                withSuperParent(3, XmlPatterns.xmlTag().withName(IdeaRefUtils.ELEMENT.DAO_CLASS))),
+                XmlPsi.inside_attribute_value(IdeaRefUtils.ATTRIBUTE.DTO, 3,
+                        new String[]{IdeaRefUtils.ELEMENT.DAO_CLASS}, null),
                 new CompletionProviderDtoClass());
-
         extend(CompletionType.BASIC,
-                PlatformPatterns.psiElement().
-                        inside(XmlPatterns.xmlAttributeValue().withLocalName(IdeaRefUtils.ATTRIBUTE.TABLE).
-                                withSuperParent(3, XmlPatterns.xmlTag().withName(IdeaRefUtils.ELEMENT.DAO_CLASS))),
+                XmlPsi.inside_attribute_value(IdeaRefUtils.ATTRIBUTE.TABLE, 3,
+                        new String[]{IdeaRefUtils.ELEMENT.DAO_CLASS}, null),
                 new CompletionProviderTable());
     }
 }

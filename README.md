@@ -2,13 +2,13 @@
 
 ### About
 
-SQL DAL Maker generates the data access layer — DTO, Model, and DAO classes — for PHP, Java, C++, Python, and Go.
+SQL DAL Maker generates the data access layer — DTO, Model, and DAO classes — for PHP, Java, Python, and Go.
 
 It works like this:
 
 1. **XML manifest.** The manifest describes what to generate: the DTO and model classes, the DAO methods, and the SQL
    behind them.
-2. **Translate.** The manifest is translated into complete source code — free of any direct call to PDO, JDBC, or QtSql.
+2. **Translate.** The manifest is translated into complete source code — free of any direct call to PDO, JDBC, or DB-API.
    Those stay behind a `DataStore` interface that you own.
 
 Reverse engineering serves both. It can write a first draft of the manifest, so you rarely start from an empty file —
@@ -28,7 +28,7 @@ Quick Start in
 mp4: [https://github.com/panedrone/sqldalmaker/releases/tag/latest](https://github.com/panedrone/sqldalmaker/releases/tag/latest)
 
 Also, welcome to [sdmc](https://github.com/panedrone/sdmc) — the command-line twin of this plug-in: the
-same `sdm.xml` and `settings.xml`, the same generated code for Go, Python and C++ (Qt) on PostgreSQL, MySQL
+same `sdm.xml` and `settings.xml`, the same generated code for Go and Python on PostgreSQL, MySQL
 and SQLite. No IDE needed: handy in CI.
 
 ### Hello-App
@@ -110,17 +110,6 @@ Or use "Install..." button from the plug-in web-page: [http://plugins.jetbrains.
       </ul>
     </td>
     <td>
-    </td>
-</tr>
-<tr>
-    <td>
-        C++
-    </td>
-    <td>
-        <a href="https://github.com/panedrone/sdm_demo_qt6_thesaurus">QtSql</a>
-    </td>
-    <td>
-        Qt
     </td>
 </tr>
 <tr>

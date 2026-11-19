@@ -14,11 +14,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
-import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.psi.xml.XmlAttribute;
-import com.intellij.psi.xml.XmlAttributeValue;
-import com.intellij.psi.xml.XmlFile;
-import com.intellij.psi.xml.XmlTag;
 import com.intellij.util.ProcessingContext;
 import com.sqldalmaker.common.Const;
 import org.jetbrains.annotations.NotNull;
@@ -33,13 +28,13 @@ public class CompletionProviderDtoClass extends CompletionProvider<CompletionPar
     protected void addCompletions(@NotNull CompletionParameters completionParameters,
                                   @NotNull ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
 
-        final XmlAttributeValue attribute_value = PsiTreeUtil.getParentOfType(completionParameters.getPosition(), XmlAttributeValue.class, false);
+        final PsiElement attribute_value = XmlPsi.attribute_value_of(completionParameters.getPosition());
         if (attribute_value == null) {
             // we are injected, only getContext() returns attribute value
             return;
         }
         PsiElement attr_element = attribute_value.getParent();
-        if (!(attr_element instanceof XmlAttribute)) {
+        if (!XmlPsi.is_attribute(attr_element)) {
             return;
         }
         final PsiFile containing_file = attr_element.getContainingFile();
@@ -65,36 +60,23 @@ public class CompletionProviderDtoClass extends CompletionProvider<CompletionPar
 //            return null; // ---- it is @NotNull
 //        }
         PsiElement res = PsiManager.getInstance(project).findFile(sdm_xml_file);// @Nullable
-        if (!(res instanceof XmlFile)) {
+        if (!(res instanceof PsiFile)) {
             return;
         }
-        XmlFile xml_file = (XmlFile) res;
-        XmlTag root;
+        PsiElement root;
         try {
-            root = xml_file.getRootTag();
+            root = XmlPsi.root_tag((PsiFile) res);
         } catch (Throwable th) {
             return;
         }
         if (root == null) {
             return;
         }
-        PsiElement[] tags;
-        try {
-            tags = root.getChildren(); // notnull;
-        } catch (Throwable th) {
-            return;
-        }
-        for (PsiElement el : tags) {
-            if (el instanceof XmlTag) {
-                XmlTag t = (XmlTag) el;
-                if (IdeaRefUtils.ELEMENT.DTO_CLASS.equals(t.getName())) {
-                    XmlAttribute a = t.getAttribute(IdeaRefUtils.ATTRIBUTE.NAME);
-                    if (a != null) {
-                        String v = a.getValue();
-                        if (v != null && !v.isEmpty()) {
-                            completionResultSet.addElement(LookupElementBuilder.create(v));
-                        }
-                    }
+        for (PsiElement t : XmlPsi.sub_tags(root)) {
+            if (IdeaRefUtils.ELEMENT.DTO_CLASS.equals(XmlPsi.name_of(t))) {
+                String v = XmlPsi.attribute_value(t, IdeaRefUtils.ATTRIBUTE.NAME);
+                if (v != null && !v.isEmpty()) {
+                    completionResultSet.addElement(LookupElementBuilder.create(v));
                 }
             }
         }

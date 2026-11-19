@@ -303,14 +303,6 @@
         <!--        <type detected="byte[]" target="array"/>-->
         <!--        <type detected="java.lang.Object" target="object"/>-->
 
-        <!-- Example for C++ and SQLite3: -->
-
-        <!--        <type detected="java.lang.Integer" target="CLong"/>-->
-        <!--        <type detected="java.lang.Double" target="CDouble"/>-->
-        <!--        <type detected="java.lang.Float" target="CDouble"/>-->
-        <!--        <type detected="java.lang.String" target="CText"/>-->
-        <!--        <type detected="byte[]" target="CBlob"/>-->
-
     </type-map>
 
     <macros>

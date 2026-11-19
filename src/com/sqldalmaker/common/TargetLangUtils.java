@@ -6,7 +6,6 @@
 package com.sqldalmaker.common;
 
 import com.sqldalmaker.cg.*;
-import com.sqldalmaker.cg.cpp.CppCG;
 import com.sqldalmaker.cg.go.GoCG;
 import com.sqldalmaker.cg.java.JavaCG;
 import com.sqldalmaker.cg.php.PhpCG;
@@ -40,8 +39,6 @@ public class TargetLangUtils {
             return class_name + ".php";
         } else if (Const.Root.JAVA.equals(root_fn)) {
             return class_name + ".java";
-        } else if (Const.Root.CPP.equals(root_fn)) {
-            return class_name + ".h";
         } else if (Const.Root.PYTHON.equals(root_fn)) {
             return Names.convert_file_name_to_snake_case(class_name, "py");
         } else if (Const.Root.GO.equals(root_fn)) {
@@ -52,7 +49,6 @@ public class TargetLangUtils {
 
     public static boolean accept(String root_fn) {
         return Const.Root.JAVA.equals(root_fn) ||
-                Const.Root.CPP.equals(root_fn) ||
                 Const.Root.PHP.equals(root_fn) ||
                 Const.Root.PYTHON.equals(root_fn) ||
                 Const.Root.GO.equals(root_fn);
@@ -182,12 +178,6 @@ public class TargetLangUtils {
             }
             return new JavaCG.DTO(sdm, settings, connection, dto_package,
                     sql_root_abs_path, dto_inheritance, field_names_mode, vm_template);
-        } else if (Const.Root.CPP.equals(root_fn)) {
-            if (output_dir_rel_path != null) {
-                String package_rel_path = settings.getFolders().getTarget();
-                output_dir_rel_path.append(package_rel_path);
-            }
-            return new CppCG.DTO(sdm, settings, connection, sql_root_abs_path, "", vm_template);
         } else if (Const.Root.PYTHON.equals(root_fn)) {
             if (output_dir_rel_path != null) {
                 String package_rel_path = settings.getFolders().getTarget();
@@ -241,12 +231,6 @@ public class TargetLangUtils {
             }
             return new JavaCG.DAO(dto_classes, settings, con, dto_package, dao_package,
                     sql_root_abs_path, field_names_mode, vm_template);
-        } else if (Const.Root.CPP.equals(root_fn)) {
-            if (output_dir_rel_path != null) {
-                String package_rel_path = settings.getFolders().getTarget();
-                output_dir_rel_path.append(package_rel_path);
-            }
-            return new CppCG.DAO(dto_classes, settings, con, sql_root_abs_path, "", vm_template);
         } else if (Const.Root.PYTHON.equals(root_fn)) {
             String package_rel_path = settings.getFolders().getTarget();
             if (output_dir_rel_path != null) {

@@ -36,7 +36,6 @@ public class Const {
 
     public static class Root {
         public static final String JAVA = "java.dal";
-        public static final String CPP = "cpp.dal";
         public static final String PHP = "php.dal";
         public static final String PYTHON = "python.dal";
         public static final String GO = "go.dal";

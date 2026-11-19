@@ -143,7 +143,7 @@ class DaoClassInfo {
         if (explicit_ret_type != null && !explicit_ret_type.trim().isEmpty()) {
             ret_type_name = explicit_ret_type;
             // the type is the XML's, the column is the query's: a data store that reads columns by
-            // name (C++) finds no "ret_value", and the value is always NULL
+            // name finds no "ret_value", and the value is always NULL
             if (!dao_fields.isEmpty()) {
                 ret_col_name = dao_fields.get(0).getColumnName();
             }

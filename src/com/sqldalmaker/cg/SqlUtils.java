@@ -41,9 +41,9 @@ public class SqlUtils {
         return parts;
     }
 
-    // A line of SQL in Python and C++ code: escapeJava for each character, but a character beyond the BMP is
-    // one \UXXXXXXXX, not the two halves of UTF-16: "\uD83D\uDE00" is two lone surrogates in Python and
-    // an error in C++. Character by character, '/' needs no "fix the bug in StringEscapeUtils" anymore.
+    // A line of SQL in Python code: escapeJava for each character, but a character beyond the BMP is
+    // one \UXXXXXXXX, not the two halves of UTF-16: "\uD83D\uDE00" is two lone surrogates in Python.
+    // Character by character, '/' needs no "fix the bug in StringEscapeUtils" anymore.
     private static String escape_sql_line(String line) {
         StringBuilder res = new StringBuilder();
         for (int i = 0; i < line.length(); ) {
@@ -58,27 +58,6 @@ public class SqlUtils {
                 res.append(org.apache.commons.lang.StringEscapeUtils.escapeJava(line.substring(i, i + n)));
             }
             i += n;
-        }
-        return res.toString();
-    }
-
-    public static String jdbc_sql_to_cpp_str(String jdbc_sql) {
-        String[] parts = get_sql_lines(jdbc_sql);
-        String new_line = "\n"; // not System.lineSeparator(): the generated code is LF on any OS
-        String new_line_j = org.apache.commons.lang.StringEscapeUtils.escapeJava("\n");
-        StringBuilder res = new StringBuilder();
-        res.append("\"");
-        for (int i = 0; i < parts.length; i++) {
-            res.append(escape_sql_line(parts[i].replace('\t', ' ')));
-            if (i < parts.length - 1) {
-                res.append(" ");
-                res.append(new_line_j);
-                res.append("\\");
-                res.append(new_line);
-                // res.append("\t\t");
-            } else {
-                res.append("\"");
-            }
         }
         return res.toString();
     }

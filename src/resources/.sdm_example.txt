@@ -4,7 +4,6 @@
 
 # sdm/php.dal
 # sdm/java.dal
-# sdm/cpp.dal
 # sdm/python.dal
 # sdm/go.dal
 

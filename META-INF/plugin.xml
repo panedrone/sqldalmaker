@@ -15,7 +15,7 @@
     <description><![CDATA[
 <p>
 SQL DAL Maker generates the data access layer: DTO, Model, and DAO classes
-for PHP, Java, C++, Python, and Go.
+for PHP, Java, Python, and Go.
 </p>
 
 <p>
@@ -29,7 +29,7 @@ methods, and the SQL behind them.
 </li>
 <li>
 <b>Translate.</b> The manifest is translated into complete source code &mdash; free of any
-direct call to PDO, JDBC, or QtSql. Those stay behind a <code>DataStore</code> interface that
+direct call to PDO, JDBC, or DB-API. Those stay behind a <code>DataStore</code> interface that
 you own.
 </li>
 </ol>
@@ -55,7 +55,7 @@ Documentation and demo projects:
 <p>
 Also, welcome to <a href="https://github.com/panedrone/sdmc">sdmc</a> &mdash; the command-line twin of
 this plug-in: the same <code>sdm.xml</code> and <code>settings.xml</code>, the same generated code for
-Go, Python and C++ (Qt) on PostgreSQL, MySQL and SQLite. No IDE needed: handy in CI.
+Go and Python on PostgreSQL, MySQL and SQLite. No IDE needed: handy in CI.
 </p>
 
     ]]></description>

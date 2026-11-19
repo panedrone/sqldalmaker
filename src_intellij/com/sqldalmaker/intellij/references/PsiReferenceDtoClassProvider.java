@@ -9,8 +9,6 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiReferenceProvider;
-import com.intellij.psi.xml.XmlAttribute;
-import com.intellij.psi.xml.XmlAttributeValue;
 import com.intellij.util.ProcessingContext;
 import com.sqldalmaker.cg.Helpers;
 import org.jetbrains.annotations.NotNull;
@@ -32,11 +30,11 @@ public class PsiReferenceDtoClassProvider extends PsiReferenceProvider {
 
     @Override
     public PsiReference @NotNull [] getReferencesByElement(@NotNull PsiElement element, @NotNull ProcessingContext context) {
-        if (!(element instanceof XmlAttributeValue)) {
+        if (!XmlPsi.is_attribute_value(element)) {
             return PsiReference.EMPTY_ARRAY;
         }
         PsiElement attr_element = element.getParent();
-        if (!(attr_element instanceof XmlAttribute)) {
+        if (!XmlPsi.is_attribute(attr_element)) {
             return PsiReference.EMPTY_ARRAY;
         }
         PsiElement parent_tag = attr_element.getParent();
@@ -48,23 +46,23 @@ public class PsiReferenceDtoClassProvider extends PsiReferenceProvider {
             return PsiReference.EMPTY_ARRAY;
         }
         String file_name = containing_file.getName();
-        final String attr_name = ((XmlAttribute) attr_element).getName();
+        final String attr_name = XmlPsi.name_of(attr_element);
         if (Helpers.is_dao_xml(file_name)) {
             if (IdeaRefUtils.ATTRIBUTE.DTO.equals(attr_name)) {
-//                    final String parent_tag_name = ((XmlTag) parent_tag).getName();
+//                    final String parent_tag_name = XmlPsi.name_of(parent_tag);
 //                    if (dao_tag_names.contains(parent_tag_name)) {
                 return new PsiReference[]{new PsiReferenceDtoClass(element/*, element.getTextRange()*/)};
 //                    }
             }
         } else if (Helpers.is_sdm_xml(file_name)) {
             if (IdeaRefUtils.ATTRIBUTE.DTO.equals(attr_name)) {
-//                    final String parent_tag_name = ((XmlTag) parent_tag).getName();
+//                    final String parent_tag_name = XmlPsi.name_of(parent_tag);
 //                    if (dao_tag_names.contains(parent_tag_name)) {
                 return new PsiReference[]{new PsiReferenceDtoClass(element/*, element.getTextRange()*/)};
 //                    }
             }
             else if (IdeaRefUtils.ATTRIBUTE.NAME.equals(attr_name)) {
-//                    final String parent_tag_name = ((XmlTag) parent_tag).getName();
+//                    final String parent_tag_name = XmlPsi.name_of(parent_tag);
 //                    if (dao_tag_names.contains(parent_tag_name)) {
                 return new PsiReference[]{new PsiReferenceDtoClass(element/*, element.getTextRange()*/)};
 //                    }

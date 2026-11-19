@@ -15,9 +15,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileVisitor;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.psi.xml.XmlAttribute;
-import com.intellij.psi.xml.XmlAttributeValue;
 import com.intellij.util.ProcessingContext;
 import com.sqldalmaker.cg.SqlUtils;
 import com.sqldalmaker.common.SdmUtils;
@@ -41,12 +38,12 @@ public class CompletionProviderSql extends CompletionProvider<CompletionParamete
             @NotNull ProcessingContext context,
             @NotNull CompletionResultSet result) {
 
-        XmlAttributeValue attribute_value = PsiTreeUtil.getParentOfType(parameters.getPosition(), XmlAttributeValue.class, false);
+        PsiElement attribute_value = XmlPsi.attribute_value_of(parameters.getPosition());
         if (attribute_value == null) {
             return;
         }
         PsiElement attr_element = attribute_value.getParent();
-        if (!(attr_element instanceof XmlAttribute)) {
+        if (!XmlPsi.is_attribute(attr_element)) {
             return;
         }
         PsiFile containing_file = attr_element.getContainingFile();

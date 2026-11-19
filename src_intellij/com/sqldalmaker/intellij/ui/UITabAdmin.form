@@ -575,18 +575,9 @@
                           <text value="java.vm"/>
                         </properties>
                       </component>
-                      <component id="10764" class="javax.swing.JButton" binding="cppVmButton" default-binding="true">
-                        <constraints>
-                          <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
-                          <gridbag weightx="0.0" weighty="0.0"/>
-                        </constraints>
-                        <properties>
-                          <text value="cpp.vm"/>
-                        </properties>
-                      </component>
                       <component id="27db8" class="javax.swing.JButton" binding="pythonVmButton" default-binding="true">
                         <constraints>
-                          <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
                           <gridbag weightx="0.0" weighty="0.0"/>
                         </constraints>
                         <properties>
@@ -595,7 +586,7 @@
                       </component>
                       <component id="b9c18" class="javax.swing.JButton" binding="btn_golangVM">
                         <constraints>
-                          <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                          <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
                           <gridbag weightx="0.0" weighty="0.0"/>
                         </constraints>
                         <properties>
@@ -637,74 +628,6 @@
                         </constraints>
                         <properties>
                           <text value="Create sdm.xml"/>
-                        </properties>
-                      </component>
-                    </children>
-                  </grid>
-                  <grid id="b869b" binding="pnl_cpp" layout-manager="GridBagLayout">
-                    <constraints>
-                      <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="8" fill="2" indent="0" use-parent-layout="false"/>
-                      <gridbag weightx="0.0" weighty="0.0"/>
-                    </constraints>
-                    <properties/>
-                    <border type="none"/>
-                    <children>
-                      <component id="df8bc" class="javax.swing.JLabel">
-                        <constraints>
-                          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                          <gridbag weightx="1.0" weighty="1.0"/>
-                        </constraints>
-                        <properties>
-                          <font size="14"/>
-                          <horizontalAlignment value="4"/>
-                          <preferredSize width="58" height="20"/>
-                          <text value=" C++ "/>
-                        </properties>
-                      </component>
-                      <component id="7efb0" class="javax.swing.JButton" binding="dataStoreQt5CButton" default-binding="true">
-                        <constraints>
-                          <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
-                          <gridbag weightx="0.0" weighty="0.0"/>
-                        </constraints>
-                        <properties>
-                          <preferredSize width="60" height="30"/>
-                          <text value="Qt"/>
-                        </properties>
-                      </component>
-                      <component id="ac058" class="javax.swing.JButton" binding="dataStoreCSTLButton" default-binding="true">
-                        <constraints>
-                          <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
-                          <gridbag weightx="0.0" weighty="0.0"/>
-                        </constraints>
-                        <properties>
-                          <text value="STL, sqlite3"/>
-                        </properties>
-                      </component>
-                      <component id="660" class="javax.swing.JButton" binding="dataStoreCATLButton" default-binding="true">
-                        <constraints>
-                          <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
-                          <gridbag weightx="0.0" weighty="0.0"/>
-                        </constraints>
-                        <properties>
-                          <text value="ATL, sqlite3"/>
-                        </properties>
-                      </component>
-                      <component id="7da21" class="javax.swing.JButton" binding="btn_cpp">
-                        <constraints>
-                          <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
-                          <gridbag weightx="0.0" weighty="0.0"/>
-                        </constraints>
-                        <properties>
-                          <borderPainted value="true"/>
-                          <contentAreaFilled value="true"/>
-                          <icon value="img/xmldoc_12x12.gif"/>
-                          <margin top="0" left="0" bottom="0" right="0"/>
-                          <maximumSize width="22" height="24"/>
-                          <minimumSize width="22" height="24"/>
-                          <opaque value="true"/>
-                          <preferredSize width="22" height="24"/>
-                          <text value=""/>
-                          <toolTipText value="settings.xml"/>
                         </properties>
                       </component>
                     </children>
